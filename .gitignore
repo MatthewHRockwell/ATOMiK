@@ -1,0 +1,49 @@
+#venv
+*.venv
+
+# --- Media & Large Files ---
+# Prevent the test video from being uploaded
+your_video.mp4
+*.mp4
+*.avi
+*.mov
+*.mkv
+
+# --- Python & Jupyter ---
+# Python bytecode (garbage files)
+__pycache__/
+*.py[cod]
+
+# Jupyter Notebook checkpoints (created by Colab/Jupyter)
+.ipynb_checkpoints/
+
+# --- OS Specific ---
+# Mac
+.DS_Store
+# Windows
+Thumbs.db
+
+# --- Hardware / FPGA (Gowin & Verilog) ---
+# Simulation waveforms (These get huge, do not upload)
+*.vcd
+*.lxt
+*.wlf
+
+# Compiled simulation executables (Icarus Verilog)
+*.vvp
+a.out
+
+# Gowin EDA Build Artifacts
+# 'impl' and 'temp' contain intermediate synthesis files
+impl/
+temp/
+
+# Bitstreams (The compiled binary for the board)
+# Generally, you don't commit these to source control, 
+# but you can comment these out if you want to share the binary.
+*.fs
+*.bin
+
+# Intermediate object files
+*.o
+*.out

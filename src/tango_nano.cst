@@ -1,0 +1,29 @@
+// Sipeed Tang Nano 9K Constraints
+// Clock
+IO_LOC "clk" 52;
+IO_PORT "clk" PULL_MODE=UP;
+
+// Reset (S1 Button)
+IO_LOC "rst_n" 3;
+IO_PORT "rst_n" PULL_MODE=UP;
+
+// UART (USB-C)
+IO_LOC "uart_tx" 17;
+IO_PORT "uart_tx" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=8;
+
+IO_LOC "uart_rx" 18;
+IO_PORT "uart_rx" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=8;
+
+// LEDs (Active Low)
+IO_LOC "rx_byte[0]" 10;
+IO_PORT "rx_byte[0]" PULL_MODE=UP DRIVE=8;
+IO_LOC "rx_byte[1]" 11;
+IO_PORT "rx_byte[1]" PULL_MODE=UP DRIVE=8;
+IO_LOC "rx_byte[2]" 13;
+IO_PORT "rx_byte[2]" PULL_MODE=UP DRIVE=8;
+IO_LOC "rx_byte[3]" 14;
+IO_PORT "rx_byte[3]" PULL_MODE=UP DRIVE=8;
+IO_LOC "rx_byte[4]" 15;
+IO_PORT "rx_byte[4]" PULL_MODE=UP DRIVE=8;
+IO_LOC "rx_byte[5]" 16;
+IO_PORT "rx_byte[5]" PULL_MODE=UP DRIVE=8;

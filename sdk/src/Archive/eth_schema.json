@@ -1,0 +1,19 @@
+{
+  "meta": {
+    "name": "Ethereum Validator Node",
+    "id": "ETH_V2",
+    "industry": "CRYPTO"
+  },
+  "policy": {
+    "security_level": "PUBLIC_LEDGER",
+    "latency_guarantee": "37ns"
+  },
+  "mutation": {
+    "scramble_freq_ms": 0
+  },
+  "dna": {
+    "reg_01": "OP_HASH_KECCAK",
+    "reg_02": "OP_VERIFY_SIG",
+    "reg_03": "OP_UPDATE_LEDGER"
+  }
+}
