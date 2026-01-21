@@ -47,3 +47,6 @@ temp/
 # Intermediate object files
 *.o
 *.out
+
+# Tang Nano Documentation
+*.Tang_Nano

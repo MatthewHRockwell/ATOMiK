@@ -18,7 +18,6 @@ IO_LOC "uart_tx" 17;
 IO_PORT "uart_tx" IO_TYPE=LVCMOS33 PULL_MODE=UP;
 
 // --- LED TELEMETRY (Active Low) ---
-// Note: Backslashes removed to ensure Gowin parser compatibility
 IO_LOC "led[0]" 10;
 IO_PORT "led[0]" PULL_MODE=UP DRIVE=8;
 
