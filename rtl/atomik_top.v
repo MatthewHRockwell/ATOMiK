@@ -4,7 +4,7 @@
 // =============================================================================
 
 module atomik_top #(
-    parameter integer SYS_CLK_HZ = 81_000_000, // set to 27_000_000 when USE_PLL=0
+    parameter integer SYS_CLK_HZ = 94_500_000, // set to 27_000_000 when USE_PLL=0
     parameter integer USE_PLL    = 1           // 0 = use sys_clk directly, 1 = use PLL output
 )(
     input  wire       sys_clk,     // 27MHz onboard oscillator
@@ -24,7 +24,7 @@ module atomik_top #(
         if (USE_PLL != 0) begin : gen_pll
             // Gowin IP: atomik_pll_81m
             // Ports: (clkout, lock, reset, clkin)
-            atomik_pll_81m u_pll (
+            atomik_pll_94p5m u_pll (
                 .clkin  (sys_clk),
                 .reset  (~sys_rst_n), // PLL reset is active-HIGH
                 .clkout (clk_int),
@@ -39,7 +39,7 @@ module atomik_top #(
     // -------------------------------------------------------------------------
     // POWER-ON RESET (POR) - runs off sys_clk so POR timing is stable
     // -------------------------------------------------------------------------
-    reg [15:0] por_cnt;
+    reg [15:0] por_cnt = 16'd0;
 
     always @(posedge sys_clk or negedge sys_rst_n) begin
         if (!sys_rst_n) begin
@@ -118,7 +118,7 @@ module atomik_top #(
     // Core held in reset until BIOS asserts core_enable.
     // Force-enable is for timing/bring-up only.
     // -------------------------------------------------------------------------
-    localparam integer CORE_DEBUG_FORCE_EN = 1; // set to 0 once genome->core path is live
+    localparam integer CORE_DEBUG_FORCE_EN = 0; // set to 0 once genome->core path is live
 
     wire core_en_effective = w_core_enable | (CORE_DEBUG_FORCE_EN != 0);
     wire core_rst_n        = internal_rst_n & core_en_effective;
