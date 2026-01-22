@@ -2,7 +2,7 @@
 # ATOMiK Timing Constraints (PLL-correct, Gowin-friendly)
 #
 # Reference clock: 27 MHz  (sys_clk port)
-# Fabric clock:    94.5 MHz (PLL CLKOUT -> atomik_clk)
+# Fabric clock:    81 MHz (PLL CLKOUT -> atomik_clk)
 #
 # Notes:
 #  - sys_clk and atomik_clk are intentionally asynchronous domains in this design
@@ -16,10 +16,10 @@
 create_clock -name sys_clk -period 37.037 -waveform {0 18.518} [get_ports {sys_clk}]
 
 # -----------------------------------------------------------------------------
-# 2) Fabric clock (PLL output) @ 94.5 MHz
+# 2) Fabric clock (PLL output) @ 81 MHz
 #    Use the exact pin path reported in your Clock Summary "Objects" column.
 # -----------------------------------------------------------------------------
-create_clock -name atomik_clk -period 10.582 -waveform {0 5.291} [get_pins {gen_pll.u_pll/rpll_inst/CLKOUT}]
+create_clock -name atomik_clk -period 12.346 -waveform {0 6.173} [get_pins {gen_pll.u_pll/rpll_inst/CLKOUT}]
 
 # -----------------------------------------------------------------------------
 # 3) Declare the two clock domains asynchronous

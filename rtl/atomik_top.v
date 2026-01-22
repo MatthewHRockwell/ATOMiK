@@ -4,7 +4,7 @@
 // =============================================================================
 
 module atomik_top #(
-    parameter integer SYS_CLK_HZ = 94_500_000, // set to 27_000_000 when USE_PLL=0
+    parameter integer SYS_CLK_HZ = 81_000_000, // set to 27_000_000 when USE_PLL=0
     parameter integer USE_PLL    = 1           // 0 = use sys_clk directly, 1 = use PLL output
 )(
     input  wire       sys_clk,     // 27MHz onboard oscillator
@@ -24,7 +24,7 @@ module atomik_top #(
         if (USE_PLL != 0) begin : gen_pll
             // Gowin IP: atomik_pll_81m
             // Ports: (clkout, lock, reset, clkin)
-            atomik_pll_94p5m u_pll (
+            atomik_pll_81m u_pll (
                 .clkin  (sys_clk),
                 .reset  (~sys_rst_n), // PLL reset is active-HIGH
                 .clkout (clk_int),
