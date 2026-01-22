@@ -40,6 +40,30 @@ From the report:
   - Frequency: ~80.998 MHz
   - Object: `gen_pll.u_pll/rpll_inst/CLKOUT`
 
+#### Example (94.5 MHz baseline — tight but clean)
+
+From the 94.5 MHz timing-clean run:
+
+- Constraint: **94.500 MHz**
+- Actual Fmax: **94.598 MHz**
+- Worst setup slack (Path 1): **+0.011 ns** (near-edge; treat as “clean but marginal”)
+
+Representative excerpts:
+
+```text
+Max Frequency Summary:
+  atomik_clk  94.500(MHz)  94.598(MHz)  Logic Level: 4
+```
+
+```text
+Setup Paths Table (Path 1):
+  Path Slack: 0.011
+  From: bios_inst/rx_sync_0_s0/Q
+  To:   bios_inst/uart_state_0_s0/CE
+  Data Delay: 10.528
+```
+
+
 You may also see Generated clocks such as:
 - `gen_pll.u_pll/rpll_inst/CLKOUTP.default_gen_clk`
 - `.../CLKOUTD.default_gen_clk`

@@ -41,14 +41,15 @@ Example wrapper signature:
 
 | Name / Module | Target MHz | FCLKIN | IDIV | FBDIV | ODIV | Notes |
 |--------------|-----------:|-------:|-----:|------:|-----:|------|
-| atomik_pll_81m  | 81  | 27 |     |      |     | Baseline PLL bring-up |
-| atomik_pll_96m  | 96  | 27 |     |      |     | First step above baseline |
-| atomik_pll_108m | 108 | 27 |     |      |     | First >100 MHz milestone |
-| atomik_pll_120m | 120 | 27 |     |      |     | Stretch |
-| atomik_pll_135m | 135 | 27 |     |      |     | Optional |
-| atomik_pll_150m | 150 | 27 |     |      |     | Optional |
+| atomik_pll_81m    | 81.0  | 27 |     |      |     | Baseline PLL bring-up |
+| atomik_pll_94p5m  | 94.5  | 27 | 1   | 6    | 8   | Current timing-clean baseline (UI-legal; replaced 96 MHz target) |
+| atomik_pll_96m    | 96.0  | 27 |     |      |     | UI target only; not reachable in rPLL UI (do not use unless proven achievable) |
+| atomik_pll_108m   | 108.0 | 27 |     |      |     | Candidate >100 MHz milestone (UI-dependent) |
+| atomik_pll_120m   | 120.0 | 27 |     |      |     | Candidate stretch (UI-dependent) |
+| atomik_pll_135m   | 135.0 | 27 |     |      |     | Optional (UI-dependent) |
+| atomik_pll_150m   | 150.0 | 27 |     |      |     | Optional (UI-dependent) |
 
-Fill in divisors based on generated wrapper `defparam` lines.
+Fill in divisors based on generated wrapper `defparam` lines. based on generated wrapper `defparam` lines.
 
 ---
 
@@ -72,6 +73,25 @@ Notes:
 - Lock must be stable before releasing fabric reset.
 - Ensure SDC defines `atomik_clk` on PLL CLKOUT object.
 
+
+### atomik_pll_94p5m
+- File: `rtl/pll/atomik_pll_94p5m.v`
+- Output used: CLKOUT
+- Reset polarity into PLL: active-high (`RESET(reset)`)
+
+Defparams (from generated wrapper):
+- FCLKIN = "27"
+- DYN_IDIV_SEL = "false" ; IDIV_SEL = 1
+- DYN_FBDIV_SEL = "false" ; FBDIV_SEL = 6
+- DYN_ODIV_SEL = "false" ; ODIV_SEL = 8
+- DYN_DA_EN = "false"
+- PSDA_SEL = "0000" ; DUTYDA_SEL = "1000"
+- CLKFB_SEL = "internal"
+- DEVICE = "GW1NR-9C"
+
+Notes:
+- This is the timing-clean 94.5 MHz fabric clock baseline.
+- rPLL UI frequency selection is quantized; do not assume 96.0 MHz is reachable even if math suggests it.
 ### atomik_pll_108m
 (same template)
 

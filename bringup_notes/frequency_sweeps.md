@@ -33,10 +33,11 @@ Purpose: Establish a disciplined, reproducible process to scale ATOMiK frequency
 ### Step 1 — Choose target frequency
 Select next target in sequence (recommended):
 - 81 MHz (baseline PLL bring-up)
-- 96 MHz
-- 108 MHz (first “over 100” milestone)
-- 120 MHz
-- 135 MHz (optional stretch)
+- 94.5 MHz (baseline; UI-legal replacement for 96 MHz)
+- Next UI-legal step above 94.5 MHz (discover via rPLL "Calculate"; record exact value)
+- 108 MHz (candidate “over 100” milestone; UI-dependent)
+- 120 MHz (candidate stretch; UI-dependent)
+- 135 MHz (optional stretch; UI-dependent)
 - 150 MHz (optional stretch; expect redesign/CDC/pipelining)
 
 ### Step 2 — Generate / select PLL variant

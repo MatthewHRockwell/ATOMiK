@@ -28,12 +28,14 @@ A baseline is “known good” only if all are true:
 
 | Baseline ID | Date | Fabric Clock | PLL | STA Status | HW Status | Notes |
 |------------|------|-------------:|-----|-----------:|----------:|------|
-| BL-81-PLL  |      | 81 MHz | Yes | Pass | Pass | First PLL-closed baseline |
-| BL-27-NO-PLL |   | 27 MHz | No  | Pass | Pass | Debug baseline |
-| BL-96-PLL  |      | 96 MHz | Yes |     |     | Candidate baseline |
-| BL-108-PLL |      | 108 MHz | Yes |     |     | “Over 100” milestone candidate |
+| BL-81-PLL    | 2026-01-21 | 81.0 MHz  | Yes | Pass | Pass | First PLL-closed baseline |
+| BL-94p5-PLL  | 2026-01-21 | 94.5 MHz  | Yes | Pass | Pass | Current timing-clean baseline (UI-legal; replaced 96 MHz target) |
+| BL-27-NO-PLL |            | 27.0 MHz  | No  | Pass | Pass | Debug baseline |
+| BL-96-PLL    |            | 96.0 MHz  | Yes | N/A  | N/A  | UI target only; not reachable in rPLL UI (do not pursue unless proven achievable) |
+| BL-108-PLL   |            | 108.0 MHz | Yes |      |      | “Over 100” milestone candidate (UI-dependent) |
 
 ---
+
 
 # Baseline Record Template (Copy/Paste)
 
@@ -174,6 +176,97 @@ Following the procedure defined in:
 - `bringup_notes/frequency_sweeps.md`
 
 ---
+
+## Baseline: BL-94p5-PLL
+
+**Date created:** 2026-01-21  
+**Git/Tag (if applicable):** `v94p5_pll_timing_clean` *(recommended tag name)*  
+**Device:** GW1NR-LV9QN88PC6/I5 (Tang Nano 9K)  
+**Toolchain:** Gowin IDE (Education) v1.9.11.03  
+
+---
+
+### Clocking
+
+- **sys_clk (reference):**
+  - Source: Top-level port `sys_clk`
+  - Frequency (Clock Summary): **27.000 MHz**
+  - Period: 37.037 ns
+
+- **fabric clock name:** `atomik_clk`
+- **fabric clock source:** PLL `CLKOUT`
+- **PLL module:** `atomik_pll_94p5m`
+- **fabric clock frequency (Clock Summary / constraint):** **94.500 MHz**
+- **fabric clock period:** 10.582 ns
+- **PLL lock used to gate reset:** **Yes**
+
+**Clock object used in SDC:**
+
+```yaml
+gen_pll.u_pll/rpll_inst/CLKOUT
+```
+
+---
+
+### Constraints
+
+- **SDC file:** `constraints/timing_constraints.sdc`
+
+**create_clock definitions:**
+- `sys_clk`: 37.037 ns (27.000 MHz)
+- `atomik_clk`: 10.582 ns (94.500 MHz)
+
+**IO delays:**
+- `uart_rx`: max 2.0 ns (relative to `atomik_clk`)
+- `uart_tx`: max 2.0 ns (relative to `atomik_clk`)
+
+**False paths:**
+- Reset (`sys_rst_n`): Yes
+- LEDs (`led[*]`): Yes
+
+---
+
+### STA Snapshot (Post-P&R)
+
+**Max Frequency Summary**
+- `atomik_clk` constraint: **94.500 MHz**
+- `atomik_clk` actual Fmax: **94.598 MHz**
+- Logic levels (critical paths): **4**
+
+**Setup Timing**
+- Violations: **0**
+- TNS: **0.000**
+- Worst path slack (Path 1): **+0.011 ns**
+
+**Hold Timing**
+- Violations: **0**
+- TNS: **0.000**
+
+**Worst Setup Path (by slack)**
+- From: `bios_inst/rx_sync_0_s0/Q`
+- To: `bios_inst/uart_state_0_s0/CE`
+- Slack: **+0.011 ns**
+- Data delay: 10.528 ns
+- Clock: `atomik_clk` → `atomik_clk`
+
+---
+
+### Hardware Validation Checklist
+
+- Bitstream programs reliably: **Pass**
+- PLL lock stable: **Pass**
+- Reset release stable (POR + PLL lock + sync): **Pass**
+- UART stable @ 115200: **Pass**
+- BIOS behavior repeatable: **Pass**
+- Loader behavior repeatable: **Pass**
+- Core logic retained (not swept): **Pass**
+
+---
+
+### Notes
+
+- This baseline replaces the earlier “96 MHz” target because the rPLL UI cannot generate an exact 96.0 MHz CLKOUT for legal divider combinations.
+- Margin is small (**+0.011 ns** worst slack). Treat this as timing-clean but near the edge; further frequency increases should be done via UI-legal steps and justified strictly by STA.
 
 ## Baseline: BL-96-PLL (Skeleton)
 
