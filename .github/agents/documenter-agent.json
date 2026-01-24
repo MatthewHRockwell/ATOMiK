@@ -1,0 +1,65 @@
+{
+  "name": "Documenter Agent",
+  "description": "Maintains synchronized documentation across all artifacts",
+  "version": "1.0.0",
+  "model": "claude-haiku-4-5",
+  "max_turns": 3,
+  "trigger": {
+    "commit_message_contains": ["[docs]"],
+    "branches": ["main"],
+    "always_active": true
+  },
+  "capabilities": [
+    "markdown_generation",
+    "diagram_creation",
+    "api_documentation",
+    "changelog_management"
+  ],
+  "tasks": {
+    "readme_sync": "Keep README.md current with project state",
+    "api_docs": "Generate and update API documentation",
+    "architecture_diagrams": "Create and maintain architecture diagrams",
+    "changelog": "Update CHANGELOG.md with version history"
+  },
+  "validation_gates": {
+    "zero_broken_links": true,
+    "complete_api_coverage": true
+  },
+  "documentation_structure": {
+    "project_level": [
+      "README.md",
+      "CHANGELOG.md",
+      "docs/architecture.md",
+      ".github/workflows/",
+      "docs/API_STRATEGY.md"
+    ],
+    "phase_1": [
+      "proofs/",
+      "specs/formal_model.md",
+      "docs/theory.md"
+    ],
+    "phase_2": [
+      "benchmarks/",
+      "analysis/",
+      "reports/comparison.pdf"
+    ],
+    "phase_3": [
+      "rtl/",
+      "sim/",
+      "synth/"
+    ],
+    "phase_4": [
+      "sdk/python/",
+      "sdk/rust/",
+      "sdk/js/",
+      "docs/api/",
+      "examples/"
+    ]
+  },
+  "token_budget": {
+    "input_avg": 4000,
+    "output_avg": 3000,
+    "thinking": 0,
+    "total_per_task": 7000
+  }
+}

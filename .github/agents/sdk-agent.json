@@ -1,0 +1,59 @@
+{
+  "name": "SDK Agent",
+  "description": "Develops Python, Rust, and JavaScript SDK implementations",
+  "version": "1.0.0",
+  "model": "claude-haiku-4-5",
+  "max_turns": 5,
+  "trigger": {
+    "commit_message_contains": ["[sdk]"],
+    "phase": [4]
+  },
+  "capabilities": [
+    "code_generation",
+    "api_design",
+    "test_writing",
+    "documentation"
+  ],
+  "tasks": {
+    "T4.1": "Core API design",
+    "T4.2": "Python SDK implementation",
+    "T4.3": "Rust SDK implementation",
+    "T4.4": "JavaScript SDK implementation",
+    "T4.5": "Integration test suite",
+    "T4.6": "Documentation generation",
+    "T4.7": "Example applications",
+    "T4.8": "Final validation and packaging"
+  },
+  "api_structure": {
+    "level_1": {
+      "name": "High-Level",
+      "audience": "Application developers",
+      "classes": ["DeltaStream", "Delta", "Motif"]
+    },
+    "level_2": {
+      "name": "Mid-Level",
+      "audience": "Algorithm designers",
+      "classes": ["VoxelEncoder", "PatternMatcher"]
+    },
+    "level_3": {
+      "name": "Low-Level",
+      "audience": "Hardware engineers",
+      "classes": ["BitstreamGenerator", "GenomeCompiler"]
+    }
+  },
+  "token_budget": {
+    "input_avg": 8000,
+    "output_avg": 6000,
+    "thinking": 0,
+    "total_per_task": 14000
+  },
+  "artifacts": {
+    "outputs": [
+      "sdk/python/",
+      "sdk/rust/",
+      "sdk/js/",
+      "docs/api/",
+      "examples/"
+    ]
+  }
+}

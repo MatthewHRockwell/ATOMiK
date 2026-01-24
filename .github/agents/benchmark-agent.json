@@ -1,0 +1,44 @@
+{
+  "name": "Benchmark Agent",
+  "description": "Executes SCORE comparison benchmarks and statistical validation",
+  "version": "1.0.0",
+  "model": "claude-sonnet-4-5",
+  "max_turns": 10,
+  "trigger": {
+    "commit_message_contains": ["[benchmark]"],
+    "phase": [2]
+  },
+  "capabilities": [
+    "benchmark_execution",
+    "statistical_analysis",
+    "report_generation"
+  ],
+  "tasks": {
+    "T2.1": "Design benchmark suite",
+    "T2.2": "Implement baseline (traditional stateful)",
+    "T2.3": "Implement ATOMiK variant",
+    "T2.4": "Define metrics framework",
+    "T2.5": "Execute memory efficiency benchmarks",
+    "T2.6": "Execute computational overhead benchmarks",
+    "T2.7": "Execute scalability benchmarks",
+    "T2.8": "Statistical analysis and visualization",
+    "T2.9": "Generate comparison report"
+  },
+  "validation_gates": {
+    "benchmarks_passed": true,
+    "statistical_significance": "pending"
+  },
+  "token_budget": {
+    "input_avg": 6000,
+    "output_avg": 3000,
+    "thinking": 8000,
+    "total_per_task": 17000
+  },
+  "artifacts": {
+    "outputs": [
+      "benchmarks/",
+      "analysis/",
+      "reports/comparison.pdf"
+    ]
+  }
+}
