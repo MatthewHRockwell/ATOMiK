@@ -1,0 +1,541 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
+<title>atomik_sdk.motifs API documentation</title>
+<meta name="description" content="Motif Module - Pattern vocabulary for delta classification …">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>atomik_sdk.motifs</code></h1>
+</header>
+<section id="section-intro">
+<p>Motif Module - Pattern vocabulary for delta classification.</p>
+<p>This module defines the Motif enumeration and pattern matching utilities
+for classifying 64-bit delta words into semantic motion categories.</p>
+<p>The motif vocabulary is designed to achieve 1000:1+ compression ratios
+by mapping common delta patterns to compact 4-bit identifiers.</p>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="atomik_sdk.motifs.bytes_to_motif"><code class="name flex">
+<span>def <span class="ident">bytes_to_motif</span></span>(<span>data: bytes) ‑> <a title="atomik_sdk.motifs.Motif" href="#atomik_sdk.motifs.Motif">Motif</a></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def bytes_to_motif(data: bytes) -&gt; Motif:
+    &#34;&#34;&#34;
+    Decode a motif from a byte.
+
+    Args:
+        data: Byte data to decode.
+
+    Returns:
+        The decoded Motif.
+
+    Raises:
+        ValueError: If the byte value is invalid.
+    &#34;&#34;&#34;
+    if len(data) &lt; 1:
+        raise ValueError(&#34;Empty byte sequence&#34;)
+
+    value = data[0] &amp; 0x0F  # Only use lower 4 bits
+    return Motif(value)</code></pre>
+</details>
+<div class="desc"><p>Decode a motif from a byte.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>data</code></strong></dt>
+<dd>Byte data to decode.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>The decoded Motif.</p>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If the byte value is invalid.</dd>
+</dl></div>
+</dd>
+<dt id="atomik_sdk.motifs.classify_delta"><code class="name flex">
+<span>def <span class="ident">classify_delta</span></span>(<span>delta_word: int) ‑> <a title="atomik_sdk.motifs.Motif" href="#atomik_sdk.motifs.Motif">Motif</a></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def classify_delta(delta_word: int) -&gt; Motif:
+    &#34;&#34;&#34;
+    Classify a 64-bit delta word into a motif category.
+
+    The classification uses a combination of bit population count,
+    bit position analysis, and pattern matching against known signatures.
+
+    Args:
+        delta_word: The 64-bit XOR result to classify.
+
+    Returns:
+        The classified Motif.
+
+    Example:
+        &gt;&gt;&gt; motif = classify_delta(0xFF00000000000000)
+        &gt;&gt;&gt; print(motif)  # Motif.HORIZONTAL_MOTION
+    &#34;&#34;&#34;
+    if delta_word == 0:
+        return Motif.STATIC
+
+    # Count bits first for density-based classification
+    bit_count = bin(delta_word).count(&#34;1&#34;)
+
+    # Very sparse patterns are noise
+    if bit_count &lt;= 2:
+        return Motif.NOISE
+
+    # Very dense patterns (&gt;40 bits) are expansion or flicker
+    # Check this BEFORE signature matching to avoid false positives
+    if bit_count &gt; 40:
+        return Motif.EXPANSION
+
+    # Check against known signatures for medium-density patterns
+    for motif, signatures in MOTIF_SIGNATURES.items():
+        for sig in signatures:
+            # Allow for partial matches (&gt;70% overlap)
+            overlap = bin(delta_word &amp; sig).count(&#34;1&#34;)
+            sig_bits = bin(sig).count(&#34;1&#34;)
+            if sig_bits &gt; 0 and overlap / sig_bits &gt; 0.7:
+                return motif
+
+    # Fallback to heuristic classification for remaining patterns
+
+    # Analyze bit distribution
+    upper_32 = (delta_word &gt;&gt; 32) &amp; 0xFFFFFFFF
+    lower_32 = delta_word &amp; 0xFFFFFFFF
+
+    upper_bits = bin(upper_32).count(&#34;1&#34;)
+    lower_bits = bin(lower_32).count(&#34;1&#34;)
+
+    if abs(upper_bits - lower_bits) &gt; 10:
+        return Motif.VERTICAL_MOTION
+
+    # Check for horizontal patterns (consecutive bytes)
+    byte_counts = []
+    for i in range(8):
+        byte_val = (delta_word &gt;&gt; (i * 8)) &amp; 0xFF
+        byte_counts.append(bin(byte_val).count(&#34;1&#34;))
+
+    # High variance in byte population suggests horizontal motion
+    mean_count = sum(byte_counts) / 8
+    variance = sum((x - mean_count) ** 2 for x in byte_counts) / 8
+    if variance &gt; 10:
+        return Motif.HORIZONTAL_MOTION
+
+    # Default classification based on density
+    if bit_count &gt; 20:
+        return Motif.FLICKER
+    else:
+        return Motif.NOISE</code></pre>
+</details>
+<div class="desc"><p>Classify a 64-bit delta word into a motif category.</p>
+<p>The classification uses a combination of bit population count,
+bit position analysis, and pattern matching against known signatures.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>delta_word</code></strong></dt>
+<dd>The 64-bit XOR result to classify.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>The classified Motif.</p>
+<h2 id="example">Example</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; motif = classify_delta(0xFF00000000000000)
+&gt;&gt;&gt; print(motif)  # Motif.HORIZONTAL_MOTION
+</code></pre></div>
+</dd>
+<dt id="atomik_sdk.motifs.get_compression_stats"><code class="name flex">
+<span>def <span class="ident">get_compression_stats</span></span>(<span>motifs: list[<a title="atomik_sdk.motifs.Motif" href="#atomik_sdk.motifs.Motif">Motif</a>]) ‑> dict[str, float]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_compression_stats(motifs: list[Motif]) -&gt; dict[str, float]:
+    &#34;&#34;&#34;
+    Calculate compression statistics for a sequence of motifs.
+
+    Args:
+        motifs: List of classified motifs.
+
+    Returns:
+        Dictionary with compression statistics.
+    &#34;&#34;&#34;
+    if not motifs:
+        return {&#34;compression_ratio&#34;: 0.0, &#34;entropy&#34;: 0.0}
+
+    # Original: 64 bits per delta
+    # Compressed: 4 bits per motif
+    original_bits = len(motifs) * 64
+    compressed_bits = len(motifs) * 4
+
+    compression_ratio = original_bits / compressed_bits if compressed_bits &gt; 0 else 0
+
+    # Calculate entropy
+    counts = Counter(motifs)
+    total = len(motifs)
+    entropy = 0.0
+
+    for count in counts.values():
+        if count &gt; 0:
+            p = count / total
+            entropy -= p * math.log2(p)
+
+    return {
+        &#34;compression_ratio&#34;: compression_ratio,
+        &#34;entropy&#34;: entropy,
+        &#34;unique_motifs&#34;: len(counts),
+        &#34;dominant_motif&#34;: counts.most_common(1)[0][0].name if counts else None,
+    }</code></pre>
+</details>
+<div class="desc"><p>Calculate compression statistics for a sequence of motifs.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>motifs</code></strong></dt>
+<dd>List of classified motifs.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>Dictionary with compression statistics.</p></div>
+</dd>
+<dt id="atomik_sdk.motifs.get_motif_name"><code class="name flex">
+<span>def <span class="ident">get_motif_name</span></span>(<span>motif: <a title="atomik_sdk.motifs.Motif" href="#atomik_sdk.motifs.Motif">Motif</a>) ‑> str</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_motif_name(motif: Motif) -&gt; str:
+    &#34;&#34;&#34;
+    Get a human-readable name for a motif.
+
+    Args:
+        motif: The Motif to describe.
+
+    Returns:
+        Human-readable string description.
+    &#34;&#34;&#34;
+    names = {
+        Motif.STATIC: &#34;No Motion&#34;,
+        Motif.HORIZONTAL_MOTION: &#34;Horizontal Motion&#34;,
+        Motif.VERTICAL_MOTION: &#34;Vertical Motion&#34;,
+        Motif.DIAGONAL_NE: &#34;Diagonal (NE)&#34;,
+        Motif.DIAGONAL_NW: &#34;Diagonal (NW)&#34;,
+        Motif.DIAGONAL_SE: &#34;Diagonal (SE)&#34;,
+        Motif.DIAGONAL_SW: &#34;Diagonal (SW)&#34;,
+        Motif.EXPANSION: &#34;Expansion&#34;,
+        Motif.CONTRACTION: &#34;Contraction&#34;,
+        Motif.ROTATION_CW: &#34;Clockwise Rotation&#34;,
+        Motif.ROTATION_CCW: &#34;Counter-Clockwise Rotation&#34;,
+        Motif.FLICKER: &#34;Flicker&#34;,
+        Motif.EDGE_APPEAR: &#34;Edge Appearing&#34;,
+        Motif.EDGE_DISAPPEAR: &#34;Edge Disappearing&#34;,
+        Motif.NOISE: &#34;Noise&#34;,
+        Motif.RESERVED: &#34;Reserved&#34;,
+    }
+    return names.get(motif, &#34;Unknown&#34;)</code></pre>
+</details>
+<div class="desc"><p>Get a human-readable name for a motif.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>motif</code></strong></dt>
+<dd>The Motif to describe.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>Human-readable string description.</p></div>
+</dd>
+<dt id="atomik_sdk.motifs.motif_to_bytes"><code class="name flex">
+<span>def <span class="ident">motif_to_bytes</span></span>(<span>motif: <a title="atomik_sdk.motifs.Motif" href="#atomik_sdk.motifs.Motif">Motif</a>) ‑> bytes</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def motif_to_bytes(motif: Motif) -&gt; bytes:
+    &#34;&#34;&#34;
+    Encode a motif as a single byte.
+
+    Args:
+        motif: The Motif to encode.
+
+    Returns:
+        Single byte representation.
+    &#34;&#34;&#34;
+    return bytes([motif.value])</code></pre>
+</details>
+<div class="desc"><p>Encode a motif as a single byte.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>motif</code></strong></dt>
+<dd>The Motif to encode.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>Single byte representation.</p></div>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="atomik_sdk.motifs.Motif"><code class="flex name class">
+<span>class <span class="ident">Motif</span></span>
+<span>(</span><span>*args, **kwds)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Motif(IntEnum):
+    &#34;&#34;&#34;
+    Enumeration of delta pattern motifs.
+
+    Each motif represents a semantic category of motion or change
+    that can be efficiently encoded in 4 bits (16 possible values).
+
+    Attributes:
+        STATIC: No change detected (0x0000000000000000)
+        HORIZONTAL_MOTION: Left-to-right or right-to-left movement
+        VERTICAL_MOTION: Up-to-down or down-to-up movement
+        DIAGONAL_NE: Northeast diagonal movement
+        DIAGONAL_NW: Northwest diagonal movement
+        DIAGONAL_SE: Southeast diagonal movement
+        DIAGONAL_SW: Southwest diagonal movement
+        EXPANSION: Outward growth pattern
+        CONTRACTION: Inward shrinking pattern
+        ROTATION_CW: Clockwise rotation
+        ROTATION_CCW: Counter-clockwise rotation
+        FLICKER: High-frequency oscillation
+        EDGE_APPEAR: New edge formation
+        EDGE_DISAPPEAR: Edge dissolution
+        NOISE: Random/unclassified pattern
+        RESERVED: Reserved for future use
+    &#34;&#34;&#34;
+
+    STATIC = 0
+    HORIZONTAL_MOTION = 1
+    VERTICAL_MOTION = 2
+    DIAGONAL_NE = 3
+    DIAGONAL_NW = 4
+    DIAGONAL_SE = 5
+    DIAGONAL_SW = 6
+    EXPANSION = 7
+    CONTRACTION = 8
+    ROTATION_CW = 9
+    ROTATION_CCW = 10
+    FLICKER = 11
+    EDGE_APPEAR = 12
+    EDGE_DISAPPEAR = 13
+    NOISE = 14
+    RESERVED = 15</code></pre>
+</details>
+<div class="desc"><p>Enumeration of delta pattern motifs.</p>
+<p>Each motif represents a semantic category of motion or change
+that can be efficiently encoded in 4 bits (16 possible values).</p>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>STATIC</code></strong></dt>
+<dd>No change detected (0x0000000000000000)</dd>
+<dt><strong><code>HORIZONTAL_MOTION</code></strong></dt>
+<dd>Left-to-right or right-to-left movement</dd>
+<dt><strong><code>VERTICAL_MOTION</code></strong></dt>
+<dd>Up-to-down or down-to-up movement</dd>
+<dt><strong><code>DIAGONAL_NE</code></strong></dt>
+<dd>Northeast diagonal movement</dd>
+<dt><strong><code>DIAGONAL_NW</code></strong></dt>
+<dd>Northwest diagonal movement</dd>
+<dt><strong><code>DIAGONAL_SE</code></strong></dt>
+<dd>Southeast diagonal movement</dd>
+<dt><strong><code>DIAGONAL_SW</code></strong></dt>
+<dd>Southwest diagonal movement</dd>
+<dt><strong><code>EXPANSION</code></strong></dt>
+<dd>Outward growth pattern</dd>
+<dt><strong><code>CONTRACTION</code></strong></dt>
+<dd>Inward shrinking pattern</dd>
+<dt><strong><code>ROTATION_CW</code></strong></dt>
+<dd>Clockwise rotation</dd>
+<dt><strong><code>ROTATION_CCW</code></strong></dt>
+<dd>Counter-clockwise rotation</dd>
+<dt><strong><code>FLICKER</code></strong></dt>
+<dd>High-frequency oscillation</dd>
+<dt><strong><code>EDGE_APPEAR</code></strong></dt>
+<dd>New edge formation</dd>
+<dt><strong><code>EDGE_DISAPPEAR</code></strong></dt>
+<dd>Edge dissolution</dd>
+<dt><strong><code>NOISE</code></strong></dt>
+<dd>Random/unclassified pattern</dd>
+<dt><strong><code>RESERVED</code></strong></dt>
+<dd>Reserved for future use</dd>
+</dl></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>enum.IntEnum</li>
+<li>builtins.int</li>
+<li>enum.ReprEnum</li>
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="atomik_sdk.motifs.Motif.CONTRACTION"><code class="name">var <span class="ident">CONTRACTION</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.motifs.Motif.DIAGONAL_NE"><code class="name">var <span class="ident">DIAGONAL_NE</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.motifs.Motif.DIAGONAL_NW"><code class="name">var <span class="ident">DIAGONAL_NW</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.motifs.Motif.DIAGONAL_SE"><code class="name">var <span class="ident">DIAGONAL_SE</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.motifs.Motif.DIAGONAL_SW"><code class="name">var <span class="ident">DIAGONAL_SW</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.motifs.Motif.EDGE_APPEAR"><code class="name">var <span class="ident">EDGE_APPEAR</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.motifs.Motif.EDGE_DISAPPEAR"><code class="name">var <span class="ident">EDGE_DISAPPEAR</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.motifs.Motif.EXPANSION"><code class="name">var <span class="ident">EXPANSION</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.motifs.Motif.FLICKER"><code class="name">var <span class="ident">FLICKER</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.motifs.Motif.HORIZONTAL_MOTION"><code class="name">var <span class="ident">HORIZONTAL_MOTION</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.motifs.Motif.NOISE"><code class="name">var <span class="ident">NOISE</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.motifs.Motif.RESERVED"><code class="name">var <span class="ident">RESERVED</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.motifs.Motif.ROTATION_CCW"><code class="name">var <span class="ident">ROTATION_CCW</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.motifs.Motif.ROTATION_CW"><code class="name">var <span class="ident">ROTATION_CW</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.motifs.Motif.STATIC"><code class="name">var <span class="ident">STATIC</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.motifs.Motif.VERTICAL_MOTION"><code class="name">var <span class="ident">VERTICAL_MOTION</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="atomik_sdk" href="index.html">atomik_sdk</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="atomik_sdk.motifs.bytes_to_motif" href="#atomik_sdk.motifs.bytes_to_motif">bytes_to_motif</a></code></li>
+<li><code><a title="atomik_sdk.motifs.classify_delta" href="#atomik_sdk.motifs.classify_delta">classify_delta</a></code></li>
+<li><code><a title="atomik_sdk.motifs.get_compression_stats" href="#atomik_sdk.motifs.get_compression_stats">get_compression_stats</a></code></li>
+<li><code><a title="atomik_sdk.motifs.get_motif_name" href="#atomik_sdk.motifs.get_motif_name">get_motif_name</a></code></li>
+<li><code><a title="atomik_sdk.motifs.motif_to_bytes" href="#atomik_sdk.motifs.motif_to_bytes">motif_to_bytes</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="atomik_sdk.motifs.Motif" href="#atomik_sdk.motifs.Motif">Motif</a></code></h4>
+<ul class="two-column">
+<li><code><a title="atomik_sdk.motifs.Motif.CONTRACTION" href="#atomik_sdk.motifs.Motif.CONTRACTION">CONTRACTION</a></code></li>
+<li><code><a title="atomik_sdk.motifs.Motif.DIAGONAL_NE" href="#atomik_sdk.motifs.Motif.DIAGONAL_NE">DIAGONAL_NE</a></code></li>
+<li><code><a title="atomik_sdk.motifs.Motif.DIAGONAL_NW" href="#atomik_sdk.motifs.Motif.DIAGONAL_NW">DIAGONAL_NW</a></code></li>
+<li><code><a title="atomik_sdk.motifs.Motif.DIAGONAL_SE" href="#atomik_sdk.motifs.Motif.DIAGONAL_SE">DIAGONAL_SE</a></code></li>
+<li><code><a title="atomik_sdk.motifs.Motif.DIAGONAL_SW" href="#atomik_sdk.motifs.Motif.DIAGONAL_SW">DIAGONAL_SW</a></code></li>
+<li><code><a title="atomik_sdk.motifs.Motif.EDGE_APPEAR" href="#atomik_sdk.motifs.Motif.EDGE_APPEAR">EDGE_APPEAR</a></code></li>
+<li><code><a title="atomik_sdk.motifs.Motif.EDGE_DISAPPEAR" href="#atomik_sdk.motifs.Motif.EDGE_DISAPPEAR">EDGE_DISAPPEAR</a></code></li>
+<li><code><a title="atomik_sdk.motifs.Motif.EXPANSION" href="#atomik_sdk.motifs.Motif.EXPANSION">EXPANSION</a></code></li>
+<li><code><a title="atomik_sdk.motifs.Motif.FLICKER" href="#atomik_sdk.motifs.Motif.FLICKER">FLICKER</a></code></li>
+<li><code><a title="atomik_sdk.motifs.Motif.HORIZONTAL_MOTION" href="#atomik_sdk.motifs.Motif.HORIZONTAL_MOTION">HORIZONTAL_MOTION</a></code></li>
+<li><code><a title="atomik_sdk.motifs.Motif.NOISE" href="#atomik_sdk.motifs.Motif.NOISE">NOISE</a></code></li>
+<li><code><a title="atomik_sdk.motifs.Motif.RESERVED" href="#atomik_sdk.motifs.Motif.RESERVED">RESERVED</a></code></li>
+<li><code><a title="atomik_sdk.motifs.Motif.ROTATION_CCW" href="#atomik_sdk.motifs.Motif.ROTATION_CCW">ROTATION_CCW</a></code></li>
+<li><code><a title="atomik_sdk.motifs.Motif.ROTATION_CW" href="#atomik_sdk.motifs.Motif.ROTATION_CW">ROTATION_CW</a></code></li>
+<li><code><a title="atomik_sdk.motifs.Motif.STATIC" href="#atomik_sdk.motifs.Motif.STATIC">STATIC</a></code></li>
+<li><code><a title="atomik_sdk.motifs.Motif.VERTICAL_MOTION" href="#atomik_sdk.motifs.Motif.VERTICAL_MOTION">VERTICAL_MOTION</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+</body>
+</html>

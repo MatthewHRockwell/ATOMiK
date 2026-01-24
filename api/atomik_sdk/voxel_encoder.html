@@ -1,0 +1,637 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
+<title>atomik_sdk.voxel_encoder API documentation</title>
+<meta name="description" content="Voxel Encoder Module - Mid-level API for spatiotemporal encoding …">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>atomik_sdk.voxel_encoder</code></h1>
+</header>
+<section id="section-intro">
+<p>Voxel Encoder Module - Mid-level API for spatiotemporal encoding.</p>
+<p>This module provides the VoxelEncoder class for converting video frames
+into ATOMiK's 4x4x4 voxel representation with configurable binarization.</p>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="atomik_sdk.voxel_encoder.TileMethod"><code class="flex name class">
+<span>class <span class="ident">TileMethod</span></span>
+<span>(</span><span>*args, **kwds)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class TileMethod(Enum):
+    &#34;&#34;&#34;Binarization methods for tile processing.&#34;&#34;&#34;
+
+    OTSU = auto()
+    MEAN = auto()
+    ADAPTIVE = auto()
+    FIXED = auto()</code></pre>
+</details>
+<div class="desc"><p>Binarization methods for tile processing.</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="atomik_sdk.voxel_encoder.TileMethod.ADAPTIVE"><code class="name">var <span class="ident">ADAPTIVE</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.voxel_encoder.TileMethod.FIXED"><code class="name">var <span class="ident">FIXED</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.voxel_encoder.TileMethod.MEAN"><code class="name">var <span class="ident">MEAN</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.voxel_encoder.TileMethod.OTSU"><code class="name">var <span class="ident">OTSU</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.voxel_encoder.Voxel"><code class="flex name class">
+<span>class <span class="ident">Voxel</span></span>
+<span>(</span><span>word: int, position: tuple[int, int, int], tile_stats: dict | None = None)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass
+class Voxel:
+    &#34;&#34;&#34;
+    A 4x4x4 spatiotemporal voxel encoded as a 64-bit word.
+
+    Attributes:
+        word: The 64-bit encoded voxel data.
+        position: The (t, y, x) position in the video grid.
+        tile_stats: Statistics from the binarization process.
+    &#34;&#34;&#34;
+
+    word: int
+    position: tuple[int, int, int]
+    tile_stats: dict | None = None
+
+    def __int__(self) -&gt; int:
+        return self.word
+
+    def to_bytes(self) -&gt; bytes:
+        return self.word.to_bytes(8, byteorder=&#34;little&#34;)
+
+    @classmethod
+    def from_bytes(
+        cls, data: bytes, position: tuple[int, int, int] = (0, 0, 0)
+    ) -&gt; Voxel:
+        word = int.from_bytes(data[:8], byteorder=&#34;little&#34;)
+        return cls(word=word, position=position)</code></pre>
+</details>
+<div class="desc"><p>A 4x4x4 spatiotemporal voxel encoded as a 64-bit word.</p>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>word</code></strong></dt>
+<dd>The 64-bit encoded voxel data.</dd>
+<dt><strong><code>position</code></strong></dt>
+<dd>The (t, y, x) position in the video grid.</dd>
+<dt><strong><code>tile_stats</code></strong></dt>
+<dd>Statistics from the binarization process.</dd>
+</dl></div>
+<h3>Static methods</h3>
+<dl>
+<dt id="atomik_sdk.voxel_encoder.Voxel.from_bytes"><code class="name flex">
+<span>def <span class="ident">from_bytes</span></span>(<span>data: bytes, position: tuple[int, int, int] = (0, 0, 0)) ‑> <a title="atomik_sdk.voxel_encoder.Voxel" href="#atomik_sdk.voxel_encoder.Voxel">Voxel</a></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Instance variables</h3>
+<dl>
+<dt id="atomik_sdk.voxel_encoder.Voxel.position"><code class="name">var <span class="ident">position</span> : tuple[int, int, int]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.voxel_encoder.Voxel.tile_stats"><code class="name">var <span class="ident">tile_stats</span> : dict | None</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.voxel_encoder.Voxel.word"><code class="name">var <span class="ident">word</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.voxel_encoder.Voxel.to_bytes"><code class="name flex">
+<span>def <span class="ident">to_bytes</span></span>(<span>self) ‑> bytes</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_bytes(self) -&gt; bytes:
+    return self.word.to_bytes(8, byteorder=&#34;little&#34;)</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.voxel_encoder.VoxelEncoder"><code class="flex name class">
+<span>class <span class="ident">VoxelEncoder</span></span>
+<span>(</span><span>tile_method: str | <a title="atomik_sdk.voxel_encoder.TileMethod" href="#atomik_sdk.voxel_encoder.TileMethod">TileMethod</a> = TileMethod.OTSU,<br>voxel_size: tuple[int, int, int] = (4, 4, 4),<br>threshold: float | None = None)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class VoxelEncoder:
+    &#34;&#34;&#34;
+    Encoder for converting video frames to 64-bit voxel words.
+
+    The VoxelEncoder implements ATOMiK&#39;s 4x4x4 spatiotemporal encoding:
+    - 4 temporal frames
+    - 4x4 spatial tile
+    - 64 binary values packed into a 64-bit word
+
+    Attributes:
+        voxel_size: The (temporal, height, width) voxel dimensions.
+        tile_method: The binarization method used.
+        threshold: Fixed threshold value (only for FIXED method).
+
+    Example:
+        &gt;&gt;&gt; encoder = VoxelEncoder(tile_method=&#34;otsu&#34;, voxel_size=(4,4,4))
+        &gt;&gt;&gt; voxels = encoder.encode_frames(frames)
+        &gt;&gt;&gt; for v in voxels:
+        ...     print(f&#34;Position {v.position}: {v.word:#018x}&#34;)
+    &#34;&#34;&#34;
+
+    def __init__(
+        self,
+        tile_method: str | TileMethod = TileMethod.OTSU,
+        voxel_size: tuple[int, int, int] = (4, 4, 4),
+        threshold: float | None = None,
+    ):
+        &#34;&#34;&#34;
+        Initialize the VoxelEncoder.
+
+        Args:
+            tile_method: Binarization method (&#39;otsu&#39;, &#39;mean&#39;, &#39;adaptive&#39;, &#39;fixed&#39;).
+            voxel_size: Dimensions (temporal, height, width) for voxels.
+            threshold: Fixed threshold value (required if tile_method=&#39;fixed&#39;).
+
+        Raises:
+            ValueError: If fixed method specified without threshold.
+        &#34;&#34;&#34;
+        if isinstance(tile_method, str):
+            tile_method = TileMethod[tile_method.upper()]
+
+        self.tile_method = tile_method
+        self.voxel_size = voxel_size
+        self.threshold = threshold
+
+        if self.tile_method == TileMethod.FIXED and threshold is None:
+            raise ValueError(&#34;Fixed method requires threshold parameter&#34;)
+
+        self._cache: dict = {}
+
+    def encode_frames(self, frames: np.ndarray) -&gt; list[Voxel]:
+        &#34;&#34;&#34;
+        Encode a sequence of frames into voxels.
+
+        Args:
+            frames: NumPy array of shape (T, H, W) containing grayscale frames.
+
+        Returns:
+            List of Voxel objects covering the entire video.
+
+        Raises:
+            ValueError: If frame dimensions are incompatible with voxel size.
+        &#34;&#34;&#34;
+        t, h, w = self.voxel_size
+        frames_t, frames_h, frames_w = frames.shape
+
+        if frames_t &lt; t or frames_h &lt; h or frames_w &lt; w:
+            raise ValueError(
+                f&#34;Frame dimensions {frames.shape} too small for voxel size {self.voxel_size}&#34;
+            )
+
+        voxels = []
+
+        for ti in range(0, frames_t - t + 1, t):
+            for yi in range(0, frames_h - h + 1, h):
+                for xi in range(0, frames_w - w + 1, w):
+                    # Extract voxel region
+                    region = frames[ti : ti + t, yi : yi + h, xi : xi + w]
+
+                    # Binarize and encode
+                    word, stats = self._encode_region(region)
+
+                    voxel = Voxel(word=word, position=(ti, yi, xi), tile_stats=stats)
+                    voxels.append(voxel)
+
+        return voxels
+
+    def encode_video(self, path: str) -&gt; list[Voxel]:
+        &#34;&#34;&#34;
+        Encode a video file into voxels.
+
+        Args:
+            path: Path to the video file.
+
+        Returns:
+            List of Voxel objects.
+        &#34;&#34;&#34;
+        try:
+            import cv2
+        except ImportError:
+            raise ImportError(&#34;OpenCV required for video encoding&#34;)
+
+        cap = cv2.VideoCapture(path)
+        frames = []
+
+        while True:
+            ret, frame = cap.read()
+            if not ret:
+                break
+            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+            frames.append(gray)
+
+        cap.release()
+
+        return self.encode_frames(np.array(frames))
+
+    def _encode_region(self, region: np.ndarray) -&gt; tuple[int, dict]:
+        &#34;&#34;&#34;
+        Encode a single voxel region into a 64-bit word.
+
+        Args:
+            region: Array of shape (t, h, w) containing pixel values.
+
+        Returns:
+            Tuple of (64-bit word, statistics dictionary).
+        &#34;&#34;&#34;
+        # Compute threshold based on method
+        if self.tile_method == TileMethod.FIXED:
+            threshold = self.threshold
+        elif self.tile_method == TileMethod.MEAN:
+            threshold = np.mean(region)
+        elif self.tile_method == TileMethod.OTSU:
+            threshold = self._otsu_threshold(region)
+        elif self.tile_method == TileMethod.ADAPTIVE:
+            threshold = self._adaptive_threshold(region)
+        else:
+            threshold = np.mean(region)
+
+        # Binarize
+        binary = (region &gt; threshold).astype(np.uint8)
+
+        # Pack into 64-bit word
+        flat = binary.flatten()[:64]  # Take first 64 bits
+
+        # Pad if necessary
+        if len(flat) &lt; 64:
+            flat = np.pad(flat, (0, 64 - len(flat)))
+
+        word = 0
+        for i, bit in enumerate(flat):
+            if bit:
+                word |= 1 &lt;&lt; i
+
+        stats = {
+            &#34;threshold&#34;: float(threshold),
+            &#34;mean&#34;: float(np.mean(region)),
+            &#34;std&#34;: float(np.std(region)),
+            &#34;ones_count&#34;: int(np.sum(binary)),
+        }
+
+        return word, stats
+
+    def _otsu_threshold(self, region: np.ndarray) -&gt; float:
+        &#34;&#34;&#34;Compute Otsu&#39;s threshold for the region.&#34;&#34;&#34;
+        hist, _ = np.histogram(region.flatten(), bins=256, range=(0, 256))
+        total = region.size
+
+        sum_total = np.sum(np.arange(256) * hist)
+        sum_bg = 0
+        weight_bg = 0
+
+        max_variance = 0
+        threshold = 0
+
+        for t in range(256):
+            weight_bg += hist[t]
+            if weight_bg == 0:
+                continue
+
+            weight_fg = total - weight_bg
+            if weight_fg == 0:
+                break
+
+            sum_bg += t * hist[t]
+
+            mean_bg = sum_bg / weight_bg
+            mean_fg = (sum_total - sum_bg) / weight_fg
+
+            variance = weight_bg * weight_fg * (mean_bg - mean_fg) ** 2
+
+            if variance &gt; max_variance:
+                max_variance = variance
+                threshold = t
+
+        return float(threshold)
+
+    def _adaptive_threshold(self, region: np.ndarray) -&gt; float:
+        &#34;&#34;&#34;Compute adaptive threshold based on local statistics.&#34;&#34;&#34;
+        mean = np.mean(region)
+        std = np.std(region)
+        return mean - 0.5 * std
+
+    def deltas(self, voxels: list[Voxel]) -&gt; Iterator[int]:
+        &#34;&#34;&#34;
+        Compute deltas between consecutive voxels.
+
+        Args:
+            voxels: List of voxels in temporal order.
+
+        Yields:
+            64-bit XOR delta values.
+        &#34;&#34;&#34;
+        prev = None
+        for voxel in voxels:
+            if prev is not None:
+                yield voxel.word ^ prev.word
+            prev = voxel</code></pre>
+</details>
+<div class="desc"><p>Encoder for converting video frames to 64-bit voxel words.</p>
+<p>The VoxelEncoder implements ATOMiK's 4x4x4 spatiotemporal encoding:
+- 4 temporal frames
+- 4x4 spatial tile
+- 64 binary values packed into a 64-bit word</p>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>voxel_size</code></strong></dt>
+<dd>The (temporal, height, width) voxel dimensions.</dd>
+<dt><strong><code>tile_method</code></strong></dt>
+<dd>The binarization method used.</dd>
+<dt><strong><code>threshold</code></strong></dt>
+<dd>Fixed threshold value (only for FIXED method).</dd>
+</dl>
+<h2 id="example">Example</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; encoder = VoxelEncoder(tile_method=&quot;otsu&quot;, voxel_size=(4,4,4))
+&gt;&gt;&gt; voxels = encoder.encode_frames(frames)
+&gt;&gt;&gt; for v in voxels:
+...     print(f&quot;Position {v.position}: {v.word:#018x}&quot;)
+</code></pre>
+<p>Initialize the VoxelEncoder.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>tile_method</code></strong></dt>
+<dd>Binarization method ('otsu', 'mean', 'adaptive', 'fixed').</dd>
+<dt><strong><code>voxel_size</code></strong></dt>
+<dd>Dimensions (temporal, height, width) for voxels.</dd>
+<dt><strong><code>threshold</code></strong></dt>
+<dd>Fixed threshold value (required if tile_method='fixed').</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If fixed method specified without threshold.</dd>
+</dl></div>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.voxel_encoder.VoxelEncoder.deltas"><code class="name flex">
+<span>def <span class="ident">deltas</span></span>(<span>self,<br>voxels: list[<a title="atomik_sdk.voxel_encoder.Voxel" href="#atomik_sdk.voxel_encoder.Voxel">Voxel</a>]) ‑> Iterator[int]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def deltas(self, voxels: list[Voxel]) -&gt; Iterator[int]:
+    &#34;&#34;&#34;
+    Compute deltas between consecutive voxels.
+
+    Args:
+        voxels: List of voxels in temporal order.
+
+    Yields:
+        64-bit XOR delta values.
+    &#34;&#34;&#34;
+    prev = None
+    for voxel in voxels:
+        if prev is not None:
+            yield voxel.word ^ prev.word
+        prev = voxel</code></pre>
+</details>
+<div class="desc"><p>Compute deltas between consecutive voxels.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>voxels</code></strong></dt>
+<dd>List of voxels in temporal order.</dd>
+</dl>
+<h2 id="yields">Yields</h2>
+<p>64-bit XOR delta values.</p></div>
+</dd>
+<dt id="atomik_sdk.voxel_encoder.VoxelEncoder.encode_frames"><code class="name flex">
+<span>def <span class="ident">encode_frames</span></span>(<span>self, frames: np.ndarray) ‑> list[<a title="atomik_sdk.voxel_encoder.Voxel" href="#atomik_sdk.voxel_encoder.Voxel">Voxel</a>]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def encode_frames(self, frames: np.ndarray) -&gt; list[Voxel]:
+    &#34;&#34;&#34;
+    Encode a sequence of frames into voxels.
+
+    Args:
+        frames: NumPy array of shape (T, H, W) containing grayscale frames.
+
+    Returns:
+        List of Voxel objects covering the entire video.
+
+    Raises:
+        ValueError: If frame dimensions are incompatible with voxel size.
+    &#34;&#34;&#34;
+    t, h, w = self.voxel_size
+    frames_t, frames_h, frames_w = frames.shape
+
+    if frames_t &lt; t or frames_h &lt; h or frames_w &lt; w:
+        raise ValueError(
+            f&#34;Frame dimensions {frames.shape} too small for voxel size {self.voxel_size}&#34;
+        )
+
+    voxels = []
+
+    for ti in range(0, frames_t - t + 1, t):
+        for yi in range(0, frames_h - h + 1, h):
+            for xi in range(0, frames_w - w + 1, w):
+                # Extract voxel region
+                region = frames[ti : ti + t, yi : yi + h, xi : xi + w]
+
+                # Binarize and encode
+                word, stats = self._encode_region(region)
+
+                voxel = Voxel(word=word, position=(ti, yi, xi), tile_stats=stats)
+                voxels.append(voxel)
+
+    return voxels</code></pre>
+</details>
+<div class="desc"><p>Encode a sequence of frames into voxels.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>frames</code></strong></dt>
+<dd>NumPy array of shape (T, H, W) containing grayscale frames.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>List of Voxel objects covering the entire video.</p>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If frame dimensions are incompatible with voxel size.</dd>
+</dl></div>
+</dd>
+<dt id="atomik_sdk.voxel_encoder.VoxelEncoder.encode_video"><code class="name flex">
+<span>def <span class="ident">encode_video</span></span>(<span>self, path: str) ‑> list[<a title="atomik_sdk.voxel_encoder.Voxel" href="#atomik_sdk.voxel_encoder.Voxel">Voxel</a>]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def encode_video(self, path: str) -&gt; list[Voxel]:
+    &#34;&#34;&#34;
+    Encode a video file into voxels.
+
+    Args:
+        path: Path to the video file.
+
+    Returns:
+        List of Voxel objects.
+    &#34;&#34;&#34;
+    try:
+        import cv2
+    except ImportError:
+        raise ImportError(&#34;OpenCV required for video encoding&#34;)
+
+    cap = cv2.VideoCapture(path)
+    frames = []
+
+    while True:
+        ret, frame = cap.read()
+        if not ret:
+            break
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        frames.append(gray)
+
+    cap.release()
+
+    return self.encode_frames(np.array(frames))</code></pre>
+</details>
+<div class="desc"><p>Encode a video file into voxels.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>path</code></strong></dt>
+<dd>Path to the video file.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>List of Voxel objects.</p></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="atomik_sdk" href="index.html">atomik_sdk</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="atomik_sdk.voxel_encoder.TileMethod" href="#atomik_sdk.voxel_encoder.TileMethod">TileMethod</a></code></h4>
+<ul class="">
+<li><code><a title="atomik_sdk.voxel_encoder.TileMethod.ADAPTIVE" href="#atomik_sdk.voxel_encoder.TileMethod.ADAPTIVE">ADAPTIVE</a></code></li>
+<li><code><a title="atomik_sdk.voxel_encoder.TileMethod.FIXED" href="#atomik_sdk.voxel_encoder.TileMethod.FIXED">FIXED</a></code></li>
+<li><code><a title="atomik_sdk.voxel_encoder.TileMethod.MEAN" href="#atomik_sdk.voxel_encoder.TileMethod.MEAN">MEAN</a></code></li>
+<li><code><a title="atomik_sdk.voxel_encoder.TileMethod.OTSU" href="#atomik_sdk.voxel_encoder.TileMethod.OTSU">OTSU</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.voxel_encoder.Voxel" href="#atomik_sdk.voxel_encoder.Voxel">Voxel</a></code></h4>
+<ul class="">
+<li><code><a title="atomik_sdk.voxel_encoder.Voxel.from_bytes" href="#atomik_sdk.voxel_encoder.Voxel.from_bytes">from_bytes</a></code></li>
+<li><code><a title="atomik_sdk.voxel_encoder.Voxel.position" href="#atomik_sdk.voxel_encoder.Voxel.position">position</a></code></li>
+<li><code><a title="atomik_sdk.voxel_encoder.Voxel.tile_stats" href="#atomik_sdk.voxel_encoder.Voxel.tile_stats">tile_stats</a></code></li>
+<li><code><a title="atomik_sdk.voxel_encoder.Voxel.to_bytes" href="#atomik_sdk.voxel_encoder.Voxel.to_bytes">to_bytes</a></code></li>
+<li><code><a title="atomik_sdk.voxel_encoder.Voxel.word" href="#atomik_sdk.voxel_encoder.Voxel.word">word</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.voxel_encoder.VoxelEncoder" href="#atomik_sdk.voxel_encoder.VoxelEncoder">VoxelEncoder</a></code></h4>
+<ul class="">
+<li><code><a title="atomik_sdk.voxel_encoder.VoxelEncoder.deltas" href="#atomik_sdk.voxel_encoder.VoxelEncoder.deltas">deltas</a></code></li>
+<li><code><a title="atomik_sdk.voxel_encoder.VoxelEncoder.encode_frames" href="#atomik_sdk.voxel_encoder.VoxelEncoder.encode_frames">encode_frames</a></code></li>
+<li><code><a title="atomik_sdk.voxel_encoder.VoxelEncoder.encode_video" href="#atomik_sdk.voxel_encoder.VoxelEncoder.encode_video">encode_video</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+</body>
+</html>

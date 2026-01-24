@@ -1,0 +1,722 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
+<title>atomik_sdk.delta_stream API documentation</title>
+<meta name="description" content="Delta Stream Module - High-level API for video-to-delta processing …">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>atomik_sdk.delta_stream</code></h1>
+</header>
+<section id="section-intro">
+<p>Delta Stream Module - High-level API for video-to-delta processing.</p>
+<p>This module provides the primary interface for processing video files
+as streams of delta objects, enabling efficient motion detection and
+pattern recognition using ATOMiK's stateless architecture.</p>
+<h2 id="example">Example</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; stream = DeltaStream.from_video(&quot;input.mp4&quot;, voxel=(4,4,4))
+&gt;&gt;&gt; for delta in stream:
+...     print(f&quot;Frame {delta.frame_index}: motif={delta.motif}&quot;)
+</code></pre>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="atomik_sdk.delta_stream.Delta"><code class="flex name class">
+<span>class <span class="ident">Delta</span></span>
+<span>(</span><span>frame_index: int,<br>voxel_index: tuple[int, int],<br>delta_word: int,<br>motif: <a title="atomik_sdk.delta_stream.MotifType" href="#atomik_sdk.delta_stream.MotifType">MotifType</a>,<br>magnitude: float,<br>timestamp_ms: float)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass
+class Delta:
+    &#34;&#34;&#34;
+    Represents a single delta computation result.
+
+    Attributes:
+        frame_index: The frame number in the video sequence.
+        voxel_index: The spatial position (x, y) of this voxel.
+        delta_word: The 64-bit XOR result between consecutive voxels.
+        motif: The classified motion pattern.
+        magnitude: The strength of the detected change (0.0 to 1.0).
+        timestamp_ms: The timestamp in milliseconds.
+    &#34;&#34;&#34;
+
+    frame_index: int
+    voxel_index: tuple[int, int]
+    delta_word: int
+    motif: MotifType
+    magnitude: float
+    timestamp_ms: float
+
+    @property
+    def is_event(self) -&gt; bool:
+        &#34;&#34;&#34;Returns True if this delta represents a significant event.&#34;&#34;&#34;
+        return self.delta_word != 0 and self.magnitude &gt; 0.1
+
+    def to_bytes(self) -&gt; bytes:
+        &#34;&#34;&#34;Serialize the delta to bytes for hardware transmission.&#34;&#34;&#34;
+        return self.delta_word.to_bytes(8, byteorder=&#34;little&#34;)</code></pre>
+</details>
+<div class="desc"><p>Represents a single delta computation result.</p>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>frame_index</code></strong></dt>
+<dd>The frame number in the video sequence.</dd>
+<dt><strong><code>voxel_index</code></strong></dt>
+<dd>The spatial position (x, y) of this voxel.</dd>
+<dt><strong><code>delta_word</code></strong></dt>
+<dd>The 64-bit XOR result between consecutive voxels.</dd>
+<dt><strong><code>motif</code></strong></dt>
+<dd>The classified motion pattern.</dd>
+<dt><strong><code>magnitude</code></strong></dt>
+<dd>The strength of the detected change (0.0 to 1.0).</dd>
+<dt><strong><code>timestamp_ms</code></strong></dt>
+<dd>The timestamp in milliseconds.</dd>
+</dl></div>
+<h3>Instance variables</h3>
+<dl>
+<dt id="atomik_sdk.delta_stream.Delta.delta_word"><code class="name">var <span class="ident">delta_word</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.delta_stream.Delta.frame_index"><code class="name">var <span class="ident">frame_index</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.delta_stream.Delta.is_event"><code class="name">prop <span class="ident">is_event</span> : bool</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def is_event(self) -&gt; bool:
+    &#34;&#34;&#34;Returns True if this delta represents a significant event.&#34;&#34;&#34;
+    return self.delta_word != 0 and self.magnitude &gt; 0.1</code></pre>
+</details>
+<div class="desc"><p>Returns True if this delta represents a significant event.</p></div>
+</dd>
+<dt id="atomik_sdk.delta_stream.Delta.magnitude"><code class="name">var <span class="ident">magnitude</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.delta_stream.Delta.motif"><code class="name">var <span class="ident">motif</span> : <a title="atomik_sdk.delta_stream.MotifType" href="#atomik_sdk.delta_stream.MotifType">MotifType</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.delta_stream.Delta.timestamp_ms"><code class="name">var <span class="ident">timestamp_ms</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.delta_stream.Delta.voxel_index"><code class="name">var <span class="ident">voxel_index</span> : tuple[int, int]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.delta_stream.Delta.to_bytes"><code class="name flex">
+<span>def <span class="ident">to_bytes</span></span>(<span>self) ‑> bytes</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_bytes(self) -&gt; bytes:
+    &#34;&#34;&#34;Serialize the delta to bytes for hardware transmission.&#34;&#34;&#34;
+    return self.delta_word.to_bytes(8, byteorder=&#34;little&#34;)</code></pre>
+</details>
+<div class="desc"><p>Serialize the delta to bytes for hardware transmission.</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.delta_stream.DeltaStream"><code class="flex name class">
+<span>class <span class="ident">DeltaStream</span></span>
+<span>(</span><span>frames: np.ndarray,<br>voxel_size: tuple[int, int, int] = (4, 4, 4),<br>tile_method: str = 'otsu',<br>fps: float = 30.0)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class DeltaStream:
+    &#34;&#34;&#34;
+    Iterator over video frames producing Delta objects.
+
+    The DeltaStream processes video input using ATOMiK&#39;s 4x4x4 voxel
+    encoding scheme, computing XOR-based deltas between consecutive
+    temporal windows and classifying the resulting patterns.
+
+    Attributes:
+        voxel_size: The (temporal, height, width) dimensions of each voxel.
+        tile_method: The binarization method (&#39;otsu&#39;, &#39;mean&#39;, &#39;adaptive&#39;).
+        frame_count: Total number of frames in the video.
+        fps: Frames per second of the source video.
+
+    Example:
+        &gt;&gt;&gt; stream = DeltaStream.from_video(&#34;input.mp4&#34;)
+        &gt;&gt;&gt; motions = [d for d in stream if d.motif == MotifType.HORIZONTAL_MOTION]
+        &gt;&gt;&gt; print(f&#34;Found {len(motions)} horizontal motion events&#34;)
+    &#34;&#34;&#34;
+
+    def __init__(
+        self,
+        frames: np.ndarray,
+        voxel_size: tuple[int, int, int] = (4, 4, 4),
+        tile_method: str = &#34;otsu&#34;,
+        fps: float = 30.0,
+    ):
+        &#34;&#34;&#34;
+        Initialize a DeltaStream from frame data.
+
+        Args:
+            frames: NumPy array of shape (T, H, W) or (T, H, W, C).
+            voxel_size: Temporal and spatial dimensions for voxel encoding.
+            tile_method: Binarization method (&#39;otsu&#39;, &#39;mean&#39;, &#39;adaptive&#39;).
+            fps: Frames per second for timestamp calculation.
+
+        Raises:
+            ValueError: If frames array has invalid shape.
+        &#34;&#34;&#34;
+        if frames.ndim == 4:
+            # Convert to grayscale if color
+            frames = np.mean(frames, axis=-1).astype(np.uint8)
+
+        if frames.ndim != 3:
+            raise ValueError(f&#34;Expected 3D array (T, H, W), got shape {frames.shape}&#34;)
+
+        self._frames = frames
+        self.voxel_size = voxel_size
+        self.tile_method = tile_method
+        self.fps = fps
+        self.frame_count = frames.shape[0]
+
+        self._current_index = 0
+        self._prev_voxels: np.ndarray | None = None
+
+    @classmethod
+    def from_video(
+        cls,
+        path: str | Path,
+        voxel: tuple[int, int, int] = (4, 4, 4),
+        tile_method: str = &#34;otsu&#34;,
+    ) -&gt; DeltaStream:
+        &#34;&#34;&#34;
+        Create a DeltaStream from a video file.
+
+        Args:
+            path: Path to the video file.
+            voxel: Voxel dimensions (temporal, height, width).
+            tile_method: Binarization method.
+
+        Returns:
+            A configured DeltaStream instance.
+
+        Raises:
+            FileNotFoundError: If the video file doesn&#39;t exist.
+            ImportError: If cv2 is not available.
+
+        Example:
+            &gt;&gt;&gt; stream = DeltaStream.from_video(&#34;surveillance.mp4&#34;, voxel=(4,4,4))
+        &#34;&#34;&#34;
+        try:
+            import cv2
+        except ImportError:
+            raise ImportError(&#34;OpenCV (cv2) is required for video loading&#34;)
+
+        path = Path(path)
+        if not path.exists():
+            raise FileNotFoundError(f&#34;Video file not found: {path}&#34;)
+
+        cap = cv2.VideoCapture(str(path))
+        fps = cap.get(cv2.CAP_PROP_FPS)
+
+        frames = []
+        while True:
+            ret, frame = cap.read()
+            if not ret:
+                break
+            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+            frames.append(gray)
+
+        cap.release()
+
+        return cls(np.array(frames), voxel_size=voxel, tile_method=tile_method, fps=fps)
+
+    @classmethod
+    def from_numpy(
+        cls,
+        frames: np.ndarray,
+        voxel: tuple[int, int, int] = (4, 4, 4),
+        fps: float = 30.0,
+    ) -&gt; DeltaStream:
+        &#34;&#34;&#34;
+        Create a DeltaStream from a NumPy array.
+
+        Args:
+            frames: Array of shape (T, H, W) containing grayscale frames.
+            voxel: Voxel dimensions (temporal, height, width).
+            fps: Frames per second for timestamp calculation.
+
+        Returns:
+            A configured DeltaStream instance.
+        &#34;&#34;&#34;
+        return cls(frames, voxel_size=voxel, fps=fps)
+
+    def __iter__(self) -&gt; Iterator[Delta]:
+        &#34;&#34;&#34;Reset iterator and return self.&#34;&#34;&#34;
+        self._current_index = 0
+        self._prev_voxels = None
+        return self
+
+    def __next__(self) -&gt; Delta:
+        &#34;&#34;&#34;
+        Compute and return the next Delta.
+
+        Returns:
+            The next Delta object in the stream.
+
+        Raises:
+            StopIteration: When all frames have been processed.
+        &#34;&#34;&#34;
+        t, h, w = self.voxel_size
+
+        if self._current_index + t &gt; self.frame_count:
+            raise StopIteration
+
+        # Extract current voxel window
+        window = self._frames[self._current_index : self._current_index + t]
+
+        # Binarize and encode
+        curr_voxels = self._encode_voxels(window)
+
+        if self._prev_voxels is None:
+            self._prev_voxels = curr_voxels
+            self._current_index += t
+            # Return initial frame with zero delta
+            return Delta(
+                frame_index=self._current_index - t,
+                voxel_index=(0, 0),
+                delta_word=0,
+                motif=MotifType.STATIC,
+                magnitude=0.0,
+                timestamp_ms=(self._current_index - t) / self.fps * 1000,
+            )
+
+        # Compute XOR delta
+        delta_word = int(curr_voxels[0, 0] ^ self._prev_voxels[0, 0])
+
+        # Classify motif
+        motif = self._classify_motif(delta_word)
+        magnitude = bin(delta_word).count(&#34;1&#34;) / 64.0
+
+        # Create Delta object
+        delta = Delta(
+            frame_index=self._current_index,
+            voxel_index=(0, 0),
+            delta_word=delta_word,
+            motif=motif,
+            magnitude=magnitude,
+            timestamp_ms=self._current_index / self.fps * 1000,
+        )
+
+        self._prev_voxels = curr_voxels
+        self._current_index += t
+
+        return delta
+
+    def __len__(self) -&gt; int:
+        &#34;&#34;&#34;Return the number of delta computations available.&#34;&#34;&#34;
+        return max(0, (self.frame_count - self.voxel_size[0]) // self.voxel_size[0])
+
+    def _encode_voxels(self, window: np.ndarray) -&gt; np.ndarray:
+        &#34;&#34;&#34;
+        Encode a temporal window into 64-bit voxel words.
+
+        Args:
+            window: Array of shape (T, H, W) containing frames.
+
+        Returns:
+            Array of 64-bit encoded voxel words.
+        &#34;&#34;&#34;
+        # Simplified encoding: binarize and pack into 64-bit words
+        threshold = np.mean(window)
+        binary = (window &gt; threshold).astype(np.uint8)
+
+        # Pack into 64-bit word (simplified)
+        packed = np.packbits(binary.flatten()[:64])
+        word = int.from_bytes(packed, byteorder=&#34;little&#34;)
+
+        return np.array([[word]], dtype=np.uint64)
+
+    def _classify_motif(self, delta_word: int) -&gt; MotifType:
+        &#34;&#34;&#34;
+        Classify a delta word into a semantic motif.
+
+        Args:
+            delta_word: The 64-bit XOR delta.
+
+        Returns:
+            The classified MotifType.
+        &#34;&#34;&#34;
+        if delta_word == 0:
+            return MotifType.STATIC
+
+        bit_count = bin(delta_word).count(&#34;1&#34;)
+
+        # Simple heuristic classification
+        if bit_count &lt; 4:
+            return MotifType.NOISE
+        elif bit_count &lt; 16:
+            # Check pattern for direction
+            upper_half = (delta_word &gt;&gt; 32) &amp; 0xFFFFFFFF
+            lower_half = delta_word &amp; 0xFFFFFFFF
+
+            if upper_half &gt; lower_half:
+                return MotifType.VERTICAL_MOTION
+            else:
+                return MotifType.HORIZONTAL_MOTION
+        elif bit_count &lt; 32:
+            return MotifType.DIAGONAL_MOTION
+        else:
+            return MotifType.EXPANSION
+
+    def filter_motif(self, motif: MotifType) -&gt; Iterator[Delta]:
+        &#34;&#34;&#34;
+        Iterate over deltas matching a specific motif.
+
+        Args:
+            motif: The motif type to filter for.
+
+        Yields:
+            Delta objects matching the specified motif.
+
+        Example:
+            &gt;&gt;&gt; for d in stream.filter_motif(MotifType.HORIZONTAL_MOTION):
+            ...     print(f&#34;Motion at frame {d.frame_index}&#34;)
+        &#34;&#34;&#34;
+        for delta in self:
+            if delta.motif == motif:
+                yield delta
+
+    def events_only(self) -&gt; Iterator[Delta]:
+        &#34;&#34;&#34;
+        Iterate over only significant event deltas.
+
+        Yields:
+            Delta objects where is_event is True.
+        &#34;&#34;&#34;
+        for delta in self:
+            if delta.is_event:
+                yield delta</code></pre>
+</details>
+<div class="desc"><p>Iterator over video frames producing Delta objects.</p>
+<p>The DeltaStream processes video input using ATOMiK's 4x4x4 voxel
+encoding scheme, computing XOR-based deltas between consecutive
+temporal windows and classifying the resulting patterns.</p>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>voxel_size</code></strong></dt>
+<dd>The (temporal, height, width) dimensions of each voxel.</dd>
+<dt><strong><code>tile_method</code></strong></dt>
+<dd>The binarization method ('otsu', 'mean', 'adaptive').</dd>
+<dt><strong><code>frame_count</code></strong></dt>
+<dd>Total number of frames in the video.</dd>
+<dt><strong><code>fps</code></strong></dt>
+<dd>Frames per second of the source video.</dd>
+</dl>
+<h2 id="example">Example</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; stream = DeltaStream.from_video(&quot;input.mp4&quot;)
+&gt;&gt;&gt; motions = [d for d in stream if d.motif == MotifType.HORIZONTAL_MOTION]
+&gt;&gt;&gt; print(f&quot;Found {len(motions)} horizontal motion events&quot;)
+</code></pre>
+<p>Initialize a DeltaStream from frame data.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>frames</code></strong></dt>
+<dd>NumPy array of shape (T, H, W) or (T, H, W, C).</dd>
+<dt><strong><code>voxel_size</code></strong></dt>
+<dd>Temporal and spatial dimensions for voxel encoding.</dd>
+<dt><strong><code>tile_method</code></strong></dt>
+<dd>Binarization method ('otsu', 'mean', 'adaptive').</dd>
+<dt><strong><code>fps</code></strong></dt>
+<dd>Frames per second for timestamp calculation.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If frames array has invalid shape.</dd>
+</dl></div>
+<h3>Static methods</h3>
+<dl>
+<dt id="atomik_sdk.delta_stream.DeltaStream.from_numpy"><code class="name flex">
+<span>def <span class="ident">from_numpy</span></span>(<span>frames: np.ndarray, voxel: tuple[int, int, int] = (4, 4, 4), fps: float = 30.0) ‑> <a title="atomik_sdk.delta_stream.DeltaStream" href="#atomik_sdk.delta_stream.DeltaStream">DeltaStream</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Create a DeltaStream from a NumPy array.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>frames</code></strong></dt>
+<dd>Array of shape (T, H, W) containing grayscale frames.</dd>
+<dt><strong><code>voxel</code></strong></dt>
+<dd>Voxel dimensions (temporal, height, width).</dd>
+<dt><strong><code>fps</code></strong></dt>
+<dd>Frames per second for timestamp calculation.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>A configured DeltaStream instance.</p></div>
+</dd>
+<dt id="atomik_sdk.delta_stream.DeltaStream.from_video"><code class="name flex">
+<span>def <span class="ident">from_video</span></span>(<span>path: str | Path,<br>voxel: tuple[int, int, int] = (4, 4, 4),<br>tile_method: str = 'otsu') ‑> <a title="atomik_sdk.delta_stream.DeltaStream" href="#atomik_sdk.delta_stream.DeltaStream">DeltaStream</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Create a DeltaStream from a video file.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>path</code></strong></dt>
+<dd>Path to the video file.</dd>
+<dt><strong><code>voxel</code></strong></dt>
+<dd>Voxel dimensions (temporal, height, width).</dd>
+<dt><strong><code>tile_method</code></strong></dt>
+<dd>Binarization method.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>A configured DeltaStream instance.</p>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>FileNotFoundError</code></dt>
+<dd>If the video file doesn't exist.</dd>
+<dt><code>ImportError</code></dt>
+<dd>If cv2 is not available.</dd>
+</dl>
+<h2 id="example">Example</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; stream = DeltaStream.from_video(&quot;surveillance.mp4&quot;, voxel=(4,4,4))
+</code></pre></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.delta_stream.DeltaStream.events_only"><code class="name flex">
+<span>def <span class="ident">events_only</span></span>(<span>self) ‑> Iterator[<a title="atomik_sdk.delta_stream.Delta" href="#atomik_sdk.delta_stream.Delta">Delta</a>]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def events_only(self) -&gt; Iterator[Delta]:
+    &#34;&#34;&#34;
+    Iterate over only significant event deltas.
+
+    Yields:
+        Delta objects where is_event is True.
+    &#34;&#34;&#34;
+    for delta in self:
+        if delta.is_event:
+            yield delta</code></pre>
+</details>
+<div class="desc"><p>Iterate over only significant event deltas.</p>
+<h2 id="yields">Yields</h2>
+<p>Delta objects where is_event is True.</p></div>
+</dd>
+<dt id="atomik_sdk.delta_stream.DeltaStream.filter_motif"><code class="name flex">
+<span>def <span class="ident">filter_motif</span></span>(<span>self,<br>motif: <a title="atomik_sdk.delta_stream.MotifType" href="#atomik_sdk.delta_stream.MotifType">MotifType</a>) ‑> Iterator[<a title="atomik_sdk.delta_stream.Delta" href="#atomik_sdk.delta_stream.Delta">Delta</a>]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def filter_motif(self, motif: MotifType) -&gt; Iterator[Delta]:
+    &#34;&#34;&#34;
+    Iterate over deltas matching a specific motif.
+
+    Args:
+        motif: The motif type to filter for.
+
+    Yields:
+        Delta objects matching the specified motif.
+
+    Example:
+        &gt;&gt;&gt; for d in stream.filter_motif(MotifType.HORIZONTAL_MOTION):
+        ...     print(f&#34;Motion at frame {d.frame_index}&#34;)
+    &#34;&#34;&#34;
+    for delta in self:
+        if delta.motif == motif:
+            yield delta</code></pre>
+</details>
+<div class="desc"><p>Iterate over deltas matching a specific motif.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>motif</code></strong></dt>
+<dd>The motif type to filter for.</dd>
+</dl>
+<h2 id="yields">Yields</h2>
+<p>Delta objects matching the specified motif.</p>
+<h2 id="example">Example</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; for d in stream.filter_motif(MotifType.HORIZONTAL_MOTION):
+...     print(f&quot;Motion at frame {d.frame_index}&quot;)
+</code></pre></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.delta_stream.MotifType"><code class="flex name class">
+<span>class <span class="ident">MotifType</span></span>
+<span>(</span><span>*args, **kwds)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class MotifType(Enum):
+    &#34;&#34;&#34;Classification of delta patterns into semantic motifs.&#34;&#34;&#34;
+
+    STATIC = auto()
+    HORIZONTAL_MOTION = auto()
+    VERTICAL_MOTION = auto()
+    DIAGONAL_MOTION = auto()
+    EXPANSION = auto()
+    CONTRACTION = auto()
+    ROTATION = auto()
+    NOISE = auto()</code></pre>
+</details>
+<div class="desc"><p>Classification of delta patterns into semantic motifs.</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="atomik_sdk.delta_stream.MotifType.CONTRACTION"><code class="name">var <span class="ident">CONTRACTION</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.delta_stream.MotifType.DIAGONAL_MOTION"><code class="name">var <span class="ident">DIAGONAL_MOTION</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.delta_stream.MotifType.EXPANSION"><code class="name">var <span class="ident">EXPANSION</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.delta_stream.MotifType.HORIZONTAL_MOTION"><code class="name">var <span class="ident">HORIZONTAL_MOTION</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.delta_stream.MotifType.NOISE"><code class="name">var <span class="ident">NOISE</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.delta_stream.MotifType.ROTATION"><code class="name">var <span class="ident">ROTATION</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.delta_stream.MotifType.STATIC"><code class="name">var <span class="ident">STATIC</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.delta_stream.MotifType.VERTICAL_MOTION"><code class="name">var <span class="ident">VERTICAL_MOTION</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="atomik_sdk" href="index.html">atomik_sdk</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="atomik_sdk.delta_stream.Delta" href="#atomik_sdk.delta_stream.Delta">Delta</a></code></h4>
+<ul class="two-column">
+<li><code><a title="atomik_sdk.delta_stream.Delta.delta_word" href="#atomik_sdk.delta_stream.Delta.delta_word">delta_word</a></code></li>
+<li><code><a title="atomik_sdk.delta_stream.Delta.frame_index" href="#atomik_sdk.delta_stream.Delta.frame_index">frame_index</a></code></li>
+<li><code><a title="atomik_sdk.delta_stream.Delta.is_event" href="#atomik_sdk.delta_stream.Delta.is_event">is_event</a></code></li>
+<li><code><a title="atomik_sdk.delta_stream.Delta.magnitude" href="#atomik_sdk.delta_stream.Delta.magnitude">magnitude</a></code></li>
+<li><code><a title="atomik_sdk.delta_stream.Delta.motif" href="#atomik_sdk.delta_stream.Delta.motif">motif</a></code></li>
+<li><code><a title="atomik_sdk.delta_stream.Delta.timestamp_ms" href="#atomik_sdk.delta_stream.Delta.timestamp_ms">timestamp_ms</a></code></li>
+<li><code><a title="atomik_sdk.delta_stream.Delta.to_bytes" href="#atomik_sdk.delta_stream.Delta.to_bytes">to_bytes</a></code></li>
+<li><code><a title="atomik_sdk.delta_stream.Delta.voxel_index" href="#atomik_sdk.delta_stream.Delta.voxel_index">voxel_index</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.delta_stream.DeltaStream" href="#atomik_sdk.delta_stream.DeltaStream">DeltaStream</a></code></h4>
+<ul class="">
+<li><code><a title="atomik_sdk.delta_stream.DeltaStream.events_only" href="#atomik_sdk.delta_stream.DeltaStream.events_only">events_only</a></code></li>
+<li><code><a title="atomik_sdk.delta_stream.DeltaStream.filter_motif" href="#atomik_sdk.delta_stream.DeltaStream.filter_motif">filter_motif</a></code></li>
+<li><code><a title="atomik_sdk.delta_stream.DeltaStream.from_numpy" href="#atomik_sdk.delta_stream.DeltaStream.from_numpy">from_numpy</a></code></li>
+<li><code><a title="atomik_sdk.delta_stream.DeltaStream.from_video" href="#atomik_sdk.delta_stream.DeltaStream.from_video">from_video</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.delta_stream.MotifType" href="#atomik_sdk.delta_stream.MotifType">MotifType</a></code></h4>
+<ul class="two-column">
+<li><code><a title="atomik_sdk.delta_stream.MotifType.CONTRACTION" href="#atomik_sdk.delta_stream.MotifType.CONTRACTION">CONTRACTION</a></code></li>
+<li><code><a title="atomik_sdk.delta_stream.MotifType.DIAGONAL_MOTION" href="#atomik_sdk.delta_stream.MotifType.DIAGONAL_MOTION">DIAGONAL_MOTION</a></code></li>
+<li><code><a title="atomik_sdk.delta_stream.MotifType.EXPANSION" href="#atomik_sdk.delta_stream.MotifType.EXPANSION">EXPANSION</a></code></li>
+<li><code><a title="atomik_sdk.delta_stream.MotifType.HORIZONTAL_MOTION" href="#atomik_sdk.delta_stream.MotifType.HORIZONTAL_MOTION">HORIZONTAL_MOTION</a></code></li>
+<li><code><a title="atomik_sdk.delta_stream.MotifType.NOISE" href="#atomik_sdk.delta_stream.MotifType.NOISE">NOISE</a></code></li>
+<li><code><a title="atomik_sdk.delta_stream.MotifType.ROTATION" href="#atomik_sdk.delta_stream.MotifType.ROTATION">ROTATION</a></code></li>
+<li><code><a title="atomik_sdk.delta_stream.MotifType.STATIC" href="#atomik_sdk.delta_stream.MotifType.STATIC">STATIC</a></code></li>
+<li><code><a title="atomik_sdk.delta_stream.MotifType.VERTICAL_MOTION" href="#atomik_sdk.delta_stream.MotifType.VERTICAL_MOTION">VERTICAL_MOTION</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+</body>
+</html>

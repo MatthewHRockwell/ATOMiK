@@ -1,0 +1,717 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
+<title>atomik_sdk.bitstream_gen API documentation</title>
+<meta name="description" content="Bitstream Generator Module - Low-level API for Verilog synthesis …">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>atomik_sdk.bitstream_gen</code></h1>
+</header>
+<section id="section-intro">
+<p>Bitstream Generator Module - Low-level API for Verilog synthesis.</p>
+<p>This module provides the BitstreamGenerator class for generating
+synthesizable Verilog code from genome configurations.</p>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="atomik_sdk.bitstream_gen.BitstreamGenerator"><code class="flex name class">
+<span>class <span class="ident">BitstreamGenerator</span></span>
+<span>(</span><span>target: str = 'gowin_gw1nr9')</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class BitstreamGenerator:
+    &#34;&#34;&#34;
+    Generator for producing synthesizable Verilog from genome files.
+
+    The BitstreamGenerator takes compiled genome configurations and
+    produces Verilog RTL code targeting specific FPGA platforms.
+
+    Example:
+        &gt;&gt;&gt; gen = BitstreamGenerator()
+        &gt;&gt;&gt; gen.load_genome(&#34;config.gnm&#34;)
+        &gt;&gt;&gt; verilog = gen.synthesize_verilog()
+        &gt;&gt;&gt; with open(&#34;output.v&#34;, &#34;w&#34;) as f:
+        ...     f.write(verilog)
+    &#34;&#34;&#34;
+
+    def __init__(self, target: str = &#34;gowin_gw1nr9&#34;):
+        &#34;&#34;&#34;
+        Initialize the BitstreamGenerator.
+
+        Args:
+            target: Target FPGA platform identifier.
+        &#34;&#34;&#34;
+        self.target = target
+        self.genome: Genome | None = None
+        self.module_name = &#34;atomik_core&#34;
+
+    def load_genome(self, path: str | Path) -&gt; None:
+        &#34;&#34;&#34;
+        Load a genome file for synthesis.
+
+        Args:
+            path: Path to the .gnm genome file.
+        &#34;&#34;&#34;
+        self.genome = Genome.load(path)
+
+    def set_genome(self, genome: Genome) -&gt; None:
+        &#34;&#34;&#34;
+        Set a genome object directly.
+
+        Args:
+            genome: Compiled Genome object.
+        &#34;&#34;&#34;
+        self.genome = genome
+
+    def synthesize_verilog(self, module_name: str | None = None) -&gt; str:
+        &#34;&#34;&#34;
+        Generate Verilog RTL code from the loaded genome.
+
+        Args:
+            module_name: Optional name for the generated module.
+
+        Returns:
+            String containing synthesizable Verilog code.
+
+        Raises:
+            ValueError: If no genome is loaded.
+        &#34;&#34;&#34;
+        if self.genome is None:
+            raise ValueError(&#34;No genome loaded&#34;)
+
+        if module_name:
+            self.module_name = module_name
+
+        lines = []
+
+        # Module header
+        lines.append(self._generate_header())
+        lines.append(self._generate_ports())
+        lines.append(&#34;&#34;)
+
+        # Internal signals
+        lines.append(self._generate_signals())
+        lines.append(&#34;&#34;)
+
+        # Instruction ROM
+        lines.append(self._generate_instruction_rom())
+        lines.append(&#34;&#34;)
+
+        # State machine
+        lines.append(self._generate_state_machine())
+        lines.append(&#34;&#34;)
+
+        # Module footer
+        lines.append(&#34;endmodule&#34;)
+
+        return &#34;\n&#34;.join(lines)
+
+    def _generate_header(self) -&gt; str:
+        &#34;&#34;&#34;Generate module header with documentation.&#34;&#34;&#34;
+        return f&#34;&#34;&#34;// ATOMiK Core - Auto-generated from genome &#34;{self.genome.name}&#34;
+// Version: {self.genome.version}
+// Target: {self.target}
+// Generated by BitstreamGenerator
+
+`timescale 1ns / 1ps
+
+module {self.module_name} (&#34;&#34;&#34;
+
+    def _generate_ports(self) -&gt; str:
+        &#34;&#34;&#34;Generate port declarations.&#34;&#34;&#34;
+        return &#34;&#34;&#34;    input  wire        clk,
+    input  wire        rst_n,
+    input  wire        enable,
+    input  wire [63:0] data_in,
+    input  wire        data_valid,
+    output reg  [63:0] data_out,
+    output reg         data_ready,
+    output reg  [3:0]  motif_id,
+    output reg         event_flag
+);&#34;&#34;&#34;
+
+    def _generate_signals(self) -&gt; str:
+        &#34;&#34;&#34;Generate internal signal declarations.&#34;&#34;&#34;
+        inst_count = len(self.genome.instructions)
+        addr_width = max(1, (inst_count - 1).bit_length())
+
+        return f&#34;&#34;&#34;    // Internal registers
+    reg [63:0] accumulator;
+    reg [63:0] prev_data;
+    reg [{addr_width-1}:0] pc;
+    reg [2:0] state;
+
+    // State definitions
+    localparam IDLE    = 3&#39;b000;
+    localparam FETCH   = 3&#39;b001;
+    localparam DECODE  = 3&#39;b010;
+    localparam EXECUTE = 3&#39;b011;
+    localparam OUTPUT  = 3&#39;b100;
+    localparam HALT    = 3&#39;b101;
+
+    // Instruction fields
+    wire [7:0] opcode;
+    wire [7:0] operand_a;
+    wire [7:0] operand_b;
+    wire [7:0] codon_seq;
+    reg [31:0] instruction;&#34;&#34;&#34;
+
+    def _generate_instruction_rom(self) -&gt; str:
+        &#34;&#34;&#34;Generate instruction ROM from genome.&#34;&#34;&#34;
+        lines = [&#34;    // Instruction ROM&#34;]
+        lines.append(f&#34;    reg [31:0] rom [{len(self.genome.instructions)-1}:0];&#34;)
+        lines.append(&#34;&#34;)
+        lines.append(&#34;    initial begin&#34;)
+
+        for i, inst in enumerate(self.genome.instructions):
+            packed = (
+                (inst.opcode &amp; 0xFF)
+                | ((inst.operand_a &amp; 0xFF) &lt;&lt; 8)
+                | ((inst.operand_b &amp; 0xFF) &lt;&lt; 16)
+                | ((self._encode_codons(inst.codon_sequence) &amp; 0xFF) &lt;&lt; 24)
+            )
+            lines.append(
+                f&#34;        rom[{i}] = 32&#39;h{packed:08X};  // {self._opcode_name(inst.opcode)}&#34;
+            )
+
+        lines.append(&#34;    end&#34;)
+        lines.append(&#34;&#34;)
+        lines.append(&#34;    assign opcode    = instruction[7:0];&#34;)
+        lines.append(&#34;    assign operand_a = instruction[15:8];&#34;)
+        lines.append(&#34;    assign operand_b = instruction[23:16];&#34;)
+        lines.append(&#34;    assign codon_seq = instruction[31:24];&#34;)
+
+        return &#34;\n&#34;.join(lines)
+
+    def _generate_state_machine(self) -&gt; str:
+        &#34;&#34;&#34;Generate the main state machine.&#34;&#34;&#34;
+        return &#34;&#34;&#34;    // Main state machine
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            state &lt;= IDLE;
+            pc &lt;= 0;
+            accumulator &lt;= 64&#39;b0;
+            prev_data &lt;= 64&#39;b0;
+            data_out &lt;= 64&#39;b0;
+            data_ready &lt;= 1&#39;b0;
+            motif_id &lt;= 4&#39;b0;
+            event_flag &lt;= 1&#39;b0;
+        end else begin
+            case (state)
+                IDLE: begin
+                    data_ready &lt;= 1&#39;b0;
+                    event_flag &lt;= 1&#39;b0;
+                    if (enable &amp;&amp; data_valid) begin
+                        prev_data &lt;= accumulator;
+                        accumulator &lt;= data_in;
+                        state &lt;= FETCH;
+                    end
+                end
+
+                FETCH: begin
+                    instruction &lt;= rom[pc];
+                    state &lt;= DECODE;
+                end
+
+                DECODE: begin
+                    state &lt;= EXECUTE;
+                end
+
+                EXECUTE: begin
+                    case (opcode)
+                        8&#39;h00: begin // NOP
+                            pc &lt;= pc + 1;
+                            state &lt;= FETCH;
+                        end
+                        8&#39;h01: begin // XOR
+                            accumulator &lt;= accumulator ^ prev_data;
+                            pc &lt;= pc + 1;
+                            state &lt;= FETCH;
+                        end
+                        8&#39;h0D: begin // EMIT
+                            data_out &lt;= accumulator;
+                            data_ready &lt;= 1&#39;b1;
+                            pc &lt;= pc + 1;
+                            state &lt;= OUTPUT;
+                        end
+                        8&#39;h0E: begin // CLASSIFY
+                            motif_id &lt;= classify_motif(accumulator);
+                            event_flag &lt;= (accumulator != 64&#39;b0);
+                            pc &lt;= pc + 1;
+                            state &lt;= FETCH;
+                        end
+                        8&#39;h0F: begin // HALT
+                            state &lt;= HALT;
+                        end
+                        default: begin
+                            pc &lt;= pc + 1;
+                            state &lt;= FETCH;
+                        end
+                    endcase
+                end
+
+                OUTPUT: begin
+                    data_ready &lt;= 1&#39;b0;
+                    state &lt;= IDLE;
+                    pc &lt;= 0;
+                end
+
+                HALT: begin
+                    // Wait for reset
+                end
+            endcase
+        end
+    end
+
+    // Motif classification function
+    function [3:0] classify_motif;
+        input [63:0] delta;
+        reg [6:0] bit_count;
+        begin
+            bit_count = $countones(delta);
+            if (delta == 64&#39;b0)
+                classify_motif = 4&#39;h0;  // STATIC
+            else if (bit_count &lt; 8)
+                classify_motif = 4&#39;hE;  // NOISE
+            else if ((delta &gt;&gt; 32) &gt; (delta &amp; 32&#39;hFFFFFFFF))
+                classify_motif = 4&#39;h2;  // VERTICAL
+            else
+                classify_motif = 4&#39;h1;  // HORIZONTAL
+        end
+    endfunction&#34;&#34;&#34;
+
+    def _encode_codons(self, sequence: str) -&gt; int:
+        &#34;&#34;&#34;Encode codon sequence to byte.&#34;&#34;&#34;
+        codon_map = {&#34;A&#34;: 0, &#34;G&#34;: 1, &#34;T&#34;: 2, &#34;C&#34;: 3}
+        result = 0
+        for i, c in enumerate(sequence[:4]):
+            if c in codon_map:
+                result |= codon_map[c] &lt;&lt; (i * 2)
+        return result
+
+    def _opcode_name(self, opcode: int) -&gt; str:
+        &#34;&#34;&#34;Get opcode name for comments.&#34;&#34;&#34;
+        names = {
+            0x00: &#34;NOP&#34;,
+            0x01: &#34;XOR&#34;,
+            0x02: &#34;AND&#34;,
+            0x03: &#34;OR&#34;,
+            0x04: &#34;NOT&#34;,
+            0x05: &#34;SHIFT_L&#34;,
+            0x06: &#34;SHIFT_R&#34;,
+            0x07: &#34;ROTATE_L&#34;,
+            0x08: &#34;ROTATE_R&#34;,
+            0x09: &#34;COMPARE&#34;,
+            0x0A: &#34;BRANCH&#34;,
+            0x0B: &#34;LOAD&#34;,
+            0x0C: &#34;STORE&#34;,
+            0x0D: &#34;EMIT&#34;,
+            0x0E: &#34;CLASSIFY&#34;,
+            0x0F: &#34;HALT&#34;,
+        }
+        return names.get(opcode, f&#34;UNKNOWN({opcode:#04x})&#34;)
+
+    def generate_testbench(self) -&gt; str:
+        &#34;&#34;&#34;
+        Generate a Verilog testbench for the synthesized module.
+
+        Returns:
+            String containing testbench Verilog code.
+        &#34;&#34;&#34;
+        return f&#34;&#34;&#34;// Testbench for {self.module_name}
+// Auto-generated by BitstreamGenerator
+
+`timescale 1ns / 1ps
+
+module tb_{self.module_name};
+
+    // Clock and reset
+    reg clk;
+    reg rst_n;
+
+    // DUT signals
+    reg enable;
+    reg [63:0] data_in;
+    reg data_valid;
+    wire [63:0] data_out;
+    wire data_ready;
+    wire [3:0] motif_id;
+    wire event_flag;
+
+    // Instantiate DUT
+    {self.module_name} dut (
+        .clk(clk),
+        .rst_n(rst_n),
+        .enable(enable),
+        .data_in(data_in),
+        .data_valid(data_valid),
+        .data_out(data_out),
+        .data_ready(data_ready),
+        .motif_id(motif_id),
+        .event_flag(event_flag)
+    );
+
+    // Clock generation
+    initial clk = 0;
+    always #18.5 clk = ~clk;  // 27 MHz
+
+    // Test sequence
+    initial begin
+        $dumpfile(&#34;tb_{self.module_name}.vcd&#34;);
+        $dumpvars(0, tb_{self.module_name});
+
+        // Initialize
+        rst_n = 0;
+        enable = 0;
+        data_in = 64&#39;b0;
+        data_valid = 0;
+
+        #100 rst_n = 1;
+        #100 enable = 1;
+
+        // Test case 1: First frame
+        data_in = 64&#39;hFF00FF00FF00FF00;
+        data_valid = 1;
+        #37 data_valid = 0;
+
+        // Wait for processing
+        wait(data_ready);
+        $display(&#34;Output 1: %h, Motif: %d&#34;, data_out, motif_id);
+
+        #100;
+
+        // Test case 2: Second frame (creates delta)
+        data_in = 64&#39;h00FF00FF00FF00FF;
+        data_valid = 1;
+        #37 data_valid = 0;
+
+        wait(data_ready);
+        $display(&#34;Output 2: %h, Motif: %d, Event: %b&#34;, data_out, motif_id, event_flag);
+
+        #100;
+
+        $display(&#34;PASS: Testbench completed&#34;);
+        $finish;
+    end
+
+    // Timeout
+    initial begin
+        #10000;
+        $display(&#34;FAIL: Testbench timeout&#34;);
+        $finish;
+    end
+
+endmodule
+&#34;&#34;&#34;</code></pre>
+</details>
+<div class="desc"><p>Generator for producing synthesizable Verilog from genome files.</p>
+<p>The BitstreamGenerator takes compiled genome configurations and
+produces Verilog RTL code targeting specific FPGA platforms.</p>
+<h2 id="example">Example</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; gen = BitstreamGenerator()
+&gt;&gt;&gt; gen.load_genome(&quot;config.gnm&quot;)
+&gt;&gt;&gt; verilog = gen.synthesize_verilog()
+&gt;&gt;&gt; with open(&quot;output.v&quot;, &quot;w&quot;) as f:
+...     f.write(verilog)
+</code></pre>
+<p>Initialize the BitstreamGenerator.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>target</code></strong></dt>
+<dd>Target FPGA platform identifier.</dd>
+</dl></div>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.bitstream_gen.BitstreamGenerator.generate_testbench"><code class="name flex">
+<span>def <span class="ident">generate_testbench</span></span>(<span>self) ‑> str</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">    def generate_testbench(self) -&gt; str:
+        &#34;&#34;&#34;
+        Generate a Verilog testbench for the synthesized module.
+
+        Returns:
+            String containing testbench Verilog code.
+        &#34;&#34;&#34;
+        return f&#34;&#34;&#34;// Testbench for {self.module_name}
+// Auto-generated by BitstreamGenerator
+
+`timescale 1ns / 1ps
+
+module tb_{self.module_name};
+
+    // Clock and reset
+    reg clk;
+    reg rst_n;
+
+    // DUT signals
+    reg enable;
+    reg [63:0] data_in;
+    reg data_valid;
+    wire [63:0] data_out;
+    wire data_ready;
+    wire [3:0] motif_id;
+    wire event_flag;
+
+    // Instantiate DUT
+    {self.module_name} dut (
+        .clk(clk),
+        .rst_n(rst_n),
+        .enable(enable),
+        .data_in(data_in),
+        .data_valid(data_valid),
+        .data_out(data_out),
+        .data_ready(data_ready),
+        .motif_id(motif_id),
+        .event_flag(event_flag)
+    );
+
+    // Clock generation
+    initial clk = 0;
+    always #18.5 clk = ~clk;  // 27 MHz
+
+    // Test sequence
+    initial begin
+        $dumpfile(&#34;tb_{self.module_name}.vcd&#34;);
+        $dumpvars(0, tb_{self.module_name});
+
+        // Initialize
+        rst_n = 0;
+        enable = 0;
+        data_in = 64&#39;b0;
+        data_valid = 0;
+
+        #100 rst_n = 1;
+        #100 enable = 1;
+
+        // Test case 1: First frame
+        data_in = 64&#39;hFF00FF00FF00FF00;
+        data_valid = 1;
+        #37 data_valid = 0;
+
+        // Wait for processing
+        wait(data_ready);
+        $display(&#34;Output 1: %h, Motif: %d&#34;, data_out, motif_id);
+
+        #100;
+
+        // Test case 2: Second frame (creates delta)
+        data_in = 64&#39;h00FF00FF00FF00FF;
+        data_valid = 1;
+        #37 data_valid = 0;
+
+        wait(data_ready);
+        $display(&#34;Output 2: %h, Motif: %d, Event: %b&#34;, data_out, motif_id, event_flag);
+
+        #100;
+
+        $display(&#34;PASS: Testbench completed&#34;);
+        $finish;
+    end
+
+    // Timeout
+    initial begin
+        #10000;
+        $display(&#34;FAIL: Testbench timeout&#34;);
+        $finish;
+    end
+
+endmodule
+&#34;&#34;&#34;</code></pre>
+</details>
+<div class="desc"><p>Generate a Verilog testbench for the synthesized module.</p>
+<h2 id="returns">Returns</h2>
+<p>String containing testbench Verilog code.</p></div>
+</dd>
+<dt id="atomik_sdk.bitstream_gen.BitstreamGenerator.load_genome"><code class="name flex">
+<span>def <span class="ident">load_genome</span></span>(<span>self, path: str | Path) ‑> None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def load_genome(self, path: str | Path) -&gt; None:
+    &#34;&#34;&#34;
+    Load a genome file for synthesis.
+
+    Args:
+        path: Path to the .gnm genome file.
+    &#34;&#34;&#34;
+    self.genome = Genome.load(path)</code></pre>
+</details>
+<div class="desc"><p>Load a genome file for synthesis.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>path</code></strong></dt>
+<dd>Path to the .gnm genome file.</dd>
+</dl></div>
+</dd>
+<dt id="atomik_sdk.bitstream_gen.BitstreamGenerator.set_genome"><code class="name flex">
+<span>def <span class="ident">set_genome</span></span>(<span>self, genome: Genome) ‑> None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def set_genome(self, genome: Genome) -&gt; None:
+    &#34;&#34;&#34;
+    Set a genome object directly.
+
+    Args:
+        genome: Compiled Genome object.
+    &#34;&#34;&#34;
+    self.genome = genome</code></pre>
+</details>
+<div class="desc"><p>Set a genome object directly.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>genome</code></strong></dt>
+<dd>Compiled Genome object.</dd>
+</dl></div>
+</dd>
+<dt id="atomik_sdk.bitstream_gen.BitstreamGenerator.synthesize_verilog"><code class="name flex">
+<span>def <span class="ident">synthesize_verilog</span></span>(<span>self, module_name: str | None = None) ‑> str</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def synthesize_verilog(self, module_name: str | None = None) -&gt; str:
+    &#34;&#34;&#34;
+    Generate Verilog RTL code from the loaded genome.
+
+    Args:
+        module_name: Optional name for the generated module.
+
+    Returns:
+        String containing synthesizable Verilog code.
+
+    Raises:
+        ValueError: If no genome is loaded.
+    &#34;&#34;&#34;
+    if self.genome is None:
+        raise ValueError(&#34;No genome loaded&#34;)
+
+    if module_name:
+        self.module_name = module_name
+
+    lines = []
+
+    # Module header
+    lines.append(self._generate_header())
+    lines.append(self._generate_ports())
+    lines.append(&#34;&#34;)
+
+    # Internal signals
+    lines.append(self._generate_signals())
+    lines.append(&#34;&#34;)
+
+    # Instruction ROM
+    lines.append(self._generate_instruction_rom())
+    lines.append(&#34;&#34;)
+
+    # State machine
+    lines.append(self._generate_state_machine())
+    lines.append(&#34;&#34;)
+
+    # Module footer
+    lines.append(&#34;endmodule&#34;)
+
+    return &#34;\n&#34;.join(lines)</code></pre>
+</details>
+<div class="desc"><p>Generate Verilog RTL code from the loaded genome.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>module_name</code></strong></dt>
+<dd>Optional name for the generated module.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>String containing synthesizable Verilog code.</p>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If no genome is loaded.</dd>
+</dl></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="atomik_sdk" href="index.html">atomik_sdk</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="atomik_sdk.bitstream_gen.BitstreamGenerator" href="#atomik_sdk.bitstream_gen.BitstreamGenerator">BitstreamGenerator</a></code></h4>
+<ul class="">
+<li><code><a title="atomik_sdk.bitstream_gen.BitstreamGenerator.generate_testbench" href="#atomik_sdk.bitstream_gen.BitstreamGenerator.generate_testbench">generate_testbench</a></code></li>
+<li><code><a title="atomik_sdk.bitstream_gen.BitstreamGenerator.load_genome" href="#atomik_sdk.bitstream_gen.BitstreamGenerator.load_genome">load_genome</a></code></li>
+<li><code><a title="atomik_sdk.bitstream_gen.BitstreamGenerator.set_genome" href="#atomik_sdk.bitstream_gen.BitstreamGenerator.set_genome">set_genome</a></code></li>
+<li><code><a title="atomik_sdk.bitstream_gen.BitstreamGenerator.synthesize_verilog" href="#atomik_sdk.bitstream_gen.BitstreamGenerator.synthesize_verilog">synthesize_verilog</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+</body>
+</html>

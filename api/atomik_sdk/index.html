@@ -1,0 +1,2734 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
+<title>atomik_sdk API documentation</title>
+<meta name="description" content="ATOMiK SDK - Stateless Delta-Driven Computational Architecture …">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Package <code>atomik_sdk</code></h1>
+</header>
+<section id="section-intro">
+<p>ATOMiK SDK - Stateless Delta-Driven Computational Architecture</p>
+<p>A Python SDK for working with ATOMiK's delta-based video processing pipeline.</p>
+<p>Three API Levels:
+Level 1 (High-Level): Application developers - DeltaStream, Motif
+Level 2 (Mid-Level): Algorithm designers - VoxelEncoder, PatternMatcher
+Level 3 (Low-Level): Hardware engineers - BitstreamGenerator, GenomeCompiler</p>
+<h2 id="example">Example</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; from atomik_sdk import DeltaStream, Motif
+&gt;&gt;&gt; stream = DeltaStream.from_video(&quot;input.mp4&quot;, voxel=(4,4,4))
+&gt;&gt;&gt; for delta in stream:
+...     if delta.motif == Motif.HORIZONTAL_MOTION:
+...         print(f&quot;Motion at frame {delta.frame_index}&quot;)
+</code></pre>
+</section>
+<section>
+<h2 class="section-title" id="header-submodules">Sub-modules</h2>
+<dl>
+<dt><code class="name"><a title="atomik_sdk.bitstream_gen" href="bitstream_gen.html">atomik_sdk.bitstream_gen</a></code></dt>
+<dd>
+<div class="desc"><p>Bitstream Generator Module - Low-level API for Verilog synthesis …</p></div>
+</dd>
+<dt><code class="name"><a title="atomik_sdk.delta_stream" href="delta_stream.html">atomik_sdk.delta_stream</a></code></dt>
+<dd>
+<div class="desc"><p>Delta Stream Module - High-level API for video-to-delta processing …</p></div>
+</dd>
+<dt><code class="name"><a title="atomik_sdk.genome_compiler" href="genome_compiler.html">atomik_sdk.genome_compiler</a></code></dt>
+<dd>
+<div class="desc"><p>Genome Compiler Module - Low-level API for hardware configuration …</p></div>
+</dd>
+<dt><code class="name"><a title="atomik_sdk.motifs" href="motifs.html">atomik_sdk.motifs</a></code></dt>
+<dd>
+<div class="desc"><p>Motif Module - Pattern vocabulary for delta classification …</p></div>
+</dd>
+<dt><code class="name"><a title="atomik_sdk.pattern_matcher" href="pattern_matcher.html">atomik_sdk.pattern_matcher</a></code></dt>
+<dd>
+<div class="desc"><p>Pattern Matcher Module - Mid-level API for motif vocabulary matching …</p></div>
+</dd>
+<dt><code class="name"><a title="atomik_sdk.voxel_encoder" href="voxel_encoder.html">atomik_sdk.voxel_encoder</a></code></dt>
+<dd>
+<div class="desc"><p>Voxel Encoder Module - Mid-level API for spatiotemporal encoding …</p></div>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="atomik_sdk.BitstreamGenerator"><code class="flex name class">
+<span>class <span class="ident">BitstreamGenerator</span></span>
+<span>(</span><span>target: str = 'gowin_gw1nr9')</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class BitstreamGenerator:
+    &#34;&#34;&#34;
+    Generator for producing synthesizable Verilog from genome files.
+
+    The BitstreamGenerator takes compiled genome configurations and
+    produces Verilog RTL code targeting specific FPGA platforms.
+
+    Example:
+        &gt;&gt;&gt; gen = BitstreamGenerator()
+        &gt;&gt;&gt; gen.load_genome(&#34;config.gnm&#34;)
+        &gt;&gt;&gt; verilog = gen.synthesize_verilog()
+        &gt;&gt;&gt; with open(&#34;output.v&#34;, &#34;w&#34;) as f:
+        ...     f.write(verilog)
+    &#34;&#34;&#34;
+
+    def __init__(self, target: str = &#34;gowin_gw1nr9&#34;):
+        &#34;&#34;&#34;
+        Initialize the BitstreamGenerator.
+
+        Args:
+            target: Target FPGA platform identifier.
+        &#34;&#34;&#34;
+        self.target = target
+        self.genome: Genome | None = None
+        self.module_name = &#34;atomik_core&#34;
+
+    def load_genome(self, path: str | Path) -&gt; None:
+        &#34;&#34;&#34;
+        Load a genome file for synthesis.
+
+        Args:
+            path: Path to the .gnm genome file.
+        &#34;&#34;&#34;
+        self.genome = Genome.load(path)
+
+    def set_genome(self, genome: Genome) -&gt; None:
+        &#34;&#34;&#34;
+        Set a genome object directly.
+
+        Args:
+            genome: Compiled Genome object.
+        &#34;&#34;&#34;
+        self.genome = genome
+
+    def synthesize_verilog(self, module_name: str | None = None) -&gt; str:
+        &#34;&#34;&#34;
+        Generate Verilog RTL code from the loaded genome.
+
+        Args:
+            module_name: Optional name for the generated module.
+
+        Returns:
+            String containing synthesizable Verilog code.
+
+        Raises:
+            ValueError: If no genome is loaded.
+        &#34;&#34;&#34;
+        if self.genome is None:
+            raise ValueError(&#34;No genome loaded&#34;)
+
+        if module_name:
+            self.module_name = module_name
+
+        lines = []
+
+        # Module header
+        lines.append(self._generate_header())
+        lines.append(self._generate_ports())
+        lines.append(&#34;&#34;)
+
+        # Internal signals
+        lines.append(self._generate_signals())
+        lines.append(&#34;&#34;)
+
+        # Instruction ROM
+        lines.append(self._generate_instruction_rom())
+        lines.append(&#34;&#34;)
+
+        # State machine
+        lines.append(self._generate_state_machine())
+        lines.append(&#34;&#34;)
+
+        # Module footer
+        lines.append(&#34;endmodule&#34;)
+
+        return &#34;\n&#34;.join(lines)
+
+    def _generate_header(self) -&gt; str:
+        &#34;&#34;&#34;Generate module header with documentation.&#34;&#34;&#34;
+        return f&#34;&#34;&#34;// ATOMiK Core - Auto-generated from genome &#34;{self.genome.name}&#34;
+// Version: {self.genome.version}
+// Target: {self.target}
+// Generated by BitstreamGenerator
+
+`timescale 1ns / 1ps
+
+module {self.module_name} (&#34;&#34;&#34;
+
+    def _generate_ports(self) -&gt; str:
+        &#34;&#34;&#34;Generate port declarations.&#34;&#34;&#34;
+        return &#34;&#34;&#34;    input  wire        clk,
+    input  wire        rst_n,
+    input  wire        enable,
+    input  wire [63:0] data_in,
+    input  wire        data_valid,
+    output reg  [63:0] data_out,
+    output reg         data_ready,
+    output reg  [3:0]  motif_id,
+    output reg         event_flag
+);&#34;&#34;&#34;
+
+    def _generate_signals(self) -&gt; str:
+        &#34;&#34;&#34;Generate internal signal declarations.&#34;&#34;&#34;
+        inst_count = len(self.genome.instructions)
+        addr_width = max(1, (inst_count - 1).bit_length())
+
+        return f&#34;&#34;&#34;    // Internal registers
+    reg [63:0] accumulator;
+    reg [63:0] prev_data;
+    reg [{addr_width-1}:0] pc;
+    reg [2:0] state;
+
+    // State definitions
+    localparam IDLE    = 3&#39;b000;
+    localparam FETCH   = 3&#39;b001;
+    localparam DECODE  = 3&#39;b010;
+    localparam EXECUTE = 3&#39;b011;
+    localparam OUTPUT  = 3&#39;b100;
+    localparam HALT    = 3&#39;b101;
+
+    // Instruction fields
+    wire [7:0] opcode;
+    wire [7:0] operand_a;
+    wire [7:0] operand_b;
+    wire [7:0] codon_seq;
+    reg [31:0] instruction;&#34;&#34;&#34;
+
+    def _generate_instruction_rom(self) -&gt; str:
+        &#34;&#34;&#34;Generate instruction ROM from genome.&#34;&#34;&#34;
+        lines = [&#34;    // Instruction ROM&#34;]
+        lines.append(f&#34;    reg [31:0] rom [{len(self.genome.instructions)-1}:0];&#34;)
+        lines.append(&#34;&#34;)
+        lines.append(&#34;    initial begin&#34;)
+
+        for i, inst in enumerate(self.genome.instructions):
+            packed = (
+                (inst.opcode &amp; 0xFF)
+                | ((inst.operand_a &amp; 0xFF) &lt;&lt; 8)
+                | ((inst.operand_b &amp; 0xFF) &lt;&lt; 16)
+                | ((self._encode_codons(inst.codon_sequence) &amp; 0xFF) &lt;&lt; 24)
+            )
+            lines.append(
+                f&#34;        rom[{i}] = 32&#39;h{packed:08X};  // {self._opcode_name(inst.opcode)}&#34;
+            )
+
+        lines.append(&#34;    end&#34;)
+        lines.append(&#34;&#34;)
+        lines.append(&#34;    assign opcode    = instruction[7:0];&#34;)
+        lines.append(&#34;    assign operand_a = instruction[15:8];&#34;)
+        lines.append(&#34;    assign operand_b = instruction[23:16];&#34;)
+        lines.append(&#34;    assign codon_seq = instruction[31:24];&#34;)
+
+        return &#34;\n&#34;.join(lines)
+
+    def _generate_state_machine(self) -&gt; str:
+        &#34;&#34;&#34;Generate the main state machine.&#34;&#34;&#34;
+        return &#34;&#34;&#34;    // Main state machine
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            state &lt;= IDLE;
+            pc &lt;= 0;
+            accumulator &lt;= 64&#39;b0;
+            prev_data &lt;= 64&#39;b0;
+            data_out &lt;= 64&#39;b0;
+            data_ready &lt;= 1&#39;b0;
+            motif_id &lt;= 4&#39;b0;
+            event_flag &lt;= 1&#39;b0;
+        end else begin
+            case (state)
+                IDLE: begin
+                    data_ready &lt;= 1&#39;b0;
+                    event_flag &lt;= 1&#39;b0;
+                    if (enable &amp;&amp; data_valid) begin
+                        prev_data &lt;= accumulator;
+                        accumulator &lt;= data_in;
+                        state &lt;= FETCH;
+                    end
+                end
+
+                FETCH: begin
+                    instruction &lt;= rom[pc];
+                    state &lt;= DECODE;
+                end
+
+                DECODE: begin
+                    state &lt;= EXECUTE;
+                end
+
+                EXECUTE: begin
+                    case (opcode)
+                        8&#39;h00: begin // NOP
+                            pc &lt;= pc + 1;
+                            state &lt;= FETCH;
+                        end
+                        8&#39;h01: begin // XOR
+                            accumulator &lt;= accumulator ^ prev_data;
+                            pc &lt;= pc + 1;
+                            state &lt;= FETCH;
+                        end
+                        8&#39;h0D: begin // EMIT
+                            data_out &lt;= accumulator;
+                            data_ready &lt;= 1&#39;b1;
+                            pc &lt;= pc + 1;
+                            state &lt;= OUTPUT;
+                        end
+                        8&#39;h0E: begin // CLASSIFY
+                            motif_id &lt;= classify_motif(accumulator);
+                            event_flag &lt;= (accumulator != 64&#39;b0);
+                            pc &lt;= pc + 1;
+                            state &lt;= FETCH;
+                        end
+                        8&#39;h0F: begin // HALT
+                            state &lt;= HALT;
+                        end
+                        default: begin
+                            pc &lt;= pc + 1;
+                            state &lt;= FETCH;
+                        end
+                    endcase
+                end
+
+                OUTPUT: begin
+                    data_ready &lt;= 1&#39;b0;
+                    state &lt;= IDLE;
+                    pc &lt;= 0;
+                end
+
+                HALT: begin
+                    // Wait for reset
+                end
+            endcase
+        end
+    end
+
+    // Motif classification function
+    function [3:0] classify_motif;
+        input [63:0] delta;
+        reg [6:0] bit_count;
+        begin
+            bit_count = $countones(delta);
+            if (delta == 64&#39;b0)
+                classify_motif = 4&#39;h0;  // STATIC
+            else if (bit_count &lt; 8)
+                classify_motif = 4&#39;hE;  // NOISE
+            else if ((delta &gt;&gt; 32) &gt; (delta &amp; 32&#39;hFFFFFFFF))
+                classify_motif = 4&#39;h2;  // VERTICAL
+            else
+                classify_motif = 4&#39;h1;  // HORIZONTAL
+        end
+    endfunction&#34;&#34;&#34;
+
+    def _encode_codons(self, sequence: str) -&gt; int:
+        &#34;&#34;&#34;Encode codon sequence to byte.&#34;&#34;&#34;
+        codon_map = {&#34;A&#34;: 0, &#34;G&#34;: 1, &#34;T&#34;: 2, &#34;C&#34;: 3}
+        result = 0
+        for i, c in enumerate(sequence[:4]):
+            if c in codon_map:
+                result |= codon_map[c] &lt;&lt; (i * 2)
+        return result
+
+    def _opcode_name(self, opcode: int) -&gt; str:
+        &#34;&#34;&#34;Get opcode name for comments.&#34;&#34;&#34;
+        names = {
+            0x00: &#34;NOP&#34;,
+            0x01: &#34;XOR&#34;,
+            0x02: &#34;AND&#34;,
+            0x03: &#34;OR&#34;,
+            0x04: &#34;NOT&#34;,
+            0x05: &#34;SHIFT_L&#34;,
+            0x06: &#34;SHIFT_R&#34;,
+            0x07: &#34;ROTATE_L&#34;,
+            0x08: &#34;ROTATE_R&#34;,
+            0x09: &#34;COMPARE&#34;,
+            0x0A: &#34;BRANCH&#34;,
+            0x0B: &#34;LOAD&#34;,
+            0x0C: &#34;STORE&#34;,
+            0x0D: &#34;EMIT&#34;,
+            0x0E: &#34;CLASSIFY&#34;,
+            0x0F: &#34;HALT&#34;,
+        }
+        return names.get(opcode, f&#34;UNKNOWN({opcode:#04x})&#34;)
+
+    def generate_testbench(self) -&gt; str:
+        &#34;&#34;&#34;
+        Generate a Verilog testbench for the synthesized module.
+
+        Returns:
+            String containing testbench Verilog code.
+        &#34;&#34;&#34;
+        return f&#34;&#34;&#34;// Testbench for {self.module_name}
+// Auto-generated by BitstreamGenerator
+
+`timescale 1ns / 1ps
+
+module tb_{self.module_name};
+
+    // Clock and reset
+    reg clk;
+    reg rst_n;
+
+    // DUT signals
+    reg enable;
+    reg [63:0] data_in;
+    reg data_valid;
+    wire [63:0] data_out;
+    wire data_ready;
+    wire [3:0] motif_id;
+    wire event_flag;
+
+    // Instantiate DUT
+    {self.module_name} dut (
+        .clk(clk),
+        .rst_n(rst_n),
+        .enable(enable),
+        .data_in(data_in),
+        .data_valid(data_valid),
+        .data_out(data_out),
+        .data_ready(data_ready),
+        .motif_id(motif_id),
+        .event_flag(event_flag)
+    );
+
+    // Clock generation
+    initial clk = 0;
+    always #18.5 clk = ~clk;  // 27 MHz
+
+    // Test sequence
+    initial begin
+        $dumpfile(&#34;tb_{self.module_name}.vcd&#34;);
+        $dumpvars(0, tb_{self.module_name});
+
+        // Initialize
+        rst_n = 0;
+        enable = 0;
+        data_in = 64&#39;b0;
+        data_valid = 0;
+
+        #100 rst_n = 1;
+        #100 enable = 1;
+
+        // Test case 1: First frame
+        data_in = 64&#39;hFF00FF00FF00FF00;
+        data_valid = 1;
+        #37 data_valid = 0;
+
+        // Wait for processing
+        wait(data_ready);
+        $display(&#34;Output 1: %h, Motif: %d&#34;, data_out, motif_id);
+
+        #100;
+
+        // Test case 2: Second frame (creates delta)
+        data_in = 64&#39;h00FF00FF00FF00FF;
+        data_valid = 1;
+        #37 data_valid = 0;
+
+        wait(data_ready);
+        $display(&#34;Output 2: %h, Motif: %d, Event: %b&#34;, data_out, motif_id, event_flag);
+
+        #100;
+
+        $display(&#34;PASS: Testbench completed&#34;);
+        $finish;
+    end
+
+    // Timeout
+    initial begin
+        #10000;
+        $display(&#34;FAIL: Testbench timeout&#34;);
+        $finish;
+    end
+
+endmodule
+&#34;&#34;&#34;</code></pre>
+</details>
+<div class="desc"><p>Generator for producing synthesizable Verilog from genome files.</p>
+<p>The BitstreamGenerator takes compiled genome configurations and
+produces Verilog RTL code targeting specific FPGA platforms.</p>
+<h2 id="example">Example</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; gen = BitstreamGenerator()
+&gt;&gt;&gt; gen.load_genome(&quot;config.gnm&quot;)
+&gt;&gt;&gt; verilog = gen.synthesize_verilog()
+&gt;&gt;&gt; with open(&quot;output.v&quot;, &quot;w&quot;) as f:
+...     f.write(verilog)
+</code></pre>
+<p>Initialize the BitstreamGenerator.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>target</code></strong></dt>
+<dd>Target FPGA platform identifier.</dd>
+</dl></div>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.BitstreamGenerator.generate_testbench"><code class="name flex">
+<span>def <span class="ident">generate_testbench</span></span>(<span>self) ‑> str</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">    def generate_testbench(self) -&gt; str:
+        &#34;&#34;&#34;
+        Generate a Verilog testbench for the synthesized module.
+
+        Returns:
+            String containing testbench Verilog code.
+        &#34;&#34;&#34;
+        return f&#34;&#34;&#34;// Testbench for {self.module_name}
+// Auto-generated by BitstreamGenerator
+
+`timescale 1ns / 1ps
+
+module tb_{self.module_name};
+
+    // Clock and reset
+    reg clk;
+    reg rst_n;
+
+    // DUT signals
+    reg enable;
+    reg [63:0] data_in;
+    reg data_valid;
+    wire [63:0] data_out;
+    wire data_ready;
+    wire [3:0] motif_id;
+    wire event_flag;
+
+    // Instantiate DUT
+    {self.module_name} dut (
+        .clk(clk),
+        .rst_n(rst_n),
+        .enable(enable),
+        .data_in(data_in),
+        .data_valid(data_valid),
+        .data_out(data_out),
+        .data_ready(data_ready),
+        .motif_id(motif_id),
+        .event_flag(event_flag)
+    );
+
+    // Clock generation
+    initial clk = 0;
+    always #18.5 clk = ~clk;  // 27 MHz
+
+    // Test sequence
+    initial begin
+        $dumpfile(&#34;tb_{self.module_name}.vcd&#34;);
+        $dumpvars(0, tb_{self.module_name});
+
+        // Initialize
+        rst_n = 0;
+        enable = 0;
+        data_in = 64&#39;b0;
+        data_valid = 0;
+
+        #100 rst_n = 1;
+        #100 enable = 1;
+
+        // Test case 1: First frame
+        data_in = 64&#39;hFF00FF00FF00FF00;
+        data_valid = 1;
+        #37 data_valid = 0;
+
+        // Wait for processing
+        wait(data_ready);
+        $display(&#34;Output 1: %h, Motif: %d&#34;, data_out, motif_id);
+
+        #100;
+
+        // Test case 2: Second frame (creates delta)
+        data_in = 64&#39;h00FF00FF00FF00FF;
+        data_valid = 1;
+        #37 data_valid = 0;
+
+        wait(data_ready);
+        $display(&#34;Output 2: %h, Motif: %d, Event: %b&#34;, data_out, motif_id, event_flag);
+
+        #100;
+
+        $display(&#34;PASS: Testbench completed&#34;);
+        $finish;
+    end
+
+    // Timeout
+    initial begin
+        #10000;
+        $display(&#34;FAIL: Testbench timeout&#34;);
+        $finish;
+    end
+
+endmodule
+&#34;&#34;&#34;</code></pre>
+</details>
+<div class="desc"><p>Generate a Verilog testbench for the synthesized module.</p>
+<h2 id="returns">Returns</h2>
+<p>String containing testbench Verilog code.</p></div>
+</dd>
+<dt id="atomik_sdk.BitstreamGenerator.load_genome"><code class="name flex">
+<span>def <span class="ident">load_genome</span></span>(<span>self, path: str | Path) ‑> None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def load_genome(self, path: str | Path) -&gt; None:
+    &#34;&#34;&#34;
+    Load a genome file for synthesis.
+
+    Args:
+        path: Path to the .gnm genome file.
+    &#34;&#34;&#34;
+    self.genome = Genome.load(path)</code></pre>
+</details>
+<div class="desc"><p>Load a genome file for synthesis.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>path</code></strong></dt>
+<dd>Path to the .gnm genome file.</dd>
+</dl></div>
+</dd>
+<dt id="atomik_sdk.BitstreamGenerator.set_genome"><code class="name flex">
+<span>def <span class="ident">set_genome</span></span>(<span>self, genome: Genome) ‑> None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def set_genome(self, genome: Genome) -&gt; None:
+    &#34;&#34;&#34;
+    Set a genome object directly.
+
+    Args:
+        genome: Compiled Genome object.
+    &#34;&#34;&#34;
+    self.genome = genome</code></pre>
+</details>
+<div class="desc"><p>Set a genome object directly.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>genome</code></strong></dt>
+<dd>Compiled Genome object.</dd>
+</dl></div>
+</dd>
+<dt id="atomik_sdk.BitstreamGenerator.synthesize_verilog"><code class="name flex">
+<span>def <span class="ident">synthesize_verilog</span></span>(<span>self, module_name: str | None = None) ‑> str</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def synthesize_verilog(self, module_name: str | None = None) -&gt; str:
+    &#34;&#34;&#34;
+    Generate Verilog RTL code from the loaded genome.
+
+    Args:
+        module_name: Optional name for the generated module.
+
+    Returns:
+        String containing synthesizable Verilog code.
+
+    Raises:
+        ValueError: If no genome is loaded.
+    &#34;&#34;&#34;
+    if self.genome is None:
+        raise ValueError(&#34;No genome loaded&#34;)
+
+    if module_name:
+        self.module_name = module_name
+
+    lines = []
+
+    # Module header
+    lines.append(self._generate_header())
+    lines.append(self._generate_ports())
+    lines.append(&#34;&#34;)
+
+    # Internal signals
+    lines.append(self._generate_signals())
+    lines.append(&#34;&#34;)
+
+    # Instruction ROM
+    lines.append(self._generate_instruction_rom())
+    lines.append(&#34;&#34;)
+
+    # State machine
+    lines.append(self._generate_state_machine())
+    lines.append(&#34;&#34;)
+
+    # Module footer
+    lines.append(&#34;endmodule&#34;)
+
+    return &#34;\n&#34;.join(lines)</code></pre>
+</details>
+<div class="desc"><p>Generate Verilog RTL code from the loaded genome.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>module_name</code></strong></dt>
+<dd>Optional name for the generated module.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>String containing synthesizable Verilog code.</p>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If no genome is loaded.</dd>
+</dl></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.Delta"><code class="flex name class">
+<span>class <span class="ident">Delta</span></span>
+<span>(</span><span>frame_index: int,<br>voxel_index: tuple[int, int],<br>delta_word: int,<br>motif: MotifType,<br>magnitude: float,<br>timestamp_ms: float)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass
+class Delta:
+    &#34;&#34;&#34;
+    Represents a single delta computation result.
+
+    Attributes:
+        frame_index: The frame number in the video sequence.
+        voxel_index: The spatial position (x, y) of this voxel.
+        delta_word: The 64-bit XOR result between consecutive voxels.
+        motif: The classified motion pattern.
+        magnitude: The strength of the detected change (0.0 to 1.0).
+        timestamp_ms: The timestamp in milliseconds.
+    &#34;&#34;&#34;
+
+    frame_index: int
+    voxel_index: tuple[int, int]
+    delta_word: int
+    motif: MotifType
+    magnitude: float
+    timestamp_ms: float
+
+    @property
+    def is_event(self) -&gt; bool:
+        &#34;&#34;&#34;Returns True if this delta represents a significant event.&#34;&#34;&#34;
+        return self.delta_word != 0 and self.magnitude &gt; 0.1
+
+    def to_bytes(self) -&gt; bytes:
+        &#34;&#34;&#34;Serialize the delta to bytes for hardware transmission.&#34;&#34;&#34;
+        return self.delta_word.to_bytes(8, byteorder=&#34;little&#34;)</code></pre>
+</details>
+<div class="desc"><p>Represents a single delta computation result.</p>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>frame_index</code></strong></dt>
+<dd>The frame number in the video sequence.</dd>
+<dt><strong><code>voxel_index</code></strong></dt>
+<dd>The spatial position (x, y) of this voxel.</dd>
+<dt><strong><code>delta_word</code></strong></dt>
+<dd>The 64-bit XOR result between consecutive voxels.</dd>
+<dt><strong><code>motif</code></strong></dt>
+<dd>The classified motion pattern.</dd>
+<dt><strong><code>magnitude</code></strong></dt>
+<dd>The strength of the detected change (0.0 to 1.0).</dd>
+<dt><strong><code>timestamp_ms</code></strong></dt>
+<dd>The timestamp in milliseconds.</dd>
+</dl></div>
+<h3>Instance variables</h3>
+<dl>
+<dt id="atomik_sdk.Delta.delta_word"><code class="name">var <span class="ident">delta_word</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.Delta.frame_index"><code class="name">var <span class="ident">frame_index</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.Delta.is_event"><code class="name">prop <span class="ident">is_event</span> : bool</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def is_event(self) -&gt; bool:
+    &#34;&#34;&#34;Returns True if this delta represents a significant event.&#34;&#34;&#34;
+    return self.delta_word != 0 and self.magnitude &gt; 0.1</code></pre>
+</details>
+<div class="desc"><p>Returns True if this delta represents a significant event.</p></div>
+</dd>
+<dt id="atomik_sdk.Delta.magnitude"><code class="name">var <span class="ident">magnitude</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.Delta.motif"><code class="name">var <span class="ident">motif</span> : <a title="atomik_sdk.delta_stream.MotifType" href="delta_stream.html#atomik_sdk.delta_stream.MotifType">MotifType</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.Delta.timestamp_ms"><code class="name">var <span class="ident">timestamp_ms</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.Delta.voxel_index"><code class="name">var <span class="ident">voxel_index</span> : tuple[int, int]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.Delta.to_bytes"><code class="name flex">
+<span>def <span class="ident">to_bytes</span></span>(<span>self) ‑> bytes</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_bytes(self) -&gt; bytes:
+    &#34;&#34;&#34;Serialize the delta to bytes for hardware transmission.&#34;&#34;&#34;
+    return self.delta_word.to_bytes(8, byteorder=&#34;little&#34;)</code></pre>
+</details>
+<div class="desc"><p>Serialize the delta to bytes for hardware transmission.</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.DeltaStream"><code class="flex name class">
+<span>class <span class="ident">DeltaStream</span></span>
+<span>(</span><span>frames: np.ndarray,<br>voxel_size: tuple[int, int, int] = (4, 4, 4),<br>tile_method: str = 'otsu',<br>fps: float = 30.0)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class DeltaStream:
+    &#34;&#34;&#34;
+    Iterator over video frames producing Delta objects.
+
+    The DeltaStream processes video input using ATOMiK&#39;s 4x4x4 voxel
+    encoding scheme, computing XOR-based deltas between consecutive
+    temporal windows and classifying the resulting patterns.
+
+    Attributes:
+        voxel_size: The (temporal, height, width) dimensions of each voxel.
+        tile_method: The binarization method (&#39;otsu&#39;, &#39;mean&#39;, &#39;adaptive&#39;).
+        frame_count: Total number of frames in the video.
+        fps: Frames per second of the source video.
+
+    Example:
+        &gt;&gt;&gt; stream = DeltaStream.from_video(&#34;input.mp4&#34;)
+        &gt;&gt;&gt; motions = [d for d in stream if d.motif == MotifType.HORIZONTAL_MOTION]
+        &gt;&gt;&gt; print(f&#34;Found {len(motions)} horizontal motion events&#34;)
+    &#34;&#34;&#34;
+
+    def __init__(
+        self,
+        frames: np.ndarray,
+        voxel_size: tuple[int, int, int] = (4, 4, 4),
+        tile_method: str = &#34;otsu&#34;,
+        fps: float = 30.0,
+    ):
+        &#34;&#34;&#34;
+        Initialize a DeltaStream from frame data.
+
+        Args:
+            frames: NumPy array of shape (T, H, W) or (T, H, W, C).
+            voxel_size: Temporal and spatial dimensions for voxel encoding.
+            tile_method: Binarization method (&#39;otsu&#39;, &#39;mean&#39;, &#39;adaptive&#39;).
+            fps: Frames per second for timestamp calculation.
+
+        Raises:
+            ValueError: If frames array has invalid shape.
+        &#34;&#34;&#34;
+        if frames.ndim == 4:
+            # Convert to grayscale if color
+            frames = np.mean(frames, axis=-1).astype(np.uint8)
+
+        if frames.ndim != 3:
+            raise ValueError(f&#34;Expected 3D array (T, H, W), got shape {frames.shape}&#34;)
+
+        self._frames = frames
+        self.voxel_size = voxel_size
+        self.tile_method = tile_method
+        self.fps = fps
+        self.frame_count = frames.shape[0]
+
+        self._current_index = 0
+        self._prev_voxels: np.ndarray | None = None
+
+    @classmethod
+    def from_video(
+        cls,
+        path: str | Path,
+        voxel: tuple[int, int, int] = (4, 4, 4),
+        tile_method: str = &#34;otsu&#34;,
+    ) -&gt; DeltaStream:
+        &#34;&#34;&#34;
+        Create a DeltaStream from a video file.
+
+        Args:
+            path: Path to the video file.
+            voxel: Voxel dimensions (temporal, height, width).
+            tile_method: Binarization method.
+
+        Returns:
+            A configured DeltaStream instance.
+
+        Raises:
+            FileNotFoundError: If the video file doesn&#39;t exist.
+            ImportError: If cv2 is not available.
+
+        Example:
+            &gt;&gt;&gt; stream = DeltaStream.from_video(&#34;surveillance.mp4&#34;, voxel=(4,4,4))
+        &#34;&#34;&#34;
+        try:
+            import cv2
+        except ImportError:
+            raise ImportError(&#34;OpenCV (cv2) is required for video loading&#34;)
+
+        path = Path(path)
+        if not path.exists():
+            raise FileNotFoundError(f&#34;Video file not found: {path}&#34;)
+
+        cap = cv2.VideoCapture(str(path))
+        fps = cap.get(cv2.CAP_PROP_FPS)
+
+        frames = []
+        while True:
+            ret, frame = cap.read()
+            if not ret:
+                break
+            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+            frames.append(gray)
+
+        cap.release()
+
+        return cls(np.array(frames), voxel_size=voxel, tile_method=tile_method, fps=fps)
+
+    @classmethod
+    def from_numpy(
+        cls,
+        frames: np.ndarray,
+        voxel: tuple[int, int, int] = (4, 4, 4),
+        fps: float = 30.0,
+    ) -&gt; DeltaStream:
+        &#34;&#34;&#34;
+        Create a DeltaStream from a NumPy array.
+
+        Args:
+            frames: Array of shape (T, H, W) containing grayscale frames.
+            voxel: Voxel dimensions (temporal, height, width).
+            fps: Frames per second for timestamp calculation.
+
+        Returns:
+            A configured DeltaStream instance.
+        &#34;&#34;&#34;
+        return cls(frames, voxel_size=voxel, fps=fps)
+
+    def __iter__(self) -&gt; Iterator[Delta]:
+        &#34;&#34;&#34;Reset iterator and return self.&#34;&#34;&#34;
+        self._current_index = 0
+        self._prev_voxels = None
+        return self
+
+    def __next__(self) -&gt; Delta:
+        &#34;&#34;&#34;
+        Compute and return the next Delta.
+
+        Returns:
+            The next Delta object in the stream.
+
+        Raises:
+            StopIteration: When all frames have been processed.
+        &#34;&#34;&#34;
+        t, h, w = self.voxel_size
+
+        if self._current_index + t &gt; self.frame_count:
+            raise StopIteration
+
+        # Extract current voxel window
+        window = self._frames[self._current_index : self._current_index + t]
+
+        # Binarize and encode
+        curr_voxels = self._encode_voxels(window)
+
+        if self._prev_voxels is None:
+            self._prev_voxels = curr_voxels
+            self._current_index += t
+            # Return initial frame with zero delta
+            return Delta(
+                frame_index=self._current_index - t,
+                voxel_index=(0, 0),
+                delta_word=0,
+                motif=MotifType.STATIC,
+                magnitude=0.0,
+                timestamp_ms=(self._current_index - t) / self.fps * 1000,
+            )
+
+        # Compute XOR delta
+        delta_word = int(curr_voxels[0, 0] ^ self._prev_voxels[0, 0])
+
+        # Classify motif
+        motif = self._classify_motif(delta_word)
+        magnitude = bin(delta_word).count(&#34;1&#34;) / 64.0
+
+        # Create Delta object
+        delta = Delta(
+            frame_index=self._current_index,
+            voxel_index=(0, 0),
+            delta_word=delta_word,
+            motif=motif,
+            magnitude=magnitude,
+            timestamp_ms=self._current_index / self.fps * 1000,
+        )
+
+        self._prev_voxels = curr_voxels
+        self._current_index += t
+
+        return delta
+
+    def __len__(self) -&gt; int:
+        &#34;&#34;&#34;Return the number of delta computations available.&#34;&#34;&#34;
+        return max(0, (self.frame_count - self.voxel_size[0]) // self.voxel_size[0])
+
+    def _encode_voxels(self, window: np.ndarray) -&gt; np.ndarray:
+        &#34;&#34;&#34;
+        Encode a temporal window into 64-bit voxel words.
+
+        Args:
+            window: Array of shape (T, H, W) containing frames.
+
+        Returns:
+            Array of 64-bit encoded voxel words.
+        &#34;&#34;&#34;
+        # Simplified encoding: binarize and pack into 64-bit words
+        threshold = np.mean(window)
+        binary = (window &gt; threshold).astype(np.uint8)
+
+        # Pack into 64-bit word (simplified)
+        packed = np.packbits(binary.flatten()[:64])
+        word = int.from_bytes(packed, byteorder=&#34;little&#34;)
+
+        return np.array([[word]], dtype=np.uint64)
+
+    def _classify_motif(self, delta_word: int) -&gt; MotifType:
+        &#34;&#34;&#34;
+        Classify a delta word into a semantic motif.
+
+        Args:
+            delta_word: The 64-bit XOR delta.
+
+        Returns:
+            The classified MotifType.
+        &#34;&#34;&#34;
+        if delta_word == 0:
+            return MotifType.STATIC
+
+        bit_count = bin(delta_word).count(&#34;1&#34;)
+
+        # Simple heuristic classification
+        if bit_count &lt; 4:
+            return MotifType.NOISE
+        elif bit_count &lt; 16:
+            # Check pattern for direction
+            upper_half = (delta_word &gt;&gt; 32) &amp; 0xFFFFFFFF
+            lower_half = delta_word &amp; 0xFFFFFFFF
+
+            if upper_half &gt; lower_half:
+                return MotifType.VERTICAL_MOTION
+            else:
+                return MotifType.HORIZONTAL_MOTION
+        elif bit_count &lt; 32:
+            return MotifType.DIAGONAL_MOTION
+        else:
+            return MotifType.EXPANSION
+
+    def filter_motif(self, motif: MotifType) -&gt; Iterator[Delta]:
+        &#34;&#34;&#34;
+        Iterate over deltas matching a specific motif.
+
+        Args:
+            motif: The motif type to filter for.
+
+        Yields:
+            Delta objects matching the specified motif.
+
+        Example:
+            &gt;&gt;&gt; for d in stream.filter_motif(MotifType.HORIZONTAL_MOTION):
+            ...     print(f&#34;Motion at frame {d.frame_index}&#34;)
+        &#34;&#34;&#34;
+        for delta in self:
+            if delta.motif == motif:
+                yield delta
+
+    def events_only(self) -&gt; Iterator[Delta]:
+        &#34;&#34;&#34;
+        Iterate over only significant event deltas.
+
+        Yields:
+            Delta objects where is_event is True.
+        &#34;&#34;&#34;
+        for delta in self:
+            if delta.is_event:
+                yield delta</code></pre>
+</details>
+<div class="desc"><p>Iterator over video frames producing Delta objects.</p>
+<p>The DeltaStream processes video input using ATOMiK's 4x4x4 voxel
+encoding scheme, computing XOR-based deltas between consecutive
+temporal windows and classifying the resulting patterns.</p>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>voxel_size</code></strong></dt>
+<dd>The (temporal, height, width) dimensions of each voxel.</dd>
+<dt><strong><code>tile_method</code></strong></dt>
+<dd>The binarization method ('otsu', 'mean', 'adaptive').</dd>
+<dt><strong><code>frame_count</code></strong></dt>
+<dd>Total number of frames in the video.</dd>
+<dt><strong><code>fps</code></strong></dt>
+<dd>Frames per second of the source video.</dd>
+</dl>
+<h2 id="example">Example</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; stream = DeltaStream.from_video(&quot;input.mp4&quot;)
+&gt;&gt;&gt; motions = [d for d in stream if d.motif == MotifType.HORIZONTAL_MOTION]
+&gt;&gt;&gt; print(f&quot;Found {len(motions)} horizontal motion events&quot;)
+</code></pre>
+<p>Initialize a DeltaStream from frame data.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>frames</code></strong></dt>
+<dd>NumPy array of shape (T, H, W) or (T, H, W, C).</dd>
+<dt><strong><code>voxel_size</code></strong></dt>
+<dd>Temporal and spatial dimensions for voxel encoding.</dd>
+<dt><strong><code>tile_method</code></strong></dt>
+<dd>Binarization method ('otsu', 'mean', 'adaptive').</dd>
+<dt><strong><code>fps</code></strong></dt>
+<dd>Frames per second for timestamp calculation.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If frames array has invalid shape.</dd>
+</dl></div>
+<h3>Static methods</h3>
+<dl>
+<dt id="atomik_sdk.DeltaStream.from_numpy"><code class="name flex">
+<span>def <span class="ident">from_numpy</span></span>(<span>frames: np.ndarray, voxel: tuple[int, int, int] = (4, 4, 4), fps: float = 30.0) ‑> <a title="atomik_sdk.delta_stream.DeltaStream" href="delta_stream.html#atomik_sdk.delta_stream.DeltaStream">DeltaStream</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Create a DeltaStream from a NumPy array.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>frames</code></strong></dt>
+<dd>Array of shape (T, H, W) containing grayscale frames.</dd>
+<dt><strong><code>voxel</code></strong></dt>
+<dd>Voxel dimensions (temporal, height, width).</dd>
+<dt><strong><code>fps</code></strong></dt>
+<dd>Frames per second for timestamp calculation.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>A configured DeltaStream instance.</p></div>
+</dd>
+<dt id="atomik_sdk.DeltaStream.from_video"><code class="name flex">
+<span>def <span class="ident">from_video</span></span>(<span>path: str | Path,<br>voxel: tuple[int, int, int] = (4, 4, 4),<br>tile_method: str = 'otsu') ‑> <a title="atomik_sdk.delta_stream.DeltaStream" href="delta_stream.html#atomik_sdk.delta_stream.DeltaStream">DeltaStream</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Create a DeltaStream from a video file.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>path</code></strong></dt>
+<dd>Path to the video file.</dd>
+<dt><strong><code>voxel</code></strong></dt>
+<dd>Voxel dimensions (temporal, height, width).</dd>
+<dt><strong><code>tile_method</code></strong></dt>
+<dd>Binarization method.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>A configured DeltaStream instance.</p>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>FileNotFoundError</code></dt>
+<dd>If the video file doesn't exist.</dd>
+<dt><code>ImportError</code></dt>
+<dd>If cv2 is not available.</dd>
+</dl>
+<h2 id="example">Example</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; stream = DeltaStream.from_video(&quot;surveillance.mp4&quot;, voxel=(4,4,4))
+</code></pre></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.DeltaStream.events_only"><code class="name flex">
+<span>def <span class="ident">events_only</span></span>(<span>self) ‑> Iterator[<a title="atomik_sdk.delta_stream.Delta" href="delta_stream.html#atomik_sdk.delta_stream.Delta">Delta</a>]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def events_only(self) -&gt; Iterator[Delta]:
+    &#34;&#34;&#34;
+    Iterate over only significant event deltas.
+
+    Yields:
+        Delta objects where is_event is True.
+    &#34;&#34;&#34;
+    for delta in self:
+        if delta.is_event:
+            yield delta</code></pre>
+</details>
+<div class="desc"><p>Iterate over only significant event deltas.</p>
+<h2 id="yields">Yields</h2>
+<p>Delta objects where is_event is True.</p></div>
+</dd>
+<dt id="atomik_sdk.DeltaStream.filter_motif"><code class="name flex">
+<span>def <span class="ident">filter_motif</span></span>(<span>self, motif: MotifType) ‑> Iterator[<a title="atomik_sdk.delta_stream.Delta" href="delta_stream.html#atomik_sdk.delta_stream.Delta">Delta</a>]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def filter_motif(self, motif: MotifType) -&gt; Iterator[Delta]:
+    &#34;&#34;&#34;
+    Iterate over deltas matching a specific motif.
+
+    Args:
+        motif: The motif type to filter for.
+
+    Yields:
+        Delta objects matching the specified motif.
+
+    Example:
+        &gt;&gt;&gt; for d in stream.filter_motif(MotifType.HORIZONTAL_MOTION):
+        ...     print(f&#34;Motion at frame {d.frame_index}&#34;)
+    &#34;&#34;&#34;
+    for delta in self:
+        if delta.motif == motif:
+            yield delta</code></pre>
+</details>
+<div class="desc"><p>Iterate over deltas matching a specific motif.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>motif</code></strong></dt>
+<dd>The motif type to filter for.</dd>
+</dl>
+<h2 id="yields">Yields</h2>
+<p>Delta objects matching the specified motif.</p>
+<h2 id="example">Example</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; for d in stream.filter_motif(MotifType.HORIZONTAL_MOTION):
+...     print(f&quot;Motion at frame {d.frame_index}&quot;)
+</code></pre></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.GenomeCompiler"><code class="flex name class">
+<span>class <span class="ident">GenomeCompiler</span></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class GenomeCompiler:
+    &#34;&#34;&#34;
+    Compiler for transforming high-level configurations into genome files.
+
+    The GenomeCompiler takes JSON schema definitions and produces binary
+    genome files that can be loaded onto ATOMiK hardware accelerators.
+
+    Example:
+        &gt;&gt;&gt; compiler = GenomeCompiler()
+        &gt;&gt;&gt; compiler.load_schema(&#34;eth_schema.json&#34;)
+        &gt;&gt;&gt; genome = compiler.compile()
+        &gt;&gt;&gt; genome.save(&#34;output.gnm&#34;)
+    &#34;&#34;&#34;
+
+    # Opcode definitions
+    OPCODES = {
+        &#34;NOP&#34;: 0x00,
+        &#34;XOR&#34;: 0x01,
+        &#34;AND&#34;: 0x02,
+        &#34;OR&#34;: 0x03,
+        &#34;NOT&#34;: 0x04,
+        &#34;SHIFT_L&#34;: 0x05,
+        &#34;SHIFT_R&#34;: 0x06,
+        &#34;ROTATE_L&#34;: 0x07,
+        &#34;ROTATE_R&#34;: 0x08,
+        &#34;COMPARE&#34;: 0x09,
+        &#34;BRANCH&#34;: 0x0A,
+        &#34;LOAD&#34;: 0x0B,
+        &#34;STORE&#34;: 0x0C,
+        &#34;EMIT&#34;: 0x0D,
+        &#34;CLASSIFY&#34;: 0x0E,
+        &#34;HALT&#34;: 0x0F,
+    }
+
+    def __init__(self):
+        &#34;&#34;&#34;Initialize the GenomeCompiler.&#34;&#34;&#34;
+        self.schema: dict[str, Any] | None = None
+        self.instructions: list[GenomeInstruction] = []
+        self.labels: dict[str, int] = {}
+        self.metadata: dict[str, Any] = {}
+
+    def load_schema(self, path: str | Path) -&gt; None:
+        &#34;&#34;&#34;
+        Load a genome schema from a JSON file.
+
+        Args:
+            path: Path to the schema JSON file.
+        &#34;&#34;&#34;
+        with open(path) as f:
+            self.schema = json.load(f)
+
+        self.metadata = self.schema.get(&#34;metadata&#34;, {})
+
+    def compile(self, name: str = &#34;default&#34;, version: str = &#34;1.0&#34;) -&gt; Genome:
+        &#34;&#34;&#34;
+        Compile the loaded schema into a Genome.
+
+        Args:
+            name: Name for the compiled genome.
+            version: Version string.
+
+        Returns:
+            Compiled Genome object.
+
+        Raises:
+            ValueError: If no schema is loaded.
+        &#34;&#34;&#34;
+        if self.schema is None:
+            raise ValueError(&#34;No schema loaded&#34;)
+
+        self.instructions = []
+        self.labels = {}
+
+        # First pass: collect labels
+        for i, stmt in enumerate(self.schema.get(&#34;instructions&#34;, [])):
+            if &#34;label&#34; in stmt:
+                self.labels[stmt[&#34;label&#34;]] = i
+
+        # Second pass: compile instructions
+        for stmt in self.schema.get(&#34;instructions&#34;, []):
+            inst = self._compile_statement(stmt)
+            self.instructions.append(inst)
+
+        return Genome(
+            name=name,
+            version=version,
+            instructions=self.instructions,
+            metadata=self.metadata,
+        )
+
+    def _compile_statement(self, stmt: dict[str, Any]) -&gt; GenomeInstruction:
+        &#34;&#34;&#34;Compile a single statement to an instruction.&#34;&#34;&#34;
+        op = stmt.get(&#34;op&#34;, &#34;NOP&#34;).upper()
+        opcode = self.OPCODES.get(op, 0x00)
+
+        operand_a = self._resolve_operand(stmt.get(&#34;a&#34;, 0))
+        operand_b = self._resolve_operand(stmt.get(&#34;b&#34;, 0))
+        codon_seq = stmt.get(&#34;codons&#34;, &#34;AAAA&#34;)
+
+        return GenomeInstruction(
+            opcode=opcode,
+            operand_a=operand_a,
+            operand_b=operand_b,
+            codon_sequence=codon_seq,
+        )
+
+    def _resolve_operand(self, operand: int | str) -&gt; int:
+        &#34;&#34;&#34;Resolve an operand value, handling labels.&#34;&#34;&#34;
+        if isinstance(operand, str):
+            if operand in self.labels:
+                return self.labels[operand]
+            elif operand.startswith(&#34;0x&#34;):
+                return int(operand, 16)
+            else:
+                return int(operand)
+        return int(operand)
+
+    def create_default_schema(self) -&gt; dict[str, Any]:
+        &#34;&#34;&#34;
+        Create a default schema template.
+
+        Returns:
+            Dictionary representing a basic schema.
+        &#34;&#34;&#34;
+        return {
+            &#34;metadata&#34;: {
+                &#34;description&#34;: &#34;Default ATOMiK genome schema&#34;,
+                &#34;author&#34;: &#34;GenomeCompiler&#34;,
+                &#34;target&#34;: &#34;tang_nano_9k&#34;,
+            },
+            &#34;instructions&#34;: [
+                {&#34;op&#34;: &#34;LOAD&#34;, &#34;a&#34;: 0, &#34;b&#34;: 0, &#34;codons&#34;: &#34;AAAA&#34;},
+                {&#34;op&#34;: &#34;XOR&#34;, &#34;a&#34;: 0, &#34;b&#34;: 1, &#34;codons&#34;: &#34;AGCT&#34;},
+                {&#34;op&#34;: &#34;CLASSIFY&#34;, &#34;a&#34;: 0, &#34;b&#34;: 0, &#34;codons&#34;: &#34;AAAA&#34;},
+                {&#34;op&#34;: &#34;EMIT&#34;, &#34;a&#34;: 0, &#34;b&#34;: 0, &#34;codons&#34;: &#34;AAAA&#34;},
+                {&#34;op&#34;: &#34;HALT&#34;, &#34;a&#34;: 0, &#34;b&#34;: 0, &#34;codons&#34;: &#34;CCCC&#34;},
+            ],
+        }</code></pre>
+</details>
+<div class="desc"><p>Compiler for transforming high-level configurations into genome files.</p>
+<p>The GenomeCompiler takes JSON schema definitions and produces binary
+genome files that can be loaded onto ATOMiK hardware accelerators.</p>
+<h2 id="example">Example</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; compiler = GenomeCompiler()
+&gt;&gt;&gt; compiler.load_schema(&quot;eth_schema.json&quot;)
+&gt;&gt;&gt; genome = compiler.compile()
+&gt;&gt;&gt; genome.save(&quot;output.gnm&quot;)
+</code></pre>
+<p>Initialize the GenomeCompiler.</p></div>
+<h3>Class variables</h3>
+<dl>
+<dt id="atomik_sdk.GenomeCompiler.OPCODES"><code class="name">var <span class="ident">OPCODES</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.GenomeCompiler.compile"><code class="name flex">
+<span>def <span class="ident">compile</span></span>(<span>self, name: str = 'default', version: str = '1.0') ‑> <a title="atomik_sdk.genome_compiler.Genome" href="genome_compiler.html#atomik_sdk.genome_compiler.Genome">Genome</a></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def compile(self, name: str = &#34;default&#34;, version: str = &#34;1.0&#34;) -&gt; Genome:
+    &#34;&#34;&#34;
+    Compile the loaded schema into a Genome.
+
+    Args:
+        name: Name for the compiled genome.
+        version: Version string.
+
+    Returns:
+        Compiled Genome object.
+
+    Raises:
+        ValueError: If no schema is loaded.
+    &#34;&#34;&#34;
+    if self.schema is None:
+        raise ValueError(&#34;No schema loaded&#34;)
+
+    self.instructions = []
+    self.labels = {}
+
+    # First pass: collect labels
+    for i, stmt in enumerate(self.schema.get(&#34;instructions&#34;, [])):
+        if &#34;label&#34; in stmt:
+            self.labels[stmt[&#34;label&#34;]] = i
+
+    # Second pass: compile instructions
+    for stmt in self.schema.get(&#34;instructions&#34;, []):
+        inst = self._compile_statement(stmt)
+        self.instructions.append(inst)
+
+    return Genome(
+        name=name,
+        version=version,
+        instructions=self.instructions,
+        metadata=self.metadata,
+    )</code></pre>
+</details>
+<div class="desc"><p>Compile the loaded schema into a Genome.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>name</code></strong></dt>
+<dd>Name for the compiled genome.</dd>
+<dt><strong><code>version</code></strong></dt>
+<dd>Version string.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>Compiled Genome object.</p>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If no schema is loaded.</dd>
+</dl></div>
+</dd>
+<dt id="atomik_sdk.GenomeCompiler.create_default_schema"><code class="name flex">
+<span>def <span class="ident">create_default_schema</span></span>(<span>self) ‑> dict[str, typing.Any]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def create_default_schema(self) -&gt; dict[str, Any]:
+    &#34;&#34;&#34;
+    Create a default schema template.
+
+    Returns:
+        Dictionary representing a basic schema.
+    &#34;&#34;&#34;
+    return {
+        &#34;metadata&#34;: {
+            &#34;description&#34;: &#34;Default ATOMiK genome schema&#34;,
+            &#34;author&#34;: &#34;GenomeCompiler&#34;,
+            &#34;target&#34;: &#34;tang_nano_9k&#34;,
+        },
+        &#34;instructions&#34;: [
+            {&#34;op&#34;: &#34;LOAD&#34;, &#34;a&#34;: 0, &#34;b&#34;: 0, &#34;codons&#34;: &#34;AAAA&#34;},
+            {&#34;op&#34;: &#34;XOR&#34;, &#34;a&#34;: 0, &#34;b&#34;: 1, &#34;codons&#34;: &#34;AGCT&#34;},
+            {&#34;op&#34;: &#34;CLASSIFY&#34;, &#34;a&#34;: 0, &#34;b&#34;: 0, &#34;codons&#34;: &#34;AAAA&#34;},
+            {&#34;op&#34;: &#34;EMIT&#34;, &#34;a&#34;: 0, &#34;b&#34;: 0, &#34;codons&#34;: &#34;AAAA&#34;},
+            {&#34;op&#34;: &#34;HALT&#34;, &#34;a&#34;: 0, &#34;b&#34;: 0, &#34;codons&#34;: &#34;CCCC&#34;},
+        ],
+    }</code></pre>
+</details>
+<div class="desc"><p>Create a default schema template.</p>
+<h2 id="returns">Returns</h2>
+<p>Dictionary representing a basic schema.</p></div>
+</dd>
+<dt id="atomik_sdk.GenomeCompiler.load_schema"><code class="name flex">
+<span>def <span class="ident">load_schema</span></span>(<span>self, path: str | Path) ‑> None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def load_schema(self, path: str | Path) -&gt; None:
+    &#34;&#34;&#34;
+    Load a genome schema from a JSON file.
+
+    Args:
+        path: Path to the schema JSON file.
+    &#34;&#34;&#34;
+    with open(path) as f:
+        self.schema = json.load(f)
+
+    self.metadata = self.schema.get(&#34;metadata&#34;, {})</code></pre>
+</details>
+<div class="desc"><p>Load a genome schema from a JSON file.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>path</code></strong></dt>
+<dd>Path to the schema JSON file.</dd>
+</dl></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.Motif"><code class="flex name class">
+<span>class <span class="ident">Motif</span></span>
+<span>(</span><span>*args, **kwds)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Motif(IntEnum):
+    &#34;&#34;&#34;
+    Enumeration of delta pattern motifs.
+
+    Each motif represents a semantic category of motion or change
+    that can be efficiently encoded in 4 bits (16 possible values).
+
+    Attributes:
+        STATIC: No change detected (0x0000000000000000)
+        HORIZONTAL_MOTION: Left-to-right or right-to-left movement
+        VERTICAL_MOTION: Up-to-down or down-to-up movement
+        DIAGONAL_NE: Northeast diagonal movement
+        DIAGONAL_NW: Northwest diagonal movement
+        DIAGONAL_SE: Southeast diagonal movement
+        DIAGONAL_SW: Southwest diagonal movement
+        EXPANSION: Outward growth pattern
+        CONTRACTION: Inward shrinking pattern
+        ROTATION_CW: Clockwise rotation
+        ROTATION_CCW: Counter-clockwise rotation
+        FLICKER: High-frequency oscillation
+        EDGE_APPEAR: New edge formation
+        EDGE_DISAPPEAR: Edge dissolution
+        NOISE: Random/unclassified pattern
+        RESERVED: Reserved for future use
+    &#34;&#34;&#34;
+
+    STATIC = 0
+    HORIZONTAL_MOTION = 1
+    VERTICAL_MOTION = 2
+    DIAGONAL_NE = 3
+    DIAGONAL_NW = 4
+    DIAGONAL_SE = 5
+    DIAGONAL_SW = 6
+    EXPANSION = 7
+    CONTRACTION = 8
+    ROTATION_CW = 9
+    ROTATION_CCW = 10
+    FLICKER = 11
+    EDGE_APPEAR = 12
+    EDGE_DISAPPEAR = 13
+    NOISE = 14
+    RESERVED = 15</code></pre>
+</details>
+<div class="desc"><p>Enumeration of delta pattern motifs.</p>
+<p>Each motif represents a semantic category of motion or change
+that can be efficiently encoded in 4 bits (16 possible values).</p>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>STATIC</code></strong></dt>
+<dd>No change detected (0x0000000000000000)</dd>
+<dt><strong><code>HORIZONTAL_MOTION</code></strong></dt>
+<dd>Left-to-right or right-to-left movement</dd>
+<dt><strong><code>VERTICAL_MOTION</code></strong></dt>
+<dd>Up-to-down or down-to-up movement</dd>
+<dt><strong><code>DIAGONAL_NE</code></strong></dt>
+<dd>Northeast diagonal movement</dd>
+<dt><strong><code>DIAGONAL_NW</code></strong></dt>
+<dd>Northwest diagonal movement</dd>
+<dt><strong><code>DIAGONAL_SE</code></strong></dt>
+<dd>Southeast diagonal movement</dd>
+<dt><strong><code>DIAGONAL_SW</code></strong></dt>
+<dd>Southwest diagonal movement</dd>
+<dt><strong><code>EXPANSION</code></strong></dt>
+<dd>Outward growth pattern</dd>
+<dt><strong><code>CONTRACTION</code></strong></dt>
+<dd>Inward shrinking pattern</dd>
+<dt><strong><code>ROTATION_CW</code></strong></dt>
+<dd>Clockwise rotation</dd>
+<dt><strong><code>ROTATION_CCW</code></strong></dt>
+<dd>Counter-clockwise rotation</dd>
+<dt><strong><code>FLICKER</code></strong></dt>
+<dd>High-frequency oscillation</dd>
+<dt><strong><code>EDGE_APPEAR</code></strong></dt>
+<dd>New edge formation</dd>
+<dt><strong><code>EDGE_DISAPPEAR</code></strong></dt>
+<dd>Edge dissolution</dd>
+<dt><strong><code>NOISE</code></strong></dt>
+<dd>Random/unclassified pattern</dd>
+<dt><strong><code>RESERVED</code></strong></dt>
+<dd>Reserved for future use</dd>
+</dl></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>enum.IntEnum</li>
+<li>builtins.int</li>
+<li>enum.ReprEnum</li>
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="atomik_sdk.Motif.CONTRACTION"><code class="name">var <span class="ident">CONTRACTION</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.Motif.DIAGONAL_NE"><code class="name">var <span class="ident">DIAGONAL_NE</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.Motif.DIAGONAL_NW"><code class="name">var <span class="ident">DIAGONAL_NW</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.Motif.DIAGONAL_SE"><code class="name">var <span class="ident">DIAGONAL_SE</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.Motif.DIAGONAL_SW"><code class="name">var <span class="ident">DIAGONAL_SW</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.Motif.EDGE_APPEAR"><code class="name">var <span class="ident">EDGE_APPEAR</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.Motif.EDGE_DISAPPEAR"><code class="name">var <span class="ident">EDGE_DISAPPEAR</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.Motif.EXPANSION"><code class="name">var <span class="ident">EXPANSION</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.Motif.FLICKER"><code class="name">var <span class="ident">FLICKER</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.Motif.HORIZONTAL_MOTION"><code class="name">var <span class="ident">HORIZONTAL_MOTION</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.Motif.NOISE"><code class="name">var <span class="ident">NOISE</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.Motif.RESERVED"><code class="name">var <span class="ident">RESERVED</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.Motif.ROTATION_CCW"><code class="name">var <span class="ident">ROTATION_CCW</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.Motif.ROTATION_CW"><code class="name">var <span class="ident">ROTATION_CW</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.Motif.STATIC"><code class="name">var <span class="ident">STATIC</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.Motif.VERTICAL_MOTION"><code class="name">var <span class="ident">VERTICAL_MOTION</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.PatternMatcher"><code class="flex name class">
+<span>class <span class="ident">PatternMatcher</span></span>
+<span>(</span><span>vocab: list[str | int | Pattern] | None = None,<br>default_pattern_name: str = 'unknown')</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class PatternMatcher:
+    &#34;&#34;&#34;
+    Matcher for classifying delta words against a pattern vocabulary.
+
+    The PatternMatcher allows custom definition of patterns for domain-specific
+    motion detection. Patterns are matched using bitwise comparison with
+    configurable masks and confidence thresholds.
+
+    Attributes:
+        patterns: Dictionary of pattern ID to Pattern objects.
+        default_pattern: Pattern returned when no match is found.
+
+    Example:
+        &gt;&gt;&gt; matcher = PatternMatcher(vocab=[&#34;0xFFFF000000000000&#34;])
+        &gt;&gt;&gt; for delta in deltas:
+        ...     result = matcher.match(delta)
+        ...     if result:
+        ...         print(f&#34;Matched: {result.pattern_name}&#34;)
+    &#34;&#34;&#34;
+
+    def __init__(
+        self,
+        vocab: list[str | int | Pattern] | None = None,
+        default_pattern_name: str = &#34;unknown&#34;,
+    ):
+        &#34;&#34;&#34;
+        Initialize the PatternMatcher.
+
+        Args:
+            vocab: List of patterns as hex strings, integers, or Pattern objects.
+            default_pattern_name: Name for unmatched patterns.
+        &#34;&#34;&#34;
+        self.patterns: dict[int, Pattern] = {}
+        self.default_pattern = Pattern(
+            id=-1, name=default_pattern_name, signature=0, min_confidence=0.0
+        )
+
+        if vocab:
+            for i, item in enumerate(vocab):
+                self.add_pattern(item, pattern_id=i)
+
+    def add_pattern(
+        self,
+        pattern: str | int | Pattern,
+        pattern_id: int | None = None,
+        name: str | None = None,
+        mask: int = 0xFFFFFFFFFFFFFFFF,
+        min_confidence: float = 0.7,
+    ) -&gt; int:
+        &#34;&#34;&#34;
+        Add a pattern to the vocabulary.
+
+        Args:
+            pattern: Hex string, integer, or Pattern object.
+            pattern_id: Optional ID (auto-assigned if not provided).
+            name: Optional pattern name.
+            mask: Bit mask for matching.
+            min_confidence: Minimum confidence for a match.
+
+        Returns:
+            The assigned pattern ID.
+        &#34;&#34;&#34;
+        if pattern_id is None:
+            pattern_id = len(self.patterns)
+
+        if isinstance(pattern, Pattern):
+            self.patterns[pattern_id] = pattern
+        elif isinstance(pattern, str):
+            signature = int(pattern, 16) if pattern.startswith(&#34;0x&#34;) else int(pattern, 16)
+            self.patterns[pattern_id] = Pattern(
+                id=pattern_id,
+                name=name or f&#34;pattern_{pattern_id}&#34;,
+                signature=signature,
+                mask=mask,
+                min_confidence=min_confidence,
+            )
+        else:
+            self.patterns[pattern_id] = Pattern(
+                id=pattern_id,
+                name=name or f&#34;pattern_{pattern_id}&#34;,
+                signature=int(pattern),
+                mask=mask,
+                min_confidence=min_confidence,
+            )
+
+        return pattern_id
+
+    def match(self, delta: int) -&gt; MatchResult | None:
+        &#34;&#34;&#34;
+        Match a delta word against the vocabulary.
+
+        Args:
+            delta: The 64-bit delta word to match.
+
+        Returns:
+            MatchResult if a pattern matches, None otherwise.
+        &#34;&#34;&#34;
+        best_match: MatchResult | None = None
+        best_confidence = 0.0
+
+        for pattern in self.patterns.values():
+            result = pattern.matches(delta)
+            if result and result.confidence &gt; best_confidence:
+                best_match = result
+                best_confidence = result.confidence
+
+        return best_match
+
+    def match_all(self, delta: int) -&gt; list[MatchResult]:
+        &#34;&#34;&#34;
+        Find all patterns matching the delta word.
+
+        Args:
+            delta: The 64-bit delta word to match.
+
+        Returns:
+            List of all matching MatchResults, sorted by confidence.
+        &#34;&#34;&#34;
+        results = []
+
+        for pattern in self.patterns.values():
+            result = pattern.matches(delta)
+            if result:
+                results.append(result)
+
+        return sorted(results, key=lambda r: r.confidence, reverse=True)
+
+    def load_vocab(self, path: str | Path) -&gt; None:
+        &#34;&#34;&#34;
+        Load pattern vocabulary from a JSON file.
+
+        Args:
+            path: Path to the vocabulary JSON file.
+
+        Expected format:
+            {
+                &#34;patterns&#34;: [
+                    {
+                        &#34;id&#34;: 0,
+                        &#34;name&#34;: &#34;horizontal&#34;,
+                        &#34;signature&#34;: &#34;0xFF00...&#34;,
+                        &#34;mask&#34;: &#34;0xFF...&#34;,
+                        &#34;min_confidence&#34;: 0.8
+                    },
+                    ...
+                ]
+            }
+        &#34;&#34;&#34;
+        with open(path) as f:
+            data = json.load(f)
+
+        for p in data.get(&#34;patterns&#34;, []):
+            mask_val = p.get(&#34;mask&#34;, &#34;0xFFFFFFFFFFFFFFFF&#34;)
+            if isinstance(mask_val, str):
+                mask_val = int(mask_val, 16)
+            self.add_pattern(
+                pattern=p[&#34;signature&#34;],
+                pattern_id=p.get(&#34;id&#34;),
+                name=p.get(&#34;name&#34;),
+                mask=mask_val,
+                min_confidence=p.get(&#34;min_confidence&#34;, 0.7),
+            )
+
+    def save_vocab(self, path: str | Path) -&gt; None:
+        &#34;&#34;&#34;
+        Save pattern vocabulary to a JSON file.
+
+        Args:
+            path: Path for the output JSON file.
+        &#34;&#34;&#34;
+        data = {
+            &#34;patterns&#34;: [
+                {
+                    &#34;id&#34;: p.id,
+                    &#34;name&#34;: p.name,
+                    &#34;signature&#34;: f&#34;0x{p.signature:016X}&#34;,
+                    &#34;mask&#34;: f&#34;0x{p.mask:016X}&#34;,
+                    &#34;min_confidence&#34;: p.min_confidence,
+                }
+                for p in self.patterns.values()
+            ]
+        }
+
+        with open(path, &#34;w&#34;) as f:
+            json.dump(data, f, indent=2)
+
+    @classmethod
+    def default_motion_vocab(cls) -&gt; PatternMatcher:
+        &#34;&#34;&#34;
+        Create a matcher with the default motion detection vocabulary.
+
+        Returns:
+            PatternMatcher configured for general motion detection.
+        &#34;&#34;&#34;
+        matcher = cls()
+
+        matcher.add_pattern(0xFF00000000000000, name=&#34;right_motion&#34;, min_confidence=0.6)
+        matcher.add_pattern(0x00000000000000FF, name=&#34;left_motion&#34;, min_confidence=0.6)
+        matcher.add_pattern(0x0101010101010101, name=&#34;down_motion&#34;, min_confidence=0.6)
+        matcher.add_pattern(0x8080808080808080, name=&#34;up_motion&#34;, min_confidence=0.6)
+        matcher.add_pattern(0x183C7EFFFF7E3C18, name=&#34;expansion&#34;, min_confidence=0.5)
+        matcher.add_pattern(0xE7C38100008143E7, name=&#34;contraction&#34;, min_confidence=0.5)
+
+        return matcher</code></pre>
+</details>
+<div class="desc"><p>Matcher for classifying delta words against a pattern vocabulary.</p>
+<p>The PatternMatcher allows custom definition of patterns for domain-specific
+motion detection. Patterns are matched using bitwise comparison with
+configurable masks and confidence thresholds.</p>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>patterns</code></strong></dt>
+<dd>Dictionary of pattern ID to Pattern objects.</dd>
+<dt><strong><code>default_pattern</code></strong></dt>
+<dd>Pattern returned when no match is found.</dd>
+</dl>
+<h2 id="example">Example</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; matcher = PatternMatcher(vocab=[&quot;0xFFFF000000000000&quot;])
+&gt;&gt;&gt; for delta in deltas:
+...     result = matcher.match(delta)
+...     if result:
+...         print(f&quot;Matched: {result.pattern_name}&quot;)
+</code></pre>
+<p>Initialize the PatternMatcher.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>vocab</code></strong></dt>
+<dd>List of patterns as hex strings, integers, or Pattern objects.</dd>
+<dt><strong><code>default_pattern_name</code></strong></dt>
+<dd>Name for unmatched patterns.</dd>
+</dl></div>
+<h3>Static methods</h3>
+<dl>
+<dt id="atomik_sdk.PatternMatcher.default_motion_vocab"><code class="name flex">
+<span>def <span class="ident">default_motion_vocab</span></span>(<span>) ‑> <a title="atomik_sdk.pattern_matcher.PatternMatcher" href="pattern_matcher.html#atomik_sdk.pattern_matcher.PatternMatcher">PatternMatcher</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Create a matcher with the default motion detection vocabulary.</p>
+<h2 id="returns">Returns</h2>
+<p>PatternMatcher configured for general motion detection.</p></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.PatternMatcher.add_pattern"><code class="name flex">
+<span>def <span class="ident">add_pattern</span></span>(<span>self,<br>pattern: str | int | Pattern,<br>pattern_id: int | None = None,<br>name: str | None = None,<br>mask: int = 18446744073709551615,<br>min_confidence: float = 0.7) ‑> int</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_pattern(
+    self,
+    pattern: str | int | Pattern,
+    pattern_id: int | None = None,
+    name: str | None = None,
+    mask: int = 0xFFFFFFFFFFFFFFFF,
+    min_confidence: float = 0.7,
+) -&gt; int:
+    &#34;&#34;&#34;
+    Add a pattern to the vocabulary.
+
+    Args:
+        pattern: Hex string, integer, or Pattern object.
+        pattern_id: Optional ID (auto-assigned if not provided).
+        name: Optional pattern name.
+        mask: Bit mask for matching.
+        min_confidence: Minimum confidence for a match.
+
+    Returns:
+        The assigned pattern ID.
+    &#34;&#34;&#34;
+    if pattern_id is None:
+        pattern_id = len(self.patterns)
+
+    if isinstance(pattern, Pattern):
+        self.patterns[pattern_id] = pattern
+    elif isinstance(pattern, str):
+        signature = int(pattern, 16) if pattern.startswith(&#34;0x&#34;) else int(pattern, 16)
+        self.patterns[pattern_id] = Pattern(
+            id=pattern_id,
+            name=name or f&#34;pattern_{pattern_id}&#34;,
+            signature=signature,
+            mask=mask,
+            min_confidence=min_confidence,
+        )
+    else:
+        self.patterns[pattern_id] = Pattern(
+            id=pattern_id,
+            name=name or f&#34;pattern_{pattern_id}&#34;,
+            signature=int(pattern),
+            mask=mask,
+            min_confidence=min_confidence,
+        )
+
+    return pattern_id</code></pre>
+</details>
+<div class="desc"><p>Add a pattern to the vocabulary.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>pattern</code></strong></dt>
+<dd>Hex string, integer, or Pattern object.</dd>
+<dt><strong><code>pattern_id</code></strong></dt>
+<dd>Optional ID (auto-assigned if not provided).</dd>
+<dt><strong><code>name</code></strong></dt>
+<dd>Optional pattern name.</dd>
+<dt><strong><code>mask</code></strong></dt>
+<dd>Bit mask for matching.</dd>
+<dt><strong><code>min_confidence</code></strong></dt>
+<dd>Minimum confidence for a match.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>The assigned pattern ID.</p></div>
+</dd>
+<dt id="atomik_sdk.PatternMatcher.load_vocab"><code class="name flex">
+<span>def <span class="ident">load_vocab</span></span>(<span>self, path: str | Path) ‑> None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def load_vocab(self, path: str | Path) -&gt; None:
+    &#34;&#34;&#34;
+    Load pattern vocabulary from a JSON file.
+
+    Args:
+        path: Path to the vocabulary JSON file.
+
+    Expected format:
+        {
+            &#34;patterns&#34;: [
+                {
+                    &#34;id&#34;: 0,
+                    &#34;name&#34;: &#34;horizontal&#34;,
+                    &#34;signature&#34;: &#34;0xFF00...&#34;,
+                    &#34;mask&#34;: &#34;0xFF...&#34;,
+                    &#34;min_confidence&#34;: 0.8
+                },
+                ...
+            ]
+        }
+    &#34;&#34;&#34;
+    with open(path) as f:
+        data = json.load(f)
+
+    for p in data.get(&#34;patterns&#34;, []):
+        mask_val = p.get(&#34;mask&#34;, &#34;0xFFFFFFFFFFFFFFFF&#34;)
+        if isinstance(mask_val, str):
+            mask_val = int(mask_val, 16)
+        self.add_pattern(
+            pattern=p[&#34;signature&#34;],
+            pattern_id=p.get(&#34;id&#34;),
+            name=p.get(&#34;name&#34;),
+            mask=mask_val,
+            min_confidence=p.get(&#34;min_confidence&#34;, 0.7),
+        )</code></pre>
+</details>
+<div class="desc"><p>Load pattern vocabulary from a JSON file.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>path</code></strong></dt>
+<dd>Path to the vocabulary JSON file.</dd>
+</dl>
+<p>Expected format:
+{
+"patterns": [
+{
+"id": 0,
+"name": "horizontal",
+"signature": "0xFF00&hellip;",
+"mask": "0xFF&hellip;",
+"min_confidence": 0.8
+},
+&hellip;
+]
+}</p></div>
+</dd>
+<dt id="atomik_sdk.PatternMatcher.match"><code class="name flex">
+<span>def <span class="ident">match</span></span>(<span>self, delta: int) ‑> <a title="atomik_sdk.pattern_matcher.MatchResult" href="pattern_matcher.html#atomik_sdk.pattern_matcher.MatchResult">MatchResult</a> | None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def match(self, delta: int) -&gt; MatchResult | None:
+    &#34;&#34;&#34;
+    Match a delta word against the vocabulary.
+
+    Args:
+        delta: The 64-bit delta word to match.
+
+    Returns:
+        MatchResult if a pattern matches, None otherwise.
+    &#34;&#34;&#34;
+    best_match: MatchResult | None = None
+    best_confidence = 0.0
+
+    for pattern in self.patterns.values():
+        result = pattern.matches(delta)
+        if result and result.confidence &gt; best_confidence:
+            best_match = result
+            best_confidence = result.confidence
+
+    return best_match</code></pre>
+</details>
+<div class="desc"><p>Match a delta word against the vocabulary.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>delta</code></strong></dt>
+<dd>The 64-bit delta word to match.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>MatchResult if a pattern matches, None otherwise.</p></div>
+</dd>
+<dt id="atomik_sdk.PatternMatcher.match_all"><code class="name flex">
+<span>def <span class="ident">match_all</span></span>(<span>self, delta: int) ‑> list[<a title="atomik_sdk.pattern_matcher.MatchResult" href="pattern_matcher.html#atomik_sdk.pattern_matcher.MatchResult">MatchResult</a>]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def match_all(self, delta: int) -&gt; list[MatchResult]:
+    &#34;&#34;&#34;
+    Find all patterns matching the delta word.
+
+    Args:
+        delta: The 64-bit delta word to match.
+
+    Returns:
+        List of all matching MatchResults, sorted by confidence.
+    &#34;&#34;&#34;
+    results = []
+
+    for pattern in self.patterns.values():
+        result = pattern.matches(delta)
+        if result:
+            results.append(result)
+
+    return sorted(results, key=lambda r: r.confidence, reverse=True)</code></pre>
+</details>
+<div class="desc"><p>Find all patterns matching the delta word.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>delta</code></strong></dt>
+<dd>The 64-bit delta word to match.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>List of all matching MatchResults, sorted by confidence.</p></div>
+</dd>
+<dt id="atomik_sdk.PatternMatcher.save_vocab"><code class="name flex">
+<span>def <span class="ident">save_vocab</span></span>(<span>self, path: str | Path) ‑> None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def save_vocab(self, path: str | Path) -&gt; None:
+    &#34;&#34;&#34;
+    Save pattern vocabulary to a JSON file.
+
+    Args:
+        path: Path for the output JSON file.
+    &#34;&#34;&#34;
+    data = {
+        &#34;patterns&#34;: [
+            {
+                &#34;id&#34;: p.id,
+                &#34;name&#34;: p.name,
+                &#34;signature&#34;: f&#34;0x{p.signature:016X}&#34;,
+                &#34;mask&#34;: f&#34;0x{p.mask:016X}&#34;,
+                &#34;min_confidence&#34;: p.min_confidence,
+            }
+            for p in self.patterns.values()
+        ]
+    }
+
+    with open(path, &#34;w&#34;) as f:
+        json.dump(data, f, indent=2)</code></pre>
+</details>
+<div class="desc"><p>Save pattern vocabulary to a JSON file.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>path</code></strong></dt>
+<dd>Path for the output JSON file.</dd>
+</dl></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.VoxelEncoder"><code class="flex name class">
+<span>class <span class="ident">VoxelEncoder</span></span>
+<span>(</span><span>tile_method: str | TileMethod = TileMethod.OTSU,<br>voxel_size: tuple[int, int, int] = (4, 4, 4),<br>threshold: float | None = None)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class VoxelEncoder:
+    &#34;&#34;&#34;
+    Encoder for converting video frames to 64-bit voxel words.
+
+    The VoxelEncoder implements ATOMiK&#39;s 4x4x4 spatiotemporal encoding:
+    - 4 temporal frames
+    - 4x4 spatial tile
+    - 64 binary values packed into a 64-bit word
+
+    Attributes:
+        voxel_size: The (temporal, height, width) voxel dimensions.
+        tile_method: The binarization method used.
+        threshold: Fixed threshold value (only for FIXED method).
+
+    Example:
+        &gt;&gt;&gt; encoder = VoxelEncoder(tile_method=&#34;otsu&#34;, voxel_size=(4,4,4))
+        &gt;&gt;&gt; voxels = encoder.encode_frames(frames)
+        &gt;&gt;&gt; for v in voxels:
+        ...     print(f&#34;Position {v.position}: {v.word:#018x}&#34;)
+    &#34;&#34;&#34;
+
+    def __init__(
+        self,
+        tile_method: str | TileMethod = TileMethod.OTSU,
+        voxel_size: tuple[int, int, int] = (4, 4, 4),
+        threshold: float | None = None,
+    ):
+        &#34;&#34;&#34;
+        Initialize the VoxelEncoder.
+
+        Args:
+            tile_method: Binarization method (&#39;otsu&#39;, &#39;mean&#39;, &#39;adaptive&#39;, &#39;fixed&#39;).
+            voxel_size: Dimensions (temporal, height, width) for voxels.
+            threshold: Fixed threshold value (required if tile_method=&#39;fixed&#39;).
+
+        Raises:
+            ValueError: If fixed method specified without threshold.
+        &#34;&#34;&#34;
+        if isinstance(tile_method, str):
+            tile_method = TileMethod[tile_method.upper()]
+
+        self.tile_method = tile_method
+        self.voxel_size = voxel_size
+        self.threshold = threshold
+
+        if self.tile_method == TileMethod.FIXED and threshold is None:
+            raise ValueError(&#34;Fixed method requires threshold parameter&#34;)
+
+        self._cache: dict = {}
+
+    def encode_frames(self, frames: np.ndarray) -&gt; list[Voxel]:
+        &#34;&#34;&#34;
+        Encode a sequence of frames into voxels.
+
+        Args:
+            frames: NumPy array of shape (T, H, W) containing grayscale frames.
+
+        Returns:
+            List of Voxel objects covering the entire video.
+
+        Raises:
+            ValueError: If frame dimensions are incompatible with voxel size.
+        &#34;&#34;&#34;
+        t, h, w = self.voxel_size
+        frames_t, frames_h, frames_w = frames.shape
+
+        if frames_t &lt; t or frames_h &lt; h or frames_w &lt; w:
+            raise ValueError(
+                f&#34;Frame dimensions {frames.shape} too small for voxel size {self.voxel_size}&#34;
+            )
+
+        voxels = []
+
+        for ti in range(0, frames_t - t + 1, t):
+            for yi in range(0, frames_h - h + 1, h):
+                for xi in range(0, frames_w - w + 1, w):
+                    # Extract voxel region
+                    region = frames[ti : ti + t, yi : yi + h, xi : xi + w]
+
+                    # Binarize and encode
+                    word, stats = self._encode_region(region)
+
+                    voxel = Voxel(word=word, position=(ti, yi, xi), tile_stats=stats)
+                    voxels.append(voxel)
+
+        return voxels
+
+    def encode_video(self, path: str) -&gt; list[Voxel]:
+        &#34;&#34;&#34;
+        Encode a video file into voxels.
+
+        Args:
+            path: Path to the video file.
+
+        Returns:
+            List of Voxel objects.
+        &#34;&#34;&#34;
+        try:
+            import cv2
+        except ImportError:
+            raise ImportError(&#34;OpenCV required for video encoding&#34;)
+
+        cap = cv2.VideoCapture(path)
+        frames = []
+
+        while True:
+            ret, frame = cap.read()
+            if not ret:
+                break
+            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+            frames.append(gray)
+
+        cap.release()
+
+        return self.encode_frames(np.array(frames))
+
+    def _encode_region(self, region: np.ndarray) -&gt; tuple[int, dict]:
+        &#34;&#34;&#34;
+        Encode a single voxel region into a 64-bit word.
+
+        Args:
+            region: Array of shape (t, h, w) containing pixel values.
+
+        Returns:
+            Tuple of (64-bit word, statistics dictionary).
+        &#34;&#34;&#34;
+        # Compute threshold based on method
+        if self.tile_method == TileMethod.FIXED:
+            threshold = self.threshold
+        elif self.tile_method == TileMethod.MEAN:
+            threshold = np.mean(region)
+        elif self.tile_method == TileMethod.OTSU:
+            threshold = self._otsu_threshold(region)
+        elif self.tile_method == TileMethod.ADAPTIVE:
+            threshold = self._adaptive_threshold(region)
+        else:
+            threshold = np.mean(region)
+
+        # Binarize
+        binary = (region &gt; threshold).astype(np.uint8)
+
+        # Pack into 64-bit word
+        flat = binary.flatten()[:64]  # Take first 64 bits
+
+        # Pad if necessary
+        if len(flat) &lt; 64:
+            flat = np.pad(flat, (0, 64 - len(flat)))
+
+        word = 0
+        for i, bit in enumerate(flat):
+            if bit:
+                word |= 1 &lt;&lt; i
+
+        stats = {
+            &#34;threshold&#34;: float(threshold),
+            &#34;mean&#34;: float(np.mean(region)),
+            &#34;std&#34;: float(np.std(region)),
+            &#34;ones_count&#34;: int(np.sum(binary)),
+        }
+
+        return word, stats
+
+    def _otsu_threshold(self, region: np.ndarray) -&gt; float:
+        &#34;&#34;&#34;Compute Otsu&#39;s threshold for the region.&#34;&#34;&#34;
+        hist, _ = np.histogram(region.flatten(), bins=256, range=(0, 256))
+        total = region.size
+
+        sum_total = np.sum(np.arange(256) * hist)
+        sum_bg = 0
+        weight_bg = 0
+
+        max_variance = 0
+        threshold = 0
+
+        for t in range(256):
+            weight_bg += hist[t]
+            if weight_bg == 0:
+                continue
+
+            weight_fg = total - weight_bg
+            if weight_fg == 0:
+                break
+
+            sum_bg += t * hist[t]
+
+            mean_bg = sum_bg / weight_bg
+            mean_fg = (sum_total - sum_bg) / weight_fg
+
+            variance = weight_bg * weight_fg * (mean_bg - mean_fg) ** 2
+
+            if variance &gt; max_variance:
+                max_variance = variance
+                threshold = t
+
+        return float(threshold)
+
+    def _adaptive_threshold(self, region: np.ndarray) -&gt; float:
+        &#34;&#34;&#34;Compute adaptive threshold based on local statistics.&#34;&#34;&#34;
+        mean = np.mean(region)
+        std = np.std(region)
+        return mean - 0.5 * std
+
+    def deltas(self, voxels: list[Voxel]) -&gt; Iterator[int]:
+        &#34;&#34;&#34;
+        Compute deltas between consecutive voxels.
+
+        Args:
+            voxels: List of voxels in temporal order.
+
+        Yields:
+            64-bit XOR delta values.
+        &#34;&#34;&#34;
+        prev = None
+        for voxel in voxels:
+            if prev is not None:
+                yield voxel.word ^ prev.word
+            prev = voxel</code></pre>
+</details>
+<div class="desc"><p>Encoder for converting video frames to 64-bit voxel words.</p>
+<p>The VoxelEncoder implements ATOMiK's 4x4x4 spatiotemporal encoding:
+- 4 temporal frames
+- 4x4 spatial tile
+- 64 binary values packed into a 64-bit word</p>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>voxel_size</code></strong></dt>
+<dd>The (temporal, height, width) voxel dimensions.</dd>
+<dt><strong><code>tile_method</code></strong></dt>
+<dd>The binarization method used.</dd>
+<dt><strong><code>threshold</code></strong></dt>
+<dd>Fixed threshold value (only for FIXED method).</dd>
+</dl>
+<h2 id="example">Example</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; encoder = VoxelEncoder(tile_method=&quot;otsu&quot;, voxel_size=(4,4,4))
+&gt;&gt;&gt; voxels = encoder.encode_frames(frames)
+&gt;&gt;&gt; for v in voxels:
+...     print(f&quot;Position {v.position}: {v.word:#018x}&quot;)
+</code></pre>
+<p>Initialize the VoxelEncoder.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>tile_method</code></strong></dt>
+<dd>Binarization method ('otsu', 'mean', 'adaptive', 'fixed').</dd>
+<dt><strong><code>voxel_size</code></strong></dt>
+<dd>Dimensions (temporal, height, width) for voxels.</dd>
+<dt><strong><code>threshold</code></strong></dt>
+<dd>Fixed threshold value (required if tile_method='fixed').</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If fixed method specified without threshold.</dd>
+</dl></div>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.VoxelEncoder.deltas"><code class="name flex">
+<span>def <span class="ident">deltas</span></span>(<span>self, voxels: list[Voxel]) ‑> Iterator[int]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def deltas(self, voxels: list[Voxel]) -&gt; Iterator[int]:
+    &#34;&#34;&#34;
+    Compute deltas between consecutive voxels.
+
+    Args:
+        voxels: List of voxels in temporal order.
+
+    Yields:
+        64-bit XOR delta values.
+    &#34;&#34;&#34;
+    prev = None
+    for voxel in voxels:
+        if prev is not None:
+            yield voxel.word ^ prev.word
+        prev = voxel</code></pre>
+</details>
+<div class="desc"><p>Compute deltas between consecutive voxels.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>voxels</code></strong></dt>
+<dd>List of voxels in temporal order.</dd>
+</dl>
+<h2 id="yields">Yields</h2>
+<p>64-bit XOR delta values.</p></div>
+</dd>
+<dt id="atomik_sdk.VoxelEncoder.encode_frames"><code class="name flex">
+<span>def <span class="ident">encode_frames</span></span>(<span>self, frames: np.ndarray) ‑> list[<a title="atomik_sdk.voxel_encoder.Voxel" href="voxel_encoder.html#atomik_sdk.voxel_encoder.Voxel">Voxel</a>]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def encode_frames(self, frames: np.ndarray) -&gt; list[Voxel]:
+    &#34;&#34;&#34;
+    Encode a sequence of frames into voxels.
+
+    Args:
+        frames: NumPy array of shape (T, H, W) containing grayscale frames.
+
+    Returns:
+        List of Voxel objects covering the entire video.
+
+    Raises:
+        ValueError: If frame dimensions are incompatible with voxel size.
+    &#34;&#34;&#34;
+    t, h, w = self.voxel_size
+    frames_t, frames_h, frames_w = frames.shape
+
+    if frames_t &lt; t or frames_h &lt; h or frames_w &lt; w:
+        raise ValueError(
+            f&#34;Frame dimensions {frames.shape} too small for voxel size {self.voxel_size}&#34;
+        )
+
+    voxels = []
+
+    for ti in range(0, frames_t - t + 1, t):
+        for yi in range(0, frames_h - h + 1, h):
+            for xi in range(0, frames_w - w + 1, w):
+                # Extract voxel region
+                region = frames[ti : ti + t, yi : yi + h, xi : xi + w]
+
+                # Binarize and encode
+                word, stats = self._encode_region(region)
+
+                voxel = Voxel(word=word, position=(ti, yi, xi), tile_stats=stats)
+                voxels.append(voxel)
+
+    return voxels</code></pre>
+</details>
+<div class="desc"><p>Encode a sequence of frames into voxels.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>frames</code></strong></dt>
+<dd>NumPy array of shape (T, H, W) containing grayscale frames.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>List of Voxel objects covering the entire video.</p>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If frame dimensions are incompatible with voxel size.</dd>
+</dl></div>
+</dd>
+<dt id="atomik_sdk.VoxelEncoder.encode_video"><code class="name flex">
+<span>def <span class="ident">encode_video</span></span>(<span>self, path: str) ‑> list[<a title="atomik_sdk.voxel_encoder.Voxel" href="voxel_encoder.html#atomik_sdk.voxel_encoder.Voxel">Voxel</a>]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def encode_video(self, path: str) -&gt; list[Voxel]:
+    &#34;&#34;&#34;
+    Encode a video file into voxels.
+
+    Args:
+        path: Path to the video file.
+
+    Returns:
+        List of Voxel objects.
+    &#34;&#34;&#34;
+    try:
+        import cv2
+    except ImportError:
+        raise ImportError(&#34;OpenCV required for video encoding&#34;)
+
+    cap = cv2.VideoCapture(path)
+    frames = []
+
+    while True:
+        ret, frame = cap.read()
+        if not ret:
+            break
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        frames.append(gray)
+
+    cap.release()
+
+    return self.encode_frames(np.array(frames))</code></pre>
+</details>
+<div class="desc"><p>Encode a video file into voxels.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>path</code></strong></dt>
+<dd>Path to the video file.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>List of Voxel objects.</p></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3><a href="#header-submodules">Sub-modules</a></h3>
+<ul>
+<li><code><a title="atomik_sdk.bitstream_gen" href="bitstream_gen.html">atomik_sdk.bitstream_gen</a></code></li>
+<li><code><a title="atomik_sdk.delta_stream" href="delta_stream.html">atomik_sdk.delta_stream</a></code></li>
+<li><code><a title="atomik_sdk.genome_compiler" href="genome_compiler.html">atomik_sdk.genome_compiler</a></code></li>
+<li><code><a title="atomik_sdk.motifs" href="motifs.html">atomik_sdk.motifs</a></code></li>
+<li><code><a title="atomik_sdk.pattern_matcher" href="pattern_matcher.html">atomik_sdk.pattern_matcher</a></code></li>
+<li><code><a title="atomik_sdk.voxel_encoder" href="voxel_encoder.html">atomik_sdk.voxel_encoder</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="atomik_sdk.BitstreamGenerator" href="#atomik_sdk.BitstreamGenerator">BitstreamGenerator</a></code></h4>
+<ul class="">
+<li><code><a title="atomik_sdk.BitstreamGenerator.generate_testbench" href="#atomik_sdk.BitstreamGenerator.generate_testbench">generate_testbench</a></code></li>
+<li><code><a title="atomik_sdk.BitstreamGenerator.load_genome" href="#atomik_sdk.BitstreamGenerator.load_genome">load_genome</a></code></li>
+<li><code><a title="atomik_sdk.BitstreamGenerator.set_genome" href="#atomik_sdk.BitstreamGenerator.set_genome">set_genome</a></code></li>
+<li><code><a title="atomik_sdk.BitstreamGenerator.synthesize_verilog" href="#atomik_sdk.BitstreamGenerator.synthesize_verilog">synthesize_verilog</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.Delta" href="#atomik_sdk.Delta">Delta</a></code></h4>
+<ul class="two-column">
+<li><code><a title="atomik_sdk.Delta.delta_word" href="#atomik_sdk.Delta.delta_word">delta_word</a></code></li>
+<li><code><a title="atomik_sdk.Delta.frame_index" href="#atomik_sdk.Delta.frame_index">frame_index</a></code></li>
+<li><code><a title="atomik_sdk.Delta.is_event" href="#atomik_sdk.Delta.is_event">is_event</a></code></li>
+<li><code><a title="atomik_sdk.Delta.magnitude" href="#atomik_sdk.Delta.magnitude">magnitude</a></code></li>
+<li><code><a title="atomik_sdk.Delta.motif" href="#atomik_sdk.Delta.motif">motif</a></code></li>
+<li><code><a title="atomik_sdk.Delta.timestamp_ms" href="#atomik_sdk.Delta.timestamp_ms">timestamp_ms</a></code></li>
+<li><code><a title="atomik_sdk.Delta.to_bytes" href="#atomik_sdk.Delta.to_bytes">to_bytes</a></code></li>
+<li><code><a title="atomik_sdk.Delta.voxel_index" href="#atomik_sdk.Delta.voxel_index">voxel_index</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.DeltaStream" href="#atomik_sdk.DeltaStream">DeltaStream</a></code></h4>
+<ul class="">
+<li><code><a title="atomik_sdk.DeltaStream.events_only" href="#atomik_sdk.DeltaStream.events_only">events_only</a></code></li>
+<li><code><a title="atomik_sdk.DeltaStream.filter_motif" href="#atomik_sdk.DeltaStream.filter_motif">filter_motif</a></code></li>
+<li><code><a title="atomik_sdk.DeltaStream.from_numpy" href="#atomik_sdk.DeltaStream.from_numpy">from_numpy</a></code></li>
+<li><code><a title="atomik_sdk.DeltaStream.from_video" href="#atomik_sdk.DeltaStream.from_video">from_video</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.GenomeCompiler" href="#atomik_sdk.GenomeCompiler">GenomeCompiler</a></code></h4>
+<ul class="">
+<li><code><a title="atomik_sdk.GenomeCompiler.OPCODES" href="#atomik_sdk.GenomeCompiler.OPCODES">OPCODES</a></code></li>
+<li><code><a title="atomik_sdk.GenomeCompiler.compile" href="#atomik_sdk.GenomeCompiler.compile">compile</a></code></li>
+<li><code><a title="atomik_sdk.GenomeCompiler.create_default_schema" href="#atomik_sdk.GenomeCompiler.create_default_schema">create_default_schema</a></code></li>
+<li><code><a title="atomik_sdk.GenomeCompiler.load_schema" href="#atomik_sdk.GenomeCompiler.load_schema">load_schema</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.Motif" href="#atomik_sdk.Motif">Motif</a></code></h4>
+<ul class="two-column">
+<li><code><a title="atomik_sdk.Motif.CONTRACTION" href="#atomik_sdk.Motif.CONTRACTION">CONTRACTION</a></code></li>
+<li><code><a title="atomik_sdk.Motif.DIAGONAL_NE" href="#atomik_sdk.Motif.DIAGONAL_NE">DIAGONAL_NE</a></code></li>
+<li><code><a title="atomik_sdk.Motif.DIAGONAL_NW" href="#atomik_sdk.Motif.DIAGONAL_NW">DIAGONAL_NW</a></code></li>
+<li><code><a title="atomik_sdk.Motif.DIAGONAL_SE" href="#atomik_sdk.Motif.DIAGONAL_SE">DIAGONAL_SE</a></code></li>
+<li><code><a title="atomik_sdk.Motif.DIAGONAL_SW" href="#atomik_sdk.Motif.DIAGONAL_SW">DIAGONAL_SW</a></code></li>
+<li><code><a title="atomik_sdk.Motif.EDGE_APPEAR" href="#atomik_sdk.Motif.EDGE_APPEAR">EDGE_APPEAR</a></code></li>
+<li><code><a title="atomik_sdk.Motif.EDGE_DISAPPEAR" href="#atomik_sdk.Motif.EDGE_DISAPPEAR">EDGE_DISAPPEAR</a></code></li>
+<li><code><a title="atomik_sdk.Motif.EXPANSION" href="#atomik_sdk.Motif.EXPANSION">EXPANSION</a></code></li>
+<li><code><a title="atomik_sdk.Motif.FLICKER" href="#atomik_sdk.Motif.FLICKER">FLICKER</a></code></li>
+<li><code><a title="atomik_sdk.Motif.HORIZONTAL_MOTION" href="#atomik_sdk.Motif.HORIZONTAL_MOTION">HORIZONTAL_MOTION</a></code></li>
+<li><code><a title="atomik_sdk.Motif.NOISE" href="#atomik_sdk.Motif.NOISE">NOISE</a></code></li>
+<li><code><a title="atomik_sdk.Motif.RESERVED" href="#atomik_sdk.Motif.RESERVED">RESERVED</a></code></li>
+<li><code><a title="atomik_sdk.Motif.ROTATION_CCW" href="#atomik_sdk.Motif.ROTATION_CCW">ROTATION_CCW</a></code></li>
+<li><code><a title="atomik_sdk.Motif.ROTATION_CW" href="#atomik_sdk.Motif.ROTATION_CW">ROTATION_CW</a></code></li>
+<li><code><a title="atomik_sdk.Motif.STATIC" href="#atomik_sdk.Motif.STATIC">STATIC</a></code></li>
+<li><code><a title="atomik_sdk.Motif.VERTICAL_MOTION" href="#atomik_sdk.Motif.VERTICAL_MOTION">VERTICAL_MOTION</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.PatternMatcher" href="#atomik_sdk.PatternMatcher">PatternMatcher</a></code></h4>
+<ul class="">
+<li><code><a title="atomik_sdk.PatternMatcher.add_pattern" href="#atomik_sdk.PatternMatcher.add_pattern">add_pattern</a></code></li>
+<li><code><a title="atomik_sdk.PatternMatcher.default_motion_vocab" href="#atomik_sdk.PatternMatcher.default_motion_vocab">default_motion_vocab</a></code></li>
+<li><code><a title="atomik_sdk.PatternMatcher.load_vocab" href="#atomik_sdk.PatternMatcher.load_vocab">load_vocab</a></code></li>
+<li><code><a title="atomik_sdk.PatternMatcher.match" href="#atomik_sdk.PatternMatcher.match">match</a></code></li>
+<li><code><a title="atomik_sdk.PatternMatcher.match_all" href="#atomik_sdk.PatternMatcher.match_all">match_all</a></code></li>
+<li><code><a title="atomik_sdk.PatternMatcher.save_vocab" href="#atomik_sdk.PatternMatcher.save_vocab">save_vocab</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.VoxelEncoder" href="#atomik_sdk.VoxelEncoder">VoxelEncoder</a></code></h4>
+<ul class="">
+<li><code><a title="atomik_sdk.VoxelEncoder.deltas" href="#atomik_sdk.VoxelEncoder.deltas">deltas</a></code></li>
+<li><code><a title="atomik_sdk.VoxelEncoder.encode_frames" href="#atomik_sdk.VoxelEncoder.encode_frames">encode_frames</a></code></li>
+<li><code><a title="atomik_sdk.VoxelEncoder.encode_video" href="#atomik_sdk.VoxelEncoder.encode_video">encode_video</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+</body>
+</html>
