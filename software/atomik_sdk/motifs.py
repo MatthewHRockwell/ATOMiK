@@ -107,7 +107,19 @@ def classify_delta(delta_word: int) -> Motif:
     if delta_word == 0:
         return Motif.STATIC
 
-    # Check against known signatures
+    # Count bits first for density-based classification
+    bit_count = bin(delta_word).count("1")
+
+    # Very sparse patterns are noise
+    if bit_count <= 2:
+        return Motif.NOISE
+
+    # Very dense patterns (>40 bits) are expansion or flicker
+    # Check this BEFORE signature matching to avoid false positives
+    if bit_count > 40:
+        return Motif.EXPANSION
+
+    # Check against known signatures for medium-density patterns
     for motif, signatures in MOTIF_SIGNATURES.items():
         for sig in signatures:
             # Allow for partial matches (>70% overlap)
@@ -116,11 +128,7 @@ def classify_delta(delta_word: int) -> Motif:
             if sig_bits > 0 and overlap / sig_bits > 0.7:
                 return motif
 
-    # Fallback to heuristic classification
-    bit_count = bin(delta_word).count("1")
-
-    if bit_count <= 2:
-        return Motif.NOISE
+    # Fallback to heuristic classification for remaining patterns
 
     # Analyze bit distribution
     upper_32 = (delta_word >> 32) & 0xFFFFFFFF
@@ -145,9 +153,7 @@ def classify_delta(delta_word: int) -> Motif:
         return Motif.HORIZONTAL_MOTION
 
     # Default classification based on density
-    if bit_count > 40:
-        return Motif.EXPANSION
-    elif bit_count > 20:
+    if bit_count > 20:
         return Motif.FLICKER
     else:
         return Motif.NOISE
