@@ -1,5 +1,9 @@
 # ATOMiK Formal Model Specification
 
+**Version**: 2.0  
+**Status**: ✅ Complete (All proofs verified)  
+**Last Updated**: January 24, 2026  
+
 ## Overview
 
 This document defines the mathematical foundations of the ATOMiK delta-state algebra, providing the formal specification that underlies all Lean4 proofs in `math/proofs/`.
@@ -55,10 +59,10 @@ transition : State → Delta → State
 transition(s, δ) = s XOR δ
 ```
 
-**Lean4 Implementation** (`ATOMiK/Delta.lean`):
+**Lean4 Implementation** (`ATOMiK/Transition.lean`):
 ```lean
-def Delta.apply (d : Delta) (s : State) : State :=
-  s ^^^ d.bits
+def transition (s : State) (d : Delta) : State := Delta.apply d s
+notation:50 s " ▷ " d => transition s d
 ```
 
 ### 2.2 Determinism Guarantee
@@ -71,6 +75,14 @@ For any state `s` and delta `δ`, the transition function always produces the sa
 
 This is trivially true for pure functions with no side effects.
 
+### 2.3 Composition Property
+
+Sequential transitions can be composed:
+
+```
+transition(transition(s, δ₁), δ₂) = transition(s, δ₁ ⊕ δ₂)
+```
+
 ---
 
 ## 3. Computational Model
@@ -82,53 +94,113 @@ The ATOMiK model is computationally equivalent to traditional stateful computati
 **Traditional**: State × Input → State × Output
 **ATOMiK**: State × Delta → State (where Delta encodes both input and output transformation)
 
-### 3.2 Turing Completeness
+### 3.2 Encoding/Decoding
+
+```lean
+def encodeTraditional (initialState finalState : State) : Delta :=
+  ⟨initialState ^^^ finalState⟩
+
+def decodeAtomik (d : Delta) (initialState : State) : State :=
+  transition initialState d
+```
+
+### 3.3 Turing Completeness
 
 ATOMiK achieves Turing completeness through:
-- Conditional branching via delta selection
-- Iteration via recursive delta composition
-- Memory via state accumulation
+- **Conditional branching**: Delta selection based on state predicates
+- **Iteration**: Recursive delta composition
+- **Memory**: State accumulation via XOR
+
+Proven via counter machine (Minsky machine) simulation in `TuringComplete.lean`.
 
 ---
 
 ## 4. Proof Obligations
 
-| Property | Lean4 File | Status | Task |
-|----------|------------|--------|------|
-| Type definitions | `Basic.lean`, `Delta.lean` | ✅ Complete | T1.1 |
-| Closure | `Closure.lean` | ⏳ Pending | T1.2 |
-| Associativity | `Properties.lean` | ⏳ Pending | T1.3 |
-| Commutativity | `Properties.lean` | ⏳ Pending | T1.3 |
-| Identity | `Delta.lean` | ✅ Proven | T1.1 |
-| Inverse | `Delta.lean` | ✅ Proven | T1.1 |
-| Determinism | `Transition.lean` | ⏳ Pending | T1.6 |
-| Turing Completeness | `TuringComplete.lean` | ⏳ Pending | T1.8 |
+| Property | Lean4 File | Theorem | Status |
+|----------|------------|---------|--------|
+| Type definitions | `Basic.lean`, `Delta.lean` | - | ✅ |
+| Closure | `Closure.lean` | `delta_closure` | ✅ |
+| Associativity | `Properties.lean` | `delta_assoc` | ✅ |
+| Commutativity | `Properties.lean` | `delta_comm` | ✅ |
+| Identity | `Properties.lean` | `delta_identity` | ✅ |
+| Inverse | `Properties.lean` | `delta_inverse` | ✅ |
+| Determinism | `Transition.lean` | `determinism_guarantees` | ✅ |
+| Composition | `Composition.lean` | `composition_laws` | ✅ |
+| Equivalence | `Equivalence.lean` | `computational_equivalence` | ✅ |
+| Turing Completeness | `TuringComplete.lean` | `turing_completeness_summary` | ✅ |
 
 ---
 
-## 5. T1.1 Deliverables
+## 5. Module Summary
 
 ### 5.1 Basic.lean
 - `DELTA_WIDTH` constant (64 bits)
-- `State` type alias
-- `State.zero` and `State.xor` operations
+- `State` type alias (`BitVec DELTA_WIDTH`)
+- `State.zero` - zero state
 
 ### 5.2 Delta.lean
-- `Delta` structure with `bits : BitVec 64`
-- `Delta.zero` / `Delta.identity` - identity element
+- `Delta` structure with `bits : BitVec DELTA_WIDTH`
+- `Delta.zero` - identity element
 - `Delta.compose` - group operation (XOR)
-- `Delta.inverse` - self-inverse
+- `Delta.inverse` - self-inverse (returns self)
 - `Delta.apply` - state transition
-- Utility functions: `ofNat`, `ofBitVec`, `toBitVec`, `isZero`, `popCount`, `hammingDistance`
-- Basic lemmas:
-  - `Delta.compose_zero_right`
-  - `Delta.compose_zero_left`
-  - `Delta.compose_self`
-  - `Delta.add_neg_self`
+- Utility functions: `ofNat`, `toBitVec`, `isZero`
+
+### 5.3 Closure.lean
+- `delta_closure` - composition produces valid delta
+- `delta_compose_type` - type preservation
+
+### 5.4 Properties.lean
+- `delta_assoc` - associativity
+- `delta_comm` - commutativity
+- `delta_identity` - identity element
+- `delta_inverse` - self-inverse
+- `delta_algebra_properties` - summary theorem
+
+### 5.5 Composition.lean
+- `Delta.seq` - sequential composition (notation `>>`)
+- `Delta.par` - parallel composition (notation `|||`)
+- `Delta.composeAll` - list fold
+- `composition_laws` - 7 core operator laws
+
+### 5.6 Transition.lean
+- `transition` - state transition function (notation `▷`)
+- `PureFunction` - pure function structure
+- `TransitionTrace` - trace structure
+- `determinism_guarantees` - 4 determinism properties
+- `transition_compose` - composition property
+
+### 5.7 Equivalence.lean
+- `TraditionalComputation` - traditional model
+- `AtomikComputation` - ATOMiK model
+- `encodeTraditional` / `decodeAtomik` - encoding functions
+- `roundtrip_encode_decode` - roundtrip correctness
+- `computational_equivalence` - 5 equivalence claims
+
+### 5.8 TuringComplete.lean
+- `CMInstruction` - counter machine instruction type
+- `CMState` - counter machine state
+- `ATOMiKSimulation` - simulation structure
+- `encodeCMState` / `decodeCMState` - state encoding
+- `turing_complete` - main theorem
+- `turing_completeness_summary` - 5 key properties
 
 ---
 
-*Document version: 1.1*
-*Last updated: January 24, 2026*
-*T1.1 completed: January 24, 2026*
+## 6. Verification Summary
+
+| Metric | Value |
+|--------|-------|
+| Total modules | 8 |
+| Total theorems | 92 |
+| Sorry statements | 0 |
+| Lean version | 4.27.0 |
+| Build status | ✅ Pass |
+
+---
+
+*Document version: 2.0*  
+*Last updated: January 24, 2026*  
+*Phase 1 completed: January 24, 2026*  
 *Related proofs: `math/proofs/ATOMiK/`*
