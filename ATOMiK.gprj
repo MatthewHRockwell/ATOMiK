@@ -7,8 +7,8 @@
     <FileList>
         <File path="rtl/atomik_core.v" type="file.verilog" enable="1"/>
         <File path="rtl/atomik_top.v" type="file.verilog" enable="1"/>
-        <File path="rtl/pll/atomik_pll_81m.v" type="file.verilog" enable="1"/>
         <File path="rtl/uart_genome_loader.v" type="file.verilog" enable="1"/>
+        <File path="src/atomik_pll_81m/atomik_pll_81m.v" type="file.verilog" enable="1"/>
         <File path="constraints/atomik_constraints.cst" type="file.cst" enable="1"/>
         <File path="constraints/timing_constraints.sdc" type="file.sdc" enable="1"/>
     </FileList>

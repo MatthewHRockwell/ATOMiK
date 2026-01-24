@@ -160,21 +160,43 @@ module atomik_top #(
     // Make it a wire to avoid reg init issues; this is sufficient for link test.
     // -------------------------------------------------------------------------
     assign uart_tx = uart_rx;
+    // -------------------------------------------------------------------------
+    
+    // UART RX ACTIVITY (DEBUG) - run in sys_clk domain to avoid impacting Fmax
+    // -------------------------------------------------------------------------
+    reg [2:0] rx_sync_sys;
+    reg       rx_sys_d1;
+    reg [19:0] rx_pulse_sys;
 
+    always @(posedge sys_clk or negedge sys_rst_n) begin
+      if (!sys_rst_n) begin
+        rx_sync_sys  <= 3'b111;
+        rx_sys_d1    <= 1'b1;
+        rx_pulse_sys <= 20'd0;
+      end else begin
+        // simple sync for LED/debug only
+        rx_sync_sys <= {rx_sync_sys[1:0], uart_rx};
+        rx_sys_d1   <= rx_sync_sys[2];
+
+        // edge detect on synced RX
+        if (rx_sys_d1 ^ rx_sync_sys[2]) begin
+          rx_pulse_sys <= 20'hFFFFF;
+        end else if (rx_pulse_sys != 0) begin
+          rx_pulse_sys <= rx_pulse_sys - 1'b1;
+        end
+      end
+    end
+
+    wire rx_activity_sys = (rx_pulse_sys != 0);
     // -------------------------------------------------------------------------
     // LED MAPPING (Tang Nano LEDs are typically active-low)
     // -------------------------------------------------------------------------
-    // led[5] = PLL lock indicator (active-low; ON when locked)
-    // led[4] = heartbeat (active-low)
-    // led[3] = loader busy (active-low; ON when busy)
-    // led[2] = core enabled (active-low; ON when enabled)
-    // led[1] = OTP enabled (active-low; ON when otp_en=1)
-    // led[0] = core debug tap (active-low; ON when core_debug=1)
     assign led[5] = ~pll_lock;
-    assign led[4] = ~heartbeat_cnt[23];
-    assign led[3] = ~w_loader_busy;
-    assign led[2] = ~w_core_enable;
-    assign led[1] = ~w_otp_en;
-    assign led[0] = ~core_debug;
+    assign led[4] = ~heartbeat_cnt[23];  
+    assign led[3] = ~rx_activity_sys;                 // UART RX activity pulse (debug)
+    assign led[2] = ~w_loader_busy;                   // BIOS is actively loading
+    assign led[1] = ~w_core_enable;                   // BIOS completed; core enabled
+    assign led[0] = ~(w_otp_en ^ core_debug);         // policy bit
+
 
 endmodule

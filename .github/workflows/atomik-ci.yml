@@ -1,0 +1,331 @@
+name: ATOMiK CI/CD
+
+on:
+  push:
+    branches: [main, develop, 'phase/**']
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+    inputs:
+      phase:
+        description: 'Phase to execute (1-4 or all)'
+        required: true
+        default: 'all'
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+env:
+  PYTHON_VERSION: '3.11'
+  ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+
+jobs:
+  # ============================================
+  # VALIDATION JOB - Runs on all commits
+  # ============================================
+  validate:
+    name: Validate Changes
+    runs-on: ubuntu-latest
+    outputs:
+      phase_detected: ${{ steps.detect.outputs.phase }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      
+      - name: Install dependencies
+        run: |
+          pip install pytest pytest-cov numpy sympy
+          pip install -e software/
+      
+      - name: Detect affected phase
+        id: detect
+        run: |
+          if git diff --name-only HEAD~1 | grep -q "^math/"; then
+            echo "phase=1" >> $GITHUB_OUTPUT
+          elif git diff --name-only HEAD~1 | grep -q "^experiments/02"; then
+            echo "phase=2" >> $GITHUB_OUTPUT
+          elif git diff --name-only HEAD~1 | grep -q "^hardware/"; then
+            echo "phase=3" >> $GITHUB_OUTPUT
+          elif git diff --name-only HEAD~1 | grep -q "^software/"; then
+            echo "phase=4" >> $GITHUB_OUTPUT
+          else
+            echo "phase=all" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Run linters
+        run: |
+          pip install ruff
+          ruff check software/ experiments/ --ignore E501
+      
+      - name: Run unit tests
+        run: |
+          pytest software/tests/ -v --cov=software/atomik_sdk --cov-report=xml
+      
+      - name: Upload coverage
+        uses: codecov/codecov-action@v3
+        with:
+          files: coverage.xml
+
+  # ============================================
+  # PHASE 1: Mathematical Formalization
+  # ============================================
+  phase1-proofs:
+    name: Phase 1 - Proof Verification
+    needs: validate
+    if: |
+      needs.validate.outputs.phase_detected == '1' || 
+      needs.validate.outputs.phase_detected == 'all' ||
+      contains(github.event.head_commit.message, '[proof]')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      
+      - name: Install math dependencies
+        run: |
+          pip install numpy sympy scipy matplotlib
+      
+      - name: Run eigenvalue analysis
+        run: |
+          python math/proofs/eigenvalue_analysis.py
+      
+      - name: Run reconstruction test
+        run: |
+          python math/validation/test_reconstruction.py
+      
+      - name: Verify compression benchmarks
+        run: |
+          python math/benchmarks/atomik_vs_dct.py
+          python math/benchmarks/atomik_vs_wavelets.py
+      
+      - name: Check LaTeX compilation
+        run: |
+          sudo apt-get update && sudo apt-get install -y texlive-latex-base texlive-latex-extra
+          cd math/proofs
+          for f in *.tex; do
+            pdflatex -interaction=nonstopmode "$f" || exit 1
+          done
+      
+      - name: Upload proof artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase1-proofs
+          path: |
+            math/proofs/*.pdf
+            math/benchmarks/results/
+
+  # ============================================
+  # PHASE 2: SCORE Comparison
+  # ============================================
+  phase2-benchmarks:
+    name: Phase 2 - Benchmark Execution
+    needs: [validate, phase1-proofs]
+    if: |
+      needs.validate.outputs.phase_detected == '2' ||
+      needs.validate.outputs.phase_detected == 'all' ||
+      contains(github.event.head_commit.message, '[benchmark]')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      
+      - name: Install benchmark dependencies
+        run: |
+          pip install numpy tracemalloc-utils matplotlib pandas scipy
+      
+      - name: Run SCORE implementation
+        run: |
+          python experiments/02_score_comparison/score_implementation.py
+      
+      - name: Run ATOMiK implementation
+        run: |
+          python experiments/02_score_comparison/atomik_implementation.py
+      
+      - name: Execute benchmark harness
+        run: |
+          python experiments/02_score_comparison/benchmark_harness.py
+      
+      - name: Statistical validation
+        run: |
+          python -c "
+          import json
+          with open('experiments/02_score_comparison/results.json') as f:
+              results = json.load(f)
+          assert results['p_value'] < 0.05, 'Statistical significance not achieved'
+          print('✓ Benchmarks statistically significant')
+          "
+      
+      - name: Upload benchmark results
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase2-benchmarks
+          path: experiments/02_score_comparison/
+
+  # ============================================
+  # PHASE 3: Hardware Synthesis
+  # ============================================
+  phase3-synthesis:
+    name: Phase 3 - Hardware Verification
+    needs: [validate, phase2-benchmarks]
+    if: |
+      needs.validate.outputs.phase_detected == '3' ||
+      needs.validate.outputs.phase_detected == 'all' ||
+      contains(github.event.head_commit.message, '[synthesis]')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Install Verilator
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y verilator iverilog
+      
+      - name: Lint Verilog modules
+        run: |
+          cd hardware/verilog
+          for f in *.v; do
+            verilator --lint-only "$f" -Wall || exit 1
+          done
+          echo "✓ All modules pass lint"
+      
+      - name: Run simulations
+        run: |
+          cd hardware
+          iverilog -o sim verilog/*.v testbenches/*.v
+          vvp sim > simulation.log
+          grep -q "PASS" simulation.log || exit 1
+          echo "✓ All simulations pass"
+      
+      - name: Check resource utilization
+        run: |
+          # Placeholder for Gowin synthesis - would run in real environment
+          echo "Resource utilization check (requires Gowin EDA)"
+          echo "Target: GW1NR-9 (8640 LUTs, 6480 FFs)"
+      
+      - name: Upload simulation results
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase3-hardware
+          path: |
+            hardware/simulation.log
+            hardware/testbenches/waveforms/
+
+  # ============================================
+  # PHASE 4: SDK Development
+  # ============================================
+  phase4-sdk:
+    name: Phase 4 - SDK Validation
+    needs: [validate, phase3-synthesis]
+    if: |
+      needs.validate.outputs.phase_detected == '4' ||
+      needs.validate.outputs.phase_detected == 'all' ||
+      contains(github.event.head_commit.message, '[sdk]')
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10', '3.11', '3.12']
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      
+      - name: Install SDK
+        run: |
+          pip install -e software/[dev]
+      
+      - name: Run tests with coverage
+        run: |
+          pytest software/tests/ -v --cov=software/atomik_sdk --cov-report=xml --cov-fail-under=90
+      
+      - name: Run integration tests
+        run: |
+          pytest software/tests/test_integration.py -v
+      
+      - name: Execute examples
+        run: |
+          cd software/examples
+          for nb in *.ipynb; do
+            jupyter nbconvert --to script "$nb"
+            python "${nb%.ipynb}.py" || exit 1
+          done
+      
+      - name: Build documentation
+        run: |
+          pip install sphinx sphinx-rtd-theme
+          cd software && sphinx-build -b html docs/ docs/_build/
+
+  # ============================================
+  # STATUS SYNC - Updates GLOBAL_STATUS.md
+  # ============================================
+  sync-status:
+    name: Sync Status Files
+    needs: [validate]
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      
+      - name: Run status sync script
+        run: |
+          python agents/scripts/sync_status.py
+      
+      - name: Commit status updates
+        run: |
+          git config user.name "ATOMiK Bot"
+          git config user.email "atomik-bot@users.noreply.github.com"
+          git add docs/GLOBAL_STATUS.md
+          git diff --staged --quiet || git commit -m "[auto] Sync GLOBAL_STATUS.md"
+          git push
+
+  # ============================================
+  # DEPLOY DOCS - GitHub Pages
+  # ============================================
+  deploy-docs:
+    name: Deploy Documentation
+    needs: [phase4-sdk]
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      
+      - name: Build docs
+        run: |
+          pip install sphinx sphinx-rtd-theme myst-parser
+          sphinx-build -b html docs/ docs/_build/
+      
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs/_build

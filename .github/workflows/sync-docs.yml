@@ -1,0 +1,171 @@
+# ATOMiK CI/CD Pipeline - Documentation Sync Workflow
+# Synchronizes STATUS.md files and updates GLOBAL_STATUS.md
+
+name: Sync Documentation
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - '**/STATUS.md'
+      - 'docs/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync-status:
+    name: Synchronize Status Files
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: pip install pyyaml
+      
+      - name: Collect STATUS.md files
+        id: collect
+        run: |
+          echo "Collecting all STATUS.md files..."
+          find . -name "STATUS.md" -type f > status_files.txt
+          cat status_files.txt
+      
+      - name: Generate GLOBAL_STATUS.md
+        run: |
+          python << 'EOF'
+          import os
+          from datetime import datetime
+          
+          status_files = []
+          for root, dirs, files in os.walk('.'):
+              for file in files:
+                  if file == 'STATUS.md':
+                      status_files.append(os.path.join(root, file))
+          
+          # Sort by directory depth
+          status_files.sort()
+          
+          with open('docs/GLOBAL_STATUS.md', 'w') as global_status:
+              global_status.write("# ATOMiK Global Status Tracker\n\n")
+              global_status.write(f"**Last Updated**: {datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')}\n\n")
+              global_status.write("---\n\n")
+              global_status.write("## Status Summary\n\n")
+              global_status.write("| Component | Status | Last Updated |\n")
+              global_status.write("|-----------|--------|-------------|\n")
+              
+              for status_file in status_files:
+                  component = os.path.dirname(status_file).replace('./', '').replace('/', ' > ')
+                  if not component:
+                      continue
+                  
+                  # Read first non-empty line as status
+                  with open(status_file, 'r') as f:
+                      lines = f.readlines()
+                      status = "Unknown"
+                      for line in lines:
+                          line = line.strip()
+                          if line and not line.startswith('#'):
+                              status = line[:50] + "..." if len(line) > 50 else line
+                              break
+                  
+                  # Get file modification time
+                  mtime = os.path.getmtime(status_file)
+                  mtime_str = datetime.fromtimestamp(mtime).strftime('%Y-%m-%d')
+                  
+                  global_status.write(f"| {component} | {status} | {mtime_str} |\n")
+              
+              global_status.write("\n---\n\n")
+              global_status.write("## Detailed Status by Component\n\n")
+              
+              for status_file in status_files:
+                  component = os.path.dirname(status_file).replace('./', '')
+                  if not component:
+                      continue
+                  
+                  global_status.write(f"### {component}\n\n")
+                  global_status.write(f"*Source: [{status_file}]({status_file})*\n\n")
+                  
+                  with open(status_file, 'r') as f:
+                      content = f.read()
+                      # Include first 500 chars of each status file
+                      preview = content[:500]
+                      if len(content) > 500:
+                          preview += "\n\n*[... truncated, see full file]*"
+                      global_status.write(preview + "\n\n")
+                      global_status.write("---\n\n")
+          
+          print("GLOBAL_STATUS.md generated successfully")
+          EOF
+      
+      - name: Commit changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add docs/GLOBAL_STATUS.md
+          git diff --staged --quiet || git commit -m "[documenter] chore(docs): sync GLOBAL_STATUS.md"
+          git push || echo "No changes to push"
+  
+  validate-links:
+    name: Validate Documentation Links
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Check internal links
+        run: |
+          echo "Checking for broken internal links..."
+          find . -name "*.md" -exec grep -l "\[.*\](.*\.md)" {} \; | while read file; do
+            echo "Checking: $file"
+            grep -oP '\[.*?\]\(\K[^)]+\.md' "$file" 2>/dev/null | while read link; do
+              # Handle relative paths
+              dir=$(dirname "$file")
+              full_path="$dir/$link"
+              if [ ! -f "$full_path" ] && [ ! -f "$link" ]; then
+                echo "::warning file=$file::Broken link: $link"
+              fi
+            done
+          done
+
+  generate-changelog:
+    name: Generate Changelog
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Generate changelog from commits
+        run: |
+          echo "# Changelog" > CHANGELOG_NEW.md
+          echo "" >> CHANGELOG_NEW.md
+          echo "## Recent Changes" >> CHANGELOG_NEW.md
+          echo "" >> CHANGELOG_NEW.md
+          
+          git log --oneline -20 --format="- %s (%h)" >> CHANGELOG_NEW.md
+          
+          if [ -f CHANGELOG.md ]; then
+            echo "" >> CHANGELOG_NEW.md
+            echo "---" >> CHANGELOG_NEW.md
+            echo "" >> CHANGELOG_NEW.md
+            tail -n +3 CHANGELOG.md >> CHANGELOG_NEW.md
+          fi
+          
+          mv CHANGELOG_NEW.md CHANGELOG.md
+      
+      - name: Commit changelog
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add CHANGELOG.md
+          git diff --staged --quiet || git commit -m "[documenter] chore: update CHANGELOG.md"
+          git push || echo "No changes to push"

@@ -1,0 +1,89 @@
+{
+  "name": "validator-agent",
+  "version": "1.0.0",
+  "description": "Continuous validation and quality gate enforcement agent for ATOMiK",
+  "model": {
+    "primary": "claude-haiku-4-5-20251001",
+    "fallback": "claude-sonnet-4-5-20250929"
+  },
+  "capabilities": {
+    "extended_thinking": {
+      "enabled": false
+    },
+    "tool_use": true,
+    "code_execution": true,
+    "batch_api": true
+  },
+  "tools": [
+    {
+      "name": "code_executor",
+      "languages": ["python", "bash"],
+      "timeout_seconds": 600
+    },
+    {
+      "name": "file_io",
+      "allowed_paths": ["./"],
+      "operations": ["read"]
+    },
+    {
+      "name": "test_runner",
+      "frameworks": ["pytest", "unittest", "iverilog"]
+    },
+    {
+      "name": "coverage_reporter",
+      "tool": "pytest-cov"
+    }
+  ],
+  "responsibilities": [
+    "Run comprehensive test suites on every commit",
+    "Enforce validation gates for each phase",
+    "Generate coverage reports",
+    "Block merges that fail validation",
+    "Trigger re-runs on transient failures",
+    "Update GLOBAL_STATUS.md after validation"
+  ],
+  "validation_protocol": {
+    "on_push": ["lint", "unit_tests"],
+    "on_pr": ["lint", "unit_tests", "integration_tests", "coverage_check"],
+    "on_merge_to_main": ["full_validation_suite"],
+    "scheduled_daily": ["benchmark_regression", "documentation_check"]
+  },
+  "phase_gates": {
+    "phase_1": {
+      "proofs_verified": true,
+      "latex_compiles": true,
+      "coverage_minimum": 0.90
+    },
+    "phase_2": {
+      "output_equivalence": true,
+      "memory_ratio_maximum": 0.1,
+      "p_value_maximum": 0.05
+    },
+    "phase_3": {
+      "lint_warnings": 0,
+      "simulation_pass_rate": 1.0,
+      "resource_utilization_maximum": 0.8,
+      "timing_slack_minimum": 0
+    },
+    "phase_4": {
+      "test_pass_rate": 1.0,
+      "coverage_minimum": 0.9,
+      "documentation_coverage": 1.0
+    }
+  },
+  "output_artifacts": [
+    "coverage/",
+    "docs/GLOBAL_STATUS.md"
+  ],
+  "status_file": "docs/GLOBAL_STATUS.md",
+  "escalation": {
+    "max_retries": 2,
+    "escalation_trigger": "validation_gate_failure",
+    "escalation_action": "block_merge_create_issue"
+  },
+  "token_limits": {
+    "per_task_input": 4000,
+    "per_task_output": 2000,
+    "daily_budget": 200000
+  }
+}

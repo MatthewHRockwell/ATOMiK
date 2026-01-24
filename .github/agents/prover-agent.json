@@ -1,0 +1,103 @@
+{
+  "agent_id": "prover-agent",
+  "name": "ATOMiK Prover Agent",
+  "description": "Executes mathematical proofs, generates LaTeX documents, runs validation scripts",
+  "model": {
+    "primary": "claude-opus-4-5-20251101",
+    "fallback": "claude-sonnet-4-5-20250929"
+  },
+  "extended_thinking": {
+    "enabled": true,
+    "budget_tokens": 32768,
+    "use_for": [
+      "complex_proofs",
+      "formal_verification",
+      "algorithm_design",
+      "debugging"
+    ]
+  },
+  "tools": [
+    {
+      "name": "code_execution",
+      "languages": ["python"],
+      "packages": ["numpy", "sympy", "scipy", "z3-solver"],
+      "timeout_seconds": 300
+    },
+    {
+      "name": "file_io",
+      "permissions": ["read", "write"],
+      "allowed_paths": [
+        "math/proofs/*",
+        "math/validation/*",
+        "math/benchmarks/*"
+      ]
+    },
+    {
+      "name": "latex_generation",
+      "template_dir": "math/proofs/templates/",
+      "output_format": ["tex", "pdf"]
+    }
+  ],
+  "context_caching": {
+    "enabled": true,
+    "cache_ttl_minutes": 60,
+    "cached_content": [
+      "system_prompt",
+      "mathematical_foundations",
+      "axiom_definitions",
+      "tool_definitions"
+    ]
+  },
+  "responsibilities": [
+    "Formalize ATOMiK mathematical foundations",
+    "Generate machine-verifiable proofs (Lean4/Coq)",
+    "Create LaTeX documentation for proofs",
+    "Run eigenvalue and reconstruction analyses",
+    "Validate proof correctness"
+  ],
+  "outputs": {
+    "proof_files": "math/proofs/*.lean",
+    "latex_documents": "math/proofs/*.tex",
+    "validation_scripts": "math/validation/*.py",
+    "status_file": "math/STATUS.md"
+  },
+  "validation_gate": {
+    "criteria": [
+      {
+        "name": "proofs_verified",
+        "check": "lean4 build exits with code 0",
+        "required": true
+      },
+      {
+        "name": "latex_compiles",
+        "check": "pdflatex compiles without errors",
+        "required": true
+      },
+      {
+        "name": "coverage",
+        "check": "formal spec coverage >= 95%",
+        "required": true
+      }
+    ],
+    "on_failure": {
+      "max_retries": 3,
+      "decompose_on_failure": true,
+      "escalate_after_retries": true
+    }
+  },
+  "communication": {
+    "publishes_to": ["artifact_registry"],
+    "subscribes_to": [],
+    "handoff_format": "json_manifest"
+  },
+  "budget": {
+    "max_tokens_per_task": 50000,
+    "max_daily_tokens": 500000,
+    "alert_threshold": 0.8
+  },
+  "constraints": {
+    "no_external_api_calls": true,
+    "deterministic_outputs": true,
+    "reproducible_proofs": true
+  }
+}

@@ -1,0 +1,88 @@
+{
+  "name": "benchmark-agent",
+  "version": "1.0.0",
+  "description": "Performance benchmarking and comparison agent for ATOMiK",
+  "model": {
+    "primary": "claude-sonnet-4-5-20250929",
+    "fallback": "claude-haiku-4-5-20251001"
+  },
+  "capabilities": {
+    "extended_thinking": {
+      "enabled": true,
+      "budget_tokens": 8192,
+      "min_tokens": 1024,
+      "selective": true,
+      "enable_for": ["experiment_design", "statistical_analysis"]
+    },
+    "tool_use": true,
+    "code_execution": true,
+    "batch_api": true
+  },
+  "tools": [
+    {
+      "name": "code_executor",
+      "languages": ["python"],
+      "timeout_seconds": 600,
+      "libraries": ["numpy", "scipy", "pandas", "matplotlib", "tracemalloc"]
+    },
+    {
+      "name": "file_io",
+      "allowed_paths": ["experiments/", "math/benchmarks/"],
+      "operations": ["read", "write", "create"]
+    },
+    {
+      "name": "batch_submitter",
+      "max_batch_size": 100
+    }
+  ],
+  "responsibilities": [
+    "Design and implement benchmark experiments",
+    "Execute SCORE vs ATOMiK comparison tests",
+    "Collect performance metrics (memory, throughput, latency)",
+    "Perform statistical analysis with p-value validation",
+    "Generate comparison reports and visualizations"
+  ],
+  "validation_gates": [
+    {
+      "name": "output_equivalence",
+      "description": "Both implementations produce identical output",
+      "metric": "bit_exact_match",
+      "threshold": true
+    },
+    {
+      "name": "memory_efficiency",
+      "description": "ATOMiK memory < 10% of SCORE",
+      "metric": "memory_ratio",
+      "threshold": 0.1
+    },
+    {
+      "name": "statistical_significance",
+      "description": "Performance difference is statistically significant",
+      "metric": "p_value",
+      "threshold": 0.05
+    }
+  ],
+  "output_artifacts": [
+    "experiments/*/results/*.csv",
+    "experiments/*/results/*.png",
+    "experiments/*/STATUS.md"
+  ],
+  "benchmark_config": {
+    "min_iterations": 10,
+    "warmup_iterations": 3,
+    "confidence_level": 0.95,
+    "timeout_per_run_seconds": 300
+  },
+  "status_file": "experiments/02_score_comparison/STATUS.md",
+  "escalation": {
+    "max_retries": 5,
+    "escalation_trigger": "statistical_insignificance",
+    "escalation_action": "increase_sample_size"
+  },
+  "token_limits": {
+    "per_task_input": 8000,
+    "per_task_output": 4000,
+    "per_task_thinking": 8000,
+    "daily_budget": 300000
+  }
+}

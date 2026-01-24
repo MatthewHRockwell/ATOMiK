@@ -1,50 +1,153 @@
-#venv
-*.venv
+# ATOMiK Project .gitignore
 
-# --- Media & Large Files ---
-# Prevent the test video from being uploaded
-your_video.mp4
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.project
+.pydevproject
+.settings/
+*.sublime-project
+*.sublime-workspace
+
+# Testing
+.tox/
+.nox/
+.coverage
+.coverage.*
+htmlcov/
+.pytest_cache/
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+
+# Documentation
+docs/_build/
+site/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# Verilog simulation
+*.vcd
+*.fst
+*.vpd
+*.wdb
+work/
+simulation/
+*.log
+*.jou
+*.pb
+
+# Synthesis outputs
+*.bit
+*.bin
+*.fs
+*.rbf
+impl/
+output_files/
+db/
+incremental_db/
+*.qpf
+*.qsf
+*.sof
+*.pof
+
+# Gowin specific
+*.gprj
+*.gprj.user
+*.rao
+project/
+
+# LaTeX
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.lof
+*.lot
+*.out
+*.toc
+*.synctex.gz
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Secrets and credentials
+*.pem
+*.key
+.env.local
+.env.*.local
+secrets.yaml
+secrets.json
+
+# API keys
+.anthropic
+.openai
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+tmp/
+temp/
+
+# Results and outputs (keep structure, ignore data)
+experiments/*/raw_results/*.json
+experiments/*/raw_results/*.csv
+hardware/testbenches/waveforms/*.vcd
+math/benchmarks/results/*.json
+
+# Large data files
 *.mp4
 *.avi
 *.mov
 *.mkv
-
-# --- Python & Jupyter ---
-# Python bytecode (garbage files)
-__pycache__/
-*.py[cod]
-
-# Jupyter Notebook checkpoints (created by Colab/Jupyter)
-.ipynb_checkpoints/
-
-# --- OS Specific ---
-# Mac
-.DS_Store
-# Windows
-Thumbs.db
-
-# --- Hardware / FPGA (Gowin & Verilog) ---
-# Simulation waveforms (These get huge, do not upload)
-*.vcd
-*.lxt
-*.wlf
-
-# Compiled simulation executables (Icarus Verilog)
-*.vvp
-a.out
-
-# Gowin EDA Build Artifacts
-# 'impl' and 'temp' contain intermediate synthesis files
-impl/
-temp/
-
-# Bitstreams (The compiled binary for the board)
-# Generally, you don't commit these to source control, 
-# but you can comment these out if you want to share the binary.
-*.fs
-*.bin
-
-# Intermediate object files
-*.o
-*.out
-
+*.npy
+*.npz
+*.h5
+*.hdf5

@@ -1,0 +1,120 @@
+{
+  "name": "synthesis-agent",
+  "version": "1.0.0",
+  "description": "Hardware RTL generation and synthesis agent for ATOMiK",
+  "model": {
+    "primary": "claude-sonnet-4-5-20250929",
+    "fallback": "claude-haiku-4-5-20251001"
+  },
+  "capabilities": {
+    "extended_thinking": {
+      "enabled": false
+    },
+    "tool_use": true,
+    "code_execution": true
+  },
+  "tools": [
+    {
+      "name": "code_executor",
+      "languages": ["verilog", "systemverilog", "python"],
+      "timeout_seconds": 300
+    },
+    {
+      "name": "file_io",
+      "allowed_paths": ["hardware/"],
+      "operations": ["read", "write", "create"]
+    },
+    {
+      "name": "verilog_linter",
+      "tool": "verilator",
+      "flags": ["--lint-only", "-Wall"]
+    },
+    {
+      "name": "simulator",
+      "tool": "iverilog",
+      "timeout_seconds": 120
+    }
+  ],
+  "responsibilities": [
+    "Generate synthesizable Verilog RTL modules",
+    "Create comprehensive testbenches",
+    "Run simulation and verification",
+    "Optimize for timing closure at 27 MHz",
+    "Generate synthesis scripts for Gowin FPGA"
+  ],
+  "target_hardware": {
+    "fpga": "Gowin GW1NR-9",
+    "resources": {
+      "luts": 8640,
+      "ffs": 6480,
+      "psram_mbit": 64
+    },
+    "clock_mhz": 27,
+    "io": ["uart_115200", "spi"]
+  },
+  "modules": [
+    {
+      "name": "binarizer",
+      "file": "hardware/verilog/binarizer.v",
+      "description": "Tile-energy thresholding (25×25 grid)"
+    },
+    {
+      "name": "pattern_encoder",
+      "file": "hardware/verilog/pattern_encoder.v",
+      "description": "4-bit pattern generation from 4 temporal frames"
+    },
+    {
+      "name": "delta_core",
+      "file": "hardware/verilog/delta_core.v",
+      "description": "64-bit XOR engine"
+    },
+    {
+      "name": "motif_classifier",
+      "file": "hardware/verilog/motif_classifier.v",
+      "description": "Pattern matching LUT"
+    },
+    {
+      "name": "uart_tx",
+      "file": "hardware/verilog/uart_tx.v",
+      "description": "Serial transmitter (115200 baud, 8N1)"
+    }
+  ],
+  "validation_gates": [
+    {
+      "name": "lint_pass",
+      "description": "All Verilog files pass linting",
+      "command": "verilator --lint-only -Wall",
+      "threshold": "zero_warnings"
+    },
+    {
+      "name": "simulation_pass",
+      "description": "All testbenches pass",
+      "metric": "functional_coverage",
+      "threshold": 1.0
+    },
+    {
+      "name": "resource_utilization",
+      "description": "Resource usage < 80% of target FPGA",
+      "metric": "utilization_ratio",
+      "threshold": 0.8
+    },
+    {
+      "name": "timing_closure",
+      "description": "Design meets 27 MHz timing",
+      "metric": "slack_ns",
+      "threshold": 0
+    }
+  ],
+  "output_artifacts": [
+    "hardware/verilog/*.v",
+    "hardware/testbenches/tb_*.v",
+    "hardware/synthesis/*.cst",
+    "hardware/testbenches/waveforms/*.vcd"
+  ],
+  "status_file": "hardware/STATUS.md",
+  "token_limits": {
+    "per_task_input": 10000,
+    "per_task_output": 8000,
+    "daily_budget": 400000
+  }
+}
