@@ -16,13 +16,21 @@ A **Delta** (δ) represents an atomic state difference that can be composed with
 Delta := BitVec(64)
 ```
 
+**Lean4 Implementation** (`ATOMiK/Delta.lean`):
+```lean
+structure Delta where
+  bits : BitVec DELTA_WIDTH
+  deriving DecidableEq, Repr, Inhabited
+```
+
 ### 1.2 Core Operations
 
-| Operation | Symbol | Definition |
-|-----------|--------|------------|
-| Composition | ⊕ | δ₁ ⊕ δ₂ = δ₁ XOR δ₂ |
-| Identity | 𝟎 | 64-bit zero vector |
-| Inverse | δ⁻¹ | δ⁻¹ = δ (self-inverse under XOR) |
+| Operation | Symbol | Definition | Lean4 Function |
+|-----------|--------|------------|----------------|
+| Composition | ⊕ | δ₁ ⊕ δ₂ = δ₁ XOR δ₂ | `Delta.compose` |
+| Identity | 𝟎 | 64-bit zero vector | `Delta.zero` |
+| Inverse | δ⁻¹ | δ⁻¹ = δ (self-inverse under XOR) | `Delta.inverse` |
+| Application | · | s · δ = s XOR δ | `Delta.apply` |
 
 ### 1.3 Algebraic Properties
 
@@ -45,6 +53,12 @@ A stateless transition function transforms input state to output state through d
 ```
 transition : State → Delta → State
 transition(s, δ) = s XOR δ
+```
+
+**Lean4 Implementation** (`ATOMiK/Delta.lean`):
+```lean
+def Delta.apply (d : Delta) (s : State) : State :=
+  s ^^^ d.bits
 ```
 
 ### 2.2 Determinism Guarantee
@@ -79,18 +93,42 @@ ATOMiK achieves Turing completeness through:
 
 ## 4. Proof Obligations
 
-| Property | Lean4 File | Status |
-|----------|------------|--------|
-| Closure | `Closure.lean` | Pending |
-| Associativity | `Properties.lean` | Pending |
-| Commutativity | `Properties.lean` | Pending |
-| Identity | `Properties.lean` | Pending |
-| Inverse | `Properties.lean` | Pending |
-| Determinism | `Transition.lean` | Pending |
-| Turing Completeness | `TuringComplete.lean` | Pending |
+| Property | Lean4 File | Status | Task |
+|----------|------------|--------|------|
+| Type definitions | `Basic.lean`, `Delta.lean` | ✅ Complete | T1.1 |
+| Closure | `Closure.lean` | ⏳ Pending | T1.2 |
+| Associativity | `Properties.lean` | ⏳ Pending | T1.3 |
+| Commutativity | `Properties.lean` | ⏳ Pending | T1.3 |
+| Identity | `Delta.lean` | ✅ Proven | T1.1 |
+| Inverse | `Delta.lean` | ✅ Proven | T1.1 |
+| Determinism | `Transition.lean` | ⏳ Pending | T1.6 |
+| Turing Completeness | `TuringComplete.lean` | ⏳ Pending | T1.8 |
 
 ---
 
-*Document version: 1.0*
+## 5. T1.1 Deliverables
+
+### 5.1 Basic.lean
+- `DELTA_WIDTH` constant (64 bits)
+- `State` type alias
+- `State.zero` and `State.xor` operations
+
+### 5.2 Delta.lean
+- `Delta` structure with `bits : BitVec 64`
+- `Delta.zero` / `Delta.identity` - identity element
+- `Delta.compose` - group operation (XOR)
+- `Delta.inverse` - self-inverse
+- `Delta.apply` - state transition
+- Utility functions: `ofNat`, `ofBitVec`, `toBitVec`, `isZero`, `popCount`, `hammingDistance`
+- Basic lemmas:
+  - `Delta.compose_zero_right`
+  - `Delta.compose_zero_left`
+  - `Delta.compose_self`
+  - `Delta.add_neg_self`
+
+---
+
+*Document version: 1.1*
 *Last updated: January 24, 2026*
+*T1.1 completed: January 24, 2026*
 *Related proofs: `math/proofs/ATOMiK/`*
