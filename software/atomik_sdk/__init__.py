@@ -20,17 +20,12 @@ Example:
 __version__ = "0.1.0"
 __author__ = "ATOMiK Project"
 
-# Level 1: High-Level API (Application Developers)
-from .delta_stream import DeltaStream, Delta
-from .motifs import Motif
-
-# Level 2: Mid-Level API (Algorithm Designers)
-from .voxel_encoder import VoxelEncoder
-from .pattern_matcher import PatternMatcher
-
-# Level 3: Low-Level API (Hardware Engineers)
-from .genome_compiler import GenomeCompiler
 from .bitstream_gen import BitstreamGenerator
+from .delta_stream import Delta, DeltaStream
+from .genome_compiler import GenomeCompiler
+from .motifs import Motif
+from .pattern_matcher import PatternMatcher
+from .voxel_encoder import VoxelEncoder
 
 __all__ = [
     # Level 1
