@@ -1,0 +1,75 @@
+\begin{thebibliography}{10}
+
+\bibitem{arvind1990executing}
+Arvind and Rishiyur~S Nikhil.
+\newblock Executing a program on the {MIT} tagged-token dataflow architecture.
+\newblock {\em IEEE Transactions on Computers}, 39(3):300--318, 1990.
+
+\bibitem{bennett1973logical}
+Charles~H Bennett.
+\newblock Logical reversibility of computation.
+\newblock {\em IBM Journal of Research and Development}, 17(6):525--532, 1973.
+
+\bibitem{moura2021lean4}
+Leonardo de~Moura and Sebastian Ullrich.
+\newblock The {Lean} 4 theorem prover and programming language.
+\newblock In {\em International Conference on Automated Deduction}, pages
+  625--635. Springer, 2021.
+
+\bibitem{dennis1974first}
+Jack~B Dennis.
+\newblock First version of a data flow procedure language.
+\newblock {\em Programming Symposium}, pages 362--376, 1974.
+
+\bibitem{elliott1997functional}
+Conal Elliott and Paul Hudak.
+\newblock Functional reactive animation.
+\newblock In {\em ACM SIGPLAN International Conference on Functional
+  Programming}, pages 263--273. ACM, 1997.
+
+\bibitem{hennessy2019new}
+John~L Hennessy and David~A Patterson.
+\newblock {\em A New Golden Age for Computer Architecture}, volume~62.
+\newblock ACM, 2019.
+
+\bibitem{hunt1989fm8501}
+Warren~A Hunt~Jr.
+\newblock Microprocessor design verification.
+\newblock {\em Journal of Automated Reasoning}, 5(4):429--460, 1989.
+
+\bibitem{kocher2019spectre}
+Paul Kocher, Jann Horn, Anders Fogh, Daniel Genkin, Daniel Gruss, Werner Haas,
+  Mike Hamburg, Moritz Lipp, Stefan Mangard, Thomas Prescher, et~al.
+\newblock Spectre attacks: Exploiting speculative execution.
+\newblock In {\em 2019 IEEE Symposium on Security and Privacy (SP)}, pages
+  1--19. IEEE, 2019.
+
+\bibitem{landauer1961irreversibility}
+Rolf Landauer.
+\newblock Irreversibility and heat generation in the computing process.
+\newblock {\em IBM Journal of Research and Development}, 5(3):183--191, 1961.
+
+\bibitem{lipp2018meltdown}
+Moritz Lipp, Michael Schwarz, Daniel Gruss, Thomas Prescher, Werner Haas,
+  Anders Fogh, Jann Horn, Stefan Mangard, Paul Kocher, Daniel Genkin, et~al.
+\newblock Meltdown: Reading kernel memory from user space.
+\newblock In {\em 27th USENIX Security Symposium}, pages 973--990, 2018.
+
+\bibitem{minsky1967computation}
+Marvin~L Minsky.
+\newblock {\em Computation: Finite and Infinite Machines}.
+\newblock Prentice-Hall, 1967.
+
+\bibitem{reid2016trustworthy}
+Alastair Reid.
+\newblock Trustworthy specifications of {ARM} v8-a and v8-m system level
+  architecture.
+\newblock In {\em 2016 Formal Methods in Computer-Aided Design (FMCAD)}, pages
+  161--168. IEEE, 2016.
+
+\bibitem{wulf1995hitting}
+Wm~A Wulf and Sally~A McKee.
+\newblock Hitting the memory wall: Implications of the obvious.
+\newblock {\em ACM SIGARCH Computer Architecture News}, 23(1):20--24, 1995.
+
+\end{thebibliography}

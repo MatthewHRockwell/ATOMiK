@@ -1,0 +1,35 @@
+Title: Delta-State Algebra: A Formally Verified Foundation for Transient State Computation
+
+Authors: Matthew H. Rockwell
+
+Abstract: We present delta-state algebra, a mathematical foundation for transient state computation that replaces persistent architectural state with composable state differences. Unlike traditional computational models where state is read, modified, and written back, delta-state computation expresses transformations as atomic deltas that compose via XOR operations, forming an Abelian group. This algebraic structure enables hardware optimizations impossible in conventional architectures: deltas can be accumulated in any order, composed before application, and reduced via parallel XOR trees with O(log n) latency.
+
+We formally verify 92 theorems in the Lean4 proof assistant, establishing: (1) the delta-state algebra forms a well-defined Abelian group under composition; (2) state transitions are deterministic and reversible; (3) sequential operations can be collapsed into single delta applications; and (4) the model is Turing complete via counter machine simulation. All proofs are machine-checked with zero unverified obligations (sorry statements).
+
+These results provide a rigorous mathematical foundation for ATOMiK, a hardware-native architecture that achieves bounded, deterministic latency by eliminating cache hierarchies, speculative execution, and coherency protocols. The formal verification establishes that the architectural optimizations preserve computational semantics while enabling order-of-magnitude improvements in memory efficiency and latency determinism. To our knowledge, this represents the first formally verified foundation for transient state computation.
+
+Primary Category: cs.AR (Computer Architecture)
+
+Cross-list Categories:
+- cs.PL (Programming Languages)
+- cs.LO (Logic in Computer Science)
+
+Comments: 12 pages, 2 figures, 92 formally verified theorems in Lean4
+
+MSC-class: 68Q05 (Models of computation)
+
+ACM-class: C.1.3 (Other Architecture Styles); F.3.1 (Specifying and Verifying Programs)
+
+License: CC BY 4.0 (recommended for open science)
+
+Journal-ref: (leave blank - preprint)
+
+---
+Author Information:
+Name: Matthew H. Rockwell
+Affiliation: Independent Researcher
+Location: Santa Rosa, CA 95404, United States
+Email: matthew.h.rockwell@gmail.com
+ORCID: 0009-0006-6082-5583
+
+Repository: https://github.com/mattrockwell/ATOMiK

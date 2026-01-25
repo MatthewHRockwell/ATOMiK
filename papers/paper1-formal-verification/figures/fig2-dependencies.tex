@@ -1,22 +1,8 @@
 % Figure 2: Lean4 Module Dependency Graph
-%
-% This file contains TikZ code for the module dependency diagram.
-% Can be compiled standalone or included in main.tex
-%
-% SPECIFICATION:
-% - Show all 8 Lean4 modules as nodes
-% - Directed edges showing import dependencies
-% - Module statistics (theorems count) as labels
-% - Layered layout: foundational at top, derived at bottom
-% - Color coding by category
+% For inclusion in main.tex via \input{figures/fig2-dependencies}
 
-\documentclass[tikz,border=10pt]{standalone}
-\usepackage{tikz}
-\usetikzlibrary{arrows.meta,shapes,positioning,calc}
-
-\begin{document}
 \begin{tikzpicture}[
-    module/.style={draw, rectangle, rounded corners, minimum width=3cm, minimum height=1cm, font=\small},
+    module/.style={draw, rectangle, rounded corners, minimum width=3cm, minimum height=1cm, font=\small, align=center},
     core/.style={module, fill=blue!20},
     props/.style={module, fill=green!20},
     advanced/.style={module, fill=orange!20},
@@ -60,11 +46,7 @@
 \node[advanced, minimum width=1.5cm, minimum height=0.6cm] at (6, -2) {};
 \node[right] at (6.8, -2) {Advanced};
 
-% Title
-\node at (0, 1.5) {\textbf{Lean4 Module Dependencies}};
-
 % Total
-\node at (0, -10) {\textit{Total: 8 modules, 92 theorems, 0 sorry statements}};
+\node at (0, -9.5) {\textit{Total: 8 modules, 92 theorems, 0 sorry statements}};
 
 \end{tikzpicture}
-\end{document}

@@ -25,7 +25,7 @@
 \usepackage{caption}
 \usepackage{subcaption}
 \usepackage{tikz}
-\usetikzlibrary{arrows,shapes,positioning,calc,patterns,decorations.pathreplacing}
+\usetikzlibrary{arrows,arrows.meta,shapes,positioning,calc,patterns,decorations.pathreplacing}
 
 % === THEOREM ENVIRONMENTS ===
 \theoremstyle{plain}
@@ -49,8 +49,8 @@
 \newcommand{\xorop}{\mathbin{\hat{\oplus}}} % XOR operation
 
 % Types
-\newcommand{\State}{\mathsf{State}}
-\newcommand{\Delta}{\mathsf{Delta}}
+\newcommand{\StateType}{\mathsf{State}}
+\newcommand{\DeltaType}{\mathsf{Delta}}
 \newcommand{\BitVec}[1]{\mathsf{BitVec}_{#1}}
 
 % Lean4 code formatting
@@ -84,10 +84,11 @@
 \title{Delta-State Algebra: A Formally Verified Foundation\\for Transient State Computation}
 
 \author{
-  % PLACEHOLDER: Add author information
-  Anonymous Author(s)\\
-  \textit{Institution}\\
-  \texttt{email@institution.edu}
+  Matthew H. Rockwell\\
+  \textit{Independent Researcher}\\
+  Santa Rosa, CA 95404, United States\\
+  \texttt{matthew.h.rockwell@gmail.com}\\
+  \href{https://orcid.org/0009-0006-6082-5583}{ORCID: 0009-0006-6082-5583}
 }
 
 \date{January 2026}
@@ -123,7 +124,7 @@ We propose a different approach: rather than accelerating access to persistent s
 This paper makes the following contributions:
 
 \begin{enumerate}
-    \item \textbf{Delta-State Algebra} (\Cref{sec:algebra}): We define a formal algebraic structure $(\Delta, \dcompose, \dzero)$ where deltas compose via XOR. We prove this structure forms an Abelian group with closure, associativity, commutativity, identity, and self-inverse properties.
+    \item \textbf{Delta-State Algebra} (\Cref{sec:algebra}): We define a formal algebraic structure $(\DeltaType, \dcompose, \dzero)$ where deltas compose via XOR. We prove this structure forms an Abelian group with closure, associativity, commutativity, identity, and self-inverse properties.
     
     \item \textbf{Deterministic State Transitions} (\Cref{sec:transitions}): We formalize the transition function $s \transition \delta = s \oplus \delta$ and prove it is deterministic, reversible, and free of hidden state dependencies.
     
@@ -166,9 +167,9 @@ We define the core mathematical structures underlying delta-state computation. T
 \label{def:state}
 A \emph{state} is a 64-bit vector:
 \[
-\State \triangleq \BitVec{64}
+\StateType \triangleq \BitVec{64}
 \]
-The zero state is defined as $\State_0 \triangleq 0^{64}$ (64 zero bits).
+The zero state is defined as $\StateType_0 \triangleq 0^{64}$ (64 zero bits).
 
 \medskip
 \noindent\textbf{Lean4 Implementation:}
@@ -183,7 +184,7 @@ def State.zero : State := BitVec.zero DELTA_WIDTH
 \label{def:delta}
 A \emph{delta} is a state difference encoded as a 64-bit vector:
 \[
-\Delta \triangleq \BitVec{64}
+\DeltaType \triangleq \BitVec{64}
 \]
 The identity delta (zero delta) is $\dzero \triangleq 0^{64}$.
 
@@ -240,13 +241,13 @@ def Delta.apply (d : Delta) (s : State) : State :=
 
 \subsection{Algebraic Properties}
 
-The delta-state algebra $(\Delta, \dcompose, \dzero)$ forms an Abelian group. We state and prove each property, showing both the mathematical formulation and the verified Lean4 theorem.
+The delta-state algebra $(\DeltaType, \dcompose, \dzero)$ forms an Abelian group. We state and prove each property, showing both the mathematical formulation and the verified Lean4 theorem.
 
 \begin{theorem}[Closure]
 \label{thm:closure}
 Delta composition is closed: for all $\delta_1, \delta_2 \in \Delta$, we have $\delta_1 \dcompose \delta_2 \in \Delta$.
 \[
-\forall \delta_1, \delta_2 : \Delta.\; \delta_1 \dcompose \delta_2 : \Delta
+\forall \delta_1, \delta_2 : \DeltaType.\; \delta_1 \dcompose \delta_2 : \DeltaType
 \]
 
 \begin{proof}
@@ -258,7 +259,7 @@ By definition, \texttt{Delta.compose} returns a \texttt{Delta} value. The XOR of
 \begin{lstlisting}
 theorem delta_closure (a b : Delta) : 
     exists c : Delta, c = Delta.compose a b := 
-  ⟨Delta.compose a b, rfl⟩
+  <Delta.compose a b, rfl>
 \end{lstlisting}
 \end{theorem}
 
@@ -266,7 +267,7 @@ theorem delta_closure (a b : Delta) :
 \label{thm:assoc}
 Delta composition is associative:
 \[
-\forall \delta_1, \delta_2, \delta_3 : \Delta.\; (\delta_1 \dcompose \delta_2) \dcompose \delta_3 = \delta_1 \dcompose (\delta_2 \dcompose \delta_3)
+\forall \delta_1, \delta_2, \delta_3 : \DeltaType.\; (\delta_1 \dcompose \delta_2) \dcompose \delta_3 = \delta_1 \dcompose (\delta_2 \dcompose \delta_3)
 \]
 
 \begin{proof}
@@ -287,7 +288,7 @@ theorem delta_assoc (a b c : Delta) :
 \label{thm:comm}
 Delta composition is commutative:
 \[
-\forall \delta_1, \delta_2 : \Delta.\; \delta_1 \dcompose \delta_2 = \delta_2 \dcompose \delta_1
+\forall \delta_1, \delta_2 : \DeltaType.\; \delta_1 \dcompose \delta_2 = \delta_2 \dcompose \delta_1
 \]
 
 \begin{proof}
@@ -307,7 +308,7 @@ theorem delta_comm (a b : Delta) :
 \label{thm:identity}
 The zero delta is an identity element:
 \[
-\forall \delta : \Delta.\; \delta \dcompose \dzero = \delta
+\forall \delta : \DeltaType.\; \delta \dcompose \dzero = \delta
 \]
 
 \begin{proof}
@@ -327,7 +328,7 @@ theorem delta_identity (a : Delta) :
 \label{thm:inverse}
 Every delta is its own inverse:
 \[
-\forall \delta : \Delta.\; \delta \dcompose \delta = \dzero
+\forall \delta : \DeltaType.\; \delta \dcompose \delta = \dzero
 \]
 
 \begin{proof}
@@ -345,7 +346,7 @@ theorem delta_inverse (a : Delta) :
 
 \begin{corollary}[Abelian Group]
 \label{cor:abelian}
-The structure $(\Delta, \dcompose, \dzero)$ is an Abelian group.
+The structure $(\DeltaType, \dcompose, \dzero)$ is an Abelian group.
 \end{corollary}
 
 \begin{proof}
@@ -375,7 +376,7 @@ theorem delta_algebra_properties :
     (forall a b : Delta, compose a b = compose b a) /\
     (forall a : Delta, compose a Delta.zero = a) /\
     (forall a : Delta, compose a a = Delta.zero) := by
-  exact ⟨delta_assoc, delta_comm, delta_identity, delta_inverse⟩
+  exact <delta_assoc, delta_comm, delta_identity, delta_inverse>
 \end{lstlisting}
 \end{theorem}
 
@@ -393,7 +394,7 @@ We formalize the state transition function and prove it is deterministic, revers
 \label{def:transition}
 The \emph{transition function} applies a delta to a state:
 \[
-\mathsf{transition} : \State \times \Delta \to \State
+\mathsf{transition} : \StateType \times \DeltaType \to \StateType
 \]
 \[
 \mathsf{transition}(s, \delta) \triangleq s \oplus \delta
@@ -517,8 +518,8 @@ theorem determinism_guarantees :
     (forall s d1 d2, transition (transition s d1) d2 = 
                      transition (transition s d1) d2) /\
     (forall s d, transition (transition s d) d = s) := by
-  exact ⟨fun _ _ => rfl, fun _ _ => rfl, fun _ _ _ => rfl, 
-         transition_self_inverse⟩
+  exact <fun _ _ => rfl, fun _ _ => rfl, fun _ _ _ => rfl,
+         transition_self_inverse>
 \end{lstlisting}
 \end{theorem}
 
@@ -624,17 +625,9 @@ By induction on $n$ using \Cref{thm:transition-compose}.
     \item \textbf{Parallel Reduction}: Commutativity enables tree-based XOR reduction with $O(\log n)$ latency
 \end{enumerate}
 
-% [FIGURE PLACEHOLDER: Delta accumulator hardware diagram]
 \begin{figure}[h]
 \centering
-\fbox{\parbox{0.8\textwidth}{\centering
-\vspace{2cm}
-\textbf{[FIGURE PLACEHOLDER]}\\
-Delta Accumulator Architecture\\
-\vspace{0.5cm}
-\small Shows: Input deltas $\to$ XOR tree $\to$ Accumulated delta $\to$ Single state XOR
-\vspace{2cm}
-}}
+\input{figures/fig1-accumulator}
 \caption{Delta accumulator hardware. Deltas arrive in any order and are reduced via XOR tree before single application to state.}
 \label{fig:accumulator}
 \end{figure}
@@ -653,7 +646,7 @@ We prove that delta-state computation is equivalent to traditional stateful comp
 \label{def:traditional}
 A \emph{traditional stateful computation} transforms state directly:
 \[
-f_{\text{trad}} : \State \to \State
+f_{\text{trad}} : \StateType \to \StateType
 \]
 Given initial state $s_1$ and final state $s_2$, the computation is $f_{\text{trad}}(s_1) = s_2$.
 \end{definition}
@@ -699,7 +692,7 @@ def decodeAtomik (d : Delta) (s : State) : State :=
 \label{thm:transform-exists}
 For any two states, there exists a delta that transforms one to the other:
 \[
-\forall s_1, s_2 : \State.\; \exists \delta : \Delta.\; s_1 \transition \delta = s_2
+\forall s_1, s_2 : \StateType.\; \exists \delta : \DeltaType.\; s_1 \transition \delta = s_2
 \]
 
 \begin{proof}
@@ -714,7 +707,7 @@ s_1 \transition \delta = s_1 \oplus (s_1 \oplus s_2) = (s_1 \oplus s_1) \oplus s
 \begin{lstlisting}
 theorem traditional_to_atomik_exists (s1 s2 : State) :
     exists d : Delta, transition s1 d = s2 :=
-  ⟨encodeTraditional s1 s2, encode_preserves_transformation s1 s2⟩
+  <encodeTraditional s1 s2, encode_preserves_transformation s1 s2>
 \end{lstlisting}
 \end{theorem}
 
@@ -722,7 +715,7 @@ theorem traditional_to_atomik_exists (s1 s2 : State) :
 \label{thm:roundtrip}
 Encoding a transformation and decoding recovers the original:
 \[
-\forall s_1, s_2 : \State.\; \mathsf{decode}(\mathsf{encode}(s_1, s_2), s_1) = s_2
+\forall s_1, s_2 : \StateType.\; \mathsf{decode}(\mathsf{encode}(s_1, s_2), s_1) = s_2
 \]
 
 \begin{proof}
@@ -834,7 +827,7 @@ def encodeCMState (cms : CMState) : State :=
 \label{def:simulation}
 An \emph{ATOMiK simulation} of a computation is a function producing delta sequences:
 \[
-\mathsf{sim} : \mathbb{N} \to \mathsf{List}(\Delta)
+\mathsf{sim} : \mathbb{N} \to \mathsf{List}(\DeltaType)
 \]
 
 Execution applies the deltas to an initial state:
@@ -916,17 +909,9 @@ All theorems in this paper have been formally verified in Lean4 \cite{moura2021l
 
 \subsection{Module Dependency}
 
-% [FIGURE PLACEHOLDER: Module dependency graph]
 \begin{figure}[h]
 \centering
-\fbox{\parbox{0.8\textwidth}{\centering
-\vspace{2cm}
-\textbf{[FIGURE PLACEHOLDER]}\\
-Lean4 Module Dependency Graph\\
-\vspace{0.5cm}
-\small Basic $\to$ Delta $\to$ \{Closure, Properties, Transition\} $\to$ Composition $\to$ \{Equivalence, TuringComplete\}
-\vspace{2cm}
-}}
+\input{figures/fig2-dependencies}
 \caption{Lean4 module dependencies. Arrows indicate import relationships.}
 \label{fig:dependencies}
 \end{figure}
@@ -1015,7 +1000,7 @@ Prior work has verified specific processors \cite{hunt1989fm8501} and ISAs \cite
 We have presented delta-state algebra, a formally verified mathematical foundation for transient state computation. The key results are:
 
 \begin{enumerate}
-    \item \textbf{Algebraic structure}: $(\Delta, \dcompose, \dzero)$ forms an Abelian group
+    \item \textbf{Algebraic structure}: $(\DeltaType, \dcompose, \dzero)$ forms an Abelian group
     \item \textbf{Determinism}: Transitions are deterministic, reversible, and history-independent
     \item \textbf{Composition}: Sequential operations collapse into single applications
     \item \textbf{Equivalence}: Bidirectional mapping to traditional computation
@@ -1033,13 +1018,16 @@ This formal foundation enables:
     \item \textbf{Probabilistic extensions}: Delta distributions for approximate computing
 \end{itemize}
 
-The proofs and source code are available at: \texttt{[URL placeholder]}.
+The proofs and source code are available at: \texttt{https://github.com/MatthewHRockwell/ATOMiK}.
 
 % ============================================================================
 % ACKNOWLEDGMENTS
 % ============================================================================
 \section*{Acknowledgments}
-% PLACEHOLDER: Add acknowledgments
+
+The author thanks the Santa Rosa Junior College STEM department faculty for their passion and approach to teaching that established strong foundations and a love for STEM, which made this work possible.
+
+The formal proofs were developed using Lean4 \cite{moura2021lean4}. All source code and proofs are available at: \texttt{https://github.com/MatthewHRockwell/ATOMiK}.
 
 % ============================================================================
 % REFERENCES
