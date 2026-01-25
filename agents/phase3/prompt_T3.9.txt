@@ -1,0 +1,110 @@
+You are implementing Phase 3, Task T3.9 of the ATOMiK project.
+
+FIRST: Read these context files:
+- specs/rtl_architecture.md (design specification)
+- rtl/atomik_core_v2.v (integrated core)
+- rtl/atomik_delta_acc.v (accumulator)
+- rtl/atomik_state_rec.v (reconstructor)
+- sim/SIMULATION_RESULTS.md (verification results)
+- reports/resource_utilization.md (T3.8 output)
+- reports/timing_analysis.md (T3.6 output)
+- synth/README.md (synthesis documentation)
+- .github/atomik-status.yml (current project status)
+
+CONTEXT:
+- All Phase 3 implementation and verification complete
+- Create final validation report for Phase 3
+- This report will be reviewed by human operator before proceeding to Phase 4
+
+TASK T3.9: Create Hardware Validation Report
+
+Create reports/PHASE_3_COMPLETION_REPORT.md with:
+
+1. **Executive Summary**
+   - Phase 3 objectives achieved
+   - Key metrics vs targets
+   - Overall status: PASS/FAIL
+
+2. **Implementation Summary**
+   | Module | File | Lines | Function |
+   |--------|------|-------|----------|
+   | Delta Accumulator | rtl/atomik_delta_acc.v | ? | XOR accumulation |
+   | State Reconstructor | rtl/atomik_state_rec.v | ? | State output |
+   | Core v2 | rtl/atomik_core_v2.v | ? | Integration |
+   | PLL | rtl/pll/atomik_pll_81m.v | ? | Clock generation |
+   
+   Count actual lines in each file and fill in the table.
+
+3. **Verification Results**
+   - Simulation test results (reference sim/SIMULATION_RESULTS.md)
+   - Coverage metrics (if available)
+   - Comparison to Python reference model
+   - Test case summary with pass/fail counts
+
+4. **Synthesis Results**
+   - Timing closure: Pass/Fail (reference reports/timing_analysis.md)
+   - Resource utilization summary (reference reports/resource_utilization.md)
+   - Power estimates (if available)
+   - Maximum frequency achieved vs target (50 MHz)
+
+5. **Performance Validation**
+   - Accumulate latency: 1 cycle (target: 1) ✓/?
+   - Reconstruct latency: 1 cycle (target: 1) ✓/?
+   - Maximum frequency achieved: ? MHz
+   - Assessment against Phase 2 predictions
+
+6. **Key Achievement: Read Penalty Eliminated**
+   - Phase 2 software benchmark: 32% slower for read-heavy workloads
+   - Phase 3 hardware design: O(1) reconstruction (single XOR)
+   - Theoretical improvement: 32% → 0% read penalty
+   - This validates the core hardware optimization thesis of ATOMiK
+
+7. **Validation Gates Summary**
+   | Gate | Threshold | Actual | Status |
+   |------|-----------|--------|--------|
+   | RTL simulation | 100% pass | ?/? tests | ✓/✗ |
+   | Verilator lint | 0 errors | ? errors | ✓/✗ |
+   | Timing closure | Slack ≥ 0ns | ?ns | ✓/✗ |
+   | LUT utilization | ≤ 80% | ?% | ✓/✗ |
+   | FF utilization | ≤ 80% | ?% | ✓/✗ |
+
+8. **Lessons Learned**
+   - What worked well
+   - Challenges encountered  
+   - Design decisions and rationale
+   - Recommendations for future iterations
+
+9. **Artifacts Delivered**
+   List all files created in Phase 3:
+   - RTL modules
+   - Testbenches
+   - Constraints
+   - Scripts
+   - Reports
+   - Documentation
+
+10. **Next Steps**
+    - Phase 4: SDK Development
+    - Future hardware optimizations to consider:
+      - Parallel delta input capability
+      - Wider bus support (128/256-bit)
+      - Hardware debugging features
+
+11. **Human Review Checklist**
+    - [ ] RTL code reviewed
+    - [ ] Test coverage adequate
+    - [ ] Synthesis results acceptable
+    - [ ] Documentation complete
+    - [ ] Ready for Phase 4
+
+Also update:
+- README.md: Update Phase 3 status to Complete
+- .github/atomik-status.yml: Set phase_3.status to "complete" and all T3.X tasks to complete
+
+Output files:
+- reports/PHASE_3_COMPLETION_REPORT.md
+- Update README.md
+- Update .github/atomik-status.yml
+
+Mark T3.9_hardware_validation: complete
+Mark phase_3.status: complete
