@@ -19,11 +19,11 @@
 | Phase | Description | Status | Milestone |
 |-------|-------------|--------|-----------|
 | **Phase 1** | Mathematical Formalization | ✅ **Complete** | 92 theorems verified in Lean4 |
-| **Phase 2** | SCORE Comparison | 🔄 Ready | Benchmarking delta vs traditional architectures |
-| **Phase 3** | Hardware Synthesis | ⏳ Pending | Verified RTL from proven model |
+| **Phase 2** | SCORE Comparison | ✅ **Complete** | 95-100% memory reduction, 22-55% speedup validated |
+| **Phase 3** | Hardware Synthesis | 🔄 Ready | Verified RTL from proven model |
 | **Phase 4** | SDK Development | ⏳ Pending | Python/Rust/JS SDKs |
 
-**Latest**: Phase 1 complete (January 24, 2026). Delta-state algebra formally verified with zero `sorry` statements. See [`reports/PROOF_VERIFICATION_REPORT.md`](reports/PROOF_VERIFICATION_REPORT.md) for details.
+**Latest**: Phase 2 complete (January 24, 2026). Benchmark comparison validates ATOMiK's 95-100% memory traffic reduction and 22-55% speed improvement on write-heavy workloads vs traditional SCORE. Statistical significance achieved (p < 0.05) on 75% of comparisons. See [`reports/comparison.md`](reports/comparison.md) for details.
 
 ---
 
@@ -90,6 +90,42 @@ lake build  # All proofs verified, 0 sorry statements
 
 ---
 
+## Performance Validation
+
+The theoretical advantages proven in Phase 1 have been **empirically validated** through comprehensive benchmarking against traditional SCORE (State-Centric Operation with Register Execution) architecture.
+
+### Benchmark Results
+
+| Metric | ATOMiK vs Baseline | Significance |
+|--------|-------------------|--------------|
+| **Memory Traffic** | 95-100% reduction | ✅ Verified (MB → KB) |
+| **Execution Speed (write-heavy)** | +22% to +55% faster | ✅ p < 0.001 |
+| **Execution Speed (read-heavy)** | -32% slower | Trade-off for reconstruction cost |
+| **Parallel Efficiency** | 0.85 vs 0.0 | ✅ Commutative composition |
+| **Cache Performance** | +16% to +23% | ✅ Smaller delta footprint |
+
+### Workload Analysis
+
+**ATOMiK excels at**:
+- Write-heavy workloads (< 30% reads): Matrix operations, streaming pipelines
+- Long operation chains: Orders of magnitude memory reduction
+- Parallel composition: 85% efficiency (vs impossible for baseline)
+
+**Trade-offs**:
+- Read-heavy workloads (> 70% reads): Reconstruction overhead
+- Crossover point: ~50% read ratio
+
+### Statistical Rigor
+
+- **360 measurements** across 9 workloads
+- **100 outliers** detected and removed (modified Z-score)
+- **75% of comparisons** statistically significant (p < 0.05, Welch's t-test)
+- **45 unit tests** passing (baseline + ATOMiK implementations)
+
+See [`reports/comparison.md`](reports/comparison.md) for complete analysis.
+
+---
+
 ## Execution Model Summary
 
 At a high level, ATOMiK operates under the following principles:
@@ -139,8 +175,13 @@ ATOMiK/
 │   ├── formal_model.md     # ✅ Mathematical specification
 │   └── equivalence_claims.md  # ✅ Computational equivalence proofs
 ├── reports/
-│   └── PROOF_VERIFICATION_REPORT.md  # ✅ Phase 1 verification
-├── experiments/            # Phase 2 benchmarks (pending)
+│   ├── PROOF_VERIFICATION_REPORT.md     # ✅ Phase 1 verification
+│   ├── comparison.md                    # ✅ Phase 2 SCORE comparison
+│   └── PHASE_2_COMPLETION_REPORT.md     # ✅ Phase 2 completion summary
+├── experiments/            # ✅ Phase 2 benchmarks (360 measurements)
+│   ├── benchmarks/         # Baseline & ATOMiK implementations (2,100 LOC)
+│   ├── data/               # Memory, overhead, scalability results
+│   └── analysis/           # Statistical analysis and reports
 ├── hardware/               # Phase 3 synthesis (pending)
 └── impl/                   # Gowin synthesis outputs
 ```
@@ -228,15 +269,20 @@ ATOMiK occupies a distinct point in the compute design space: **where computatio
 - Turing completeness established
 - [View Report](reports/PROOF_VERIFICATION_REPORT.md)
 
-### 🔄 Phase 2: SCORE Comparison (Ready)
-- Benchmark ATOMiK vs traditional state-centric architectures
-- Memory efficiency, computational overhead, scalability metrics
-- Statistical validation of performance claims
+### ✅ Phase 2: SCORE Comparison (Complete)
+- Benchmarked ATOMiK vs traditional state-centric architectures
+- **Results**: 95-100% memory traffic reduction, 22-55% speed improvement on write-heavy workloads
+- **Measurements**: 360 data points across 9 workloads (memory, overhead, scalability)
+- **Statistical Validation**: 75% of comparisons statistically significant (p < 0.05)
+- **Tests**: 45/45 unit tests passing (baseline + ATOMiK implementations)
+- **Key Finding**: Parallel efficiency 0.85 vs 0.0 (ATOMiK vs baseline) due to commutative composition
+- [View Comparison Report](reports/comparison.md) | [View Completion Report](reports/PHASE_2_COMPLETION_REPORT.md)
 
-### ⏳ Phase 3: Hardware Synthesis (Pending)
+### 🔄 Phase 3: Hardware Synthesis (Ready)
 - Synthesize verified RTL from proven mathematical model
 - Delta accumulator and state reconstructor modules
 - FPGA deployment on Gowin platform
+- Informed by Phase 2: optimize for write-heavy workloads, implement parallel XOR tree
 
 ### ⏳ Phase 4: SDK Development (Pending)
 - Multi-language SDKs (Python, Rust, JavaScript)
@@ -255,7 +301,9 @@ ATOMiK occupies a distinct point in the compute design space: **where computatio
 | [Theoretical Foundations](docs/theory.md) | Mathematical background and proof summaries |
 | [Formal Model Specification](specs/formal_model.md) | Delta-state algebra definitions |
 | [Equivalence Claims](specs/equivalence_claims.md) | Computational equivalence proofs |
-| [Proof Verification Report](reports/PROOF_VERIFICATION_REPORT.md) | Phase 1 completion report |
+| [Proof Verification Report](reports/PROOF_VERIFICATION_REPORT.md) | Phase 1 completion report (92 theorems verified) |
+| [SCORE Comparison Report](reports/comparison.md) | Phase 2 benchmark results and analysis |
+| [Phase 2 Completion Report](reports/PHASE_2_COMPLETION_REPORT.md) | Phase 2 task completion summary |
 
 ---
 
@@ -266,6 +314,25 @@ ATOMiK occupies a distinct point in the compute design space: **where computatio
 cd math/proofs
 lake build
 # Expected: Build completed successfully, 0 errors
+```
+
+### Benchmarks
+```bash
+cd experiments/benchmarks
+
+# Run unit tests
+python baseline/test_baseline.py    # 13 tests
+python atomik/test_atomik.py        # 19 tests
+python test_metrics.py              # 13 tests
+
+# Execute full benchmark suite
+python runner.py
+# Generates data in experiments/data/{memory,overhead,scalability}/
+
+# Run statistical analysis
+cd ../analysis
+python analyze.py
+# Generates statistics.md with significance tests
 ```
 
 ### Python SDK
@@ -317,4 +384,4 @@ For licensing inquiries, commercial integration, or architectural collaboration,
 
 ---
 
-*Last updated: January 24, 2026*
+*Last updated: January 24, 2026 (Phase 2 Complete)*
