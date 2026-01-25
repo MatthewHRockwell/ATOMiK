@@ -76,13 +76,11 @@ module atomik_delta_acc #(
             delta_accumulator <= {DELTA_WIDTH{1'b0}};
         end
         else begin
-            // Load initial state (takes priority over accumulate)
-            // This allows setting a new base state at any time
+            // Load initial state - also clears delta accumulator
+            // This establishes a fresh starting point
             if (load_initial) begin
-                initial_state <= initial_state_in;
-                // Note: We do NOT clear delta_accumulator on load
-                // This is intentional - allows loading new initial state
-                // while preserving accumulated deltas (useful for checkpointing)
+                initial_state     <= initial_state_in;
+                delta_accumulator <= {DELTA_WIDTH{1'b0}};  // Clear accumulator on LOAD
             end
             
             // Accumulate delta via XOR
