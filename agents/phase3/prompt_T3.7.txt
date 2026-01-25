@@ -1,0 +1,268 @@
+You are implementing Phase 3, Task T3.7 of the ATOMiK project.
+
+FIRST: Read these context files:
+- specs/rtl_architecture.md (design specification)
+- rtl/atomik_core_v2.v (integrated core)
+- rtl/atomik_delta_acc.v (accumulator)
+- rtl/atomik_state_rec.v (reconstructor)
+- rtl/pll/atomik_pll_94p5m.v (PLL module - CURRENTLY IN USE by atomik_top.v)
+- rtl/pll/README.md (PLL documentation)
+- docs/reference/gowin/CLOCK_REFERENCE.md (PLL formulas and specs)
+- docs/reference/gowin/TIMING_REFERENCE.md (SDC syntax reference)
+- constraints/atomik_constraints.cst (physical constraints)
+- constraints/atomik_timing.sdc (timing constraints)
+- impl/ directory (existing synthesis outputs for reference)
+- ATOMiK.gprj (existing Gowin project file)
+
+CONTEXT:
+- RTL verified, constraints ready
+- Now create synthesis flow for Gowin FPGA
+- Target: GW1NR-LV9QN88PC6/I5 (Tang Nano 9K)
+- Tool: Gowin EDA V1.9.11.03 (Education)
+- Current PLL: atomik_pll_94p5m (94.5 MHz output)
+
+TASK T3.7: Create FPGA Synthesis Flow
+
+1. **Update Gowin Project File** (if needed)
+   - Review ATOMiK.gprj to understand current structure
+   - May need to add new RTL files to project
+
+2. **Synthesis TCL Script**: Create synth/gowin_synth.tcl
+
+```tcl
+# =============================================================================
+# ATOMiK Gowin Synthesis Script
+# Target: GW1NR-LV9QN88PC6/I5
+# =============================================================================
+
+# Set device
+set_device -device GW1NR-9C -package QN88P -speed 6
+
+# Set options
+set_option -synthesis_tool gowinsynthesis
+set_option -output_base_name atomik
+set_option -top_module atomik_top
+set_option -verilog_std v2001
+
+# Add RTL files
+add_file -type verilog "rtl/atomik_top.v"
+add_file -type verilog "rtl/atomik_core_v2.v"
+add_file -type verilog "rtl/atomik_delta_acc.v"
+add_file -type verilog "rtl/atomik_state_rec.v"
+add_file -type verilog "rtl/pll/atomik_pll_94p5m.v"
+add_file -type verilog "rtl/uart_genome_loader.v"
+
+# Add constraints
+add_file -type cst "constraints/atomik_constraints.cst"
+add_file -type sdc "constraints/atomik_timing.sdc"
+
+# Run synthesis
+run all
+
+# Generate reports
+# (Reports are automatically generated in impl/ directory)
+```
+
+3. **Synthesis Runner Script**: Create synth/run_synthesis.sh
+
+```bash
+#!/bin/bash
+# =============================================================================
+# ATOMiK Gowin Synthesis Runner
+# =============================================================================
+
+set -e
+cd "$(dirname "$0")/.."
+
+echo "=========================================="
+echo "ATOMiK FPGA Synthesis"
+echo "Target: Gowin GW1NR-9C"
+echo "PLL: atomik_pll_94p5m (94.5 MHz)"
+echo "=========================================="
+
+# Check for Gowin tools
+if ! command -v gw_sh &> /dev/null; then
+    echo "ERROR: gw_sh not found. Add Gowin EDA to PATH."
+    echo "Example: export PATH=\$PATH:/path/to/gowin/IDE/bin"
+    exit 1
+fi
+
+# Run synthesis
+echo "[1/3] Running synthesis..."
+gw_sh synth/gowin_synth.tcl
+
+# Check results
+echo "[2/3] Checking results..."
+if [ -f "impl/pnr/atomik.fs" ]; then
+    echo "Bitstream generated: impl/pnr/atomik.fs"
+else
+    echo "WARNING: Bitstream not found"
+fi
+
+# Extract timing report
+echo "[3/3] Extracting reports..."
+if [ -f "impl/pnr/atomik.tr" ]; then
+    echo "Timing report: impl/pnr/atomik.tr"
+    # Extract worst slack
+    grep -i "slack" impl/pnr/atomik.tr | head -5
+fi
+
+echo "=========================================="
+echo "Synthesis complete!"
+echo "=========================================="
+```
+
+4. **Alternative Yosys Flow**: Create synth/run_yosys.sh
+
+```bash
+#!/bin/bash
+# =============================================================================
+# ATOMiK Open-Source Synthesis (Yosys + nextpnr-gowin)
+# Alternative to Gowin EDA
+# =============================================================================
+
+set -e
+cd "$(dirname "$0")/.."
+
+echo "=========================================="
+echo "ATOMiK Open-Source Synthesis"
+echo "Using: Yosys + nextpnr-gowin"
+echo "=========================================="
+
+# Check tools
+if ! command -v yosys &> /dev/null; then
+    echo "ERROR: yosys not found"
+    exit 1
+fi
+
+if ! command -v nextpnr-gowin &> /dev/null; then
+    echo "ERROR: nextpnr-gowin not found"
+    exit 1
+fi
+
+# Create output directory
+mkdir -p synth/output
+
+# Run Yosys synthesis
+echo "[1/3] Running Yosys synthesis..."
+yosys -p "
+    read_verilog rtl/atomik_top.v
+    read_verilog rtl/atomik_core_v2.v
+    read_verilog rtl/atomik_delta_acc.v
+    read_verilog rtl/atomik_state_rec.v
+    read_verilog rtl/uart_genome_loader.v
+    
+    # Note: PLL needs special handling for Gowin
+    # Using blackbox for now
+    read_verilog -lib rtl/pll/atomik_pll_94p5m.v
+    
+    synth_gowin -top atomik_top -json synth/output/atomik.json
+"
+
+# Run nextpnr place and route
+echo "[2/3] Running nextpnr-gowin..."
+nextpnr-gowin \
+    --json synth/output/atomik.json \
+    --write synth/output/atomik_pnr.json \
+    --device GW1NR-9C \
+    --package QN88P \
+    --cst constraints/atomik_constraints.cst
+
+# Generate bitstream
+echo "[3/3] Generating bitstream..."
+gowin_pack -d GW1NR-9C -o synth/output/atomik.fs synth/output/atomik_pnr.json
+
+echo "=========================================="
+echo "Open-source synthesis complete!"
+echo "Bitstream: synth/output/atomik.fs"
+echo "=========================================="
+```
+
+5. **Build Documentation**: Update synth/README.md
+
+```markdown
+# ATOMiK Synthesis
+
+## Quick Start
+
+### Using Gowin EDA (Recommended)
+```bash
+./run_synthesis.sh
+```
+
+### Using Open-Source Tools
+```bash
+./run_yosys.sh
+```
+
+## Prerequisites
+
+### Gowin EDA
+- Version: V1.9.11.03 or later
+- License: Education or Commercial
+- Add to PATH: `export PATH=$PATH:/path/to/gowin/IDE/bin`
+
+### Open-Source Alternative
+- Yosys: `apt install yosys`
+- nextpnr-gowin: Build from source (Project Apicula)
+- gowin_pack: Part of Project Apicula
+
+## PLL Configuration
+
+The synthesis includes `rtl/pll/atomik_pll_94p5m.v` which provides:
+- Input: 27 MHz (Tang Nano 9K crystal)
+- Output: 94.5 MHz
+- Lock signal for reset synchronization
+
+Alternative PLLs available in `rtl/pll/`:
+- `atomik_pll_81m.v` - 81 MHz output
+- `gowin_rpll/` - Dynamic frequency (runtime selectable)
+
+See `docs/reference/gowin/CLOCK_REFERENCE.md` for PLL formulas.
+
+## Output Files
+
+| File | Description |
+|------|-------------|
+| `impl/pnr/atomik.fs` | FPGA bitstream |
+| `impl/pnr/atomik.tr` | Timing report |
+| `impl/gwsynthesis/atomik.vg` | Synthesized netlist |
+
+## Programming the FPGA
+
+```bash
+# Using openFPGALoader
+openFPGALoader -b tangnano9k impl/pnr/atomik.fs
+
+# Using Gowin Programmer
+# GUI: Tools → Programmer
+```
+
+## Troubleshooting
+
+### "gw_sh not found"
+Add Gowin EDA bin directory to PATH.
+
+### Timing failure
+1. Check impl/pnr/atomik.tr for failing paths
+2. Reduce clock frequency in PLL (use atomik_pll_81m.v)
+3. Add pipeline registers if needed
+4. See `docs/reference/gowin/TIMING_REFERENCE.md`
+
+### Resource overflow
+Design is very small (~200 LUTs), this shouldn't happen.
+Check for accidentally included test/debug logic.
+
+### PLL won't lock
+1. Verify 27 MHz input clock is present
+2. Check reset polarity (rPLL RESET is active-HIGH)
+3. See `docs/reference/gowin/CLOCK_REFERENCE.md`
+```
+
+Output files:
+- synth/gowin_synth.tcl
+- synth/run_synthesis.sh (make executable)
+- synth/run_yosys.sh (make executable)
+- synth/README.md (update existing)
+
+Update .github/atomik-status.yml to mark T3.7_fpga_synthesis: complete
