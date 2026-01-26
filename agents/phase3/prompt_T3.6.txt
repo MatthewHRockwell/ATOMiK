@@ -1,0 +1,155 @@
+You are implementing Phase 3, Task T3.6 of the ATOMiK project.
+
+FIRST: Read these context files:
+- specs/rtl_architecture.md (design specification)
+- rtl/atomik_core_v2.v (integrated core)
+- rtl/pll/atomik_pll_81m.v (PLL configuration)
+- constraints/atomik_constraints.cst (existing physical constraints)
+- constraints/timing_constraints.sdc (existing timing constraints, if any)
+
+CONTEXT:
+- RTL is verified in simulation (T3.5)
+- Now prepare for synthesis with proper timing constraints
+- Target: Gowin GW1NR-9, 50 MHz minimum (conservative target)
+- PLL provides 81 MHz from 27 MHz input
+- 64-bit XOR should easily meet timing (no carry chain)
+
+TASK T3.6: Create Timing Constraints and Optimization
+
+1. **SDC Constraints File**: Create/update constraints/atomik_timing.sdc
+
+```tcl
+# =============================================================================
+# ATOMiK Timing Constraints
+# Target: Gowin GW1NR-9, 50 MHz minimum
+# =============================================================================
+
+# ------------------------------------------------------------------------------
+# Clock Definitions
+# ------------------------------------------------------------------------------
+# Input clock (on-board crystal)
+create_clock -name clk_27m -period 37.037 [get_ports sys_clk]
+
+# PLL output clock (81 MHz)
+# Period = 1000/81 = 12.346 ns
+create_clock -name clk_81m -period 12.346 [get_pins u_pll/rpll_inst/CLKOUT]
+
+# Clock uncertainty (jitter allowance)
+set_clock_uncertainty 0.5 [get_clocks clk_81m]
+
+# ------------------------------------------------------------------------------
+# Input Constraints
+# ------------------------------------------------------------------------------
+# External inputs synchronized to clk_81m
+set_input_delay -clock clk_81m -max 3.0 [get_ports delta_in*]
+set_input_delay -clock clk_81m -min 0.5 [get_ports delta_in*]
+
+set_input_delay -clock clk_81m -max 3.0 [get_ports initial_state*]
+set_input_delay -clock clk_81m -min 0.5 [get_ports initial_state*]
+
+set_input_delay -clock clk_81m -max 2.0 [get_ports {delta_valid load_initial state_read}]
+set_input_delay -clock clk_81m -min 0.5 [get_ports {delta_valid load_initial state_read}]
+
+# ------------------------------------------------------------------------------
+# Output Constraints
+# ------------------------------------------------------------------------------
+set_output_delay -clock clk_81m -max 3.0 [get_ports state_out*]
+set_output_delay -clock clk_81m -min 0.5 [get_ports state_out*]
+
+set_output_delay -clock clk_81m -max 2.0 [get_ports {state_valid delta_ready}]
+set_output_delay -clock clk_81m -min 0.5 [get_ports {state_valid delta_ready}]
+
+# ------------------------------------------------------------------------------
+# False Paths
+# ------------------------------------------------------------------------------
+# Asynchronous reset
+set_false_path -from [get_ports sys_rst_n]
+
+# Initial state load (quasi-static configuration)
+# set_false_path -from [get_ports initial_state*] -to [get_pins *initial_state_reg*]
+
+# ------------------------------------------------------------------------------
+# Multicycle Paths (if needed)
+# ------------------------------------------------------------------------------
+# None expected for this simple design
+
+# ------------------------------------------------------------------------------
+# Max Delay Constraints (critical paths)
+# ------------------------------------------------------------------------------
+# 64-bit XOR should complete well within one cycle
+# If timing fails, add pipeline register (but shouldn't be needed)
+```
+
+2. **Critical Path Analysis Document**: Create reports/timing_analysis.md
+
+```markdown
+# ATOMiK Timing Analysis
+
+## Target Specification
+
+| Parameter | Value |
+|-----------|-------|
+| Clock Period | 12.346 ns (81 MHz) |
+| Target Period | 20.0 ns (50 MHz) |
+| Setup Margin | 7.654 ns |
+
+## Expected Critical Paths
+
+### Write Path (Delta Accumulation)
+```
+delta_in[63:0] → XOR[63:0] → accumulator[63:0]
+```
+- XOR gate delay: ~0.3 ns (single LUT4)
+- Register setup: ~0.5 ns
+- Routing: ~2.0 ns (estimated)
+- **Total: ~2.8 ns** (well within 12.346 ns)
+
+### Read Path (State Reconstruction)
+```
+initial_state[63:0] ─┐
+                     ├─→ XOR[63:0] → current_state[63:0]
+accumulator[63:0] ───┘
+```
+- XOR gate delay: ~0.3 ns
+- Register setup: ~0.5 ns
+- Routing: ~2.5 ns (estimated, two sources)
+- **Total: ~3.3 ns** (well within 12.346 ns)
+
+## Why XOR is Fast
+
+Unlike addition or multiplication:
+- XOR has NO carry propagation
+- Each bit is independent
+- 64-bit XOR = 64 parallel 1-bit XORs
+- Single LUT4 level for any width
+
+## Timing Margin
+
+At 81 MHz (12.346 ns period):
+- Worst path estimate: 3.3 ns
+- Available margin: 9.0 ns
+- **Margin: 73%** (excellent)
+
+At 50 MHz target (20 ns period):
+- Worst path estimate: 3.3 ns
+- Available margin: 16.7 ns
+- **Margin: 84%** (very comfortable)
+
+## Optimization Notes
+
+1. No pipelining needed at 50-100 MHz
+2. For higher frequencies (>150 MHz), consider:
+   - Pipeline the 64-bit XOR into 2x32-bit stages
+   - Add output register to state_rec
+3. Current design prioritizes simplicity over max Fmax
+```
+
+3. **Update Physical Constraints**: Review constraints/atomik_constraints.cst
+   - Verify pin assignments are compatible with new core
+   - Add any new ports if interface changed
+
+Output files:
+- constraints/atomik_timing.sdc (create or update)
+- reports/timing_analysis.md
+
+Update .github/atomik-status.yml to mark T3.6_timing_optimization: complete

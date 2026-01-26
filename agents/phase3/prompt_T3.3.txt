@@ -1,0 +1,73 @@
+You are implementing Phase 3, Task T3.3 of the ATOMiK project.
+
+FIRST: Read these context files:
+- specs/rtl_architecture.md (design specification from T3.1)
+- rtl/atomik_delta_acc.v (accumulator from T3.2 for interface reference)
+- reports/comparison.md (the 32% read penalty we're eliminating)
+
+CONTEXT:
+- The state reconstructor is the READ PATH of ATOMiK
+- KEY INSIGHT: Current state = initial_state ^ accumulator (SINGLE XOR!)
+- This is O(1), not O(N) like the software implementation
+- This ELIMINATES the 32% read penalty observed in Phase 2 benchmarks
+- Phase 2 showed software read-heavy workloads were 32% slower
+- In hardware, read and write are BOTH single-cycle operations
+
+TASK T3.3: Implement State Reconstructor Module
+
+Create rtl/atomik_state_rec.v with:
+
+1. **Module Interface**
+```verilog
+module atomik_state_rec #(
+    parameter WIDTH = 64
+) (
+    input  wire             clk,
+    input  wire             rst_n,          // Active-low reset
+    input  wire [WIDTH-1:0] initial_state,  // S₀ (can be registered or direct)
+    input  wire [WIDTH-1:0] accumulator,    // Σδᵢ from delta_acc
+    input  wire             read_enable,    // Trigger state output
+    output reg  [WIDTH-1:0] current_state,  // S₀ ⊕ Σδᵢ
+    output reg              state_valid     // Output is valid
+);
+```
+
+2. **Behavior**
+   - Combinational path: wire reconstructed = initial_state ^ accumulator
+   - Registered output for timing closure
+   - state_valid indicates when output is stable (1 cycle after read_enable)
+
+3. **Design Rationale**
+   - Option A (Pure Combinational): 0-cycle latency but timing risk
+   - Option B (Registered): 1-cycle latency, better timing closure
+   - IMPLEMENT OPTION B - it matches the accumulator's 1-cycle behavior
+   - This gives symmetric read/write latency (both 1 cycle)
+
+4. **Testbench**: Create sim/tb_state_rec.v with test cases:
+   - Initial state with zero accumulator → output should equal initial_state
+   - Initial state with non-zero accumulator → verify XOR correct
+   - Round-trip test: apply delta, reconstruct, should match expected
+   - Multiple different initial states
+   - Rapid read_enable toggles
+   - Verify state_valid timing (high 1 cycle after read_enable)
+
+5. **Verification Script**: Create sim/run_state_rec.sh
+```bash
+#!/bin/bash
+set -e
+cd "$(dirname "$0")"
+iverilog -o sim_state_rec ../rtl/atomik_state_rec.v tb_state_rec.v
+vvp sim_state_rec
+echo "State reconstructor tests PASSED"
+```
+
+After implementation:
+1. Run the testbench and verify all tests pass
+2. Run lint: verilator --lint-only -Wall rtl/atomik_state_rec.v
+
+Output files:
+- rtl/atomik_state_rec.v
+- sim/tb_state_rec.v
+- sim/run_state_rec.sh (make executable)
+
+Update .github/atomik-status.yml to mark T3.3_state_reconstructor: complete

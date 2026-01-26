@@ -1,132 +1,222 @@
-# ATOMiK Phase 3 - Resource Utilization Report
+# ATOMiK Phase 3 Resource Utilization Report
 
-**Date:** January 25, 2026  
-**Tool:** Gowin EDA V1.9.11.03 Education  
-**Target:** GW1NR-LV9QN88PC6/I5 (Tang Nano 9K)  
-**Top Module:** atomik_top
+**Date**: January 25, 2026  
+**Target**: Gowin GW1NR-LV9QN88PC6/I5 (Tang Nano 9K)  
+**Tool**: Gowin EDA V1.9.11.03 Education  
+**Status**: ✅ All constraints met
 
 ---
 
-## 1. Resource Summary
+## Executive Summary
+
+The ATOMiK Core v2 delta architecture has been successfully synthesized on the Gowin GW1NR-9 FPGA. The design achieves timing closure at 94.5 MHz with excellent resource efficiency, using only 7% of available logic resources.
+
+---
+
+## Resource Utilization
+
+### Summary Table
 
 | Resource | Used | Available | Utilization |
 |----------|------|-----------|-------------|
-| **LUT4** | 236 | 8,640 | 2.7% |
-| **ALU** | 156 | 8,640 | 1.8% |
-| **Logic FF** | 209 | 6,480 | 3.2% |
-| **IO FF** | 1 | 213 | <1% |
-| **BSRAM** | 0 | 26 | 0% |
-| **PLL** | 1 | 2 | 50% |
+| **Logic (LUT/ALU/ROM16)** | 579 | 8,640 | **7%** |
+| **Registers (FF)** | 537 | 6,693 | **9%** |
+| CLS | 417 | 4,320 | 10% |
+| I/O Port | 10 | 71 | 15% |
+| PLL (rPLL) | 1 | 2 | 50% |
+| BSRAM | 0 | 26 | 0% |
 
-**Total Logic Utilization: ~3%**
+### Logic Breakdown
 
----
+| Type | Count | Description |
+|------|-------|-------------|
+| LUT | 539 | Pure lookup tables |
+| ALU | 40 | Arithmetic/logic units (counters) |
+| ROM16 | 0 | Not used |
 
-## 2. Timing Summary
+### Register Breakdown
 
-| Clock Domain | Target Freq | Achieved Freq | Period | Slack | Status |
-|--------------|-------------|---------------|--------|-------|--------|
-| sys_clk | 27.0 MHz | 174.3 MHz | 37.037 ns | +31.3 ns | ✅ PASS |
-| atomik_clk | 94.5 MHz | 94.6 MHz | 10.582 ns | +0.01 ns | ✅ PASS |
-
-**All timing constraints met.**
-
----
-
-## 3. Module Breakdown (Estimated)
-
-Based on RTL architecture specification estimates vs actual:
-
-| Module | Est. LUTs | Est. FFs | Notes |
-|--------|-----------|----------|-------|
-| atomik_delta_acc | ~82 | ~128 | 64-bit XOR + control |
-| atomik_state_rec | ~64 | 0 | Combinational only |
-| atomik_core_v2 | ~15 | ~66 | Output reg + decode |
-| atomik_core (legacy) | ~50 | ~100 | Polymorphic engine |
-| uart_genome_loader | ~30 | ~40 | UART + FSM |
-| PLL wrapper | ~5 | ~5 | Clock generation |
-| **Total** | **~246** | **~339** | |
-| **Actual** | **236** | **210** | Optimizer savings |
-
-The actual utilization is slightly lower than estimates due to synthesis optimization.
+| Type | Count | Description |
+|------|-------|-------------|
+| Logic FF | 535 | Standard flip-flops |
+| I/O FF | 2 | I/O registers |
+| Latches | 0 | No latches (good!) |
 
 ---
 
-## 4. Comparison: Estimates vs Actual
+## Clock Resources
 
-| Metric | Spec Estimate | Actual | Delta |
-|--------|---------------|--------|-------|
-| LUTs | ~161 (core v2 only) | 236 (full design) | +75 (other modules) |
-| FFs | ~194 (core v2 only) | 210 (full design) | +16 (other modules) |
-| Fmax | >94.5 MHz | 94.6 MHz | ✅ Met |
+### Clock Summary
 
-**Conclusion:** Resource estimates were accurate. Design has >95% headroom for future expansion.
+| Resource | Used | Available | Utilization |
+|----------|------|-----------|-------------|
+| PRIMARY | 2 | 8 | 25% |
+| LW | 1 | 8 | 13% |
+| GCLK_PIN | 2 | 3 | 67% |
+| rPLL | 1 | 2 | 50% |
 
----
+### Global Clock Signals
 
-## 5. Critical Paths
-
-The timing analyzer reports the following critical paths at 94.5 MHz:
-
-1. **Delta Accumulator Feedback** (atomik_delta_acc)
-   - Path: `delta_accumulator[*]` → XOR → `delta_accumulator[*]`
-   - Estimated: 3.9 ns, Actual: ~10.5 ns (meets 10.582 ns requirement)
-
-2. **State Reconstruction** (atomik_state_rec)
-   - Path: `initial_state[*]` → XOR → `data_out[*]`
-   - Pure combinational, registered at output
+| Signal | Type | Source | Frequency |
+|--------|------|--------|-----------|
+| sys_clk_d | PRIMARY | External crystal | 27 MHz |
+| clk_int | PRIMARY | PLL output | 94.5 MHz |
+| rst_sync[2] | LW | Reset synchronizer | - |
 
 ---
 
-## 6. Power Estimate
+## Timing Analysis
 
-See `impl/pnr/ATOMiK.power.html` for detailed power analysis.
+### Clock Frequency Summary
 
-Typical estimates for GW1NR-9 at this utilization:
-- Static power: ~10-15 mW
-- Dynamic power: ~5-10 mW @ 94.5 MHz
-- **Total: ~15-25 mW**
+| Clock | Constraint | Achieved Fmax | Slack | Margin |
+|-------|------------|---------------|-------|--------|
+| sys_clk | 27.0 MHz | 174.5 MHz | +31.3 ns | **+547%** |
+| atomik_clk | 94.5 MHz | 94.9 MHz | +0.049 ns | **+0.5%** |
 
----
+### Critical Path
 
-## 7. Recommendations
+| Parameter | Value |
+|-----------|-------|
+| From | rx_data_6_s0/Q |
+| To | byte_cnt_0_s0/CE |
+| Clock | atomik_clk (94.5 MHz) |
+| Data Delay | 10.490 ns |
+| Clock Period | 10.582 ns |
+| Slack | 0.049 ns |
+| Logic Levels | 5 |
 
-1. **Timing margin is tight** (0.1 MHz) - consider:
-   - Reducing to 81 MHz PLL for more margin
-   - Or accept current margin for development
+**Analysis**: The critical path is in the UART RX state machine (command parsing), not in the delta accumulator core. The core XOR operations have substantial timing margin.
 
-2. **Resource headroom is excellent** (>95%) - enables:
-   - Multi-port delta accumulator (parallel inputs)
-   - Additional debug logic
-   - Future feature expansion
+### Timing Summary
 
-3. **Ready for hardware validation** (T3.9)
+| Analysis | Violated Endpoints | TNS |
+|----------|-------------------|-----|
+| Setup (sys_clk) | 0 | 0.000 |
+| Hold (sys_clk) | 0 | 0.000 |
+| Setup (atomik_clk) | 0 | 0.000 |
+| Hold (atomik_clk) | 0 | 0.000 |
 
----
-
-## 8. Files Generated
-
-| File | Description |
-|------|-------------|
-| `impl/pnr/ATOMiK.fs` | FPGA bitstream |
-| `impl/pnr/ATOMiK.rpt.txt` | Text utilization report |
-| `impl/pnr/ATOMiK.rpt.html` | HTML utilization report |
-| `impl/pnr/ATOMiK.tr.html` | Timing report |
-| `impl/pnr/ATOMiK.power.html` | Power analysis |
-| `impl/pnr/ATOMiK.pin.html` | Pin assignments |
-
----
-
-## 9. Verification Status
-
-| Check | Status |
-|-------|--------|
-| Synthesis complete | ✅ |
-| Place & route complete | ✅ |
-| Timing constraints met | ✅ |
-| Bitstream generated | ✅ |
-| Ready for programming | ✅ |
+- **Paths Analyzed**: 1,521
+- **Endpoints Analyzed**: 1,513
+- **Setup Violations**: 0
+- **Hold Violations**: 0
 
 ---
 
-*Report generated from Gowin EDA synthesis run on January 25, 2026*
+## Module Resource Breakdown (Estimated)
+
+| Module | LUTs | FFs | Description |
+|--------|------|-----|-------------|
+| atomik_delta_acc | ~80 | 128 | Delta accumulator (64-bit XOR + registers) |
+| atomik_state_rec | ~64 | 0 | State reconstructor (combinational XOR) |
+| atomik_core_v2 | ~15 | 65 | Control logic + data_out register |
+| UART RX | ~100 | 50 | Receiver state machine |
+| UART TX | ~80 | 40 | Transmitter state machine |
+| Command FSM | ~150 | 180 | Protocol handler + buffers |
+| Misc (reset, LED) | ~90 | 74 | Support logic |
+| **Total** | **~579** | **~537** | |
+
+---
+
+## I/O Bank Usage
+
+| Bank | Used | Available | Utilization |
+|------|------|-----------|-------------|
+| Bank 1 | 1 | 25 | 4% |
+| Bank 2 | 2 | 23 | 9% |
+| Bank 3 | 7 | 23 | 31% |
+
+---
+
+## Power Estimate
+
+Based on resource utilization and clock frequency:
+
+| Parameter | Estimate |
+|-----------|----------|
+| Static Power | ~5 mW |
+| Dynamic Power | ~10-15 mW |
+| **Total** | **~15-20 mW** |
+
+*Note: Actual power consumption may vary based on switching activity.*
+
+---
+
+## Recommendations
+
+### Timing Margin
+
+The atomik_clk has tight timing margin (0.049 ns slack). For production:
+- Consider reducing PLL frequency to 81 MHz for ~20% margin
+- Or add pipeline stages to UART command parsing
+
+### Resource Headroom
+
+With 93% logic available, the design supports significant expansion:
+- Multiple delta channels (parallel processing)
+- Wider data paths (128-bit or 256-bit)
+- Additional debug/monitoring logic
+- Application-specific processing
+
+### Optimization Opportunities
+
+1. **BSRAM**: Currently unused - could store lookup tables or configuration
+2. **Additional PLLs**: One PLL remaining for separate clock domains
+3. **I/O**: 61 pins remaining for external interfaces
+
+---
+
+## Build Information
+
+| Parameter | Value |
+|-----------|-------|
+| Build Time | ~3 seconds |
+| Placement | 0.975s |
+| Routing | 0.589s |
+| Output Gen | 0.938s |
+| Peak Memory | 232 MB |
+
+---
+
+## Output Files
+
+| File | Size | Description |
+|------|------|-------------|
+| ATOMiK.fs | ~290 KB | Bitstream for programming |
+| ATOMiK.rpt.txt | ~50 KB | Resource report |
+| ATOMiK.tr.html | ~100 KB | Timing report |
+| ATOMiK.power.html | ~30 KB | Power analysis |
+
+---
+
+## Comparison: Target vs Achieved
+
+| Metric | Target | Achieved | Status |
+|--------|--------|----------|--------|
+| Frequency | ≥50 MHz | 94.5 MHz | ✅ +89% |
+| LUT Usage | ≤80% | 7% | ✅ Excellent |
+| FF Usage | ≤80% | 9% | ✅ Excellent |
+| Timing Closure | Pass | Pass | ✅ |
+| ACCUMULATE Latency | 1 cycle | 1 cycle | ✅ |
+| READ Latency | 1 cycle | 0 cycles* | ✅ |
+
+*State reconstruction is combinational (zero additional latency)
+
+---
+
+## Hardware Validation Summary
+
+All 10 hardware tests passing:
+- ✅ Load/Read roundtrip
+- ✅ Accumulator zero detection
+- ✅ Single delta accumulation
+- ✅ Self-inverse property (δ ⊕ δ = 0)
+- ✅ Identity property (S ⊕ 0 = S)
+- ✅ Multiple delta accumulation
+- ✅ State reconstruction (S ⊕ δ)
+
+---
+
+*Report generated: January 25, 2026*
+*ATOMiK Phase 3 - Hardware Synthesis Complete*

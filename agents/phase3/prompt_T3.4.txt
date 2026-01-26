@@ -1,0 +1,104 @@
+You are implementing Phase 3, Task T3.4 of the ATOMiK project.
+
+FIRST: Read these context files:
+- specs/rtl_architecture.md (design specification)
+- rtl/atomik_delta_acc.v (accumulator module from T3.2)
+- rtl/atomik_state_rec.v (reconstructor module from T3.3)
+- rtl/atomik_core.v (existing core for style reference)
+- rtl/atomik_top.v (top-level for integration reference)
+
+CONTEXT:
+- T3.2 created atomik_delta_acc.v (write path - single-cycle accumulation)
+- T3.3 created atomik_state_rec.v (read path - single-cycle reconstruction)
+- Now integrate them into atomik_core_v2.v
+- The new core implements the delta-state algebra proven in Phase 1
+
+TASK T3.4: Create Integrated ATOMiK Core v2
+
+Create rtl/atomik_core_v2.v that:
+
+1. **Instantiates Sub-modules**
+   - atomik_delta_acc (accumulator)
+   - atomik_state_rec (reconstructor)
+
+2. **Top-Level Interface**
+```verilog
+module atomik_core_v2 #(
+    parameter WIDTH = 64
+) (
+    input  wire             clk,
+    input  wire             rst_n,          // Active-low reset
+    
+    // Configuration
+    input  wire [WIDTH-1:0] initial_state,  // S₀
+    input  wire             load_initial,   // Load new initial state
+    
+    // Delta input (write path)
+    input  wire [WIDTH-1:0] delta_in,
+    input  wire             delta_valid,    // Delta ready to accumulate
+    output wire             delta_ready,    // Core ready for delta
+    
+    // State output (read path)  
+    input  wire             state_read,     // Request state reconstruction
+    output wire [WIDTH-1:0] state_out,      // Reconstructed state
+    output wire             state_valid,    // State output is valid
+    
+    // Status/Debug
+    output reg  [31:0]      delta_count,    // Number of deltas accumulated
+    output wire             busy            // Core is processing
+);
+```
+
+3. **Internal Architecture**
+```
+                    ┌─────────────────────────────────────┐
+                    │        ATOMiK Core v2               │
+                    │                                     │
+  delta_in ────────►│  ┌─────────────────┐               │
+  delta_valid ─────►│  │ atomik_delta_acc│               │
+                    │  │                 │──┐            │
+                    │  └─────────────────┘  │            │
+                    │                       │accumulator │
+  initial_state ───►│  ┌────────────────┐  │            │
+  load_initial ────►│  │ Initial State  │  │            │
+                    │  │   Register     │──┼────┐       │
+                    │  └────────────────┘  │    │       │
+                    │                       │    │       │
+                    │  ┌─────────────────┐  │    │       │
+  state_read ──────►│  │atomik_state_rec │◄─┴────┘       │
+                    │  │                 │───────────────►│──► state_out
+                    │  └─────────────────┘               │──► state_valid
+                    │                                     │
+                    └─────────────────────────────────────┘
+```
+
+4. **Operating Modes**
+   - IDLE: Ready for commands, delta_ready=1
+   - ACCUMULATE: Processing delta_valid (1 cycle)
+   - READ: Processing state_read (1 cycle)
+   - Both can happen simultaneously (read doesn't block writes)
+
+5. **Control Logic**
+   - Minimal FSM (or pure combinational control)
+   - delta_count increments on each successful accumulation
+   - busy = delta_valid | state_read (indicates activity)
+   - delta_ready = 1 always (pipelined, no backpressure for now)
+
+6. **Initial State Handling**
+   - Register to hold initial_state
+   - load_initial captures initial_state into register
+   - Can be loaded while accumulator is non-zero (for state "forking")
+
+7. **Reset Behavior**
+   - accumulator <= 0
+   - initial_state_reg <= 0
+   - delta_count <= 0
+
+After implementation:
+1. Run lint: verilator --lint-only -Wall rtl/atomik_core_v2.v rtl/atomik_delta_acc.v rtl/atomik_state_rec.v
+2. Verify all modules instantiate correctly
+
+Output files:
+- rtl/atomik_core_v2.v
+
+Update .github/atomik-status.yml to mark T3.4_verilog_implementation: complete
