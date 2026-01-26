@@ -189,7 +189,18 @@ phases:
           - sdk/schemas/examples/matrix-ops.json
           - docs/SDK_SCHEMA_GUIDE.md
           - docs/user/SDK_USER_MANUAL.md
-      T4A.2_generator_framework: pending
+      T4A.2_generator_framework:
+        status: complete
+        date_completed: 2026-01-26
+        deliverables:
+          - software/atomik_sdk/generator/core.py
+          - software/atomik_sdk/generator/schema_validator.py
+          - software/atomik_sdk/generator/code_emitter.py
+          - software/atomik_sdk/generator/namespace_mapper.py
+          - software/atomik_sdk/generator/__init__.py
+          - software/atomik_sdk/generator/README.md
+          - software/atomik_sdk/tests/test_generator_core.py
+          - software/atomik_sdk/tests/test_generator_simple.py
       T4A.3_python_generator: pending
       T4A.4_rust_generator: pending
       T4A.5_c_generator: pending
