@@ -1,0 +1,48 @@
+{
+  "catalogue": {
+    "vertical": "Compute",
+    "field": "Linear",
+    "object": "MatrixOps",
+    "version": "1.0.0",
+    "author": "ATOMiK Project",
+    "license": "MIT",
+    "description": "Matrix operations with delta-based computation for efficient incremental updates. Optimized for sparse matrix modifications and iterative algorithms."
+  },
+  "schema": {
+    "delta_fields": {
+      "matrix_delta": {
+        "type": "delta_stream",
+        "width": 256,
+        "encoding": "spatiotemporal_4x4x4",
+        "compression": "xor",
+        "default_value": 0
+      }
+    },
+    "operations": {
+      "accumulate": {
+        "enabled": true,
+        "latency_cycles": 1
+      },
+      "reconstruct": {
+        "enabled": true,
+        "latency_cycles": 1
+      }
+    },
+    "constraints": {
+      "max_memory_mb": 64,
+      "update_latency_ms": 5,
+      "target_frequency_mhz": 94.5
+    }
+  },
+  "hardware": {
+    "target_device": "GW1NR-9",
+    "rtl_params": {
+      "DATA_WIDTH": 256,
+      "ENABLE_PARALLEL": true,
+      "CLOCK_DOMAIN": "compute_clk"
+    },
+    "synthesis_options": {
+      "optimization_goal": "speed"
+    }
+  }
+}

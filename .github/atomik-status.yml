@@ -170,23 +170,35 @@ phases:
 
   phase_4:
     name: "SDK Development"
-    status: ready
+    status: in_progress
+    started: 2026-01-26T00:00:00Z
     validation_gates:
       test_coverage: pending
       api_completeness: pending
       examples_passing: pending
       cross_platform: pending
     tasks:
-      T4.1_api_design: pending
-      T4.2_python_sdk: pending
-      T4.3_rust_sdk: pending
-      T4.4_javascript_sdk: pending
-      T4.5_integration_tests: pending
-      T4.6_documentation: pending
-      T4.7_examples: pending
-      T4.8_final_validation: pending
+      T4A.1_schema_spec:
+        status: complete
+        date_completed: 2026-01-26
+        deliverables:
+          - specs/atomik_schema_v1.json
+          - specs/schema_validation_rules.md
+          - sdk/schemas/examples/terminal-io.json
+          - sdk/schemas/examples/p2p-delta.json
+          - sdk/schemas/examples/matrix-ops.json
+          - docs/SDK_SCHEMA_GUIDE.md
+          - docs/user/SDK_USER_MANUAL.md
+      T4A.2_generator_framework: pending
+      T4A.3_python_generator: pending
+      T4A.4_rust_generator: pending
+      T4A.5_c_generator: pending
+      T4A.6_verilog_generator: pending
+      T4A.7_javascript_generator: pending
+      T4A.8_integration_tests: pending
+      T4A.9_sdk_documentation: pending
     blocking_tasks: []
-    budget_allocated: "$130"
+    budget_allocated: "$240"
     hardware_interface_reference:
       operations:
         - "LOAD: Set initial state (64-bit)"
@@ -204,9 +216,10 @@ overall:
   phases_total: 4
   critical_path_status: "on_track"
   current_phase: "Phase 4 - SDK Development"
-  next_milestone: "T4.1 - Core API Design"
-  human_approval_required: false
-  last_ci_run: 2026-01-25T18:00:00Z
+  next_milestone: "T4A.2 - Generator Framework"
+  human_approval_required: true
+  human_checkpoint_reason: "Review JSON schema specification before proceeding to code generation"
+  last_ci_run: 2026-01-26T00:00:00Z
 
   phase_1_2_3_summary:
     total_theorems_proven: 92

@@ -1,0 +1,55 @@
+{
+  "catalogue": {
+    "vertical": "System",
+    "field": "Terminal",
+    "object": "TerminalIO",
+    "version": "1.0.0",
+    "author": "ATOMiK Project",
+    "license": "MIT",
+    "description": "Control primitive for terminal I/O operations using delta-based state management. Demonstrates basic command/response pattern with minimal memory footprint."
+  },
+  "schema": {
+    "delta_fields": {
+      "command_delta": {
+        "type": "parameter_delta",
+        "width": 64,
+        "encoding": "raw",
+        "compression": "none",
+        "default_value": 0
+      },
+      "response_delta": {
+        "type": "parameter_delta",
+        "width": 64,
+        "encoding": "raw",
+        "compression": "none",
+        "default_value": 0
+      }
+    },
+    "operations": {
+      "accumulate": {
+        "enabled": true,
+        "latency_cycles": 1
+      },
+      "reconstruct": {
+        "enabled": true,
+        "latency_cycles": 1
+      }
+    },
+    "constraints": {
+      "max_memory_mb": 1,
+      "update_latency_ms": 1,
+      "target_frequency_mhz": 94.5
+    }
+  },
+  "hardware": {
+    "target_device": "GW1NR-9",
+    "rtl_params": {
+      "DATA_WIDTH": 64,
+      "ENABLE_PARALLEL": false,
+      "CLOCK_DOMAIN": "sys_clk"
+    },
+    "synthesis_options": {
+      "optimization_goal": "speed"
+    }
+  }
+}

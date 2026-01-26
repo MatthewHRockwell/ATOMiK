@@ -1,0 +1,52 @@
+{
+  "catalogue": {
+    "vertical": "Network",
+    "field": "P2P",
+    "object": "DeltaExchange",
+    "version": "1.0.0",
+    "author": "ATOMiK Project",
+    "license": "MIT",
+    "description": "Peer-to-peer delta synchronization primitive for distributed state management. Enables efficient network state replication with rollback capability for conflict resolution."
+  },
+  "schema": {
+    "delta_fields": {
+      "network_delta": {
+        "type": "delta_stream",
+        "width": 128,
+        "encoding": "raw",
+        "compression": "xor",
+        "default_value": 0
+      }
+    },
+    "operations": {
+      "accumulate": {
+        "enabled": true,
+        "latency_cycles": 1
+      },
+      "reconstruct": {
+        "enabled": true,
+        "latency_cycles": 1
+      },
+      "rollback": {
+        "enabled": true,
+        "history_depth": 256
+      }
+    },
+    "constraints": {
+      "max_memory_mb": 8,
+      "update_latency_ms": 10,
+      "target_frequency_mhz": 94.5
+    }
+  },
+  "hardware": {
+    "target_device": "GW1NR-9",
+    "rtl_params": {
+      "DATA_WIDTH": 128,
+      "ENABLE_PARALLEL": false,
+      "CLOCK_DOMAIN": "net_clk"
+    },
+    "synthesis_options": {
+      "optimization_goal": "power"
+    }
+  }
+}
