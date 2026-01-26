@@ -6,7 +6,8 @@
       "Bash(python:*)",
       "Bash(where:*)",
       "Bash(pdflatex:*)",
-      "Bash(bibtex:*)"
+      "Bash(bibtex:*)",
+      "Bash(pip install:*)"
     ]
   }
 }
