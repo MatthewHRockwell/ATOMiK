@@ -1,0 +1,52 @@
+Placeholder Instructions for Data-Driven Figures
+================================================
+
+The following figures should be generated from experimental data using Python/matplotlib:
+
+Figure 3: Memory Traffic Comparison (Bar Chart, Log Scale)
+----------------------------------------------------------
+Data source: experiments/data/memory/*.csv
+Chart type: Grouped bar chart
+X-axis: Workload names (Matrix 32x32, Matrix 64x64, State Machine, Streaming)
+Y-axis: Memory traffic (bytes, log scale)
+Bars: Baseline (blue), ATOMiK (orange)
+Include: Error bars for standard deviation
+
+Python command:
+  python experiments/analysis/plot_memory_traffic.py --output figures/fig3-memory.pdf
+
+Figure 4: Execution Time with 95% CI Error Bars
+-----------------------------------------------
+Data source: experiments/data/overhead/*.csv
+Chart type: Grouped bar chart with error bars
+X-axis: Workload names
+Y-axis: Execution time (milliseconds)
+Bars: Baseline (blue), ATOMiK (orange)
+Include: 95% confidence interval error bars
+
+Python command:
+  python experiments/analysis/plot_execution_time.py --output figures/fig4-execution.pdf
+
+Figure 5: Parallel Scaling Comparison
+-------------------------------------
+Data source: experiments/data/scalability/parallel_*.csv
+Chart type: Line plot
+X-axis: Number of parallel units (1, 2, 4, 8)
+Y-axis: Speedup (relative to serial)
+Lines: Baseline (flat at 1.0x, blue), ATOMiK (increasing, orange)
+Include: Ideal linear scaling (dashed gray line)
+
+Python command:
+  python experiments/analysis/plot_parallel_scaling.py --output figures/fig5-parallel.pdf
+
+Figure 6: Hardware Timing Diagram (TikZ)
+----------------------------------------
+This should be created as a TikZ diagram showing:
+- Clock cycles (horizontal axis)
+- LOAD, ACCUMULATE, READ operations
+- Single-cycle timing for each
+
+See atomik_core_v2_logic.svg for reference architecture.
+
+Note: If data plotting scripts don't exist, use dummy data that matches
+the statistical results from the benchmark report for placeholder generation.

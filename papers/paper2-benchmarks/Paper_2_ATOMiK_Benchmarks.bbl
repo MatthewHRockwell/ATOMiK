@@ -1,0 +1,77 @@
+\begin{thebibliography}{10}
+
+\bibitem{balasubramonian2014near}
+Rajeev Balasubramonian, Jichuan Chang, Troy Manning, Jaime~H. Moreno, Richard
+  Murphy, Ravi Nair, and Steven Swanson.
+\newblock Near-data processing: Insights from a micro-46 workshop.
+\newblock {\em IEEE Micro}, 34(4):36--42, 2014.
+
+\bibitem{bourgeat2020koika}
+Thomas Bourgeat, Cl{\'e}ment Pit-Claudel, Adam Chlipala, and Arvind.
+\newblock The essence of bluespec: A core language for rule-based hardware
+  design.
+\newblock In {\em Proceedings of the 41st ACM SIGPLAN Conference on Programming
+  Language Design and Implementation}, pages 243--257, 2020.
+
+\bibitem{choi2017kami}
+Joonwon Choi, Muralidaran Vijayaraghavan, Benjamin Sherman, Adam Chlipala, and
+  Arvind.
+\newblock Kami: A platform for high-level parametric hardware specification and
+  its modular verification.
+\newblock In {\em Proceedings of the ACM on Programming Languages}, volume~1,
+  pages 1--30, 2017.
+
+\bibitem{moura2021lean4}
+Leonardo de~Moura and Sebastian Ullrich.
+\newblock The lean 4 theorem prover and programming language.
+\newblock In {\em International Conference on Automated Deduction}, pages
+  625--635. Springer, 2021.
+
+\bibitem{hammer2014adapton}
+Matthew~A. Hammer, Khoo~Yit Phang, Michael Hicks, and Jeffrey~S. Foster.
+\newblock Adapton: Composable, demand-driven incremental computation.
+\newblock In {\em Proceedings of the 35th ACM SIGPLAN Conference on Programming
+  Language Design and Implementation}, pages 156--166, 2014.
+
+\bibitem{kocher2019spectre}
+Paul Kocher, Jann Horn, Anders Fogh, Daniel Genkin, Daniel Gruss, Werner Haas,
+  Mike Hamburg, Moritz Lipp, Stefan Mangard, Thomas Prescher, et~al.
+\newblock Spectre attacks: Exploiting speculative execution.
+\newblock In {\em 2019 IEEE Symposium on Security and Privacy (SP)}, pages
+  1--19. IEEE, 2019.
+
+\bibitem{lipp2018meltdown}
+Moritz Lipp, Michael Schwarz, Daniel Gruss, Thomas Prescher, Werner Haas,
+  Anders Fogh, Jann Horn, Stefan Mangard, Paul Kocher, Daniel Genkin, et~al.
+\newblock Meltdown: Reading kernel memory from user space.
+\newblock In {\em 27th USENIX Security Symposium (USENIX Security 18)}, pages
+  973--990, 2018.
+
+\bibitem{mcsherry2013differential}
+Frank McSherry, Derek~G. Murray, Rebecca Isaacs, and Michael Isard.
+\newblock Differential dataflow.
+\newblock In {\em CIDR}, 2013.
+
+\bibitem{mutlu2019processing}
+Onur Mutlu, Saugata Ghose, Juan G{\'o}mez-Luna, and Rachata Ausavarungnirun.
+\newblock Processing data where it makes sense: Enabling in-memory computation.
+\newblock {\em Microprocessors and Microsystems}, 67:28--41, 2019.
+
+\bibitem{paper1}
+Matthew~H. Rockwell.
+\newblock Delta-state algebra: A formally verified foundation for transient
+  state computation, 2026.
+\newblock arXiv preprint, cs.AR.
+
+\bibitem{shapiro2011conflict}
+Marc Shapiro, Nuno Pregui{\c{c}}a, Carlos Baquero, and Marek Zawirski.
+\newblock Conflict-free replicated data types.
+\newblock {\em Stabilization, Safety, and Security of Distributed Systems},
+  pages 386--400, 2011.
+
+\bibitem{wulf1995hitting}
+Wm~A. Wulf and Sally~A. McKee.
+\newblock Hitting the memory wall: Implications of the obvious.
+\newblock {\em ACM SIGARCH Computer Architecture News}, 23(1):20--24, 1995.
+
+\end{thebibliography}
