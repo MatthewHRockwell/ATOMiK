@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="700" height="430" viewBox="0 0 700 430" font-family="Monaco, Consolas, 'Courier New', monospace">
 
-  <!-- Shadow (simple offset rect) -->
+  <!-- Shadow -->
   <rect x="24" y="16" width="660" height="400" rx="10" fill="#b0b8c4" opacity="0.25"/>
 
   <!-- Terminal body -->
@@ -19,62 +19,70 @@
   <!-- Title text -->
   <text x="350" y="33" text-anchor="middle" font-size="12" fill="#a0a0a0" font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif">atomik-gen -- ATOMiK Schema Tools</text>
 
-  <!-- ============ TERMINAL BODY ============ -->
+  <!-- === PROMPT === -->
+  <text x="42" y="72" font-size="13" fill="#a6e3a1">$</text>
+  <text x="57" y="72" font-size="13" fill="#cdd6f4">atomik-gen</text>
+  <text x="142" y="72" font-size="13" fill="#89b4fa">--help</text>
 
-  <!-- Prompt -->
-  <text x="42" y="72" font-size="12.5" fill="#a6e3a1">$ <tspan fill="#cdd6f4">atomik-gen </tspan><tspan fill="#89b4fa">--help</tspan></text>
+  <!-- === USAGE === -->
+  <text x="42" y="102" font-size="13" fill="#cdd6f4">Usage:</text>
+  <text x="95" y="102" font-size="13" fill="#6c7086">atomik-gen &lt;command&gt; [options]</text>
 
-  <!-- Usage line -->
-  <text x="42" y="102" font-size="12.5" fill="#cdd6f4">Usage: <tspan fill="#6c7086">atomik-gen &lt;command&gt; [options]</tspan></text>
-
-  <!-- Commands header -->
-  <text x="42" y="136" font-size="12.5" fill="#cdd6f4">Commands:</text>
+  <!-- === COMMANDS HEADER === -->
+  <text x="42" y="136" font-size="13" fill="#cdd6f4">Commands:</text>
 
   <!-- generate -->
-  <text x="62" y="158" font-size="12.5" fill="#f9e2af">generate <tspan fill="#6c7086">&lt;schema&gt;</tspan></text>
-  <text x="310" y="158" font-size="12.5" fill="#a6adc8">Generate SDK code from a schema</text>
+  <text x="62" y="158" font-size="13" fill="#f9e2af">generate</text>
+  <text x="130" y="158" font-size="13" fill="#6c7086">&lt;schema&gt;</text>
+  <text x="310" y="158" font-size="13" fill="#a6adc8">Generate SDK code from a schema</text>
 
   <!-- validate -->
-  <text x="62" y="178" font-size="12.5" fill="#f9e2af">validate <tspan fill="#6c7086">&lt;schema&gt;</tspan></text>
-  <text x="310" y="178" font-size="12.5" fill="#a6adc8">Validate a schema (no generation)</text>
+  <text x="62" y="178" font-size="13" fill="#f9e2af">validate</text>
+  <text x="130" y="178" font-size="13" fill="#6c7086">&lt;schema&gt;</text>
+  <text x="310" y="178" font-size="13" fill="#a6adc8">Validate a schema (no generation)</text>
 
   <!-- info -->
-  <text x="62" y="198" font-size="12.5" fill="#f9e2af">info     <tspan fill="#6c7086">&lt;schema&gt;</tspan></text>
-  <text x="310" y="198" font-size="12.5" fill="#a6adc8">Show schema summary</text>
+  <text x="62" y="198" font-size="13" fill="#f9e2af">info</text>
+  <text x="130" y="198" font-size="13" fill="#6c7086">&lt;schema&gt;</text>
+  <text x="310" y="198" font-size="13" fill="#a6adc8">Show schema summary</text>
 
   <!-- batch -->
-  <text x="62" y="218" font-size="12.5" fill="#f9e2af">batch    <tspan fill="#6c7086">&lt;directory&gt;</tspan></text>
-  <text x="310" y="218" font-size="12.5" fill="#a6adc8">Batch generate from a directory</text>
+  <text x="62" y="218" font-size="13" fill="#f9e2af">batch</text>
+  <text x="130" y="218" font-size="13" fill="#6c7086">&lt;directory&gt;</text>
+  <text x="310" y="218" font-size="13" fill="#a6adc8">Batch generate from a directory</text>
 
   <!-- list -->
-  <text x="62" y="238" font-size="12.5" fill="#f9e2af">list</text>
-  <text x="310" y="238" font-size="12.5" fill="#a6adc8">List available target languages</text>
+  <text x="62" y="238" font-size="13" fill="#f9e2af">list</text>
+  <text x="310" y="238" font-size="13" fill="#a6adc8">List available target languages</text>
 
-  <!-- Options header -->
-  <text x="42" y="272" font-size="12.5" fill="#cdd6f4">Options:</text>
+  <!-- === OPTIONS HEADER === -->
+  <text x="42" y="272" font-size="13" fill="#cdd6f4">Options:</text>
 
   <!-- --output-dir -->
-  <text x="62" y="294" font-size="12.5" fill="#89b4fa">--output-dir <tspan fill="#6c7086">DIR</tspan></text>
-  <text x="310" y="294" font-size="12.5" fill="#a6adc8">Output directory (default: generated)</text>
+  <text x="62" y="294" font-size="13" fill="#89b4fa">--output-dir</text>
+  <text x="164" y="294" font-size="13" fill="#6c7086">DIR</text>
+  <text x="310" y="294" font-size="13" fill="#a6adc8">Output directory (default: generated)</text>
 
   <!-- --languages -->
-  <text x="62" y="314" font-size="12.5" fill="#89b4fa">--languages  <tspan fill="#6c7086">LANG [...]</tspan></text>
-  <text x="310" y="314" font-size="12.5" fill="#a6adc8">Target languages (default: all 5)</text>
+  <text x="62" y="314" font-size="13" fill="#89b4fa">--languages</text>
+  <text x="156" y="314" font-size="13" fill="#6c7086">LANG [...]</text>
+  <text x="310" y="314" font-size="13" fill="#a6adc8">Target languages (default: all 5)</text>
 
   <!-- --report -->
-  <text x="62" y="334" font-size="12.5" fill="#89b4fa">--report     <tspan fill="#6c7086">FILE</tspan></text>
-  <text x="310" y="334" font-size="12.5" fill="#a6adc8">Write JSON report to file</text>
+  <text x="62" y="334" font-size="13" fill="#89b4fa">--report</text>
+  <text x="130" y="334" font-size="13" fill="#6c7086">FILE</text>
+  <text x="310" y="334" font-size="13" fill="#a6adc8">Write JSON report to file</text>
 
   <!-- --verbose -->
-  <text x="62" y="354" font-size="12.5" fill="#89b4fa">-v, --verbose</text>
-  <text x="310" y="354" font-size="12.5" fill="#a6adc8">Verbose output</text>
+  <text x="62" y="354" font-size="13" fill="#89b4fa">-v, --verbose</text>
+  <text x="310" y="354" font-size="13" fill="#a6adc8">Verbose output</text>
 
   <!-- --version -->
-  <text x="62" y="374" font-size="12.5" fill="#89b4fa">--version</text>
-  <text x="310" y="374" font-size="12.5" fill="#a6adc8">Show version and exit</text>
+  <text x="62" y="374" font-size="13" fill="#89b4fa">--version</text>
+  <text x="310" y="374" font-size="13" fill="#a6adc8">Show version and exit</text>
 
-  <!-- Static cursor -->
-  <text x="42" y="400" font-size="12.5" fill="#a6e3a1">$</text>
-  <rect x="53" y="390" width="8" height="14" rx="1" fill="#a6e3a1" opacity="0.7"/>
+  <!-- === CURSOR === -->
+  <text x="42" y="400" font-size="13" fill="#a6e3a1">$</text>
+  <rect x="55" y="390" width="8" height="14" rx="1" fill="#a6e3a1" opacity="0.7"/>
 
 </svg>
