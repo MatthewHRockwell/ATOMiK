@@ -1,9 +1,9 @@
 """
 ATOMiK CLI Tool (atomik-gen)
 
-Command-line interface for ATOMiK schema validation and multi-language
-SDK code generation. Wraps the GeneratorEngine API as a pip-installable
-entry point.
+Command-line interface for ATOMiK schema validation, multi-language
+SDK code generation, autonomous pipeline execution, performance
+metrics, and domain hardware demonstrators.
 
 Usage:
     atomik-gen generate <schema> [options]
@@ -11,6 +11,13 @@ Usage:
     atomik-gen info <schema>
     atomik-gen batch <directory> [options]
     atomik-gen list
+    atomik-gen pipeline run <schema> [options]
+    atomik-gen pipeline diff <schema>
+    atomik-gen pipeline status
+    atomik-gen metrics show [options]
+    atomik-gen metrics compare
+    atomik-gen metrics export --output <file>
+    atomik-gen demo <domain> [options]
     atomik-gen --version
 """
 
@@ -266,6 +273,320 @@ def cmd_list(_args: argparse.Namespace) -> int:
     return EXIT_SUCCESS
 
 
+# ---------------------------------------------------------------------------
+# Pipeline commands (Phase 4C)
+# ---------------------------------------------------------------------------
+
+EXIT_HARDWARE_FAILURE = 4
+
+
+def _create_pipeline(args: argparse.Namespace):
+    """Create and configure a Pipeline with all stages registered."""
+    from atomik_sdk.pipeline.controller import Pipeline, PipelineConfig
+    from atomik_sdk.pipeline.stages.validate import ValidateStage
+    from atomik_sdk.pipeline.stages.diff import DiffStage
+    from atomik_sdk.pipeline.stages.generate import GenerateStage
+    from atomik_sdk.pipeline.stages.verify import VerifyStage
+    from atomik_sdk.pipeline.stages.hardware import HardwareStage
+    from atomik_sdk.pipeline.stages.metrics import MetricsStage
+
+    config = PipelineConfig(
+        output_dir=getattr(args, "output_dir", "generated"),
+        languages=getattr(args, "languages", None),
+        verbose=getattr(args, "verbose", False),
+        report_path=getattr(args, "report", None),
+        checkpoint_dir=getattr(args, "checkpoint", ".atomik"),
+        metrics_csv=getattr(args, "metrics_csv", ".atomik/metrics.csv"),
+        com_port=getattr(args, "com_port", None),
+        token_budget=getattr(args, "token_budget", None),
+        sim_only=getattr(args, "sim_only", False),
+        skip_synthesis=getattr(args, "skip_synthesis", False),
+        dry_run=getattr(args, "dry_run", False),
+    )
+
+    pipeline = Pipeline(config)
+    pipeline.register_stage(ValidateStage())
+    pipeline.register_stage(DiffStage())
+    pipeline.register_stage(GenerateStage())
+    pipeline.register_stage(VerifyStage())
+    pipeline.register_stage(HardwareStage())
+    pipeline.register_stage(MetricsStage())
+
+    return pipeline
+
+
+def cmd_pipeline_run(args: argparse.Namespace) -> int:
+    """Execute the autonomous pipeline on a schema or directory."""
+    target = Path(args.target)
+    if not target.exists():
+        print(f"Error: not found: {target}", file=sys.stderr)
+        return EXIT_FILE_ERROR
+
+    pipeline = _create_pipeline(args)
+
+    if target.is_dir() or getattr(args, "batch", False):
+        results = pipeline.run_batch(target)
+        failures = sum(1 for r in results if not r.success)
+        total = len(results)
+        print(f"\nPipeline complete: {total} schema(s), {failures} failure(s)")
+        for r in results:
+            status = "OK" if r.success else "FAIL"
+            print(f"  {r.schema}: {status} [{r.validation_level}] "
+                  f"({r.files_generated} files, {r.total_tokens} tokens, "
+                  f"{r.total_time_ms:.0f}ms)")
+        return EXIT_GENERATION_FAILURE if failures else EXIT_SUCCESS
+    else:
+        result = pipeline.run(target)
+        if result.success:
+            print(f"\nPipeline SUCCESS [{result.validation_level}]")
+            print(f"  Files: {result.files_generated}, "
+                  f"Lines: {result.lines_generated}, "
+                  f"Tokens: {result.total_tokens}, "
+                  f"Time: {result.total_time_ms:.0f}ms")
+        else:
+            print(f"\nPipeline FAILED", file=sys.stderr)
+            for err in result.errors:
+                print(f"  - {err}", file=sys.stderr)
+        return EXIT_SUCCESS if result.success else EXIT_GENERATION_FAILURE
+
+
+def cmd_pipeline_diff(args: argparse.Namespace) -> int:
+    """Show what the pipeline would do without executing."""
+    args.dry_run = True
+    return cmd_pipeline_run(args)
+
+
+def cmd_pipeline_status(_args: argparse.Namespace) -> int:
+    """Show pipeline status from checkpoint."""
+    from atomik_sdk.pipeline.context.checkpoint import Checkpoint
+
+    checkpoint_dir = getattr(_args, "checkpoint", ".atomik")
+    checkpoint = Checkpoint(checkpoint_dir)
+    state = checkpoint.to_dict()
+
+    schemas = state.get("schemas", {})
+    history = state.get("metrics_history", [])
+
+    print("ATOMiK Pipeline Status")
+    print("=" * 40)
+    print(f"  Checkpoint:    {checkpoint_dir}")
+    print(f"  Last updated:  {state.get('last_updated', 'never')}")
+    print(f"  Schemas:       {len(schemas)}")
+    print(f"  History:       {len(history)} run(s)")
+    print()
+
+    if schemas:
+        print("Registered Schemas:")
+        for name, info in schemas.items():
+            gen = info.get("last_generated", "never")
+            print(f"  {name}: generated {gen}")
+        print()
+
+    if history:
+        last = history[-1]
+        print("Last Run:")
+        print(f"  Schema:    {last.get('schema', 'unknown')}")
+        print(f"  Timestamp: {last.get('timestamp', 'unknown')}")
+        print(f"  Tokens:    {last.get('tokens_consumed', 0)}")
+        print(f"  Files:     {last.get('files_generated', 0)}")
+
+    return EXIT_SUCCESS
+
+
+# ---------------------------------------------------------------------------
+# Metrics commands (Phase 4C)
+# ---------------------------------------------------------------------------
+
+def cmd_metrics_show(args: argparse.Namespace) -> int:
+    """Show metrics for the last pipeline run."""
+    from atomik_sdk.pipeline.metrics.reporter import MetricsReporter
+    from atomik_sdk.pipeline.context.checkpoint import Checkpoint
+
+    checkpoint = Checkpoint(getattr(args, "checkpoint", ".atomik"))
+    schema_name = getattr(args, "schema", None)
+    history = checkpoint.get_metrics_history(schema_name)
+
+    if not history:
+        print("No metrics data available. Run the pipeline first.")
+        return EXIT_SUCCESS
+
+    reporter = MetricsReporter()
+    last = history[-1]
+    report = reporter.format_text_report(last.get("schema", "unknown"), last)
+    print(report)
+
+    return EXIT_SUCCESS
+
+
+def cmd_metrics_compare(args: argparse.Namespace) -> int:
+    """Compare metrics across schemas."""
+    from atomik_sdk.pipeline.metrics.reporter import MetricsReporter
+    from atomik_sdk.pipeline.context.checkpoint import Checkpoint
+
+    checkpoint = Checkpoint(getattr(args, "checkpoint", ".atomik"))
+    history = checkpoint.get_metrics_history()
+
+    if not history:
+        print("No metrics data available.")
+        return EXIT_SUCCESS
+
+    # Get latest run per schema
+    latest: dict[str, dict] = {}
+    for entry in history:
+        name = entry.get("schema", "unknown")
+        latest[name] = entry
+
+    reporter = MetricsReporter()
+    schemas = {}
+    for name, data in latest.items():
+        schemas[name] = {
+            "time_ms": data.get("pipeline_total_time_ms", 0),
+            "tokens": data.get("tokens_consumed", 0),
+            "files": data.get("files_generated", 0),
+            "lines": data.get("lines_generated", 0),
+            "efficiency": data.get("token_efficiency_pct", 100),
+        }
+
+    table = reporter.format_comparison_table(schemas)
+    print(table)
+
+    return EXIT_SUCCESS
+
+
+def cmd_metrics_export(args: argparse.Namespace) -> int:
+    """Export metrics history to CSV."""
+    from atomik_sdk.pipeline.context.checkpoint import Checkpoint
+
+    checkpoint = Checkpoint(getattr(args, "checkpoint", ".atomik"))
+    history = checkpoint.get_metrics_history()
+
+    if not history:
+        print("No metrics data to export.")
+        return EXIT_SUCCESS
+
+    import csv
+    output = Path(args.output)
+    output.parent.mkdir(parents=True, exist_ok=True)
+
+    keys = list(history[0].keys())
+    with open(output, "w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=keys)
+        writer.writeheader()
+        writer.writerows(history)
+
+    print(f"Exported {len(history)} entries to {output}")
+    return EXIT_SUCCESS
+
+
+# ---------------------------------------------------------------------------
+# Demo commands (Phase 4C)
+# ---------------------------------------------------------------------------
+
+def cmd_demo(args: argparse.Namespace) -> int:
+    """Run a domain hardware demonstrator."""
+    domain = args.domain
+    valid_domains = ["video", "sensor", "finance"]
+
+    if domain not in valid_domains:
+        print(f"Error: unknown domain '{domain}'. "
+              f"Valid: {', '.join(valid_domains)}", file=sys.stderr)
+        return EXIT_FILE_ERROR
+
+    project_root = Path(__file__).resolve().parent.parent.parent
+    demo_dir = project_root / "demos" / domain
+
+    if not demo_dir.exists():
+        print(f"Error: demo directory not found: {demo_dir}", file=sys.stderr)
+        return EXIT_FILE_ERROR
+
+    top_file = demo_dir / f"{domain}_demo_top.v"
+    tb_file = demo_dir / f"tb_{domain}_demo.v"
+
+    if not top_file.exists():
+        print(f"Error: demo top module not found: {top_file}", file=sys.stderr)
+        return EXIT_FILE_ERROR
+
+    sim_only = getattr(args, "sim_only", False)
+    verbose = getattr(args, "verbose", False)
+
+    print(f"ATOMiK {domain.title()} Domain Demonstrator")
+    print("=" * 40)
+    print(f"  Top module: {top_file.name}")
+    print(f"  Testbench:  {tb_file.name if tb_file.exists() else 'N/A'}")
+    print(f"  Mode:       {'simulation' if sim_only else 'full'}")
+    print()
+
+    # Gather all Verilog source files
+    common_dir = project_root / "demos" / "common"
+    rtl_dir = project_root / "rtl"
+
+    src_files = []
+    for d in [rtl_dir, common_dir, demo_dir]:
+        if d.exists():
+            src_files.extend(sorted(d.glob("*.v")))
+
+    # Remove testbenches from source list
+    src_files = [f for f in src_files if not f.name.startswith("tb_")]
+
+    # Run simulation if testbench exists
+    if tb_file.exists():
+        import shutil
+        iverilog = shutil.which("iverilog")
+        vvp_cmd = shutil.which("vvp")
+
+        if iverilog and vvp_cmd:
+            import subprocess
+            import tempfile
+
+            print("Running RTL simulation...")
+            all_files = [str(f) for f in src_files] + [str(tb_file)]
+
+            with tempfile.NamedTemporaryFile(suffix=".vvp", delete=False) as tmp:
+                vvp_out = tmp.name
+
+            result = subprocess.run(
+                [iverilog, "-o", vvp_out] + all_files,
+                capture_output=True, text=True,
+            )
+
+            if result.returncode != 0:
+                print(f"Compilation failed:\n{result.stderr}")
+                return EXIT_HARDWARE_FAILURE
+
+            result = subprocess.run(
+                [vvp_cmd, vvp_out],
+                capture_output=True, text=True,
+                timeout=60,
+            )
+
+            print(result.stdout)
+            if result.stderr and verbose:
+                print(result.stderr)
+
+            Path(vvp_out).unlink(missing_ok=True)
+
+            if "FAIL" in result.stdout.upper() and "0 FAIL" not in result.stdout.upper():
+                print("Demo simulation: FAILED")
+                return EXIT_HARDWARE_FAILURE
+            else:
+                print("Demo simulation: PASSED")
+        else:
+            print("iverilog/vvp not found -- cannot simulate")
+            return EXIT_HARDWARE_FAILURE
+    else:
+        print("No testbench found for this demo")
+
+    if args.report:
+        _write_report(args.report, {
+            "domain": domain,
+            "mode": "simulation" if sim_only else "full",
+            "top_module": str(top_file),
+            "testbench": str(tb_file) if tb_file.exists() else None,
+        })
+
+    return EXIT_SUCCESS
+
+
 def _write_report(path: str, data: dict) -> None:
     """Write a JSON report file."""
     report_path = Path(path)
@@ -320,6 +641,68 @@ def build_parser() -> argparse.ArgumentParser:
     # list
     sub.add_parser("list", help="List available target languages")
 
+    # -----------------------------------------------------------------------
+    # pipeline subcommand group
+    # -----------------------------------------------------------------------
+    pipe = sub.add_parser("pipeline", help="Autonomous pipeline execution")
+    pipe_sub = pipe.add_subparsers(dest="pipeline_command")
+
+    # pipeline run
+    pipe_run = pipe_sub.add_parser("run", help="Execute full pipeline")
+    pipe_run.add_argument("target", help="Schema file or directory")
+    pipe_run.add_argument("--output-dir", default="generated")
+    pipe_run.add_argument("--languages", nargs="+", choices=list(GENERATORS.keys()))
+    pipe_run.add_argument("--report", help="Write pipeline report to file")
+    pipe_run.add_argument("--checkpoint", default=".atomik")
+    pipe_run.add_argument("--metrics-csv", default=".atomik/metrics.csv")
+    pipe_run.add_argument("--com-port", help="Serial port for hardware validation")
+    pipe_run.add_argument("--token-budget", type=int, help="Maximum tokens for this run")
+    pipe_run.add_argument("--sim-only", action="store_true", help="RTL simulation only")
+    pipe_run.add_argument("--skip-synthesis", action="store_true")
+    pipe_run.add_argument("--batch", action="store_true", help="Process directory")
+    pipe_run.add_argument("-v", "--verbose", action="store_true")
+
+    # pipeline diff
+    pipe_diff = pipe_sub.add_parser("diff", help="Show what would change (dry run)")
+    pipe_diff.add_argument("target", help="Schema file or directory")
+    pipe_diff.add_argument("--output-dir", default="generated")
+    pipe_diff.add_argument("--checkpoint", default=".atomik")
+    pipe_diff.add_argument("-v", "--verbose", action="store_true")
+
+    # pipeline status
+    pipe_status = pipe_sub.add_parser("status", help="Show pipeline state")
+    pipe_status.add_argument("--checkpoint", default=".atomik")
+
+    # -----------------------------------------------------------------------
+    # metrics subcommand group
+    # -----------------------------------------------------------------------
+    met = sub.add_parser("metrics", help="Performance metrics")
+    met_sub = met.add_subparsers(dest="metrics_command")
+
+    # metrics show
+    met_show = met_sub.add_parser("show", help="Show metrics for last run")
+    met_show.add_argument("--schema", help="Filter by schema name")
+    met_show.add_argument("--checkpoint", default=".atomik")
+
+    # metrics compare
+    met_compare = met_sub.add_parser("compare", help="Compare metrics across schemas")
+    met_compare.add_argument("--checkpoint", default=".atomik")
+
+    # metrics export
+    met_export = met_sub.add_parser("export", help="Export metrics to CSV")
+    met_export.add_argument("--output", required=True, help="Output CSV file")
+    met_export.add_argument("--checkpoint", default=".atomik")
+
+    # -----------------------------------------------------------------------
+    # demo subcommand
+    # -----------------------------------------------------------------------
+    demo = sub.add_parser("demo", help="Run domain hardware demonstrator")
+    demo.add_argument("domain", help="Domain name (video, sensor, finance)")
+    demo.add_argument("--com-port", help="Serial port for FPGA")
+    demo.add_argument("--sim-only", action="store_true", help="Simulation only")
+    demo.add_argument("--report", help="Write demo report to file")
+    demo.add_argument("-v", "--verbose", action="store_true")
+
     return parser
 
 
@@ -332,12 +715,38 @@ def main() -> int:
         parser.print_help()
         return EXIT_SUCCESS
 
+    # Handle subcommand groups
+    if args.command == "pipeline":
+        pipeline_commands = {
+            "run": cmd_pipeline_run,
+            "diff": cmd_pipeline_diff,
+            "status": cmd_pipeline_status,
+        }
+        subcmd = getattr(args, "pipeline_command", None)
+        if subcmd is None:
+            parser.parse_args(["pipeline", "--help"])
+            return EXIT_SUCCESS
+        return pipeline_commands[subcmd](args)
+
+    if args.command == "metrics":
+        metrics_commands = {
+            "show": cmd_metrics_show,
+            "compare": cmd_metrics_compare,
+            "export": cmd_metrics_export,
+        }
+        subcmd = getattr(args, "metrics_command", None)
+        if subcmd is None:
+            parser.parse_args(["metrics", "--help"])
+            return EXIT_SUCCESS
+        return metrics_commands[subcmd](args)
+
     commands = {
         "generate": cmd_generate,
         "validate": cmd_validate,
         "info": cmd_info,
         "batch": cmd_batch,
         "list": cmd_list,
+        "demo": cmd_demo,
     }
 
     try:
