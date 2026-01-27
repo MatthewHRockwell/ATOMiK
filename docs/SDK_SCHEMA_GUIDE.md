@@ -676,7 +676,7 @@ See: [`math/proofs/ATOMiK/`](../math/proofs/ATOMiK/)
 - Write-heavy speed: **+22% to +55%**
 - Parallel efficiency: **0.85** (85%)
 
-See: [`reports/comparison.md`](../reports/comparison.md)
+See: [`math/benchmarks/results/PERFORMANCE_COMPARISON.md`](../math/benchmarks/results/PERFORMANCE_COMPARISON.md)
 
 ### Phase 3: Hardware Validation
 
@@ -685,7 +685,7 @@ See: [`reports/comparison.md`](../reports/comparison.md)
 - Resource: **7% logic, 9% registers**
 - Tests: **10/10 passing**
 
-See: [`reports/PHASE_3_COMPLETION_REPORT.md`](../reports/PHASE_3_COMPLETION_REPORT.md)
+See: [`archive/PHASE_3_COMPLETION_REPORT.md`](../archive/PHASE_3_COMPLETION_REPORT.md)
 
 ---
 

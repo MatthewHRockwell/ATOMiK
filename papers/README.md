@@ -6,79 +6,93 @@ This directory contains academic papers documenting the ATOMiK architecture.
 
 | Paper | Title | Status | Target | Timing |
 |-------|-------|--------|--------|--------|
-| **Paper 1** | Delta-State Algebra: A Formally Verified Foundation | ✅ Draft Complete | arXiv → PLDI/CAL | **Now** |
-| **Paper 2** | ATOMiK: Benchmarking Delta-State Execution | ⏳ Pending Phase 2 | MICRO/ASPLOS | Post-benchmarks |
-| **Paper 3** | From Proofs to Silicon: Verified Hardware Synthesis | ⏳ Pending Phase 3 | FPGA/DATE | Post-synthesis |
+| **Paper 1** | Delta-State Algebra: A Formally Verified Foundation | ✅ Complete | arXiv → PLDI/CAL | Ready for submission |
+| **Paper 2** | ATOMiK: Benchmarking Delta-State Execution | ✅ Complete | arXiv → MICRO/ASPLOS | Ready for submission |
+| **Paper 3** | Hardware Implementation and SDK Architecture | 📋 Planned | FPGA/DATE, IEEE TCAD | Post-Phase 4B |
 
 ## Directory Structure
 
 ```
 papers/
-├── paper1-formal-verification/    # ✅ Ready for completion
-│   ├── main.tex                   # Main LaTeX document
+├── paper1-formal-verification/    # ✅ Complete
+│   ├── Delta_State_Algebra.pdf    # Final manuscript (445 KB)
+│   ├── Delta_State_Algebra.tex    # LaTeX source
 │   ├── references.bib             # Bibliography
-│   ├── figures/                   # TikZ figure sources
+│   ├── arxiv-metadata.txt         # arXiv submission metadata
+│   ├── figures/                   # Figure sources
 │   └── README.md                  # Paper-specific instructions
-├── paper2-benchmarks/             # ⏳ After Phase 2
-│   └── (placeholder)
-├── paper3-hardware/               # ⏳ After Phase 3
-│   └── (placeholder)
+├── paper2-benchmarks/             # ✅ Complete
+│   ├── Paper_2_ATOMiK_Benchmarks.pdf  # Final manuscript (545 KB)
+│   ├── Paper_2_ATOMiK_Benchmarks.tex  # LaTeX source
+│   ├── references.bib             # Bibliography
+│   ├── figures/                   # Benchmark plots
+│   ├── compile.sh                 # Build script
+│   └── README.md                  # Paper-specific instructions
+├── paper3-hardware/               # 📋 Planned
+│   └── README.md                  # Placeholder
 └── README.md                      # This file
 ```
 
 ## Paper 1: Formal Verification
 
-**Status**: Draft complete, ready for final polish
+**Status**: ✅ Complete - Ready for arXiv submission
 
-**Content completed by Opus 4.5**:
+**Content**:
 - Abstract with key contributions
-- Introduction with motivation
-- All 17 major theorems with proofs
-- Lean4 code for each theorem
+- Introduction with motivation and related work
+- All 17 major theorems with complete proofs
+- Lean4 formal verification code listings
 - Mathematical ↔ computational notation mapping
-- Hardware implications discussion
-- Related work survey
-- Bibliography
-
-**Remaining work**:
-- Author information
-- Create figures from TikZ specifications
-- Final formatting
-- arXiv submission metadata
+- Hardware implications and implementation discussion
+- Complete bibliography
 
 **Build**:
 ```bash
 cd paper1-formal-verification
-pdflatex main.tex && bibtex main && pdflatex main.tex && pdflatex main.tex
+pdflatex Delta_State_Algebra.tex
+bibtex Delta_State_Algebra
+pdflatex Delta_State_Algebra.tex
+pdflatex Delta_State_Algebra.tex
 ```
 
-## Paper 2: Benchmarks (Planned)
+## Paper 2: Benchmarks
 
-**Timing**: After Phase 2 completion (~3-4 weeks)
+**Status**: ✅ Complete - Ready for arXiv submission
 
-**Planned content**:
-- SCORE baseline implementation
-- ATOMiK variant benchmarks
-- Memory efficiency metrics
-- Computational overhead analysis
-- Scalability results
-- Statistical validation
+**Content**:
+- SCORE baseline implementation and methodology
+- ATOMiK variant benchmark design
+- Memory efficiency analysis (95-100% reduction validated)
+- Computational overhead measurements across 4 workloads
+- Scalability results with statistical validation
+- 360 measurements with p < 0.05 significance
+
+**Build**:
+```bash
+cd paper2-benchmarks
+./compile.sh
+# or manually:
+pdflatex Paper_2_ATOMiK_Benchmarks.tex
+bibtex Paper_2_ATOMiK_Benchmarks
+pdflatex Paper_2_ATOMiK_Benchmarks.tex
+pdflatex Paper_2_ATOMiK_Benchmarks.tex
+```
 
 **Target venues**: IEEE MICRO, ACM ASPLOS, IEEE HPCA
 
-## Paper 3: Hardware (Planned)
+## Paper 3: Hardware and SDK (Planned)
 
-**Timing**: After Phase 3 completion (~6-8 weeks)
+**Status**: 📋 Planned - Awaiting Phase 4B completion
 
 **Planned content**:
-- RTL architecture derived from proofs
-- Delta accumulator design
-- State reconstructor module
-- FPGA synthesis results
-- Timing analysis
-- Resource utilization
+- RTL architecture derived from formal proofs
+- Delta accumulator and state reconstructor design
+- FPGA synthesis results (Tang Nano 9K, 7% LUT @ 94.5 MHz)
+- Multi-language SDK architecture (5 language targets)
+- Code generation framework design
+- Hardware-software co-design methodology
 
-**Target venues**: FPGA Conference, DATE, IEEE TCAD
+**Target venues**: FPGA Conference, DATE, IEEE TCAD, IEEE Micro
 
 ## arXiv Categories
 

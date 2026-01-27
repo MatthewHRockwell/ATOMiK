@@ -54,8 +54,8 @@
 | Benchmark code | `experiments/benchmarks/` |
 | Raw measurements (360) | `experiments/data/` |
 | Statistical analysis | `experiments/analysis/` |
-| Comparison report | `reports/comparison.md` |
-| Hardware validation | `reports/PHASE_3_COMPLETION_REPORT.md` |
+| Comparison report | `math/benchmarks/results/PERFORMANCE_COMPARISON.md` |
+| Hardware validation | `archive/PHASE_3_COMPLETION_REPORT.md` |
 | RTL source | `rtl/atomik_*.v` |
 | Logic diagram | `docs/diagrams/atomik_core_v2_logic.svg` |
 

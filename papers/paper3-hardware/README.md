@@ -42,8 +42,8 @@
 ## Data Sources
 
 - `rtl/` - Verilog source
-- `hardware/` - Synthesis outputs
-- `reports/hardware_validation.pdf` - Validation report
+- `impl/` - Synthesis outputs
+- `archive/PHASE_3_COMPLETION_REPORT.md` - Validation report
 
 ## Timeline
 

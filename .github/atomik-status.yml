@@ -33,9 +33,9 @@ phases:
       - math/proofs/ATOMiK/Equivalence.lean
       - math/proofs/ATOMiK/TuringComplete.lean
       - specs/formal_model.md
-      - specs/equivalence_claims.md
-      - docs/theory.md
-      - reports/PROOF_VERIFICATION_REPORT.md
+      - math/proofs/ATOMiK/LOGIC_MATH_EQUIVALENCE_CLAIMS.md
+      - archive/PHASE_1_PLAN.md
+      - math/validation/PROOF_VERIFICATION_REPORT.md
     metrics:
       theorems_proven: 92
       token_usage_estimated: "175K"
@@ -80,8 +80,8 @@ phases:
       - experiments/analysis/statistics.md
       - experiments/analysis/generate_plots.py
       - experiments/analysis/plots/README.md
-      - reports/comparison.md
-      - reports/PHASE_2_COMPLETION_REPORT.md
+      - math/benchmarks/results/PERFORMANCE_COMPARISON.md
+      - archive/PHASE_2_COMPLETION_REPORT.md
     metrics:
       total_measurements: 360
       workloads_tested: 9
@@ -124,9 +124,9 @@ phases:
       - rtl/atomik_state_rec.v
       - rtl/atomik_core_v2.v
       - rtl/atomik_top.v
-      - testbench/tb_delta_acc.v
-      - testbench/tb_state_rec.v
-      - testbench/tb_core_v2.v
+      - sim/tb_delta_acc.v
+      - sim/tb_state_rec.v
+      - sim/tb_core_v2.v
       - constraints/atomik_constraints.cst
       - constraints/timing_constraints.sdc
       - synth/gowin_synth.tcl
@@ -134,8 +134,8 @@ phases:
       - synth/README.md
       - scripts/test_hardware.py
       - impl/pnr/ATOMiK.fs
-      - reports/resource_utilization.md
-      - reports/PHASE_3_COMPLETION_REPORT.md
+      - math/benchmarks/results/RESOURCE_UTILIZATION.md
+      - archive/PHASE_3_COMPLETION_REPORT.md
     metrics:
       target_frequency_mhz: 94.5
       achieved_frequency_mhz: 94.9
@@ -244,7 +244,7 @@ phases:
           - docs/SDK_DEVELOPER_GUIDE.md
           - docs/SDK_API_REFERENCE.md
           - software/atomik_sdk/README.md
-          - reports/PHASE_4A_COMPLETION_REPORT.md
+          - archive/PHASE_4A_COMPLETION_REPORT.md
     blocking_tasks: []
     budget_allocated: "$240"
     budget_used: "$50"
@@ -271,7 +271,7 @@ phases:
       - software/atomik_sdk/tests/test_integration.py
       - docs/SDK_DEVELOPER_GUIDE.md
       - docs/SDK_API_REFERENCE.md
-      - reports/PHASE_4A_COMPLETION_REPORT.md
+      - archive/PHASE_4A_COMPLETION_REPORT.md
     hardware_interface_reference:
       operations:
         - "LOAD: Set initial state (64-bit)"

@@ -243,7 +243,7 @@ Based on the proven mathematical properties (from Phase 1):
 | Task | Description | Output |
 |------|-------------|--------|
 | T2.8 | Statistical analysis, visualization | `analysis/plots/`, `analysis/statistics.md` |
-| T2.9 | Final comparison report | `reports/comparison.md` |
+| T2.9 | Final comparison report | `math/benchmarks/results/PERFORMANCE_COMPARISON.md` |
 
 ---
 
@@ -306,14 +306,14 @@ Based on the proven mathematical properties (from Phase 1):
 **Analysis**:
 - `experiments/analysis/plots/` - Visualizations (box plots, violin plots, scaling curves)
 - `experiments/analysis/statistics.md` - Statistical summary
-- `reports/comparison.md` - Final SCORE comparison report
+- `math/benchmarks/results/PERFORMANCE_COMPARISON.md` - Final SCORE comparison report
 
 ---
 
 ## References
 
-1. Phase 1 Proof Verification Report (`reports/PROOF_VERIFICATION_REPORT.md`)
-2. Theoretical Foundations (`docs/theory.md`)
+1. Phase 1 Proof Verification Report (`math/validation/PROOF_VERIFICATION_REPORT.md`)
+2. Theoretical Foundations (`archive/PHASE_1_PLAN.md`)
 3. Lean4 Proofs (`math/proofs/ATOMiK/*.lean`)
 
 ---

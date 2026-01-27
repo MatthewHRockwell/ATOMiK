@@ -165,8 +165,8 @@ theorem turing_completeness_summary :
 
 | File | Path | Status |
 |------|------|--------|
-| `theory.md` | `docs/` | ✅ Complete |
-| `PROOF_VERIFICATION_REPORT.md` | `reports/` | ✅ This file |
+| `PHASE_1_PLAN.md` | `archive/` | ✅ Complete |
+| `PROOF_VERIFICATION_REPORT.md` | `math/validation/` | ✅ This file |
 
 ---
 

@@ -38,7 +38,7 @@
     "outputs": [
       "benchmarks/",
       "analysis/",
-      "reports/comparison.pdf"
+      "math/benchmarks/results/PERFORMANCE_COMPARISON.md"
     ]
   }
 }

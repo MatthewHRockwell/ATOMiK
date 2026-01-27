@@ -36,12 +36,12 @@
     "phase_1": [
       "proofs/",
       "specs/formal_model.md",
-      "docs/theory.md"
+      "archive/PHASE_1_PLAN.md"
     ],
     "phase_2": [
       "benchmarks/",
       "analysis/",
-      "reports/comparison.pdf"
+      "math/benchmarks/results/PERFORMANCE_COMPARISON.md"
     ],
     "phase_3": [
       "rtl/",

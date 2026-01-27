@@ -1,4 +1,5 @@
-#venv
+# --- Python Virtual Environments ---
+.venv/
 *.venv
 
 # --- Media & Large Files ---
@@ -47,4 +48,13 @@ temp/
 # Intermediate object files
 *.o
 *.out
+
+# --- Vendor Temporary Files ---
+*_tmp.v
+
+# --- Tool Caches ---
+.ruff_cache/
+
+# --- Editor/Tool Local Settings ---
+.claude/settings.local.json
 

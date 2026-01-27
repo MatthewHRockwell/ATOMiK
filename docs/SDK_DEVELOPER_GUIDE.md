@@ -530,7 +530,7 @@ python tests/test_integration.py
 - [ATOMiK Schema Specification](../specs/atomik_schema_v1.json)
 - [SDK User Manual](./user/SDK_USER_MANUAL.md)
 - [Schema Guide](./SDK_SCHEMA_GUIDE.md)
-- [Phase 3 Hardware Report](../reports/PHASE_3_COMPLETION_REPORT.md)
+- [Phase 3 Hardware Report](../archive/PHASE_3_COMPLETION_REPORT.md)
 - [Mathematical Foundations](../specs/formal_model.md)
 
 ---

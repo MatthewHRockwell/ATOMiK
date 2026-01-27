@@ -21,9 +21,11 @@
 | **Phase 1** | Mathematical Formalization | ✅ **Complete** | 92 theorems verified in Lean4 |
 | **Phase 2** | SCORE Comparison | ✅ **Complete** | 95-100% memory reduction validated |
 | **Phase 3** | Hardware Synthesis | ✅ **Complete** | 10/10 hardware tests, 7% LUT @ 94.5 MHz |
-| **Phase 4** | SDK Development | 🔄 Ready | Python/Rust/JS SDKs |
+| **Phase 4A** | SDK Code Generation | ✅ **Complete** | Python/Rust/C/JS/Verilog generators |
 
-**Latest**: Phase 3 complete (January 25, 2026). ATOMiK Core v2 validated on Tang Nano 9K FPGA with all delta algebra properties verified in silicon. Single-cycle operations for LOAD, ACCUMULATE, and READ—no performance trade-offs. See [`reports/PHASE_3_COMPLETION_REPORT.md`](reports/PHASE_3_COMPLETION_REPORT.md) for details.
+**Latest**: Phase 4A complete (January 26, 2026). Multi-language SDK with 5 code generators (Python, Rust, C, JavaScript, Verilog) delivering production-ready implementations from JSON schemas. See [`archive/PHASE_4A_COMPLETION_REPORT.md`](archive/PHASE_4A_COMPLETION_REPORT.md) for details.
+
+Phase 3 complete (January 25, 2026). ATOMiK Core v2 validated on Tang Nano 9K FPGA with all delta algebra properties verified in silicon. Single-cycle operations for LOAD, ACCUMULATE, and READ. See [`archive/PHASE_3_COMPLETION_REPORT.md`](archive/PHASE_3_COMPLETION_REPORT.md).
 
 ---
 
@@ -202,9 +204,10 @@ ATOMiK/
 ├── constraints/            # ✅ FPGA timing and physical constraints
 ├── synth/                  # ✅ Synthesis scripts (Gowin EDA)
 ├── scripts/                # ✅ Hardware validation tests
-├── docs/                   # Theory and development roadmap
+├── software/              # ✅ Python SDK + 5-language generators
+├── docs/                   # SDK documentation and guides
 ├── specs/                  # Formal model and RTL architecture
-├── reports/                # Phase completion reports
+├── archive/                # Phase completion reports (historical)
 └── impl/pnr/ATOMiK.fs      # ✅ FPGA bitstream (Tang Nano 9K)
 ```
 
@@ -245,9 +248,10 @@ python scripts/test_hardware.py COM6
 | **Phase 1**: Mathematical Formalization | ✅ Complete | 92 theorems, Turing completeness proven |
 | **Phase 2**: Performance Benchmarking | ✅ Complete | 95-100% memory reduction, parallelization validated |
 | **Phase 3**: Hardware Synthesis | ✅ Complete | Silicon validation, single-cycle operations confirmed |
-| **Phase 4**: SDK Development | 🔄 Ready | Python/Rust/JS SDKs |
+| **Phase 4A**: SDK Code Generation | ✅ Complete | 5-language generators, 100% test coverage |
+| **Phase 4B**: Ecosystem & Tooling | 📋 Planned | CLI tools, VS Code extension, hardware integration |
 
-**Full roadmap**: [`docs/ATOMiK_Development_Roadmap.md`](docs/ATOMiK_Development_Roadmap.md)
+**Full roadmap**: [`archive/ATOMiK_DEVELOPMENT_ROADMAP.md`](archive/ATOMiK_DEVELOPMENT_ROADMAP.md) (historical)
 
 ---
 
@@ -255,11 +259,13 @@ python scripts/test_hardware.py COM6
 
 | Document | Description |
 |----------|-------------|
-| [Theoretical Foundations](docs/theory.md) | Mathematical background and proof summaries |
-| [Formal Model](specs/formal_model.md) | Delta-state algebra definitions |
-| [RTL Architecture](specs/rtl_architecture.md) | Hardware design specification |
-| [Benchmark Analysis](reports/comparison.md) | Phase 2 performance results |
-| [Hardware Validation](reports/PHASE_3_COMPLETION_REPORT.md) | Phase 3 silicon verification |
+| [SDK User Manual](docs/user/SDK_USER_MANUAL.md) | End-user guide for SDK usage |
+| [SDK API Reference](docs/SDK_API_REFERENCE.md) | Complete API documentation (5 languages) |
+| [SDK Developer Guide](docs/SDK_DEVELOPER_GUIDE.md) | SDK architecture and development |
+| [Formal Model](specs/formal_model.md) | Delta-state algebra mathematical specification |
+| [RTL Architecture](specs/rtl_architecture.md) | Hardware design specification and timing |
+| [Phase 4A Report](archive/PHASE_4A_COMPLETION_REPORT.md) | SDK development completion report |
+| [Phase 3 Report](archive/PHASE_3_COMPLETION_REPORT.md) | Hardware synthesis completion report |
 
 ---
 
@@ -271,4 +277,4 @@ For licensing inquiries, commercial integration, or architectural collaboration,
 
 ---
 
-*Last updated: January 25, 2026 (Phase 3 Complete)*
+*Last updated: January 26, 2026 (Phase 4A Complete)*

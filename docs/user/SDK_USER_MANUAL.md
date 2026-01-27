@@ -629,9 +629,9 @@ atomik_your_object_init(&obj);
 - RTL Architecture: [`../../specs/rtl_architecture.md`](../../specs/rtl_architecture.md)
 
 **Phase Reports**:
-- Phase 1 (Proofs): [`../../reports/PROOF_VERIFICATION_REPORT.md`](../../reports/PROOF_VERIFICATION_REPORT.md)
-- Phase 2 (Benchmarks): [`../../reports/comparison.md`](../../reports/comparison.md)
-- Phase 3 (Hardware): [`../../reports/PHASE_3_COMPLETION_REPORT.md`](../../reports/PHASE_3_COMPLETION_REPORT.md)
+- Phase 1 (Proofs): [`../../math/validation/PROOF_VERIFICATION_REPORT.md`](../../math/validation/PROOF_VERIFICATION_REPORT.md)
+- Phase 2 (Benchmarks): [`../../math/benchmarks/results/PERFORMANCE_COMPARISON.md`](../../math/benchmarks/results/PERFORMANCE_COMPARISON.md)
+- Phase 3 (Hardware): [`../../archive/PHASE_3_COMPLETION_REPORT.md`](../../archive/PHASE_3_COMPLETION_REPORT.md)
 
 **Community**: TBD (Phase 4 completion)
 

@@ -336,7 +336,7 @@ The proven mathematical properties from Phase 1 translate to measurable performa
 ## 6. References
 
 1. **Phase 1 Proofs**: `math/proofs/ATOMiK/*.lean` (92 theorems, 0 sorry)
-2. **Theoretical Foundations**: `docs/theory.md`
+2. **Theoretical Foundations**: `archive/PHASE_1_PLAN.md`
 3. **Benchmark Design**: `experiments/benchmarks/design.md`
 4. **Statistical Analysis**: `experiments/analysis/statistics.md`
 5. **Raw Data**: `experiments/data/{memory,overhead,scalability}/*.csv`

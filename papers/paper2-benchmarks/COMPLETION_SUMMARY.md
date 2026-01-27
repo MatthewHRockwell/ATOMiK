@@ -137,8 +137,8 @@ All results sourced from:
 
 | Data | Source File |
 |------|-------------|
-| Software benchmarks | `reports/comparison.md` (360 measurements) |
-| Hardware validation | `reports/PHASE_3_COMPLETION_REPORT.md` |
+| Software benchmarks | `math/benchmarks/results/PERFORMANCE_COMPARISON.md` (360 measurements) |
+| Hardware validation | `archive/PHASE_3_COMPLETION_REPORT.md` |
 | Theoretical foundation | Paper 1 / `math/proofs/ATOMiK/*.lean` |
 | Architecture diagram | `docs/diagrams/atomik_core_v2_logic.svg` |
 

@@ -77,13 +77,13 @@ jobs:
       - name: Execute benchmark suite
         run: |
           if [ -d "experiments/benchmarks" ]; then
-            python experiments/benchmarks/run_all.py --output reports/benchmark_results.json || echo "Benchmark script not found"
+            python experiments/benchmarks/run_all.py --output math/benchmarks/results/benchmark_results.json || echo "Benchmark script not found"
           fi
       - name: Upload benchmark results
         uses: actions/upload-artifact@v4
         with:
           name: benchmark-results
-          path: reports/
+          path: math/benchmarks/results/
           retention-days: 30
 
   synthesis:

@@ -1070,8 +1070,8 @@ ATOMiK Core v2 implements delta-state computation in hardware with:
 | **T3.5** | Write testbenches, simulate | T3.4 | `sim/tb_*.v`, passing tests |
 | **T3.6** | Timing constraints | T3.5 | `constraints/atomik_timing.sdc` |
 | **T3.7** | FPGA synthesis scripts | T3.6 | `synth/gowin_synth.tcl` |
-| **T3.8** | Resource utilization analysis | T3.7 | `reports/resource_utilization.md` |
-| **T3.9** | Hardware validation report | T3.8 | `reports/hardware_validation.md` |
+| **T3.8** | Resource utilization analysis | T3.7 | `math/benchmarks/results/RESOURCE_UTILIZATION.md` |
+| **T3.9** | Hardware validation report | T3.8 | `archive/PHASE_3_COMPLETION_REPORT.md` |
 
 ### 9.4 Design Decisions Summary
 
@@ -1211,5 +1211,5 @@ Critical Path 2: State Reconstruction
 | Synthesis scripts | `synth/gowin_synth.tcl` | ✅ |
 | Hardware test script | `scripts/test_hardware.py` | ✅ |
 | FPGA bitstream | `impl/pnr/ATOMiK.fs` | ✅ |
-| Resource report | `reports/resource_utilization.md` | ✅ |
-| Completion report | `reports/PHASE_3_COMPLETION_REPORT.md` | ✅ |
+| Resource report | `math/benchmarks/results/RESOURCE_UTILIZATION.md` | ✅ |
+| Completion report | `archive/PHASE_3_COMPLETION_REPORT.md` | ✅ |
