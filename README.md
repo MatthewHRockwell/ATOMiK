@@ -338,6 +338,11 @@ ATOMiK/
 
 ## Quick Start
 
+### Clone the Repository
+```bash
+git clone https://github.com/MatthewHRockell/ATOMiK.git
+```
+
 ### Verify Mathematical Proofs
 ```bash
 cd math/proofs && lake build
