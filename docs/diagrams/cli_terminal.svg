@@ -1,122 +1,80 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 430" font-family="Monaco, Consolas, 'Courier New', monospace">
-  <defs>
-    <linearGradient id="titleBar" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#3b3b3b"/>
-      <stop offset="100%" stop-color="#2d2d2d"/>
-    </linearGradient>
-    <filter id="termShadow" x="-4%" y="-3%" width="108%" height="112%">
-      <feDropShadow dx="0" dy="4" stdDeviation="10" flood-color="#0f172a" flood-opacity="0.25"/>
-    </filter>
-  </defs>
+<svg xmlns="http://www.w3.org/2000/svg" width="700" height="430" viewBox="0 0 700 430" font-family="Monaco, Consolas, 'Courier New', monospace">
 
-  <!-- ============ TERMINAL WINDOW ============ -->
-  <g filter="url(#termShadow)">
-    <rect x="20" y="10" width="660" height="400" rx="10" fill="#1e1e2e"/>
-  </g>
+  <!-- Shadow (simple offset rect) -->
+  <rect x="24" y="16" width="660" height="400" rx="10" fill="#b0b8c4" opacity="0.25"/>
+
+  <!-- Terminal body -->
+  <rect x="20" y="10" width="660" height="400" rx="10" fill="#1e1e2e"/>
 
   <!-- Title bar -->
-  <rect x="20" y="10" width="660" height="36" rx="10" fill="url(#titleBar)"/>
-  <rect x="20" y="36" width="660" height="10" fill="url(#titleBar)"/>
+  <rect x="20" y="10" width="660" height="36" rx="10" fill="#313244"/>
+  <rect x="20" y="36" width="660" height="10" fill="#313244"/>
+
   <!-- Traffic lights -->
   <circle cx="44" cy="28" r="6.5" fill="#ff5f57"/>
   <circle cx="66" cy="28" r="6.5" fill="#febc2e"/>
   <circle cx="88" cy="28" r="6.5" fill="#28c840"/>
-  <!-- Title text (centered between y=10 top and y=46 bar bottom) -->
-  <text x="350" y="32" text-anchor="middle" font-size="12" fill="#a0a0a0" font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif">atomik-gen -- ATOMiK Schema Tools</text>
+
+  <!-- Title text -->
+  <text x="350" y="33" text-anchor="middle" font-size="12" fill="#a0a0a0" font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif">atomik-gen -- ATOMiK Schema Tools</text>
 
   <!-- ============ TERMINAL BODY ============ -->
 
   <!-- Prompt -->
-  <text x="42" y="72" font-size="12.5">
-    <tspan fill="#a6e3a1">$</tspan>
-    <tspan fill="#cdd6f4"> atomik-gen </tspan>
-    <tspan fill="#89b4fa">--help</tspan>
-  </text>
+  <text x="42" y="72" font-size="12.5" fill="#a6e3a1">$ <tspan fill="#cdd6f4">atomik-gen </tspan><tspan fill="#89b4fa">--help</tspan></text>
 
   <!-- Usage line -->
-  <text x="42" y="102" font-size="12.5">
-    <tspan fill="#cdd6f4">Usage:</tspan>
-    <tspan fill="#6c7086"> atomik-gen &lt;command&gt; [options]</tspan>
-  </text>
+  <text x="42" y="102" font-size="12.5" fill="#cdd6f4">Usage: <tspan fill="#6c7086">atomik-gen &lt;command&gt; [options]</tspan></text>
 
   <!-- Commands header -->
-  <text x="42" y="136" font-size="12.5" fill="#cdd6f4" font-weight="bold">Commands:</text>
+  <text x="42" y="136" font-size="12.5" fill="#cdd6f4">Commands:</text>
 
   <!-- generate -->
-  <text x="62" y="158" font-size="12.5">
-    <tspan fill="#f9e2af">generate</tspan>
-    <tspan fill="#6c7086"> &lt;schema&gt;</tspan>
-  </text>
+  <text x="62" y="158" font-size="12.5" fill="#f9e2af">generate <tspan fill="#6c7086">&lt;schema&gt;</tspan></text>
   <text x="310" y="158" font-size="12.5" fill="#a6adc8">Generate SDK code from a schema</text>
 
   <!-- validate -->
-  <text x="62" y="178" font-size="12.5">
-    <tspan fill="#f9e2af">validate</tspan>
-    <tspan fill="#6c7086"> &lt;schema&gt;</tspan>
-  </text>
+  <text x="62" y="178" font-size="12.5" fill="#f9e2af">validate <tspan fill="#6c7086">&lt;schema&gt;</tspan></text>
   <text x="310" y="178" font-size="12.5" fill="#a6adc8">Validate a schema (no generation)</text>
 
   <!-- info -->
-  <text x="62" y="198" font-size="12.5">
-    <tspan fill="#f9e2af">info</tspan>
-    <tspan fill="#6c7086">     &lt;schema&gt;</tspan>
-  </text>
+  <text x="62" y="198" font-size="12.5" fill="#f9e2af">info     <tspan fill="#6c7086">&lt;schema&gt;</tspan></text>
   <text x="310" y="198" font-size="12.5" fill="#a6adc8">Show schema summary</text>
 
   <!-- batch -->
-  <text x="62" y="218" font-size="12.5">
-    <tspan fill="#f9e2af">batch</tspan>
-    <tspan fill="#6c7086">    &lt;directory&gt;</tspan>
-  </text>
+  <text x="62" y="218" font-size="12.5" fill="#f9e2af">batch    <tspan fill="#6c7086">&lt;directory&gt;</tspan></text>
   <text x="310" y="218" font-size="12.5" fill="#a6adc8">Batch generate from a directory</text>
 
   <!-- list -->
-  <text x="62" y="238" font-size="12.5">
-    <tspan fill="#f9e2af">list</tspan>
-  </text>
+  <text x="62" y="238" font-size="12.5" fill="#f9e2af">list</text>
   <text x="310" y="238" font-size="12.5" fill="#a6adc8">List available target languages</text>
 
   <!-- Options header -->
-  <text x="42" y="272" font-size="12.5" fill="#cdd6f4" font-weight="bold">Options:</text>
+  <text x="42" y="272" font-size="12.5" fill="#cdd6f4">Options:</text>
 
   <!-- --output-dir -->
-  <text x="62" y="294" font-size="12.5">
-    <tspan fill="#89b4fa">--output-dir</tspan>
-    <tspan fill="#6c7086"> DIR</tspan>
-  </text>
+  <text x="62" y="294" font-size="12.5" fill="#89b4fa">--output-dir <tspan fill="#6c7086">DIR</tspan></text>
   <text x="310" y="294" font-size="12.5" fill="#a6adc8">Output directory (default: generated)</text>
 
   <!-- --languages -->
-  <text x="62" y="314" font-size="12.5">
-    <tspan fill="#89b4fa">--languages</tspan>
-    <tspan fill="#6c7086">  LANG [...]</tspan>
-  </text>
+  <text x="62" y="314" font-size="12.5" fill="#89b4fa">--languages  <tspan fill="#6c7086">LANG [...]</tspan></text>
   <text x="310" y="314" font-size="12.5" fill="#a6adc8">Target languages (default: all 5)</text>
 
   <!-- --report -->
-  <text x="62" y="334" font-size="12.5">
-    <tspan fill="#89b4fa">--report</tspan>
-    <tspan fill="#6c7086">     FILE</tspan>
-  </text>
+  <text x="62" y="334" font-size="12.5" fill="#89b4fa">--report     <tspan fill="#6c7086">FILE</tspan></text>
   <text x="310" y="334" font-size="12.5" fill="#a6adc8">Write JSON report to file</text>
 
   <!-- --verbose -->
-  <text x="62" y="354" font-size="12.5">
-    <tspan fill="#89b4fa">-v, --verbose</tspan>
-  </text>
+  <text x="62" y="354" font-size="12.5" fill="#89b4fa">-v, --verbose</text>
   <text x="310" y="354" font-size="12.5" fill="#a6adc8">Verbose output</text>
 
   <!-- --version -->
-  <text x="62" y="374" font-size="12.5">
-    <tspan fill="#89b4fa">--version</tspan>
-  </text>
+  <text x="62" y="374" font-size="12.5" fill="#89b4fa">--version</text>
   <text x="310" y="374" font-size="12.5" fill="#a6adc8">Show version and exit</text>
 
-  <!-- Blinking cursor -->
+  <!-- Static cursor -->
   <text x="42" y="400" font-size="12.5" fill="#a6e3a1">$</text>
-  <rect x="53" y="390" width="8" height="14" fill="#a6e3a1" opacity="0.7">
-    <animate attributeName="opacity" values="0.7;0;0.7" dur="1.2s" repeatCount="indefinite"/>
-  </rect>
+  <rect x="53" y="390" width="8" height="14" rx="1" fill="#a6e3a1" opacity="0.7"/>
 
 </svg>
