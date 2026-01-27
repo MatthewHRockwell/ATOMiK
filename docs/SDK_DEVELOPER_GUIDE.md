@@ -622,7 +622,7 @@ The test suite validates:
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/mopore/ATOMiK.git
+git clone https://github.com/MatthewHRockell/ATOMiK.git
 cd ATOMiK/software
 ```
 

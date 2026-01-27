@@ -1,0 +1,96 @@
+{
+  "schemas_dir": "C:\\Users\\matth\\OneDrive\\Personal\\Projects\\ATOMiK\\sdk\\schemas\\domains",
+  "output_dir": "C:\\Users\\matth\\OneDrive\\Personal\\Projects\\ATOMiK\\generated_sdks",
+  "total_schemas": 3,
+  "total_files": 57,
+  "failures": 0,
+  "results": [
+    {
+      "schema": "edge-sensor-imu.json",
+      "namespace": "Edge.Sensor.IMUFusion",
+      "success": true,
+      "languages": {
+        "python": {
+          "success": true,
+          "files": 3
+        },
+        "rust": {
+          "success": true,
+          "files": 5
+        },
+        "c": {
+          "success": true,
+          "files": 4
+        },
+        "javascript": {
+          "success": true,
+          "files": 4
+        },
+        "verilog": {
+          "success": true,
+          "files": 3
+        }
+      },
+      "total_files": 19,
+      "errors": []
+    },
+    {
+      "schema": "finance-price-tick.json",
+      "namespace": "Finance.Trading.PriceTick",
+      "success": true,
+      "languages": {
+        "python": {
+          "success": true,
+          "files": 3
+        },
+        "rust": {
+          "success": true,
+          "files": 5
+        },
+        "c": {
+          "success": true,
+          "files": 4
+        },
+        "javascript": {
+          "success": true,
+          "files": 4
+        },
+        "verilog": {
+          "success": true,
+          "files": 3
+        }
+      },
+      "total_files": 19,
+      "errors": []
+    },
+    {
+      "schema": "video-h264-delta.json",
+      "namespace": "Video.Streaming.H264Delta",
+      "success": true,
+      "languages": {
+        "python": {
+          "success": true,
+          "files": 3
+        },
+        "rust": {
+          "success": true,
+          "files": 5
+        },
+        "c": {
+          "success": true,
+          "files": 4
+        },
+        "javascript": {
+          "success": true,
+          "files": 4
+        },
+        "verilog": {
+          "success": true,
+          "files": 3
+        }
+      },
+      "total_files": 19,
+      "errors": []
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+numpy>=1.21.0
+jsonschema>=4.0.0
+
+[all]
+atomik-sdk[dev,video]
+
+[dev]
+pytest>=7.0.0
+pytest-cov>=4.0.0
+ruff>=0.1.0
+mypy>=1.0.0
+sphinx>=6.0.0
+sphinx-rtd-theme>=1.0.0
+
+[video]
+opencv-python>=4.5.0

@@ -27,7 +27,7 @@ The ATOMiK SDK is a schema-driven code generation framework that produces delta-
 
 ```bash
 # Clone repository
-git clone https://github.com/your-org/ATOMiK.git
+git clone https://github.com/MatthewHRockwell/ATOMiK.git
 cd ATOMiK/software/atomik_sdk
 
 # Install Python dependencies
@@ -386,7 +386,7 @@ Apache License 2.0 - See LICENSE file for details
   author={ATOMiK Development Team},
   year={2026},
   version={1.0.0},
-  url={https://github.com/your-org/ATOMiK}
+  url={https://github.com/MatthewHRockwell/ATOMiK}
 }
 ```
 
