@@ -1,5 +1,10 @@
 """Tests for adaptive model router."""
 
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
 from pipeline.agents.adaptive_router import AdaptiveRouter
 from pipeline.agents.router import ModelTier
 

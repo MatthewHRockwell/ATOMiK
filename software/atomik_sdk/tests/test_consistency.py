@@ -1,5 +1,10 @@
 """Tests for cross-language consistency checker."""
 
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
 from pipeline.verification.consistency import (
     ConsistencyChecker,
     _normalize_to_snake,

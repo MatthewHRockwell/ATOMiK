@@ -1,6 +1,12 @@
 """Tests for event-driven orchestrator and DAG scheduler."""
 
+import sys
+from pathlib import Path
+
 import pytest
+
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
 from pipeline.dag import CycleError, TaskDAG, TaskState
 from pipeline.event_bus import Event, EventBus, EventType
 

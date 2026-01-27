@@ -1,5 +1,10 @@
 """Tests for parallel task execution."""
 
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
 from pipeline.parallel.decomposer import ParallelTask, TaskDecomposer
 from pipeline.parallel.executor import ParallelExecutor
 from pipeline.parallel.worker import Worker, WorkerState

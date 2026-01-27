@@ -1,5 +1,10 @@
 """Tests for error pattern knowledge base."""
 
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
 from pipeline.knowledge.error_kb import ErrorKnowledgeBase, ErrorPattern
 from pipeline.knowledge.fuzzy_match import edit_distance, fuzzy_score, token_overlap
 

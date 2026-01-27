@@ -1,5 +1,10 @@
 """Tests for pipeline self-optimization engine."""
 
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
 from pipeline.consensus import ConsensusResolver
 from pipeline.context.intelligent_manager import IntelligentContextManager
 from pipeline.context.segment_tracker import SegmentTracker

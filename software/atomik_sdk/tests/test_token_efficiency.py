@@ -1,5 +1,10 @@
 """Tests for token prediction, caching, and compression."""
 
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
 from pipeline.agents.context_compressor import ContextCompressor
 from pipeline.agents.prompt_cache import PromptCache
 from pipeline.agents.token_predictor import TokenPredictor

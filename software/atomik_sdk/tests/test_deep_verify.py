@@ -1,5 +1,10 @@
 """Tests for deep verification engine."""
 
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
 from pipeline.verification.deep_verify import DeepVerifier, DeepVerifyResult
 from pipeline.verification.runners.python_runner import RunnerResult
 
