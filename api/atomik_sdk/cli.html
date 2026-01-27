@@ -1,0 +1,430 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
+<title>atomik_sdk.cli API documentation</title>
+<meta name="description" content="ATOMiK CLI Tool (atomik-gen) …">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>atomik_sdk.cli</code></h1>
+</header>
+<section id="section-intro">
+<p>ATOMiK CLI Tool (atomik-gen)</p>
+<p>Command-line interface for ATOMiK schema validation and multi-language
+SDK code generation. Wraps the GeneratorEngine API as a pip-installable
+entry point.</p>
+<h2 id="usage">Usage</h2>
+<p>atomik-gen generate <schema> [options]
+atomik-gen validate <schema>
+atomik-gen info <schema>
+atomik-gen batch <directory> [options]
+atomik-gen list
+atomik-gen &ndash;version</p>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="atomik_sdk.cli.build_parser"><code class="name flex">
+<span>def <span class="ident">build_parser</span></span>(<span>) ‑> argparse.ArgumentParser</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def build_parser() -&gt; argparse.ArgumentParser:
+    &#34;&#34;&#34;Build the argument parser with all subcommands.&#34;&#34;&#34;
+    parser = argparse.ArgumentParser(
+        prog=&#34;atomik-gen&#34;,
+        description=&#34;ATOMiK schema validation and multi-language SDK code generation&#34;,
+    )
+    parser.add_argument(
+        &#34;--version&#34;, action=&#34;version&#34;, version=f&#34;atomik-gen {__version__}&#34;
+    )
+
+    sub = parser.add_subparsers(dest=&#34;command&#34;, help=&#34;Available commands&#34;)
+
+    # generate
+    gen = sub.add_parser(&#34;generate&#34;, help=&#34;Generate SDK code from a schema&#34;)
+    gen.add_argument(&#34;schema&#34;, help=&#34;Path to schema JSON file&#34;)
+    gen.add_argument(&#34;--output-dir&#34;, default=&#34;generated&#34;, help=&#34;Output directory (default: generated)&#34;)
+    gen.add_argument(
+        &#34;--languages&#34;, nargs=&#34;+&#34;, choices=list(GENERATORS.keys()),
+        help=&#34;Target languages (default: all)&#34;,
+    )
+    gen.add_argument(&#34;--report&#34;, help=&#34;Write JSON report to file&#34;)
+    gen.add_argument(&#34;-v&#34;, &#34;--verbose&#34;, action=&#34;store_true&#34;, help=&#34;Verbose output&#34;)
+
+    # validate
+    val = sub.add_parser(&#34;validate&#34;, help=&#34;Validate a schema (no generation)&#34;)
+    val.add_argument(&#34;schema&#34;, help=&#34;Path to schema JSON file&#34;)
+
+    # info
+    inf = sub.add_parser(&#34;info&#34;, help=&#34;Show schema summary&#34;)
+    inf.add_argument(&#34;schema&#34;, help=&#34;Path to schema JSON file&#34;)
+
+    # batch
+    bat = sub.add_parser(&#34;batch&#34;, help=&#34;Batch generate from a directory of schemas&#34;)
+    bat.add_argument(&#34;directory&#34;, help=&#34;Directory containing schema JSON files&#34;)
+    bat.add_argument(&#34;--output-dir&#34;, default=&#34;generated&#34;, help=&#34;Output directory (default: generated)&#34;)
+    bat.add_argument(
+        &#34;--languages&#34;, nargs=&#34;+&#34;, choices=list(GENERATORS.keys()),
+        help=&#34;Target languages (default: all)&#34;,
+    )
+    bat.add_argument(&#34;--report&#34;, help=&#34;Write JSON report to file&#34;)
+    bat.add_argument(&#34;-v&#34;, &#34;--verbose&#34;, action=&#34;store_true&#34;, help=&#34;Verbose output&#34;)
+
+    # list
+    sub.add_parser(&#34;list&#34;, help=&#34;List available target languages&#34;)
+
+    return parser</code></pre>
+</details>
+<div class="desc"><p>Build the argument parser with all subcommands.</p></div>
+</dd>
+<dt id="atomik_sdk.cli.cmd_batch"><code class="name flex">
+<span>def <span class="ident">cmd_batch</span></span>(<span>args: argparse.Namespace) ‑> int</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def cmd_batch(args: argparse.Namespace) -&gt; int:
+    &#34;&#34;&#34;Batch-generate SDK code from a directory of schemas.&#34;&#34;&#34;
+    schemas_dir = Path(args.directory)
+    if not schemas_dir.is_dir():
+        print(f&#34;Error: directory not found: {schemas_dir}&#34;, file=sys.stderr)
+        return EXIT_FILE_ERROR
+
+    schemas = sorted(schemas_dir.glob(&#34;*.json&#34;))
+    if not schemas:
+        print(f&#34;Error: no JSON schemas found in {schemas_dir}&#34;, file=sys.stderr)
+        return EXIT_FILE_ERROR
+
+    print(f&#34;Found {len(schemas)} schema(s) in {schemas_dir}&#34;)
+    print()
+
+    all_results = []
+    total_files = 0
+    failures = 0
+
+    for schema_path in schemas:
+        engine = _create_engine(args.output_dir, args.languages, args.verbose)
+
+        validation = engine.load_schema(schema_path)
+        if not validation:
+            print(f&#34;  {schema_path.name}: VALIDATION FAILED&#34;)
+            for err in validation.errors:
+                print(f&#34;    - {err}&#34;)
+            all_results.append({
+                &#34;schema&#34;: schema_path.name,
+                &#34;success&#34;: False,
+                &#34;errors&#34;: validation.errors,
+                &#34;files&#34;: 0,
+            })
+            failures += 1
+            continue
+
+        ns = engine.extract_metadata()
+        namespace = f&#34;{ns.vertical}.{ns.field}.{ns.object}&#34;
+        results = engine.generate(args.languages)
+        files = engine.write_output(results)
+
+        errors = []
+        lang_results = {}
+        for lang, result in results.items():
+            lang_results[lang] = {
+                &#34;success&#34;: result.success,
+                &#34;files&#34;: len(result.files),
+            }
+            if not result.success:
+                errors.extend(result.errors)
+
+        schema_ok = len(errors) == 0
+        status = &#34;OK&#34; if schema_ok else &#34;FAIL&#34;
+        print(f&#34;  {schema_path.name}: {status} ({namespace}, {len(files)} files)&#34;)
+
+        if not schema_ok:
+            failures += 1
+
+        total_files += len(files)
+        all_results.append({
+            &#34;schema&#34;: schema_path.name,
+            &#34;namespace&#34;: namespace,
+            &#34;success&#34;: schema_ok,
+            &#34;languages&#34;: lang_results,
+            &#34;total_files&#34;: len(files),
+            &#34;errors&#34;: errors,
+        })
+
+    print()
+    print(f&#34;Processed: {len(schemas)} schema(s), {total_files} file(s), {failures} failure(s)&#34;)
+
+    if args.report:
+        _write_report(args.report, {
+            &#34;schemas_dir&#34;: str(schemas_dir),
+            &#34;output_dir&#34;: args.output_dir,
+            &#34;total_schemas&#34;: len(schemas),
+            &#34;total_files&#34;: total_files,
+            &#34;failures&#34;: failures,
+            &#34;results&#34;: all_results,
+        })
+
+    return EXIT_GENERATION_FAILURE if failures else EXIT_SUCCESS</code></pre>
+</details>
+<div class="desc"><p>Batch-generate SDK code from a directory of schemas.</p></div>
+</dd>
+<dt id="atomik_sdk.cli.cmd_generate"><code class="name flex">
+<span>def <span class="ident">cmd_generate</span></span>(<span>args: argparse.Namespace) ‑> int</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def cmd_generate(args: argparse.Namespace) -&gt; int:
+    &#34;&#34;&#34;Generate SDK code from a schema file.&#34;&#34;&#34;
+    schema_path = Path(args.schema)
+    if not schema_path.exists():
+        print(f&#34;Error: schema file not found: {schema_path}&#34;, file=sys.stderr)
+        return EXIT_FILE_ERROR
+
+    engine = _create_engine(args.output_dir, args.languages, args.verbose)
+
+    # Load and validate
+    validation = engine.load_schema(schema_path)
+    if not validation:
+        print(f&#34;Validation failed for {schema_path.name}:&#34;, file=sys.stderr)
+        for err in validation.errors:
+            print(f&#34;  - {err}&#34;, file=sys.stderr)
+        return EXIT_VALIDATION_FAILURE
+
+    ns = engine.extract_metadata()
+    namespace = f&#34;{ns.vertical}.{ns.field}.{ns.object}&#34;
+
+    if args.verbose:
+        print(f&#34;Namespace: {namespace}&#34;)
+
+    # Generate
+    results = engine.generate(args.languages)
+    files = engine.write_output(results)
+
+    # Collect errors
+    errors = []
+    for lang, result in results.items():
+        status = &#34;OK&#34; if result.success else &#34;FAIL&#34;
+        print(f&#34;  {lang}: {status} ({len(result.files)} files)&#34;)
+        if not result.success:
+            errors.extend(result.errors)
+
+    print(f&#34;Generated {len(files)} file(s) in {args.output_dir}/&#34;)
+
+    # Write report if requested
+    if args.report:
+        _write_report(args.report, {
+            &#34;schema&#34;: schema_path.name,
+            &#34;namespace&#34;: namespace,
+            &#34;output_dir&#34;: args.output_dir,
+            &#34;total_files&#34;: len(files),
+            &#34;success&#34;: len(errors) == 0,
+            &#34;languages&#34;: {
+                lang: {&#34;success&#34;: r.success, &#34;files&#34;: len(r.files)}
+                for lang, r in results.items()
+            },
+            &#34;errors&#34;: errors,
+        })
+
+    return EXIT_GENERATION_FAILURE if errors else EXIT_SUCCESS</code></pre>
+</details>
+<div class="desc"><p>Generate SDK code from a schema file.</p></div>
+</dd>
+<dt id="atomik_sdk.cli.cmd_info"><code class="name flex">
+<span>def <span class="ident">cmd_info</span></span>(<span>args: argparse.Namespace) ‑> int</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def cmd_info(args: argparse.Namespace) -&gt; int:
+    &#34;&#34;&#34;Show summary information about a schema.&#34;&#34;&#34;
+    schema_path = Path(args.schema)
+    if not schema_path.exists():
+        print(f&#34;Error: schema file not found: {schema_path}&#34;, file=sys.stderr)
+        return EXIT_FILE_ERROR
+
+    engine = GeneratorEngine(GeneratorConfig(validate_schemas=False))
+
+    try:
+        engine.load_schema(schema_path)
+    except (ValueError, FileNotFoundError) as e:
+        print(f&#34;Error: {e}&#34;, file=sys.stderr)
+        return EXIT_FILE_ERROR
+
+    summary = engine.get_schema_summary()
+    cat = summary[&#34;catalogue&#34;]
+
+    print(f&#34;Schema:     {schema_path.name}&#34;)
+    print(f&#34;Namespace:  {cat[&#39;vertical&#39;]}.{cat[&#39;field&#39;]}.{cat[&#39;object&#39;]}&#34;)
+    print(f&#34;Version:    {cat[&#39;version&#39;]}&#34;)
+    print(f&#34;Hardware:   {&#39;yes&#39; if summary[&#39;has_hardware&#39;] else &#39;no&#39;}&#34;)
+    print()
+
+    print(&#34;Delta Fields:&#34;)
+    for name, spec in summary[&#34;delta_fields&#34;].items():
+        print(f&#34;  {name}: {spec[&#39;type&#39;]} ({spec[&#39;width&#39;]}-bit)&#34;)
+
+    print()
+    print(f&#34;Operations: {&#39;, &#39;.join(summary[&#39;operations&#39;])}&#34;)
+
+    return EXIT_SUCCESS</code></pre>
+</details>
+<div class="desc"><p>Show summary information about a schema.</p></div>
+</dd>
+<dt id="atomik_sdk.cli.cmd_list"><code class="name flex">
+<span>def <span class="ident">cmd_list</span></span>(<span>_args: argparse.Namespace) ‑> int</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def cmd_list(_args: argparse.Namespace) -&gt; int:
+    &#34;&#34;&#34;List available target languages.&#34;&#34;&#34;
+    print(&#34;Available target languages:&#34;)
+    for lang in GENERATORS:
+        print(f&#34;  {lang}&#34;)
+    return EXIT_SUCCESS</code></pre>
+</details>
+<div class="desc"><p>List available target languages.</p></div>
+</dd>
+<dt id="atomik_sdk.cli.cmd_validate"><code class="name flex">
+<span>def <span class="ident">cmd_validate</span></span>(<span>args: argparse.Namespace) ‑> int</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def cmd_validate(args: argparse.Namespace) -&gt; int:
+    &#34;&#34;&#34;Validate a schema file without generating code.&#34;&#34;&#34;
+    schema_path = Path(args.schema)
+    if not schema_path.exists():
+        print(f&#34;Error: schema file not found: {schema_path}&#34;, file=sys.stderr)
+        return EXIT_FILE_ERROR
+
+    validator = SchemaValidator()
+    result = validator.validate_file(schema_path)
+
+    print(f&#34;{schema_path.name}: {result}&#34;)
+
+    if result.errors:
+        for err in result.errors:
+            print(f&#34;  ERROR: {err}&#34;)
+
+    if result.warnings:
+        for warn in result.warnings:
+            print(f&#34;  WARN:  {warn}&#34;)
+
+    return EXIT_SUCCESS if result.valid else EXIT_VALIDATION_FAILURE</code></pre>
+</details>
+<div class="desc"><p>Validate a schema file without generating code.</p></div>
+</dd>
+<dt id="atomik_sdk.cli.main"><code class="name flex">
+<span>def <span class="ident">main</span></span>(<span>) ‑> int</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def main() -&gt; int:
+    &#34;&#34;&#34;Entry point for the atomik-gen CLI.&#34;&#34;&#34;
+    parser = build_parser()
+    args = parser.parse_args()
+
+    if args.command is None:
+        parser.print_help()
+        return EXIT_SUCCESS
+
+    commands = {
+        &#34;generate&#34;: cmd_generate,
+        &#34;validate&#34;: cmd_validate,
+        &#34;info&#34;: cmd_info,
+        &#34;batch&#34;: cmd_batch,
+        &#34;list&#34;: cmd_list,
+    }
+
+    try:
+        return commands[args.command](args)
+    except Exception as e:
+        print(f&#34;Error: {e}&#34;, file=sys.stderr)
+        return EXIT_FILE_ERROR</code></pre>
+</details>
+<div class="desc"><p>Entry point for the atomik-gen CLI.</p></div>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="atomik_sdk" href="index.html">atomik_sdk</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="two-column">
+<li><code><a title="atomik_sdk.cli.build_parser" href="#atomik_sdk.cli.build_parser">build_parser</a></code></li>
+<li><code><a title="atomik_sdk.cli.cmd_batch" href="#atomik_sdk.cli.cmd_batch">cmd_batch</a></code></li>
+<li><code><a title="atomik_sdk.cli.cmd_generate" href="#atomik_sdk.cli.cmd_generate">cmd_generate</a></code></li>
+<li><code><a title="atomik_sdk.cli.cmd_info" href="#atomik_sdk.cli.cmd_info">cmd_info</a></code></li>
+<li><code><a title="atomik_sdk.cli.cmd_list" href="#atomik_sdk.cli.cmd_list">cmd_list</a></code></li>
+<li><code><a title="atomik_sdk.cli.cmd_validate" href="#atomik_sdk.cli.cmd_validate">cmd_validate</a></code></li>
+<li><code><a title="atomik_sdk.cli.main" href="#atomik_sdk.cli.main">main</a></code></li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+</body>
+</html>

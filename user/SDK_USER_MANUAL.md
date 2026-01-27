@@ -48,21 +48,31 @@ ATOMiK SDK is ideal for:
 
 ### 1.3 Installation
 
-**Note**: Phase 4A (SDK Generator) is under development. Installation instructions will be available in Phase 4A.2+.
-
-**Coming Soon**:
+**Python SDK + CLI tool**:
 ```bash
-# Python
-pip install atomik-sdk
+cd software
+pip install -e .
 
-# Rust
-cargo add atomik-sdk
+# Verify
+atomik-gen --version
+atomik-gen list
+```
 
-# JavaScript
-npm install @atomik/sdk
+This installs both the Python SDK and the `atomik-gen` command-line tool for schema validation and multi-language code generation.
 
-# C
-# Headers and libraries will be available for download
+**VS Code Extension** (optional):
+```bash
+cd vscode-extension/atomik-vscode
+npm install && npm run compile
+code --install-extension .
+```
+
+Provides schema intellisense, snippets, and command palette integration. See [extension README](../../vscode-extension/atomik-vscode/README.md).
+
+**Generated SDKs** (Rust, C, JavaScript, Verilog):
+```bash
+# Generate from any schema
+atomik-gen generate sdk/schemas/examples/terminal-io.json --output-dir generated
 ```
 
 ---
@@ -80,14 +90,13 @@ Browse available schemas in `sdk/schemas/examples/`:
 - `p2p-delta.json` - Network synchronization
 - `matrix-ops.json` - Matrix operations
 
-#### Step 2: Generate Code (Coming in T4A.2+)
+#### Step 2: Generate Code
 
-**Command-line tool (future)**:
 ```bash
-atomik-gen --schema sdk/schemas/examples/terminal-io.json --lang python --output ./generated
+atomik-gen generate sdk/schemas/examples/terminal-io.json --languages python --output-dir ./generated
 ```
 
-This will generate:
+This generates:
 ```
 generated/
 └── atomik/
@@ -347,10 +356,12 @@ Specify resource limits for your deployment target:
 3. Ensure delta field widths are powers of 2 (8, 16, 32, 64, 128, 256)
 4. Confirm object names are PascalCase identifiers
 
-**Automated Validation** (coming in Phase 4A.2+):
+**Automated Validation**:
 ```bash
-atomik-validate sdk/schemas/my-schema.json
+atomik-gen validate sdk/schemas/my-schema.json
 ```
+
+**VS Code**: Files matching `*.atomik.json` receive real-time validation with the ATOMiK extension installed.
 
 ---
 
@@ -637,6 +648,6 @@ atomik_your_object_init(&obj);
 
 ---
 
-*SDK User Manual v1.0.0 (Initial Draft) - January 26, 2026*
-*ATOMiK Project - Phase 4A.1*
-*Ready for Phase 4A.2: Generator Framework Implementation*
+*SDK User Manual v1.1.0 - January 26, 2026*
+*ATOMiK Project - Phase 4B*
+*CLI tool (`atomik-gen`) and VS Code extension available*

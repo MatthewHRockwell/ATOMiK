@@ -36,6 +36,7 @@ The ATOMiK SDK is a multi-language code generation framework that produces delta
 
 ```
 software/atomik_sdk/
+├── cli.py                    # atomik-gen CLI tool (pip-installable entry point)
 ├── generator/
 │   ├── core.py               # GeneratorEngine orchestrator
 │   ├── schema_validator.py   # JSON Schema validation
@@ -62,6 +63,8 @@ software/atomik_sdk/
 ```
 JSON Schema
     ↓
+atomik-gen CLI  (user-facing entry point)
+    ↓
 SchemaValidator (validates schema)
     ↓
 NamespaceMapper (extracts catalogue metadata)
@@ -72,6 +75,27 @@ CodeEmitter plugins (generate language-specific code)
     ↓
 Generated Files (written to output directory)
 ```
+
+### CLI Tool
+
+The `atomik-gen` CLI (`atomik_sdk/cli.py`) is the primary user-facing interface. It wraps `GeneratorEngine` with argparse subcommands:
+
+```bash
+atomik-gen generate <schema> [--output-dir DIR] [--languages LANG ...]
+atomik-gen validate <schema>
+atomik-gen info <schema>
+atomik-gen batch <directory> [--output-dir DIR] [--report FILE]
+atomik-gen list
+```
+
+Installed via `pip install -e ./software` (entry point defined in `pyproject.toml`).
+
+### VS Code Extension
+
+The [VS Code extension](../vscode-extension/atomik-vscode/README.md) provides:
+- JSON Schema intellisense for `*.atomik.json` and `**/schemas/**/*.json` files
+- Schema snippets (`atomik-schema`, `atomik-field`, `atomik-hardware`)
+- Command palette integration invoking `atomik-gen` CLI commands
 
 ---
 
@@ -447,26 +471,32 @@ The test suite validates:
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/your-org/ATOMiK.git
-cd ATOMiK/software/atomik_sdk
+git clone https://github.com/mopore/ATOMiK.git
+cd ATOMiK/software
 ```
 
-2. Install development dependencies:
+2. Install SDK with development dependencies:
 ```bash
-# Python
-pip install jsonschema
-
-# Rust (optional, for validation)
-rustup install stable
-
-# Node.js (optional, for validation)
-nvm install 14
+pip install -e ".[dev]"
 ```
 
-3. Run tests:
+This installs the `atomik-gen` CLI tool and all dependencies including `jsonschema`.
+
+3. Verify CLI:
 ```bash
-python tests/test_generator_simple.py
-python tests/test_integration.py
+atomik-gen --version
+atomik-gen list
+```
+
+4. Run tests:
+```bash
+pytest tests/ atomik_sdk/tests/ -v
+```
+
+5. (Optional) Build the VS Code extension:
+```bash
+cd ../vscode-extension/atomik-vscode
+npm install && npm run compile
 ```
 
 ### Adding a New Language Generator
@@ -530,6 +560,7 @@ python tests/test_integration.py
 - [ATOMiK Schema Specification](../specs/atomik_schema_v1.json)
 - [SDK User Manual](./user/SDK_USER_MANUAL.md)
 - [Schema Guide](./SDK_SCHEMA_GUIDE.md)
+- [VS Code Extension](../vscode-extension/atomik-vscode/README.md)
 - [Phase 3 Hardware Report](../archive/PHASE_3_COMPLETION_REPORT.md)
 - [Mathematical Foundations](../specs/formal_model.md)
 

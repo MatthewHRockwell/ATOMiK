@@ -6,17 +6,18 @@
 ## Table of Contents
 
 1. [Overview](#overview)
-2. [Python SDK API](#python-sdk-api)
-3. [Rust SDK API](#rust-sdk-api)
-4. [C SDK API](#c-sdk-api)
-5. [JavaScript SDK API](#javascript-sdk-api)
-6. [Verilog RTL Interface](#verilog-rtl-interface)
+2. [CLI Tool Reference](#cli-tool-reference)
+3. [Python SDK API](#python-sdk-api)
+4. [Rust SDK API](#rust-sdk-api)
+5. [C SDK API](#c-sdk-api)
+6. [JavaScript SDK API](#javascript-sdk-api)
+7. [Verilog RTL Interface](#verilog-rtl-interface)
 
 ---
 
 ## Overview
 
-This document provides API reference for all generated SDKs. Each language implementation provides semantically equivalent operations based on ATOMiK delta algebra:
+This document provides API reference for the `atomik-gen` CLI tool and all generated SDKs. Each language implementation provides semantically equivalent operations based on ATOMiK delta algebra:
 
 **Core Operations:**
 - **LOAD**: Set initial state
@@ -24,6 +25,59 @@ This document provides API reference for all generated SDKs. Each language imple
 - **RECONSTRUCT**: Compute current_state = initial_state ⊕ accumulator
 - **STATUS**: Check if accumulator is zero
 - **ROLLBACK** (optional): Undo N previous delta operations
+
+---
+
+## CLI Tool Reference
+
+The `atomik-gen` CLI tool is the primary interface for schema validation and code generation.
+
+**Installation**: `pip install -e ./software`
+
+### Commands
+
+| Command | Description |
+|---------|-------------|
+| `atomik-gen generate <schema>` | Generate SDK code from a schema file |
+| `atomik-gen validate <schema>` | Validate a schema (no generation) |
+| `atomik-gen info <schema>` | Show schema summary (namespace, fields, operations) |
+| `atomik-gen batch <directory>` | Batch generate from a directory of schemas |
+| `atomik-gen list` | List available target languages |
+| `atomik-gen --version` | Show version |
+
+### Options (generate/batch)
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| `--output-dir DIR` | Output directory | `generated` |
+| `--languages LANG [LANG ...]` | Target languages | all 5 |
+| `--report FILE` | Write JSON report | none |
+| `-v`, `--verbose` | Verbose output | off |
+
+### Exit Codes
+
+| Code | Meaning |
+|------|---------|
+| 0 | Success |
+| 1 | Validation failure |
+| 2 | Generation failure |
+| 3 | File or configuration error |
+
+### Examples
+
+```bash
+# Generate Python + Rust from a schema
+atomik-gen generate sdk/schemas/examples/terminal-io.json --languages python rust
+
+# Validate a domain schema
+atomik-gen validate sdk/schemas/domains/video-h264-delta.json
+
+# Batch process all domain schemas with report
+atomik-gen batch sdk/schemas/domains/ --output-dir generated_sdks --report report.json
+
+# Show schema metadata
+atomik-gen info sdk/schemas/domains/finance-price-tick.json
+```
 
 ---
 

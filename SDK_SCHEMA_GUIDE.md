@@ -523,6 +523,17 @@ Constraints define resource and performance limits for the generated SDK.
 
 All ATOMiK schemas must validate against `specs/atomik_schema_v1.json` (JSON Schema Draft 7).
 
+**CLI Validation** (recommended):
+```bash
+# Validate a single schema
+atomik-gen validate sdk/schemas/examples/terminal-io.json
+
+# Show schema summary (namespace, fields, operations)
+atomik-gen info sdk/schemas/domains/finance-price-tick.json
+```
+
+**VS Code**: Files matching `*.atomik.json` or in `**/schemas/**/*.json` are automatically validated with real-time error squiggles when the [ATOMiK VS Code extension](../vscode-extension/atomik-vscode/README.md) is installed.
+
 **Python Example**:
 ```python
 import json
@@ -539,9 +550,9 @@ with open('sdk/schemas/examples/terminal-io.json') as f:
 # Validate
 try:
     jsonschema.validate(instance=instance, schema=schema_spec)
-    print("✓ Schema is valid")
+    print("Schema is valid")
 except jsonschema.ValidationError as e:
-    print(f"✗ Validation error: {e.message}")
+    print(f"Validation error: {e.message}")
 ```
 
 ### 6.2 Common Validation Errors
