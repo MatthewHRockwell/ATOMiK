@@ -2,16 +2,15 @@
 Simple tests for ATOMiK SDK Generator Framework (no pytest required)
 """
 
-import json
-from pathlib import Path
 import sys
+from pathlib import Path
 
 # Add parent directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from generator.schema_validator import SchemaValidator
+from generator.core import GeneratorConfig, GeneratorEngine
 from generator.namespace_mapper import NamespaceMapper
-from generator.core import GeneratorEngine, GeneratorConfig
+from generator.schema_validator import SchemaValidator
 
 
 def test_schema_validator():

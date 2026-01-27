@@ -2,14 +2,14 @@
 Test Verilog RTL generation
 """
 
+import subprocess
 import sys
 import tempfile
-import subprocess
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from generator.core import GeneratorEngine, GeneratorConfig
+from generator.core import GeneratorConfig, GeneratorEngine
 from generator.verilog_generator import VerilogGenerator
 
 
@@ -34,7 +34,7 @@ def test_verilog_generation():
         # Test each example schema
         examples = list(examples_dir.glob("*.json"))
         if not examples:
-            print(f"[WARN] No example schemas found")
+            print("[WARN] No example schemas found")
             return 1
 
         for example_path in examples:
@@ -55,24 +55,24 @@ def test_verilog_generation():
             try:
                 validation = engine.load_schema(example_path)
                 if not validation:
-                    print(f"  [FAIL] Validation errors:")
+                    print("  [FAIL] Validation errors:")
                     for error in validation.errors:
                         print(f"    - {error}")
                     continue
 
-                print(f"  [PASS] Schema validated")
+                print("  [PASS] Schema validated")
 
                 # Generate code
                 results = engine.generate(target_languages=['verilog'])
 
                 if 'verilog' not in results:
-                    print(f"  [FAIL] No Verilog results")
+                    print("  [FAIL] No Verilog results")
                     continue
 
                 result = results['verilog']
 
                 if not result.success:
-                    print(f"  [FAIL] Generation errors:")
+                    print("  [FAIL] Generation errors:")
                     for error in result.errors:
                         print(f"    - {error}")
                     continue
@@ -86,7 +86,7 @@ def test_verilog_generation():
                 # Verify generated files have Verilog syntax
                 verilog_files = [f for f in files if str(f).endswith('.v')]
                 for verilog_file in verilog_files:
-                    with open(verilog_file, 'r') as f:
+                    with open(verilog_file) as f:
                         content = f.read()
                         # Basic syntax checks
                         if 'module' not in content:
@@ -96,7 +96,7 @@ def test_verilog_generation():
                             print(f"  [FAIL] Missing 'endmodule' keyword in {Path(verilog_file).name}")
                             continue
 
-                print(f"  [PASS] Verilog syntax appears valid")
+                print("  [PASS] Verilog syntax appears valid")
 
                 # Check if iverilog is available for syntax checking
                 try:
@@ -108,7 +108,7 @@ def test_verilog_generation():
                     )
 
                     if iverilog_version.returncode == 0:
-                        print(f"  [INFO] Found iverilog for syntax checking")
+                        print("  [INFO] Found iverilog for syntax checking")
 
                         # Try to compile the main module
                         main_module = None
@@ -126,24 +126,24 @@ def test_verilog_generation():
                             )
 
                             if iverilog_result.returncode == 0:
-                                print(f"  [PASS] Verilog syntax check passed")
+                                print("  [PASS] Verilog syntax check passed")
                             else:
-                                print(f"  [WARN] Verilog syntax warnings:")
+                                print("  [WARN] Verilog syntax warnings:")
                                 if iverilog_result.stderr:
                                     for line in iverilog_result.stderr.split('\n')[:5]:
                                         if line.strip():
                                             print(f"    {line}")
                     else:
-                        print(f"  [INFO] iverilog not available, skipping syntax check")
+                        print("  [INFO] iverilog not available, skipping syntax check")
 
                 except FileNotFoundError:
-                    print(f"  [INFO] iverilog not installed, skipping syntax check")
+                    print("  [INFO] iverilog not installed, skipping syntax check")
                 except subprocess.TimeoutExpired:
-                    print(f"  [WARN] iverilog check timed out")
+                    print("  [WARN] iverilog check timed out")
                 except Exception as e:
                     print(f"  [WARN] Could not run iverilog: {e}")
 
-                print(f"  [PASS] Verilog RTL generation successful")
+                print("  [PASS] Verilog RTL generation successful")
 
             except Exception as e:
                 print(f"  [FAIL] Exception: {e}")

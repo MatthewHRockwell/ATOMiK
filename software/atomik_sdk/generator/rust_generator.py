@@ -6,8 +6,7 @@ Generates Rust modules from ATOMiK schemas with proper Rust idioms.
 
 from __future__ import annotations
 
-from typing import Dict, Any
-from pathlib import Path
+from typing import Any
 
 from .code_emitter import CodeEmitter, GeneratedFile, GenerationResult
 from .namespace_mapper import NamespaceMapping
@@ -28,7 +27,7 @@ class RustGenerator(CodeEmitter):
         """Initialize Rust code generator."""
         super().__init__('rust')
 
-    def generate(self, schema: Dict[str, Any], namespace: NamespaceMapping) -> GenerationResult:
+    def generate(self, schema: dict[str, Any], namespace: NamespaceMapping) -> GenerationResult:
         """Generate Rust SDK code from schema."""
         try:
             files = []
@@ -82,9 +81,9 @@ class RustGenerator(CodeEmitter):
     def _generate_module(
         self,
         namespace: NamespaceMapping,
-        delta_fields: Dict[str, Any],
-        operations: Dict[str, Any],
-        hardware: Dict[str, Any]
+        delta_fields: dict[str, Any],
+        operations: dict[str, Any],
+        hardware: dict[str, Any]
     ) -> GeneratedFile:
         """Generate the main Rust module implementation."""
 
@@ -110,18 +109,18 @@ class RustGenerator(CodeEmitter):
         lines.append(f"/// {namespace.object} delta-state manager")
         lines.append("#[derive(Debug, Clone)]")
         lines.append(f"pub struct {namespace.object} {{")
-        lines.append(f"    /// Initial state")
+        lines.append("    /// Initial state")
         lines.append(f"    initial_state: {delta_type},")
-        lines.append(f"    /// Delta accumulator (XOR of all deltas)")
+        lines.append("    /// Delta accumulator (XOR of all deltas)")
         lines.append(f"    accumulator: {delta_type},")
 
         # Add history for rollback if enabled
         if operations.get('rollback', {}).get('enabled', False):
-            lines.append(f"    /// Delta history for rollback")
+            lines.append("    /// Delta history for rollback")
             lines.append(f"    history: VecDeque<{delta_type}>,")
             history_depth = operations['rollback'].get('history_depth', 10)
-            lines.append(f"    /// Maximum history depth")
-            lines.append(f"    max_history: usize,")
+            lines.append("    /// Maximum history depth")
+            lines.append("    max_history: usize,")
 
         lines.append("}")
         lines.append("")
@@ -294,14 +293,14 @@ class RustGenerator(CodeEmitter):
 
     def _generate_cargo_toml(
         self,
-        catalogue: Dict[str, Any],
+        catalogue: dict[str, Any],
         namespace: NamespaceMapping
     ) -> GeneratedFile:
         """Generate Cargo.toml manifest."""
 
         vertical_lower = namespace.vertical.lower()
         field_lower = namespace.field.lower()
-        obj_snake = self._to_snake_case(namespace.object)
+        self._to_snake_case(namespace.object)
 
         version = catalogue.get('version', '0.1.0')
         description = catalogue.get('description', f'{namespace.object} delta-state module')
@@ -331,8 +330,8 @@ class RustGenerator(CodeEmitter):
     def _generate_tests(
         self,
         namespace: NamespaceMapping,
-        delta_fields: Dict[str, Any],
-        operations: Dict[str, Any]
+        delta_fields: dict[str, Any],
+        operations: dict[str, Any]
     ) -> GeneratedFile:
         """Generate integration tests."""
 
@@ -421,7 +420,7 @@ class RustGenerator(CodeEmitter):
         )
 
     @staticmethod
-    def _get_rust_type(delta_fields: Dict[str, Any]) -> str:
+    def _get_rust_type(delta_fields: dict[str, Any]) -> str:
         """Determine Rust type based on delta field widths."""
         max_width = 64
         for field_name, field_spec in delta_fields.items():

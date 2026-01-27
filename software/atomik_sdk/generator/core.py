@@ -9,11 +9,11 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
-from .schema_validator import SchemaValidator, ValidationResult
+from .code_emitter import CodeEmitter, GenerationResult, MultiLanguageEmitter
 from .namespace_mapper import NamespaceMapper, NamespaceMapping
-from .code_emitter import CodeEmitter, MultiLanguageEmitter, GenerationResult
+from .schema_validator import SchemaValidator, ValidationResult
 
 
 class GeneratorConfig:
@@ -57,7 +57,7 @@ class GeneratorEngine:
         >>>     print(f"Generated {len(result.files)} files")
     """
 
-    def __init__(self, config: Optional[GeneratorConfig] = None):
+    def __init__(self, config: GeneratorConfig | None = None):
         """
         Initialize generator engine.
 
@@ -69,9 +69,9 @@ class GeneratorEngine:
         self.mapper = NamespaceMapper()
         self.emitter = MultiLanguageEmitter()
 
-        self.schema: Optional[Dict[str, Any]] = None
-        self.schema_path: Optional[Path] = None
-        self.namespace: Optional[NamespaceMapping] = None
+        self.schema: dict[str, Any] | None = None
+        self.schema_path: Path | None = None
+        self.namespace: NamespaceMapping | None = None
 
     def load_schema(self, schema_path: str | Path) -> ValidationResult:
         """
@@ -91,7 +91,7 @@ class GeneratorEngine:
 
         # Load JSON
         try:
-            with open(self.schema_path, 'r', encoding='utf-8') as f:
+            with open(self.schema_path, encoding='utf-8') as f:
                 self.schema = json.load(f)
         except FileNotFoundError:
             raise FileNotFoundError(f"Schema file not found: {schema_path}")
@@ -106,12 +106,12 @@ class GeneratorEngine:
             result = self.validator.validate(self.schema)
 
             if result.errors and self.config.verbose:
-                print(f"Validation errors:")
+                print("Validation errors:")
                 for error in result.errors:
                     print(f"  - {error}")
 
             if result.warnings and self.config.verbose:
-                print(f"Validation warnings:")
+                print("Validation warnings:")
                 for warning in result.warnings:
                     print(f"  - {warning}")
 
@@ -156,8 +156,8 @@ class GeneratorEngine:
 
     def generate(
         self,
-        target_languages: Optional[List[str]] = None
-    ) -> Dict[str, GenerationResult]:
+        target_languages: list[str] | None = None
+    ) -> dict[str, GenerationResult]:
         """
         Generate code for target languages.
 
@@ -215,7 +215,7 @@ class GeneratorEngine:
 
         return results
 
-    def write_output(self, results: Dict[str, GenerationResult]) -> List[str]:
+    def write_output(self, results: dict[str, GenerationResult]) -> list[str]:
         """
         Write generated files to disk.
 
@@ -238,8 +238,8 @@ class GeneratorEngine:
     def generate_and_write(
         self,
         schema_path: str | Path,
-        target_languages: Optional[List[str]] = None
-    ) -> tuple[Dict[str, GenerationResult], List[str]]:
+        target_languages: list[str] | None = None
+    ) -> tuple[dict[str, GenerationResult], list[str]]:
         """
         Complete pipeline: load, validate, generate, and write.
 
@@ -263,7 +263,7 @@ class GeneratorEngine:
 
         return results, files
 
-    def get_schema_summary(self) -> Dict[str, Any]:
+    def get_schema_summary(self) -> dict[str, Any]:
         """
         Get summary information about the loaded schema.
 

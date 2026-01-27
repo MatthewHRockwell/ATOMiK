@@ -7,8 +7,7 @@ Matches the Phase 3 hardware architecture.
 
 from __future__ import annotations
 
-from typing import Dict, Any
-from pathlib import Path
+from typing import Any
 
 from .code_emitter import CodeEmitter, GeneratedFile, GenerationResult
 from .namespace_mapper import NamespaceMapping
@@ -28,7 +27,7 @@ class VerilogGenerator(CodeEmitter):
         """Initialize Verilog code generator."""
         super().__init__('verilog')
 
-    def generate(self, schema: Dict[str, Any], namespace: NamespaceMapping) -> GenerationResult:
+    def generate(self, schema: dict[str, Any], namespace: NamespaceMapping) -> GenerationResult:
         """Generate Verilog RTL code from schema."""
         try:
             files = []
@@ -36,7 +35,7 @@ class VerilogGenerator(CodeEmitter):
             warnings = []
 
             # Extract schema components
-            catalogue = schema.get('catalogue', {})
+            schema.get('catalogue', {})
             schema_def = schema.get('schema', {})
             delta_fields = schema_def.get('delta_fields', {})
             operations = schema_def.get('operations', {})
@@ -79,9 +78,9 @@ class VerilogGenerator(CodeEmitter):
     def _generate_rtl_module(
         self,
         namespace: NamespaceMapping,
-        delta_fields: Dict[str, Any],
-        operations: Dict[str, Any],
-        hardware: Dict[str, Any],
+        delta_fields: dict[str, Any],
+        operations: dict[str, Any],
+        hardware: dict[str, Any],
         data_width: int
     ) -> GeneratedFile:
         """Generate synthesizable Verilog RTL module."""
@@ -93,18 +92,18 @@ class VerilogGenerator(CodeEmitter):
         lines = []
 
         # Module header
-        lines.append(f"/**")
+        lines.append("/**")
         lines.append(f" * {module_name}")
-        lines.append(f" * ")
+        lines.append(" * ")
         lines.append(f" * Delta-state module for {namespace.object}")
-        lines.append(f" * Generated from ATOMiK schema")
-        lines.append(f" * ")
-        lines.append(f" * Operations:")
-        lines.append(f" *   LOAD: Set initial state")
-        lines.append(f" *   ACCUMULATE: XOR delta into accumulator")
-        lines.append(f" *   READ: Reconstruct current state")
-        lines.append(f" *   STATUS: Check if accumulator is zero")
-        lines.append(f" */")
+        lines.append(" * Generated from ATOMiK schema")
+        lines.append(" * ")
+        lines.append(" * Operations:")
+        lines.append(" *   LOAD: Set initial state")
+        lines.append(" *   ACCUMULATE: XOR delta into accumulator")
+        lines.append(" *   READ: Reconstruct current state")
+        lines.append(" *   STATUS: Check if accumulator is zero")
+        lines.append(" */")
         lines.append("")
 
         # Module declaration
@@ -140,7 +139,7 @@ class VerilogGenerator(CodeEmitter):
         # Rollback support
         if operations.get('rollback', {}).get('enabled', False):
             history_depth = operations['rollback'].get('history_depth', 10)
-            lines.append(f"    // Rollback history")
+            lines.append("    // Rollback history")
             lines.append(f"    reg [DATA_WIDTH-1:0] history [0:{history_depth-1}];")
             lines.append(f"    reg [$clog2({history_depth}):0] history_count;")
             lines.append(f"    reg [$clog2({history_depth})-1:0] history_head;")
@@ -222,8 +221,8 @@ class VerilogGenerator(CodeEmitter):
     def _generate_testbench(
         self,
         namespace: NamespaceMapping,
-        delta_fields: Dict[str, Any],
-        operations: Dict[str, Any],
+        delta_fields: dict[str, Any],
+        operations: dict[str, Any],
         data_width: int
     ) -> GeneratedFile:
         """Generate Verilog testbench."""
@@ -234,19 +233,19 @@ class VerilogGenerator(CodeEmitter):
         lines = []
 
         # Testbench module
-        lines.append(f"/**")
+        lines.append("/**")
         lines.append(f" * Testbench for {module_name}")
-        lines.append(f" */")
+        lines.append(" */")
         lines.append("")
-        lines.append(f"`timescale 1ns / 1ps")
+        lines.append("`timescale 1ns / 1ps")
         lines.append("")
         lines.append(f"module {tb_name};")
         lines.append("")
 
         # Testbench signals
-        lines.append(f"    // Parameters")
+        lines.append("    // Parameters")
         lines.append(f"    parameter DATA_WIDTH = {data_width};")
-        lines.append(f"    parameter CLK_PERIOD = 10;  // 10ns = 100MHz")
+        lines.append("    parameter CLK_PERIOD = 10;  // 10ns = 100MHz")
         lines.append("")
         lines.append("    // Clock and reset")
         lines.append("    reg clk;")
@@ -268,10 +267,10 @@ class VerilogGenerator(CodeEmitter):
         lines.append("")
 
         # DUT instantiation
-        lines.append(f"    // DUT instantiation")
+        lines.append("    // DUT instantiation")
         lines.append(f"    {module_name} #(")
-        lines.append(f"        .DATA_WIDTH(DATA_WIDTH)")
-        lines.append(f"    ) dut (")
+        lines.append("        .DATA_WIDTH(DATA_WIDTH)")
+        lines.append("    ) dut (")
         lines.append("        .clk(clk),")
         lines.append("        .rst_n(rst_n),")
         lines.append("        .load_en(load_en),")
@@ -399,7 +398,7 @@ class VerilogGenerator(CodeEmitter):
         module_name = namespace.verilog_module_name
 
         lines = []
-        lines.append("# Constraint file for %s" % module_name)
+        lines.append(f"# Constraint file for {module_name}")
         lines.append("# ")
         lines.append("# Target: Generic FPGA")
         lines.append("# Clock: 27 MHz input, 94.5 MHz PLL output (matches Phase 3)")
@@ -422,7 +421,7 @@ class VerilogGenerator(CodeEmitter):
         )
 
     @staticmethod
-    def _get_data_width(delta_fields: Dict[str, Any]) -> int:
+    def _get_data_width(delta_fields: dict[str, Any]) -> int:
         """Determine DATA_WIDTH parameter from delta fields."""
         max_width = 64
         for field_name, field_spec in delta_fields.items():

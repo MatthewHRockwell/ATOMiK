@@ -5,19 +5,19 @@ Tests cross-language consistency and semantic equivalence.
 Validates that all generators produce code with matching behavior.
 """
 
-import sys
 import json
+import sys
 import tempfile
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from generator.core import GeneratorEngine, GeneratorConfig
+from generator.c_generator import CGenerator
+from generator.core import GeneratorConfig, GeneratorEngine
+from generator.javascript_generator import JavaScriptGenerator
 from generator.python_generator import PythonGenerator
 from generator.rust_generator import RustGenerator
-from generator.c_generator import CGenerator
 from generator.verilog_generator import VerilogGenerator
-from generator.javascript_generator import JavaScriptGenerator
 
 
 def test_cross_language_integration():
@@ -37,7 +37,7 @@ def test_cross_language_integration():
     # Test each example schema
     examples = list(examples_dir.glob("*.json"))
     if not examples:
-        print(f"[WARN] No example schemas found")
+        print("[WARN] No example schemas found")
         return 1
 
     all_passed = True
@@ -47,7 +47,7 @@ def test_cross_language_integration():
         print("-" * 70)
 
         # Load schema once
-        with open(example_path, 'r') as f:
+        with open(example_path) as f:
             schema = json.load(f)
 
         catalogue = schema.get('catalogue', {})
@@ -80,13 +80,13 @@ def test_cross_language_integration():
             try:
                 validation = engine.load_schema(example_path)
                 if not validation.valid:
-                    print(f"  [FAIL] Schema validation failed:")
+                    print("  [FAIL] Schema validation failed:")
                     for error in validation.errors:
                         print(f"    - {error}")
                     all_passed = False
                     continue
 
-                print(f"  [PASS] Schema validated")
+                print("  [PASS] Schema validated")
 
                 # Generate all languages
                 results = engine.generate(target_languages=[
@@ -123,7 +123,7 @@ def test_cross_language_integration():
                     print(f"  [INFO] C: {namespace.c_include_statement}")
                     print(f"  [INFO] JavaScript: {namespace.javascript_require_statement}")
                     print(f"  [INFO] Verilog: module {namespace.verilog_module_name}")
-                    print(f"  [PASS] Namespace mapping consistent")
+                    print("  [PASS] Namespace mapping consistent")
 
                 # Check that all languages have consistent file counts
                 file_counts = {lang: len(results[lang].files) for lang in expected_languages}
@@ -132,11 +132,11 @@ def test_cross_language_integration():
                 # Verify key operations are present in generated files
                 operations_present = test_operations_present(output_dir, results)
                 if operations_present:
-                    print(f"  [PASS] All operations present in generated code")
+                    print("  [PASS] All operations present in generated code")
                 else:
-                    print(f"  [WARN] Some operations may be missing")
+                    print("  [WARN] Some operations may be missing")
 
-                print(f"  [PASS] Integration test successful")
+                print("  [PASS] Integration test successful")
 
             except Exception as e:
                 print(f"  [FAIL] Exception: {e}")
@@ -168,7 +168,7 @@ def test_operations_present(output_dir: Path, results: dict) -> bool:
         for pyfile in python_files:
             if pyfile.name == '__init__.py':
                 continue
-            with open(pyfile, 'r') as f:
+            with open(pyfile) as f:
                 content = f.read().lower()
                 for op in operations_to_check:
                     if op not in content:
@@ -180,7 +180,7 @@ def test_operations_present(output_dir: Path, results: dict) -> bool:
         for rsfile in rust_files:
             if rsfile.name == 'lib.rs' or rsfile.name == 'mod.rs':
                 continue
-            with open(rsfile, 'r') as f:
+            with open(rsfile) as f:
                 content = f.read().lower()
                 for op in operations_to_check:
                     if op not in content:
@@ -190,7 +190,7 @@ def test_operations_present(output_dir: Path, results: dict) -> bool:
     c_files = list(output_dir.glob("atomik/**/*.c"))
     if c_files:
         for cfile in c_files:
-            with open(cfile, 'r') as f:
+            with open(cfile) as f:
                 content = f.read().lower()
                 for op in operations_to_check:
                     if op not in content:
@@ -202,7 +202,7 @@ def test_operations_present(output_dir: Path, results: dict) -> bool:
         for vfile in verilog_files:
             if vfile.name.startswith('tb_'):
                 continue
-            with open(vfile, 'r') as f:
+            with open(vfile) as f:
                 content = f.read().lower()
                 # Verilog uses different names
                 verilog_ops = ['load', 'accumulate', 'read']
@@ -214,7 +214,7 @@ def test_operations_present(output_dir: Path, results: dict) -> bool:
     js_files = list(output_dir.glob("src/**/*.js"))
     if js_files:
         for jsfile in js_files:
-            with open(jsfile, 'r') as f:
+            with open(jsfile) as f:
                 content = f.read().lower()
                 for op in operations_to_check:
                     if op not in content:
@@ -234,12 +234,12 @@ def test_schema_summary():
     examples_dir = project_root / "sdk" / "schemas" / "examples"
 
     if not examples_dir.exists():
-        print(f"[WARN] Examples directory not found")
+        print("[WARN] Examples directory not found")
         return 1
 
     examples = list(examples_dir.glob("*.json"))
     if not examples:
-        print(f"[WARN] No example schemas found")
+        print("[WARN] No example schemas found")
         return 1
 
     for example_path in examples:
@@ -251,7 +251,7 @@ def test_schema_summary():
 
         summary = engine.get_schema_summary()
 
-        print(f"  Catalogue:")
+        print("  Catalogue:")
         print(f"    Vertical: {summary['catalogue']['vertical']}")
         print(f"    Field: {summary['catalogue']['field']}")
         print(f"    Object: {summary['catalogue']['object']}")
@@ -264,7 +264,7 @@ def test_schema_summary():
         print(f"  Operations: {', '.join(summary['operations'])}")
 
         if summary.get('has_hardware'):
-            print(f"  Hardware: Yes")
+            print("  Hardware: Yes")
 
         print()
 
@@ -285,7 +285,7 @@ def test_multi_language_generation():
     schema_path = project_root / "sdk" / "schemas" / "examples" / "terminal-io.json"
 
     if not schema_path.exists():
-        print(f"[WARN] terminal-io.json not found")
+        print("[WARN] terminal-io.json not found")
         return 1
 
     with tempfile.TemporaryDirectory() as temp_dir:
@@ -318,11 +318,11 @@ def test_multi_language_generation():
             ext = Path(file_path).suffix
             file_extensions[ext] = file_extensions.get(ext, 0) + 1
 
-        print(f"File breakdown:")
+        print("File breakdown:")
         for ext, count in sorted(file_extensions.items()):
             print(f"  {ext or 'no extension'}: {count} files")
 
-        print(f"[PASS] Multi-language generation successful")
+        print("[PASS] Multi-language generation successful")
 
     print()
     print("=" * 70)

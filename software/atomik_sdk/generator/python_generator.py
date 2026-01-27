@@ -6,8 +6,8 @@ Generates Python modules with type hints and docstrings from ATOMiK schemas.
 
 from __future__ import annotations
 
-from typing import Any, Dict, List
 from pathlib import Path
+from typing import Any
 
 from .code_emitter import CodeEmitter, GeneratedFile, GenerationResult
 from .namespace_mapper import NamespaceMapping
@@ -30,7 +30,7 @@ class PythonGenerator(CodeEmitter):
 
     def generate(
         self,
-        schema: Dict[str, Any],
+        schema: dict[str, Any],
         namespace: NamespaceMapping
     ) -> GenerationResult:
         """
@@ -105,10 +105,10 @@ class PythonGenerator(CodeEmitter):
     def _generate_module(
         self,
         namespace: NamespaceMapping,
-        catalogue: Dict[str, Any],
-        delta_fields: Dict[str, Dict[str, Any]],
-        operations: Dict[str, Dict[str, Any]],
-        constraints: Dict[str, Any]
+        catalogue: dict[str, Any],
+        delta_fields: dict[str, dict[str, Any]],
+        operations: dict[str, dict[str, Any]],
+        constraints: dict[str, Any]
     ) -> str:
         """Generate main Python module content."""
         lines = []
@@ -204,7 +204,7 @@ class PythonGenerator(CodeEmitter):
 
         return '\n'.join(lines)
 
-    def _generate_load_method(self, field_name: str, width: int, mask: int) -> List[str]:
+    def _generate_load_method(self, field_name: str, width: int, mask: int) -> list[str]:
         """Generate load_initial_state method."""
         method_name = f'load_{field_name}'
         lines = []
@@ -220,7 +220,7 @@ class PythonGenerator(CodeEmitter):
 
     def _generate_accumulate_method(
         self, field_name: str, width: int, mask: int, has_rollback: bool
-    ) -> List[str]:
+    ) -> list[str]:
         """Generate accumulate_delta method."""
         method_name = f'accumulate_{field_name}'
         lines = []
@@ -236,7 +236,7 @@ class PythonGenerator(CodeEmitter):
         lines.append(self._indent('"""', 8))
 
         if has_rollback:
-            lines.append(self._indent(f'# Save to history', 8))
+            lines.append(self._indent('# Save to history', 8))
             lines.append(self._indent(f'self._{field_name}_history.append(delta)', 8))
             lines.append(self._indent(f'if len(self._{field_name}_history) > self._history_depth:', 8))
             lines.append(self._indent(f'    self._{field_name}_history.pop(0)', 12))
@@ -246,7 +246,7 @@ class PythonGenerator(CodeEmitter):
         lines.append(self._indent(f'return self._{field_name}_accumulator', 8))
         return lines
 
-    def _generate_reconstruct_method(self, field_name: str, mask: int) -> List[str]:
+    def _generate_reconstruct_method(self, field_name: str, mask: int) -> list[str]:
         """Generate reconstruct_state method."""
         method_name = f'reconstruct_{field_name}'
         lines = []
@@ -263,7 +263,7 @@ class PythonGenerator(CodeEmitter):
         ))
         return lines
 
-    def _generate_rollback_method(self, field_names: List[str]) -> List[str]:
+    def _generate_rollback_method(self, field_names: list[str]) -> list[str]:
         """Generate rollback method."""
         lines = []
         lines.append(self._indent('def rollback(self, steps: int = 1) -> bool:'))
@@ -291,7 +291,7 @@ class PythonGenerator(CodeEmitter):
         lines.append(self._indent('return True', 8))
         return lines
 
-    def _generate_status_methods(self, field_names: List[str]) -> List[str]:
+    def _generate_status_methods(self, field_names: list[str]) -> list[str]:
         """Generate status check methods."""
         lines = []
 
@@ -307,7 +307,7 @@ class PythonGenerator(CodeEmitter):
         lines.append(self._indent('    True if accumulator(s) are zero', 8))
         lines.append(self._indent('"""', 8))
         lines.append(self._indent('if field_name:', 8))
-        lines.append(self._indent(f'    return getattr(self, f"_{{field_name}}_accumulator") == 0', 8))
+        lines.append(self._indent('    return getattr(self, f"_{field_name}_accumulator") == 0', 8))
         lines.append(self._indent('', 8))
 
         # Check all fields
@@ -319,9 +319,9 @@ class PythonGenerator(CodeEmitter):
     def _generate_init(self, namespace: NamespaceMapping) -> str:
         """Generate __init__.py for package."""
         lines = []
-        lines.append(f'"""')
+        lines.append('"""')
         lines.append(f'{namespace.vertical}.{namespace.field} package.')
-        lines.append(f'"""')
+        lines.append('"""')
         lines.append('')
         lines.append(f'from .{namespace.object.lower()} import {namespace.object}')
         lines.append('')
@@ -332,16 +332,16 @@ class PythonGenerator(CodeEmitter):
     def _generate_test(
         self,
         namespace: NamespaceMapping,
-        delta_fields: Dict[str, Dict[str, Any]],
-        operations: Dict[str, Dict[str, Any]]
+        delta_fields: dict[str, dict[str, Any]],
+        operations: dict[str, dict[str, Any]]
     ) -> str:
         """Generate unit test file."""
         lines = []
 
         # Header
-        lines.append(f'"""')
+        lines.append('"""')
         lines.append(f'Tests for {namespace.object}')
-        lines.append(f'"""')
+        lines.append('"""')
         lines.append('')
         lines.append('import unittest')
         lines.append('')

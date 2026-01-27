@@ -2,14 +2,14 @@
 Test JavaScript SDK generation
 """
 
+import subprocess
 import sys
 import tempfile
-import subprocess
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from generator.core import GeneratorEngine, GeneratorConfig
+from generator.core import GeneratorConfig, GeneratorEngine
 from generator.javascript_generator import JavaScriptGenerator
 
 
@@ -34,7 +34,7 @@ def test_javascript_generation():
         # Test each example schema
         examples = list(examples_dir.glob("*.json"))
         if not examples:
-            print(f"[WARN] No example schemas found")
+            print("[WARN] No example schemas found")
             return 1
 
         for example_path in examples:
@@ -55,24 +55,24 @@ def test_javascript_generation():
             try:
                 validation = engine.load_schema(example_path)
                 if not validation:
-                    print(f"  [FAIL] Validation errors:")
+                    print("  [FAIL] Validation errors:")
                     for error in validation.errors:
                         print(f"    - {error}")
                     continue
 
-                print(f"  [PASS] Schema validated")
+                print("  [PASS] Schema validated")
 
                 # Generate code
                 results = engine.generate(target_languages=['javascript'])
 
                 if 'javascript' not in results:
-                    print(f"  [FAIL] No JavaScript results")
+                    print("  [FAIL] No JavaScript results")
                     continue
 
                 result = results['javascript']
 
                 if not result.success:
-                    print(f"  [FAIL] Generation errors:")
+                    print("  [FAIL] Generation errors:")
                     for error in result.errors:
                         print(f"    - {error}")
                     continue
@@ -91,7 +91,7 @@ def test_javascript_generation():
                         print(f"  [FAIL] Missing expected file: {expected}")
                         continue
 
-                print(f"  [PASS] All expected files present")
+                print("  [PASS] All expected files present")
 
                 # Check if node is available
                 try:
@@ -109,7 +109,7 @@ def test_javascript_generation():
                         test_files = list(output_dir.glob("test/*.test.js"))
                         if test_files:
                             test_file = test_files[0]
-                            print(f"  [INFO] Running tests...")
+                            print("  [INFO] Running tests...")
                             test_result = subprocess.run(
                                 ['node', str(test_file)],
                                 capture_output=True,
@@ -119,27 +119,27 @@ def test_javascript_generation():
                             )
 
                             if test_result.returncode == 0:
-                                print(f"  [PASS] Tests executed successfully")
+                                print("  [PASS] Tests executed successfully")
                                 for line in test_result.stdout.strip().split('\n'):
                                     if line.strip():
                                         print(f"    {line}")
                             else:
-                                print(f"  [WARN] Tests failed:")
+                                print("  [WARN] Tests failed:")
                                 if test_result.stderr:
                                     for line in test_result.stderr.split('\n')[:10]:
                                         if line.strip():
                                             print(f"    {line}")
                     else:
-                        print(f"  [INFO] Node.js not available, skipping execution")
+                        print("  [INFO] Node.js not available, skipping execution")
 
                 except FileNotFoundError:
-                    print(f"  [INFO] Node.js not installed, skipping execution")
+                    print("  [INFO] Node.js not installed, skipping execution")
                 except subprocess.TimeoutExpired:
-                    print(f"  [WARN] Test execution timed out")
+                    print("  [WARN] Test execution timed out")
                 except Exception as e:
                     print(f"  [WARN] Could not run tests: {e}")
 
-                print(f"  [PASS] JavaScript code generation successful")
+                print("  [PASS] JavaScript code generation successful")
 
             except Exception as e:
                 print(f"  [FAIL] Exception: {e}")

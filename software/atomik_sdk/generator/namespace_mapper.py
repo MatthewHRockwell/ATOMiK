@@ -7,7 +7,7 @@ Maps catalogue metadata to language-specific namespaces and import paths.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, Any
+from typing import Any
 
 
 @dataclass
@@ -55,7 +55,7 @@ class NamespaceMapper:
     """
 
     @staticmethod
-    def map_catalogue(catalogue: Dict[str, Any]) -> NamespaceMapping:
+    def map_catalogue(catalogue: dict[str, Any]) -> NamespaceMapping:
         """
         Map catalogue metadata to language-specific namespaces.
 
@@ -72,7 +72,7 @@ class NamespaceMapper:
         # Convert to lowercase for case-sensitive languages
         vertical_lower = vertical.lower()
         field_lower = field.lower()
-        obj_lower = obj.lower()
+        obj.lower()
 
         # Convert PascalCase to snake_case for C
         obj_snake = NamespaceMapper._to_snake_case(obj)
@@ -160,7 +160,7 @@ class NamespaceMapper:
             Tuple of (valid: bool, error_message: str | None)
         """
         # Reserved keywords across all languages
-        RESERVED_KEYWORDS = {
+        reserved_keywords = {
             # Python
             'False', 'None', 'True', 'and', 'as', 'assert', 'async', 'await',
             'break', 'class', 'continue', 'def', 'del', 'elif', 'else', 'except',
@@ -205,7 +205,7 @@ class NamespaceMapper:
             return False, "Identifier must contain only alphanumeric characters"
 
         # Check for reserved keywords
-        if name in RESERVED_KEYWORDS or name.lower() in RESERVED_KEYWORDS:
+        if name in reserved_keywords or name.lower() in reserved_keywords:
             return False, f"'{name}' is a reserved keyword in one or more target languages"
 
         # Length check
@@ -217,7 +217,7 @@ class NamespaceMapper:
         return True, None
 
     @staticmethod
-    def generate_directory_structure(mapping: NamespaceMapping) -> Dict[str, str]:
+    def generate_directory_structure(mapping: NamespaceMapping) -> dict[str, str]:
         """
         Generate directory structure for each language target.
 

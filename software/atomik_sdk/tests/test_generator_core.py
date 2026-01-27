@@ -9,19 +9,23 @@ Tests cover:
 """
 
 import json
-import pytest
-from pathlib import Path
 import sys
-import os
+from pathlib import Path
+
+import pytest
 
 # Add parent directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from generator.schema_validator import SchemaValidator, ValidationResult
-from generator.namespace_mapper import NamespaceMapper, NamespaceMapping
-from generator.code_emitter import CodeEmitter, GeneratedFile, GenerationResult, MultiLanguageEmitter
-from generator.core import GeneratorEngine, GeneratorConfig
-
+from generator.code_emitter import (
+    CodeEmitter,
+    GeneratedFile,
+    GenerationResult,
+    MultiLanguageEmitter,
+)
+from generator.core import GeneratorConfig, GeneratorEngine
+from generator.namespace_mapper import NamespaceMapper
+from generator.schema_validator import SchemaValidator
 
 # Test fixtures
 

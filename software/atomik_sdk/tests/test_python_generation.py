@@ -2,14 +2,14 @@
 Test Python SDK generation
 """
 
+import py_compile
 import sys
 import tempfile
-import py_compile
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from generator.core import GeneratorEngine, GeneratorConfig
+from generator.core import GeneratorConfig, GeneratorEngine
 from generator.python_generator import PythonGenerator
 
 
@@ -34,7 +34,7 @@ def test_python_generation():
         # Test each example schema
         examples = list(examples_dir.glob("*.json"))
         if not examples:
-            print(f"[WARN] No example schemas found")
+            print("[WARN] No example schemas found")
             return 1
 
         for example_path in examples:
@@ -55,24 +55,24 @@ def test_python_generation():
             try:
                 validation = engine.load_schema(example_path)
                 if not validation:
-                    print(f"  [FAIL] Validation errors:")
+                    print("  [FAIL] Validation errors:")
                     for error in validation.errors:
                         print(f"    - {error}")
                     continue
 
-                print(f"  [PASS] Schema validated")
+                print("  [PASS] Schema validated")
 
                 # Generate code
                 results = engine.generate(target_languages=['python'])
 
                 if 'python' not in results:
-                    print(f"  [FAIL] No Python results")
+                    print("  [FAIL] No Python results")
                     continue
 
                 result = results['python']
 
                 if not result.success:
-                    print(f"  [FAIL] Generation errors:")
+                    print("  [FAIL] Generation errors:")
                     for error in result.errors:
                         print(f"    - {error}")
                     continue
@@ -93,14 +93,14 @@ def test_python_generation():
                         syntax_errors += 1
 
                 if syntax_errors == 0:
-                    print(f"  [PASS] All generated files compile successfully")
+                    print("  [PASS] All generated files compile successfully")
                 else:
                     print(f"  [FAIL] {syntax_errors} file(s) have syntax errors")
                     continue
 
                 # Try importing the generated module (basic check)
                 # Note: This requires the module structure to be valid
-                print(f"  [PASS] Python code generation successful")
+                print("  [PASS] Python code generation successful")
 
             except Exception as e:
                 print(f"  [FAIL] Exception: {e}")

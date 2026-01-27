@@ -9,11 +9,10 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
+from typing import Any
 
 try:
-    import jsonschema
-    from jsonschema import validate, ValidationError, SchemaError
+    import jsonschema  # noqa: F401
     HAS_JSONSCHEMA = True
 except ImportError:
     HAS_JSONSCHEMA = False
@@ -22,7 +21,7 @@ except ImportError:
 class ValidationResult:
     """Result of schema validation."""
 
-    def __init__(self, valid: bool, errors: List[str] = None, warnings: List[str] = None):
+    def __init__(self, valid: bool, errors: list[str] = None, warnings: list[str] = None):
         self.valid = valid
         self.errors = errors or []
         self.warnings = warnings or []
@@ -78,10 +77,10 @@ class SchemaValidator:
         else:
             self.validator = None
 
-    def _load_schema_spec(self) -> Dict[str, Any]:
+    def _load_schema_spec(self) -> dict[str, Any]:
         """Load the ATOMiK schema specification."""
         try:
-            with open(self.schema_spec_path, 'r', encoding='utf-8') as f:
+            with open(self.schema_spec_path, encoding='utf-8') as f:
                 return json.load(f)
         except FileNotFoundError:
             raise FileNotFoundError(
@@ -103,7 +102,7 @@ class SchemaValidator:
             ValidationResult with validity status and any errors/warnings.
         """
         try:
-            with open(schema_path, 'r', encoding='utf-8') as f:
+            with open(schema_path, encoding='utf-8') as f:
                 schema = json.load(f)
         except FileNotFoundError:
             return ValidationResult(False, [f"File not found: {schema_path}"])
@@ -112,7 +111,7 @@ class SchemaValidator:
 
         return self.validate(schema)
 
-    def validate(self, schema: Dict[str, Any]) -> ValidationResult:
+    def validate(self, schema: dict[str, Any]) -> ValidationResult:
         """
         Validate a schema dictionary.
 
@@ -145,7 +144,7 @@ class SchemaValidator:
 
         return ValidationResult(len(errors) == 0, errors, warnings)
 
-    def _basic_validation(self, schema: Dict[str, Any]) -> List[str]:
+    def _basic_validation(self, schema: dict[str, Any]) -> list[str]:
         """Basic validation without jsonschema library."""
         errors = []
 
@@ -183,7 +182,7 @@ class SchemaValidator:
 
         return errors
 
-    def _validate_cross_field_dependencies(self, schema: Dict[str, Any]) -> List[str]:
+    def _validate_cross_field_dependencies(self, schema: dict[str, Any]) -> list[str]:
         """
         Validate cross-field dependencies.
 
@@ -228,7 +227,7 @@ class SchemaValidator:
 
         return errors
 
-    def _validate_semantics(self, schema: Dict[str, Any]) -> List[str]:
+    def _validate_semantics(self, schema: dict[str, Any]) -> list[str]:
         """
         Validate semantic rules and generate warnings.
 
@@ -280,8 +279,8 @@ class SchemaValidator:
 
     def validate_namespace_uniqueness(
         self,
-        schemas: List[Dict[str, Any]]
-    ) -> Tuple[bool, List[str]]:
+        schemas: list[dict[str, Any]]
+    ) -> tuple[bool, list[str]]:
         """
         Validate that all schemas have unique namespaces.
 

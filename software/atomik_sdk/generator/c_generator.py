@@ -6,8 +6,7 @@ Generates C header and implementation files from ATOMiK schemas.
 
 from __future__ import annotations
 
-from typing import Dict, Any
-from pathlib import Path
+from typing import Any
 
 from .code_emitter import CodeEmitter, GeneratedFile, GenerationResult
 from .namespace_mapper import NamespaceMapping
@@ -28,7 +27,7 @@ class CGenerator(CodeEmitter):
         """Initialize C code generator."""
         super().__init__('c')
 
-    def generate(self, schema: Dict[str, Any], namespace: NamespaceMapping) -> GenerationResult:
+    def generate(self, schema: dict[str, Any], namespace: NamespaceMapping) -> GenerationResult:
         """Generate C SDK code from schema."""
         try:
             files = []
@@ -36,7 +35,7 @@ class CGenerator(CodeEmitter):
             warnings = []
 
             # Extract schema components
-            catalogue = schema.get('catalogue', {})
+            schema.get('catalogue', {})
             schema_def = schema.get('schema', {})
             delta_fields = schema_def.get('delta_fields', {})
             operations = schema_def.get('operations', {})
@@ -78,8 +77,8 @@ class CGenerator(CodeEmitter):
     def _generate_header(
         self,
         namespace: NamespaceMapping,
-        delta_fields: Dict[str, Any],
-        operations: Dict[str, Any]
+        delta_fields: dict[str, Any],
+        operations: dict[str, Any]
     ) -> GeneratedFile:
         """Generate C header file."""
 
@@ -113,19 +112,19 @@ class CGenerator(CodeEmitter):
             lines.append("")
 
         # Struct definition
-        lines.append(f"/**")
+        lines.append("/**")
         lines.append(f" * {namespace.object} - Delta-state manager")
-        lines.append(f" *")
-        lines.append(f" * Manages delta-state operations using XOR algebra.")
-        lines.append(f" */")
-        lines.append(f"typedef struct {{")
+        lines.append(" *")
+        lines.append(" * Manages delta-state operations using XOR algebra.")
+        lines.append(" */")
+        lines.append("typedef struct {")
         lines.append(f"    {delta_type} initial_state;  /**< Initial state */")
         lines.append(f"    {delta_type} accumulator;    /**< Delta accumulator (XOR of all deltas) */")
 
         if operations.get('rollback', {}).get('enabled', False):
             lines.append(f"    {delta_type} history[ATOMIK_HISTORY_DEPTH];  /**< Delta history */")
-            lines.append(f"    size_t history_count;      /**< Number of deltas in history */")
-            lines.append(f"    size_t history_head;       /**< History buffer head index */")
+            lines.append("    size_t history_count;      /**< Number of deltas in history */")
+            lines.append("    size_t history_head;       /**< History buffer head index */")
 
         lines.append(f"}} atomik_{obj_snake}_t;")
         lines.append("")
@@ -203,9 +202,9 @@ class CGenerator(CodeEmitter):
     def _generate_implementation(
         self,
         namespace: NamespaceMapping,
-        delta_fields: Dict[str, Any],
-        operations: Dict[str, Any],
-        hardware: Dict[str, Any]
+        delta_fields: dict[str, Any],
+        operations: dict[str, Any],
+        hardware: dict[str, Any]
     ) -> GeneratedFile:
         """Generate C implementation file."""
 
@@ -309,8 +308,8 @@ class CGenerator(CodeEmitter):
     def _generate_test(
         self,
         namespace: NamespaceMapping,
-        delta_fields: Dict[str, Any],
-        operations: Dict[str, Any]
+        delta_fields: dict[str, Any],
+        operations: dict[str, Any]
     ) -> GeneratedFile:
         """Generate C test file."""
 
@@ -323,8 +322,8 @@ class CGenerator(CodeEmitter):
         lines = []
 
         # Includes
-        lines.append(f"#include <stdio.h>")
-        lines.append(f"#include <assert.h>")
+        lines.append("#include <stdio.h>")
+        lines.append("#include <assert.h>")
         lines.append(f"#include \"../atomik/{vertical_lower}/{field_lower}/{obj_snake}.h\"")
         lines.append("")
 
@@ -333,10 +332,10 @@ class CGenerator(CodeEmitter):
         lines.append(f"    atomik_{obj_snake}_t manager;")
         lines.append(f"    atomik_{obj_snake}_init(&manager);")
         lines.append(f"    atomik_{obj_snake}_load(&manager, 0x1234567890ABCDEFULL);")
-        lines.append(f"    ")
+        lines.append("    ")
         lines.append(f"    assert(atomik_{obj_snake}_get_initial_state(&manager) == 0x1234567890ABCDEFULL);")
         lines.append(f"    assert(atomik_{obj_snake}_get_accumulator(&manager) == 0);")
-        lines.append(f'    printf("[PASS] test_load\\n");')
+        lines.append('    printf("[PASS] test_load\\n");')
         lines.append("}")
         lines.append("")
 
@@ -344,13 +343,13 @@ class CGenerator(CodeEmitter):
         lines.append(f"    atomik_{obj_snake}_t manager;")
         lines.append(f"    atomik_{obj_snake}_init(&manager);")
         lines.append(f"    atomik_{obj_snake}_load(&manager, 0);")
-        lines.append(f"    ")
+        lines.append("    ")
         lines.append(f"    atomik_{obj_snake}_accumulate(&manager, 0x1111111111111111ULL);")
         lines.append(f"    assert(atomik_{obj_snake}_get_accumulator(&manager) == 0x1111111111111111ULL);")
-        lines.append(f"    ")
+        lines.append("    ")
         lines.append(f"    atomik_{obj_snake}_accumulate(&manager, 0x2222222222222222ULL);")
         lines.append(f"    assert(atomik_{obj_snake}_get_accumulator(&manager) == 0x3333333333333333ULL);")
-        lines.append(f'    printf("[PASS] test_accumulate\\n");')
+        lines.append('    printf("[PASS] test_accumulate\\n");')
         lines.append("}")
         lines.append("")
 
@@ -359,10 +358,10 @@ class CGenerator(CodeEmitter):
         lines.append(f"    atomik_{obj_snake}_init(&manager);")
         lines.append(f"    atomik_{obj_snake}_load(&manager, 0xAAAAAAAAAAAAAAAAULL);")
         lines.append(f"    atomik_{obj_snake}_accumulate(&manager, 0x5555555555555555ULL);")
-        lines.append(f"    ")
-        lines.append(f"    /* 0xAAAA XOR 0x5555 = 0xFFFF */")
+        lines.append("    ")
+        lines.append("    /* 0xAAAA XOR 0x5555 = 0xFFFF */")
         lines.append(f"    assert(atomik_{obj_snake}_reconstruct(&manager) == 0xFFFFFFFFFFFFFFFFULL);")
-        lines.append(f'    printf("[PASS] test_reconstruct\\n");')
+        lines.append('    printf("[PASS] test_reconstruct\\n");')
         lines.append("}")
         lines.append("")
 
@@ -370,15 +369,15 @@ class CGenerator(CodeEmitter):
         lines.append(f"    atomik_{obj_snake}_t manager;")
         lines.append(f"    atomik_{obj_snake}_init(&manager);")
         lines.append(f"    atomik_{obj_snake}_load(&manager, 0xAAAAAAAAAAAAAAAAULL);")
-        lines.append(f"    ")
+        lines.append("    ")
         lines.append(f"    {delta_type} delta = 0x1234567890ABCDEFULL;")
         lines.append(f"    atomik_{obj_snake}_accumulate(&manager, delta);")
         lines.append(f"    atomik_{obj_snake}_accumulate(&manager, delta);  /* Apply same delta twice */")
-        lines.append(f"    ")
-        lines.append(f"    /* Self-inverse: delta XOR delta = 0 */")
+        lines.append("    ")
+        lines.append("    /* Self-inverse: delta XOR delta = 0 */")
         lines.append(f"    assert(atomik_{obj_snake}_is_accumulator_zero(&manager));")
         lines.append(f"    assert(atomik_{obj_snake}_reconstruct(&manager) == 0xAAAAAAAAAAAAAAAAULL);")
-        lines.append(f'    printf("[PASS] test_self_inverse\\n");')
+        lines.append('    printf("[PASS] test_self_inverse\\n");')
         lines.append("}")
         lines.append("")
 
@@ -387,17 +386,17 @@ class CGenerator(CodeEmitter):
             lines.append(f"    atomik_{obj_snake}_t manager;")
             lines.append(f"    atomik_{obj_snake}_init(&manager);")
             lines.append(f"    atomik_{obj_snake}_load(&manager, 0);")
-            lines.append(f"    ")
+            lines.append("    ")
             lines.append(f"    atomik_{obj_snake}_accumulate(&manager, 0x1111111111111111ULL);")
             lines.append(f"    atomik_{obj_snake}_accumulate(&manager, 0x2222222222222222ULL);")
             lines.append(f"    atomik_{obj_snake}_accumulate(&manager, 0x4444444444444444ULL);")
             lines.append(f"    assert(atomik_{obj_snake}_get_accumulator(&manager) == 0x7777777777777777ULL);")
-            lines.append(f"    ")
-            lines.append(f"    /* Rollback last 2 operations */")
+            lines.append("    ")
+            lines.append("    /* Rollback last 2 operations */")
             lines.append(f"    size_t count = atomik_{obj_snake}_rollback(&manager, 2);")
-            lines.append(f"    assert(count == 2);")
+            lines.append("    assert(count == 2);")
             lines.append(f"    assert(atomik_{obj_snake}_get_accumulator(&manager) == 0x1111111111111111ULL);")
-            lines.append(f'    printf("[PASS] test_rollback\\n");')
+            lines.append('    printf("[PASS] test_rollback\\n");')
             lines.append("}")
             lines.append("")
 
@@ -412,7 +411,7 @@ class CGenerator(CodeEmitter):
         if operations.get('rollback', {}).get('enabled', False):
             lines.append("    test_rollback();")
         lines.append("")
-        lines.append(f'    printf("\\nAll tests passed!\\n");')
+        lines.append('    printf("\\nAll tests passed!\\n");')
         lines.append("    return 0;")
         lines.append("}")
         lines.append("")
@@ -436,8 +435,8 @@ class CGenerator(CodeEmitter):
         lines = []
         lines.append("# Makefile for ATOMiK C SDK")
         lines.append("")
-        lines.append(f"CC = gcc")
-        lines.append(f"CFLAGS = -Wall -Wextra -std=c99 -I.")
+        lines.append("CC = gcc")
+        lines.append("CFLAGS = -Wall -Wextra -std=c99 -I.")
         lines.append("")
         lines.append(f"SRC = atomik/{vertical_lower}/{field_lower}/{obj_snake}.c")
         lines.append(f"TEST = tests/test_{obj_snake}.c")
@@ -464,7 +463,7 @@ class CGenerator(CodeEmitter):
         )
 
     @staticmethod
-    def _get_c_type(delta_fields: Dict[str, Any]) -> str:
+    def _get_c_type(delta_fields: dict[str, Any]) -> str:
         """Determine C type based on delta field widths."""
         max_width = 64
         for field_name, field_spec in delta_fields.items():

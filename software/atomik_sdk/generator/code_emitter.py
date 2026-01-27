@@ -8,8 +8,8 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Any, Dict, List
 from pathlib import Path
+from typing import Any
 
 from .namespace_mapper import NamespaceMapping
 
@@ -29,9 +29,9 @@ class GenerationResult:
     """Result of code generation."""
 
     success: bool
-    files: List[GeneratedFile]
-    errors: List[str]
-    warnings: List[str]
+    files: list[GeneratedFile]
+    errors: list[str]
+    warnings: list[str]
 
     def __bool__(self) -> bool:
         return self.success
@@ -63,7 +63,7 @@ class CodeEmitter(ABC):
     @abstractmethod
     def generate(
         self,
-        schema: Dict[str, Any],
+        schema: dict[str, Any],
         namespace: NamespaceMapping
     ) -> GenerationResult:
         """
@@ -78,7 +78,7 @@ class CodeEmitter(ABC):
         """
         pass
 
-    def _extract_delta_fields(self, schema: Dict[str, Any]) -> Dict[str, Dict[str, Any]]:
+    def _extract_delta_fields(self, schema: dict[str, Any]) -> dict[str, dict[str, Any]]:
         """
         Extract delta fields from schema.
 
@@ -90,7 +90,7 @@ class CodeEmitter(ABC):
         """
         return schema.get('schema', {}).get('delta_fields', {})
 
-    def _extract_operations(self, schema: Dict[str, Any]) -> Dict[str, Dict[str, Any]]:
+    def _extract_operations(self, schema: dict[str, Any]) -> dict[str, dict[str, Any]]:
         """
         Extract operations from schema.
 
@@ -102,7 +102,7 @@ class CodeEmitter(ABC):
         """
         return schema.get('schema', {}).get('operations', {})
 
-    def _extract_constraints(self, schema: Dict[str, Any]) -> Dict[str, Any]:
+    def _extract_constraints(self, schema: dict[str, Any]) -> dict[str, Any]:
         """
         Extract constraints from schema.
 
@@ -114,7 +114,7 @@ class CodeEmitter(ABC):
         """
         return schema.get('schema', {}).get('constraints', {})
 
-    def _extract_hardware(self, schema: Dict[str, Any]) -> Dict[str, Any]:
+    def _extract_hardware(self, schema: dict[str, Any]) -> dict[str, Any]:
         """
         Extract hardware mapping from schema.
 
@@ -203,7 +203,7 @@ class MultiLanguageEmitter:
 
     def __init__(self):
         """Initialize multi-language emitter."""
-        self.generators: Dict[str, CodeEmitter] = {}
+        self.generators: dict[str, CodeEmitter] = {}
 
     def register(self, language: str, generator: CodeEmitter) -> None:
         """
@@ -217,9 +217,9 @@ class MultiLanguageEmitter:
 
     def generate_all(
         self,
-        schema: Dict[str, Any],
+        schema: dict[str, Any],
         namespace: NamespaceMapping
-    ) -> Dict[str, GenerationResult]:
+    ) -> dict[str, GenerationResult]:
         """
         Generate code for all registered languages.
 
@@ -248,9 +248,9 @@ class MultiLanguageEmitter:
 
     def write_generated_files(
         self,
-        results: Dict[str, GenerationResult],
+        results: dict[str, GenerationResult],
         output_dir: str | Path
-    ) -> List[str]:
+    ) -> list[str]:
         """
         Write generated files to disk.
 

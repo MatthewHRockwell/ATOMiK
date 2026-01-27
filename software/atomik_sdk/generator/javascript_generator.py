@@ -7,8 +7,7 @@ Supports both CommonJS and ES6 modules.
 
 from __future__ import annotations
 
-from typing import Dict, Any
-from pathlib import Path
+from typing import Any
 
 from .code_emitter import CodeEmitter, GeneratedFile, GenerationResult
 from .namespace_mapper import NamespaceMapping
@@ -28,7 +27,7 @@ class JavaScriptGenerator(CodeEmitter):
         """Initialize JavaScript code generator."""
         super().__init__('javascript')
 
-    def generate(self, schema: Dict[str, Any], namespace: NamespaceMapping) -> GenerationResult:
+    def generate(self, schema: dict[str, Any], namespace: NamespaceMapping) -> GenerationResult:
         """Generate JavaScript SDK code from schema."""
         try:
             files = []
@@ -78,9 +77,9 @@ class JavaScriptGenerator(CodeEmitter):
     def _generate_module(
         self,
         namespace: NamespaceMapping,
-        delta_fields: Dict[str, Any],
-        operations: Dict[str, Any],
-        hardware: Dict[str, Any]
+        delta_fields: dict[str, Any],
+        operations: dict[str, Any],
+        hardware: dict[str, Any]
     ) -> GeneratedFile:
         """Generate JavaScript module file."""
 
@@ -96,12 +95,12 @@ class JavaScriptGenerator(CodeEmitter):
         # Module header
         lines.append("/**")
         lines.append(f" * {obj_name} - Delta-state module")
-        lines.append(f" * ")
-        lines.append(f" * Generated from ATOMiK schema")
+        lines.append(" * ")
+        lines.append(" * Generated from ATOMiK schema")
         lines.append(f" * Vertical: {namespace.vertical}")
         lines.append(f" * Field: {namespace.field}")
         lines.append(" * ")
-        lines.append(" * @module @atomik/%s/%s" % (vertical_lower, field_lower))
+        lines.append(f" * @module @atomik/{vertical_lower}/{field_lower}")
         lines.append(" */")
         lines.append("")
 
@@ -313,7 +312,7 @@ class JavaScriptGenerator(CodeEmitter):
 
     def _generate_package_json(
         self,
-        catalogue: Dict[str, Any],
+        catalogue: dict[str, Any],
         namespace: NamespaceMapping
     ) -> GeneratedFile:
         """Generate package.json for NPM."""
@@ -332,7 +331,7 @@ class JavaScriptGenerator(CodeEmitter):
             "main": "index.js",
             "type": "module",
             "scripts": {
-                "test": "node test/%s.test.js" % obj_name
+                "test": f"node test/{obj_name}.test.js"
             },
             "keywords": [
                 "atomik",
@@ -361,8 +360,8 @@ class JavaScriptGenerator(CodeEmitter):
     def _generate_test(
         self,
         namespace: NamespaceMapping,
-        delta_fields: Dict[str, Any],
-        operations: Dict[str, Any]
+        delta_fields: dict[str, Any],
+        operations: dict[str, Any]
     ) -> GeneratedFile:
         """Generate test file."""
 
@@ -486,7 +485,7 @@ class JavaScriptGenerator(CodeEmitter):
         )
 
     @staticmethod
-    def _should_use_bigint(delta_fields: Dict[str, Any]) -> bool:
+    def _should_use_bigint(delta_fields: dict[str, Any]) -> bool:
         """Determine if BigInt should be used (>53 bits)."""
         max_width = 64
         for field_name, field_spec in delta_fields.items():
