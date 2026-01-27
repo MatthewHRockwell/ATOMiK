@@ -140,35 +140,40 @@ Validates that all generators produce code with matching behavior.</p>
 
     exit_code = 0
 
+    # Test 1: Cross-language integration
     try:
-        # Test 1: Cross-language integration
-        result = test_cross_language_integration()
-        if result != 0:
-            exit_code = result
-
-        # Test 2: Schema summary
-        result = test_schema_summary()
-        if result != 0:
-            exit_code = result
-
-        # Test 3: Multi-language generation
-        result = test_multi_language_generation()
-        if result != 0:
-            exit_code = result
-
-        print()
-        print(&#34;*&#34; * 70)
-        if exit_code == 0:
-            print(&#34;ALL INTEGRATION TESTS PASSED&#34;)
-        else:
-            print(&#34;SOME INTEGRATION TESTS FAILED&#34;)
-        print(&#34;*&#34; * 70)
-
+        test_cross_language_integration()
+    except (SystemExit, KeyboardInterrupt):
+        raise
     except Exception as e:
-        print(f&#34;FATAL ERROR: {e}&#34;)
-        import traceback
-        traceback.print_exc()
+        print(f&#34;FAILED: {e}&#34;)
         exit_code = 1
+
+    # Test 2: Schema summary
+    try:
+        test_schema_summary()
+    except (SystemExit, KeyboardInterrupt):
+        raise
+    except Exception as e:
+        print(f&#34;FAILED: {e}&#34;)
+        exit_code = 1
+
+    # Test 3: Multi-language generation
+    try:
+        test_multi_language_generation()
+    except (SystemExit, KeyboardInterrupt):
+        raise
+    except Exception as e:
+        print(f&#34;FAILED: {e}&#34;)
+        exit_code = 1
+
+    print()
+    print(&#34;*&#34; * 70)
+    if exit_code == 0:
+        print(&#34;ALL INTEGRATION TESTS PASSED&#34;)
+    else:
+        print(&#34;SOME INTEGRATION TESTS FAILED&#34;)
+    print(&#34;*&#34; * 70)
 
     return exit_code</code></pre>
 </details>
@@ -193,14 +198,12 @@ Validates that all generators produce code with matching behavior.</p>
     examples_dir = project_root / &#34;sdk&#34; / &#34;schemas&#34; / &#34;examples&#34;
 
     if not examples_dir.exists():
-        print(f&#34;[WARN] Examples directory not found: {examples_dir}&#34;)
-        return 1
+        pytest.skip(f&#34;Examples directory not found: {examples_dir}&#34;)
 
     # Test each example schema
     examples = list(examples_dir.glob(&#34;*.json&#34;))
     if not examples:
-        print(&#34;[WARN] No example schemas found&#34;)
-        return 1
+        pytest.skip(&#34;No example schemas found&#34;)
 
     all_passed = True
 
@@ -316,7 +319,7 @@ Validates that all generators produce code with matching behavior.</p>
         print(&#34;Some integration tests FAILED&#34;)
     print(&#34;=&#34; * 70)
 
-    return 0 if all_passed else 1</code></pre>
+    assert all_passed, &#34;Some cross-language integration tests failed&#34;</code></pre>
 </details>
 <div class="desc"><p>Test that all languages generate consistent code from same schema.</p></div>
 </dd>
@@ -339,8 +342,7 @@ Validates that all generators produce code with matching behavior.</p>
     schema_path = project_root / &#34;sdk&#34; / &#34;schemas&#34; / &#34;examples&#34; / &#34;terminal-io.json&#34;
 
     if not schema_path.exists():
-        print(&#34;[WARN] terminal-io.json not found&#34;)
-        return 1
+        pytest.skip(&#34;terminal-io.json not found&#34;)
 
     with tempfile.TemporaryDirectory() as temp_dir:
         output_dir = Path(temp_dir)
@@ -381,8 +383,7 @@ Validates that all generators produce code with matching behavior.</p>
     print()
     print(&#34;=&#34; * 70)
     print(&#34;Multi-language generation tests complete&#34;)
-    print(&#34;=&#34; * 70)
-    return 0</code></pre>
+    print(&#34;=&#34; * 70)</code></pre>
 </details>
 <div class="desc"><p>Test generating multiple languages simultaneously.</p></div>
 </dd>
@@ -405,13 +406,11 @@ Validates that all generators produce code with matching behavior.</p>
     examples_dir = project_root / &#34;sdk&#34; / &#34;schemas&#34; / &#34;examples&#34;
 
     if not examples_dir.exists():
-        print(&#34;[WARN] Examples directory not found&#34;)
-        return 1
+        pytest.skip(&#34;Examples directory not found&#34;)
 
     examples = list(examples_dir.glob(&#34;*.json&#34;))
     if not examples:
-        print(&#34;[WARN] No example schemas found&#34;)
-        return 1
+        pytest.skip(&#34;No example schemas found&#34;)
 
     for example_path in examples:
         print(f&#34;Schema: {example_path.name}&#34;)
@@ -441,8 +440,7 @@ Validates that all generators produce code with matching behavior.</p>
 
     print(&#34;=&#34; * 70)
     print(&#34;Schema summary tests complete&#34;)
-    print(&#34;=&#34; * 70)
-    return 0</code></pre>
+    print(&#34;=&#34; * 70)</code></pre>
 </details>
 <div class="desc"><p>Test schema summary generation.</p></div>
 </dd>

@@ -64,8 +64,7 @@ el.replaceWith(d);
     examples_dir = project_root / &#34;sdk&#34; / &#34;schemas&#34; / &#34;examples&#34;
 
     if not examples_dir.exists():
-        print(f&#34;[WARN] Examples directory not found: {examples_dir}&#34;)
-        return 1
+        pytest.skip(f&#34;Examples directory not found: {examples_dir}&#34;)
 
     # Create temporary output directory
     with tempfile.TemporaryDirectory() as temp_dir:
@@ -74,8 +73,7 @@ el.replaceWith(d);
         # Test each example schema
         examples = list(examples_dir.glob(&#34;*.json&#34;))
         if not examples:
-            print(&#34;[WARN] No example schemas found&#34;)
-            return 1
+            pytest.skip(&#34;No example schemas found&#34;)
 
         for example_path in examples:
             print(f&#34;Testing {example_path.name}...&#34;)
@@ -195,8 +193,7 @@ el.replaceWith(d);
 
     print(&#34;=&#34; * 70)
     print(&#34;Verilog generation tests complete&#34;)
-    print(&#34;=&#34; * 70)
-    return 0</code></pre>
+    print(&#34;=&#34; * 70)</code></pre>
 </details>
 <div class="desc"><p>Test Verilog RTL code generation from example schemas.</p></div>
 </dd>
