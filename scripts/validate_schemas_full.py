@@ -28,6 +28,7 @@ def load_json(filepath):
         return None
 
 def main():
+    
     if not HAS_JSONSCHEMA:
         print("[WARN] jsonschema library not available, run: pip install jsonschema")
         print("[INFO] Using basic validation only")

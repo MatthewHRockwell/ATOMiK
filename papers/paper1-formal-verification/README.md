@@ -52,13 +52,13 @@ latexmk -pdf main.tex
 - [x] Bibliography
 
 ### To Complete (cheaper model)
-- [ ] Author information
-- [ ] Figure 1: Delta Accumulator Architecture
-- [ ] Figure 2: Lean4 Module Dependency Graph
-- [ ] Acknowledgments
-- [ ] Repository URL
-- [ ] Final formatting and polish
-- [ ] arXiv metadata
+- [x] Author information
+- [x] Figure 1: Delta Accumulator Architecture
+- [x] Figure 2: Lean4 Module Dependency Graph
+- [x] Acknowledgments
+- [x] Repository URL
+- [x] Final formatting and polish
+- [x] arXiv metadata
 
 ## Key Technical Content
 
