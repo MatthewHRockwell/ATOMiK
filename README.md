@@ -24,7 +24,9 @@
 | **Phase 4A** | SDK Code Generation | ✅ **Complete** | Python/Rust/C/JS/Verilog generators |
 | **Phase 4B** | Domain SDKs | ✅ **Complete** | 3 domain SDKs, 57 generated files |
 
-**Latest**: Phase 4B complete (January 26, 2026). Three domain SDK schemas (Video, Edge Sensor, Finance) validated and used to generate 57 production-ready files across 5 languages. Automated generation pipeline with CLI tooling. See [`archive/PHASE_4B_COMPLETION_REPORT.md`](archive/PHASE_4B_COMPLETION_REPORT.md) for details.
+**Latest**: `atomik-gen` CLI tool and VS Code extension now available. The CLI (`pip install -e ./software`) provides schema validation, code generation, and batch processing from the command line. The VS Code extension adds JSON schema intellisense, snippets, and command palette integration. See [Developer Tooling](#developer-tooling) below.
+
+Phase 4B complete (January 26, 2026). Three domain SDK schemas (Video, Edge Sensor, Finance) validated and used to generate 57 production-ready files across 5 languages. See [`archive/PHASE_4B_COMPLETION_REPORT.md`](archive/PHASE_4B_COMPLETION_REPORT.md) for details.
 
 Phase 4A complete (January 26, 2026). Multi-language SDK with 5 code generators (Python, Rust, C, JavaScript, Verilog) delivering production-ready implementations from JSON schemas. See [`archive/PHASE_4A_COMPLETION_REPORT.md`](archive/PHASE_4A_COMPLETION_REPORT.md).
 
@@ -217,6 +219,41 @@ Each generator produces:
 
 ---
 
+## Developer Tooling
+
+### `atomik-gen` CLI Tool
+
+A pip-installable command-line tool for schema validation and multi-language code generation:
+
+```bash
+pip install -e ./software        # Installs atomik-gen
+atomik-gen --version              # Show version
+```
+
+| Command | Description |
+|---------|-------------|
+| `atomik-gen generate <schema>` | Generate SDK code (5 languages) |
+| `atomik-gen validate <schema>` | Validate a schema without generating |
+| `atomik-gen info <schema>` | Show namespace, fields, and operations |
+| `atomik-gen batch <directory>` | Batch generate from a directory of schemas |
+| `atomik-gen list` | List available target languages |
+
+Options: `--output-dir`, `--languages`, `--report`, `--verbose`. See [API Reference](docs/SDK_API_REFERENCE.md#cli-tool-reference) for full details.
+
+### VS Code Extension
+
+The [ATOMiK Schema Tools](vscode-extension/atomik-vscode/README.md) extension provides:
+
+- **JSON Schema intellisense** — autocompletion, validation, and hover docs for `*.atomik.json` and `**/schemas/**/*.json` files (uses `specs/atomik_schema_v1.json`, zero config)
+- **Snippets** — `atomik-schema` (full skeleton), `atomik-field` (delta field), `atomik-hardware` (hardware section)
+- **Command palette** — Generate, Validate, Batch Generate, and Show Info commands that invoke `atomik-gen`
+
+```bash
+cd vscode-extension/atomik-vscode && npm install && npm run compile
+```
+
+---
+
 ## What ATOMiK Is
 
 - **A delta-state accelerator**: Single-cycle accumulation with O(1) state reconstruction
@@ -380,4 +417,4 @@ For licensing inquiries, commercial integration, or architectural collaboration,
 
 ---
 
-*Last updated: January 26, 2026 (Phase 4B Complete — 3 domain SDKs, 57 generated files across 5 languages)*
+*Last updated: January 26, 2026 — `atomik-gen` CLI tool + VS Code extension, Phase 4B (3 domain SDKs, 57 generated files across 5 languages)*
