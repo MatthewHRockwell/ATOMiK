@@ -354,6 +354,9 @@ class TestCodeEmitter:
     class MockGenerator(CodeEmitter):
         """Mock generator for testing."""
 
+        def __init__(self):
+            super().__init__('mock')
+
         def generate(self, schema, namespace):
             files = [
                 GeneratedFile(

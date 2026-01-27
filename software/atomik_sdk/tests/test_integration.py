@@ -130,7 +130,7 @@ def test_cross_language_integration():
                 print(f"  [INFO] File counts: {file_counts}")
 
                 # Verify key operations are present in generated files
-                operations_present = test_operations_present(output_dir, results)
+                operations_present = check_operations_present(output_dir, results)
                 if operations_present:
                     print("  [PASS] All operations present in generated code")
                 else:
@@ -157,7 +157,7 @@ def test_cross_language_integration():
     return 0 if all_passed else 1
 
 
-def test_operations_present(output_dir: Path, results: dict) -> bool:
+def check_operations_present(output_dir: Path, results: dict) -> bool:
     """Verify that key operations are present in generated code."""
     operations_to_check = ['load', 'accumulate', 'reconstruct']
     all_present = True
