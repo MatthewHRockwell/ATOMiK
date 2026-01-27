@@ -22,10 +22,13 @@
 | **Phase 2** | SCORE Comparison | ✅ **Complete** | 95-100% memory reduction validated |
 | **Phase 3** | Hardware Synthesis | ✅ **Complete** | 10/10 hardware tests, 7% LUT @ 94.5 MHz |
 | **Phase 4A** | SDK Code Generation | ✅ **Complete** | Python/Rust/C/JS/Verilog generators |
+| **Phase 4B** | Domain SDKs | ✅ **Complete** | 3 domain SDKs, 57 generated files |
 
-**Latest**: Phase 4A complete (January 26, 2026). Multi-language SDK with 5 code generators (Python, Rust, C, JavaScript, Verilog) delivering production-ready implementations from JSON schemas. See [`archive/PHASE_4A_COMPLETION_REPORT.md`](archive/PHASE_4A_COMPLETION_REPORT.md) for details.
+**Latest**: Phase 4B complete (January 26, 2026). Three domain SDK schemas (Video, Edge Sensor, Finance) validated and used to generate 57 production-ready files across 5 languages. Automated generation pipeline with CLI tooling. See [`archive/PHASE_4B_COMPLETION_REPORT.md`](archive/PHASE_4B_COMPLETION_REPORT.md) for details.
 
-Phase 3 complete (January 25, 2026). ATOMiK Core v2 validated on Tang Nano 9K FPGA with all delta algebra properties verified in silicon. Single-cycle operations for LOAD, ACCUMULATE, and READ. See [`archive/PHASE_3_COMPLETION_REPORT.md`](archive/PHASE_3_COMPLETION_REPORT.md).
+Phase 4A complete (January 26, 2026). Multi-language SDK with 5 code generators (Python, Rust, C, JavaScript, Verilog) delivering production-ready implementations from JSON schemas. See [`archive/PHASE_4A_COMPLETION_REPORT.md`](archive/PHASE_4A_COMPLETION_REPORT.md).
+
+Phase 3 complete (January 25, 2026). ATOMiK Core v2 validated on Tang Nano 9K FPGA with all delta algebra properties verified in silicon. See [`archive/PHASE_3_COMPLETION_REPORT.md`](archive/PHASE_3_COMPLETION_REPORT.md).
 
 ---
 
@@ -257,10 +260,14 @@ ATOMiK/
 ├── experiments/            # ✅ Phase 2 benchmarks (360 measurements)
 ├── constraints/            # ✅ FPGA timing and physical constraints
 ├── synth/                  # ✅ Synthesis scripts (Gowin EDA)
-├── scripts/                # ✅ Hardware validation tests
+├── scripts/                # ✅ Hardware validation + FPGA pipeline + SDK generation
 ├── software/              # ✅ Python SDK + 5-language generators
 │   ├── atomik_sdk/generator/  # Schema-driven code generators (Py/Rust/C/JS/Verilog)
 │   └── atomik_sdk/tests/      # Generator test suite (algebraic property verification)
+├── sdk/schemas/            # ✅ Schema definitions
+│   ├── examples/              # Reference schemas (terminal-io, p2p-delta, matrix-ops)
+│   └── domains/               # Domain SDK schemas (video, edge-sensor, finance)
+├── generated_sdks/         # ✅ Phase 4B generated code (3 domains x 5 languages)
 ├── docs/                   # SDK documentation and guides
 ├── specs/                  # Formal model and RTL architecture
 ├── archive/                # Phase completion reports (historical)
@@ -289,6 +296,12 @@ cd synth && .\run_synthesis.ps1
 openFPGALoader -b tangnano9k ..\impl\pnr\ATOMiK.fs
 ```
 
+### Generate Domain SDKs
+```bash
+python scripts/generate_domain_sdks.py
+# 3 schemas → 57 files across Python, Rust, C, JavaScript, Verilog
+```
+
 ### Validate Hardware
 ```bash
 python scripts/test_hardware.py COM6
@@ -305,7 +318,8 @@ python scripts/test_hardware.py COM6
 | **Phase 2**: Performance Benchmarking | ✅ Complete | 95-100% memory reduction, parallelization validated |
 | **Phase 3**: Hardware Synthesis | ✅ Complete | Silicon validation, single-cycle operations confirmed |
 | **Phase 4A**: SDK Code Generation | ✅ Complete | 5-language generators, 100% test coverage |
-| **Phase 4B**: Ecosystem & Tooling | 📋 Planned | CLI tools, VS Code extension, hardware integration |
+| **Phase 4B**: Domain SDKs | ✅ Complete | 3 domain schemas (Video/Edge/Finance), 57 generated files |
+| **Phase 4C**: Hardware Demonstrators | 📋 Planned | FPGA demos for video, sensor fusion, network processing |
 | **Phase 5**: Multi-Accumulator Architecture | 📋 Planned | Parallel accumulator banks, linear throughput scaling |
 
 ### What the SDK Architecture Enables
@@ -315,6 +329,8 @@ The schema-driven code generation pipeline ensures that **every new ATOMiK objec
 - **One schema → five implementations**: Define a new delta-state object once in JSON; Python, Rust, C, JavaScript, and Verilog code is generated automatically.
 - **Generated test suites**: Each generator produces tests that verify the algebraic properties (self-inverse, commutativity, identity) hold in the target language.
 - **Semantic equivalence**: All generated implementations are semantically equivalent—proven by the same formal model verified in Phase 1.
+
+**Phase 4B validated this at scale**: Three domain SDKs (Video H.264 Delta, Edge Sensor IMU Fusion, Financial Price Tick) generated 57 files across all 5 languages from 3 JSON schemas, with all algebraic properties verified in generated test suites.
 
 **Full roadmap**: [`archive/ATOMiK_DEVELOPMENT_ROADMAP.md`](archive/ATOMiK_DEVELOPMENT_ROADMAP.md) (historical)
 
@@ -330,7 +346,8 @@ The schema-driven code generation pipeline ensures that **every new ATOMiK objec
 | [Formal Model](specs/formal_model.md) | Delta-state algebra mathematical specification |
 | [RTL Architecture](specs/rtl_architecture.md) | Hardware design specification and timing |
 | [Schema Specification](docs/SDK_SCHEMA_GUIDE.md) | JSON schema format for code generation targets |
-| [Phase 4A Report](archive/PHASE_4A_COMPLETION_REPORT.md) | SDK development completion report |
+| [Phase 4B Report](archive/PHASE_4B_COMPLETION_REPORT.md) | Domain SDK generation completion report |
+| [Phase 4A Report](archive/PHASE_4A_COMPLETION_REPORT.md) | SDK framework development completion report |
 | [Phase 3 Report](archive/PHASE_3_COMPLETION_REPORT.md) | Hardware synthesis completion report |
 
 ---
@@ -343,4 +360,4 @@ For licensing inquiries, commercial integration, or architectural collaboration,
 
 ---
 
-*Last updated: January 26, 2026 (Phase 4A Complete — License aligned, T4A bug fixes, README enhanced)*
+*Last updated: January 26, 2026 (Phase 4B Complete — 3 domain SDKs, 57 generated files across 5 languages)*

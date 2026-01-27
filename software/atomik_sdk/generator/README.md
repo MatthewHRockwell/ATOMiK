@@ -466,12 +466,30 @@ To add a new language generator:
 
 ---
 
+## Domain SDK Generation (Phase 4B)
+
+Three domain schemas were created and validated against this generator framework:
+
+| Domain | Schema | Namespace |
+|--------|--------|-----------|
+| Video H.264 | `sdk/schemas/domains/video-h264-delta.json` | Video.Streaming.H264Delta |
+| Edge Sensor | `sdk/schemas/domains/edge-sensor-imu.json` | Edge.Sensor.IMUFusion |
+| Financial | `sdk/schemas/domains/finance-price-tick.json` | Finance.Trading.PriceTick |
+
+Batch generation CLI:
+```bash
+python scripts/generate_domain_sdks.py --report generation_report.json
+```
+
+---
+
 ## Version History
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 1.1.0 | 2026-01-26 | Domain SDK generation (Phase 4B), batch CLI tool |
 | 1.0.0 | 2026-01-26 | Initial framework (Phase 4A.2) |
 
 ---
 
-*ATOMiK SDK Generator Framework - Phase 4A.2 Complete*
+*ATOMiK SDK Generator Framework - Phase 4B Complete*

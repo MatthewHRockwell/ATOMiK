@@ -639,6 +639,67 @@ See [`specs/schema_validation_rules.md`](../specs/schema_validation_rules.md) fo
 - Computer graphics (transformation matrices)
 - Quantum simulation (state evolution)
 
+### 7.4 Domain SDK: Video H.264 Delta (Phase 4B)
+
+**File**: [`sdk/schemas/domains/video-h264-delta.json`](../sdk/schemas/domains/video-h264-delta.json)
+
+**Vertical**: Video
+**Field**: Streaming
+**Object**: H264Delta
+
+**Purpose**: Delta-based video frame processing for H.264 streams with motion vector tracking.
+
+**Key Features**:
+- 256-bit `frame_delta` with spatiotemporal 4x4x4 encoding and XOR compression
+- 256-bit `motion_vector` parameter delta
+- Rollback support (512 frame history)
+- Hardware-optimized for speed at 150 MHz target
+
+**Generated Namespace**:
+- Python: `from atomik.Video.Streaming import H264Delta`
+- Rust: `use atomik::video::streaming::H264Delta;`
+
+### 7.5 Domain SDK: Edge Sensor IMU Fusion (Phase 4B)
+
+**File**: [`sdk/schemas/domains/edge-sensor-imu.json`](../sdk/schemas/domains/edge-sensor-imu.json)
+
+**Vertical**: Edge
+**Field**: Sensor
+**Object**: IMUFusion
+
+**Purpose**: Edge sensor fusion for IMU devices with anomaly detection via bitmask alerts.
+
+**Key Features**:
+- 64-bit `motion_delta` stream for accelerometer/gyroscope data
+- 64-bit `alert_flags` bitmask delta for anomaly detection
+- Rollback support (1024 sample history)
+- Power-optimized hardware at 100 MHz target, 500 mW budget
+
+**Generated Namespace**:
+- Python: `from atomik.Edge.Sensor import IMUFusion`
+- Rust: `use atomik::edge::sensor::IMUFusion;`
+
+### 7.6 Domain SDK: Financial Price Tick (Phase 4B)
+
+**File**: [`sdk/schemas/domains/finance-price-tick.json`](../sdk/schemas/domains/finance-price-tick.json)
+
+**Vertical**: Finance
+**Field**: Trading
+**Object**: PriceTick
+
+**Purpose**: High-frequency price tick delta processing with deep rollback for transaction audit.
+
+**Key Features**:
+- 64-bit `price_delta` (parameter delta for bid/ask changes)
+- 64-bit `volume_delta` (delta stream with XOR compression)
+- 64-bit `trade_flags` (bitmask delta for trade status)
+- Rollback support (4096 transaction history)
+- Speed-optimized hardware at 400 MHz target, 1 ms latency
+
+**Generated Namespace**:
+- Python: `from atomik.Finance.Trading import PriceTick`
+- Rust: `use atomik::finance::trading::PriceTick;`
+
 ---
 
 ## Appendix A: Vertical Catalog
@@ -689,5 +750,5 @@ See: [`archive/PHASE_3_COMPLETION_REPORT.md`](../archive/PHASE_3_COMPLETION_REPO
 
 ---
 
-*SDK Schema Guide v1.0.0 - January 26, 2026*
-*ATOMiK Project - Phase 4A.1*
+*SDK Schema Guide v1.1.0 - January 26, 2026*
+*ATOMiK Project - Phase 4B (3 domain SDK examples added)*

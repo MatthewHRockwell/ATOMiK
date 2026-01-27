@@ -1,12 +1,12 @@
 # ATOMiK SDK - Multi-Language Code Generator
 
-**Version:** 1.0.0
-**Phase:** 4A - SDK Development
+**Version:** 1.1.0
+**Phase:** 4B - Domain SDKs
 **Status:** Complete
 
 [![Tests](https://img.shields.io/badge/tests-passing-brightgreen)](./tests/)
 [![Languages](https://img.shields.io/badge/languages-5-blue)](#supported-languages)
-[![License](https://img.shields.io/badge/license-MIT-green)](#license)
+[![License](https://img.shields.io/badge/license-Apache%202.0-green)](#license)
 
 ## Overview
 
@@ -262,11 +262,12 @@ python tests/test_integration.py
 
 ### Test Results
 
-All tests passing:
-- **3 example schemas** tested
+All tests passing (87/87):
+- **3 example schemas** + **3 domain schemas** tested
 - **5 language generators** validated
-- **57 total files** generated per test run
+- **57 domain files** generated per test run
 - **100% pass rate** on syntax validation
+- **0 lint warnings** (ruff clean)
 
 ## Documentation
 
@@ -278,7 +279,17 @@ All tests passing:
 
 ## Project Status
 
-### Phase 4A - Complete ✅
+### Phase 4B - Domain SDKs - Complete ✅
+
+| Task | Status | Description |
+|------|--------|-------------|
+| T4B.1 | ✅ Complete | Video SDK Schema + Generation |
+| T4B.2 | ✅ Complete | Edge Sensor SDK Schema + Generation |
+| T4B.3 | ✅ Complete | Financial SDK Schema + Generation |
+| T4B.4 | ✅ Complete | SDK Test Suites |
+| T4B.5 | ✅ Complete | SDK Documentation |
+
+### Phase 4A - Generator Framework - Complete ✅
 
 | Task | Status | Description |
 |------|--------|-------------|
@@ -292,12 +303,22 @@ All tests passing:
 | T4A.8 | ✅ Complete | Integration Tests |
 | T4A.9 | ✅ Complete | SDK Documentation |
 
+### Domain SDKs (Phase 4B)
+
+| Domain | Namespace | Delta Fields | Rollback Depth |
+|--------|-----------|-------------|----------------|
+| **Video H.264** | `Video.Streaming.H264Delta` | frame_delta (256-bit), motion_vector (256-bit) | 512 |
+| **Edge Sensor** | `Edge.Sensor.IMUFusion` | motion_delta (64-bit), alert_flags (64-bit) | 1024 |
+| **Financial** | `Finance.Trading.PriceTick` | price_delta, volume_delta, trade_flags (64-bit) | 4096 |
+
 ### Statistics
 
 - **Generator files**: 10 Python modules
-- **Test files**: 8 comprehensive test suites
+- **Test files**: 9 comprehensive test suites (8 framework + 1 domain)
 - **Lines of code**: ~4,500+ across all generators
-- **Documentation pages**: 5 comprehensive guides
+- **Domain schemas**: 3 (Video, Edge Sensor, Finance)
+- **Generated files**: 57 (19 per domain, 5 languages)
+- **Documentation pages**: 5 comprehensive guides + 2 completion reports
 - **Supported languages**: Python, Rust, C, Verilog, JavaScript
 
 ## Mathematical Foundation
@@ -355,7 +376,7 @@ See [Developer Guide](../../docs/SDK_DEVELOPER_GUIDE.md) for contribution guidel
 
 ## License
 
-MIT License - See LICENSE file for details
+Apache License 2.0 - See LICENSE file for details
 
 ## Citation
 
@@ -378,6 +399,6 @@ Built on:
 
 ---
 
-**Version**: 1.0.0
+**Version**: 1.1.0
 **Last Updated**: January 26, 2026
-**Status**: Production Ready
+**Status**: Production Ready (Phase 4B Complete)
