@@ -18,6 +18,27 @@ For development:
 pip install -e ".[dev]"
 ```
 
+## CLI Tool: `atomik-gen`
+
+After installation, the `atomik-gen` command is available for schema validation and multi-language SDK generation:
+
+```bash
+atomik-gen generate <schema> [--output-dir DIR] [--languages LANG ...]
+atomik-gen validate <schema>
+atomik-gen info <schema>
+atomik-gen batch <directory> [--output-dir DIR] [--report FILE]
+atomik-gen list
+atomik-gen --version
+```
+
+Example:
+```bash
+atomik-gen generate sdk/schemas/examples/terminal-io.json --languages python rust
+atomik-gen batch sdk/schemas/domains/ --report report.json
+```
+
+A companion [VS Code extension](../vscode-extension/atomik-vscode/README.md) provides schema intellisense, snippets, and command palette integration with `atomik-gen`.
+
 ## Quick Start
 
 ```python

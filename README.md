@@ -262,8 +262,11 @@ ATOMiK/
 ├── synth/                  # ✅ Synthesis scripts (Gowin EDA)
 ├── scripts/                # ✅ Hardware validation + FPGA pipeline + SDK generation
 ├── software/              # ✅ Python SDK + 5-language generators
-│   ├── atomik_sdk/generator/  # Schema-driven code generators (Py/Rust/C/JS/Verilog)
-│   └── atomik_sdk/tests/      # Generator test suite (algebraic property verification)
+│   ├── atomik_sdk/cli.py        # atomik-gen CLI tool (pip-installable entry point)
+│   ├── atomik_sdk/generator/    # Schema-driven code generators (Py/Rust/C/JS/Verilog)
+│   └── atomik_sdk/tests/        # Generator test suite (algebraic property verification)
+├── vscode-extension/       # ✅ VS Code extension (schema intellisense + commands)
+│   └── atomik-vscode/           # Extension source (TypeScript, snippets, schema)
 ├── sdk/schemas/            # ✅ Schema definitions
 │   ├── examples/              # Reference schemas (terminal-io, p2p-delta, matrix-ops)
 │   └── domains/               # Domain SDK schemas (video, edge-sensor, finance)
@@ -298,8 +301,24 @@ openFPGALoader -b tangnano9k ..\impl\pnr\ATOMiK.fs
 
 ### Generate Domain SDKs
 ```bash
-python scripts/generate_domain_sdks.py
+# Install CLI tool
+cd software && pip install -e .
+
+# Generate from a single schema
+atomik-gen generate sdk/schemas/examples/terminal-io.json --output-dir generated
+
+# Validate a schema
+atomik-gen validate sdk/schemas/domains/video-h264-delta.json
+
+# Batch generate all domain SDKs
+atomik-gen batch sdk/schemas/domains/ --report generation_report.json
 # 3 schemas → 57 files across Python, Rust, C, JavaScript, Verilog
+
+# Show schema summary
+atomik-gen info sdk/schemas/domains/finance-price-tick.json
+
+# List available target languages
+atomik-gen list
 ```
 
 ### Validate Hardware
@@ -346,6 +365,7 @@ The schema-driven code generation pipeline ensures that **every new ATOMiK objec
 | [Formal Model](specs/formal_model.md) | Delta-state algebra mathematical specification |
 | [RTL Architecture](specs/rtl_architecture.md) | Hardware design specification and timing |
 | [Schema Specification](docs/SDK_SCHEMA_GUIDE.md) | JSON schema format for code generation targets |
+| [VS Code Extension](vscode-extension/atomik-vscode/README.md) | Schema intellisense, validation, and SDK generation |
 | [Phase 4B Report](archive/PHASE_4B_COMPLETION_REPORT.md) | Domain SDK generation completion report |
 | [Phase 4A Report](archive/PHASE_4A_COMPLETION_REPORT.md) | SDK framework development completion report |
 | [Phase 3 Report](archive/PHASE_3_COMPLETION_REPORT.md) | Hardware synthesis completion report |

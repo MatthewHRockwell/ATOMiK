@@ -1,0 +1,71 @@
+{
+  "ATOMiK Schema": {
+    "prefix": "atomik-schema",
+    "description": "Complete ATOMiK schema skeleton",
+    "body": [
+      "{",
+      "  \"catalogue\": {",
+      "    \"vertical\": \"${1|Video,Edge,Network,Finance,Science,Compute,System,Storage|}\",",
+      "    \"field\": \"${2:FieldName}\",",
+      "    \"object\": \"${3:ObjectName}\",",
+      "    \"version\": \"${4:1.0.0}\",",
+      "    \"author\": \"${5:Author}\",",
+      "    \"license\": \"${6|Apache-2.0,MIT,GPL-3.0,BSD-3-Clause|}\",",
+      "    \"description\": \"${7:Description of the module}\"",
+      "  },",
+      "  \"schema\": {",
+      "    \"delta_fields\": {",
+      "      \"${8:field_name}\": {",
+      "        \"type\": \"${9|delta_stream,bitmask_delta,parameter_delta|}\",",
+      "        \"width\": ${10|64,8,16,32,128,256|}",
+      "      }",
+      "    },",
+      "    \"operations\": {",
+      "      \"accumulate\": {",
+      "        \"enabled\": true",
+      "      },",
+      "      \"reconstruct\": {",
+      "        \"enabled\": true",
+      "      },",
+      "      \"rollback\": {",
+      "        \"enabled\": ${11|false,true|},",
+      "        \"history_depth\": ${12:100}",
+      "      }",
+      "    },",
+      "    \"constraints\": {",
+      "      \"max_memory_mb\": ${13:256},",
+      "      \"update_latency_ms\": ${14:10}",
+      "    }",
+      "  }",
+      "}"
+    ]
+  },
+  "ATOMiK Delta Field": {
+    "prefix": "atomik-field",
+    "description": "ATOMiK delta field block",
+    "body": [
+      "\"${1:field_name}\": {",
+      "  \"type\": \"${2|delta_stream,bitmask_delta,parameter_delta|}\",",
+      "  \"width\": ${3|64,8,16,32,128,256|},",
+      "  \"encoding\": \"${4|raw,spatiotemporal_4x4x4,rle|}\",",
+      "  \"compression\": \"${5|none,xor,rle|}\"",
+      "}"
+    ]
+  },
+  "ATOMiK Hardware Section": {
+    "prefix": "atomik-hardware",
+    "description": "ATOMiK hardware mapping section",
+    "body": [
+      "\"hardware\": {",
+      "  \"target_device\": \"${1:GW1NR-9}\",",
+      "  \"rtl_params\": {",
+      "    \"DATA_WIDTH\": ${2|64,8,16,32,128,256|},",
+      "    \"ENABLE_PARALLEL\": ${3|false,true|}",
+      "  },",
+      "  \"synthesis_options\": {",
+      "    \"optimization_goal\": \"${4|speed,area,power|}\"",
+      "  }",
+      "}"
+    ]
+  }
+}

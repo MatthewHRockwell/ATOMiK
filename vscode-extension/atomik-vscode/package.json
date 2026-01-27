@@ -1,0 +1,71 @@
+{
+  "name": "atomik-vscode",
+  "displayName": "ATOMiK Schema Tools",
+  "description": "Schema validation, intellisense, and SDK generation for ATOMiK delta-state computing",
+  "version": "0.1.0",
+  "publisher": "atomik-project",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mopore/ATOMiK"
+  },
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Snippets",
+    "Other"
+  ],
+  "activationEvents": [
+    "onLanguage:json"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "atomik.generate",
+        "title": "ATOMiK: Generate SDK from Current Schema"
+      },
+      {
+        "command": "atomik.validate",
+        "title": "ATOMiK: Validate Current Schema"
+      },
+      {
+        "command": "atomik.batch",
+        "title": "ATOMiK: Batch Generate from Directory"
+      },
+      {
+        "command": "atomik.info",
+        "title": "ATOMiK: Show Schema Info"
+      }
+    ],
+    "jsonValidation": [
+      {
+        "fileMatch": [
+          "*.atomik.json",
+          "**/schemas/**/*.json"
+        ],
+        "url": "./schemas/atomik-schema-v1.json"
+      }
+    ],
+    "snippets": [
+      {
+        "language": "json",
+        "path": "./snippets/atomik-schema.json"
+      }
+    ]
+  },
+  "scripts": {
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "lint": "eslint src --ext ts",
+    "package": "vsce package"
+  },
+  "devDependencies": {
+    "@types/node": "^18.0.0",
+    "@types/vscode": "^1.85.0",
+    "typescript": "^5.3.0",
+    "@vscode/vsce": "^2.22.0"
+  }
+}

@@ -466,6 +466,29 @@ To add a new language generator:
 
 ---
 
+## CLI Tool: `atomik-gen`
+
+The generator framework is accessible via the `atomik-gen` CLI tool, a pip-installable entry point defined in `atomik_sdk/cli.py`:
+
+```bash
+# Install
+cd software && pip install -e .
+
+# Commands
+atomik-gen generate <schema> [--output-dir DIR] [--languages LANG ...]
+atomik-gen validate <schema>
+atomik-gen info <schema>
+atomik-gen batch <directory> [--output-dir DIR] [--report FILE]
+atomik-gen list
+atomik-gen --version
+```
+
+**Exit codes**: 0 = success, 1 = validation failure, 2 = generation failure, 3 = file/config error.
+
+The CLI wraps `GeneratorEngine` and all 5 language generators directly. A companion [VS Code extension](../../vscode-extension/atomik-vscode/README.md) provides schema intellisense and command palette integration with `atomik-gen`.
+
+---
+
 ## Domain SDK Generation (Phase 4B)
 
 Three domain schemas were created and validated against this generator framework:
@@ -476,9 +499,9 @@ Three domain schemas were created and validated against this generator framework
 | Edge Sensor | `sdk/schemas/domains/edge-sensor-imu.json` | Edge.Sensor.IMUFusion |
 | Financial | `sdk/schemas/domains/finance-price-tick.json` | Finance.Trading.PriceTick |
 
-Batch generation CLI:
+Batch generation via CLI:
 ```bash
-python scripts/generate_domain_sdks.py --report generation_report.json
+atomik-gen batch sdk/schemas/domains/ --report generation_report.json
 ```
 
 ---
@@ -487,6 +510,7 @@ python scripts/generate_domain_sdks.py --report generation_report.json
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 1.2.0 | 2026-01-26 | `atomik-gen` CLI tool, VS Code extension |
 | 1.1.0 | 2026-01-26 | Domain SDK generation (Phase 4B), batch CLI tool |
 | 1.0.0 | 2026-01-26 | Initial framework (Phase 4A.2) |
 

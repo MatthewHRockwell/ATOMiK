@@ -1,0 +1,266 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://atomik.dev/schemas/v1/atomik-schema.json",
+  "title": "ATOMiK Schema Specification",
+  "description": "JSON Schema for defining ATOMiK delta-state computational modules with multi-language SDK generation",
+  "version": "1.0.0",
+  "type": "object",
+  "required": ["catalogue", "schema"],
+  "additionalProperties": false,
+  "properties": {
+    "catalogue": {
+      "type": "object",
+      "description": "Positioning metadata that determines API namespace and module identity",
+      "required": ["vertical", "field", "object", "version"],
+      "additionalProperties": false,
+      "properties": {
+        "vertical": {
+          "type": "string",
+          "description": "Top-level market vertical (determines root namespace)",
+          "enum": [
+            "Video",
+            "Edge",
+            "Network",
+            "Finance",
+            "Science",
+            "Compute",
+            "System",
+            "Storage"
+          ]
+        },
+        "field": {
+          "type": "string",
+          "description": "Domain-specific field within the vertical (determines second-level namespace)",
+          "minLength": 1,
+          "maxLength": 64,
+          "pattern": "^[A-Z][A-Za-z0-9]*$"
+        },
+        "object": {
+          "type": "string",
+          "description": "Specific component name (must be unique within vertical+field, determines class/module name)",
+          "minLength": 1,
+          "maxLength": 64,
+          "pattern": "^[A-Z][A-Za-z0-9]*$"
+        },
+        "version": {
+          "type": "string",
+          "description": "Semantic version (semver format)",
+          "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$"
+        },
+        "author": {
+          "type": "string",
+          "description": "Author or organization name",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "license": {
+          "type": "string",
+          "description": "SPDX license identifier",
+          "examples": ["MIT", "Apache-2.0", "GPL-3.0", "BSD-3-Clause"]
+        },
+        "description": {
+          "type": "string",
+          "description": "Human-readable description of the module's purpose",
+          "minLength": 1,
+          "maxLength": 1024
+        }
+      }
+    },
+    "schema": {
+      "type": "object",
+      "description": "Computational definition of delta fields, operations, and constraints",
+      "required": ["delta_fields", "operations"],
+      "additionalProperties": false,
+      "properties": {
+        "delta_fields": {
+          "type": "object",
+          "description": "Delta field definitions with types, widths, and encodings",
+          "minProperties": 1,
+          "patternProperties": {
+            "^[a-z][a-z0-9_]*$": {
+              "type": "object",
+              "required": ["type", "width"],
+              "additionalProperties": false,
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "description": "Delta field type",
+                  "enum": ["delta_stream", "bitmask_delta", "parameter_delta"]
+                },
+                "width": {
+                  "type": "integer",
+                  "description": "Bit width (must be power of 2, between 8 and 256)",
+                  "enum": [8, 16, 32, 64, 128, 256]
+                },
+                "encoding": {
+                  "type": "string",
+                  "description": "Optional encoding scheme",
+                  "enum": ["spatiotemporal_4x4x4", "raw", "rle"],
+                  "default": "raw"
+                },
+                "compression": {
+                  "type": "string",
+                  "description": "Optional compression method",
+                  "enum": ["xor", "rle", "none"],
+                  "default": "none"
+                },
+                "default_value": {
+                  "type": "integer",
+                  "description": "Optional default value for initialization",
+                  "minimum": 0
+                }
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "operations": {
+          "type": "object",
+          "description": "Supported delta operations with latency specifications",
+          "required": ["accumulate"],
+          "additionalProperties": false,
+          "properties": {
+            "accumulate": {
+              "type": "object",
+              "description": "XOR-based delta accumulation (core operation, always required)",
+              "required": ["enabled"],
+              "additionalProperties": false,
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "description": "Must be true (accumulate is the core operation)"
+                },
+                "latency_cycles": {
+                  "type": "integer",
+                  "description": "Expected latency in clock cycles",
+                  "minimum": 1,
+                  "default": 1
+                }
+              }
+            },
+            "reconstruct": {
+              "type": "object",
+              "description": "State reconstruction from accumulated deltas",
+              "additionalProperties": false,
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "description": "Enable state reconstruction operation",
+                  "default": true
+                },
+                "latency_cycles": {
+                  "type": "integer",
+                  "description": "Expected latency in clock cycles",
+                  "minimum": 1,
+                  "default": 1
+                }
+              }
+            },
+            "rollback": {
+              "type": "object",
+              "description": "Temporal state rollback via delta reversal",
+              "additionalProperties": false,
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "description": "Enable rollback capability",
+                  "default": false
+                },
+                "history_depth": {
+                  "type": "integer",
+                  "description": "Number of delta history entries to maintain",
+                  "minimum": 1,
+                  "maximum": 65536
+                }
+              }
+            }
+          }
+        },
+        "constraints": {
+          "type": "object",
+          "description": "Resource and performance constraints",
+          "additionalProperties": false,
+          "properties": {
+            "max_memory_mb": {
+              "type": "integer",
+              "description": "Maximum memory usage in megabytes",
+              "minimum": 1,
+              "maximum": 65536
+            },
+            "max_power_mw": {
+              "type": "integer",
+              "description": "Maximum power consumption in milliwatts",
+              "minimum": 1,
+              "maximum": 100000
+            },
+            "update_latency_ms": {
+              "type": "integer",
+              "description": "Maximum acceptable update latency in milliseconds",
+              "minimum": 0,
+              "maximum": 10000
+            },
+            "target_frequency_mhz": {
+              "type": "number",
+              "description": "Target clock frequency for hardware implementation",
+              "minimum": 1.0,
+              "maximum": 1000.0,
+              "default": 94.5
+            }
+          }
+        }
+      }
+    },
+    "hardware": {
+      "type": "object",
+      "description": "Optional hardware mapping for Verilog RTL generation",
+      "additionalProperties": false,
+      "properties": {
+        "target_device": {
+          "type": "string",
+          "description": "Target FPGA device family or part number",
+          "examples": ["GW1NR-9", "Artix-7", "CycloneV"]
+        },
+        "rtl_params": {
+          "type": "object",
+          "description": "Verilog module parameters",
+          "additionalProperties": false,
+          "properties": {
+            "DATA_WIDTH": {
+              "type": "integer",
+              "description": "Must match delta_fields width",
+              "enum": [8, 16, 32, 64, 128, 256]
+            },
+            "ENABLE_PARALLEL": {
+              "type": "boolean",
+              "description": "Enable parallel delta accumulation",
+              "default": false
+            },
+            "CLOCK_DOMAIN": {
+              "type": "string",
+              "description": "Clock domain identifier",
+              "pattern": "^[a-z_][a-z0-9_]*$"
+            }
+          }
+        },
+        "synthesis_options": {
+          "type": "object",
+          "description": "Synthesis tool configuration",
+          "additionalProperties": false,
+          "properties": {
+            "optimization_goal": {
+              "type": "string",
+              "description": "Primary optimization objective",
+              "enum": ["area", "speed", "power"],
+              "default": "speed"
+            },
+            "timing_constraints": {
+              "type": "object",
+              "description": "Custom timing constraints",
+              "additionalProperties": true
+            }
+          }
+        }
+      }
+    }
+  }
+}
