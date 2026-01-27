@@ -185,24 +185,9 @@ Because the ATOMiK datapath uses only XOR gates (no carry propagation), the crit
 
 ATOMiK's SDK uses a **single JSON schema** to generate semantically equivalent implementations across 5 target languages:
 
-```
-                    ┌──────────────────┐
-                    │   JSON Schema    │
-                    │  (ATOMiK Object) │
-                    └────────┬─────────┘
-                             │
-              ┌──────────────┼──────────────┐
-              │              │              │
-         ┌────▼────┐   ┌────▼────┐   ┌────▼────┐
-         │ Python  │   │  Rust   │   │    C    │
-         │Generator│   │Generator│   │Generator│
-         └─────────┘   └─────────┘   └─────────┘
-              │              │              │
-         ┌────▼────┐   ┌────▼────┐   ┌────▼────┐
-         │JavaScript│   │ Verilog │   │  Tests  │
-         │Generator│   │Generator│   │  (all)  │
-         └─────────┘   └─────────┘   └─────────┘
-```
+<p align="center">
+  <img src="docs/diagrams/sdk_pipeline.svg" alt="ATOMiK SDK Pipeline: JSON Schema to 5 language generators" width="860"/>
+</p>
 
 | Target | Output Type | Use Case |
 |--------|-------------|----------|
@@ -223,20 +208,11 @@ Each generator produces:
 
 ### `atomik-gen` CLI Tool
 
-A pip-installable command-line tool for schema validation and multi-language code generation:
+A pip-installable command-line tool for schema validation and multi-language code generation. Install with `pip install -e ./software`.
 
-```bash
-pip install -e ./software        # Installs atomik-gen
-atomik-gen --version              # Show version
-```
-
-| Command | Description |
-|---------|-------------|
-| `atomik-gen generate <schema>` | Generate SDK code (5 languages) |
-| `atomik-gen validate <schema>` | Validate a schema without generating |
-| `atomik-gen info <schema>` | Show namespace, fields, and operations |
-| `atomik-gen batch <directory>` | Batch generate from a directory of schemas |
-| `atomik-gen list` | List available target languages |
+<p align="center">
+  <img src="docs/diagrams/cli_terminal.svg" alt="atomik-gen CLI tool commands and output" width="700"/>
+</p>
 
 Options: `--output-dir`, `--languages`, `--report`, `--verbose`. See [API Reference](docs/SDK_API_REFERENCE.md#cli-tool-reference) for full details.
 
