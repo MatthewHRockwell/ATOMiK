@@ -1,0 +1,509 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
+<title>atomik_sdk.pipeline.parallel.executor API documentation</title>
+<meta name="description" content="Parallel Task Executor …">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>atomik_sdk.pipeline.parallel.executor</code></h1>
+</header>
+<section id="section-intro">
+<p>Parallel Task Executor</p>
+<p>Executes decomposed tasks using a thread pool with configurable
+worker count. Handles partial failures (one language failing does
+not block others) and result aggregation.</p>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="atomik_sdk.pipeline.parallel.executor.ExecutionResult"><code class="flex name class">
+<span>class <span class="ident">ExecutionResult</span></span>
+<span>(</span><span>results: list[<a title="atomik_sdk.pipeline.parallel.executor.TaskResult" href="#atomik_sdk.pipeline.parallel.executor.TaskResult">TaskResult</a>] = &lt;factory&gt;,<br>total_time_ms: float = 0.0,<br>parallel_speedup: float = 1.0)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass
+class ExecutionResult:
+    &#34;&#34;&#34;Aggregated result of parallel execution.&#34;&#34;&#34;
+    results: list[TaskResult] = field(default_factory=list)
+    total_time_ms: float = 0.0
+    parallel_speedup: float = 1.0
+
+    @property
+    def all_success(self) -&gt; bool:
+        return all(r.success for r in self.results)
+
+    @property
+    def failures(self) -&gt; list[TaskResult]:
+        return [r for r in self.results if not r.success]
+
+    def to_dict(self) -&gt; dict[str, Any]:
+        return {
+            &#34;all_success&#34;: self.all_success,
+            &#34;total_time_ms&#34;: round(self.total_time_ms, 1),
+            &#34;parallel_speedup&#34;: round(self.parallel_speedup, 2),
+            &#34;task_count&#34;: len(self.results),
+            &#34;failures&#34;: len(self.failures),
+            &#34;results&#34;: [r.to_dict() for r in self.results],
+        }</code></pre>
+</details>
+<div class="desc"><p>Aggregated result of parallel execution.</p></div>
+<h3>Instance variables</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.parallel.executor.ExecutionResult.all_success"><code class="name">prop <span class="ident">all_success</span> : bool</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def all_success(self) -&gt; bool:
+    return all(r.success for r in self.results)</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.parallel.executor.ExecutionResult.failures"><code class="name">prop <span class="ident">failures</span> : list[<a title="atomik_sdk.pipeline.parallel.executor.TaskResult" href="#atomik_sdk.pipeline.parallel.executor.TaskResult">TaskResult</a>]</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def failures(self) -&gt; list[TaskResult]:
+    return [r for r in self.results if not r.success]</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.parallel.executor.ExecutionResult.parallel_speedup"><code class="name">var <span class="ident">parallel_speedup</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.parallel.executor.ExecutionResult.results"><code class="name">var <span class="ident">results</span> : list[<a title="atomik_sdk.pipeline.parallel.executor.TaskResult" href="#atomik_sdk.pipeline.parallel.executor.TaskResult">TaskResult</a>]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.parallel.executor.ExecutionResult.total_time_ms"><code class="name">var <span class="ident">total_time_ms</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.parallel.executor.ExecutionResult.to_dict"><code class="name flex">
+<span>def <span class="ident">to_dict</span></span>(<span>self) ‑> dict[str, typing.Any]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_dict(self) -&gt; dict[str, Any]:
+    return {
+        &#34;all_success&#34;: self.all_success,
+        &#34;total_time_ms&#34;: round(self.total_time_ms, 1),
+        &#34;parallel_speedup&#34;: round(self.parallel_speedup, 2),
+        &#34;task_count&#34;: len(self.results),
+        &#34;failures&#34;: len(self.failures),
+        &#34;results&#34;: [r.to_dict() for r in self.results],
+    }</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.pipeline.parallel.executor.ParallelExecutor"><code class="flex name class">
+<span>class <span class="ident">ParallelExecutor</span></span>
+<span>(</span><span>max_workers: int = 4)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class ParallelExecutor:
+    &#34;&#34;&#34;
+    Parallel task executor with configurable worker pool.
+
+    Executes a list of parallel tasks using a thread pool,
+    collects results, and handles partial failures gracefully.
+
+    Example:
+        &gt;&gt;&gt; executor = ParallelExecutor(max_workers=4)
+        &gt;&gt;&gt; def run_task(task):
+        ...     return f&#34;Generated {task.language}&#34;
+        &gt;&gt;&gt; results = executor.execute(tasks, run_task)
+        &gt;&gt;&gt; assert results.all_success
+    &#34;&#34;&#34;
+
+    def __init__(self, max_workers: int = 4) -&gt; None:
+        self.max_workers = min(max_workers, 8)  # Cap at 8
+
+    def execute(
+        self,
+        tasks: list[ParallelTask],
+        executor_fn: TaskExecutor,
+        timeout: float = 60.0,
+    ) -&gt; ExecutionResult:
+        &#34;&#34;&#34;
+        Execute tasks in parallel.
+
+        Args:
+            tasks: List of tasks to execute concurrently.
+            executor_fn: Function that executes a single task.
+            timeout: Per-task timeout in seconds.
+
+        Returns:
+            ExecutionResult with all task results.
+        &#34;&#34;&#34;
+        result = ExecutionResult()
+        start = time.perf_counter()
+
+        if not tasks:
+            return result
+
+        sequential_time = 0.0
+
+        with ThreadPoolExecutor(max_workers=self.max_workers) as pool:
+            future_to_task: dict[Future, ParallelTask] = {}
+
+            for task in tasks:
+                future = pool.submit(self._run_with_timing, task, executor_fn)
+                future_to_task[future] = task
+
+            for future in as_completed(future_to_task, timeout=timeout * len(tasks)):
+                task = future_to_task[future]
+                try:
+                    task_result = future.result(timeout=timeout)
+                    result.results.append(task_result)
+                    sequential_time += task_result.duration_ms
+                except Exception as e:
+                    result.results.append(TaskResult(
+                        task_id=task.task_id,
+                        success=False,
+                        error=str(e),
+                    ))
+
+        result.total_time_ms = (time.perf_counter() - start) * 1000
+        if result.total_time_ms &gt; 0 and sequential_time &gt; 0:
+            result.parallel_speedup = sequential_time / result.total_time_ms
+
+        return result
+
+    def execute_sequential(
+        self,
+        tasks: list[ParallelTask],
+        executor_fn: TaskExecutor,
+    ) -&gt; ExecutionResult:
+        &#34;&#34;&#34;Execute tasks sequentially (for comparison/fallback).&#34;&#34;&#34;
+        result = ExecutionResult()
+        start = time.perf_counter()
+
+        for task in tasks:
+            task_result = self._run_with_timing(task, executor_fn)
+            result.results.append(task_result)
+
+        result.total_time_ms = (time.perf_counter() - start) * 1000
+        result.parallel_speedup = 1.0
+        return result
+
+    def _run_with_timing(
+        self,
+        task: ParallelTask,
+        executor_fn: TaskExecutor,
+    ) -&gt; TaskResult:
+        &#34;&#34;&#34;Execute a task with timing and error handling.&#34;&#34;&#34;
+        start = time.perf_counter()
+        try:
+            output = executor_fn(task)
+            duration = (time.perf_counter() - start) * 1000
+            return TaskResult(
+                task_id=task.task_id,
+                success=True,
+                result=output,
+                duration_ms=duration,
+            )
+        except Exception as e:
+            duration = (time.perf_counter() - start) * 1000
+            return TaskResult(
+                task_id=task.task_id,
+                success=False,
+                error=str(e),
+                duration_ms=duration,
+            )</code></pre>
+</details>
+<div class="desc"><p>Parallel task executor with configurable worker pool.</p>
+<p>Executes a list of parallel tasks using a thread pool,
+collects results, and handles partial failures gracefully.</p>
+<h2 id="example">Example</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; executor = ParallelExecutor(max_workers=4)
+&gt;&gt;&gt; def run_task(task):
+...     return f&quot;Generated {task.language}&quot;
+&gt;&gt;&gt; results = executor.execute(tasks, run_task)
+&gt;&gt;&gt; assert results.all_success
+</code></pre></div>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.parallel.executor.ParallelExecutor.execute"><code class="name flex">
+<span>def <span class="ident">execute</span></span>(<span>self, tasks: list[ParallelTask], executor_fn: TaskExecutor, timeout: float = 60.0) ‑> <a title="atomik_sdk.pipeline.parallel.executor.ExecutionResult" href="#atomik_sdk.pipeline.parallel.executor.ExecutionResult">ExecutionResult</a></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def execute(
+    self,
+    tasks: list[ParallelTask],
+    executor_fn: TaskExecutor,
+    timeout: float = 60.0,
+) -&gt; ExecutionResult:
+    &#34;&#34;&#34;
+    Execute tasks in parallel.
+
+    Args:
+        tasks: List of tasks to execute concurrently.
+        executor_fn: Function that executes a single task.
+        timeout: Per-task timeout in seconds.
+
+    Returns:
+        ExecutionResult with all task results.
+    &#34;&#34;&#34;
+    result = ExecutionResult()
+    start = time.perf_counter()
+
+    if not tasks:
+        return result
+
+    sequential_time = 0.0
+
+    with ThreadPoolExecutor(max_workers=self.max_workers) as pool:
+        future_to_task: dict[Future, ParallelTask] = {}
+
+        for task in tasks:
+            future = pool.submit(self._run_with_timing, task, executor_fn)
+            future_to_task[future] = task
+
+        for future in as_completed(future_to_task, timeout=timeout * len(tasks)):
+            task = future_to_task[future]
+            try:
+                task_result = future.result(timeout=timeout)
+                result.results.append(task_result)
+                sequential_time += task_result.duration_ms
+            except Exception as e:
+                result.results.append(TaskResult(
+                    task_id=task.task_id,
+                    success=False,
+                    error=str(e),
+                ))
+
+    result.total_time_ms = (time.perf_counter() - start) * 1000
+    if result.total_time_ms &gt; 0 and sequential_time &gt; 0:
+        result.parallel_speedup = sequential_time / result.total_time_ms
+
+    return result</code></pre>
+</details>
+<div class="desc"><p>Execute tasks in parallel.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>tasks</code></strong></dt>
+<dd>List of tasks to execute concurrently.</dd>
+<dt><strong><code>executor_fn</code></strong></dt>
+<dd>Function that executes a single task.</dd>
+<dt><strong><code>timeout</code></strong></dt>
+<dd>Per-task timeout in seconds.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>ExecutionResult with all task results.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.parallel.executor.ParallelExecutor.execute_sequential"><code class="name flex">
+<span>def <span class="ident">execute_sequential</span></span>(<span>self, tasks: list[ParallelTask], executor_fn: TaskExecutor) ‑> <a title="atomik_sdk.pipeline.parallel.executor.ExecutionResult" href="#atomik_sdk.pipeline.parallel.executor.ExecutionResult">ExecutionResult</a></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def execute_sequential(
+    self,
+    tasks: list[ParallelTask],
+    executor_fn: TaskExecutor,
+) -&gt; ExecutionResult:
+    &#34;&#34;&#34;Execute tasks sequentially (for comparison/fallback).&#34;&#34;&#34;
+    result = ExecutionResult()
+    start = time.perf_counter()
+
+    for task in tasks:
+        task_result = self._run_with_timing(task, executor_fn)
+        result.results.append(task_result)
+
+    result.total_time_ms = (time.perf_counter() - start) * 1000
+    result.parallel_speedup = 1.0
+    return result</code></pre>
+</details>
+<div class="desc"><p>Execute tasks sequentially (for comparison/fallback).</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.pipeline.parallel.executor.TaskResult"><code class="flex name class">
+<span>class <span class="ident">TaskResult</span></span>
+<span>(</span><span>task_id: str,<br>success: bool,<br>result: Any = None,<br>error: str = '',<br>duration_ms: float = 0.0)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass
+class TaskResult:
+    &#34;&#34;&#34;Result of executing a single parallel task.&#34;&#34;&#34;
+    task_id: str
+    success: bool
+    result: Any = None
+    error: str = &#34;&#34;
+    duration_ms: float = 0.0
+
+    def to_dict(self) -&gt; dict[str, Any]:
+        return {
+            &#34;task_id&#34;: self.task_id,
+            &#34;success&#34;: self.success,
+            &#34;error&#34;: self.error,
+            &#34;duration_ms&#34;: round(self.duration_ms, 1),
+        }</code></pre>
+</details>
+<div class="desc"><p>Result of executing a single parallel task.</p></div>
+<h3>Instance variables</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.parallel.executor.TaskResult.duration_ms"><code class="name">var <span class="ident">duration_ms</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.parallel.executor.TaskResult.error"><code class="name">var <span class="ident">error</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.parallel.executor.TaskResult.result"><code class="name">var <span class="ident">result</span> : Any</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.parallel.executor.TaskResult.success"><code class="name">var <span class="ident">success</span> : bool</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.parallel.executor.TaskResult.task_id"><code class="name">var <span class="ident">task_id</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.parallel.executor.TaskResult.to_dict"><code class="name flex">
+<span>def <span class="ident">to_dict</span></span>(<span>self) ‑> dict[str, typing.Any]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_dict(self) -&gt; dict[str, Any]:
+    return {
+        &#34;task_id&#34;: self.task_id,
+        &#34;success&#34;: self.success,
+        &#34;error&#34;: self.error,
+        &#34;duration_ms&#34;: round(self.duration_ms, 1),
+    }</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="atomik_sdk.pipeline.parallel" href="index.html">atomik_sdk.pipeline.parallel</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="atomik_sdk.pipeline.parallel.executor.ExecutionResult" href="#atomik_sdk.pipeline.parallel.executor.ExecutionResult">ExecutionResult</a></code></h4>
+<ul class="two-column">
+<li><code><a title="atomik_sdk.pipeline.parallel.executor.ExecutionResult.all_success" href="#atomik_sdk.pipeline.parallel.executor.ExecutionResult.all_success">all_success</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.parallel.executor.ExecutionResult.failures" href="#atomik_sdk.pipeline.parallel.executor.ExecutionResult.failures">failures</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.parallel.executor.ExecutionResult.parallel_speedup" href="#atomik_sdk.pipeline.parallel.executor.ExecutionResult.parallel_speedup">parallel_speedup</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.parallel.executor.ExecutionResult.results" href="#atomik_sdk.pipeline.parallel.executor.ExecutionResult.results">results</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.parallel.executor.ExecutionResult.to_dict" href="#atomik_sdk.pipeline.parallel.executor.ExecutionResult.to_dict">to_dict</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.parallel.executor.ExecutionResult.total_time_ms" href="#atomik_sdk.pipeline.parallel.executor.ExecutionResult.total_time_ms">total_time_ms</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.pipeline.parallel.executor.ParallelExecutor" href="#atomik_sdk.pipeline.parallel.executor.ParallelExecutor">ParallelExecutor</a></code></h4>
+<ul class="">
+<li><code><a title="atomik_sdk.pipeline.parallel.executor.ParallelExecutor.execute" href="#atomik_sdk.pipeline.parallel.executor.ParallelExecutor.execute">execute</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.parallel.executor.ParallelExecutor.execute_sequential" href="#atomik_sdk.pipeline.parallel.executor.ParallelExecutor.execute_sequential">execute_sequential</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.pipeline.parallel.executor.TaskResult" href="#atomik_sdk.pipeline.parallel.executor.TaskResult">TaskResult</a></code></h4>
+<ul class="two-column">
+<li><code><a title="atomik_sdk.pipeline.parallel.executor.TaskResult.duration_ms" href="#atomik_sdk.pipeline.parallel.executor.TaskResult.duration_ms">duration_ms</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.parallel.executor.TaskResult.error" href="#atomik_sdk.pipeline.parallel.executor.TaskResult.error">error</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.parallel.executor.TaskResult.result" href="#atomik_sdk.pipeline.parallel.executor.TaskResult.result">result</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.parallel.executor.TaskResult.success" href="#atomik_sdk.pipeline.parallel.executor.TaskResult.success">success</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.parallel.executor.TaskResult.task_id" href="#atomik_sdk.pipeline.parallel.executor.TaskResult.task_id">task_id</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.parallel.executor.TaskResult.to_dict" href="#atomik_sdk.pipeline.parallel.executor.TaskResult.to_dict">to_dict</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+</body>
+</html>

@@ -1,0 +1,468 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
+<title>atomik_sdk.pipeline.agents.prompt_cache API documentation</title>
+<meta name="description" content="Prompt Cache …">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>atomik_sdk.pipeline.agents.prompt_cache</code></h1>
+</header>
+<section id="section-intro">
+<p>Prompt Cache</p>
+<p>Caches prompt content with TTL-based and schema-aware invalidation.
+Reduces input tokens for repeated schema processing.</p>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="atomik_sdk.pipeline.agents.prompt_cache.CacheEntry"><code class="flex name class">
+<span>class <span class="ident">CacheEntry</span></span>
+<span>(</span><span>key: str,<br>content: str,<br>schema_hash: str,<br>created_at: float,<br>ttl_seconds: float,<br>hit_count: int = 0)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass
+class CacheEntry:
+    &#34;&#34;&#34;A cached prompt entry.&#34;&#34;&#34;
+    key: str
+    content: str
+    schema_hash: str
+    created_at: float
+    ttl_seconds: float
+    hit_count: int = 0
+
+    @property
+    def expired(self) -&gt; bool:
+        return time.time() &gt; self.created_at + self.ttl_seconds
+
+    def to_dict(self) -&gt; dict[str, Any]:
+        return {
+            &#34;key&#34;: self.key,
+            &#34;schema_hash&#34;: self.schema_hash,
+            &#34;created_at&#34;: self.created_at,
+            &#34;ttl_seconds&#34;: self.ttl_seconds,
+            &#34;hit_count&#34;: self.hit_count,
+            &#34;expired&#34;: self.expired,
+            &#34;content_size&#34;: len(self.content),
+        }</code></pre>
+</details>
+<div class="desc"><p>A cached prompt entry.</p></div>
+<h3>Instance variables</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.agents.prompt_cache.CacheEntry.content"><code class="name">var <span class="ident">content</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.agents.prompt_cache.CacheEntry.created_at"><code class="name">var <span class="ident">created_at</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.agents.prompt_cache.CacheEntry.expired"><code class="name">prop <span class="ident">expired</span> : bool</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def expired(self) -&gt; bool:
+    return time.time() &gt; self.created_at + self.ttl_seconds</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.agents.prompt_cache.CacheEntry.hit_count"><code class="name">var <span class="ident">hit_count</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.agents.prompt_cache.CacheEntry.key"><code class="name">var <span class="ident">key</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.agents.prompt_cache.CacheEntry.schema_hash"><code class="name">var <span class="ident">schema_hash</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.agents.prompt_cache.CacheEntry.ttl_seconds"><code class="name">var <span class="ident">ttl_seconds</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.agents.prompt_cache.CacheEntry.to_dict"><code class="name flex">
+<span>def <span class="ident">to_dict</span></span>(<span>self) ‑> dict[str, typing.Any]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_dict(self) -&gt; dict[str, Any]:
+    return {
+        &#34;key&#34;: self.key,
+        &#34;schema_hash&#34;: self.schema_hash,
+        &#34;created_at&#34;: self.created_at,
+        &#34;ttl_seconds&#34;: self.ttl_seconds,
+        &#34;hit_count&#34;: self.hit_count,
+        &#34;expired&#34;: self.expired,
+        &#34;content_size&#34;: len(self.content),
+    }</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.pipeline.agents.prompt_cache.PromptCache"><code class="flex name class">
+<span>class <span class="ident">PromptCache</span></span>
+<span>(</span><span>default_ttl: float = 900.0)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class PromptCache:
+    &#34;&#34;&#34;
+    TTL-based prompt cache with schema-aware invalidation.
+
+    Caches prompt content keyed by (task, schema_hash). Entries
+    expire after a configurable TTL or when the schema hash changes.
+
+    Example:
+        &gt;&gt;&gt; cache = PromptCache(default_ttl=900)
+        &gt;&gt;&gt; cache.put(&#34;gen_python&#34;, &#34;abc123&#34;, &#34;prompt content here&#34;)
+        &gt;&gt;&gt; hit = cache.get(&#34;gen_python&#34;, &#34;abc123&#34;)
+        &gt;&gt;&gt; assert hit == &#34;prompt content here&#34;
+    &#34;&#34;&#34;
+
+    def __init__(self, default_ttl: float = 900.0) -&gt; None:
+        self._entries: dict[str, CacheEntry] = {}
+        self._default_ttl = default_ttl
+        self._stats = {&#34;hits&#34;: 0, &#34;misses&#34;: 0}
+
+    def get(self, task: str, schema_hash: str) -&gt; str | None:
+        &#34;&#34;&#34;
+        Look up cached prompt content.
+
+        Returns None on miss, expiration, or schema hash mismatch.
+        &#34;&#34;&#34;
+        key = self._make_key(task, schema_hash)
+        entry = self._entries.get(key)
+
+        if entry is None:
+            self._stats[&#34;misses&#34;] += 1
+            return None
+
+        if entry.expired:
+            del self._entries[key]
+            self._stats[&#34;misses&#34;] += 1
+            return None
+
+        if entry.schema_hash != schema_hash:
+            del self._entries[key]
+            self._stats[&#34;misses&#34;] += 1
+            return None
+
+        entry.hit_count += 1
+        self._stats[&#34;hits&#34;] += 1
+        return entry.content
+
+    def put(
+        self,
+        task: str,
+        schema_hash: str,
+        content: str,
+        ttl: float | None = None,
+    ) -&gt; None:
+        &#34;&#34;&#34;Store prompt content in cache.&#34;&#34;&#34;
+        key = self._make_key(task, schema_hash)
+        self._entries[key] = CacheEntry(
+            key=key,
+            content=content,
+            schema_hash=schema_hash,
+            created_at=time.time(),
+            ttl_seconds=ttl or self._default_ttl,
+        )
+
+    def invalidate_schema(self, schema_hash: str) -&gt; int:
+        &#34;&#34;&#34;Invalidate all entries for a schema. Returns count removed.&#34;&#34;&#34;
+        to_remove = [
+            k for k, v in self._entries.items()
+            if v.schema_hash == schema_hash
+        ]
+        for k in to_remove:
+            del self._entries[k]
+        return len(to_remove)
+
+    def clear(self) -&gt; None:
+        &#34;&#34;&#34;Clear all cached entries.&#34;&#34;&#34;
+        self._entries.clear()
+
+    def hit_rate(self) -&gt; float:
+        &#34;&#34;&#34;Compute cache hit rate percentage.&#34;&#34;&#34;
+        total = self._stats[&#34;hits&#34;] + self._stats[&#34;misses&#34;]
+        if total == 0:
+            return 0.0
+        return 100.0 * self._stats[&#34;hits&#34;] / total
+
+    def get_stats(self) -&gt; dict[str, Any]:
+        &#34;&#34;&#34;Get cache statistics.&#34;&#34;&#34;
+        self._evict_expired()
+        return {
+            &#34;entries&#34;: len(self._entries),
+            &#34;hits&#34;: self._stats[&#34;hits&#34;],
+            &#34;misses&#34;: self._stats[&#34;misses&#34;],
+            &#34;hit_rate_pct&#34;: round(self.hit_rate(), 1),
+            &#34;total_content_bytes&#34;: sum(
+                len(e.content) for e in self._entries.values()
+            ),
+        }
+
+    def _make_key(self, task: str, schema_hash: str) -&gt; str:
+        &#34;&#34;&#34;Create a cache key from task and schema hash.&#34;&#34;&#34;
+        return f&#34;{task}:{schema_hash[:16]}&#34;
+
+    def _evict_expired(self) -&gt; int:
+        &#34;&#34;&#34;Remove expired entries. Returns count removed.&#34;&#34;&#34;
+        expired = [k for k, v in self._entries.items() if v.expired]
+        for k in expired:
+            del self._entries[k]
+        return len(expired)</code></pre>
+</details>
+<div class="desc"><p>TTL-based prompt cache with schema-aware invalidation.</p>
+<p>Caches prompt content keyed by (task, schema_hash). Entries
+expire after a configurable TTL or when the schema hash changes.</p>
+<h2 id="example">Example</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; cache = PromptCache(default_ttl=900)
+&gt;&gt;&gt; cache.put(&quot;gen_python&quot;, &quot;abc123&quot;, &quot;prompt content here&quot;)
+&gt;&gt;&gt; hit = cache.get(&quot;gen_python&quot;, &quot;abc123&quot;)
+&gt;&gt;&gt; assert hit == &quot;prompt content here&quot;
+</code></pre></div>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.agents.prompt_cache.PromptCache.clear"><code class="name flex">
+<span>def <span class="ident">clear</span></span>(<span>self) ‑> None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def clear(self) -&gt; None:
+    &#34;&#34;&#34;Clear all cached entries.&#34;&#34;&#34;
+    self._entries.clear()</code></pre>
+</details>
+<div class="desc"><p>Clear all cached entries.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.agents.prompt_cache.PromptCache.get"><code class="name flex">
+<span>def <span class="ident">get</span></span>(<span>self, task: str, schema_hash: str) ‑> str | None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get(self, task: str, schema_hash: str) -&gt; str | None:
+    &#34;&#34;&#34;
+    Look up cached prompt content.
+
+    Returns None on miss, expiration, or schema hash mismatch.
+    &#34;&#34;&#34;
+    key = self._make_key(task, schema_hash)
+    entry = self._entries.get(key)
+
+    if entry is None:
+        self._stats[&#34;misses&#34;] += 1
+        return None
+
+    if entry.expired:
+        del self._entries[key]
+        self._stats[&#34;misses&#34;] += 1
+        return None
+
+    if entry.schema_hash != schema_hash:
+        del self._entries[key]
+        self._stats[&#34;misses&#34;] += 1
+        return None
+
+    entry.hit_count += 1
+    self._stats[&#34;hits&#34;] += 1
+    return entry.content</code></pre>
+</details>
+<div class="desc"><p>Look up cached prompt content.</p>
+<p>Returns None on miss, expiration, or schema hash mismatch.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.agents.prompt_cache.PromptCache.get_stats"><code class="name flex">
+<span>def <span class="ident">get_stats</span></span>(<span>self) ‑> dict[str, typing.Any]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_stats(self) -&gt; dict[str, Any]:
+    &#34;&#34;&#34;Get cache statistics.&#34;&#34;&#34;
+    self._evict_expired()
+    return {
+        &#34;entries&#34;: len(self._entries),
+        &#34;hits&#34;: self._stats[&#34;hits&#34;],
+        &#34;misses&#34;: self._stats[&#34;misses&#34;],
+        &#34;hit_rate_pct&#34;: round(self.hit_rate(), 1),
+        &#34;total_content_bytes&#34;: sum(
+            len(e.content) for e in self._entries.values()
+        ),
+    }</code></pre>
+</details>
+<div class="desc"><p>Get cache statistics.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.agents.prompt_cache.PromptCache.hit_rate"><code class="name flex">
+<span>def <span class="ident">hit_rate</span></span>(<span>self) ‑> float</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def hit_rate(self) -&gt; float:
+    &#34;&#34;&#34;Compute cache hit rate percentage.&#34;&#34;&#34;
+    total = self._stats[&#34;hits&#34;] + self._stats[&#34;misses&#34;]
+    if total == 0:
+        return 0.0
+    return 100.0 * self._stats[&#34;hits&#34;] / total</code></pre>
+</details>
+<div class="desc"><p>Compute cache hit rate percentage.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.agents.prompt_cache.PromptCache.invalidate_schema"><code class="name flex">
+<span>def <span class="ident">invalidate_schema</span></span>(<span>self, schema_hash: str) ‑> int</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def invalidate_schema(self, schema_hash: str) -&gt; int:
+    &#34;&#34;&#34;Invalidate all entries for a schema. Returns count removed.&#34;&#34;&#34;
+    to_remove = [
+        k for k, v in self._entries.items()
+        if v.schema_hash == schema_hash
+    ]
+    for k in to_remove:
+        del self._entries[k]
+    return len(to_remove)</code></pre>
+</details>
+<div class="desc"><p>Invalidate all entries for a schema. Returns count removed.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.agents.prompt_cache.PromptCache.put"><code class="name flex">
+<span>def <span class="ident">put</span></span>(<span>self, task: str, schema_hash: str, content: str, ttl: float | None = None) ‑> None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def put(
+    self,
+    task: str,
+    schema_hash: str,
+    content: str,
+    ttl: float | None = None,
+) -&gt; None:
+    &#34;&#34;&#34;Store prompt content in cache.&#34;&#34;&#34;
+    key = self._make_key(task, schema_hash)
+    self._entries[key] = CacheEntry(
+        key=key,
+        content=content,
+        schema_hash=schema_hash,
+        created_at=time.time(),
+        ttl_seconds=ttl or self._default_ttl,
+    )</code></pre>
+</details>
+<div class="desc"><p>Store prompt content in cache.</p></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="atomik_sdk.pipeline.agents" href="index.html">atomik_sdk.pipeline.agents</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="atomik_sdk.pipeline.agents.prompt_cache.CacheEntry" href="#atomik_sdk.pipeline.agents.prompt_cache.CacheEntry">CacheEntry</a></code></h4>
+<ul class="two-column">
+<li><code><a title="atomik_sdk.pipeline.agents.prompt_cache.CacheEntry.content" href="#atomik_sdk.pipeline.agents.prompt_cache.CacheEntry.content">content</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.agents.prompt_cache.CacheEntry.created_at" href="#atomik_sdk.pipeline.agents.prompt_cache.CacheEntry.created_at">created_at</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.agents.prompt_cache.CacheEntry.expired" href="#atomik_sdk.pipeline.agents.prompt_cache.CacheEntry.expired">expired</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.agents.prompt_cache.CacheEntry.hit_count" href="#atomik_sdk.pipeline.agents.prompt_cache.CacheEntry.hit_count">hit_count</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.agents.prompt_cache.CacheEntry.key" href="#atomik_sdk.pipeline.agents.prompt_cache.CacheEntry.key">key</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.agents.prompt_cache.CacheEntry.schema_hash" href="#atomik_sdk.pipeline.agents.prompt_cache.CacheEntry.schema_hash">schema_hash</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.agents.prompt_cache.CacheEntry.to_dict" href="#atomik_sdk.pipeline.agents.prompt_cache.CacheEntry.to_dict">to_dict</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.agents.prompt_cache.CacheEntry.ttl_seconds" href="#atomik_sdk.pipeline.agents.prompt_cache.CacheEntry.ttl_seconds">ttl_seconds</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.pipeline.agents.prompt_cache.PromptCache" href="#atomik_sdk.pipeline.agents.prompt_cache.PromptCache">PromptCache</a></code></h4>
+<ul class="two-column">
+<li><code><a title="atomik_sdk.pipeline.agents.prompt_cache.PromptCache.clear" href="#atomik_sdk.pipeline.agents.prompt_cache.PromptCache.clear">clear</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.agents.prompt_cache.PromptCache.get" href="#atomik_sdk.pipeline.agents.prompt_cache.PromptCache.get">get</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.agents.prompt_cache.PromptCache.get_stats" href="#atomik_sdk.pipeline.agents.prompt_cache.PromptCache.get_stats">get_stats</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.agents.prompt_cache.PromptCache.hit_rate" href="#atomik_sdk.pipeline.agents.prompt_cache.PromptCache.hit_rate">hit_rate</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.agents.prompt_cache.PromptCache.invalidate_schema" href="#atomik_sdk.pipeline.agents.prompt_cache.PromptCache.invalidate_schema">invalidate_schema</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.agents.prompt_cache.PromptCache.put" href="#atomik_sdk.pipeline.agents.prompt_cache.PromptCache.put">put</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+</body>
+</html>

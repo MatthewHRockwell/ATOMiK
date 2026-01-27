@@ -1,0 +1,580 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
+<title>atomik_sdk.tests.test_pipeline_controller API documentation</title>
+<meta name="description" content="Tests for ATOMiK Pipeline Controller …">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>atomik_sdk.tests.test_pipeline_controller</code></h1>
+</header>
+<section id="section-intro">
+<p>Tests for ATOMiK Pipeline Controller</p>
+<p>Tests cover:
+- Pipeline creation and configuration
+- Stage registration and ordering
+- End-to-end pipeline execution on domain schemas
+- Dry run mode
+- Batch processing
+- Token budget enforcement
+- Pipeline status reporting</p>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="atomik_sdk.tests.test_pipeline_controller.domain_schema_path"><code class="name flex">
+<span>def <span class="ident">domain_schema_path</span></span>(<span>project_root)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@pytest.fixture
+def domain_schema_path(project_root):
+    return project_root / &#34;sdk&#34; / &#34;schemas&#34; / &#34;domains&#34; / &#34;video-h264-delta.json&#34;</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.tests.test_pipeline_controller.domain_schemas_dir"><code class="name flex">
+<span>def <span class="ident">domain_schemas_dir</span></span>(<span>project_root)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@pytest.fixture
+def domain_schemas_dir(project_root):
+    return project_root / &#34;sdk&#34; / &#34;schemas&#34; / &#34;domains&#34;</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.tests.test_pipeline_controller.example_schema_path"><code class="name flex">
+<span>def <span class="ident">example_schema_path</span></span>(<span>project_root)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@pytest.fixture
+def example_schema_path(project_root):
+    return project_root / &#34;sdk&#34; / &#34;schemas&#34; / &#34;examples&#34; / &#34;terminal-io.json&#34;</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.tests.test_pipeline_controller.pipeline_with_stages"><code class="name flex">
+<span>def <span class="ident">pipeline_with_stages</span></span>(<span>tmp_path)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@pytest.fixture
+def pipeline_with_stages(tmp_path):
+    &#34;&#34;&#34;Pipeline with all stages registered and temp output.&#34;&#34;&#34;
+    config = PipelineConfig(
+        output_dir=str(tmp_path / &#34;generated&#34;),
+        checkpoint_dir=str(tmp_path / &#34;.atomik&#34;),
+        metrics_csv=str(tmp_path / &#34;.atomik&#34; / &#34;metrics.csv&#34;),
+        verbose=False,
+    )
+    pipeline = Pipeline(config)
+    pipeline.register_stage(ValidateStage())
+    pipeline.register_stage(DiffStage())
+    pipeline.register_stage(GenerateStage())
+    pipeline.register_stage(VerifyStage())
+    pipeline.register_stage(HardwareStage())
+    pipeline.register_stage(MetricsStage())
+    return pipeline</code></pre>
+</details>
+<div class="desc"><p>Pipeline with all stages registered and temp output.</p></div>
+</dd>
+<dt id="atomik_sdk.tests.test_pipeline_controller.project_root"><code class="name flex">
+<span>def <span class="ident">project_root</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@pytest.fixture
+def project_root():
+    return Path(__file__).parent.parent.parent.parent</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="atomik_sdk.tests.test_pipeline_controller.TestPipeline"><code class="flex name class">
+<span>class <span class="ident">TestPipeline</span></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class TestPipeline:
+    def test_create_pipeline(self):
+        pipeline = Pipeline()
+        assert pipeline.config is not None
+        assert pipeline._stages == {}
+
+    def test_register_stages(self):
+        pipeline = Pipeline()
+        pipeline.register_stage(ValidateStage())
+        pipeline.register_stage(DiffStage())
+        assert &#34;validate&#34; in pipeline._stages
+        assert &#34;diff&#34; in pipeline._stages
+
+    def test_run_nonexistent_schema(self):
+        pipeline = Pipeline()
+        result = pipeline.run(&#34;/nonexistent/path.json&#34;)
+        assert not result.success
+        assert any(&#34;load failed&#34; in e.lower() for e in result.errors)
+
+    def test_run_domain_schema(self, pipeline_with_stages, domain_schema_path):
+        if not domain_schema_path.exists():
+            pytest.skip(&#34;Domain schema not found&#34;)
+        result = pipeline_with_stages.run(domain_schema_path)
+        assert result.schema == domain_schema_path.name
+        assert result.total_time_ms &gt; 0
+        assert len(result.stages) &gt; 0
+
+    def test_run_example_schema(self, pipeline_with_stages, example_schema_path):
+        if not example_schema_path.exists():
+            pytest.skip(&#34;Example schema not found&#34;)
+        result = pipeline_with_stages.run(example_schema_path)
+        assert result.schema == example_schema_path.name
+
+    def test_dry_run(self, domain_schema_path, tmp_path):
+        if not domain_schema_path.exists():
+            pytest.skip(&#34;Domain schema not found&#34;)
+        config = PipelineConfig(
+            output_dir=str(tmp_path / &#34;generated&#34;),
+            dry_run=True,
+        )
+        pipeline = Pipeline(config)
+        pipeline.register_stage(ValidateStage())
+        result = pipeline.run(domain_schema_path)
+        assert result.files_generated == 0
+
+    def test_batch_processing(self, pipeline_with_stages, domain_schemas_dir):
+        if not domain_schemas_dir.exists():
+            pytest.skip(&#34;Domain schemas directory not found&#34;)
+        results = pipeline_with_stages.run_batch(domain_schemas_dir)
+        assert len(results) &gt;= 1
+
+    def test_get_status(self, pipeline_with_stages):
+        status = pipeline_with_stages.get_status()
+        assert &#34;total_runs&#34; in status
+        assert &#34;stages_registered&#34; in status
+        assert len(status[&#34;stages_registered&#34;]) == 6
+
+    def test_token_budget_enforcement(self, tmp_path):
+        &#34;&#34;&#34;Pipeline should respect token budget limits.&#34;&#34;&#34;
+        config = PipelineConfig(
+            output_dir=str(tmp_path / &#34;generated&#34;),
+            checkpoint_dir=str(tmp_path / &#34;.atomik&#34;),
+            token_budget=0,  # Zero budget
+        )
+        pipeline = Pipeline(config)
+        pipeline.register_stage(ValidateStage())
+        # With 0 budget, should still run local stages (0 tokens)
+        # This tests the budget check mechanism exists
+        assert config.token_budget == 0</code></pre>
+</details>
+<div class="desc"></div>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.tests.test_pipeline_controller.TestPipeline.test_batch_processing"><code class="name flex">
+<span>def <span class="ident">test_batch_processing</span></span>(<span>self, pipeline_with_stages, domain_schemas_dir)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_batch_processing(self, pipeline_with_stages, domain_schemas_dir):
+    if not domain_schemas_dir.exists():
+        pytest.skip(&#34;Domain schemas directory not found&#34;)
+    results = pipeline_with_stages.run_batch(domain_schemas_dir)
+    assert len(results) &gt;= 1</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.tests.test_pipeline_controller.TestPipeline.test_create_pipeline"><code class="name flex">
+<span>def <span class="ident">test_create_pipeline</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_create_pipeline(self):
+    pipeline = Pipeline()
+    assert pipeline.config is not None
+    assert pipeline._stages == {}</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.tests.test_pipeline_controller.TestPipeline.test_dry_run"><code class="name flex">
+<span>def <span class="ident">test_dry_run</span></span>(<span>self, domain_schema_path, tmp_path)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_dry_run(self, domain_schema_path, tmp_path):
+    if not domain_schema_path.exists():
+        pytest.skip(&#34;Domain schema not found&#34;)
+    config = PipelineConfig(
+        output_dir=str(tmp_path / &#34;generated&#34;),
+        dry_run=True,
+    )
+    pipeline = Pipeline(config)
+    pipeline.register_stage(ValidateStage())
+    result = pipeline.run(domain_schema_path)
+    assert result.files_generated == 0</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.tests.test_pipeline_controller.TestPipeline.test_get_status"><code class="name flex">
+<span>def <span class="ident">test_get_status</span></span>(<span>self, pipeline_with_stages)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_get_status(self, pipeline_with_stages):
+    status = pipeline_with_stages.get_status()
+    assert &#34;total_runs&#34; in status
+    assert &#34;stages_registered&#34; in status
+    assert len(status[&#34;stages_registered&#34;]) == 6</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.tests.test_pipeline_controller.TestPipeline.test_register_stages"><code class="name flex">
+<span>def <span class="ident">test_register_stages</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_register_stages(self):
+    pipeline = Pipeline()
+    pipeline.register_stage(ValidateStage())
+    pipeline.register_stage(DiffStage())
+    assert &#34;validate&#34; in pipeline._stages
+    assert &#34;diff&#34; in pipeline._stages</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.tests.test_pipeline_controller.TestPipeline.test_run_domain_schema"><code class="name flex">
+<span>def <span class="ident">test_run_domain_schema</span></span>(<span>self, pipeline_with_stages, domain_schema_path)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_run_domain_schema(self, pipeline_with_stages, domain_schema_path):
+    if not domain_schema_path.exists():
+        pytest.skip(&#34;Domain schema not found&#34;)
+    result = pipeline_with_stages.run(domain_schema_path)
+    assert result.schema == domain_schema_path.name
+    assert result.total_time_ms &gt; 0
+    assert len(result.stages) &gt; 0</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.tests.test_pipeline_controller.TestPipeline.test_run_example_schema"><code class="name flex">
+<span>def <span class="ident">test_run_example_schema</span></span>(<span>self, pipeline_with_stages, example_schema_path)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_run_example_schema(self, pipeline_with_stages, example_schema_path):
+    if not example_schema_path.exists():
+        pytest.skip(&#34;Example schema not found&#34;)
+    result = pipeline_with_stages.run(example_schema_path)
+    assert result.schema == example_schema_path.name</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.tests.test_pipeline_controller.TestPipeline.test_run_nonexistent_schema"><code class="name flex">
+<span>def <span class="ident">test_run_nonexistent_schema</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_run_nonexistent_schema(self):
+    pipeline = Pipeline()
+    result = pipeline.run(&#34;/nonexistent/path.json&#34;)
+    assert not result.success
+    assert any(&#34;load failed&#34; in e.lower() for e in result.errors)</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.tests.test_pipeline_controller.TestPipeline.test_token_budget_enforcement"><code class="name flex">
+<span>def <span class="ident">test_token_budget_enforcement</span></span>(<span>self, tmp_path)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_token_budget_enforcement(self, tmp_path):
+    &#34;&#34;&#34;Pipeline should respect token budget limits.&#34;&#34;&#34;
+    config = PipelineConfig(
+        output_dir=str(tmp_path / &#34;generated&#34;),
+        checkpoint_dir=str(tmp_path / &#34;.atomik&#34;),
+        token_budget=0,  # Zero budget
+    )
+    pipeline = Pipeline(config)
+    pipeline.register_stage(ValidateStage())
+    # With 0 budget, should still run local stages (0 tokens)
+    # This tests the budget check mechanism exists
+    assert config.token_budget == 0</code></pre>
+</details>
+<div class="desc"><p>Pipeline should respect token budget limits.</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.tests.test_pipeline_controller.TestPipelineConfig"><code class="flex name class">
+<span>class <span class="ident">TestPipelineConfig</span></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class TestPipelineConfig:
+    def test_default_config(self):
+        config = PipelineConfig()
+        assert config.output_dir == &#34;generated&#34;
+        assert config.verbose is False
+        assert config.sim_only is False
+        assert config.token_budget is None
+
+    def test_custom_config(self):
+        config = PipelineConfig(
+            output_dir=&#34;/tmp/out&#34;,
+            verbose=True,
+            sim_only=True,
+            token_budget=15000,
+        )
+        assert config.output_dir == &#34;/tmp/out&#34;
+        assert config.verbose is True
+        assert config.token_budget == 15000</code></pre>
+</details>
+<div class="desc"></div>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.tests.test_pipeline_controller.TestPipelineConfig.test_custom_config"><code class="name flex">
+<span>def <span class="ident">test_custom_config</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_custom_config(self):
+    config = PipelineConfig(
+        output_dir=&#34;/tmp/out&#34;,
+        verbose=True,
+        sim_only=True,
+        token_budget=15000,
+    )
+    assert config.output_dir == &#34;/tmp/out&#34;
+    assert config.verbose is True
+    assert config.token_budget == 15000</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.tests.test_pipeline_controller.TestPipelineConfig.test_default_config"><code class="name flex">
+<span>def <span class="ident">test_default_config</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_default_config(self):
+    config = PipelineConfig()
+    assert config.output_dir == &#34;generated&#34;
+    assert config.verbose is False
+    assert config.sim_only is False
+    assert config.token_budget is None</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.tests.test_pipeline_controller.TestPipelineResult"><code class="flex name class">
+<span>class <span class="ident">TestPipelineResult</span></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class TestPipelineResult:
+    def test_result_to_dict(self):
+        result = PipelineResult(schema=&#34;test.json&#34;, success=True)
+        d = result.to_dict()
+        assert d[&#34;schema&#34;] == &#34;test.json&#34;
+        assert d[&#34;success&#34;] is True
+        assert d[&#34;total_tokens&#34;] == 0
+
+    def test_failed_result(self):
+        result = PipelineResult(
+            schema=&#34;test.json&#34;, success=False, errors=[&#34;validation failed&#34;]
+        )
+        assert not result.success
+        assert len(result.errors) == 1</code></pre>
+</details>
+<div class="desc"></div>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.tests.test_pipeline_controller.TestPipelineResult.test_failed_result"><code class="name flex">
+<span>def <span class="ident">test_failed_result</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_failed_result(self):
+    result = PipelineResult(
+        schema=&#34;test.json&#34;, success=False, errors=[&#34;validation failed&#34;]
+    )
+    assert not result.success
+    assert len(result.errors) == 1</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.tests.test_pipeline_controller.TestPipelineResult.test_result_to_dict"><code class="name flex">
+<span>def <span class="ident">test_result_to_dict</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_result_to_dict(self):
+    result = PipelineResult(schema=&#34;test.json&#34;, success=True)
+    d = result.to_dict()
+    assert d[&#34;schema&#34;] == &#34;test.json&#34;
+    assert d[&#34;success&#34;] is True
+    assert d[&#34;total_tokens&#34;] == 0</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="atomik_sdk.tests" href="index.html">atomik_sdk.tests</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="atomik_sdk.tests.test_pipeline_controller.domain_schema_path" href="#atomik_sdk.tests.test_pipeline_controller.domain_schema_path">domain_schema_path</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_pipeline_controller.domain_schemas_dir" href="#atomik_sdk.tests.test_pipeline_controller.domain_schemas_dir">domain_schemas_dir</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_pipeline_controller.example_schema_path" href="#atomik_sdk.tests.test_pipeline_controller.example_schema_path">example_schema_path</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_pipeline_controller.pipeline_with_stages" href="#atomik_sdk.tests.test_pipeline_controller.pipeline_with_stages">pipeline_with_stages</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_pipeline_controller.project_root" href="#atomik_sdk.tests.test_pipeline_controller.project_root">project_root</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="atomik_sdk.tests.test_pipeline_controller.TestPipeline" href="#atomik_sdk.tests.test_pipeline_controller.TestPipeline">TestPipeline</a></code></h4>
+<ul class="">
+<li><code><a title="atomik_sdk.tests.test_pipeline_controller.TestPipeline.test_batch_processing" href="#atomik_sdk.tests.test_pipeline_controller.TestPipeline.test_batch_processing">test_batch_processing</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_pipeline_controller.TestPipeline.test_create_pipeline" href="#atomik_sdk.tests.test_pipeline_controller.TestPipeline.test_create_pipeline">test_create_pipeline</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_pipeline_controller.TestPipeline.test_dry_run" href="#atomik_sdk.tests.test_pipeline_controller.TestPipeline.test_dry_run">test_dry_run</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_pipeline_controller.TestPipeline.test_get_status" href="#atomik_sdk.tests.test_pipeline_controller.TestPipeline.test_get_status">test_get_status</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_pipeline_controller.TestPipeline.test_register_stages" href="#atomik_sdk.tests.test_pipeline_controller.TestPipeline.test_register_stages">test_register_stages</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_pipeline_controller.TestPipeline.test_run_domain_schema" href="#atomik_sdk.tests.test_pipeline_controller.TestPipeline.test_run_domain_schema">test_run_domain_schema</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_pipeline_controller.TestPipeline.test_run_example_schema" href="#atomik_sdk.tests.test_pipeline_controller.TestPipeline.test_run_example_schema">test_run_example_schema</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_pipeline_controller.TestPipeline.test_run_nonexistent_schema" href="#atomik_sdk.tests.test_pipeline_controller.TestPipeline.test_run_nonexistent_schema">test_run_nonexistent_schema</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_pipeline_controller.TestPipeline.test_token_budget_enforcement" href="#atomik_sdk.tests.test_pipeline_controller.TestPipeline.test_token_budget_enforcement">test_token_budget_enforcement</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.tests.test_pipeline_controller.TestPipelineConfig" href="#atomik_sdk.tests.test_pipeline_controller.TestPipelineConfig">TestPipelineConfig</a></code></h4>
+<ul class="">
+<li><code><a title="atomik_sdk.tests.test_pipeline_controller.TestPipelineConfig.test_custom_config" href="#atomik_sdk.tests.test_pipeline_controller.TestPipelineConfig.test_custom_config">test_custom_config</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_pipeline_controller.TestPipelineConfig.test_default_config" href="#atomik_sdk.tests.test_pipeline_controller.TestPipelineConfig.test_default_config">test_default_config</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.tests.test_pipeline_controller.TestPipelineResult" href="#atomik_sdk.tests.test_pipeline_controller.TestPipelineResult">TestPipelineResult</a></code></h4>
+<ul class="">
+<li><code><a title="atomik_sdk.tests.test_pipeline_controller.TestPipelineResult.test_failed_result" href="#atomik_sdk.tests.test_pipeline_controller.TestPipelineResult.test_failed_result">test_failed_result</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_pipeline_controller.TestPipelineResult.test_result_to_dict" href="#atomik_sdk.tests.test_pipeline_controller.TestPipelineResult.test_result_to_dict">test_result_to_dict</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+</body>
+</html>

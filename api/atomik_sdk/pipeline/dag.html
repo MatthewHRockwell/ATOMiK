@@ -1,0 +1,1011 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
+<title>atomik_sdk.pipeline.dag API documentation</title>
+<meta name="description" content="Task DAG Builder …">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>atomik_sdk.pipeline.dag</code></h1>
+</header>
+<section id="section-intro">
+<p>Task DAG Builder</p>
+<p>Builds a directed acyclic graph of pipeline tasks with dependency
+tracking, cycle detection, topological ordering, and critical path
+analysis. Tasks declare their dependencies explicitly; the DAG
+enforces execution ordering.</p>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="atomik_sdk.pipeline.dag.CycleError"><code class="flex name class">
+<span>class <span class="ident">CycleError</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class CycleError(Exception):
+    &#34;&#34;&#34;Raised when a cycle is detected in the task DAG.&#34;&#34;&#34;</code></pre>
+</details>
+<div class="desc"><p>Raised when a cycle is detected in the task DAG.</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="atomik_sdk.pipeline.dag.DAGTask"><code class="flex name class">
+<span>class <span class="ident">DAGTask</span></span>
+<span>(</span><span>task_id: str,<br>task_type: str,<br>dependencies: list[str] = &lt;factory&gt;,<br>state: <a title="atomik_sdk.pipeline.dag.TaskState" href="#atomik_sdk.pipeline.dag.TaskState">TaskState</a> = TaskState.PENDING,<br>metadata: dict[str, Any] = &lt;factory&gt;,<br>estimated_tokens: int = 0,<br>result: dict[str, Any] | None = None)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass
+class DAGTask:
+    &#34;&#34;&#34;A node in the task DAG.&#34;&#34;&#34;
+    task_id: str
+    task_type: str
+    dependencies: list[str] = field(default_factory=list)
+    state: TaskState = TaskState.PENDING
+    metadata: dict[str, Any] = field(default_factory=dict)
+    estimated_tokens: int = 0
+    result: dict[str, Any] | None = None
+
+    @property
+    def is_terminal(self) -&gt; bool:
+        return self.state in (TaskState.COMPLETED, TaskState.FAILED, TaskState.SKIPPED)
+
+    def to_dict(self) -&gt; dict[str, Any]:
+        return {
+            &#34;task_id&#34;: self.task_id,
+            &#34;task_type&#34;: self.task_type,
+            &#34;dependencies&#34;: self.dependencies,
+            &#34;state&#34;: self.state.value,
+            &#34;estimated_tokens&#34;: self.estimated_tokens,
+            &#34;metadata&#34;: self.metadata,
+        }</code></pre>
+</details>
+<div class="desc"><p>A node in the task DAG.</p></div>
+<h3>Instance variables</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.dag.DAGTask.dependencies"><code class="name">var <span class="ident">dependencies</span> : list[str]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.dag.DAGTask.estimated_tokens"><code class="name">var <span class="ident">estimated_tokens</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.dag.DAGTask.is_terminal"><code class="name">prop <span class="ident">is_terminal</span> : bool</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def is_terminal(self) -&gt; bool:
+    return self.state in (TaskState.COMPLETED, TaskState.FAILED, TaskState.SKIPPED)</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.dag.DAGTask.metadata"><code class="name">var <span class="ident">metadata</span> : dict[str, typing.Any]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.dag.DAGTask.result"><code class="name">var <span class="ident">result</span> : dict[str, typing.Any] | None</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.dag.DAGTask.state"><code class="name">var <span class="ident">state</span> : <a title="atomik_sdk.pipeline.dag.TaskState" href="#atomik_sdk.pipeline.dag.TaskState">TaskState</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.dag.DAGTask.task_id"><code class="name">var <span class="ident">task_id</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.dag.DAGTask.task_type"><code class="name">var <span class="ident">task_type</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.dag.DAGTask.to_dict"><code class="name flex">
+<span>def <span class="ident">to_dict</span></span>(<span>self) ‑> dict[str, typing.Any]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_dict(self) -&gt; dict[str, Any]:
+    return {
+        &#34;task_id&#34;: self.task_id,
+        &#34;task_type&#34;: self.task_type,
+        &#34;dependencies&#34;: self.dependencies,
+        &#34;state&#34;: self.state.value,
+        &#34;estimated_tokens&#34;: self.estimated_tokens,
+        &#34;metadata&#34;: self.metadata,
+    }</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.pipeline.dag.TaskDAG"><code class="flex name class">
+<span>class <span class="ident">TaskDAG</span></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class TaskDAG:
+    &#34;&#34;&#34;
+    Directed acyclic graph of pipeline tasks.
+
+    Provides:
+    - Task registration with explicit dependencies
+    - Cycle detection at construction time
+    - Topological ordering for sequential fallback
+    - Ready-task discovery for parallel dispatch
+    - Critical path analysis for budget estimation
+
+    Example:
+        &gt;&gt;&gt; dag = TaskDAG()
+        &gt;&gt;&gt; dag.add_task(&#34;validate&#34;, &#34;stage&#34;)
+        &gt;&gt;&gt; dag.add_task(&#34;generate&#34;, &#34;stage&#34;, dependencies=[&#34;validate&#34;])
+        &gt;&gt;&gt; dag.add_task(&#34;verify&#34;, &#34;stage&#34;, dependencies=[&#34;generate&#34;])
+        &gt;&gt;&gt; ready = dag.get_ready_tasks()
+        &gt;&gt;&gt; assert [t.task_id for t in ready] == [&#34;validate&#34;]
+    &#34;&#34;&#34;
+
+    def __init__(self) -&gt; None:
+        self._tasks: dict[str, DAGTask] = {}
+
+    def add_task(
+        self,
+        task_id: str,
+        task_type: str,
+        dependencies: list[str] | None = None,
+        estimated_tokens: int = 0,
+        metadata: dict[str, Any] | None = None,
+    ) -&gt; DAGTask:
+        &#34;&#34;&#34;
+        Add a task to the DAG.
+
+        Args:
+            task_id: Unique identifier for this task.
+            task_type: Type of task (e.g., &#34;stage&#34;, &#34;generation&#34;, &#34;verification&#34;).
+            dependencies: List of task IDs that must complete before this task.
+            estimated_tokens: Estimated token cost for this task.
+            metadata: Arbitrary metadata attached to the task.
+
+        Returns:
+            The created DAGTask.
+
+        Raises:
+            CycleError: If adding this task would create a cycle.
+            ValueError: If a dependency references an unknown task.
+        &#34;&#34;&#34;
+        deps = dependencies or []
+        for dep in deps:
+            if dep not in self._tasks:
+                raise ValueError(f&#34;Unknown dependency: {dep}&#34;)
+
+        task = DAGTask(
+            task_id=task_id,
+            task_type=task_type,
+            dependencies=list(deps),
+            estimated_tokens=estimated_tokens,
+            metadata=metadata or {},
+        )
+        self._tasks[task_id] = task
+
+        # Check for cycles after adding
+        if self._has_cycle():
+            del self._tasks[task_id]
+            raise CycleError(f&#34;Adding task &#39;{task_id}&#39; would create a cycle&#34;)
+
+        return task
+
+    def get_task(self, task_id: str) -&gt; DAGTask | None:
+        &#34;&#34;&#34;Get a task by ID.&#34;&#34;&#34;
+        return self._tasks.get(task_id)
+
+    def get_all_tasks(self) -&gt; list[DAGTask]:
+        &#34;&#34;&#34;Get all tasks in insertion order.&#34;&#34;&#34;
+        return list(self._tasks.values())
+
+    def get_ready_tasks(self) -&gt; list[DAGTask]:
+        &#34;&#34;&#34;
+        Get all tasks whose dependencies are satisfied and that
+        are not yet running or complete.
+
+        Returns:
+            List of tasks ready for execution.
+        &#34;&#34;&#34;
+        ready = []
+        for task in self._tasks.values():
+            if task.state != TaskState.PENDING:
+                continue
+            deps_met = all(
+                self._tasks[dep].state in (TaskState.COMPLETED, TaskState.SKIPPED)
+                for dep in task.dependencies
+                if dep in self._tasks
+            )
+            if deps_met:
+                ready.append(task)
+        return ready
+
+    def mark_ready(self, task_id: str) -&gt; None:
+        &#34;&#34;&#34;Mark a task as ready for execution.&#34;&#34;&#34;
+        task = self._tasks.get(task_id)
+        if task and task.state == TaskState.PENDING:
+            task.state = TaskState.READY
+
+    def mark_running(self, task_id: str) -&gt; None:
+        &#34;&#34;&#34;Mark a task as currently executing.&#34;&#34;&#34;
+        task = self._tasks.get(task_id)
+        if task:
+            task.state = TaskState.RUNNING
+
+    def mark_completed(self, task_id: str, result: dict[str, Any] | None = None) -&gt; None:
+        &#34;&#34;&#34;Mark a task as successfully completed.&#34;&#34;&#34;
+        task = self._tasks.get(task_id)
+        if task:
+            task.state = TaskState.COMPLETED
+            task.result = result
+
+    def mark_failed(self, task_id: str, result: dict[str, Any] | None = None) -&gt; None:
+        &#34;&#34;&#34;Mark a task as failed.&#34;&#34;&#34;
+        task = self._tasks.get(task_id)
+        if task:
+            task.state = TaskState.FAILED
+            task.result = result
+
+    def mark_skipped(self, task_id: str) -&gt; None:
+        &#34;&#34;&#34;Mark a task as skipped.&#34;&#34;&#34;
+        task = self._tasks.get(task_id)
+        if task:
+            task.state = TaskState.SKIPPED
+
+    def is_complete(self) -&gt; bool:
+        &#34;&#34;&#34;Check if all tasks have reached a terminal state.&#34;&#34;&#34;
+        return all(t.is_terminal for t in self._tasks.values())
+
+    def has_failures(self) -&gt; bool:
+        &#34;&#34;&#34;Check if any tasks have failed.&#34;&#34;&#34;
+        return any(t.state == TaskState.FAILED for t in self._tasks.values())
+
+    def topological_order(self) -&gt; list[str]:
+        &#34;&#34;&#34;
+        Return task IDs in topological order (dependencies first).
+
+        Raises:
+            CycleError: If the graph contains a cycle.
+        &#34;&#34;&#34;
+        in_degree: dict[str, int] = {tid: 0 for tid in self._tasks}
+        for task in self._tasks.values():
+            for dep in task.dependencies:
+                if dep in in_degree:
+                    in_degree[task.task_id] = in_degree.get(task.task_id, 0)
+
+        # Compute actual in-degrees from reverse edges
+        in_degree = {tid: 0 for tid in self._tasks}
+        for task in self._tasks.values():
+            for dep in task.dependencies:
+                if dep in self._tasks:
+                    # task depends on dep, so dep -&gt; task edge
+                    # in_degree of task increases
+                    pass  # handled below
+
+        # Recompute properly: in_degree[t] = number of tasks that t depends on
+        # that haven&#39;t been processed
+        adj: dict[str, list[str]] = {tid: [] for tid in self._tasks}
+        in_degree = {tid: 0 for tid in self._tasks}
+
+        for task in self._tasks.values():
+            for dep in task.dependencies:
+                if dep in self._tasks:
+                    adj[dep].append(task.task_id)
+                    in_degree[task.task_id] += 1
+
+        queue = deque(tid for tid, deg in in_degree.items() if deg == 0)
+        order: list[str] = []
+
+        while queue:
+            tid = queue.popleft()
+            order.append(tid)
+            for neighbor in adj[tid]:
+                in_degree[neighbor] -= 1
+                if in_degree[neighbor] == 0:
+                    queue.append(neighbor)
+
+        if len(order) != len(self._tasks):
+            raise CycleError(&#34;DAG contains a cycle&#34;)
+
+        return order
+
+    def critical_path(self) -&gt; list[str]:
+        &#34;&#34;&#34;
+        Compute the critical path (longest dependency chain).
+
+        Returns:
+            List of task IDs on the critical path.
+        &#34;&#34;&#34;
+        if not self._tasks:
+            return []
+
+        order = self.topological_order()
+
+        # Compute longest path to each node
+        dist: dict[str, int] = {tid: 0 for tid in self._tasks}
+        prev: dict[str, str | None] = {tid: None for tid in self._tasks}
+
+        for tid in order:
+            task = self._tasks[tid]
+            for dep in task.dependencies:
+                if dep in dist:
+                    new_dist = dist[dep] + 1
+                    if new_dist &gt; dist[tid]:
+                        dist[tid] = new_dist
+                        prev[tid] = dep
+
+        # Find the node with maximum distance
+        end = max(dist, key=lambda t: dist[t])
+        path: list[str] = []
+        current: str | None = end
+        while current is not None:
+            path.append(current)
+            current = prev[current]
+
+        path.reverse()
+        return path
+
+    def critical_path_tokens(self) -&gt; int:
+        &#34;&#34;&#34;Estimated tokens on the critical path.&#34;&#34;&#34;
+        return sum(
+            self._tasks[tid].estimated_tokens
+            for tid in self.critical_path()
+            if tid in self._tasks
+        )
+
+    def get_dependents(self, task_id: str) -&gt; list[str]:
+        &#34;&#34;&#34;Get tasks that depend on the given task.&#34;&#34;&#34;
+        return [
+            t.task_id for t in self._tasks.values()
+            if task_id in t.dependencies
+        ]
+
+    def _has_cycle(self) -&gt; bool:
+        &#34;&#34;&#34;Detect cycles using Kahn&#39;s algorithm.&#34;&#34;&#34;
+        try:
+            self.topological_order()
+            return False
+        except CycleError:
+            return True
+
+    def summary(self) -&gt; dict[str, Any]:
+        &#34;&#34;&#34;Get a summary of the DAG state.&#34;&#34;&#34;
+        states = {}
+        for task in self._tasks.values():
+            s = task.state.value
+            states[s] = states.get(s, 0) + 1
+
+        return {
+            &#34;total_tasks&#34;: len(self._tasks),
+            &#34;states&#34;: states,
+            &#34;is_complete&#34;: self.is_complete(),
+            &#34;has_failures&#34;: self.has_failures(),
+            &#34;critical_path&#34;: self.critical_path(),
+            &#34;critical_path_tokens&#34;: self.critical_path_tokens(),
+        }</code></pre>
+</details>
+<div class="desc"><p>Directed acyclic graph of pipeline tasks.</p>
+<p>Provides:
+- Task registration with explicit dependencies
+- Cycle detection at construction time
+- Topological ordering for sequential fallback
+- Ready-task discovery for parallel dispatch
+- Critical path analysis for budget estimation</p>
+<h2 id="example">Example</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; dag = TaskDAG()
+&gt;&gt;&gt; dag.add_task(&quot;validate&quot;, &quot;stage&quot;)
+&gt;&gt;&gt; dag.add_task(&quot;generate&quot;, &quot;stage&quot;, dependencies=[&quot;validate&quot;])
+&gt;&gt;&gt; dag.add_task(&quot;verify&quot;, &quot;stage&quot;, dependencies=[&quot;generate&quot;])
+&gt;&gt;&gt; ready = dag.get_ready_tasks()
+&gt;&gt;&gt; assert [t.task_id for t in ready] == [&quot;validate&quot;]
+</code></pre></div>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.dag.TaskDAG.add_task"><code class="name flex">
+<span>def <span class="ident">add_task</span></span>(<span>self,<br>task_id: str,<br>task_type: str,<br>dependencies: list[str] | None = None,<br>estimated_tokens: int = 0,<br>metadata: dict[str, Any] | None = None) ‑> <a title="atomik_sdk.pipeline.dag.DAGTask" href="#atomik_sdk.pipeline.dag.DAGTask">DAGTask</a></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_task(
+    self,
+    task_id: str,
+    task_type: str,
+    dependencies: list[str] | None = None,
+    estimated_tokens: int = 0,
+    metadata: dict[str, Any] | None = None,
+) -&gt; DAGTask:
+    &#34;&#34;&#34;
+    Add a task to the DAG.
+
+    Args:
+        task_id: Unique identifier for this task.
+        task_type: Type of task (e.g., &#34;stage&#34;, &#34;generation&#34;, &#34;verification&#34;).
+        dependencies: List of task IDs that must complete before this task.
+        estimated_tokens: Estimated token cost for this task.
+        metadata: Arbitrary metadata attached to the task.
+
+    Returns:
+        The created DAGTask.
+
+    Raises:
+        CycleError: If adding this task would create a cycle.
+        ValueError: If a dependency references an unknown task.
+    &#34;&#34;&#34;
+    deps = dependencies or []
+    for dep in deps:
+        if dep not in self._tasks:
+            raise ValueError(f&#34;Unknown dependency: {dep}&#34;)
+
+    task = DAGTask(
+        task_id=task_id,
+        task_type=task_type,
+        dependencies=list(deps),
+        estimated_tokens=estimated_tokens,
+        metadata=metadata or {},
+    )
+    self._tasks[task_id] = task
+
+    # Check for cycles after adding
+    if self._has_cycle():
+        del self._tasks[task_id]
+        raise CycleError(f&#34;Adding task &#39;{task_id}&#39; would create a cycle&#34;)
+
+    return task</code></pre>
+</details>
+<div class="desc"><p>Add a task to the DAG.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>task_id</code></strong></dt>
+<dd>Unique identifier for this task.</dd>
+<dt><strong><code>task_type</code></strong></dt>
+<dd>Type of task (e.g., "stage", "generation", "verification").</dd>
+<dt><strong><code>dependencies</code></strong></dt>
+<dd>List of task IDs that must complete before this task.</dd>
+<dt><strong><code>estimated_tokens</code></strong></dt>
+<dd>Estimated token cost for this task.</dd>
+<dt><strong><code>metadata</code></strong></dt>
+<dd>Arbitrary metadata attached to the task.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>The created DAGTask.</p>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code><a title="atomik_sdk.pipeline.dag.CycleError" href="#atomik_sdk.pipeline.dag.CycleError">CycleError</a></code></dt>
+<dd>If adding this task would create a cycle.</dd>
+<dt><code>ValueError</code></dt>
+<dd>If a dependency references an unknown task.</dd>
+</dl></div>
+</dd>
+<dt id="atomik_sdk.pipeline.dag.TaskDAG.critical_path"><code class="name flex">
+<span>def <span class="ident">critical_path</span></span>(<span>self) ‑> list[str]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def critical_path(self) -&gt; list[str]:
+    &#34;&#34;&#34;
+    Compute the critical path (longest dependency chain).
+
+    Returns:
+        List of task IDs on the critical path.
+    &#34;&#34;&#34;
+    if not self._tasks:
+        return []
+
+    order = self.topological_order()
+
+    # Compute longest path to each node
+    dist: dict[str, int] = {tid: 0 for tid in self._tasks}
+    prev: dict[str, str | None] = {tid: None for tid in self._tasks}
+
+    for tid in order:
+        task = self._tasks[tid]
+        for dep in task.dependencies:
+            if dep in dist:
+                new_dist = dist[dep] + 1
+                if new_dist &gt; dist[tid]:
+                    dist[tid] = new_dist
+                    prev[tid] = dep
+
+    # Find the node with maximum distance
+    end = max(dist, key=lambda t: dist[t])
+    path: list[str] = []
+    current: str | None = end
+    while current is not None:
+        path.append(current)
+        current = prev[current]
+
+    path.reverse()
+    return path</code></pre>
+</details>
+<div class="desc"><p>Compute the critical path (longest dependency chain).</p>
+<h2 id="returns">Returns</h2>
+<p>List of task IDs on the critical path.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.dag.TaskDAG.critical_path_tokens"><code class="name flex">
+<span>def <span class="ident">critical_path_tokens</span></span>(<span>self) ‑> int</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def critical_path_tokens(self) -&gt; int:
+    &#34;&#34;&#34;Estimated tokens on the critical path.&#34;&#34;&#34;
+    return sum(
+        self._tasks[tid].estimated_tokens
+        for tid in self.critical_path()
+        if tid in self._tasks
+    )</code></pre>
+</details>
+<div class="desc"><p>Estimated tokens on the critical path.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.dag.TaskDAG.get_all_tasks"><code class="name flex">
+<span>def <span class="ident">get_all_tasks</span></span>(<span>self) ‑> list[<a title="atomik_sdk.pipeline.dag.DAGTask" href="#atomik_sdk.pipeline.dag.DAGTask">DAGTask</a>]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_all_tasks(self) -&gt; list[DAGTask]:
+    &#34;&#34;&#34;Get all tasks in insertion order.&#34;&#34;&#34;
+    return list(self._tasks.values())</code></pre>
+</details>
+<div class="desc"><p>Get all tasks in insertion order.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.dag.TaskDAG.get_dependents"><code class="name flex">
+<span>def <span class="ident">get_dependents</span></span>(<span>self, task_id: str) ‑> list[str]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_dependents(self, task_id: str) -&gt; list[str]:
+    &#34;&#34;&#34;Get tasks that depend on the given task.&#34;&#34;&#34;
+    return [
+        t.task_id for t in self._tasks.values()
+        if task_id in t.dependencies
+    ]</code></pre>
+</details>
+<div class="desc"><p>Get tasks that depend on the given task.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.dag.TaskDAG.get_ready_tasks"><code class="name flex">
+<span>def <span class="ident">get_ready_tasks</span></span>(<span>self) ‑> list[<a title="atomik_sdk.pipeline.dag.DAGTask" href="#atomik_sdk.pipeline.dag.DAGTask">DAGTask</a>]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_ready_tasks(self) -&gt; list[DAGTask]:
+    &#34;&#34;&#34;
+    Get all tasks whose dependencies are satisfied and that
+    are not yet running or complete.
+
+    Returns:
+        List of tasks ready for execution.
+    &#34;&#34;&#34;
+    ready = []
+    for task in self._tasks.values():
+        if task.state != TaskState.PENDING:
+            continue
+        deps_met = all(
+            self._tasks[dep].state in (TaskState.COMPLETED, TaskState.SKIPPED)
+            for dep in task.dependencies
+            if dep in self._tasks
+        )
+        if deps_met:
+            ready.append(task)
+    return ready</code></pre>
+</details>
+<div class="desc"><p>Get all tasks whose dependencies are satisfied and that
+are not yet running or complete.</p>
+<h2 id="returns">Returns</h2>
+<p>List of tasks ready for execution.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.dag.TaskDAG.get_task"><code class="name flex">
+<span>def <span class="ident">get_task</span></span>(<span>self, task_id: str) ‑> <a title="atomik_sdk.pipeline.dag.DAGTask" href="#atomik_sdk.pipeline.dag.DAGTask">DAGTask</a> | None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_task(self, task_id: str) -&gt; DAGTask | None:
+    &#34;&#34;&#34;Get a task by ID.&#34;&#34;&#34;
+    return self._tasks.get(task_id)</code></pre>
+</details>
+<div class="desc"><p>Get a task by ID.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.dag.TaskDAG.has_failures"><code class="name flex">
+<span>def <span class="ident">has_failures</span></span>(<span>self) ‑> bool</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def has_failures(self) -&gt; bool:
+    &#34;&#34;&#34;Check if any tasks have failed.&#34;&#34;&#34;
+    return any(t.state == TaskState.FAILED for t in self._tasks.values())</code></pre>
+</details>
+<div class="desc"><p>Check if any tasks have failed.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.dag.TaskDAG.is_complete"><code class="name flex">
+<span>def <span class="ident">is_complete</span></span>(<span>self) ‑> bool</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def is_complete(self) -&gt; bool:
+    &#34;&#34;&#34;Check if all tasks have reached a terminal state.&#34;&#34;&#34;
+    return all(t.is_terminal for t in self._tasks.values())</code></pre>
+</details>
+<div class="desc"><p>Check if all tasks have reached a terminal state.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.dag.TaskDAG.mark_completed"><code class="name flex">
+<span>def <span class="ident">mark_completed</span></span>(<span>self, task_id: str, result: dict[str, Any] | None = None) ‑> None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def mark_completed(self, task_id: str, result: dict[str, Any] | None = None) -&gt; None:
+    &#34;&#34;&#34;Mark a task as successfully completed.&#34;&#34;&#34;
+    task = self._tasks.get(task_id)
+    if task:
+        task.state = TaskState.COMPLETED
+        task.result = result</code></pre>
+</details>
+<div class="desc"><p>Mark a task as successfully completed.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.dag.TaskDAG.mark_failed"><code class="name flex">
+<span>def <span class="ident">mark_failed</span></span>(<span>self, task_id: str, result: dict[str, Any] | None = None) ‑> None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def mark_failed(self, task_id: str, result: dict[str, Any] | None = None) -&gt; None:
+    &#34;&#34;&#34;Mark a task as failed.&#34;&#34;&#34;
+    task = self._tasks.get(task_id)
+    if task:
+        task.state = TaskState.FAILED
+        task.result = result</code></pre>
+</details>
+<div class="desc"><p>Mark a task as failed.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.dag.TaskDAG.mark_ready"><code class="name flex">
+<span>def <span class="ident">mark_ready</span></span>(<span>self, task_id: str) ‑> None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def mark_ready(self, task_id: str) -&gt; None:
+    &#34;&#34;&#34;Mark a task as ready for execution.&#34;&#34;&#34;
+    task = self._tasks.get(task_id)
+    if task and task.state == TaskState.PENDING:
+        task.state = TaskState.READY</code></pre>
+</details>
+<div class="desc"><p>Mark a task as ready for execution.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.dag.TaskDAG.mark_running"><code class="name flex">
+<span>def <span class="ident">mark_running</span></span>(<span>self, task_id: str) ‑> None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def mark_running(self, task_id: str) -&gt; None:
+    &#34;&#34;&#34;Mark a task as currently executing.&#34;&#34;&#34;
+    task = self._tasks.get(task_id)
+    if task:
+        task.state = TaskState.RUNNING</code></pre>
+</details>
+<div class="desc"><p>Mark a task as currently executing.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.dag.TaskDAG.mark_skipped"><code class="name flex">
+<span>def <span class="ident">mark_skipped</span></span>(<span>self, task_id: str) ‑> None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def mark_skipped(self, task_id: str) -&gt; None:
+    &#34;&#34;&#34;Mark a task as skipped.&#34;&#34;&#34;
+    task = self._tasks.get(task_id)
+    if task:
+        task.state = TaskState.SKIPPED</code></pre>
+</details>
+<div class="desc"><p>Mark a task as skipped.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.dag.TaskDAG.summary"><code class="name flex">
+<span>def <span class="ident">summary</span></span>(<span>self) ‑> dict[str, typing.Any]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def summary(self) -&gt; dict[str, Any]:
+    &#34;&#34;&#34;Get a summary of the DAG state.&#34;&#34;&#34;
+    states = {}
+    for task in self._tasks.values():
+        s = task.state.value
+        states[s] = states.get(s, 0) + 1
+
+    return {
+        &#34;total_tasks&#34;: len(self._tasks),
+        &#34;states&#34;: states,
+        &#34;is_complete&#34;: self.is_complete(),
+        &#34;has_failures&#34;: self.has_failures(),
+        &#34;critical_path&#34;: self.critical_path(),
+        &#34;critical_path_tokens&#34;: self.critical_path_tokens(),
+    }</code></pre>
+</details>
+<div class="desc"><p>Get a summary of the DAG state.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.dag.TaskDAG.topological_order"><code class="name flex">
+<span>def <span class="ident">topological_order</span></span>(<span>self) ‑> list[str]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def topological_order(self) -&gt; list[str]:
+    &#34;&#34;&#34;
+    Return task IDs in topological order (dependencies first).
+
+    Raises:
+        CycleError: If the graph contains a cycle.
+    &#34;&#34;&#34;
+    in_degree: dict[str, int] = {tid: 0 for tid in self._tasks}
+    for task in self._tasks.values():
+        for dep in task.dependencies:
+            if dep in in_degree:
+                in_degree[task.task_id] = in_degree.get(task.task_id, 0)
+
+    # Compute actual in-degrees from reverse edges
+    in_degree = {tid: 0 for tid in self._tasks}
+    for task in self._tasks.values():
+        for dep in task.dependencies:
+            if dep in self._tasks:
+                # task depends on dep, so dep -&gt; task edge
+                # in_degree of task increases
+                pass  # handled below
+
+    # Recompute properly: in_degree[t] = number of tasks that t depends on
+    # that haven&#39;t been processed
+    adj: dict[str, list[str]] = {tid: [] for tid in self._tasks}
+    in_degree = {tid: 0 for tid in self._tasks}
+
+    for task in self._tasks.values():
+        for dep in task.dependencies:
+            if dep in self._tasks:
+                adj[dep].append(task.task_id)
+                in_degree[task.task_id] += 1
+
+    queue = deque(tid for tid, deg in in_degree.items() if deg == 0)
+    order: list[str] = []
+
+    while queue:
+        tid = queue.popleft()
+        order.append(tid)
+        for neighbor in adj[tid]:
+            in_degree[neighbor] -= 1
+            if in_degree[neighbor] == 0:
+                queue.append(neighbor)
+
+    if len(order) != len(self._tasks):
+        raise CycleError(&#34;DAG contains a cycle&#34;)
+
+    return order</code></pre>
+</details>
+<div class="desc"><p>Return task IDs in topological order (dependencies first).</p>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code><a title="atomik_sdk.pipeline.dag.CycleError" href="#atomik_sdk.pipeline.dag.CycleError">CycleError</a></code></dt>
+<dd>If the graph contains a cycle.</dd>
+</dl></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.pipeline.dag.TaskState"><code class="flex name class">
+<span>class <span class="ident">TaskState</span></span>
+<span>(</span><span>*args, **kwds)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class TaskState(Enum):
+    &#34;&#34;&#34;Execution state of a DAG task.&#34;&#34;&#34;
+    PENDING = &#34;pending&#34;
+    READY = &#34;ready&#34;       # All dependencies satisfied
+    RUNNING = &#34;running&#34;
+    COMPLETED = &#34;completed&#34;
+    FAILED = &#34;failed&#34;
+    SKIPPED = &#34;skipped&#34;</code></pre>
+</details>
+<div class="desc"><p>Execution state of a DAG task.</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.dag.TaskState.COMPLETED"><code class="name">var <span class="ident">COMPLETED</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.dag.TaskState.FAILED"><code class="name">var <span class="ident">FAILED</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.dag.TaskState.PENDING"><code class="name">var <span class="ident">PENDING</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.dag.TaskState.READY"><code class="name">var <span class="ident">READY</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.dag.TaskState.RUNNING"><code class="name">var <span class="ident">RUNNING</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.dag.TaskState.SKIPPED"><code class="name">var <span class="ident">SKIPPED</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="atomik_sdk.pipeline" href="index.html">atomik_sdk.pipeline</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="atomik_sdk.pipeline.dag.CycleError" href="#atomik_sdk.pipeline.dag.CycleError">CycleError</a></code></h4>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.pipeline.dag.DAGTask" href="#atomik_sdk.pipeline.dag.DAGTask">DAGTask</a></code></h4>
+<ul class="two-column">
+<li><code><a title="atomik_sdk.pipeline.dag.DAGTask.dependencies" href="#atomik_sdk.pipeline.dag.DAGTask.dependencies">dependencies</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.dag.DAGTask.estimated_tokens" href="#atomik_sdk.pipeline.dag.DAGTask.estimated_tokens">estimated_tokens</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.dag.DAGTask.is_terminal" href="#atomik_sdk.pipeline.dag.DAGTask.is_terminal">is_terminal</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.dag.DAGTask.metadata" href="#atomik_sdk.pipeline.dag.DAGTask.metadata">metadata</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.dag.DAGTask.result" href="#atomik_sdk.pipeline.dag.DAGTask.result">result</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.dag.DAGTask.state" href="#atomik_sdk.pipeline.dag.DAGTask.state">state</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.dag.DAGTask.task_id" href="#atomik_sdk.pipeline.dag.DAGTask.task_id">task_id</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.dag.DAGTask.task_type" href="#atomik_sdk.pipeline.dag.DAGTask.task_type">task_type</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.dag.DAGTask.to_dict" href="#atomik_sdk.pipeline.dag.DAGTask.to_dict">to_dict</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.pipeline.dag.TaskDAG" href="#atomik_sdk.pipeline.dag.TaskDAG">TaskDAG</a></code></h4>
+<ul class="">
+<li><code><a title="atomik_sdk.pipeline.dag.TaskDAG.add_task" href="#atomik_sdk.pipeline.dag.TaskDAG.add_task">add_task</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.dag.TaskDAG.critical_path" href="#atomik_sdk.pipeline.dag.TaskDAG.critical_path">critical_path</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.dag.TaskDAG.critical_path_tokens" href="#atomik_sdk.pipeline.dag.TaskDAG.critical_path_tokens">critical_path_tokens</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.dag.TaskDAG.get_all_tasks" href="#atomik_sdk.pipeline.dag.TaskDAG.get_all_tasks">get_all_tasks</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.dag.TaskDAG.get_dependents" href="#atomik_sdk.pipeline.dag.TaskDAG.get_dependents">get_dependents</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.dag.TaskDAG.get_ready_tasks" href="#atomik_sdk.pipeline.dag.TaskDAG.get_ready_tasks">get_ready_tasks</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.dag.TaskDAG.get_task" href="#atomik_sdk.pipeline.dag.TaskDAG.get_task">get_task</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.dag.TaskDAG.has_failures" href="#atomik_sdk.pipeline.dag.TaskDAG.has_failures">has_failures</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.dag.TaskDAG.is_complete" href="#atomik_sdk.pipeline.dag.TaskDAG.is_complete">is_complete</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.dag.TaskDAG.mark_completed" href="#atomik_sdk.pipeline.dag.TaskDAG.mark_completed">mark_completed</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.dag.TaskDAG.mark_failed" href="#atomik_sdk.pipeline.dag.TaskDAG.mark_failed">mark_failed</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.dag.TaskDAG.mark_ready" href="#atomik_sdk.pipeline.dag.TaskDAG.mark_ready">mark_ready</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.dag.TaskDAG.mark_running" href="#atomik_sdk.pipeline.dag.TaskDAG.mark_running">mark_running</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.dag.TaskDAG.mark_skipped" href="#atomik_sdk.pipeline.dag.TaskDAG.mark_skipped">mark_skipped</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.dag.TaskDAG.summary" href="#atomik_sdk.pipeline.dag.TaskDAG.summary">summary</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.dag.TaskDAG.topological_order" href="#atomik_sdk.pipeline.dag.TaskDAG.topological_order">topological_order</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.pipeline.dag.TaskState" href="#atomik_sdk.pipeline.dag.TaskState">TaskState</a></code></h4>
+<ul class="two-column">
+<li><code><a title="atomik_sdk.pipeline.dag.TaskState.COMPLETED" href="#atomik_sdk.pipeline.dag.TaskState.COMPLETED">COMPLETED</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.dag.TaskState.FAILED" href="#atomik_sdk.pipeline.dag.TaskState.FAILED">FAILED</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.dag.TaskState.PENDING" href="#atomik_sdk.pipeline.dag.TaskState.PENDING">PENDING</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.dag.TaskState.READY" href="#atomik_sdk.pipeline.dag.TaskState.READY">READY</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.dag.TaskState.RUNNING" href="#atomik_sdk.pipeline.dag.TaskState.RUNNING">RUNNING</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.dag.TaskState.SKIPPED" href="#atomik_sdk.pipeline.dag.TaskState.SKIPPED">SKIPPED</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+</body>
+</html>

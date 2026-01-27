@@ -1,0 +1,659 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
+<title>atomik_sdk.pipeline.context.manifest API documentation</title>
+<meta name="description" content="Structured Context Manifests …">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>atomik_sdk.pipeline.context.manifest</code></h1>
+</header>
+<section id="section-intro">
+<p>Structured Context Manifests</p>
+<p>Provides compact, structured context for pipeline resumption across
+sessions. Designed for &lt;2K token cold-start loading.</p>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="atomik_sdk.pipeline.context.manifest.ArtifactEntry"><code class="flex name class">
+<span>class <span class="ident">ArtifactEntry</span></span>
+<span>(</span><span>path: str,<br>sha256: str,<br>language: str = '',<br>status: str = 'generated',<br>last_generated: str = '')</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass
+class ArtifactEntry:
+    &#34;&#34;&#34;Tracks a generated artifact with its checksum and status.&#34;&#34;&#34;
+    path: str
+    sha256: str
+    language: str = &#34;&#34;
+    status: str = &#34;generated&#34;
+    last_generated: str = &#34;&#34;
+
+    def to_dict(self) -&gt; dict[str, Any]:
+        return {
+            &#34;path&#34;: self.path,
+            &#34;sha256&#34;: self.sha256,
+            &#34;language&#34;: self.language,
+            &#34;status&#34;: self.status,
+            &#34;last_generated&#34;: self.last_generated,
+        }</code></pre>
+</details>
+<div class="desc"><p>Tracks a generated artifact with its checksum and status.</p></div>
+<h3>Instance variables</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.context.manifest.ArtifactEntry.language"><code class="name">var <span class="ident">language</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.context.manifest.ArtifactEntry.last_generated"><code class="name">var <span class="ident">last_generated</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.context.manifest.ArtifactEntry.path"><code class="name">var <span class="ident">path</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.context.manifest.ArtifactEntry.sha256"><code class="name">var <span class="ident">sha256</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.context.manifest.ArtifactEntry.status"><code class="name">var <span class="ident">status</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.context.manifest.ArtifactEntry.to_dict"><code class="name flex">
+<span>def <span class="ident">to_dict</span></span>(<span>self) ‑> dict[str, typing.Any]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_dict(self) -&gt; dict[str, Any]:
+    return {
+        &#34;path&#34;: self.path,
+        &#34;sha256&#34;: self.sha256,
+        &#34;language&#34;: self.language,
+        &#34;status&#34;: self.status,
+        &#34;last_generated&#34;: self.last_generated,
+    }</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.pipeline.context.manifest.PipelineManifest"><code class="flex name class">
+<span>class <span class="ident">PipelineManifest</span></span>
+<span>(</span><span>version: str = '2.1',<br>phase: str = '5',<br>schemas_registered: int = 0,<br>languages_supported: list[str] = &lt;factory&gt;,<br>last_pipeline_run: str = '',<br>schemas: dict[str, <a title="atomik_sdk.pipeline.context.manifest.SchemaEntry" href="#atomik_sdk.pipeline.context.manifest.SchemaEntry">SchemaEntry</a>] = &lt;factory&gt;,<br>hardware_state: dict[str, Any] = &lt;factory&gt;,<br>metrics_summary: dict[str, Any] = &lt;factory&gt;,<br>token_ledger: dict[str, Any] = &lt;factory&gt;,<br>pending_actions: list[str] = &lt;factory&gt;,<br>segment_metadata: dict[str, <a title="atomik_sdk.pipeline.context.manifest.SegmentMetadata" href="#atomik_sdk.pipeline.context.manifest.SegmentMetadata">SegmentMetadata</a>] = &lt;factory&gt;)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass
+class PipelineManifest:
+    &#34;&#34;&#34;
+    Top-level pipeline manifest for cross-session state tracking.
+
+    Designed to be serializable to &lt;2K tokens of JSON for compact
+    context loading.
+    &#34;&#34;&#34;
+    version: str = &#34;2.1&#34;
+    phase: str = &#34;5&#34;
+    schemas_registered: int = 0
+    languages_supported: list[str] = field(
+        default_factory=lambda: [&#34;python&#34;, &#34;rust&#34;, &#34;c&#34;, &#34;javascript&#34;, &#34;verilog&#34;]
+    )
+    last_pipeline_run: str = &#34;&#34;
+    schemas: dict[str, SchemaEntry] = field(default_factory=dict)
+    hardware_state: dict[str, Any] = field(default_factory=dict)
+    metrics_summary: dict[str, Any] = field(default_factory=dict)
+    token_ledger: dict[str, Any] = field(default_factory=lambda: {
+        &#34;session_total&#34;: 0,
+        &#34;budget_remaining&#34;: 130.0,
+    })
+    pending_actions: list[str] = field(default_factory=list)
+    segment_metadata: dict[str, SegmentMetadata] = field(default_factory=dict)
+
+    def register_schema(self, name: str, sha256: str, path: str, namespace: str = &#34;&#34;) -&gt; None:
+        &#34;&#34;&#34;Register or update a schema in the manifest.&#34;&#34;&#34;
+        if name in self.schemas:
+            self.schemas[name].sha256 = sha256
+            self.schemas[name].path = path
+            if namespace:
+                self.schemas[name].namespace = namespace
+        else:
+            self.schemas[name] = SchemaEntry(
+                name=name, sha256=sha256, path=path, namespace=namespace
+            )
+        self.schemas_registered = len(self.schemas)
+
+    def register_segment(
+        self,
+        segment_id: str,
+        segment_type: str,
+        task_affinity: list[str] | None = None,
+        token_estimate: int = 0,
+        priority: float = 1.0,
+    ) -&gt; None:
+        &#34;&#34;&#34;Register segment-level metadata for intelligent context loading.&#34;&#34;&#34;
+        self.segment_metadata[segment_id] = SegmentMetadata(
+            segment_type=segment_type,
+            task_affinity=task_affinity or [],
+            token_estimate=token_estimate,
+            priority=priority,
+        )
+
+    def record_run(self, tokens_consumed: int = 0) -&gt; None:
+        &#34;&#34;&#34;Record a pipeline run in the manifest.&#34;&#34;&#34;
+        self.last_pipeline_run = time.strftime(&#34;%Y-%m-%dT%H:%M:%SZ&#34;, time.gmtime())
+        self.token_ledger[&#34;session_total&#34;] += tokens_consumed
+
+    def to_dict(self) -&gt; dict[str, Any]:
+        return {
+            &#34;version&#34;: self.version,
+            &#34;project_state&#34;: {
+                &#34;phase&#34;: self.phase,
+                &#34;schemas_registered&#34;: self.schemas_registered,
+                &#34;languages_supported&#34;: self.languages_supported,
+                &#34;last_pipeline_run&#34;: self.last_pipeline_run,
+            },
+            &#34;artifact_index&#34;: {
+                &#34;schemas&#34;: {k: v.to_dict() for k, v in self.schemas.items()},
+            },
+            &#34;hardware_state&#34;: self.hardware_state,
+            &#34;metrics_summary&#34;: self.metrics_summary,
+            &#34;token_ledger&#34;: self.token_ledger,
+            &#34;pending_actions&#34;: self.pending_actions,
+            &#34;segment_metadata&#34;: {
+                k: v.to_dict() for k, v in self.segment_metadata.items()
+            },
+        }
+
+    def save(self, path: str | Path) -&gt; None:
+        &#34;&#34;&#34;Persist manifest to disk.&#34;&#34;&#34;
+        path = Path(path)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with open(path, &#34;w&#34;, encoding=&#34;utf-8&#34;) as f:
+            json.dump(self.to_dict(), f, indent=2)
+
+    @classmethod
+    def load(cls, path: str | Path) -&gt; PipelineManifest:
+        &#34;&#34;&#34;Load manifest from disk.&#34;&#34;&#34;
+        path = Path(path)
+        with open(path, encoding=&#34;utf-8&#34;) as f:
+            data = json.load(f)
+
+        manifest = cls()
+        ps = data.get(&#34;project_state&#34;, {})
+        manifest.version = data.get(&#34;version&#34;, &#34;2.0&#34;)
+        manifest.phase = ps.get(&#34;phase&#34;, &#34;4C&#34;)
+        manifest.last_pipeline_run = ps.get(&#34;last_pipeline_run&#34;, &#34;&#34;)
+        manifest.languages_supported = ps.get(
+            &#34;languages_supported&#34;, manifest.languages_supported
+        )
+
+        # Restore schemas
+        for name, sdata in data.get(&#34;artifact_index&#34;, {}).get(&#34;schemas&#34;, {}).items():
+            entry = SchemaEntry(
+                name=sdata.get(&#34;name&#34;, name),
+                sha256=sdata.get(&#34;sha256&#34;, &#34;&#34;),
+                path=sdata.get(&#34;path&#34;, &#34;&#34;),
+                namespace=sdata.get(&#34;namespace&#34;, &#34;&#34;),
+                last_generated=sdata.get(&#34;last_generated&#34;, &#34;&#34;),
+            )
+            manifest.schemas[name] = entry
+
+        manifest.schemas_registered = len(manifest.schemas)
+        manifest.hardware_state = data.get(&#34;hardware_state&#34;, {})
+        manifest.metrics_summary = data.get(&#34;metrics_summary&#34;, {})
+        manifest.token_ledger = data.get(&#34;token_ledger&#34;, manifest.token_ledger)
+        manifest.pending_actions = data.get(&#34;pending_actions&#34;, [])
+
+        return manifest</code></pre>
+</details>
+<div class="desc"><p>Top-level pipeline manifest for cross-session state tracking.</p>
+<p>Designed to be serializable to &lt;2K tokens of JSON for compact
+context loading.</p></div>
+<h3>Static methods</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.context.manifest.PipelineManifest.load"><code class="name flex">
+<span>def <span class="ident">load</span></span>(<span>path: str | Path) ‑> <a title="atomik_sdk.pipeline.context.manifest.PipelineManifest" href="#atomik_sdk.pipeline.context.manifest.PipelineManifest">PipelineManifest</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Load manifest from disk.</p></div>
+</dd>
+</dl>
+<h3>Instance variables</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.context.manifest.PipelineManifest.hardware_state"><code class="name">var <span class="ident">hardware_state</span> : dict[str, typing.Any]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.context.manifest.PipelineManifest.languages_supported"><code class="name">var <span class="ident">languages_supported</span> : list[str]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.context.manifest.PipelineManifest.last_pipeline_run"><code class="name">var <span class="ident">last_pipeline_run</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.context.manifest.PipelineManifest.metrics_summary"><code class="name">var <span class="ident">metrics_summary</span> : dict[str, typing.Any]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.context.manifest.PipelineManifest.pending_actions"><code class="name">var <span class="ident">pending_actions</span> : list[str]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.context.manifest.PipelineManifest.phase"><code class="name">var <span class="ident">phase</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.context.manifest.PipelineManifest.schemas"><code class="name">var <span class="ident">schemas</span> : dict[str, <a title="atomik_sdk.pipeline.context.manifest.SchemaEntry" href="#atomik_sdk.pipeline.context.manifest.SchemaEntry">SchemaEntry</a>]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.context.manifest.PipelineManifest.schemas_registered"><code class="name">var <span class="ident">schemas_registered</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.context.manifest.PipelineManifest.segment_metadata"><code class="name">var <span class="ident">segment_metadata</span> : dict[str, <a title="atomik_sdk.pipeline.context.manifest.SegmentMetadata" href="#atomik_sdk.pipeline.context.manifest.SegmentMetadata">SegmentMetadata</a>]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.context.manifest.PipelineManifest.token_ledger"><code class="name">var <span class="ident">token_ledger</span> : dict[str, typing.Any]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.context.manifest.PipelineManifest.version"><code class="name">var <span class="ident">version</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.context.manifest.PipelineManifest.record_run"><code class="name flex">
+<span>def <span class="ident">record_run</span></span>(<span>self, tokens_consumed: int = 0) ‑> None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def record_run(self, tokens_consumed: int = 0) -&gt; None:
+    &#34;&#34;&#34;Record a pipeline run in the manifest.&#34;&#34;&#34;
+    self.last_pipeline_run = time.strftime(&#34;%Y-%m-%dT%H:%M:%SZ&#34;, time.gmtime())
+    self.token_ledger[&#34;session_total&#34;] += tokens_consumed</code></pre>
+</details>
+<div class="desc"><p>Record a pipeline run in the manifest.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.context.manifest.PipelineManifest.register_schema"><code class="name flex">
+<span>def <span class="ident">register_schema</span></span>(<span>self, name: str, sha256: str, path: str, namespace: str = '') ‑> None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def register_schema(self, name: str, sha256: str, path: str, namespace: str = &#34;&#34;) -&gt; None:
+    &#34;&#34;&#34;Register or update a schema in the manifest.&#34;&#34;&#34;
+    if name in self.schemas:
+        self.schemas[name].sha256 = sha256
+        self.schemas[name].path = path
+        if namespace:
+            self.schemas[name].namespace = namespace
+    else:
+        self.schemas[name] = SchemaEntry(
+            name=name, sha256=sha256, path=path, namespace=namespace
+        )
+    self.schemas_registered = len(self.schemas)</code></pre>
+</details>
+<div class="desc"><p>Register or update a schema in the manifest.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.context.manifest.PipelineManifest.register_segment"><code class="name flex">
+<span>def <span class="ident">register_segment</span></span>(<span>self,<br>segment_id: str,<br>segment_type: str,<br>task_affinity: list[str] | None = None,<br>token_estimate: int = 0,<br>priority: float = 1.0) ‑> None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def register_segment(
+    self,
+    segment_id: str,
+    segment_type: str,
+    task_affinity: list[str] | None = None,
+    token_estimate: int = 0,
+    priority: float = 1.0,
+) -&gt; None:
+    &#34;&#34;&#34;Register segment-level metadata for intelligent context loading.&#34;&#34;&#34;
+    self.segment_metadata[segment_id] = SegmentMetadata(
+        segment_type=segment_type,
+        task_affinity=task_affinity or [],
+        token_estimate=token_estimate,
+        priority=priority,
+    )</code></pre>
+</details>
+<div class="desc"><p>Register segment-level metadata for intelligent context loading.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.context.manifest.PipelineManifest.save"><code class="name flex">
+<span>def <span class="ident">save</span></span>(<span>self, path: str | Path) ‑> None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def save(self, path: str | Path) -&gt; None:
+    &#34;&#34;&#34;Persist manifest to disk.&#34;&#34;&#34;
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with open(path, &#34;w&#34;, encoding=&#34;utf-8&#34;) as f:
+        json.dump(self.to_dict(), f, indent=2)</code></pre>
+</details>
+<div class="desc"><p>Persist manifest to disk.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.context.manifest.PipelineManifest.to_dict"><code class="name flex">
+<span>def <span class="ident">to_dict</span></span>(<span>self) ‑> dict[str, typing.Any]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_dict(self) -&gt; dict[str, Any]:
+    return {
+        &#34;version&#34;: self.version,
+        &#34;project_state&#34;: {
+            &#34;phase&#34;: self.phase,
+            &#34;schemas_registered&#34;: self.schemas_registered,
+            &#34;languages_supported&#34;: self.languages_supported,
+            &#34;last_pipeline_run&#34;: self.last_pipeline_run,
+        },
+        &#34;artifact_index&#34;: {
+            &#34;schemas&#34;: {k: v.to_dict() for k, v in self.schemas.items()},
+        },
+        &#34;hardware_state&#34;: self.hardware_state,
+        &#34;metrics_summary&#34;: self.metrics_summary,
+        &#34;token_ledger&#34;: self.token_ledger,
+        &#34;pending_actions&#34;: self.pending_actions,
+        &#34;segment_metadata&#34;: {
+            k: v.to_dict() for k, v in self.segment_metadata.items()
+        },
+    }</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.pipeline.context.manifest.SchemaEntry"><code class="flex name class">
+<span>class <span class="ident">SchemaEntry</span></span>
+<span>(</span><span>name: str,<br>sha256: str,<br>path: str,<br>namespace: str = '',<br>last_generated: str = '',<br>artifacts: dict[str, <a title="atomik_sdk.pipeline.context.manifest.ArtifactEntry" href="#atomik_sdk.pipeline.context.manifest.ArtifactEntry">ArtifactEntry</a>] = &lt;factory&gt;)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass
+class SchemaEntry:
+    &#34;&#34;&#34;Tracks a schema with its content hash and generation state.&#34;&#34;&#34;
+    name: str
+    sha256: str
+    path: str
+    namespace: str = &#34;&#34;
+    last_generated: str = &#34;&#34;
+    artifacts: dict[str, ArtifactEntry] = field(default_factory=dict)
+
+    def to_dict(self) -&gt; dict[str, Any]:
+        return {
+            &#34;name&#34;: self.name,
+            &#34;sha256&#34;: self.sha256,
+            &#34;path&#34;: self.path,
+            &#34;namespace&#34;: self.namespace,
+            &#34;last_generated&#34;: self.last_generated,
+            &#34;artifacts&#34;: {k: v.to_dict() for k, v in self.artifacts.items()},
+        }</code></pre>
+</details>
+<div class="desc"><p>Tracks a schema with its content hash and generation state.</p></div>
+<h3>Instance variables</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.context.manifest.SchemaEntry.artifacts"><code class="name">var <span class="ident">artifacts</span> : dict[str, <a title="atomik_sdk.pipeline.context.manifest.ArtifactEntry" href="#atomik_sdk.pipeline.context.manifest.ArtifactEntry">ArtifactEntry</a>]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.context.manifest.SchemaEntry.last_generated"><code class="name">var <span class="ident">last_generated</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.context.manifest.SchemaEntry.name"><code class="name">var <span class="ident">name</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.context.manifest.SchemaEntry.namespace"><code class="name">var <span class="ident">namespace</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.context.manifest.SchemaEntry.path"><code class="name">var <span class="ident">path</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.context.manifest.SchemaEntry.sha256"><code class="name">var <span class="ident">sha256</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.context.manifest.SchemaEntry.to_dict"><code class="name flex">
+<span>def <span class="ident">to_dict</span></span>(<span>self) ‑> dict[str, typing.Any]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_dict(self) -&gt; dict[str, Any]:
+    return {
+        &#34;name&#34;: self.name,
+        &#34;sha256&#34;: self.sha256,
+        &#34;path&#34;: self.path,
+        &#34;namespace&#34;: self.namespace,
+        &#34;last_generated&#34;: self.last_generated,
+        &#34;artifacts&#34;: {k: v.to_dict() for k, v in self.artifacts.items()},
+    }</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.pipeline.context.manifest.SegmentMetadata"><code class="flex name class">
+<span>class <span class="ident">SegmentMetadata</span></span>
+<span>(</span><span>segment_type: str = '',<br>task_affinity: list[str] = &lt;factory&gt;,<br>token_estimate: int = 0,<br>priority: float = 1.0)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass
+class SegmentMetadata:
+    &#34;&#34;&#34;Metadata for a context segment to support intelligent loading.&#34;&#34;&#34;
+    segment_type: str = &#34;&#34;        # &#34;schema&#34;, &#34;kb_entry&#34;, &#34;output&#34;, &#34;error&#34;
+    task_affinity: list[str] = field(default_factory=list)
+    token_estimate: int = 0
+    priority: float = 1.0         # Higher = more important
+
+    def to_dict(self) -&gt; dict[str, Any]:
+        return {
+            &#34;segment_type&#34;: self.segment_type,
+            &#34;task_affinity&#34;: self.task_affinity,
+            &#34;token_estimate&#34;: self.token_estimate,
+            &#34;priority&#34;: round(self.priority, 2),
+        }</code></pre>
+</details>
+<div class="desc"><p>Metadata for a context segment to support intelligent loading.</p></div>
+<h3>Instance variables</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.context.manifest.SegmentMetadata.priority"><code class="name">var <span class="ident">priority</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.context.manifest.SegmentMetadata.segment_type"><code class="name">var <span class="ident">segment_type</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.context.manifest.SegmentMetadata.task_affinity"><code class="name">var <span class="ident">task_affinity</span> : list[str]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.context.manifest.SegmentMetadata.token_estimate"><code class="name">var <span class="ident">token_estimate</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.context.manifest.SegmentMetadata.to_dict"><code class="name flex">
+<span>def <span class="ident">to_dict</span></span>(<span>self) ‑> dict[str, typing.Any]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_dict(self) -&gt; dict[str, Any]:
+    return {
+        &#34;segment_type&#34;: self.segment_type,
+        &#34;task_affinity&#34;: self.task_affinity,
+        &#34;token_estimate&#34;: self.token_estimate,
+        &#34;priority&#34;: round(self.priority, 2),
+    }</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="atomik_sdk.pipeline.context" href="index.html">atomik_sdk.pipeline.context</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="atomik_sdk.pipeline.context.manifest.ArtifactEntry" href="#atomik_sdk.pipeline.context.manifest.ArtifactEntry">ArtifactEntry</a></code></h4>
+<ul class="two-column">
+<li><code><a title="atomik_sdk.pipeline.context.manifest.ArtifactEntry.language" href="#atomik_sdk.pipeline.context.manifest.ArtifactEntry.language">language</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.context.manifest.ArtifactEntry.last_generated" href="#atomik_sdk.pipeline.context.manifest.ArtifactEntry.last_generated">last_generated</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.context.manifest.ArtifactEntry.path" href="#atomik_sdk.pipeline.context.manifest.ArtifactEntry.path">path</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.context.manifest.ArtifactEntry.sha256" href="#atomik_sdk.pipeline.context.manifest.ArtifactEntry.sha256">sha256</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.context.manifest.ArtifactEntry.status" href="#atomik_sdk.pipeline.context.manifest.ArtifactEntry.status">status</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.context.manifest.ArtifactEntry.to_dict" href="#atomik_sdk.pipeline.context.manifest.ArtifactEntry.to_dict">to_dict</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.pipeline.context.manifest.PipelineManifest" href="#atomik_sdk.pipeline.context.manifest.PipelineManifest">PipelineManifest</a></code></h4>
+<ul class="two-column">
+<li><code><a title="atomik_sdk.pipeline.context.manifest.PipelineManifest.hardware_state" href="#atomik_sdk.pipeline.context.manifest.PipelineManifest.hardware_state">hardware_state</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.context.manifest.PipelineManifest.languages_supported" href="#atomik_sdk.pipeline.context.manifest.PipelineManifest.languages_supported">languages_supported</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.context.manifest.PipelineManifest.last_pipeline_run" href="#atomik_sdk.pipeline.context.manifest.PipelineManifest.last_pipeline_run">last_pipeline_run</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.context.manifest.PipelineManifest.load" href="#atomik_sdk.pipeline.context.manifest.PipelineManifest.load">load</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.context.manifest.PipelineManifest.metrics_summary" href="#atomik_sdk.pipeline.context.manifest.PipelineManifest.metrics_summary">metrics_summary</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.context.manifest.PipelineManifest.pending_actions" href="#atomik_sdk.pipeline.context.manifest.PipelineManifest.pending_actions">pending_actions</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.context.manifest.PipelineManifest.phase" href="#atomik_sdk.pipeline.context.manifest.PipelineManifest.phase">phase</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.context.manifest.PipelineManifest.record_run" href="#atomik_sdk.pipeline.context.manifest.PipelineManifest.record_run">record_run</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.context.manifest.PipelineManifest.register_schema" href="#atomik_sdk.pipeline.context.manifest.PipelineManifest.register_schema">register_schema</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.context.manifest.PipelineManifest.register_segment" href="#atomik_sdk.pipeline.context.manifest.PipelineManifest.register_segment">register_segment</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.context.manifest.PipelineManifest.save" href="#atomik_sdk.pipeline.context.manifest.PipelineManifest.save">save</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.context.manifest.PipelineManifest.schemas" href="#atomik_sdk.pipeline.context.manifest.PipelineManifest.schemas">schemas</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.context.manifest.PipelineManifest.schemas_registered" href="#atomik_sdk.pipeline.context.manifest.PipelineManifest.schemas_registered">schemas_registered</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.context.manifest.PipelineManifest.segment_metadata" href="#atomik_sdk.pipeline.context.manifest.PipelineManifest.segment_metadata">segment_metadata</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.context.manifest.PipelineManifest.to_dict" href="#atomik_sdk.pipeline.context.manifest.PipelineManifest.to_dict">to_dict</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.context.manifest.PipelineManifest.token_ledger" href="#atomik_sdk.pipeline.context.manifest.PipelineManifest.token_ledger">token_ledger</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.context.manifest.PipelineManifest.version" href="#atomik_sdk.pipeline.context.manifest.PipelineManifest.version">version</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.pipeline.context.manifest.SchemaEntry" href="#atomik_sdk.pipeline.context.manifest.SchemaEntry">SchemaEntry</a></code></h4>
+<ul class="two-column">
+<li><code><a title="atomik_sdk.pipeline.context.manifest.SchemaEntry.artifacts" href="#atomik_sdk.pipeline.context.manifest.SchemaEntry.artifacts">artifacts</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.context.manifest.SchemaEntry.last_generated" href="#atomik_sdk.pipeline.context.manifest.SchemaEntry.last_generated">last_generated</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.context.manifest.SchemaEntry.name" href="#atomik_sdk.pipeline.context.manifest.SchemaEntry.name">name</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.context.manifest.SchemaEntry.namespace" href="#atomik_sdk.pipeline.context.manifest.SchemaEntry.namespace">namespace</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.context.manifest.SchemaEntry.path" href="#atomik_sdk.pipeline.context.manifest.SchemaEntry.path">path</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.context.manifest.SchemaEntry.sha256" href="#atomik_sdk.pipeline.context.manifest.SchemaEntry.sha256">sha256</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.context.manifest.SchemaEntry.to_dict" href="#atomik_sdk.pipeline.context.manifest.SchemaEntry.to_dict">to_dict</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.pipeline.context.manifest.SegmentMetadata" href="#atomik_sdk.pipeline.context.manifest.SegmentMetadata">SegmentMetadata</a></code></h4>
+<ul class="">
+<li><code><a title="atomik_sdk.pipeline.context.manifest.SegmentMetadata.priority" href="#atomik_sdk.pipeline.context.manifest.SegmentMetadata.priority">priority</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.context.manifest.SegmentMetadata.segment_type" href="#atomik_sdk.pipeline.context.manifest.SegmentMetadata.segment_type">segment_type</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.context.manifest.SegmentMetadata.task_affinity" href="#atomik_sdk.pipeline.context.manifest.SegmentMetadata.task_affinity">task_affinity</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.context.manifest.SegmentMetadata.to_dict" href="#atomik_sdk.pipeline.context.manifest.SegmentMetadata.to_dict">to_dict</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.context.manifest.SegmentMetadata.token_estimate" href="#atomik_sdk.pipeline.context.manifest.SegmentMetadata.token_estimate">token_estimate</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+</body>
+</html>

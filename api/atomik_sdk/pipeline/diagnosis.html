@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
+<title>atomik_sdk.pipeline.diagnosis API documentation</title>
+<meta name="description" content="Error Diagnosis …">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>atomik_sdk.pipeline.diagnosis</code></h1>
+</header>
+<section id="section-intro">
+<p>Error Diagnosis</p>
+<p>Classifies errors by type and produces structured diagnostic
+information for the feedback loop and knowledge base.</p>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="atomik_sdk.pipeline.diagnosis.Diagnosis"><code class="flex name class">
+<span>class <span class="ident">Diagnosis</span></span>
+<span>(</span><span>error_class: str,<br>severity: str,<br>primary_message: str,<br>language: str = '',<br>all_messages: list[str] = &lt;factory&gt;)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass
+class Diagnosis:
+    &#34;&#34;&#34;Structured diagnosis of an error.&#34;&#34;&#34;
+    error_class: str
+    severity: str          # &#34;critical&#34;, &#34;minor&#34;, &#34;warning&#34;
+    primary_message: str
+    language: str = &#34;&#34;
+    all_messages: list[str] = field(default_factory=list)
+
+    def to_dict(self) -&gt; dict[str, Any]:
+        return {
+            &#34;error_class&#34;: self.error_class,
+            &#34;severity&#34;: self.severity,
+            &#34;primary_message&#34;: self.primary_message,
+            &#34;language&#34;: self.language,
+            &#34;all_messages&#34;: self.all_messages,
+        }</code></pre>
+</details>
+<div class="desc"><p>Structured diagnosis of an error.</p></div>
+<h3>Instance variables</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.diagnosis.Diagnosis.all_messages"><code class="name">var <span class="ident">all_messages</span> : list[str]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.diagnosis.Diagnosis.error_class"><code class="name">var <span class="ident">error_class</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.diagnosis.Diagnosis.language"><code class="name">var <span class="ident">language</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.diagnosis.Diagnosis.primary_message"><code class="name">var <span class="ident">primary_message</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.diagnosis.Diagnosis.severity"><code class="name">var <span class="ident">severity</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.diagnosis.Diagnosis.to_dict"><code class="name flex">
+<span>def <span class="ident">to_dict</span></span>(<span>self) ‑> dict[str, typing.Any]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_dict(self) -&gt; dict[str, Any]:
+    return {
+        &#34;error_class&#34;: self.error_class,
+        &#34;severity&#34;: self.severity,
+        &#34;primary_message&#34;: self.primary_message,
+        &#34;language&#34;: self.language,
+        &#34;all_messages&#34;: self.all_messages,
+    }</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.pipeline.diagnosis.ErrorClassifier"><code class="flex name class">
+<span>class <span class="ident">ErrorClassifier</span></span>
+<span>(</span><span>custom_patterns: list[dict[str, Any]] | None = None)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class ErrorClassifier:
+    &#34;&#34;&#34;
+    Classifies error messages into known error classes.
+
+    Uses pattern matching against a database of known error signatures.
+    Returns structured Diagnosis objects.
+
+    Example:
+        &gt;&gt;&gt; classifier = ErrorClassifier()
+        &gt;&gt;&gt; diag = classifier.classify(&#34;python&#34;, [&#34;SyntaxError: unexpected EOF&#34;])
+        &gt;&gt;&gt; assert diag.error_class == &#34;syntax_error&#34;
+    &#34;&#34;&#34;
+
+    def __init__(
+        self,
+        custom_patterns: list[dict[str, Any]] | None = None,
+    ) -&gt; None:
+        self._patterns = list(ERROR_PATTERNS)
+        if custom_patterns:
+            self._patterns.extend(custom_patterns)
+
+    def classify(self, language: str, errors: list[str]) -&gt; Diagnosis:
+        &#34;&#34;&#34;
+        Classify errors into a known error class.
+
+        Args:
+            language: Language that produced the errors.
+            errors: List of error messages.
+
+        Returns:
+            Diagnosis with error class and severity.
+        &#34;&#34;&#34;
+        primary = errors[0] if errors else &#34;unknown error&#34;
+        primary_lower = primary.lower()
+
+        for pattern_info in self._patterns:
+            for pattern in pattern_info[&#34;patterns&#34;]:
+                if pattern in primary_lower:
+                    return Diagnosis(
+                        error_class=pattern_info[&#34;class&#34;],
+                        severity=pattern_info[&#34;severity&#34;],
+                        primary_message=primary,
+                        language=language,
+                        all_messages=list(errors),
+                    )
+
+        # Check remaining errors if primary didn&#39;t match
+        for error_msg in errors[1:]:
+            error_lower = error_msg.lower()
+            for pattern_info in self._patterns:
+                for pattern in pattern_info[&#34;patterns&#34;]:
+                    if pattern in error_lower:
+                        return Diagnosis(
+                            error_class=pattern_info[&#34;class&#34;],
+                            severity=pattern_info[&#34;severity&#34;],
+                            primary_message=error_msg,
+                            language=language,
+                            all_messages=list(errors),
+                        )
+
+        return Diagnosis(
+            error_class=&#34;unknown&#34;,
+            severity=&#34;critical&#34;,
+            primary_message=primary,
+            language=language,
+            all_messages=list(errors),
+        )
+
+    def classify_tuple(
+        self, language: str, errors: list[str]
+    ) -&gt; tuple[str, str]:
+        &#34;&#34;&#34;
+        Classify and return (error_class, primary_message) tuple.
+
+        Compatible with FeedbackLoop.ErrorClassifier callback type.
+        &#34;&#34;&#34;
+        diag = self.classify(language, errors)
+        return (diag.error_class, diag.primary_message)</code></pre>
+</details>
+<div class="desc"><p>Classifies error messages into known error classes.</p>
+<p>Uses pattern matching against a database of known error signatures.
+Returns structured Diagnosis objects.</p>
+<h2 id="example">Example</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; classifier = ErrorClassifier()
+&gt;&gt;&gt; diag = classifier.classify(&quot;python&quot;, [&quot;SyntaxError: unexpected EOF&quot;])
+&gt;&gt;&gt; assert diag.error_class == &quot;syntax_error&quot;
+</code></pre></div>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.diagnosis.ErrorClassifier.classify"><code class="name flex">
+<span>def <span class="ident">classify</span></span>(<span>self, language: str, errors: list[str]) ‑> <a title="atomik_sdk.pipeline.diagnosis.Diagnosis" href="#atomik_sdk.pipeline.diagnosis.Diagnosis">Diagnosis</a></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def classify(self, language: str, errors: list[str]) -&gt; Diagnosis:
+    &#34;&#34;&#34;
+    Classify errors into a known error class.
+
+    Args:
+        language: Language that produced the errors.
+        errors: List of error messages.
+
+    Returns:
+        Diagnosis with error class and severity.
+    &#34;&#34;&#34;
+    primary = errors[0] if errors else &#34;unknown error&#34;
+    primary_lower = primary.lower()
+
+    for pattern_info in self._patterns:
+        for pattern in pattern_info[&#34;patterns&#34;]:
+            if pattern in primary_lower:
+                return Diagnosis(
+                    error_class=pattern_info[&#34;class&#34;],
+                    severity=pattern_info[&#34;severity&#34;],
+                    primary_message=primary,
+                    language=language,
+                    all_messages=list(errors),
+                )
+
+    # Check remaining errors if primary didn&#39;t match
+    for error_msg in errors[1:]:
+        error_lower = error_msg.lower()
+        for pattern_info in self._patterns:
+            for pattern in pattern_info[&#34;patterns&#34;]:
+                if pattern in error_lower:
+                    return Diagnosis(
+                        error_class=pattern_info[&#34;class&#34;],
+                        severity=pattern_info[&#34;severity&#34;],
+                        primary_message=error_msg,
+                        language=language,
+                        all_messages=list(errors),
+                    )
+
+    return Diagnosis(
+        error_class=&#34;unknown&#34;,
+        severity=&#34;critical&#34;,
+        primary_message=primary,
+        language=language,
+        all_messages=list(errors),
+    )</code></pre>
+</details>
+<div class="desc"><p>Classify errors into a known error class.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>language</code></strong></dt>
+<dd>Language that produced the errors.</dd>
+<dt><strong><code>errors</code></strong></dt>
+<dd>List of error messages.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>Diagnosis with error class and severity.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.diagnosis.ErrorClassifier.classify_tuple"><code class="name flex">
+<span>def <span class="ident">classify_tuple</span></span>(<span>self, language: str, errors: list[str]) ‑> tuple[str, str]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def classify_tuple(
+    self, language: str, errors: list[str]
+) -&gt; tuple[str, str]:
+    &#34;&#34;&#34;
+    Classify and return (error_class, primary_message) tuple.
+
+    Compatible with FeedbackLoop.ErrorClassifier callback type.
+    &#34;&#34;&#34;
+    diag = self.classify(language, errors)
+    return (diag.error_class, diag.primary_message)</code></pre>
+</details>
+<div class="desc"><p>Classify and return (error_class, primary_message) tuple.</p>
+<p>Compatible with FeedbackLoop.ErrorClassifier callback type.</p></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="atomik_sdk.pipeline" href="index.html">atomik_sdk.pipeline</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="atomik_sdk.pipeline.diagnosis.Diagnosis" href="#atomik_sdk.pipeline.diagnosis.Diagnosis">Diagnosis</a></code></h4>
+<ul class="two-column">
+<li><code><a title="atomik_sdk.pipeline.diagnosis.Diagnosis.all_messages" href="#atomik_sdk.pipeline.diagnosis.Diagnosis.all_messages">all_messages</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.diagnosis.Diagnosis.error_class" href="#atomik_sdk.pipeline.diagnosis.Diagnosis.error_class">error_class</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.diagnosis.Diagnosis.language" href="#atomik_sdk.pipeline.diagnosis.Diagnosis.language">language</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.diagnosis.Diagnosis.primary_message" href="#atomik_sdk.pipeline.diagnosis.Diagnosis.primary_message">primary_message</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.diagnosis.Diagnosis.severity" href="#atomik_sdk.pipeline.diagnosis.Diagnosis.severity">severity</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.diagnosis.Diagnosis.to_dict" href="#atomik_sdk.pipeline.diagnosis.Diagnosis.to_dict">to_dict</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.pipeline.diagnosis.ErrorClassifier" href="#atomik_sdk.pipeline.diagnosis.ErrorClassifier">ErrorClassifier</a></code></h4>
+<ul class="">
+<li><code><a title="atomik_sdk.pipeline.diagnosis.ErrorClassifier.classify" href="#atomik_sdk.pipeline.diagnosis.ErrorClassifier.classify">classify</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.diagnosis.ErrorClassifier.classify_tuple" href="#atomik_sdk.pipeline.diagnosis.ErrorClassifier.classify_tuple">classify_tuple</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+</body>
+</html>

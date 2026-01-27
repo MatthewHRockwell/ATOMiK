@@ -1,0 +1,616 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
+<title>atomik_sdk.pipeline.optimization.tuner API documentation</title>
+<meta name="description" content="Configuration Auto-Tuner …">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>atomik_sdk.pipeline.optimization.tuner</code></h1>
+</header>
+<section id="section-intro">
+<p>Configuration Auto-Tuner</p>
+<p>Adjusts pipeline configuration parameters based on historical
+performance data: worker pool size, retry depth, model routing
+weights, and budget allocation.</p>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="atomik_sdk.pipeline.optimization.tuner.ConfigTuner"><code class="flex name class">
+<span>class <span class="ident">ConfigTuner</span></span>
+<span>(</span><span>min_workers: int = 1,<br>max_workers: int = 8,<br>min_retry_depth: int = 1,<br>max_retry_depth: int = 5)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class ConfigTuner:
+    &#34;&#34;&#34;
+    Auto-tunes pipeline configuration based on historical data.
+
+    Analyzes past run metrics to recommend optimal values for:
+    - Worker pool size (based on parallelism benefit)
+    - Retry depth (based on success rate at each depth)
+    - Model routing weights (based on per-tier success and cost)
+    - Budget allocation (based on per-stage token consumption)
+
+    Example:
+        &gt;&gt;&gt; tuner = ConfigTuner()
+        &gt;&gt;&gt; results = tuner.tune_all(run_history)
+        &gt;&gt;&gt; for r in results:
+        ...     print(f&#34;{r.parameter}: {r.old_value} -&gt; {r.new_value}&#34;)
+    &#34;&#34;&#34;
+
+    def __init__(
+        self,
+        min_workers: int = 1,
+        max_workers: int = 8,
+        min_retry_depth: int = 1,
+        max_retry_depth: int = 5,
+    ) -&gt; None:
+        self.min_workers = min_workers
+        self.max_workers = max_workers
+        self.min_retry_depth = min_retry_depth
+        self.max_retry_depth = max_retry_depth
+
+    def tune_all(
+        self,
+        run_history: list[dict[str, Any]],
+        current_config: dict[str, Any] | None = None,
+    ) -&gt; list[TuningResult]:
+        &#34;&#34;&#34;
+        Run all tuning analyses and return recommendations.
+
+        Args:
+            run_history: List of past run metrics dicts.
+            current_config: Current configuration values.
+
+        Returns:
+            List of TuningResult recommendations.
+        &#34;&#34;&#34;
+        config = current_config or {}
+        results: list[TuningResult] = []
+
+        if len(run_history) &lt; 2:
+            return results
+
+        workers_result = self.tune_workers(run_history, config.get(&#34;max_workers&#34;, 4))
+        if workers_result:
+            results.append(workers_result)
+
+        retry_result = self.tune_retry_depth(run_history, config.get(&#34;retry_depth&#34;, 3))
+        if retry_result:
+            results.append(retry_result)
+
+        routing_results = self.tune_model_routing(run_history, config.get(&#34;routing_weights&#34;, {}))
+        results.extend(routing_results)
+
+        return results
+
+    def tune_workers(
+        self,
+        run_history: list[dict[str, Any]],
+        current_workers: int = 4,
+    ) -&gt; TuningResult | None:
+        &#34;&#34;&#34;
+        Tune worker pool size based on observed parallelism benefit.
+
+        If parallel speedup is plateauing, reduce workers.
+        If speedup is near-linear, suggest increasing.
+        &#34;&#34;&#34;
+        speedups = [
+            r.get(&#34;parallel_speedup&#34;, 1.0)
+            for r in run_history
+            if &#34;parallel_speedup&#34; in r
+        ]
+
+        if len(speedups) &lt; 2:
+            return None
+
+        avg_speedup = sum(speedups) / len(speedups)
+
+        # Diminishing returns detection: speedup &lt; 0.7 * workers
+        efficiency = avg_speedup / current_workers if current_workers &gt; 0 else 0
+
+        if efficiency &lt; 0.4 and current_workers &gt; self.min_workers:
+            new_workers = max(self.min_workers, current_workers - 1)
+            return TuningResult(
+                parameter=&#34;max_workers&#34;,
+                old_value=current_workers,
+                new_value=new_workers,
+                reason=f&#34;Diminishing returns: avg speedup {avg_speedup:.1f}x with {current_workers} workers (efficiency {efficiency:.0%})&#34;,
+            )
+        elif efficiency &gt; 0.8 and current_workers &lt; self.max_workers:
+            new_workers = min(self.max_workers, current_workers + 1)
+            return TuningResult(
+                parameter=&#34;max_workers&#34;,
+                old_value=current_workers,
+                new_value=new_workers,
+                reason=f&#34;Near-linear speedup: {avg_speedup:.1f}x with {current_workers} workers (efficiency {efficiency:.0%})&#34;,
+            )
+
+        return None
+
+    def tune_retry_depth(
+        self,
+        run_history: list[dict[str, Any]],
+        current_depth: int = 3,
+    ) -&gt; TuningResult | None:
+        &#34;&#34;&#34;
+        Tune feedback loop retry depth based on success at each level.
+
+        If most fixes happen at depth 1, reduce depth.
+        If depth 3 frequently succeeds, consider increasing.
+        &#34;&#34;&#34;
+        depth_successes: dict[int, int] = {}
+        depth_attempts: dict[int, int] = {}
+
+        for run in run_history:
+            feedback = run.get(&#34;feedback_iterations&#34;, [])
+            for iteration in feedback:
+                depth = iteration.get(&#34;iteration&#34;, 0)
+                depth_attempts[depth] = depth_attempts.get(depth, 0) + 1
+                if iteration.get(&#34;re_verify_passed&#34;, False):
+                    depth_successes[depth] = depth_successes.get(depth, 0) + 1
+
+        if not depth_attempts:
+            return None
+
+        # Find the deepest level with &gt; 20% success rate
+        max_useful_depth = 1
+        for depth in sorted(depth_attempts.keys()):
+            attempts = depth_attempts[depth]
+            successes = depth_successes.get(depth, 0)
+            if attempts &gt; 0 and successes / attempts &gt; 0.2:
+                max_useful_depth = depth
+
+        new_depth = max(self.min_retry_depth, min(self.max_retry_depth, max_useful_depth + 1))
+
+        if new_depth != current_depth:
+            return TuningResult(
+                parameter=&#34;retry_depth&#34;,
+                old_value=current_depth,
+                new_value=new_depth,
+                reason=f&#34;Max useful retry depth is {max_useful_depth} based on {sum(depth_attempts.values())} attempts&#34;,
+            )
+
+        return None
+
+    def tune_model_routing(
+        self,
+        run_history: list[dict[str, Any]],
+        current_weights: dict[str, float] | None = None,
+    ) -&gt; list[TuningResult]:
+        &#34;&#34;&#34;
+        Tune model routing weights based on per-tier performance.
+
+        Adjusts the preference for each model tier based on
+        success rate and cost efficiency.
+        &#34;&#34;&#34;
+        results: list[TuningResult] = []
+        tier_stats: dict[str, dict[str, float]] = {}
+
+        for run in run_history:
+            tier_usage = run.get(&#34;tier_usage&#34;, {})
+            for tier, stats in tier_usage.items():
+                if tier not in tier_stats:
+                    tier_stats[tier] = {&#34;successes&#34;: 0, &#34;attempts&#34;: 0, &#34;tokens&#34;: 0}
+                tier_stats[tier][&#34;attempts&#34;] += stats.get(&#34;attempts&#34;, 0)
+                tier_stats[tier][&#34;successes&#34;] += stats.get(&#34;successes&#34;, 0)
+                tier_stats[tier][&#34;tokens&#34;] += stats.get(&#34;tokens&#34;, 0)
+
+        if not tier_stats:
+            return results
+
+        weights = current_weights or {}
+        for tier, stats in tier_stats.items():
+            attempts = stats[&#34;attempts&#34;]
+            if attempts &lt; 3:
+                continue
+            success_rate = stats[&#34;successes&#34;] / attempts
+            cost_per_success = stats[&#34;tokens&#34;] / max(stats[&#34;successes&#34;], 1)
+
+            old_weight = weights.get(tier, 1.0)
+            # Boost high-success, low-cost tiers
+            new_weight = success_rate / max(cost_per_success / 1000, 0.1)
+            new_weight = round(min(2.0, max(0.5, new_weight)), 2)
+
+            if abs(new_weight - old_weight) &gt; 0.1:
+                results.append(TuningResult(
+                    parameter=f&#34;routing_weight_{tier}&#34;,
+                    old_value=old_weight,
+                    new_value=new_weight,
+                    reason=f&#34;{tier}: {success_rate:.0%} success, {cost_per_success:.0f} tokens/success&#34;,
+                ))
+
+        return results</code></pre>
+</details>
+<div class="desc"><p>Auto-tunes pipeline configuration based on historical data.</p>
+<p>Analyzes past run metrics to recommend optimal values for:
+- Worker pool size (based on parallelism benefit)
+- Retry depth (based on success rate at each depth)
+- Model routing weights (based on per-tier success and cost)
+- Budget allocation (based on per-stage token consumption)</p>
+<h2 id="example">Example</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; tuner = ConfigTuner()
+&gt;&gt;&gt; results = tuner.tune_all(run_history)
+&gt;&gt;&gt; for r in results:
+...     print(f&quot;{r.parameter}: {r.old_value} -&gt; {r.new_value}&quot;)
+</code></pre></div>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.optimization.tuner.ConfigTuner.tune_all"><code class="name flex">
+<span>def <span class="ident">tune_all</span></span>(<span>self,<br>run_history: list[dict[str, Any]],<br>current_config: dict[str, Any] | None = None) ‑> list[<a title="atomik_sdk.pipeline.optimization.tuner.TuningResult" href="#atomik_sdk.pipeline.optimization.tuner.TuningResult">TuningResult</a>]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def tune_all(
+    self,
+    run_history: list[dict[str, Any]],
+    current_config: dict[str, Any] | None = None,
+) -&gt; list[TuningResult]:
+    &#34;&#34;&#34;
+    Run all tuning analyses and return recommendations.
+
+    Args:
+        run_history: List of past run metrics dicts.
+        current_config: Current configuration values.
+
+    Returns:
+        List of TuningResult recommendations.
+    &#34;&#34;&#34;
+    config = current_config or {}
+    results: list[TuningResult] = []
+
+    if len(run_history) &lt; 2:
+        return results
+
+    workers_result = self.tune_workers(run_history, config.get(&#34;max_workers&#34;, 4))
+    if workers_result:
+        results.append(workers_result)
+
+    retry_result = self.tune_retry_depth(run_history, config.get(&#34;retry_depth&#34;, 3))
+    if retry_result:
+        results.append(retry_result)
+
+    routing_results = self.tune_model_routing(run_history, config.get(&#34;routing_weights&#34;, {}))
+    results.extend(routing_results)
+
+    return results</code></pre>
+</details>
+<div class="desc"><p>Run all tuning analyses and return recommendations.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>run_history</code></strong></dt>
+<dd>List of past run metrics dicts.</dd>
+<dt><strong><code>current_config</code></strong></dt>
+<dd>Current configuration values.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>List of TuningResult recommendations.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.optimization.tuner.ConfigTuner.tune_model_routing"><code class="name flex">
+<span>def <span class="ident">tune_model_routing</span></span>(<span>self,<br>run_history: list[dict[str, Any]],<br>current_weights: dict[str, float] | None = None) ‑> list[<a title="atomik_sdk.pipeline.optimization.tuner.TuningResult" href="#atomik_sdk.pipeline.optimization.tuner.TuningResult">TuningResult</a>]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def tune_model_routing(
+    self,
+    run_history: list[dict[str, Any]],
+    current_weights: dict[str, float] | None = None,
+) -&gt; list[TuningResult]:
+    &#34;&#34;&#34;
+    Tune model routing weights based on per-tier performance.
+
+    Adjusts the preference for each model tier based on
+    success rate and cost efficiency.
+    &#34;&#34;&#34;
+    results: list[TuningResult] = []
+    tier_stats: dict[str, dict[str, float]] = {}
+
+    for run in run_history:
+        tier_usage = run.get(&#34;tier_usage&#34;, {})
+        for tier, stats in tier_usage.items():
+            if tier not in tier_stats:
+                tier_stats[tier] = {&#34;successes&#34;: 0, &#34;attempts&#34;: 0, &#34;tokens&#34;: 0}
+            tier_stats[tier][&#34;attempts&#34;] += stats.get(&#34;attempts&#34;, 0)
+            tier_stats[tier][&#34;successes&#34;] += stats.get(&#34;successes&#34;, 0)
+            tier_stats[tier][&#34;tokens&#34;] += stats.get(&#34;tokens&#34;, 0)
+
+    if not tier_stats:
+        return results
+
+    weights = current_weights or {}
+    for tier, stats in tier_stats.items():
+        attempts = stats[&#34;attempts&#34;]
+        if attempts &lt; 3:
+            continue
+        success_rate = stats[&#34;successes&#34;] / attempts
+        cost_per_success = stats[&#34;tokens&#34;] / max(stats[&#34;successes&#34;], 1)
+
+        old_weight = weights.get(tier, 1.0)
+        # Boost high-success, low-cost tiers
+        new_weight = success_rate / max(cost_per_success / 1000, 0.1)
+        new_weight = round(min(2.0, max(0.5, new_weight)), 2)
+
+        if abs(new_weight - old_weight) &gt; 0.1:
+            results.append(TuningResult(
+                parameter=f&#34;routing_weight_{tier}&#34;,
+                old_value=old_weight,
+                new_value=new_weight,
+                reason=f&#34;{tier}: {success_rate:.0%} success, {cost_per_success:.0f} tokens/success&#34;,
+            ))
+
+    return results</code></pre>
+</details>
+<div class="desc"><p>Tune model routing weights based on per-tier performance.</p>
+<p>Adjusts the preference for each model tier based on
+success rate and cost efficiency.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.optimization.tuner.ConfigTuner.tune_retry_depth"><code class="name flex">
+<span>def <span class="ident">tune_retry_depth</span></span>(<span>self, run_history: list[dict[str, Any]], current_depth: int = 3) ‑> <a title="atomik_sdk.pipeline.optimization.tuner.TuningResult" href="#atomik_sdk.pipeline.optimization.tuner.TuningResult">TuningResult</a> | None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def tune_retry_depth(
+    self,
+    run_history: list[dict[str, Any]],
+    current_depth: int = 3,
+) -&gt; TuningResult | None:
+    &#34;&#34;&#34;
+    Tune feedback loop retry depth based on success at each level.
+
+    If most fixes happen at depth 1, reduce depth.
+    If depth 3 frequently succeeds, consider increasing.
+    &#34;&#34;&#34;
+    depth_successes: dict[int, int] = {}
+    depth_attempts: dict[int, int] = {}
+
+    for run in run_history:
+        feedback = run.get(&#34;feedback_iterations&#34;, [])
+        for iteration in feedback:
+            depth = iteration.get(&#34;iteration&#34;, 0)
+            depth_attempts[depth] = depth_attempts.get(depth, 0) + 1
+            if iteration.get(&#34;re_verify_passed&#34;, False):
+                depth_successes[depth] = depth_successes.get(depth, 0) + 1
+
+    if not depth_attempts:
+        return None
+
+    # Find the deepest level with &gt; 20% success rate
+    max_useful_depth = 1
+    for depth in sorted(depth_attempts.keys()):
+        attempts = depth_attempts[depth]
+        successes = depth_successes.get(depth, 0)
+        if attempts &gt; 0 and successes / attempts &gt; 0.2:
+            max_useful_depth = depth
+
+    new_depth = max(self.min_retry_depth, min(self.max_retry_depth, max_useful_depth + 1))
+
+    if new_depth != current_depth:
+        return TuningResult(
+            parameter=&#34;retry_depth&#34;,
+            old_value=current_depth,
+            new_value=new_depth,
+            reason=f&#34;Max useful retry depth is {max_useful_depth} based on {sum(depth_attempts.values())} attempts&#34;,
+        )
+
+    return None</code></pre>
+</details>
+<div class="desc"><p>Tune feedback loop retry depth based on success at each level.</p>
+<p>If most fixes happen at depth 1, reduce depth.
+If depth 3 frequently succeeds, consider increasing.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.optimization.tuner.ConfigTuner.tune_workers"><code class="name flex">
+<span>def <span class="ident">tune_workers</span></span>(<span>self, run_history: list[dict[str, Any]], current_workers: int = 4) ‑> <a title="atomik_sdk.pipeline.optimization.tuner.TuningResult" href="#atomik_sdk.pipeline.optimization.tuner.TuningResult">TuningResult</a> | None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def tune_workers(
+    self,
+    run_history: list[dict[str, Any]],
+    current_workers: int = 4,
+) -&gt; TuningResult | None:
+    &#34;&#34;&#34;
+    Tune worker pool size based on observed parallelism benefit.
+
+    If parallel speedup is plateauing, reduce workers.
+    If speedup is near-linear, suggest increasing.
+    &#34;&#34;&#34;
+    speedups = [
+        r.get(&#34;parallel_speedup&#34;, 1.0)
+        for r in run_history
+        if &#34;parallel_speedup&#34; in r
+    ]
+
+    if len(speedups) &lt; 2:
+        return None
+
+    avg_speedup = sum(speedups) / len(speedups)
+
+    # Diminishing returns detection: speedup &lt; 0.7 * workers
+    efficiency = avg_speedup / current_workers if current_workers &gt; 0 else 0
+
+    if efficiency &lt; 0.4 and current_workers &gt; self.min_workers:
+        new_workers = max(self.min_workers, current_workers - 1)
+        return TuningResult(
+            parameter=&#34;max_workers&#34;,
+            old_value=current_workers,
+            new_value=new_workers,
+            reason=f&#34;Diminishing returns: avg speedup {avg_speedup:.1f}x with {current_workers} workers (efficiency {efficiency:.0%})&#34;,
+        )
+    elif efficiency &gt; 0.8 and current_workers &lt; self.max_workers:
+        new_workers = min(self.max_workers, current_workers + 1)
+        return TuningResult(
+            parameter=&#34;max_workers&#34;,
+            old_value=current_workers,
+            new_value=new_workers,
+            reason=f&#34;Near-linear speedup: {avg_speedup:.1f}x with {current_workers} workers (efficiency {efficiency:.0%})&#34;,
+        )
+
+    return None</code></pre>
+</details>
+<div class="desc"><p>Tune worker pool size based on observed parallelism benefit.</p>
+<p>If parallel speedup is plateauing, reduce workers.
+If speedup is near-linear, suggest increasing.</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.pipeline.optimization.tuner.TuningResult"><code class="flex name class">
+<span>class <span class="ident">TuningResult</span></span>
+<span>(</span><span>parameter: str, old_value: Any, new_value: Any, reason: str)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass
+class TuningResult:
+    &#34;&#34;&#34;Result of auto-tuning a configuration parameter.&#34;&#34;&#34;
+    parameter: str
+    old_value: Any
+    new_value: Any
+    reason: str
+
+    def to_dict(self) -&gt; dict[str, Any]:
+        return {
+            &#34;parameter&#34;: self.parameter,
+            &#34;old_value&#34;: self.old_value,
+            &#34;new_value&#34;: self.new_value,
+            &#34;reason&#34;: self.reason,
+        }</code></pre>
+</details>
+<div class="desc"><p>Result of auto-tuning a configuration parameter.</p></div>
+<h3>Instance variables</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.optimization.tuner.TuningResult.new_value"><code class="name">var <span class="ident">new_value</span> : Any</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.optimization.tuner.TuningResult.old_value"><code class="name">var <span class="ident">old_value</span> : Any</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.optimization.tuner.TuningResult.parameter"><code class="name">var <span class="ident">parameter</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.optimization.tuner.TuningResult.reason"><code class="name">var <span class="ident">reason</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.optimization.tuner.TuningResult.to_dict"><code class="name flex">
+<span>def <span class="ident">to_dict</span></span>(<span>self) ‑> dict[str, typing.Any]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_dict(self) -&gt; dict[str, Any]:
+    return {
+        &#34;parameter&#34;: self.parameter,
+        &#34;old_value&#34;: self.old_value,
+        &#34;new_value&#34;: self.new_value,
+        &#34;reason&#34;: self.reason,
+    }</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="atomik_sdk.pipeline.optimization" href="index.html">atomik_sdk.pipeline.optimization</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="atomik_sdk.pipeline.optimization.tuner.ConfigTuner" href="#atomik_sdk.pipeline.optimization.tuner.ConfigTuner">ConfigTuner</a></code></h4>
+<ul class="">
+<li><code><a title="atomik_sdk.pipeline.optimization.tuner.ConfigTuner.tune_all" href="#atomik_sdk.pipeline.optimization.tuner.ConfigTuner.tune_all">tune_all</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.optimization.tuner.ConfigTuner.tune_model_routing" href="#atomik_sdk.pipeline.optimization.tuner.ConfigTuner.tune_model_routing">tune_model_routing</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.optimization.tuner.ConfigTuner.tune_retry_depth" href="#atomik_sdk.pipeline.optimization.tuner.ConfigTuner.tune_retry_depth">tune_retry_depth</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.optimization.tuner.ConfigTuner.tune_workers" href="#atomik_sdk.pipeline.optimization.tuner.ConfigTuner.tune_workers">tune_workers</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.pipeline.optimization.tuner.TuningResult" href="#atomik_sdk.pipeline.optimization.tuner.TuningResult">TuningResult</a></code></h4>
+<ul class="">
+<li><code><a title="atomik_sdk.pipeline.optimization.tuner.TuningResult.new_value" href="#atomik_sdk.pipeline.optimization.tuner.TuningResult.new_value">new_value</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.optimization.tuner.TuningResult.old_value" href="#atomik_sdk.pipeline.optimization.tuner.TuningResult.old_value">old_value</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.optimization.tuner.TuningResult.parameter" href="#atomik_sdk.pipeline.optimization.tuner.TuningResult.parameter">parameter</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.optimization.tuner.TuningResult.reason" href="#atomik_sdk.pipeline.optimization.tuner.TuningResult.reason">reason</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.optimization.tuner.TuningResult.to_dict" href="#atomik_sdk.pipeline.optimization.tuner.TuningResult.to_dict">to_dict</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+</body>
+</html>

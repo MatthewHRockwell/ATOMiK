@@ -1,0 +1,759 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
+<title>atomik_sdk.pipeline.feedback API documentation</title>
+<meta name="description" content="Feedback Loop Engine …">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>atomik_sdk.pipeline.feedback</code></h1>
+</header>
+<section id="section-intro">
+<p>Feedback Loop Engine</p>
+<p>Implements the generate-verify-diagnose-fix-retry cycle with
+configurable depth. Each iteration classifies the error, consults
+the knowledge base for known fixes, applies the fix (or invokes
+LLM diagnosis), and re-verifies.</p>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-variables">Global variables</h2>
+<dl>
+<dt id="atomik_sdk.pipeline.feedback.ErrorClassifier"><code class="name">var <span class="ident">ErrorClassifier</span></code></dt>
+<dd>
+<div class="desc"><p>(language, errors) -&gt; (error_class, primary_error_message)</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.feedback.FixApplier"><code class="name">var <span class="ident">FixApplier</span></code></dt>
+<dd>
+<div class="desc"><p>(language, error_class, fix_description) -&gt; success</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.feedback.KBLookup"><code class="name">var <span class="ident">KBLookup</span></code></dt>
+<dd>
+<div class="desc"><p>(language, error_class, error_msg) -&gt; (found, fix_description)</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.feedback.KBRecorder"><code class="name">var <span class="ident">KBRecorder</span></code></dt>
+<dd>
+<div class="desc"><p>(language, error_class, error_msg, fix_description) -&gt; None</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.feedback.LLMDiagnoser"><code class="name">var <span class="ident">LLMDiagnoser</span></code></dt>
+<dd>
+<div class="desc"><p>(language, error_class, errors) -&gt; (fix_description, tokens_consumed)</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.feedback.Verifier"><code class="name">var <span class="ident">Verifier</span></code></dt>
+<dd>
+<div class="desc"><p>(language) -&gt; (passed, errors)</p></div>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="atomik_sdk.pipeline.feedback.FeedbackIteration"><code class="flex name class">
+<span>class <span class="ident">FeedbackIteration</span></span>
+<span>(</span><span>iteration: int,<br>error_class: str,<br>error_message: str,<br>fix_source: str = '',<br>fix_applied: bool = False,<br>fix_description: str = '',<br>tokens_consumed: int = 0,<br>re_verify_passed: bool = False,<br>duration_ms: float = 0.0)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass
+class FeedbackIteration:
+    &#34;&#34;&#34;Record of a single feedback loop iteration.&#34;&#34;&#34;
+    iteration: int
+    error_class: str
+    error_message: str
+    fix_source: str = &#34;&#34;        # &#34;kb&#34;, &#34;llm&#34;, or &#34;&#34;
+    fix_applied: bool = False
+    fix_description: str = &#34;&#34;
+    tokens_consumed: int = 0
+    re_verify_passed: bool = False
+    duration_ms: float = 0.0
+
+    def to_dict(self) -&gt; dict[str, Any]:
+        return {
+            &#34;iteration&#34;: self.iteration,
+            &#34;error_class&#34;: self.error_class,
+            &#34;error_message&#34;: self.error_message,
+            &#34;fix_source&#34;: self.fix_source,
+            &#34;fix_applied&#34;: self.fix_applied,
+            &#34;fix_description&#34;: self.fix_description,
+            &#34;tokens_consumed&#34;: self.tokens_consumed,
+            &#34;re_verify_passed&#34;: self.re_verify_passed,
+            &#34;duration_ms&#34;: round(self.duration_ms, 1),
+        }</code></pre>
+</details>
+<div class="desc"><p>Record of a single feedback loop iteration.</p></div>
+<h3>Instance variables</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.feedback.FeedbackIteration.duration_ms"><code class="name">var <span class="ident">duration_ms</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.feedback.FeedbackIteration.error_class"><code class="name">var <span class="ident">error_class</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.feedback.FeedbackIteration.error_message"><code class="name">var <span class="ident">error_message</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.feedback.FeedbackIteration.fix_applied"><code class="name">var <span class="ident">fix_applied</span> : bool</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.feedback.FeedbackIteration.fix_description"><code class="name">var <span class="ident">fix_description</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.feedback.FeedbackIteration.fix_source"><code class="name">var <span class="ident">fix_source</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.feedback.FeedbackIteration.iteration"><code class="name">var <span class="ident">iteration</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.feedback.FeedbackIteration.re_verify_passed"><code class="name">var <span class="ident">re_verify_passed</span> : bool</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.feedback.FeedbackIteration.tokens_consumed"><code class="name">var <span class="ident">tokens_consumed</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.feedback.FeedbackIteration.to_dict"><code class="name flex">
+<span>def <span class="ident">to_dict</span></span>(<span>self) ‑> dict[str, typing.Any]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_dict(self) -&gt; dict[str, Any]:
+    return {
+        &#34;iteration&#34;: self.iteration,
+        &#34;error_class&#34;: self.error_class,
+        &#34;error_message&#34;: self.error_message,
+        &#34;fix_source&#34;: self.fix_source,
+        &#34;fix_applied&#34;: self.fix_applied,
+        &#34;fix_description&#34;: self.fix_description,
+        &#34;tokens_consumed&#34;: self.tokens_consumed,
+        &#34;re_verify_passed&#34;: self.re_verify_passed,
+        &#34;duration_ms&#34;: round(self.duration_ms, 1),
+    }</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.pipeline.feedback.FeedbackLoop"><code class="flex name class">
+<span>class <span class="ident">FeedbackLoop</span></span>
+<span>(</span><span>max_depth: int = 3, event_bus: EventBus | None = None)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class FeedbackLoop:
+    &#34;&#34;&#34;
+    Feedback loop engine for self-correcting pipeline failures.
+
+    Wraps a verify-diagnose-fix cycle with configurable max depth.
+    On each iteration:
+    1. Classify the error
+    2. Check the knowledge base for a known fix
+    3. If known: apply fix (0 tokens), re-verify
+    4. If unknown: invoke LLM diagnosis, apply fix, re-verify
+    5. If fix succeeds: record in KB for future use
+    6. If identical error repeats: escalate immediately
+
+    Example:
+        &gt;&gt;&gt; loop = FeedbackLoop(max_depth=3)
+        &gt;&gt;&gt; result = loop.run(&#34;python&#34;, errors, classifier, kb_lookup, ...)
+        &gt;&gt;&gt; if result.resolved:
+        ...     print(f&#34;Fixed in {len(result.iterations)} iterations&#34;)
+    &#34;&#34;&#34;
+
+    def __init__(
+        self,
+        max_depth: int = 3,
+        event_bus: EventBus | None = None,
+    ) -&gt; None:
+        self.max_depth = max_depth
+        self.event_bus = event_bus
+
+    def run(
+        self,
+        language: str,
+        initial_errors: list[str],
+        classify: ErrorClassifier,
+        kb_lookup: KBLookup,
+        apply_fix: FixApplier,
+        llm_diagnose: LLMDiagnoser,
+        verify: Verifier,
+        kb_record: KBRecorder | None = None,
+    ) -&gt; FeedbackResult:
+        &#34;&#34;&#34;
+        Execute the feedback loop.
+
+        Args:
+            language: Language of the failing code.
+            initial_errors: Initial error messages from verification.
+            classify: Callback to classify errors.
+            kb_lookup: Callback to look up known fixes.
+            apply_fix: Callback to apply a fix.
+            llm_diagnose: Callback to invoke LLM diagnosis.
+            verify: Callback to re-verify after fix.
+            kb_record: Optional callback to record new patterns in KB.
+
+        Returns:
+            FeedbackResult with outcome and iteration details.
+        &#34;&#34;&#34;
+        result = FeedbackResult(outcome=FeedbackOutcome.RETRY_EXHAUSTED)
+        errors = list(initial_errors)
+        prev_error_class = &#34;&#34;
+
+        for i in range(self.max_depth):
+            start = time.perf_counter()
+            error_class, primary_error = classify(language, errors)
+            iteration = FeedbackIteration(
+                iteration=i + 1,
+                error_class=error_class,
+                error_message=primary_error,
+            )
+
+            if self.event_bus:
+                self.event_bus.emit(Event(
+                    EventType.FEEDBACK_START,
+                    {
+                        &#34;language&#34;: language,
+                        &#34;error_class&#34;: error_class,
+                        &#34;retry_number&#34;: i + 1,
+                        &#34;max_retries&#34;: self.max_depth,
+                    },
+                    source=&#34;feedback_loop&#34;,
+                ))
+
+            # Identical error detection -- prevent oscillation
+            if error_class == prev_error_class and i &gt; 0:
+                iteration.duration_ms = (time.perf_counter() - start) * 1000
+                result.iterations.append(iteration)
+                result.outcome = FeedbackOutcome.IDENTICAL_ERROR
+                result.final_errors = errors
+                break
+
+            prev_error_class = error_class
+
+            # Step 1: Check knowledge base
+            kb_found, fix_desc = kb_lookup(language, error_class, primary_error)
+
+            if kb_found:
+                iteration.fix_source = &#34;kb&#34;
+                iteration.fix_description = fix_desc
+                success = apply_fix(language, error_class, fix_desc)
+                iteration.fix_applied = success
+
+                if success:
+                    passed, new_errors = verify(language)
+                    iteration.re_verify_passed = passed
+                    iteration.duration_ms = (time.perf_counter() - start) * 1000
+                    result.iterations.append(iteration)
+
+                    if self.event_bus:
+                        self.event_bus.emit(Event(
+                            EventType.FEEDBACK_RESULT,
+                            {
+                                &#34;fix_source&#34;: &#34;kb&#34;,
+                                &#34;success&#34;: passed,
+                                &#34;iteration&#34;: i + 1,
+                            },
+                            source=&#34;feedback_loop&#34;,
+                        ))
+
+                    if passed:
+                        result.outcome = FeedbackOutcome.FIXED_BY_KB
+                        result.total_tokens = sum(
+                            it.tokens_consumed for it in result.iterations
+                        )
+                        return result
+                    errors = new_errors
+                    continue
+
+            # Step 2: LLM diagnosis
+            fix_desc, tokens = llm_diagnose(language, error_class, errors)
+            iteration.fix_source = &#34;llm&#34;
+            iteration.fix_description = fix_desc
+            iteration.tokens_consumed = tokens
+
+            success = apply_fix(language, error_class, fix_desc)
+            iteration.fix_applied = success
+
+            if success:
+                passed, new_errors = verify(language)
+                iteration.re_verify_passed = passed
+                iteration.duration_ms = (time.perf_counter() - start) * 1000
+                result.iterations.append(iteration)
+
+                if self.event_bus:
+                    self.event_bus.emit(Event(
+                        EventType.FEEDBACK_RESULT,
+                        {
+                            &#34;fix_source&#34;: &#34;llm&#34;,
+                            &#34;success&#34;: passed,
+                            &#34;iteration&#34;: i + 1,
+                        },
+                        source=&#34;feedback_loop&#34;,
+                    ))
+
+                if passed:
+                    result.outcome = FeedbackOutcome.FIXED_BY_LLM
+                    # Record successful LLM fix in KB for future use
+                    if kb_record:
+                        kb_record(language, error_class, primary_error, fix_desc)
+                    result.total_tokens = sum(
+                        it.tokens_consumed for it in result.iterations
+                    )
+                    return result
+                errors = new_errors
+            else:
+                iteration.duration_ms = (time.perf_counter() - start) * 1000
+                result.iterations.append(iteration)
+
+        result.final_errors = errors
+        result.total_tokens = sum(it.tokens_consumed for it in result.iterations)
+        return result</code></pre>
+</details>
+<div class="desc"><p>Feedback loop engine for self-correcting pipeline failures.</p>
+<p>Wraps a verify-diagnose-fix cycle with configurable max depth.
+On each iteration:
+1. Classify the error
+2. Check the knowledge base for a known fix
+3. If known: apply fix (0 tokens), re-verify
+4. If unknown: invoke LLM diagnosis, apply fix, re-verify
+5. If fix succeeds: record in KB for future use
+6. If identical error repeats: escalate immediately</p>
+<h2 id="example">Example</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; loop = FeedbackLoop(max_depth=3)
+&gt;&gt;&gt; result = loop.run(&quot;python&quot;, errors, classifier, kb_lookup, ...)
+&gt;&gt;&gt; if result.resolved:
+...     print(f&quot;Fixed in {len(result.iterations)} iterations&quot;)
+</code></pre></div>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.feedback.FeedbackLoop.run"><code class="name flex">
+<span>def <span class="ident">run</span></span>(<span>self,<br>language: str,<br>initial_errors: list[str],<br>classify: <a title="atomik_sdk.pipeline.feedback.ErrorClassifier" href="#atomik_sdk.pipeline.feedback.ErrorClassifier">ErrorClassifier</a>,<br>kb_lookup: <a title="atomik_sdk.pipeline.feedback.KBLookup" href="#atomik_sdk.pipeline.feedback.KBLookup">KBLookup</a>,<br>apply_fix: <a title="atomik_sdk.pipeline.feedback.FixApplier" href="#atomik_sdk.pipeline.feedback.FixApplier">FixApplier</a>,<br>llm_diagnose: <a title="atomik_sdk.pipeline.feedback.LLMDiagnoser" href="#atomik_sdk.pipeline.feedback.LLMDiagnoser">LLMDiagnoser</a>,<br>verify: <a title="atomik_sdk.pipeline.feedback.Verifier" href="#atomik_sdk.pipeline.feedback.Verifier">Verifier</a>,<br>kb_record: <a title="atomik_sdk.pipeline.feedback.KBRecorder" href="#atomik_sdk.pipeline.feedback.KBRecorder">KBRecorder</a> | None = None) ‑> <a title="atomik_sdk.pipeline.feedback.FeedbackResult" href="#atomik_sdk.pipeline.feedback.FeedbackResult">FeedbackResult</a></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def run(
+    self,
+    language: str,
+    initial_errors: list[str],
+    classify: ErrorClassifier,
+    kb_lookup: KBLookup,
+    apply_fix: FixApplier,
+    llm_diagnose: LLMDiagnoser,
+    verify: Verifier,
+    kb_record: KBRecorder | None = None,
+) -&gt; FeedbackResult:
+    &#34;&#34;&#34;
+    Execute the feedback loop.
+
+    Args:
+        language: Language of the failing code.
+        initial_errors: Initial error messages from verification.
+        classify: Callback to classify errors.
+        kb_lookup: Callback to look up known fixes.
+        apply_fix: Callback to apply a fix.
+        llm_diagnose: Callback to invoke LLM diagnosis.
+        verify: Callback to re-verify after fix.
+        kb_record: Optional callback to record new patterns in KB.
+
+    Returns:
+        FeedbackResult with outcome and iteration details.
+    &#34;&#34;&#34;
+    result = FeedbackResult(outcome=FeedbackOutcome.RETRY_EXHAUSTED)
+    errors = list(initial_errors)
+    prev_error_class = &#34;&#34;
+
+    for i in range(self.max_depth):
+        start = time.perf_counter()
+        error_class, primary_error = classify(language, errors)
+        iteration = FeedbackIteration(
+            iteration=i + 1,
+            error_class=error_class,
+            error_message=primary_error,
+        )
+
+        if self.event_bus:
+            self.event_bus.emit(Event(
+                EventType.FEEDBACK_START,
+                {
+                    &#34;language&#34;: language,
+                    &#34;error_class&#34;: error_class,
+                    &#34;retry_number&#34;: i + 1,
+                    &#34;max_retries&#34;: self.max_depth,
+                },
+                source=&#34;feedback_loop&#34;,
+            ))
+
+        # Identical error detection -- prevent oscillation
+        if error_class == prev_error_class and i &gt; 0:
+            iteration.duration_ms = (time.perf_counter() - start) * 1000
+            result.iterations.append(iteration)
+            result.outcome = FeedbackOutcome.IDENTICAL_ERROR
+            result.final_errors = errors
+            break
+
+        prev_error_class = error_class
+
+        # Step 1: Check knowledge base
+        kb_found, fix_desc = kb_lookup(language, error_class, primary_error)
+
+        if kb_found:
+            iteration.fix_source = &#34;kb&#34;
+            iteration.fix_description = fix_desc
+            success = apply_fix(language, error_class, fix_desc)
+            iteration.fix_applied = success
+
+            if success:
+                passed, new_errors = verify(language)
+                iteration.re_verify_passed = passed
+                iteration.duration_ms = (time.perf_counter() - start) * 1000
+                result.iterations.append(iteration)
+
+                if self.event_bus:
+                    self.event_bus.emit(Event(
+                        EventType.FEEDBACK_RESULT,
+                        {
+                            &#34;fix_source&#34;: &#34;kb&#34;,
+                            &#34;success&#34;: passed,
+                            &#34;iteration&#34;: i + 1,
+                        },
+                        source=&#34;feedback_loop&#34;,
+                    ))
+
+                if passed:
+                    result.outcome = FeedbackOutcome.FIXED_BY_KB
+                    result.total_tokens = sum(
+                        it.tokens_consumed for it in result.iterations
+                    )
+                    return result
+                errors = new_errors
+                continue
+
+        # Step 2: LLM diagnosis
+        fix_desc, tokens = llm_diagnose(language, error_class, errors)
+        iteration.fix_source = &#34;llm&#34;
+        iteration.fix_description = fix_desc
+        iteration.tokens_consumed = tokens
+
+        success = apply_fix(language, error_class, fix_desc)
+        iteration.fix_applied = success
+
+        if success:
+            passed, new_errors = verify(language)
+            iteration.re_verify_passed = passed
+            iteration.duration_ms = (time.perf_counter() - start) * 1000
+            result.iterations.append(iteration)
+
+            if self.event_bus:
+                self.event_bus.emit(Event(
+                    EventType.FEEDBACK_RESULT,
+                    {
+                        &#34;fix_source&#34;: &#34;llm&#34;,
+                        &#34;success&#34;: passed,
+                        &#34;iteration&#34;: i + 1,
+                    },
+                    source=&#34;feedback_loop&#34;,
+                ))
+
+            if passed:
+                result.outcome = FeedbackOutcome.FIXED_BY_LLM
+                # Record successful LLM fix in KB for future use
+                if kb_record:
+                    kb_record(language, error_class, primary_error, fix_desc)
+                result.total_tokens = sum(
+                    it.tokens_consumed for it in result.iterations
+                )
+                return result
+            errors = new_errors
+        else:
+            iteration.duration_ms = (time.perf_counter() - start) * 1000
+            result.iterations.append(iteration)
+
+    result.final_errors = errors
+    result.total_tokens = sum(it.tokens_consumed for it in result.iterations)
+    return result</code></pre>
+</details>
+<div class="desc"><p>Execute the feedback loop.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>language</code></strong></dt>
+<dd>Language of the failing code.</dd>
+<dt><strong><code>initial_errors</code></strong></dt>
+<dd>Initial error messages from verification.</dd>
+<dt><strong><code>classify</code></strong></dt>
+<dd>Callback to classify errors.</dd>
+<dt><strong><code>kb_lookup</code></strong></dt>
+<dd>Callback to look up known fixes.</dd>
+<dt><strong><code>apply_fix</code></strong></dt>
+<dd>Callback to apply a fix.</dd>
+<dt><strong><code>llm_diagnose</code></strong></dt>
+<dd>Callback to invoke LLM diagnosis.</dd>
+<dt><strong><code>verify</code></strong></dt>
+<dd>Callback to re-verify after fix.</dd>
+<dt><strong><code>kb_record</code></strong></dt>
+<dd>Optional callback to record new patterns in KB.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>FeedbackResult with outcome and iteration details.</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.pipeline.feedback.FeedbackOutcome"><code class="flex name class">
+<span>class <span class="ident">FeedbackOutcome</span></span>
+<span>(</span><span>*args, **kwds)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class FeedbackOutcome(Enum):
+    &#34;&#34;&#34;Outcome of a feedback loop iteration.&#34;&#34;&#34;
+    FIXED_BY_KB = &#34;fixed_by_kb&#34;        # Known fix applied from knowledge base
+    FIXED_BY_LLM = &#34;fixed_by_llm&#34;      # LLM-diagnosed fix applied
+    RETRY_EXHAUSTED = &#34;retry_exhausted&#34;  # Max retries reached
+    ESCALATED = &#34;escalated&#34;             # Escalated to higher tier / human
+    IDENTICAL_ERROR = &#34;identical_error&#34;  # Same error repeated -- immediate escalation</code></pre>
+</details>
+<div class="desc"><p>Outcome of a feedback loop iteration.</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.feedback.FeedbackOutcome.ESCALATED"><code class="name">var <span class="ident">ESCALATED</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.feedback.FeedbackOutcome.FIXED_BY_KB"><code class="name">var <span class="ident">FIXED_BY_KB</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.feedback.FeedbackOutcome.FIXED_BY_LLM"><code class="name">var <span class="ident">FIXED_BY_LLM</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.feedback.FeedbackOutcome.IDENTICAL_ERROR"><code class="name">var <span class="ident">IDENTICAL_ERROR</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.feedback.FeedbackOutcome.RETRY_EXHAUSTED"><code class="name">var <span class="ident">RETRY_EXHAUSTED</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.pipeline.feedback.FeedbackResult"><code class="flex name class">
+<span>class <span class="ident">FeedbackResult</span></span>
+<span>(</span><span>outcome: <a title="atomik_sdk.pipeline.feedback.FeedbackOutcome" href="#atomik_sdk.pipeline.feedback.FeedbackOutcome">FeedbackOutcome</a>,<br>iterations: list[<a title="atomik_sdk.pipeline.feedback.FeedbackIteration" href="#atomik_sdk.pipeline.feedback.FeedbackIteration">FeedbackIteration</a>] = &lt;factory&gt;,<br>total_tokens: int = 0,<br>final_errors: list[str] = &lt;factory&gt;)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass
+class FeedbackResult:
+    &#34;&#34;&#34;Result of a complete feedback loop execution.&#34;&#34;&#34;
+    outcome: FeedbackOutcome
+    iterations: list[FeedbackIteration] = field(default_factory=list)
+    total_tokens: int = 0
+    final_errors: list[str] = field(default_factory=list)
+
+    @property
+    def resolved(self) -&gt; bool:
+        return self.outcome in (FeedbackOutcome.FIXED_BY_KB, FeedbackOutcome.FIXED_BY_LLM)
+
+    def to_dict(self) -&gt; dict[str, Any]:
+        return {
+            &#34;outcome&#34;: self.outcome.value,
+            &#34;resolved&#34;: self.resolved,
+            &#34;iterations&#34;: [it.to_dict() for it in self.iterations],
+            &#34;total_tokens&#34;: self.total_tokens,
+            &#34;final_errors&#34;: self.final_errors,
+        }</code></pre>
+</details>
+<div class="desc"><p>Result of a complete feedback loop execution.</p></div>
+<h3>Instance variables</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.feedback.FeedbackResult.final_errors"><code class="name">var <span class="ident">final_errors</span> : list[str]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.feedback.FeedbackResult.iterations"><code class="name">var <span class="ident">iterations</span> : list[<a title="atomik_sdk.pipeline.feedback.FeedbackIteration" href="#atomik_sdk.pipeline.feedback.FeedbackIteration">FeedbackIteration</a>]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.feedback.FeedbackResult.outcome"><code class="name">var <span class="ident">outcome</span> : <a title="atomik_sdk.pipeline.feedback.FeedbackOutcome" href="#atomik_sdk.pipeline.feedback.FeedbackOutcome">FeedbackOutcome</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.feedback.FeedbackResult.resolved"><code class="name">prop <span class="ident">resolved</span> : bool</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def resolved(self) -&gt; bool:
+    return self.outcome in (FeedbackOutcome.FIXED_BY_KB, FeedbackOutcome.FIXED_BY_LLM)</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.feedback.FeedbackResult.total_tokens"><code class="name">var <span class="ident">total_tokens</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.feedback.FeedbackResult.to_dict"><code class="name flex">
+<span>def <span class="ident">to_dict</span></span>(<span>self) ‑> dict[str, typing.Any]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_dict(self) -&gt; dict[str, Any]:
+    return {
+        &#34;outcome&#34;: self.outcome.value,
+        &#34;resolved&#34;: self.resolved,
+        &#34;iterations&#34;: [it.to_dict() for it in self.iterations],
+        &#34;total_tokens&#34;: self.total_tokens,
+        &#34;final_errors&#34;: self.final_errors,
+    }</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="atomik_sdk.pipeline" href="index.html">atomik_sdk.pipeline</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-variables">Global variables</a></h3>
+<ul class="two-column">
+<li><code><a title="atomik_sdk.pipeline.feedback.ErrorClassifier" href="#atomik_sdk.pipeline.feedback.ErrorClassifier">ErrorClassifier</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.feedback.FixApplier" href="#atomik_sdk.pipeline.feedback.FixApplier">FixApplier</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.feedback.KBLookup" href="#atomik_sdk.pipeline.feedback.KBLookup">KBLookup</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.feedback.KBRecorder" href="#atomik_sdk.pipeline.feedback.KBRecorder">KBRecorder</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.feedback.LLMDiagnoser" href="#atomik_sdk.pipeline.feedback.LLMDiagnoser">LLMDiagnoser</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.feedback.Verifier" href="#atomik_sdk.pipeline.feedback.Verifier">Verifier</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="atomik_sdk.pipeline.feedback.FeedbackIteration" href="#atomik_sdk.pipeline.feedback.FeedbackIteration">FeedbackIteration</a></code></h4>
+<ul class="two-column">
+<li><code><a title="atomik_sdk.pipeline.feedback.FeedbackIteration.duration_ms" href="#atomik_sdk.pipeline.feedback.FeedbackIteration.duration_ms">duration_ms</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.feedback.FeedbackIteration.error_class" href="#atomik_sdk.pipeline.feedback.FeedbackIteration.error_class">error_class</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.feedback.FeedbackIteration.error_message" href="#atomik_sdk.pipeline.feedback.FeedbackIteration.error_message">error_message</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.feedback.FeedbackIteration.fix_applied" href="#atomik_sdk.pipeline.feedback.FeedbackIteration.fix_applied">fix_applied</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.feedback.FeedbackIteration.fix_description" href="#atomik_sdk.pipeline.feedback.FeedbackIteration.fix_description">fix_description</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.feedback.FeedbackIteration.fix_source" href="#atomik_sdk.pipeline.feedback.FeedbackIteration.fix_source">fix_source</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.feedback.FeedbackIteration.iteration" href="#atomik_sdk.pipeline.feedback.FeedbackIteration.iteration">iteration</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.feedback.FeedbackIteration.re_verify_passed" href="#atomik_sdk.pipeline.feedback.FeedbackIteration.re_verify_passed">re_verify_passed</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.feedback.FeedbackIteration.to_dict" href="#atomik_sdk.pipeline.feedback.FeedbackIteration.to_dict">to_dict</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.feedback.FeedbackIteration.tokens_consumed" href="#atomik_sdk.pipeline.feedback.FeedbackIteration.tokens_consumed">tokens_consumed</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.pipeline.feedback.FeedbackLoop" href="#atomik_sdk.pipeline.feedback.FeedbackLoop">FeedbackLoop</a></code></h4>
+<ul class="">
+<li><code><a title="atomik_sdk.pipeline.feedback.FeedbackLoop.run" href="#atomik_sdk.pipeline.feedback.FeedbackLoop.run">run</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.pipeline.feedback.FeedbackOutcome" href="#atomik_sdk.pipeline.feedback.FeedbackOutcome">FeedbackOutcome</a></code></h4>
+<ul class="">
+<li><code><a title="atomik_sdk.pipeline.feedback.FeedbackOutcome.ESCALATED" href="#atomik_sdk.pipeline.feedback.FeedbackOutcome.ESCALATED">ESCALATED</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.feedback.FeedbackOutcome.FIXED_BY_KB" href="#atomik_sdk.pipeline.feedback.FeedbackOutcome.FIXED_BY_KB">FIXED_BY_KB</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.feedback.FeedbackOutcome.FIXED_BY_LLM" href="#atomik_sdk.pipeline.feedback.FeedbackOutcome.FIXED_BY_LLM">FIXED_BY_LLM</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.feedback.FeedbackOutcome.IDENTICAL_ERROR" href="#atomik_sdk.pipeline.feedback.FeedbackOutcome.IDENTICAL_ERROR">IDENTICAL_ERROR</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.feedback.FeedbackOutcome.RETRY_EXHAUSTED" href="#atomik_sdk.pipeline.feedback.FeedbackOutcome.RETRY_EXHAUSTED">RETRY_EXHAUSTED</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.pipeline.feedback.FeedbackResult" href="#atomik_sdk.pipeline.feedback.FeedbackResult">FeedbackResult</a></code></h4>
+<ul class="two-column">
+<li><code><a title="atomik_sdk.pipeline.feedback.FeedbackResult.final_errors" href="#atomik_sdk.pipeline.feedback.FeedbackResult.final_errors">final_errors</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.feedback.FeedbackResult.iterations" href="#atomik_sdk.pipeline.feedback.FeedbackResult.iterations">iterations</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.feedback.FeedbackResult.outcome" href="#atomik_sdk.pipeline.feedback.FeedbackResult.outcome">outcome</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.feedback.FeedbackResult.resolved" href="#atomik_sdk.pipeline.feedback.FeedbackResult.resolved">resolved</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.feedback.FeedbackResult.to_dict" href="#atomik_sdk.pipeline.feedback.FeedbackResult.to_dict">to_dict</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.feedback.FeedbackResult.total_tokens" href="#atomik_sdk.pipeline.feedback.FeedbackResult.total_tokens">total_tokens</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+</body>
+</html>

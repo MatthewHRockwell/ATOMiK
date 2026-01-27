@@ -1,0 +1,498 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
+<title>atomik_sdk.pipeline.agents.token_budget API documentation</title>
+<meta name="description" content="Token Budget Accounting …">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>atomik_sdk.pipeline.agents.token_budget</code></h1>
+</header>
+<section id="section-intro">
+<p>Token Budget Accounting</p>
+<p>Tracks per-pipeline and per-session token consumption. Enforces
+budget limits and reports token efficiency metrics.</p>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="atomik_sdk.pipeline.agents.token_budget.TokenBudget"><code class="flex name class">
+<span>class <span class="ident">TokenBudget</span></span>
+<span>(</span><span>limit: int | None = None)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class TokenBudget:
+    &#34;&#34;&#34;
+    Token budget accounting for pipeline runs.
+
+    Tracks actual vs. estimated consumption, enforces budget limits,
+    and computes efficiency metrics.
+
+    Example:
+        &gt;&gt;&gt; budget = TokenBudget(limit=15000)
+        &gt;&gt;&gt; budget.record(&#34;validate&#34;, &#34;local&#34;, 0)
+        &gt;&gt;&gt; budget.record(&#34;generate&#34;, &#34;local&#34;, 0)
+        &gt;&gt;&gt; print(f&#34;Spent: {budget.total_consumed}&#34;)
+    &#34;&#34;&#34;
+
+    def __init__(self, limit: int | None = None):
+        self.limit = limit
+        self._entries: list[TokenEntry] = []
+        self._estimates: dict[str, int] = {}
+
+    @property
+    def total_consumed(self) -&gt; int:
+        return sum(e.tokens for e in self._entries)
+
+    @property
+    def remaining(self) -&gt; int | None:
+        if self.limit is None:
+            return None
+        return max(0, self.limit - self.total_consumed)
+
+    def record(
+        self,
+        stage: str,
+        model_tier: str,
+        tokens: int,
+        description: str = &#34;&#34;,
+    ) -&gt; None:
+        &#34;&#34;&#34;Record actual token consumption for a stage.&#34;&#34;&#34;
+        self._entries.append(TokenEntry(
+            stage=stage,
+            model_tier=model_tier,
+            tokens=tokens,
+            timestamp=time.strftime(&#34;%Y-%m-%dT%H:%M:%SZ&#34;, time.gmtime()),
+            description=description,
+        ))
+
+    def set_estimate(self, stage: str, tokens: int) -&gt; None:
+        &#34;&#34;&#34;Set estimated token consumption for a stage.&#34;&#34;&#34;
+        self._estimates[stage] = tokens
+
+    def can_afford(self, estimated_tokens: int) -&gt; bool:
+        &#34;&#34;&#34;Check if the budget can afford the estimated tokens.&#34;&#34;&#34;
+        if self.limit is None:
+            return True
+        return self.total_consumed + estimated_tokens &lt;= self.limit
+
+    def get_efficiency(self) -&gt; dict[str, Any]:
+        &#34;&#34;&#34;Compute token efficiency metrics.&#34;&#34;&#34;
+        total = self.total_consumed
+        total_estimated = sum(self._estimates.values())
+
+        # Breakdown by model tier
+        by_tier: dict[str, int] = {}
+        for entry in self._entries:
+            by_tier[entry.model_tier] = by_tier.get(entry.model_tier, 0) + entry.tokens
+
+        local_stages = sum(1 for e in self._entries if e.model_tier == &#34;local&#34;)
+        total_stages = len(self._entries)
+
+        return {
+            &#34;total_consumed&#34;: total,
+            &#34;total_estimated&#34;: total_estimated,
+            &#34;estimation_accuracy_pct&#34;: (
+                round(100 * total / total_estimated, 1) if total_estimated &gt; 0 else 0
+            ),
+            &#34;budget_limit&#34;: self.limit,
+            &#34;budget_remaining&#34;: self.remaining,
+            &#34;local_execution_pct&#34;: (
+                round(100 * local_stages / total_stages, 1) if total_stages &gt; 0 else 0
+            ),
+            &#34;by_tier&#34;: by_tier,
+            &#34;stages_recorded&#34;: total_stages,
+        }
+
+    def get_ledger(self) -&gt; list[dict[str, Any]]:
+        &#34;&#34;&#34;Get the full token ledger.&#34;&#34;&#34;
+        return [e.to_dict() for e in self._entries]
+
+    @property
+    def budget_pressure(self) -&gt; float:
+        &#34;&#34;&#34;Budget utilization as a fraction (0.0 to 1.0).&#34;&#34;&#34;
+        if self.limit is None or self.limit == 0:
+            return 0.0
+        return min(1.0, self.total_consumed / self.limit)
+
+    def check_warnings(self) -&gt; list[str]:
+        &#34;&#34;&#34;Check for budget threshold warnings.&#34;&#34;&#34;
+        warnings = []
+        pressure = self.budget_pressure
+        if pressure &gt;= 0.9:
+            warnings.append(f&#34;CRITICAL: Budget 90% consumed ({self.total_consumed}/{self.limit})&#34;)
+        elif pressure &gt;= 0.75:
+            warnings.append(f&#34;WARNING: Budget 75% consumed ({self.total_consumed}/{self.limit})&#34;)
+        elif pressure &gt;= 0.5:
+            warnings.append(f&#34;INFO: Budget 50% consumed ({self.total_consumed}/{self.limit})&#34;)
+        return warnings
+
+    def reset(self) -&gt; None:
+        &#34;&#34;&#34;Reset the budget for a new pipeline run.&#34;&#34;&#34;
+        self._entries.clear()
+        self._estimates.clear()</code></pre>
+</details>
+<div class="desc"><p>Token budget accounting for pipeline runs.</p>
+<p>Tracks actual vs. estimated consumption, enforces budget limits,
+and computes efficiency metrics.</p>
+<h2 id="example">Example</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; budget = TokenBudget(limit=15000)
+&gt;&gt;&gt; budget.record(&quot;validate&quot;, &quot;local&quot;, 0)
+&gt;&gt;&gt; budget.record(&quot;generate&quot;, &quot;local&quot;, 0)
+&gt;&gt;&gt; print(f&quot;Spent: {budget.total_consumed}&quot;)
+</code></pre></div>
+<h3>Instance variables</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.agents.token_budget.TokenBudget.budget_pressure"><code class="name">prop <span class="ident">budget_pressure</span> : float</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def budget_pressure(self) -&gt; float:
+    &#34;&#34;&#34;Budget utilization as a fraction (0.0 to 1.0).&#34;&#34;&#34;
+    if self.limit is None or self.limit == 0:
+        return 0.0
+    return min(1.0, self.total_consumed / self.limit)</code></pre>
+</details>
+<div class="desc"><p>Budget utilization as a fraction (0.0 to 1.0).</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.agents.token_budget.TokenBudget.remaining"><code class="name">prop <span class="ident">remaining</span> : int | None</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def remaining(self) -&gt; int | None:
+    if self.limit is None:
+        return None
+    return max(0, self.limit - self.total_consumed)</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.agents.token_budget.TokenBudget.total_consumed"><code class="name">prop <span class="ident">total_consumed</span> : int</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def total_consumed(self) -&gt; int:
+    return sum(e.tokens for e in self._entries)</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.agents.token_budget.TokenBudget.can_afford"><code class="name flex">
+<span>def <span class="ident">can_afford</span></span>(<span>self, estimated_tokens: int) ‑> bool</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def can_afford(self, estimated_tokens: int) -&gt; bool:
+    &#34;&#34;&#34;Check if the budget can afford the estimated tokens.&#34;&#34;&#34;
+    if self.limit is None:
+        return True
+    return self.total_consumed + estimated_tokens &lt;= self.limit</code></pre>
+</details>
+<div class="desc"><p>Check if the budget can afford the estimated tokens.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.agents.token_budget.TokenBudget.check_warnings"><code class="name flex">
+<span>def <span class="ident">check_warnings</span></span>(<span>self) ‑> list[str]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def check_warnings(self) -&gt; list[str]:
+    &#34;&#34;&#34;Check for budget threshold warnings.&#34;&#34;&#34;
+    warnings = []
+    pressure = self.budget_pressure
+    if pressure &gt;= 0.9:
+        warnings.append(f&#34;CRITICAL: Budget 90% consumed ({self.total_consumed}/{self.limit})&#34;)
+    elif pressure &gt;= 0.75:
+        warnings.append(f&#34;WARNING: Budget 75% consumed ({self.total_consumed}/{self.limit})&#34;)
+    elif pressure &gt;= 0.5:
+        warnings.append(f&#34;INFO: Budget 50% consumed ({self.total_consumed}/{self.limit})&#34;)
+    return warnings</code></pre>
+</details>
+<div class="desc"><p>Check for budget threshold warnings.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.agents.token_budget.TokenBudget.get_efficiency"><code class="name flex">
+<span>def <span class="ident">get_efficiency</span></span>(<span>self) ‑> dict[str, typing.Any]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_efficiency(self) -&gt; dict[str, Any]:
+    &#34;&#34;&#34;Compute token efficiency metrics.&#34;&#34;&#34;
+    total = self.total_consumed
+    total_estimated = sum(self._estimates.values())
+
+    # Breakdown by model tier
+    by_tier: dict[str, int] = {}
+    for entry in self._entries:
+        by_tier[entry.model_tier] = by_tier.get(entry.model_tier, 0) + entry.tokens
+
+    local_stages = sum(1 for e in self._entries if e.model_tier == &#34;local&#34;)
+    total_stages = len(self._entries)
+
+    return {
+        &#34;total_consumed&#34;: total,
+        &#34;total_estimated&#34;: total_estimated,
+        &#34;estimation_accuracy_pct&#34;: (
+            round(100 * total / total_estimated, 1) if total_estimated &gt; 0 else 0
+        ),
+        &#34;budget_limit&#34;: self.limit,
+        &#34;budget_remaining&#34;: self.remaining,
+        &#34;local_execution_pct&#34;: (
+            round(100 * local_stages / total_stages, 1) if total_stages &gt; 0 else 0
+        ),
+        &#34;by_tier&#34;: by_tier,
+        &#34;stages_recorded&#34;: total_stages,
+    }</code></pre>
+</details>
+<div class="desc"><p>Compute token efficiency metrics.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.agents.token_budget.TokenBudget.get_ledger"><code class="name flex">
+<span>def <span class="ident">get_ledger</span></span>(<span>self) ‑> list[dict[str, typing.Any]]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_ledger(self) -&gt; list[dict[str, Any]]:
+    &#34;&#34;&#34;Get the full token ledger.&#34;&#34;&#34;
+    return [e.to_dict() for e in self._entries]</code></pre>
+</details>
+<div class="desc"><p>Get the full token ledger.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.agents.token_budget.TokenBudget.record"><code class="name flex">
+<span>def <span class="ident">record</span></span>(<span>self, stage: str, model_tier: str, tokens: int, description: str = '') ‑> None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def record(
+    self,
+    stage: str,
+    model_tier: str,
+    tokens: int,
+    description: str = &#34;&#34;,
+) -&gt; None:
+    &#34;&#34;&#34;Record actual token consumption for a stage.&#34;&#34;&#34;
+    self._entries.append(TokenEntry(
+        stage=stage,
+        model_tier=model_tier,
+        tokens=tokens,
+        timestamp=time.strftime(&#34;%Y-%m-%dT%H:%M:%SZ&#34;, time.gmtime()),
+        description=description,
+    ))</code></pre>
+</details>
+<div class="desc"><p>Record actual token consumption for a stage.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.agents.token_budget.TokenBudget.reset"><code class="name flex">
+<span>def <span class="ident">reset</span></span>(<span>self) ‑> None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def reset(self) -&gt; None:
+    &#34;&#34;&#34;Reset the budget for a new pipeline run.&#34;&#34;&#34;
+    self._entries.clear()
+    self._estimates.clear()</code></pre>
+</details>
+<div class="desc"><p>Reset the budget for a new pipeline run.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.agents.token_budget.TokenBudget.set_estimate"><code class="name flex">
+<span>def <span class="ident">set_estimate</span></span>(<span>self, stage: str, tokens: int) ‑> None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def set_estimate(self, stage: str, tokens: int) -&gt; None:
+    &#34;&#34;&#34;Set estimated token consumption for a stage.&#34;&#34;&#34;
+    self._estimates[stage] = tokens</code></pre>
+</details>
+<div class="desc"><p>Set estimated token consumption for a stage.</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.pipeline.agents.token_budget.TokenEntry"><code class="flex name class">
+<span>class <span class="ident">TokenEntry</span></span>
+<span>(</span><span>stage: str,<br>model_tier: str,<br>tokens: int,<br>timestamp: str = '',<br>description: str = '')</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass
+class TokenEntry:
+    &#34;&#34;&#34;A single token consumption record.&#34;&#34;&#34;
+    stage: str
+    model_tier: str
+    tokens: int
+    timestamp: str = &#34;&#34;
+    description: str = &#34;&#34;
+
+    def to_dict(self) -&gt; dict[str, Any]:
+        return {
+            &#34;stage&#34;: self.stage,
+            &#34;model_tier&#34;: self.model_tier,
+            &#34;tokens&#34;: self.tokens,
+            &#34;timestamp&#34;: self.timestamp,
+            &#34;description&#34;: self.description,
+        }</code></pre>
+</details>
+<div class="desc"><p>A single token consumption record.</p></div>
+<h3>Instance variables</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.agents.token_budget.TokenEntry.description"><code class="name">var <span class="ident">description</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.agents.token_budget.TokenEntry.model_tier"><code class="name">var <span class="ident">model_tier</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.agents.token_budget.TokenEntry.stage"><code class="name">var <span class="ident">stage</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.agents.token_budget.TokenEntry.timestamp"><code class="name">var <span class="ident">timestamp</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.agents.token_budget.TokenEntry.tokens"><code class="name">var <span class="ident">tokens</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.agents.token_budget.TokenEntry.to_dict"><code class="name flex">
+<span>def <span class="ident">to_dict</span></span>(<span>self) ‑> dict[str, typing.Any]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_dict(self) -&gt; dict[str, Any]:
+    return {
+        &#34;stage&#34;: self.stage,
+        &#34;model_tier&#34;: self.model_tier,
+        &#34;tokens&#34;: self.tokens,
+        &#34;timestamp&#34;: self.timestamp,
+        &#34;description&#34;: self.description,
+    }</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="atomik_sdk.pipeline.agents" href="index.html">atomik_sdk.pipeline.agents</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="atomik_sdk.pipeline.agents.token_budget.TokenBudget" href="#atomik_sdk.pipeline.agents.token_budget.TokenBudget">TokenBudget</a></code></h4>
+<ul class="two-column">
+<li><code><a title="atomik_sdk.pipeline.agents.token_budget.TokenBudget.budget_pressure" href="#atomik_sdk.pipeline.agents.token_budget.TokenBudget.budget_pressure">budget_pressure</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.agents.token_budget.TokenBudget.can_afford" href="#atomik_sdk.pipeline.agents.token_budget.TokenBudget.can_afford">can_afford</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.agents.token_budget.TokenBudget.check_warnings" href="#atomik_sdk.pipeline.agents.token_budget.TokenBudget.check_warnings">check_warnings</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.agents.token_budget.TokenBudget.get_efficiency" href="#atomik_sdk.pipeline.agents.token_budget.TokenBudget.get_efficiency">get_efficiency</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.agents.token_budget.TokenBudget.get_ledger" href="#atomik_sdk.pipeline.agents.token_budget.TokenBudget.get_ledger">get_ledger</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.agents.token_budget.TokenBudget.record" href="#atomik_sdk.pipeline.agents.token_budget.TokenBudget.record">record</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.agents.token_budget.TokenBudget.remaining" href="#atomik_sdk.pipeline.agents.token_budget.TokenBudget.remaining">remaining</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.agents.token_budget.TokenBudget.reset" href="#atomik_sdk.pipeline.agents.token_budget.TokenBudget.reset">reset</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.agents.token_budget.TokenBudget.set_estimate" href="#atomik_sdk.pipeline.agents.token_budget.TokenBudget.set_estimate">set_estimate</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.agents.token_budget.TokenBudget.total_consumed" href="#atomik_sdk.pipeline.agents.token_budget.TokenBudget.total_consumed">total_consumed</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.pipeline.agents.token_budget.TokenEntry" href="#atomik_sdk.pipeline.agents.token_budget.TokenEntry">TokenEntry</a></code></h4>
+<ul class="two-column">
+<li><code><a title="atomik_sdk.pipeline.agents.token_budget.TokenEntry.description" href="#atomik_sdk.pipeline.agents.token_budget.TokenEntry.description">description</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.agents.token_budget.TokenEntry.model_tier" href="#atomik_sdk.pipeline.agents.token_budget.TokenEntry.model_tier">model_tier</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.agents.token_budget.TokenEntry.stage" href="#atomik_sdk.pipeline.agents.token_budget.TokenEntry.stage">stage</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.agents.token_budget.TokenEntry.timestamp" href="#atomik_sdk.pipeline.agents.token_budget.TokenEntry.timestamp">timestamp</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.agents.token_budget.TokenEntry.to_dict" href="#atomik_sdk.pipeline.agents.token_budget.TokenEntry.to_dict">to_dict</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.agents.token_budget.TokenEntry.tokens" href="#atomik_sdk.pipeline.agents.token_budget.TokenEntry.tokens">tokens</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+</body>
+</html>

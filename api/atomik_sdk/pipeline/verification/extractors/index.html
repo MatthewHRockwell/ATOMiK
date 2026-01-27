@@ -1,0 +1,929 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
+<title>atomik_sdk.pipeline.verification.extractors API documentation</title>
+<meta name="description" content="Per-language interface extractors for consistency checking.">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>atomik_sdk.pipeline.verification.extractors</code></h1>
+</header>
+<section id="section-intro">
+<p>Per-language interface extractors for consistency checking.</p>
+</section>
+<section>
+<h2 class="section-title" id="header-submodules">Sub-modules</h2>
+<dl>
+<dt><code class="name"><a title="atomik_sdk.pipeline.verification.extractors.c_extractor" href="c_extractor.html">atomik_sdk.pipeline.verification.extractors.c_extractor</a></code></dt>
+<dd>
+<div class="desc"><p>C interface extractor using regex-based parsing.</p></div>
+</dd>
+<dt><code class="name"><a title="atomik_sdk.pipeline.verification.extractors.js_extractor" href="js_extractor.html">atomik_sdk.pipeline.verification.extractors.js_extractor</a></code></dt>
+<dd>
+<div class="desc"><p>JavaScript interface extractor using regex-based parsing.</p></div>
+</dd>
+<dt><code class="name"><a title="atomik_sdk.pipeline.verification.extractors.python_extractor" href="python_extractor.html">atomik_sdk.pipeline.verification.extractors.python_extractor</a></code></dt>
+<dd>
+<div class="desc"><p>Python interface extractor using AST parsing.</p></div>
+</dd>
+<dt><code class="name"><a title="atomik_sdk.pipeline.verification.extractors.rust_extractor" href="rust_extractor.html">atomik_sdk.pipeline.verification.extractors.rust_extractor</a></code></dt>
+<dd>
+<div class="desc"><p>Rust interface extractor using regex-based parsing.</p></div>
+</dd>
+<dt><code class="name"><a title="atomik_sdk.pipeline.verification.extractors.verilog_extractor" href="verilog_extractor.html">atomik_sdk.pipeline.verification.extractors.verilog_extractor</a></code></dt>
+<dd>
+<div class="desc"><p>Verilog interface extractor using regex-based parsing.</p></div>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="atomik_sdk.pipeline.verification.extractors.CExtractor"><code class="flex name class">
+<span>class <span class="ident">CExtractor</span></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class CExtractor:
+    &#34;&#34;&#34;Extract interface definitions from C header/source files.&#34;&#34;&#34;
+
+    STRUCT_RE = re.compile(
+        r&#34;typedef\s+struct\s*\w*\s*\{([^}]*)\}\s*(\w+)\s*;&#34;,
+        re.DOTALL,
+    )
+    FIELD_RE = re.compile(
+        r&#34;(\w[\w\s\*]*?)\s+(\w+)\s*(?:\[(\d+)\])?\s*;&#34;,
+    )
+    FUNC_RE = re.compile(
+        r&#34;(\w+)\s+(\w+)\s*\(([^)]*)\)\s*;&#34;,
+    )
+    DEFINE_RE = re.compile(
+        r&#34;#define\s+(\w+)\s+(.+)&#34;,
+    )
+
+    def extract(self, filepath: str) -&gt; LanguageInterface:
+        &#34;&#34;&#34;Extract struct members and function signatures from a C file.&#34;&#34;&#34;
+        with open(filepath, encoding=&#34;utf-8&#34;) as f:
+            source = f.read()
+
+        iface = LanguageInterface(language=&#34;c&#34;, file_path=filepath)
+
+        # Extract struct
+        struct_match = self.STRUCT_RE.search(source)
+        if struct_match:
+            body = struct_match.group(1)
+            iface.struct_name = struct_match.group(2)
+            iface.fields = self._extract_fields(body)
+
+        # Extract function prototypes
+        iface.operations = self._extract_functions(source)
+
+        # Extract #define constants
+        iface.constants = self._extract_defines(source)
+
+        return iface
+
+    def _extract_fields(self, struct_body: str) -&gt; list[InterfaceField]:
+        &#34;&#34;&#34;Extract fields from a C struct body.&#34;&#34;&#34;
+        fields = []
+        for match in self.FIELD_RE.finditer(struct_body):
+            type_name = match.group(1).strip()
+            name = match.group(2)
+            array_size = match.group(3)
+
+            # Clean up type name
+            base_type = type_name.replace(&#34;*&#34;, &#34;&#34;).strip()
+            bit_width = C_TYPE_WIDTHS.get(base_type, 0)
+
+            fields.append(InterfaceField(
+                name=name,
+                type_name=type_name,
+                bit_width=bit_width,
+                is_array=array_size is not None or &#34;*&#34; in type_name,
+            ))
+        return fields
+
+    def _extract_functions(self, source: str) -&gt; list[InterfaceOperation]:
+        &#34;&#34;&#34;Extract function prototypes.&#34;&#34;&#34;
+        ops = []
+        for match in self.FUNC_RE.finditer(source):
+            ret_type = match.group(1)
+            name = match.group(2)
+            params_str = match.group(3).strip()
+
+            if ret_type in (&#34;typedef&#34;, &#34;struct&#34;, &#34;enum&#34;, &#34;union&#34;):
+                continue
+
+            params = []
+            if params_str and params_str != &#34;void&#34;:
+                for p in params_str.split(&#34;,&#34;):
+                    p = p.strip()
+                    parts = p.rsplit(None, 1)
+                    if len(parts) == 2:
+                        params.append(parts[1].lstrip(&#34;*&#34;))
+
+            ops.append(InterfaceOperation(
+                name=name,
+                return_type=ret_type,
+                parameters=params,
+            ))
+        return ops
+
+    def _extract_defines(self, source: str) -&gt; dict[str, Any]:
+        &#34;&#34;&#34;Extract #define constants.&#34;&#34;&#34;
+        constants: dict[str, Any] = {}
+        for match in self.DEFINE_RE.finditer(source):
+            name = match.group(1)
+            value = match.group(2).strip()
+            if name.startswith(&#34;_&#34;) and name.endswith(&#34;_H&#34;):
+                continue
+            try:
+                if value.startswith(&#34;0x&#34;):
+                    constants[name] = int(value, 16)
+                else:
+                    constants[name] = int(value)
+            except ValueError:
+                try:
+                    constants[name] = float(value)
+                except ValueError:
+                    constants[name] = value.strip(&#39;&#34;&#39;)
+        return constants</code></pre>
+</details>
+<div class="desc"><p>Extract interface definitions from C header/source files.</p></div>
+<h3>Class variables</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.verification.extractors.CExtractor.DEFINE_RE"><code class="name">var <span class="ident">DEFINE_RE</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.verification.extractors.CExtractor.FIELD_RE"><code class="name">var <span class="ident">FIELD_RE</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.verification.extractors.CExtractor.FUNC_RE"><code class="name">var <span class="ident">FUNC_RE</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.verification.extractors.CExtractor.STRUCT_RE"><code class="name">var <span class="ident">STRUCT_RE</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.verification.extractors.CExtractor.extract"><code class="name flex">
+<span>def <span class="ident">extract</span></span>(<span>self, filepath: str) ‑> <a title="atomik_sdk.pipeline.verification.interfaces.LanguageInterface" href="../interfaces.html#atomik_sdk.pipeline.verification.interfaces.LanguageInterface">LanguageInterface</a></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def extract(self, filepath: str) -&gt; LanguageInterface:
+    &#34;&#34;&#34;Extract struct members and function signatures from a C file.&#34;&#34;&#34;
+    with open(filepath, encoding=&#34;utf-8&#34;) as f:
+        source = f.read()
+
+    iface = LanguageInterface(language=&#34;c&#34;, file_path=filepath)
+
+    # Extract struct
+    struct_match = self.STRUCT_RE.search(source)
+    if struct_match:
+        body = struct_match.group(1)
+        iface.struct_name = struct_match.group(2)
+        iface.fields = self._extract_fields(body)
+
+    # Extract function prototypes
+    iface.operations = self._extract_functions(source)
+
+    # Extract #define constants
+    iface.constants = self._extract_defines(source)
+
+    return iface</code></pre>
+</details>
+<div class="desc"><p>Extract struct members and function signatures from a C file.</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.pipeline.verification.extractors.JavaScriptExtractor"><code class="flex name class">
+<span>class <span class="ident">JavaScriptExtractor</span></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class JavaScriptExtractor:
+    &#34;&#34;&#34;Extract interface definitions from JavaScript source files.&#34;&#34;&#34;
+
+    CLASS_RE = re.compile(
+        r&#34;class\s+(\w+)\s*(?:extends\s+\w+\s*)?\{&#34;,
+    )
+    CONSTRUCTOR_FIELD_RE = re.compile(
+        r&#34;this\.(\w+)\s*=&#34;,
+    )
+    METHOD_RE = re.compile(
+        r&#34;(?:^|\n)\s+(\w+)\s*\(([^)]*)\)\s*\{&#34;,
+    )
+    JSDOC_TYPE_RE = re.compile(
+        r&#34;@(?:type|param)\s*\{(\w+)\}\s*(\w+)?&#34;,
+    )
+    CONST_RE = re.compile(
+        r&#34;(?:const|var|let)\s+([A-Z][A-Z_0-9]+)\s*=\s*([^;\n]+)&#34;,
+    )
+
+    def extract(self, filepath: str) -&gt; LanguageInterface:
+        &#34;&#34;&#34;Extract class properties and methods from a JavaScript file.&#34;&#34;&#34;
+        with open(filepath, encoding=&#34;utf-8&#34;) as f:
+            source = f.read()
+
+        iface = LanguageInterface(language=&#34;javascript&#34;, file_path=filepath)
+
+        # Extract class name
+        class_match = self.CLASS_RE.search(source)
+        if class_match:
+            iface.struct_name = class_match.group(1)
+
+        # Extract constructor fields
+        iface.fields = self._extract_fields(source)
+
+        # Extract methods
+        iface.operations = self._extract_methods(source)
+
+        # Extract constants
+        iface.constants = self._extract_constants(source)
+
+        return iface
+
+    def _extract_fields(self, source: str) -&gt; list[InterfaceField]:
+        &#34;&#34;&#34;Extract this.field assignments from constructor.&#34;&#34;&#34;
+        fields = []
+        seen: set[str] = set()
+
+        for match in self.CONSTRUCTOR_FIELD_RE.finditer(source):
+            name = match.group(1)
+            if name not in seen:
+                seen.add(name)
+                fields.append(InterfaceField(name=name))
+
+        return fields
+
+    def _extract_methods(self, source: str) -&gt; list[InterfaceOperation]:
+        &#34;&#34;&#34;Extract class methods.&#34;&#34;&#34;
+        ops = []
+        for match in self.METHOD_RE.finditer(source):
+            name = match.group(1)
+            if name in (&#34;constructor&#34;, &#34;if&#34;, &#34;for&#34;, &#34;while&#34;, &#34;switch&#34;):
+                continue
+            params_str = match.group(2).strip()
+            params = [
+                p.strip() for p in params_str.split(&#34;,&#34;)
+                if p.strip()
+            ]
+            ops.append(InterfaceOperation(
+                name=name,
+                parameters=params,
+            ))
+        return ops
+
+    def _extract_constants(self, source: str) -&gt; dict[str, Any]:
+        &#34;&#34;&#34;Extract module-level constants.&#34;&#34;&#34;
+        constants: dict[str, Any] = {}
+        for match in self.CONST_RE.finditer(source):
+            name = match.group(1)
+            value = match.group(2).strip().rstrip(&#34;;&#34;)
+            try:
+                constants[name] = int(value)
+            except ValueError:
+                try:
+                    constants[name] = float(value)
+                except ValueError:
+                    constants[name] = value.strip(&#34;&#39;\&#34;&#34;)
+        return constants</code></pre>
+</details>
+<div class="desc"><p>Extract interface definitions from JavaScript source files.</p></div>
+<h3>Class variables</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.verification.extractors.JavaScriptExtractor.CLASS_RE"><code class="name">var <span class="ident">CLASS_RE</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.verification.extractors.JavaScriptExtractor.CONSTRUCTOR_FIELD_RE"><code class="name">var <span class="ident">CONSTRUCTOR_FIELD_RE</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.verification.extractors.JavaScriptExtractor.CONST_RE"><code class="name">var <span class="ident">CONST_RE</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.verification.extractors.JavaScriptExtractor.JSDOC_TYPE_RE"><code class="name">var <span class="ident">JSDOC_TYPE_RE</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.verification.extractors.JavaScriptExtractor.METHOD_RE"><code class="name">var <span class="ident">METHOD_RE</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.verification.extractors.JavaScriptExtractor.extract"><code class="name flex">
+<span>def <span class="ident">extract</span></span>(<span>self, filepath: str) ‑> <a title="atomik_sdk.pipeline.verification.interfaces.LanguageInterface" href="../interfaces.html#atomik_sdk.pipeline.verification.interfaces.LanguageInterface">LanguageInterface</a></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def extract(self, filepath: str) -&gt; LanguageInterface:
+    &#34;&#34;&#34;Extract class properties and methods from a JavaScript file.&#34;&#34;&#34;
+    with open(filepath, encoding=&#34;utf-8&#34;) as f:
+        source = f.read()
+
+    iface = LanguageInterface(language=&#34;javascript&#34;, file_path=filepath)
+
+    # Extract class name
+    class_match = self.CLASS_RE.search(source)
+    if class_match:
+        iface.struct_name = class_match.group(1)
+
+    # Extract constructor fields
+    iface.fields = self._extract_fields(source)
+
+    # Extract methods
+    iface.operations = self._extract_methods(source)
+
+    # Extract constants
+    iface.constants = self._extract_constants(source)
+
+    return iface</code></pre>
+</details>
+<div class="desc"><p>Extract class properties and methods from a JavaScript file.</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.pipeline.verification.extractors.PythonExtractor"><code class="flex name class">
+<span>class <span class="ident">PythonExtractor</span></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class PythonExtractor:
+    &#34;&#34;&#34;Extract interface definitions from Python source files.&#34;&#34;&#34;
+
+    def extract(self, filepath: str) -&gt; LanguageInterface:
+        &#34;&#34;&#34;
+        Extract fields, methods, and constants from a Python file.
+
+        Uses AST parsing to find class definitions, their attributes
+        (from __init__ or dataclass fields), and methods.
+        &#34;&#34;&#34;
+        with open(filepath, encoding=&#34;utf-8&#34;) as f:
+            source = f.read()
+
+        iface = LanguageInterface(language=&#34;python&#34;, file_path=filepath)
+
+        try:
+            tree = ast.parse(source)
+        except SyntaxError:
+            return iface
+
+        for node in ast.walk(tree):
+            if isinstance(node, ast.ClassDef):
+                iface.struct_name = node.name
+                iface.fields = self._extract_fields(node)
+                iface.operations = self._extract_methods(node)
+                iface.constants = self._extract_constants(tree)
+                break
+
+        return iface
+
+    def _extract_fields(self, cls_node: ast.ClassDef) -&gt; list[InterfaceField]:
+        &#34;&#34;&#34;Extract fields from class (dataclass or __init__).&#34;&#34;&#34;
+        fields = []
+
+        # Check for dataclass-style annotations
+        for node in cls_node.body:
+            if isinstance(node, ast.AnnAssign) and isinstance(node.target, ast.Name):
+                field = InterfaceField(name=node.target.id)
+                if isinstance(node.annotation, ast.Name):
+                    field.type_name = node.annotation.id
+                    field.bit_width = PYTHON_TYPE_WIDTHS.get(field.type_name, 0)
+                elif isinstance(node.annotation, ast.Constant):
+                    field.type_name = str(node.annotation.value)
+                fields.append(field)
+
+        # Check __init__ if no annotations found
+        if not fields:
+            for node in cls_node.body:
+                if (isinstance(node, ast.FunctionDef) and node.name == &#34;__init__&#34;):
+                    for stmt in ast.walk(node):
+                        if (isinstance(stmt, ast.Assign) and
+                                len(stmt.targets) == 1 and
+                                isinstance(stmt.targets[0], ast.Attribute) and
+                                isinstance(stmt.targets[0].value, ast.Name) and
+                                stmt.targets[0].value.id == &#34;self&#34;):
+                            field = InterfaceField(
+                                name=stmt.targets[0].attr,
+                            )
+                            fields.append(field)
+
+        return fields
+
+    def _extract_methods(self, cls_node: ast.ClassDef) -&gt; list[InterfaceOperation]:
+        &#34;&#34;&#34;Extract public methods from class.&#34;&#34;&#34;
+        ops = []
+        for node in cls_node.body:
+            if isinstance(node, ast.FunctionDef) and not node.name.startswith(&#34;_&#34;):
+                params = [
+                    arg.arg for arg in node.args.args
+                    if arg.arg != &#34;self&#34;
+                ]
+                ret_type = &#34;&#34;
+                if node.returns and isinstance(node.returns, ast.Name):
+                    ret_type = node.returns.id
+                ops.append(InterfaceOperation(
+                    name=node.name,
+                    return_type=ret_type,
+                    parameters=params,
+                ))
+        return ops
+
+    def _extract_constants(self, tree: ast.Module) -&gt; dict[str, Any]:
+        &#34;&#34;&#34;Extract module-level constants (UPPER_CASE assignments).&#34;&#34;&#34;
+        constants: dict[str, Any] = {}
+        for node in tree.body:
+            if isinstance(node, ast.Assign):
+                for target in node.targets:
+                    if isinstance(target, ast.Name) and target.id.isupper():
+                        if isinstance(node.value, ast.Constant):
+                            constants[target.id] = node.value.value
+        return constants</code></pre>
+</details>
+<div class="desc"><p>Extract interface definitions from Python source files.</p></div>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.verification.extractors.PythonExtractor.extract"><code class="name flex">
+<span>def <span class="ident">extract</span></span>(<span>self, filepath: str) ‑> <a title="atomik_sdk.pipeline.verification.interfaces.LanguageInterface" href="../interfaces.html#atomik_sdk.pipeline.verification.interfaces.LanguageInterface">LanguageInterface</a></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def extract(self, filepath: str) -&gt; LanguageInterface:
+    &#34;&#34;&#34;
+    Extract fields, methods, and constants from a Python file.
+
+    Uses AST parsing to find class definitions, their attributes
+    (from __init__ or dataclass fields), and methods.
+    &#34;&#34;&#34;
+    with open(filepath, encoding=&#34;utf-8&#34;) as f:
+        source = f.read()
+
+    iface = LanguageInterface(language=&#34;python&#34;, file_path=filepath)
+
+    try:
+        tree = ast.parse(source)
+    except SyntaxError:
+        return iface
+
+    for node in ast.walk(tree):
+        if isinstance(node, ast.ClassDef):
+            iface.struct_name = node.name
+            iface.fields = self._extract_fields(node)
+            iface.operations = self._extract_methods(node)
+            iface.constants = self._extract_constants(tree)
+            break
+
+    return iface</code></pre>
+</details>
+<div class="desc"><p>Extract fields, methods, and constants from a Python file.</p>
+<p>Uses AST parsing to find class definitions, their attributes
+(from <strong>init</strong> or dataclass fields), and methods.</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.pipeline.verification.extractors.RustExtractor"><code class="flex name class">
+<span>class <span class="ident">RustExtractor</span></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class RustExtractor:
+    &#34;&#34;&#34;Extract interface definitions from Rust source files.&#34;&#34;&#34;
+
+    # Regex patterns for Rust constructs
+    STRUCT_RE = re.compile(
+        r&#34;pub\s+struct\s+(\w+)\s*\{([^}]*)\}&#34;,
+        re.DOTALL,
+    )
+    FIELD_RE = re.compile(
+        r&#34;pub\s+(\w+)\s*:\s*([^,\n]+)&#34;,
+    )
+    IMPL_FN_RE = re.compile(
+        r&#34;pub\s+fn\s+(\w+)\s*\(([^)]*)\)\s*(?:-&gt;\s*(\S+))?&#34;,
+    )
+    CONST_RE = re.compile(
+        r&#34;pub\s+const\s+(\w+)\s*:\s*\w+\s*=\s*([^;]+);&#34;,
+    )
+
+    def extract(self, filepath: str) -&gt; LanguageInterface:
+        &#34;&#34;&#34;Extract struct fields and impl methods from a Rust file.&#34;&#34;&#34;
+        with open(filepath, encoding=&#34;utf-8&#34;) as f:
+            source = f.read()
+
+        iface = LanguageInterface(language=&#34;rust&#34;, file_path=filepath)
+
+        # Extract struct
+        struct_match = self.STRUCT_RE.search(source)
+        if struct_match:
+            iface.struct_name = struct_match.group(1)
+            body = struct_match.group(2)
+            iface.fields = self._extract_fields(body)
+
+        # Extract impl methods
+        iface.operations = self._extract_methods(source)
+
+        # Extract constants
+        iface.constants = self._extract_constants(source)
+
+        return iface
+
+    def _extract_fields(self, struct_body: str) -&gt; list[InterfaceField]:
+        &#34;&#34;&#34;Extract fields from a Rust struct body.&#34;&#34;&#34;
+        fields = []
+        for match in self.FIELD_RE.finditer(struct_body):
+            name = match.group(1)
+            type_name = match.group(2).strip().rstrip(&#34;,&#34;)
+            bit_width = RUST_TYPE_WIDTHS.get(type_name, 0)
+            is_array = type_name.startswith(&#34;Vec&lt;&#34;) or type_name.startswith(&#34;[&#34;)
+            fields.append(InterfaceField(
+                name=name,
+                type_name=type_name,
+                bit_width=bit_width,
+                is_array=is_array,
+            ))
+        return fields
+
+    def _extract_methods(self, source: str) -&gt; list[InterfaceOperation]:
+        &#34;&#34;&#34;Extract public impl methods.&#34;&#34;&#34;
+        ops = []
+        for match in self.IMPL_FN_RE.finditer(source):
+            name = match.group(1)
+            if name in (&#34;new&#34;, &#34;default&#34;):
+                continue
+            params_str = match.group(2)
+            params = [
+                p.strip().split(&#34;:&#34;)[0].strip()
+                for p in params_str.split(&#34;,&#34;)
+                if p.strip() and &#34;&amp;self&#34; not in p and &#34;self&#34; not in p.split(&#34;:&#34;)[0]
+            ]
+            ret_type = match.group(3) or &#34;&#34;
+            ops.append(InterfaceOperation(
+                name=name,
+                return_type=ret_type.strip(),
+                parameters=params,
+            ))
+        return ops
+
+    def _extract_constants(self, source: str) -&gt; dict[str, Any]:
+        &#34;&#34;&#34;Extract public constants.&#34;&#34;&#34;
+        constants: dict[str, Any] = {}
+        for match in self.CONST_RE.finditer(source):
+            name = match.group(1)
+            value = match.group(2).strip()
+            try:
+                constants[name] = int(value)
+            except ValueError:
+                try:
+                    constants[name] = float(value)
+                except ValueError:
+                    constants[name] = value.strip(&#39;&#34;&#39;)
+        return constants</code></pre>
+</details>
+<div class="desc"><p>Extract interface definitions from Rust source files.</p></div>
+<h3>Class variables</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.verification.extractors.RustExtractor.CONST_RE"><code class="name">var <span class="ident">CONST_RE</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.verification.extractors.RustExtractor.FIELD_RE"><code class="name">var <span class="ident">FIELD_RE</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.verification.extractors.RustExtractor.IMPL_FN_RE"><code class="name">var <span class="ident">IMPL_FN_RE</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.verification.extractors.RustExtractor.STRUCT_RE"><code class="name">var <span class="ident">STRUCT_RE</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.verification.extractors.RustExtractor.extract"><code class="name flex">
+<span>def <span class="ident">extract</span></span>(<span>self, filepath: str) ‑> <a title="atomik_sdk.pipeline.verification.interfaces.LanguageInterface" href="../interfaces.html#atomik_sdk.pipeline.verification.interfaces.LanguageInterface">LanguageInterface</a></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def extract(self, filepath: str) -&gt; LanguageInterface:
+    &#34;&#34;&#34;Extract struct fields and impl methods from a Rust file.&#34;&#34;&#34;
+    with open(filepath, encoding=&#34;utf-8&#34;) as f:
+        source = f.read()
+
+    iface = LanguageInterface(language=&#34;rust&#34;, file_path=filepath)
+
+    # Extract struct
+    struct_match = self.STRUCT_RE.search(source)
+    if struct_match:
+        iface.struct_name = struct_match.group(1)
+        body = struct_match.group(2)
+        iface.fields = self._extract_fields(body)
+
+    # Extract impl methods
+    iface.operations = self._extract_methods(source)
+
+    # Extract constants
+    iface.constants = self._extract_constants(source)
+
+    return iface</code></pre>
+</details>
+<div class="desc"><p>Extract struct fields and impl methods from a Rust file.</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.pipeline.verification.extractors.VerilogExtractor"><code class="flex name class">
+<span>class <span class="ident">VerilogExtractor</span></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class VerilogExtractor:
+    &#34;&#34;&#34;Extract interface definitions from Verilog module files.&#34;&#34;&#34;
+
+    MODULE_RE = re.compile(
+        r&#34;module\s+(\w+)\s*(?:#\s*\([^)]*\))?\s*\(&#34;,
+    )
+    PORT_RE = re.compile(
+        r&#34;(input|output|inout)\s+(?:(reg|wire)\s+)?(?:\[(\d+):(\d+)\]\s+)?(\w+)&#34;,
+    )
+    PARAM_RE = re.compile(
+        r&#34;parameter\s+(?:\[[\d:]+\]\s+)?(\w+)\s*=\s*([^;,\n]+)&#34;,
+    )
+    LOCALPARAM_RE = re.compile(
+        r&#34;localparam\s+(?:\[[\d:]+\]\s+)?(\w+)\s*=\s*([^;,\n]+)&#34;,
+    )
+
+    def extract(self, filepath: str) -&gt; LanguageInterface:
+        &#34;&#34;&#34;Extract module ports and parameters from a Verilog file.&#34;&#34;&#34;
+        with open(filepath, encoding=&#34;utf-8&#34;) as f:
+            source = f.read()
+
+        iface = LanguageInterface(language=&#34;verilog&#34;, file_path=filepath)
+
+        # Extract module name
+        mod_match = self.MODULE_RE.search(source)
+        if mod_match:
+            iface.struct_name = mod_match.group(1)
+
+        # Extract ports as fields
+        iface.fields = self._extract_ports(source)
+
+        # Extract parameters as constants
+        iface.constants = self._extract_parameters(source)
+
+        return iface
+
+    def _extract_ports(self, source: str) -&gt; list[InterfaceField]:
+        &#34;&#34;&#34;Extract module ports.&#34;&#34;&#34;
+        fields = []
+        seen: set[str] = set()
+
+        for match in self.PORT_RE.finditer(source):
+            direction = match.group(1)
+            msb_str = match.group(3)
+            lsb_str = match.group(4)
+            name = match.group(5)
+
+            if name in seen:
+                continue
+            seen.add(name)
+
+            if msb_str is not None and lsb_str is not None:
+                msb = int(msb_str)
+                lsb = int(lsb_str)
+                bit_width = abs(msb - lsb) + 1
+            else:
+                bit_width = 1
+
+            fields.append(InterfaceField(
+                name=name,
+                type_name=direction,
+                bit_width=bit_width,
+            ))
+
+        return fields
+
+    def _extract_parameters(self, source: str) -&gt; dict[str, Any]:
+        &#34;&#34;&#34;Extract parameter and localparam declarations.&#34;&#34;&#34;
+        constants: dict[str, Any] = {}
+
+        for pattern in (self.PARAM_RE, self.LOCALPARAM_RE):
+            for match in pattern.finditer(source):
+                name = match.group(1)
+                value = match.group(2).strip().rstrip(&#34;,&#34;)
+                try:
+                    if value.startswith(&#34;&#39;h&#34;) or value.startswith(&#34;&#39;H&#34;):
+                        constants[name] = int(value[2:], 16)
+                    elif &#34;&#39;d&#34; in value:
+                        constants[name] = int(value.split(&#34;&#39;d&#34;)[-1])
+                    elif &#34;&#39;b&#34; in value:
+                        constants[name] = int(value.split(&#34;&#39;b&#34;)[-1], 2)
+                    else:
+                        constants[name] = int(value)
+                except ValueError:
+                    constants[name] = value
+
+        return constants</code></pre>
+</details>
+<div class="desc"><p>Extract interface definitions from Verilog module files.</p></div>
+<h3>Class variables</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.verification.extractors.VerilogExtractor.LOCALPARAM_RE"><code class="name">var <span class="ident">LOCALPARAM_RE</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.verification.extractors.VerilogExtractor.MODULE_RE"><code class="name">var <span class="ident">MODULE_RE</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.verification.extractors.VerilogExtractor.PARAM_RE"><code class="name">var <span class="ident">PARAM_RE</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.verification.extractors.VerilogExtractor.PORT_RE"><code class="name">var <span class="ident">PORT_RE</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.verification.extractors.VerilogExtractor.extract"><code class="name flex">
+<span>def <span class="ident">extract</span></span>(<span>self, filepath: str) ‑> <a title="atomik_sdk.pipeline.verification.interfaces.LanguageInterface" href="../interfaces.html#atomik_sdk.pipeline.verification.interfaces.LanguageInterface">LanguageInterface</a></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def extract(self, filepath: str) -&gt; LanguageInterface:
+    &#34;&#34;&#34;Extract module ports and parameters from a Verilog file.&#34;&#34;&#34;
+    with open(filepath, encoding=&#34;utf-8&#34;) as f:
+        source = f.read()
+
+    iface = LanguageInterface(language=&#34;verilog&#34;, file_path=filepath)
+
+    # Extract module name
+    mod_match = self.MODULE_RE.search(source)
+    if mod_match:
+        iface.struct_name = mod_match.group(1)
+
+    # Extract ports as fields
+    iface.fields = self._extract_ports(source)
+
+    # Extract parameters as constants
+    iface.constants = self._extract_parameters(source)
+
+    return iface</code></pre>
+</details>
+<div class="desc"><p>Extract module ports and parameters from a Verilog file.</p></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="atomik_sdk.pipeline.verification" href="../index.html">atomik_sdk.pipeline.verification</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-submodules">Sub-modules</a></h3>
+<ul>
+<li><code><a title="atomik_sdk.pipeline.verification.extractors.c_extractor" href="c_extractor.html">atomik_sdk.pipeline.verification.extractors.c_extractor</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.verification.extractors.js_extractor" href="js_extractor.html">atomik_sdk.pipeline.verification.extractors.js_extractor</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.verification.extractors.python_extractor" href="python_extractor.html">atomik_sdk.pipeline.verification.extractors.python_extractor</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.verification.extractors.rust_extractor" href="rust_extractor.html">atomik_sdk.pipeline.verification.extractors.rust_extractor</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.verification.extractors.verilog_extractor" href="verilog_extractor.html">atomik_sdk.pipeline.verification.extractors.verilog_extractor</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="atomik_sdk.pipeline.verification.extractors.CExtractor" href="#atomik_sdk.pipeline.verification.extractors.CExtractor">CExtractor</a></code></h4>
+<ul class="">
+<li><code><a title="atomik_sdk.pipeline.verification.extractors.CExtractor.DEFINE_RE" href="#atomik_sdk.pipeline.verification.extractors.CExtractor.DEFINE_RE">DEFINE_RE</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.verification.extractors.CExtractor.FIELD_RE" href="#atomik_sdk.pipeline.verification.extractors.CExtractor.FIELD_RE">FIELD_RE</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.verification.extractors.CExtractor.FUNC_RE" href="#atomik_sdk.pipeline.verification.extractors.CExtractor.FUNC_RE">FUNC_RE</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.verification.extractors.CExtractor.STRUCT_RE" href="#atomik_sdk.pipeline.verification.extractors.CExtractor.STRUCT_RE">STRUCT_RE</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.verification.extractors.CExtractor.extract" href="#atomik_sdk.pipeline.verification.extractors.CExtractor.extract">extract</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.pipeline.verification.extractors.JavaScriptExtractor" href="#atomik_sdk.pipeline.verification.extractors.JavaScriptExtractor">JavaScriptExtractor</a></code></h4>
+<ul class="">
+<li><code><a title="atomik_sdk.pipeline.verification.extractors.JavaScriptExtractor.CLASS_RE" href="#atomik_sdk.pipeline.verification.extractors.JavaScriptExtractor.CLASS_RE">CLASS_RE</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.verification.extractors.JavaScriptExtractor.CONSTRUCTOR_FIELD_RE" href="#atomik_sdk.pipeline.verification.extractors.JavaScriptExtractor.CONSTRUCTOR_FIELD_RE">CONSTRUCTOR_FIELD_RE</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.verification.extractors.JavaScriptExtractor.CONST_RE" href="#atomik_sdk.pipeline.verification.extractors.JavaScriptExtractor.CONST_RE">CONST_RE</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.verification.extractors.JavaScriptExtractor.JSDOC_TYPE_RE" href="#atomik_sdk.pipeline.verification.extractors.JavaScriptExtractor.JSDOC_TYPE_RE">JSDOC_TYPE_RE</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.verification.extractors.JavaScriptExtractor.METHOD_RE" href="#atomik_sdk.pipeline.verification.extractors.JavaScriptExtractor.METHOD_RE">METHOD_RE</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.verification.extractors.JavaScriptExtractor.extract" href="#atomik_sdk.pipeline.verification.extractors.JavaScriptExtractor.extract">extract</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.pipeline.verification.extractors.PythonExtractor" href="#atomik_sdk.pipeline.verification.extractors.PythonExtractor">PythonExtractor</a></code></h4>
+<ul class="">
+<li><code><a title="atomik_sdk.pipeline.verification.extractors.PythonExtractor.extract" href="#atomik_sdk.pipeline.verification.extractors.PythonExtractor.extract">extract</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.pipeline.verification.extractors.RustExtractor" href="#atomik_sdk.pipeline.verification.extractors.RustExtractor">RustExtractor</a></code></h4>
+<ul class="">
+<li><code><a title="atomik_sdk.pipeline.verification.extractors.RustExtractor.CONST_RE" href="#atomik_sdk.pipeline.verification.extractors.RustExtractor.CONST_RE">CONST_RE</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.verification.extractors.RustExtractor.FIELD_RE" href="#atomik_sdk.pipeline.verification.extractors.RustExtractor.FIELD_RE">FIELD_RE</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.verification.extractors.RustExtractor.IMPL_FN_RE" href="#atomik_sdk.pipeline.verification.extractors.RustExtractor.IMPL_FN_RE">IMPL_FN_RE</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.verification.extractors.RustExtractor.STRUCT_RE" href="#atomik_sdk.pipeline.verification.extractors.RustExtractor.STRUCT_RE">STRUCT_RE</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.verification.extractors.RustExtractor.extract" href="#atomik_sdk.pipeline.verification.extractors.RustExtractor.extract">extract</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.pipeline.verification.extractors.VerilogExtractor" href="#atomik_sdk.pipeline.verification.extractors.VerilogExtractor">VerilogExtractor</a></code></h4>
+<ul class="">
+<li><code><a title="atomik_sdk.pipeline.verification.extractors.VerilogExtractor.LOCALPARAM_RE" href="#atomik_sdk.pipeline.verification.extractors.VerilogExtractor.LOCALPARAM_RE">LOCALPARAM_RE</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.verification.extractors.VerilogExtractor.MODULE_RE" href="#atomik_sdk.pipeline.verification.extractors.VerilogExtractor.MODULE_RE">MODULE_RE</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.verification.extractors.VerilogExtractor.PARAM_RE" href="#atomik_sdk.pipeline.verification.extractors.VerilogExtractor.PARAM_RE">PARAM_RE</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.verification.extractors.VerilogExtractor.PORT_RE" href="#atomik_sdk.pipeline.verification.extractors.VerilogExtractor.PORT_RE">PORT_RE</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.verification.extractors.VerilogExtractor.extract" href="#atomik_sdk.pipeline.verification.extractors.VerilogExtractor.extract">extract</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+</body>
+</html>

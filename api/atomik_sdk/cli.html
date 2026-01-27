@@ -37,15 +37,22 @@ el.replaceWith(d);
 </header>
 <section id="section-intro">
 <p>ATOMiK CLI Tool (atomik-gen)</p>
-<p>Command-line interface for ATOMiK schema validation and multi-language
-SDK code generation. Wraps the GeneratorEngine API as a pip-installable
-entry point.</p>
+<p>Command-line interface for ATOMiK schema validation, multi-language
+SDK code generation, autonomous pipeline execution, performance
+metrics, and domain hardware demonstrators.</p>
 <h2 id="usage">Usage</h2>
 <p>atomik-gen generate <schema> [options]
 atomik-gen validate <schema>
 atomik-gen info <schema>
 atomik-gen batch <directory> [options]
 atomik-gen list
+atomik-gen pipeline run <schema> [options]
+atomik-gen pipeline diff <schema>
+atomik-gen pipeline status
+atomik-gen metrics show [options]
+atomik-gen metrics compare
+atomik-gen metrics export &ndash;output <file>
+atomik-gen demo <domain> [options]
 atomik-gen &ndash;version</p>
 </section>
 <section>
@@ -107,6 +114,68 @@ atomik-gen &ndash;version</p>
 
     # list
     sub.add_parser(&#34;list&#34;, help=&#34;List available target languages&#34;)
+
+    # -----------------------------------------------------------------------
+    # pipeline subcommand group
+    # -----------------------------------------------------------------------
+    pipe = sub.add_parser(&#34;pipeline&#34;, help=&#34;Autonomous pipeline execution&#34;)
+    pipe_sub = pipe.add_subparsers(dest=&#34;pipeline_command&#34;)
+
+    # pipeline run
+    pipe_run = pipe_sub.add_parser(&#34;run&#34;, help=&#34;Execute full pipeline&#34;)
+    pipe_run.add_argument(&#34;target&#34;, help=&#34;Schema file or directory&#34;)
+    pipe_run.add_argument(&#34;--output-dir&#34;, default=&#34;generated&#34;)
+    pipe_run.add_argument(&#34;--languages&#34;, nargs=&#34;+&#34;, choices=list(GENERATORS.keys()))
+    pipe_run.add_argument(&#34;--report&#34;, help=&#34;Write pipeline report to file&#34;)
+    pipe_run.add_argument(&#34;--checkpoint&#34;, default=&#34;.atomik&#34;)
+    pipe_run.add_argument(&#34;--metrics-csv&#34;, default=&#34;.atomik/metrics.csv&#34;)
+    pipe_run.add_argument(&#34;--com-port&#34;, help=&#34;Serial port for hardware validation&#34;)
+    pipe_run.add_argument(&#34;--token-budget&#34;, type=int, help=&#34;Maximum tokens for this run&#34;)
+    pipe_run.add_argument(&#34;--sim-only&#34;, action=&#34;store_true&#34;, help=&#34;RTL simulation only&#34;)
+    pipe_run.add_argument(&#34;--skip-synthesis&#34;, action=&#34;store_true&#34;)
+    pipe_run.add_argument(&#34;--batch&#34;, action=&#34;store_true&#34;, help=&#34;Process directory&#34;)
+    pipe_run.add_argument(&#34;-v&#34;, &#34;--verbose&#34;, action=&#34;store_true&#34;)
+
+    # pipeline diff
+    pipe_diff = pipe_sub.add_parser(&#34;diff&#34;, help=&#34;Show what would change (dry run)&#34;)
+    pipe_diff.add_argument(&#34;target&#34;, help=&#34;Schema file or directory&#34;)
+    pipe_diff.add_argument(&#34;--output-dir&#34;, default=&#34;generated&#34;)
+    pipe_diff.add_argument(&#34;--checkpoint&#34;, default=&#34;.atomik&#34;)
+    pipe_diff.add_argument(&#34;-v&#34;, &#34;--verbose&#34;, action=&#34;store_true&#34;)
+
+    # pipeline status
+    pipe_status = pipe_sub.add_parser(&#34;status&#34;, help=&#34;Show pipeline state&#34;)
+    pipe_status.add_argument(&#34;--checkpoint&#34;, default=&#34;.atomik&#34;)
+
+    # -----------------------------------------------------------------------
+    # metrics subcommand group
+    # -----------------------------------------------------------------------
+    met = sub.add_parser(&#34;metrics&#34;, help=&#34;Performance metrics&#34;)
+    met_sub = met.add_subparsers(dest=&#34;metrics_command&#34;)
+
+    # metrics show
+    met_show = met_sub.add_parser(&#34;show&#34;, help=&#34;Show metrics for last run&#34;)
+    met_show.add_argument(&#34;--schema&#34;, help=&#34;Filter by schema name&#34;)
+    met_show.add_argument(&#34;--checkpoint&#34;, default=&#34;.atomik&#34;)
+
+    # metrics compare
+    met_compare = met_sub.add_parser(&#34;compare&#34;, help=&#34;Compare metrics across schemas&#34;)
+    met_compare.add_argument(&#34;--checkpoint&#34;, default=&#34;.atomik&#34;)
+
+    # metrics export
+    met_export = met_sub.add_parser(&#34;export&#34;, help=&#34;Export metrics to CSV&#34;)
+    met_export.add_argument(&#34;--output&#34;, required=True, help=&#34;Output CSV file&#34;)
+    met_export.add_argument(&#34;--checkpoint&#34;, default=&#34;.atomik&#34;)
+
+    # -----------------------------------------------------------------------
+    # demo subcommand
+    # -----------------------------------------------------------------------
+    demo = sub.add_parser(&#34;demo&#34;, help=&#34;Run domain hardware demonstrator&#34;)
+    demo.add_argument(&#34;domain&#34;, help=&#34;Domain name (video, sensor, finance)&#34;)
+    demo.add_argument(&#34;--com-port&#34;, help=&#34;Serial port for FPGA&#34;)
+    demo.add_argument(&#34;--sim-only&#34;, action=&#34;store_true&#34;, help=&#34;Simulation only&#34;)
+    demo.add_argument(&#34;--report&#34;, help=&#34;Write demo report to file&#34;)
+    demo.add_argument(&#34;-v&#34;, &#34;--verbose&#34;, action=&#34;store_true&#34;)
 
     return parser</code></pre>
 </details>
@@ -204,6 +273,120 @@ atomik-gen &ndash;version</p>
     return EXIT_GENERATION_FAILURE if failures else EXIT_SUCCESS</code></pre>
 </details>
 <div class="desc"><p>Batch-generate SDK code from a directory of schemas.</p></div>
+</dd>
+<dt id="atomik_sdk.cli.cmd_demo"><code class="name flex">
+<span>def <span class="ident">cmd_demo</span></span>(<span>args: argparse.Namespace) ‑> int</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def cmd_demo(args: argparse.Namespace) -&gt; int:
+    &#34;&#34;&#34;Run a domain hardware demonstrator.&#34;&#34;&#34;
+    domain = args.domain
+    valid_domains = [&#34;video&#34;, &#34;sensor&#34;, &#34;finance&#34;]
+
+    if domain not in valid_domains:
+        print(f&#34;Error: unknown domain &#39;{domain}&#39;. &#34;
+              f&#34;Valid: {&#39;, &#39;.join(valid_domains)}&#34;, file=sys.stderr)
+        return EXIT_FILE_ERROR
+
+    project_root = Path(__file__).resolve().parent.parent.parent
+    demo_dir = project_root / &#34;demos&#34; / domain
+
+    if not demo_dir.exists():
+        print(f&#34;Error: demo directory not found: {demo_dir}&#34;, file=sys.stderr)
+        return EXIT_FILE_ERROR
+
+    top_file = demo_dir / f&#34;{domain}_demo_top.v&#34;
+    tb_file = demo_dir / f&#34;tb_{domain}_demo.v&#34;
+
+    if not top_file.exists():
+        print(f&#34;Error: demo top module not found: {top_file}&#34;, file=sys.stderr)
+        return EXIT_FILE_ERROR
+
+    sim_only = getattr(args, &#34;sim_only&#34;, False)
+    verbose = getattr(args, &#34;verbose&#34;, False)
+
+    print(f&#34;ATOMiK {domain.title()} Domain Demonstrator&#34;)
+    print(&#34;=&#34; * 40)
+    print(f&#34;  Top module: {top_file.name}&#34;)
+    print(f&#34;  Testbench:  {tb_file.name if tb_file.exists() else &#39;N/A&#39;}&#34;)
+    print(f&#34;  Mode:       {&#39;simulation&#39; if sim_only else &#39;full&#39;}&#34;)
+    print()
+
+    # Gather all Verilog source files
+    common_dir = project_root / &#34;demos&#34; / &#34;common&#34;
+    rtl_dir = project_root / &#34;rtl&#34;
+
+    src_files = []
+    for d in [rtl_dir, common_dir, demo_dir]:
+        if d.exists():
+            src_files.extend(sorted(d.glob(&#34;*.v&#34;)))
+
+    # Remove testbenches from source list
+    src_files = [f for f in src_files if not f.name.startswith(&#34;tb_&#34;)]
+
+    # Run simulation if testbench exists
+    if tb_file.exists():
+        import shutil
+        iverilog = shutil.which(&#34;iverilog&#34;)
+        vvp_cmd = shutil.which(&#34;vvp&#34;)
+
+        if iverilog and vvp_cmd:
+            import subprocess
+            import tempfile
+
+            print(&#34;Running RTL simulation...&#34;)
+            all_files = [str(f) for f in src_files] + [str(tb_file)]
+
+            with tempfile.NamedTemporaryFile(suffix=&#34;.vvp&#34;, delete=False) as tmp:
+                vvp_out = tmp.name
+
+            result = subprocess.run(
+                [iverilog, &#34;-o&#34;, vvp_out] + all_files,
+                capture_output=True, text=True,
+            )
+
+            if result.returncode != 0:
+                print(f&#34;Compilation failed:\n{result.stderr}&#34;)
+                return EXIT_HARDWARE_FAILURE
+
+            result = subprocess.run(
+                [vvp_cmd, vvp_out],
+                capture_output=True, text=True,
+                timeout=60,
+            )
+
+            print(result.stdout)
+            if result.stderr and verbose:
+                print(result.stderr)
+
+            Path(vvp_out).unlink(missing_ok=True)
+
+            if &#34;FAIL&#34; in result.stdout.upper() and &#34;0 FAIL&#34; not in result.stdout.upper():
+                print(&#34;Demo simulation: FAILED&#34;)
+                return EXIT_HARDWARE_FAILURE
+            else:
+                print(&#34;Demo simulation: PASSED&#34;)
+        else:
+            print(&#34;iverilog/vvp not found -- cannot simulate&#34;)
+            return EXIT_HARDWARE_FAILURE
+    else:
+        print(&#34;No testbench found for this demo&#34;)
+
+    if args.report:
+        _write_report(args.report, {
+            &#34;domain&#34;: domain,
+            &#34;mode&#34;: &#34;simulation&#34; if sim_only else &#34;full&#34;,
+            &#34;top_module&#34;: str(top_file),
+            &#34;testbench&#34;: str(tb_file) if tb_file.exists() else None,
+        })
+
+    return EXIT_SUCCESS</code></pre>
+</details>
+<div class="desc"><p>Run a domain hardware demonstrator.</p></div>
 </dd>
 <dt id="atomik_sdk.cli.cmd_generate"><code class="name flex">
 <span>def <span class="ident">cmd_generate</span></span>(<span>args: argparse.Namespace) ‑> int</span>
@@ -329,6 +512,219 @@ atomik-gen &ndash;version</p>
 </details>
 <div class="desc"><p>List available target languages.</p></div>
 </dd>
+<dt id="atomik_sdk.cli.cmd_metrics_compare"><code class="name flex">
+<span>def <span class="ident">cmd_metrics_compare</span></span>(<span>args: argparse.Namespace) ‑> int</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def cmd_metrics_compare(args: argparse.Namespace) -&gt; int:
+    &#34;&#34;&#34;Compare metrics across schemas.&#34;&#34;&#34;
+    from atomik_sdk.pipeline.context.checkpoint import Checkpoint
+    from atomik_sdk.pipeline.metrics.reporter import MetricsReporter
+
+    checkpoint = Checkpoint(getattr(args, &#34;checkpoint&#34;, &#34;.atomik&#34;))
+    history = checkpoint.get_metrics_history()
+
+    if not history:
+        print(&#34;No metrics data available.&#34;)
+        return EXIT_SUCCESS
+
+    # Get latest run per schema
+    latest: dict[str, dict] = {}
+    for entry in history:
+        name = entry.get(&#34;schema&#34;, &#34;unknown&#34;)
+        latest[name] = entry
+
+    reporter = MetricsReporter()
+    schemas = {}
+    for name, data in latest.items():
+        schemas[name] = {
+            &#34;time_ms&#34;: data.get(&#34;pipeline_total_time_ms&#34;, 0),
+            &#34;tokens&#34;: data.get(&#34;tokens_consumed&#34;, 0),
+            &#34;files&#34;: data.get(&#34;files_generated&#34;, 0),
+            &#34;lines&#34;: data.get(&#34;lines_generated&#34;, 0),
+            &#34;efficiency&#34;: data.get(&#34;token_efficiency_pct&#34;, 100),
+        }
+
+    table = reporter.format_comparison_table(schemas)
+    print(table)
+
+    return EXIT_SUCCESS</code></pre>
+</details>
+<div class="desc"><p>Compare metrics across schemas.</p></div>
+</dd>
+<dt id="atomik_sdk.cli.cmd_metrics_export"><code class="name flex">
+<span>def <span class="ident">cmd_metrics_export</span></span>(<span>args: argparse.Namespace) ‑> int</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def cmd_metrics_export(args: argparse.Namespace) -&gt; int:
+    &#34;&#34;&#34;Export metrics history to CSV.&#34;&#34;&#34;
+    from atomik_sdk.pipeline.context.checkpoint import Checkpoint
+
+    checkpoint = Checkpoint(getattr(args, &#34;checkpoint&#34;, &#34;.atomik&#34;))
+    history = checkpoint.get_metrics_history()
+
+    if not history:
+        print(&#34;No metrics data to export.&#34;)
+        return EXIT_SUCCESS
+
+    import csv
+    output = Path(args.output)
+    output.parent.mkdir(parents=True, exist_ok=True)
+
+    keys = list(history[0].keys())
+    with open(output, &#34;w&#34;, newline=&#34;&#34;, encoding=&#34;utf-8&#34;) as f:
+        writer = csv.DictWriter(f, fieldnames=keys)
+        writer.writeheader()
+        writer.writerows(history)
+
+    print(f&#34;Exported {len(history)} entries to {output}&#34;)
+    return EXIT_SUCCESS</code></pre>
+</details>
+<div class="desc"><p>Export metrics history to CSV.</p></div>
+</dd>
+<dt id="atomik_sdk.cli.cmd_metrics_show"><code class="name flex">
+<span>def <span class="ident">cmd_metrics_show</span></span>(<span>args: argparse.Namespace) ‑> int</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def cmd_metrics_show(args: argparse.Namespace) -&gt; int:
+    &#34;&#34;&#34;Show metrics for the last pipeline run.&#34;&#34;&#34;
+    from atomik_sdk.pipeline.context.checkpoint import Checkpoint
+    from atomik_sdk.pipeline.metrics.reporter import MetricsReporter
+
+    checkpoint = Checkpoint(getattr(args, &#34;checkpoint&#34;, &#34;.atomik&#34;))
+    schema_name = getattr(args, &#34;schema&#34;, None)
+    history = checkpoint.get_metrics_history(schema_name)
+
+    if not history:
+        print(&#34;No metrics data available. Run the pipeline first.&#34;)
+        return EXIT_SUCCESS
+
+    reporter = MetricsReporter()
+    last = history[-1]
+    report = reporter.format_text_report(last.get(&#34;schema&#34;, &#34;unknown&#34;), last)
+    print(report)
+
+    return EXIT_SUCCESS</code></pre>
+</details>
+<div class="desc"><p>Show metrics for the last pipeline run.</p></div>
+</dd>
+<dt id="atomik_sdk.cli.cmd_pipeline_diff"><code class="name flex">
+<span>def <span class="ident">cmd_pipeline_diff</span></span>(<span>args: argparse.Namespace) ‑> int</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def cmd_pipeline_diff(args: argparse.Namespace) -&gt; int:
+    &#34;&#34;&#34;Show what the pipeline would do without executing.&#34;&#34;&#34;
+    args.dry_run = True
+    return cmd_pipeline_run(args)</code></pre>
+</details>
+<div class="desc"><p>Show what the pipeline would do without executing.</p></div>
+</dd>
+<dt id="atomik_sdk.cli.cmd_pipeline_run"><code class="name flex">
+<span>def <span class="ident">cmd_pipeline_run</span></span>(<span>args: argparse.Namespace) ‑> int</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def cmd_pipeline_run(args: argparse.Namespace) -&gt; int:
+    &#34;&#34;&#34;Execute the autonomous pipeline on a schema or directory.&#34;&#34;&#34;
+    target = Path(args.target)
+    if not target.exists():
+        print(f&#34;Error: not found: {target}&#34;, file=sys.stderr)
+        return EXIT_FILE_ERROR
+
+    pipeline = _create_pipeline(args)
+
+    if target.is_dir() or getattr(args, &#34;batch&#34;, False):
+        results = pipeline.run_batch(target)
+        failures = sum(1 for r in results if not r.success)
+        total = len(results)
+        print(f&#34;\nPipeline complete: {total} schema(s), {failures} failure(s)&#34;)
+        for r in results:
+            status = &#34;OK&#34; if r.success else &#34;FAIL&#34;
+            print(f&#34;  {r.schema}: {status} [{r.validation_level}] &#34;
+                  f&#34;({r.files_generated} files, {r.total_tokens} tokens, &#34;
+                  f&#34;{r.total_time_ms:.0f}ms)&#34;)
+        return EXIT_GENERATION_FAILURE if failures else EXIT_SUCCESS
+    else:
+        result = pipeline.run(target)
+        if result.success:
+            print(f&#34;\nPipeline SUCCESS [{result.validation_level}]&#34;)
+            print(f&#34;  Files: {result.files_generated}, &#34;
+                  f&#34;Lines: {result.lines_generated}, &#34;
+                  f&#34;Tokens: {result.total_tokens}, &#34;
+                  f&#34;Time: {result.total_time_ms:.0f}ms&#34;)
+        else:
+            print(&#34;\nPipeline FAILED&#34;, file=sys.stderr)
+            for err in result.errors:
+                print(f&#34;  - {err}&#34;, file=sys.stderr)
+        return EXIT_SUCCESS if result.success else EXIT_GENERATION_FAILURE</code></pre>
+</details>
+<div class="desc"><p>Execute the autonomous pipeline on a schema or directory.</p></div>
+</dd>
+<dt id="atomik_sdk.cli.cmd_pipeline_status"><code class="name flex">
+<span>def <span class="ident">cmd_pipeline_status</span></span>(<span>_args: argparse.Namespace) ‑> int</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def cmd_pipeline_status(_args: argparse.Namespace) -&gt; int:
+    &#34;&#34;&#34;Show pipeline status from checkpoint.&#34;&#34;&#34;
+    from atomik_sdk.pipeline.context.checkpoint import Checkpoint
+
+    checkpoint_dir = getattr(_args, &#34;checkpoint&#34;, &#34;.atomik&#34;)
+    checkpoint = Checkpoint(checkpoint_dir)
+    state = checkpoint.to_dict()
+
+    schemas = state.get(&#34;schemas&#34;, {})
+    history = state.get(&#34;metrics_history&#34;, [])
+
+    print(&#34;ATOMiK Pipeline Status&#34;)
+    print(&#34;=&#34; * 40)
+    print(f&#34;  Checkpoint:    {checkpoint_dir}&#34;)
+    print(f&#34;  Last updated:  {state.get(&#39;last_updated&#39;, &#39;never&#39;)}&#34;)
+    print(f&#34;  Schemas:       {len(schemas)}&#34;)
+    print(f&#34;  History:       {len(history)} run(s)&#34;)
+    print()
+
+    if schemas:
+        print(&#34;Registered Schemas:&#34;)
+        for name, info in schemas.items():
+            gen = info.get(&#34;last_generated&#34;, &#34;never&#34;)
+            print(f&#34;  {name}: generated {gen}&#34;)
+        print()
+
+    if history:
+        last = history[-1]
+        print(&#34;Last Run:&#34;)
+        print(f&#34;  Schema:    {last.get(&#39;schema&#39;, &#39;unknown&#39;)}&#34;)
+        print(f&#34;  Timestamp: {last.get(&#39;timestamp&#39;, &#39;unknown&#39;)}&#34;)
+        print(f&#34;  Tokens:    {last.get(&#39;tokens_consumed&#39;, 0)}&#34;)
+        print(f&#34;  Files:     {last.get(&#39;files_generated&#39;, 0)}&#34;)
+
+    return EXIT_SUCCESS</code></pre>
+</details>
+<div class="desc"><p>Show pipeline status from checkpoint.</p></div>
+</dd>
 <dt id="atomik_sdk.cli.cmd_validate"><code class="name flex">
 <span>def <span class="ident">cmd_validate</span></span>(<span>args: argparse.Namespace) ‑> int</span>
 </code></dt>
@@ -378,12 +774,38 @@ atomik-gen &ndash;version</p>
         parser.print_help()
         return EXIT_SUCCESS
 
+    # Handle subcommand groups
+    if args.command == &#34;pipeline&#34;:
+        pipeline_commands = {
+            &#34;run&#34;: cmd_pipeline_run,
+            &#34;diff&#34;: cmd_pipeline_diff,
+            &#34;status&#34;: cmd_pipeline_status,
+        }
+        subcmd = getattr(args, &#34;pipeline_command&#34;, None)
+        if subcmd is None:
+            parser.parse_args([&#34;pipeline&#34;, &#34;--help&#34;])
+            return EXIT_SUCCESS
+        return pipeline_commands[subcmd](args)
+
+    if args.command == &#34;metrics&#34;:
+        metrics_commands = {
+            &#34;show&#34;: cmd_metrics_show,
+            &#34;compare&#34;: cmd_metrics_compare,
+            &#34;export&#34;: cmd_metrics_export,
+        }
+        subcmd = getattr(args, &#34;metrics_command&#34;, None)
+        if subcmd is None:
+            parser.parse_args([&#34;metrics&#34;, &#34;--help&#34;])
+            return EXIT_SUCCESS
+        return metrics_commands[subcmd](args)
+
     commands = {
         &#34;generate&#34;: cmd_generate,
         &#34;validate&#34;: cmd_validate,
         &#34;info&#34;: cmd_info,
         &#34;batch&#34;: cmd_batch,
         &#34;list&#34;: cmd_list,
+        &#34;demo&#34;: cmd_demo,
     }
 
     try:
@@ -413,9 +835,16 @@ atomik-gen &ndash;version</p>
 <ul class="two-column">
 <li><code><a title="atomik_sdk.cli.build_parser" href="#atomik_sdk.cli.build_parser">build_parser</a></code></li>
 <li><code><a title="atomik_sdk.cli.cmd_batch" href="#atomik_sdk.cli.cmd_batch">cmd_batch</a></code></li>
+<li><code><a title="atomik_sdk.cli.cmd_demo" href="#atomik_sdk.cli.cmd_demo">cmd_demo</a></code></li>
 <li><code><a title="atomik_sdk.cli.cmd_generate" href="#atomik_sdk.cli.cmd_generate">cmd_generate</a></code></li>
 <li><code><a title="atomik_sdk.cli.cmd_info" href="#atomik_sdk.cli.cmd_info">cmd_info</a></code></li>
 <li><code><a title="atomik_sdk.cli.cmd_list" href="#atomik_sdk.cli.cmd_list">cmd_list</a></code></li>
+<li><code><a title="atomik_sdk.cli.cmd_metrics_compare" href="#atomik_sdk.cli.cmd_metrics_compare">cmd_metrics_compare</a></code></li>
+<li><code><a title="atomik_sdk.cli.cmd_metrics_export" href="#atomik_sdk.cli.cmd_metrics_export">cmd_metrics_export</a></code></li>
+<li><code><a title="atomik_sdk.cli.cmd_metrics_show" href="#atomik_sdk.cli.cmd_metrics_show">cmd_metrics_show</a></code></li>
+<li><code><a title="atomik_sdk.cli.cmd_pipeline_diff" href="#atomik_sdk.cli.cmd_pipeline_diff">cmd_pipeline_diff</a></code></li>
+<li><code><a title="atomik_sdk.cli.cmd_pipeline_run" href="#atomik_sdk.cli.cmd_pipeline_run">cmd_pipeline_run</a></code></li>
+<li><code><a title="atomik_sdk.cli.cmd_pipeline_status" href="#atomik_sdk.cli.cmd_pipeline_status">cmd_pipeline_status</a></code></li>
 <li><code><a title="atomik_sdk.cli.cmd_validate" href="#atomik_sdk.cli.cmd_validate">cmd_validate</a></code></li>
 <li><code><a title="atomik_sdk.cli.main" href="#atomik_sdk.cli.main">main</a></code></li>
 </ul>

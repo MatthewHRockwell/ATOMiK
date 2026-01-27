@@ -1,0 +1,443 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
+<title>atomik_sdk.pipeline.stages.hardware API documentation</title>
+<meta name="description" content="Hardware-in-the-Loop Pipeline Stage (Mandatory) …">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>atomik_sdk.pipeline.stages.hardware</code></h1>
+</header>
+<section id="section-intro">
+<p>Hardware-in-the-Loop Pipeline Stage (Mandatory)</p>
+<p>Stage 5 of the pipeline: validates generated Verilog through RTL
+simulation and, when hardware is available, FPGA synthesis,
+programming, and on-device test execution.</p>
+<p>RTL simulation always runs. FPGA synthesis and programming run
+when the respective tools and hardware are detected.</p>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="atomik_sdk.pipeline.stages.hardware.HardwareStage"><code class="flex name class">
+<span>class <span class="ident">HardwareStage</span></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class HardwareStage(BaseStage):
+    &#34;&#34;&#34;Mandatory hardware validation stage.&#34;&#34;&#34;
+
+    name = &#34;hardware&#34;
+
+    # Phase 3 baseline for comparison
+    PHASE3_BASELINE = {
+        &#34;fmax_mhz&#34;: 94.9,
+        &#34;lut_pct&#34;: 7,
+        &#34;ff_pct&#34;: 9,
+        &#34;tests_passed&#34;: 10,
+        &#34;tests_total&#34;: 10,
+    }
+
+    def run(
+        self,
+        schema: dict[str, Any],
+        schema_path: str,
+        previous_manifest: StageManifest | None,
+        manifest: StageManifest,
+        config: Any,
+    ) -&gt; None:
+        sim_only = getattr(config, &#34;sim_only&#34;, False)
+        skip_synthesis = getattr(config, &#34;skip_synthesis&#34;, False)
+        output_dir = getattr(config, &#34;output_dir&#34;, &#34;generated&#34;)
+
+        # Find generated Verilog files
+        verilog_files = list(Path(output_dir).rglob(&#34;*.v&#34;))
+        if not verilog_files:
+            manifest.warnings.append(&#34;No Verilog files found in output directory&#34;)
+            manifest.validation_level = &#34;no_rtl&#34;
+            manifest.next_stage = &#34;metrics&#34;
+            return
+
+        # Separate testbenches from source
+        tb_files = [f for f in verilog_files if f.name.startswith(&#34;tb_&#34;)]
+        src_files = [f for f in verilog_files if not f.name.startswith(&#34;tb_&#34;)]
+
+        # ---- Step 1: RTL Simulation (ALWAYS) ----
+        sim_result = self._rtl_simulation(src_files, tb_files, manifest)
+        manifest.validation_level = &#34;simulation_only&#34;
+
+        if not sim_result:
+            manifest.status = StageStatus.FAILED
+            manifest.next_stage = &#34;metrics&#34;
+            return
+
+        # Include Phase 3 baseline in all cases where RTL exists
+        manifest.metrics[&#34;phase3_baseline&#34;] = self.PHASE3_BASELINE
+
+        if sim_only:
+            manifest.next_stage = &#34;metrics&#34;
+            return
+
+        # ---- Step 2: FPGA Synthesis (when tools available) ----
+        if not skip_synthesis and self._has_gowin_eda():
+            synth_result = self._fpga_synthesis(src_files, manifest)
+            if synth_result:
+                manifest.validation_level = &#34;synthesized&#34;
+
+        # ---- Step 3: FPGA Programming (when board detected) ----
+        if not skip_synthesis and self._has_fpga_tools():
+            board = self._detect_board()
+            if board:
+                program_ok = self._program_fpga(manifest, config)
+                if program_ok:
+                    manifest.validation_level = &#34;hw_programmed&#34;
+
+                    # ---- Step 4: On-Device Validation ----
+                    com_port = getattr(config, &#34;com_port&#34;, None) or self._detect_com_port()
+                    if com_port:
+                        hw_ok = self._on_device_validation(com_port, manifest)
+                        if hw_ok:
+                            manifest.validation_level = &#34;hw_validated&#34;
+
+        manifest.next_stage = &#34;metrics&#34;
+        manifest.tokens_consumed = 0  # All local execution
+
+    def _rtl_simulation(
+        self,
+        src_files: list[Path],
+        tb_files: list[Path],
+        manifest: StageManifest,
+    ) -&gt; bool:
+        &#34;&#34;&#34;Run RTL simulation with iverilog/vvp.&#34;&#34;&#34;
+        iverilog = shutil.which(&#34;iverilog&#34;)
+        vvp = shutil.which(&#34;vvp&#34;)
+
+        if not iverilog or not vvp:
+            manifest.warnings.append(
+                &#34;iverilog/vvp not found -- RTL simulation skipped&#34;
+            )
+            manifest.metrics[&#34;sim_tests_passed&#34;] = 0
+            manifest.metrics[&#34;sim_tests_total&#34;] = 0
+            manifest.metrics[&#34;sim_available&#34;] = False
+            return True  # Not a failure, just can&#39;t simulate
+
+        manifest.metrics[&#34;sim_available&#34;] = True
+        tests_passed = 0
+        tests_total = 0
+
+        for tb in tb_files:
+            tests_total += 1
+            try:
+                # Compile
+                with tempfile.NamedTemporaryFile(
+                    suffix=&#34;.vvp&#34;, delete=False
+                ) as tmp:
+                    vvp_out = tmp.name
+
+                all_files = [str(f) for f in src_files] + [str(tb)]
+                compile_result = subprocess.run(
+                    [iverilog, &#34;-o&#34;, vvp_out] + all_files,
+                    capture_output=True,
+                    text=True,
+                    timeout=60,
+                )
+
+                if compile_result.returncode != 0:
+                    manifest.errors.append(
+                        f&#34;iverilog compile failed for {tb.name}: &#34;
+                        f&#34;{compile_result.stderr.strip()}&#34;
+                    )
+                    continue
+
+                # Simulate
+                sim_result = subprocess.run(
+                    [vvp, vvp_out],
+                    capture_output=True,
+                    text=True,
+                    timeout=60,
+                )
+
+                output = sim_result.stdout + sim_result.stderr
+
+                # Parse for pass/fail indicators
+                if &#34;FAIL&#34; in output.upper() and &#34;0 FAIL&#34; not in output.upper():
+                    manifest.errors.append(
+                        f&#34;RTL simulation FAILED for {tb.name}&#34;
+                    )
+                else:
+                    tests_passed += 1
+
+                # Clean up
+                Path(vvp_out).unlink(missing_ok=True)
+
+            except subprocess.TimeoutExpired:
+                manifest.errors.append(f&#34;RTL simulation timed out for {tb.name}&#34;)
+            except Exception as e:
+                manifest.errors.append(f&#34;RTL simulation error for {tb.name}: {e}&#34;)
+
+        manifest.metrics[&#34;sim_tests_passed&#34;] = tests_passed
+        manifest.metrics[&#34;sim_tests_total&#34;] = tests_total
+
+        return tests_passed == tests_total
+
+    def _has_gowin_eda(self) -&gt; bool:
+        &#34;&#34;&#34;Check if Gowin EDA synthesis tools are available.&#34;&#34;&#34;
+        # Check common Gowin tool names
+        return shutil.which(&#34;gw_sh&#34;) is not None
+
+    def _has_fpga_tools(self) -&gt; bool:
+        &#34;&#34;&#34;Check if openFPGALoader is available.&#34;&#34;&#34;
+        return shutil.which(&#34;openFPGALoader&#34;) is not None
+
+    def _detect_board(self) -&gt; str | None:
+        &#34;&#34;&#34;Detect connected Tang Nano 9K board.&#34;&#34;&#34;
+        openfpga = shutil.which(&#34;openFPGALoader&#34;)
+        if not openfpga:
+            return None
+        try:
+            result = subprocess.run(
+                [openfpga, &#34;--detect&#34;],
+                capture_output=True, text=True, timeout=10,
+            )
+            if &#34;GW1NR&#34; in result.stdout or &#34;tangnano9k&#34; in result.stdout.lower():
+                return &#34;tangnano9k&#34;
+        except (subprocess.TimeoutExpired, OSError):
+            pass
+        return None
+
+    def _program_fpga(self, manifest: StageManifest, config: Any) -&gt; bool:
+        &#34;&#34;&#34;Program the FPGA with the bitstream.&#34;&#34;&#34;
+        # This would invoke the existing fpga_pipeline.py --program-only
+        project_root = Path(__file__).resolve().parents[4]
+        pipeline_script = project_root / &#34;scripts&#34; / &#34;fpga_pipeline.py&#34;
+
+        if not pipeline_script.exists():
+            manifest.warnings.append(&#34;fpga_pipeline.py not found&#34;)
+            return False
+
+        try:
+            result = subprocess.run(
+                [&#34;python&#34;, str(pipeline_script), &#34;--program-only&#34;],
+                capture_output=True, text=True, timeout=30,
+                cwd=str(project_root),
+            )
+            manifest.metrics[&#34;programming_time_s&#34;] = 0  # Would parse from output
+            return result.returncode == 0
+        except (subprocess.TimeoutExpired, OSError) as e:
+            manifest.warnings.append(f&#34;FPGA programming failed: {e}&#34;)
+            return False
+
+    def _detect_com_port(self) -&gt; str | None:
+        &#34;&#34;&#34;Auto-detect COM port for UART communication.&#34;&#34;&#34;
+        try:
+            import serial.tools.list_ports
+            for port in serial.tools.list_ports.comports():
+                if &#34;USB&#34; in port.description.upper() or &#34;SERIAL&#34; in port.description.upper():
+                    return port.device
+        except ImportError:
+            pass
+        return None
+
+    def _on_device_validation(
+        self, com_port: str, manifest: StageManifest
+    ) -&gt; bool:
+        &#34;&#34;&#34;Run hardware test suite via UART.&#34;&#34;&#34;
+        project_root = Path(__file__).resolve().parents[4]
+        test_script = project_root / &#34;scripts&#34; / &#34;test_hardware.py&#34;
+
+        if not test_script.exists():
+            manifest.warnings.append(&#34;test_hardware.py not found&#34;)
+            return False
+
+        try:
+            result = subprocess.run(
+                [&#34;python&#34;, str(test_script), &#34;--port&#34;, com_port],
+                capture_output=True, text=True, timeout=60,
+                cwd=str(project_root),
+            )
+            output = result.stdout
+
+            # Parse test results
+            passed = output.count(&#34;PASS&#34;)
+            failed = output.count(&#34;FAIL&#34;)
+            total = passed + failed
+
+            manifest.metrics[&#34;hw_tests_passed&#34;] = passed
+            manifest.metrics[&#34;hw_tests_total&#34;] = total
+
+            return result.returncode == 0
+
+        except (subprocess.TimeoutExpired, OSError) as e:
+            manifest.warnings.append(f&#34;Hardware validation failed: {e}&#34;)
+            return False
+
+    def _fpga_synthesis(
+        self, src_files: list[Path], manifest: StageManifest
+    ) -&gt; bool:
+        &#34;&#34;&#34;Run FPGA synthesis with Gowin EDA.&#34;&#34;&#34;
+        manifest.warnings.append(&#34;FPGA synthesis integration pending&#34;)
+        return False</code></pre>
+</details>
+<div class="desc"><p>Mandatory hardware validation stage.</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="atomik_sdk.pipeline.stages.BaseStage" href="index.html#atomik_sdk.pipeline.stages.BaseStage">BaseStage</a></li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.stages.hardware.HardwareStage.PHASE3_BASELINE"><code class="name">var <span class="ident">PHASE3_BASELINE</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.stages.hardware.HardwareStage.name"><code class="name">var <span class="ident">name</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.stages.hardware.HardwareStage.run"><code class="name flex">
+<span>def <span class="ident">run</span></span>(<span>self,<br>schema: dict[str, Any],<br>schema_path: str,<br>previous_manifest: StageManifest | None,<br>manifest: StageManifest,<br>config: Any) ‑> None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def run(
+    self,
+    schema: dict[str, Any],
+    schema_path: str,
+    previous_manifest: StageManifest | None,
+    manifest: StageManifest,
+    config: Any,
+) -&gt; None:
+    sim_only = getattr(config, &#34;sim_only&#34;, False)
+    skip_synthesis = getattr(config, &#34;skip_synthesis&#34;, False)
+    output_dir = getattr(config, &#34;output_dir&#34;, &#34;generated&#34;)
+
+    # Find generated Verilog files
+    verilog_files = list(Path(output_dir).rglob(&#34;*.v&#34;))
+    if not verilog_files:
+        manifest.warnings.append(&#34;No Verilog files found in output directory&#34;)
+        manifest.validation_level = &#34;no_rtl&#34;
+        manifest.next_stage = &#34;metrics&#34;
+        return
+
+    # Separate testbenches from source
+    tb_files = [f for f in verilog_files if f.name.startswith(&#34;tb_&#34;)]
+    src_files = [f for f in verilog_files if not f.name.startswith(&#34;tb_&#34;)]
+
+    # ---- Step 1: RTL Simulation (ALWAYS) ----
+    sim_result = self._rtl_simulation(src_files, tb_files, manifest)
+    manifest.validation_level = &#34;simulation_only&#34;
+
+    if not sim_result:
+        manifest.status = StageStatus.FAILED
+        manifest.next_stage = &#34;metrics&#34;
+        return
+
+    # Include Phase 3 baseline in all cases where RTL exists
+    manifest.metrics[&#34;phase3_baseline&#34;] = self.PHASE3_BASELINE
+
+    if sim_only:
+        manifest.next_stage = &#34;metrics&#34;
+        return
+
+    # ---- Step 2: FPGA Synthesis (when tools available) ----
+    if not skip_synthesis and self._has_gowin_eda():
+        synth_result = self._fpga_synthesis(src_files, manifest)
+        if synth_result:
+            manifest.validation_level = &#34;synthesized&#34;
+
+    # ---- Step 3: FPGA Programming (when board detected) ----
+    if not skip_synthesis and self._has_fpga_tools():
+        board = self._detect_board()
+        if board:
+            program_ok = self._program_fpga(manifest, config)
+            if program_ok:
+                manifest.validation_level = &#34;hw_programmed&#34;
+
+                # ---- Step 4: On-Device Validation ----
+                com_port = getattr(config, &#34;com_port&#34;, None) or self._detect_com_port()
+                if com_port:
+                    hw_ok = self._on_device_validation(com_port, manifest)
+                    if hw_ok:
+                        manifest.validation_level = &#34;hw_validated&#34;
+
+    manifest.next_stage = &#34;metrics&#34;
+    manifest.tokens_consumed = 0  # All local execution</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="atomik_sdk.pipeline.stages" href="index.html">atomik_sdk.pipeline.stages</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="atomik_sdk.pipeline.stages.hardware.HardwareStage" href="#atomik_sdk.pipeline.stages.hardware.HardwareStage">HardwareStage</a></code></h4>
+<ul class="">
+<li><code><a title="atomik_sdk.pipeline.stages.hardware.HardwareStage.PHASE3_BASELINE" href="#atomik_sdk.pipeline.stages.hardware.HardwareStage.PHASE3_BASELINE">PHASE3_BASELINE</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.stages.hardware.HardwareStage.name" href="#atomik_sdk.pipeline.stages.hardware.HardwareStage.name">name</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.stages.hardware.HardwareStage.run" href="#atomik_sdk.pipeline.stages.hardware.HardwareStage.run">run</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+</body>
+</html>

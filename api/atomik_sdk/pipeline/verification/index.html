@@ -1,0 +1,1079 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
+<title>atomik_sdk.pipeline.verification API documentation</title>
+<meta name="description" content="Deep verification engine with native toolchain runners and consistency checking.">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>atomik_sdk.pipeline.verification</code></h1>
+</header>
+<section id="section-intro">
+<p>Deep verification engine with native toolchain runners and consistency checking.</p>
+</section>
+<section>
+<h2 class="section-title" id="header-submodules">Sub-modules</h2>
+<dl>
+<dt><code class="name"><a title="atomik_sdk.pipeline.verification.consistency" href="consistency.html">atomik_sdk.pipeline.verification.consistency</a></code></dt>
+<dd>
+<div class="desc"><p>Cross-Language Consistency Checker …</p></div>
+</dd>
+<dt><code class="name"><a title="atomik_sdk.pipeline.verification.deep_verify" href="deep_verify.html">atomik_sdk.pipeline.verification.deep_verify</a></code></dt>
+<dd>
+<div class="desc"><p>Deep Verification Engine …</p></div>
+</dd>
+<dt><code class="name"><a title="atomik_sdk.pipeline.verification.extractors" href="extractors/index.html">atomik_sdk.pipeline.verification.extractors</a></code></dt>
+<dd>
+<div class="desc"><p>Per-language interface extractors for consistency checking.</p></div>
+</dd>
+<dt><code class="name"><a title="atomik_sdk.pipeline.verification.interfaces" href="interfaces.html">atomik_sdk.pipeline.verification.interfaces</a></code></dt>
+<dd>
+<div class="desc"><p>Shared interface dataclasses for cross-language consistency checking …</p></div>
+</dd>
+<dt><code class="name"><a title="atomik_sdk.pipeline.verification.runners" href="runners/index.html">atomik_sdk.pipeline.verification.runners</a></code></dt>
+<dd>
+<div class="desc"><p>Per-language native toolchain verification runners.</p></div>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="atomik_sdk.pipeline.verification.ConsistencyChecker"><code class="flex name class">
+<span>class <span class="ident">ConsistencyChecker</span></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class ConsistencyChecker:
+    &#34;&#34;&#34;
+    Cross-language consistency checker.
+
+    Extracts interface definitions from each generated file and
+    compares them to ensure all languages implement the same fields,
+    operations, and type mappings.
+
+    Example:
+        &gt;&gt;&gt; checker = ConsistencyChecker()
+        &gt;&gt;&gt; report = checker.check(files_by_language)
+        &gt;&gt;&gt; if not report.consistent:
+        ...     for issue in report.issues:
+        ...         print(f&#34;{issue.issue_type}: {issue.field_name}&#34;)
+    &#34;&#34;&#34;
+
+    def __init__(self) -&gt; None:
+        self._extractors = {
+            &#34;python&#34;: PythonExtractor(),
+            &#34;rust&#34;: RustExtractor(),
+            &#34;c&#34;: CExtractor(),
+            &#34;javascript&#34;: JavaScriptExtractor(),
+            &#34;verilog&#34;: VerilogExtractor(),
+        }
+
+    def check(
+        self,
+        files_by_language: dict[str, str],
+    ) -&gt; ConsistencyReport:
+        &#34;&#34;&#34;
+        Check consistency across language outputs.
+
+        Args:
+            files_by_language: Map of language -&gt; file path.
+
+        Returns:
+            ConsistencyReport with issues and extracted interfaces.
+        &#34;&#34;&#34;
+        report = ConsistencyReport()
+
+        # Extract interfaces
+        for lang, filepath in files_by_language.items():
+            extractor = self._extractors.get(lang)
+            if extractor is None:
+                continue
+            try:
+                iface = extractor.extract(filepath)
+                iface.language = lang
+                iface.file_path = filepath
+                report.interfaces[lang] = iface
+            except Exception:
+                continue
+
+        if len(report.interfaces) &lt; 2:
+            return report
+
+        # Check field consistency
+        self._check_fields(report)
+
+        # Check operation consistency
+        self._check_operations(report)
+
+        # Check type mapping consistency
+        self._check_type_mappings(report)
+
+        return report
+
+    def check_from_interfaces(
+        self,
+        interfaces: dict[str, LanguageInterface],
+    ) -&gt; ConsistencyReport:
+        &#34;&#34;&#34;Check consistency from pre-extracted interfaces.&#34;&#34;&#34;
+        report = ConsistencyReport()
+        report.interfaces = dict(interfaces)
+
+        if len(interfaces) &lt; 2:
+            return report
+
+        self._check_fields(report)
+        self._check_operations(report)
+        self._check_type_mappings(report)
+
+        return report
+
+    def _check_fields(self, report: ConsistencyReport) -&gt; None:
+        &#34;&#34;&#34;Check that all languages have the same fields.&#34;&#34;&#34;
+        # Collect normalized field names per language
+        lang_fields: dict[str, set[str]] = {}
+        for lang, iface in report.interfaces.items():
+            lang_fields[lang] = {
+                _normalize_to_snake(f.name) for f in iface.fields
+            }
+
+        # Union of all fields
+        all_fields = set()
+        for fields in lang_fields.values():
+            all_fields |= fields
+
+        for field_name in sorted(all_fields):
+            present_in = [
+                lang for lang, fields in lang_fields.items()
+                if field_name in fields
+            ]
+            missing_in = [
+                lang for lang in lang_fields
+                if lang not in present_in
+            ]
+
+            if missing_in:
+                report.consistent = False
+                report.issues.append(ConsistencyIssue(
+                    issue_type=&#34;missing_field&#34;,
+                    field_name=field_name,
+                    languages_present=present_in,
+                    languages_missing=missing_in,
+                    details=f&#34;Field &#39;{field_name}&#39; missing in: {&#39;, &#39;.join(missing_in)}&#34;,
+                ))
+
+    def _check_operations(self, report: ConsistencyReport) -&gt; None:
+        &#34;&#34;&#34;Check that all languages have the same operations.&#34;&#34;&#34;
+        lang_ops: dict[str, set[str]] = {}
+        for lang, iface in report.interfaces.items():
+            lang_ops[lang] = {
+                _normalize_to_snake(op.name) for op in iface.operations
+            }
+
+        all_ops = set()
+        for ops in lang_ops.values():
+            all_ops |= ops
+
+        for op_name in sorted(all_ops):
+            present_in = [
+                lang for lang, ops in lang_ops.items()
+                if op_name in ops
+            ]
+            missing_in = [
+                lang for lang in lang_ops
+                if lang not in present_in
+            ]
+
+            if missing_in:
+                report.consistent = False
+                report.issues.append(ConsistencyIssue(
+                    issue_type=&#34;missing_operation&#34;,
+                    field_name=op_name,
+                    languages_present=present_in,
+                    languages_missing=missing_in,
+                    details=f&#34;Operation &#39;{op_name}&#39; missing in: {&#39;, &#39;.join(missing_in)}&#34;,
+                ))
+
+    def _check_type_mappings(self, report: ConsistencyReport) -&gt; None:
+        &#34;&#34;&#34;Check for type mapping inconsistencies across languages.&#34;&#34;&#34;
+        # Collect field bit widths per normalized name
+        field_widths: dict[str, dict[str, int]] = {}
+
+        for lang, iface in report.interfaces.items():
+            for f in iface.fields:
+                norm_name = _normalize_to_snake(f.name)
+                if f.bit_width &gt; 0:
+                    if norm_name not in field_widths:
+                        field_widths[norm_name] = {}
+                    field_widths[norm_name][lang] = f.bit_width
+
+        for field_name, widths in field_widths.items():
+            unique_widths = set(widths.values())
+            if len(unique_widths) &gt; 1:
+                report.consistent = False
+                width_details = &#34;, &#34;.join(
+                    f&#34;{lang}={w}bit&#34; for lang, w in sorted(widths.items())
+                )
+                report.issues.append(ConsistencyIssue(
+                    issue_type=&#34;type_mismatch&#34;,
+                    field_name=field_name,
+                    languages_present=list(widths.keys()),
+                    details=f&#34;Bit width mismatch for &#39;{field_name}&#39;: {width_details}&#34;,
+                ))</code></pre>
+</details>
+<div class="desc"><p>Cross-language consistency checker.</p>
+<p>Extracts interface definitions from each generated file and
+compares them to ensure all languages implement the same fields,
+operations, and type mappings.</p>
+<h2 id="example">Example</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; checker = ConsistencyChecker()
+&gt;&gt;&gt; report = checker.check(files_by_language)
+&gt;&gt;&gt; if not report.consistent:
+...     for issue in report.issues:
+...         print(f&quot;{issue.issue_type}: {issue.field_name}&quot;)
+</code></pre></div>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.verification.ConsistencyChecker.check"><code class="name flex">
+<span>def <span class="ident">check</span></span>(<span>self, files_by_language: dict[str, str]) ‑> <a title="atomik_sdk.pipeline.verification.consistency.ConsistencyReport" href="consistency.html#atomik_sdk.pipeline.verification.consistency.ConsistencyReport">ConsistencyReport</a></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def check(
+    self,
+    files_by_language: dict[str, str],
+) -&gt; ConsistencyReport:
+    &#34;&#34;&#34;
+    Check consistency across language outputs.
+
+    Args:
+        files_by_language: Map of language -&gt; file path.
+
+    Returns:
+        ConsistencyReport with issues and extracted interfaces.
+    &#34;&#34;&#34;
+    report = ConsistencyReport()
+
+    # Extract interfaces
+    for lang, filepath in files_by_language.items():
+        extractor = self._extractors.get(lang)
+        if extractor is None:
+            continue
+        try:
+            iface = extractor.extract(filepath)
+            iface.language = lang
+            iface.file_path = filepath
+            report.interfaces[lang] = iface
+        except Exception:
+            continue
+
+    if len(report.interfaces) &lt; 2:
+        return report
+
+    # Check field consistency
+    self._check_fields(report)
+
+    # Check operation consistency
+    self._check_operations(report)
+
+    # Check type mapping consistency
+    self._check_type_mappings(report)
+
+    return report</code></pre>
+</details>
+<div class="desc"><p>Check consistency across language outputs.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>files_by_language</code></strong></dt>
+<dd>Map of language -&gt; file path.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>ConsistencyReport with issues and extracted interfaces.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.verification.ConsistencyChecker.check_from_interfaces"><code class="name flex">
+<span>def <span class="ident">check_from_interfaces</span></span>(<span>self,<br>interfaces: dict[str, <a title="atomik_sdk.pipeline.verification.LanguageInterface" href="#atomik_sdk.pipeline.verification.LanguageInterface">LanguageInterface</a>]) ‑> <a title="atomik_sdk.pipeline.verification.consistency.ConsistencyReport" href="consistency.html#atomik_sdk.pipeline.verification.consistency.ConsistencyReport">ConsistencyReport</a></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def check_from_interfaces(
+    self,
+    interfaces: dict[str, LanguageInterface],
+) -&gt; ConsistencyReport:
+    &#34;&#34;&#34;Check consistency from pre-extracted interfaces.&#34;&#34;&#34;
+    report = ConsistencyReport()
+    report.interfaces = dict(interfaces)
+
+    if len(interfaces) &lt; 2:
+        return report
+
+    self._check_fields(report)
+    self._check_operations(report)
+    self._check_type_mappings(report)
+
+    return report</code></pre>
+</details>
+<div class="desc"><p>Check consistency from pre-extracted interfaces.</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.pipeline.verification.ConsistencyReport"><code class="flex name class">
+<span>class <span class="ident">ConsistencyReport</span></span>
+<span>(</span><span>consistent: bool = True,<br>issues: list[ConsistencyIssue] = &lt;factory&gt;,<br>interfaces: dict[str, <a title="atomik_sdk.pipeline.verification.LanguageInterface" href="#atomik_sdk.pipeline.verification.LanguageInterface">LanguageInterface</a>] = &lt;factory&gt;)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass
+class ConsistencyReport:
+    &#34;&#34;&#34;Report of cross-language consistency check.&#34;&#34;&#34;
+    consistent: bool = True
+    issues: list[ConsistencyIssue] = field(default_factory=list)
+    interfaces: dict[str, LanguageInterface] = field(default_factory=dict)
+
+    @property
+    def issue_count(self) -&gt; int:
+        return len(self.issues)
+
+    def to_dict(self) -&gt; dict[str, Any]:
+        return {
+            &#34;consistent&#34;: self.consistent,
+            &#34;issue_count&#34;: self.issue_count,
+            &#34;issues&#34;: [i.to_dict() for i in self.issues],
+            &#34;interfaces&#34;: {
+                lang: iface.to_dict()
+                for lang, iface in self.interfaces.items()
+            },
+        }</code></pre>
+</details>
+<div class="desc"><p>Report of cross-language consistency check.</p></div>
+<h3>Instance variables</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.verification.ConsistencyReport.consistent"><code class="name">var <span class="ident">consistent</span> : bool</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.verification.ConsistencyReport.interfaces"><code class="name">var <span class="ident">interfaces</span> : dict[str, <a title="atomik_sdk.pipeline.verification.interfaces.LanguageInterface" href="interfaces.html#atomik_sdk.pipeline.verification.interfaces.LanguageInterface">LanguageInterface</a>]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.verification.ConsistencyReport.issue_count"><code class="name">prop <span class="ident">issue_count</span> : int</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def issue_count(self) -&gt; int:
+    return len(self.issues)</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.verification.ConsistencyReport.issues"><code class="name">var <span class="ident">issues</span> : list[<a title="atomik_sdk.pipeline.verification.consistency.ConsistencyIssue" href="consistency.html#atomik_sdk.pipeline.verification.consistency.ConsistencyIssue">ConsistencyIssue</a>]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.verification.ConsistencyReport.to_dict"><code class="name flex">
+<span>def <span class="ident">to_dict</span></span>(<span>self) ‑> dict[str, typing.Any]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_dict(self) -&gt; dict[str, Any]:
+    return {
+        &#34;consistent&#34;: self.consistent,
+        &#34;issue_count&#34;: self.issue_count,
+        &#34;issues&#34;: [i.to_dict() for i in self.issues],
+        &#34;interfaces&#34;: {
+            lang: iface.to_dict()
+            for lang, iface in self.interfaces.items()
+        },
+    }</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.pipeline.verification.DeepVerifier"><code class="flex name class">
+<span>class <span class="ident">DeepVerifier</span></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class DeepVerifier:
+    &#34;&#34;&#34;
+    Deep verification engine with per-language native toolchain runners.
+
+    Runs each language&#39;s native verification tools (pytest, cargo test,
+    gcc, node --check, iverilog+vvp). Verification depth adapts to
+    the change scope.
+
+    Example:
+        &gt;&gt;&gt; verifier = DeepVerifier()
+        &gt;&gt;&gt; result = verifier.verify_all(file_map)
+        &gt;&gt;&gt; if not result.passed:
+        ...     print(f&#34;Failed: {result.all_errors}&#34;)
+    &#34;&#34;&#34;
+
+    def __init__(self) -&gt; None:
+        self._runners = {
+            &#34;python&#34;: PythonRunner(),
+            &#34;rust&#34;: RustRunner(),
+            &#34;c&#34;: CRunner(),
+            &#34;javascript&#34;: JavaScriptRunner(),
+            &#34;verilog&#34;: VerilogRunner(),
+        }
+
+    def verify_all(
+        self,
+        files_by_language: dict[str, list[str]],
+        verification_depth: str = &#34;full&#34;,
+    ) -&gt; DeepVerifyResult:
+        &#34;&#34;&#34;
+        Verify all language outputs.
+
+        Args:
+            files_by_language: Map of language -&gt; list of file paths.
+            verification_depth: &#34;full&#34;, &#34;partial&#34;, or &#34;metadata_only&#34;.
+
+        Returns:
+            DeepVerifyResult with per-language results.
+        &#34;&#34;&#34;
+        result = DeepVerifyResult(verification_depth=verification_depth)
+
+        if verification_depth == &#34;metadata_only&#34;:
+            # Only verify Python and JavaScript (docstrings/JSDoc)
+            languages = {&#34;python&#34;, &#34;javascript&#34;} &amp; set(files_by_language.keys())
+        elif verification_depth == &#34;partial&#34;:
+            languages = set(files_by_language.keys())
+        else:
+            languages = set(files_by_language.keys())
+
+        for lang in sorted(languages):
+            files = files_by_language.get(lang, [])
+            if not files:
+                continue
+
+            runner = self._runners.get(lang)
+            if runner is None:
+                continue
+
+            lang_result = runner.verify(files)
+            result.language_results[lang] = lang_result
+
+            result.total_tests += lang_result.tests_run
+            result.total_passed += lang_result.tests_passed
+            result.total_failed += lang_result.tests_failed
+
+            if not lang_result.passed:
+                result.passed = False
+                result.all_errors.extend(lang_result.errors)
+
+        return result
+
+    def verify_language(
+        self,
+        language: str,
+        files: list[str],
+    ) -&gt; RunnerResult:
+        &#34;&#34;&#34;Verify a single language&#39;s output.&#34;&#34;&#34;
+        runner = self._runners.get(language)
+        if runner is None:
+            return RunnerResult(
+                language=language,
+                passed=False,
+                errors=[f&#34;No runner for language: {language}&#34;],
+                tool_available=False,
+            )
+        return runner.verify(files)</code></pre>
+</details>
+<div class="desc"><p>Deep verification engine with per-language native toolchain runners.</p>
+<p>Runs each language's native verification tools (pytest, cargo test,
+gcc, node &ndash;check, iverilog+vvp). Verification depth adapts to
+the change scope.</p>
+<h2 id="example">Example</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; verifier = DeepVerifier()
+&gt;&gt;&gt; result = verifier.verify_all(file_map)
+&gt;&gt;&gt; if not result.passed:
+...     print(f&quot;Failed: {result.all_errors}&quot;)
+</code></pre></div>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.verification.DeepVerifier.verify_all"><code class="name flex">
+<span>def <span class="ident">verify_all</span></span>(<span>self, files_by_language: dict[str, list[str]], verification_depth: str = 'full') ‑> <a title="atomik_sdk.pipeline.verification.deep_verify.DeepVerifyResult" href="deep_verify.html#atomik_sdk.pipeline.verification.deep_verify.DeepVerifyResult">DeepVerifyResult</a></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def verify_all(
+    self,
+    files_by_language: dict[str, list[str]],
+    verification_depth: str = &#34;full&#34;,
+) -&gt; DeepVerifyResult:
+    &#34;&#34;&#34;
+    Verify all language outputs.
+
+    Args:
+        files_by_language: Map of language -&gt; list of file paths.
+        verification_depth: &#34;full&#34;, &#34;partial&#34;, or &#34;metadata_only&#34;.
+
+    Returns:
+        DeepVerifyResult with per-language results.
+    &#34;&#34;&#34;
+    result = DeepVerifyResult(verification_depth=verification_depth)
+
+    if verification_depth == &#34;metadata_only&#34;:
+        # Only verify Python and JavaScript (docstrings/JSDoc)
+        languages = {&#34;python&#34;, &#34;javascript&#34;} &amp; set(files_by_language.keys())
+    elif verification_depth == &#34;partial&#34;:
+        languages = set(files_by_language.keys())
+    else:
+        languages = set(files_by_language.keys())
+
+    for lang in sorted(languages):
+        files = files_by_language.get(lang, [])
+        if not files:
+            continue
+
+        runner = self._runners.get(lang)
+        if runner is None:
+            continue
+
+        lang_result = runner.verify(files)
+        result.language_results[lang] = lang_result
+
+        result.total_tests += lang_result.tests_run
+        result.total_passed += lang_result.tests_passed
+        result.total_failed += lang_result.tests_failed
+
+        if not lang_result.passed:
+            result.passed = False
+            result.all_errors.extend(lang_result.errors)
+
+    return result</code></pre>
+</details>
+<div class="desc"><p>Verify all language outputs.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>files_by_language</code></strong></dt>
+<dd>Map of language -&gt; list of file paths.</dd>
+<dt><strong><code>verification_depth</code></strong></dt>
+<dd>"full", "partial", or "metadata_only".</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>DeepVerifyResult with per-language results.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.verification.DeepVerifier.verify_language"><code class="name flex">
+<span>def <span class="ident">verify_language</span></span>(<span>self, language: str, files: list[str]) ‑> <a title="atomik_sdk.pipeline.verification.runners.python_runner.RunnerResult" href="runners/python_runner.html#atomik_sdk.pipeline.verification.runners.python_runner.RunnerResult">RunnerResult</a></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def verify_language(
+    self,
+    language: str,
+    files: list[str],
+) -&gt; RunnerResult:
+    &#34;&#34;&#34;Verify a single language&#39;s output.&#34;&#34;&#34;
+    runner = self._runners.get(language)
+    if runner is None:
+        return RunnerResult(
+            language=language,
+            passed=False,
+            errors=[f&#34;No runner for language: {language}&#34;],
+            tool_available=False,
+        )
+    return runner.verify(files)</code></pre>
+</details>
+<div class="desc"><p>Verify a single language's output.</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.pipeline.verification.DeepVerifyResult"><code class="flex name class">
+<span>class <span class="ident">DeepVerifyResult</span></span>
+<span>(</span><span>passed: bool = True,<br>language_results: dict[str, RunnerResult] = &lt;factory&gt;,<br>total_tests: int = 0,<br>total_passed: int = 0,<br>total_failed: int = 0,<br>all_errors: list[str] = &lt;factory&gt;,<br>verification_depth: str = 'full')</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass
+class DeepVerifyResult:
+    &#34;&#34;&#34;Aggregated result of deep verification across all languages.&#34;&#34;&#34;
+    passed: bool = True
+    language_results: dict[str, RunnerResult] = field(default_factory=dict)
+    total_tests: int = 0
+    total_passed: int = 0
+    total_failed: int = 0
+    all_errors: list[str] = field(default_factory=list)
+    verification_depth: str = &#34;full&#34;  # &#34;full&#34;, &#34;partial&#34;, &#34;metadata_only&#34;
+
+    def to_dict(self) -&gt; dict[str, Any]:
+        return {
+            &#34;passed&#34;: self.passed,
+            &#34;total_tests&#34;: self.total_tests,
+            &#34;total_passed&#34;: self.total_passed,
+            &#34;total_failed&#34;: self.total_failed,
+            &#34;verification_depth&#34;: self.verification_depth,
+            &#34;errors&#34;: self.all_errors,
+            &#34;languages&#34;: {
+                lang: r.to_dict() for lang, r in self.language_results.items()
+            },
+        }</code></pre>
+</details>
+<div class="desc"><p>Aggregated result of deep verification across all languages.</p></div>
+<h3>Instance variables</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.verification.DeepVerifyResult.all_errors"><code class="name">var <span class="ident">all_errors</span> : list[str]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.verification.DeepVerifyResult.language_results"><code class="name">var <span class="ident">language_results</span> : dict[str, <a title="atomik_sdk.pipeline.verification.runners.python_runner.RunnerResult" href="runners/python_runner.html#atomik_sdk.pipeline.verification.runners.python_runner.RunnerResult">RunnerResult</a>]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.verification.DeepVerifyResult.passed"><code class="name">var <span class="ident">passed</span> : bool</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.verification.DeepVerifyResult.total_failed"><code class="name">var <span class="ident">total_failed</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.verification.DeepVerifyResult.total_passed"><code class="name">var <span class="ident">total_passed</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.verification.DeepVerifyResult.total_tests"><code class="name">var <span class="ident">total_tests</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.verification.DeepVerifyResult.verification_depth"><code class="name">var <span class="ident">verification_depth</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.verification.DeepVerifyResult.to_dict"><code class="name flex">
+<span>def <span class="ident">to_dict</span></span>(<span>self) ‑> dict[str, typing.Any]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_dict(self) -&gt; dict[str, Any]:
+    return {
+        &#34;passed&#34;: self.passed,
+        &#34;total_tests&#34;: self.total_tests,
+        &#34;total_passed&#34;: self.total_passed,
+        &#34;total_failed&#34;: self.total_failed,
+        &#34;verification_depth&#34;: self.verification_depth,
+        &#34;errors&#34;: self.all_errors,
+        &#34;languages&#34;: {
+            lang: r.to_dict() for lang, r in self.language_results.items()
+        },
+    }</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.pipeline.verification.InterfaceField"><code class="flex name class">
+<span>class <span class="ident">InterfaceField</span></span>
+<span>(</span><span>name: str, type_name: str = '', bit_width: int = 0, is_array: bool = False)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass
+class InterfaceField:
+    &#34;&#34;&#34;A single field/member extracted from generated code.&#34;&#34;&#34;
+    name: str
+    type_name: str = &#34;&#34;
+    bit_width: int = 0
+    is_array: bool = False
+
+    def to_dict(self) -&gt; dict[str, Any]:
+        return {
+            &#34;name&#34;: self.name,
+            &#34;type_name&#34;: self.type_name,
+            &#34;bit_width&#34;: self.bit_width,
+            &#34;is_array&#34;: self.is_array,
+        }</code></pre>
+</details>
+<div class="desc"><p>A single field/member extracted from generated code.</p></div>
+<h3>Instance variables</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.verification.InterfaceField.bit_width"><code class="name">var <span class="ident">bit_width</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.verification.InterfaceField.is_array"><code class="name">var <span class="ident">is_array</span> : bool</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.verification.InterfaceField.name"><code class="name">var <span class="ident">name</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.verification.InterfaceField.type_name"><code class="name">var <span class="ident">type_name</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.verification.InterfaceField.to_dict"><code class="name flex">
+<span>def <span class="ident">to_dict</span></span>(<span>self) ‑> dict[str, typing.Any]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_dict(self) -&gt; dict[str, Any]:
+    return {
+        &#34;name&#34;: self.name,
+        &#34;type_name&#34;: self.type_name,
+        &#34;bit_width&#34;: self.bit_width,
+        &#34;is_array&#34;: self.is_array,
+    }</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.pipeline.verification.InterfaceOperation"><code class="flex name class">
+<span>class <span class="ident">InterfaceOperation</span></span>
+<span>(</span><span>name: str, return_type: str = '', parameters: list[str] = &lt;factory&gt;)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass
+class InterfaceOperation:
+    &#34;&#34;&#34;An operation/method extracted from generated code.&#34;&#34;&#34;
+    name: str
+    return_type: str = &#34;&#34;
+    parameters: list[str] = field(default_factory=list)
+
+    def to_dict(self) -&gt; dict[str, Any]:
+        return {
+            &#34;name&#34;: self.name,
+            &#34;return_type&#34;: self.return_type,
+            &#34;parameters&#34;: self.parameters,
+        }</code></pre>
+</details>
+<div class="desc"><p>An operation/method extracted from generated code.</p></div>
+<h3>Instance variables</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.verification.InterfaceOperation.name"><code class="name">var <span class="ident">name</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.verification.InterfaceOperation.parameters"><code class="name">var <span class="ident">parameters</span> : list[str]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.verification.InterfaceOperation.return_type"><code class="name">var <span class="ident">return_type</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.verification.InterfaceOperation.to_dict"><code class="name flex">
+<span>def <span class="ident">to_dict</span></span>(<span>self) ‑> dict[str, typing.Any]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_dict(self) -&gt; dict[str, Any]:
+    return {
+        &#34;name&#34;: self.name,
+        &#34;return_type&#34;: self.return_type,
+        &#34;parameters&#34;: self.parameters,
+    }</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.pipeline.verification.LanguageInterface"><code class="flex name class">
+<span>class <span class="ident">LanguageInterface</span></span>
+<span>(</span><span>language: str,<br>file_path: str = '',<br>struct_name: str = '',<br>fields: list[<a title="atomik_sdk.pipeline.verification.InterfaceField" href="#atomik_sdk.pipeline.verification.InterfaceField">InterfaceField</a>] = &lt;factory&gt;,<br>operations: list[<a title="atomik_sdk.pipeline.verification.InterfaceOperation" href="#atomik_sdk.pipeline.verification.InterfaceOperation">InterfaceOperation</a>] = &lt;factory&gt;,<br>constants: dict[str, Any] = &lt;factory&gt;)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass
+class LanguageInterface:
+    &#34;&#34;&#34;Extracted interface for a single language.&#34;&#34;&#34;
+    language: str
+    file_path: str = &#34;&#34;
+    struct_name: str = &#34;&#34;
+    fields: list[InterfaceField] = field(default_factory=list)
+    operations: list[InterfaceOperation] = field(default_factory=list)
+    constants: dict[str, Any] = field(default_factory=dict)
+
+    @property
+    def field_names(self) -&gt; set[str]:
+        return {f.name for f in self.fields}
+
+    @property
+    def operation_names(self) -&gt; set[str]:
+        return {op.name for op in self.operations}
+
+    def to_dict(self) -&gt; dict[str, Any]:
+        return {
+            &#34;language&#34;: self.language,
+            &#34;file_path&#34;: self.file_path,
+            &#34;struct_name&#34;: self.struct_name,
+            &#34;fields&#34;: [f.to_dict() for f in self.fields],
+            &#34;operations&#34;: [op.to_dict() for op in self.operations],
+            &#34;constants&#34;: self.constants,
+        }</code></pre>
+</details>
+<div class="desc"><p>Extracted interface for a single language.</p></div>
+<h3>Instance variables</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.verification.LanguageInterface.constants"><code class="name">var <span class="ident">constants</span> : dict[str, typing.Any]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.verification.LanguageInterface.field_names"><code class="name">prop <span class="ident">field_names</span> : set[str]</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def field_names(self) -&gt; set[str]:
+    return {f.name for f in self.fields}</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.verification.LanguageInterface.fields"><code class="name">var <span class="ident">fields</span> : list[<a title="atomik_sdk.pipeline.verification.interfaces.InterfaceField" href="interfaces.html#atomik_sdk.pipeline.verification.interfaces.InterfaceField">InterfaceField</a>]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.verification.LanguageInterface.file_path"><code class="name">var <span class="ident">file_path</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.verification.LanguageInterface.language"><code class="name">var <span class="ident">language</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.verification.LanguageInterface.operation_names"><code class="name">prop <span class="ident">operation_names</span> : set[str]</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def operation_names(self) -&gt; set[str]:
+    return {op.name for op in self.operations}</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.verification.LanguageInterface.operations"><code class="name">var <span class="ident">operations</span> : list[<a title="atomik_sdk.pipeline.verification.interfaces.InterfaceOperation" href="interfaces.html#atomik_sdk.pipeline.verification.interfaces.InterfaceOperation">InterfaceOperation</a>]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.verification.LanguageInterface.struct_name"><code class="name">var <span class="ident">struct_name</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.verification.LanguageInterface.to_dict"><code class="name flex">
+<span>def <span class="ident">to_dict</span></span>(<span>self) ‑> dict[str, typing.Any]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_dict(self) -&gt; dict[str, Any]:
+    return {
+        &#34;language&#34;: self.language,
+        &#34;file_path&#34;: self.file_path,
+        &#34;struct_name&#34;: self.struct_name,
+        &#34;fields&#34;: [f.to_dict() for f in self.fields],
+        &#34;operations&#34;: [op.to_dict() for op in self.operations],
+        &#34;constants&#34;: self.constants,
+    }</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="atomik_sdk.pipeline" href="../index.html">atomik_sdk.pipeline</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-submodules">Sub-modules</a></h3>
+<ul>
+<li><code><a title="atomik_sdk.pipeline.verification.consistency" href="consistency.html">atomik_sdk.pipeline.verification.consistency</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.verification.deep_verify" href="deep_verify.html">atomik_sdk.pipeline.verification.deep_verify</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.verification.extractors" href="extractors/index.html">atomik_sdk.pipeline.verification.extractors</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.verification.interfaces" href="interfaces.html">atomik_sdk.pipeline.verification.interfaces</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.verification.runners" href="runners/index.html">atomik_sdk.pipeline.verification.runners</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="atomik_sdk.pipeline.verification.ConsistencyChecker" href="#atomik_sdk.pipeline.verification.ConsistencyChecker">ConsistencyChecker</a></code></h4>
+<ul class="">
+<li><code><a title="atomik_sdk.pipeline.verification.ConsistencyChecker.check" href="#atomik_sdk.pipeline.verification.ConsistencyChecker.check">check</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.verification.ConsistencyChecker.check_from_interfaces" href="#atomik_sdk.pipeline.verification.ConsistencyChecker.check_from_interfaces">check_from_interfaces</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.pipeline.verification.ConsistencyReport" href="#atomik_sdk.pipeline.verification.ConsistencyReport">ConsistencyReport</a></code></h4>
+<ul class="">
+<li><code><a title="atomik_sdk.pipeline.verification.ConsistencyReport.consistent" href="#atomik_sdk.pipeline.verification.ConsistencyReport.consistent">consistent</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.verification.ConsistencyReport.interfaces" href="#atomik_sdk.pipeline.verification.ConsistencyReport.interfaces">interfaces</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.verification.ConsistencyReport.issue_count" href="#atomik_sdk.pipeline.verification.ConsistencyReport.issue_count">issue_count</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.verification.ConsistencyReport.issues" href="#atomik_sdk.pipeline.verification.ConsistencyReport.issues">issues</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.verification.ConsistencyReport.to_dict" href="#atomik_sdk.pipeline.verification.ConsistencyReport.to_dict">to_dict</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.pipeline.verification.DeepVerifier" href="#atomik_sdk.pipeline.verification.DeepVerifier">DeepVerifier</a></code></h4>
+<ul class="">
+<li><code><a title="atomik_sdk.pipeline.verification.DeepVerifier.verify_all" href="#atomik_sdk.pipeline.verification.DeepVerifier.verify_all">verify_all</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.verification.DeepVerifier.verify_language" href="#atomik_sdk.pipeline.verification.DeepVerifier.verify_language">verify_language</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.pipeline.verification.DeepVerifyResult" href="#atomik_sdk.pipeline.verification.DeepVerifyResult">DeepVerifyResult</a></code></h4>
+<ul class="two-column">
+<li><code><a title="atomik_sdk.pipeline.verification.DeepVerifyResult.all_errors" href="#atomik_sdk.pipeline.verification.DeepVerifyResult.all_errors">all_errors</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.verification.DeepVerifyResult.language_results" href="#atomik_sdk.pipeline.verification.DeepVerifyResult.language_results">language_results</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.verification.DeepVerifyResult.passed" href="#atomik_sdk.pipeline.verification.DeepVerifyResult.passed">passed</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.verification.DeepVerifyResult.to_dict" href="#atomik_sdk.pipeline.verification.DeepVerifyResult.to_dict">to_dict</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.verification.DeepVerifyResult.total_failed" href="#atomik_sdk.pipeline.verification.DeepVerifyResult.total_failed">total_failed</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.verification.DeepVerifyResult.total_passed" href="#atomik_sdk.pipeline.verification.DeepVerifyResult.total_passed">total_passed</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.verification.DeepVerifyResult.total_tests" href="#atomik_sdk.pipeline.verification.DeepVerifyResult.total_tests">total_tests</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.verification.DeepVerifyResult.verification_depth" href="#atomik_sdk.pipeline.verification.DeepVerifyResult.verification_depth">verification_depth</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.pipeline.verification.InterfaceField" href="#atomik_sdk.pipeline.verification.InterfaceField">InterfaceField</a></code></h4>
+<ul class="">
+<li><code><a title="atomik_sdk.pipeline.verification.InterfaceField.bit_width" href="#atomik_sdk.pipeline.verification.InterfaceField.bit_width">bit_width</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.verification.InterfaceField.is_array" href="#atomik_sdk.pipeline.verification.InterfaceField.is_array">is_array</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.verification.InterfaceField.name" href="#atomik_sdk.pipeline.verification.InterfaceField.name">name</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.verification.InterfaceField.to_dict" href="#atomik_sdk.pipeline.verification.InterfaceField.to_dict">to_dict</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.verification.InterfaceField.type_name" href="#atomik_sdk.pipeline.verification.InterfaceField.type_name">type_name</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.pipeline.verification.InterfaceOperation" href="#atomik_sdk.pipeline.verification.InterfaceOperation">InterfaceOperation</a></code></h4>
+<ul class="">
+<li><code><a title="atomik_sdk.pipeline.verification.InterfaceOperation.name" href="#atomik_sdk.pipeline.verification.InterfaceOperation.name">name</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.verification.InterfaceOperation.parameters" href="#atomik_sdk.pipeline.verification.InterfaceOperation.parameters">parameters</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.verification.InterfaceOperation.return_type" href="#atomik_sdk.pipeline.verification.InterfaceOperation.return_type">return_type</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.verification.InterfaceOperation.to_dict" href="#atomik_sdk.pipeline.verification.InterfaceOperation.to_dict">to_dict</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.pipeline.verification.LanguageInterface" href="#atomik_sdk.pipeline.verification.LanguageInterface">LanguageInterface</a></code></h4>
+<ul class="two-column">
+<li><code><a title="atomik_sdk.pipeline.verification.LanguageInterface.constants" href="#atomik_sdk.pipeline.verification.LanguageInterface.constants">constants</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.verification.LanguageInterface.field_names" href="#atomik_sdk.pipeline.verification.LanguageInterface.field_names">field_names</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.verification.LanguageInterface.fields" href="#atomik_sdk.pipeline.verification.LanguageInterface.fields">fields</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.verification.LanguageInterface.file_path" href="#atomik_sdk.pipeline.verification.LanguageInterface.file_path">file_path</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.verification.LanguageInterface.language" href="#atomik_sdk.pipeline.verification.LanguageInterface.language">language</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.verification.LanguageInterface.operation_names" href="#atomik_sdk.pipeline.verification.LanguageInterface.operation_names">operation_names</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.verification.LanguageInterface.operations" href="#atomik_sdk.pipeline.verification.LanguageInterface.operations">operations</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.verification.LanguageInterface.struct_name" href="#atomik_sdk.pipeline.verification.LanguageInterface.struct_name">struct_name</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.verification.LanguageInterface.to_dict" href="#atomik_sdk.pipeline.verification.LanguageInterface.to_dict">to_dict</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+</body>
+</html>

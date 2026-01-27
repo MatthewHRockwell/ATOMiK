@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 680" font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif">
+  <defs>
+    <linearGradient id="orchBg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#334155"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+    <linearGradient id="stageBg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#818cf8"/>
+      <stop offset="100%" stop-color="#6366f1"/>
+    </linearGradient>
+    <linearGradient id="feedBg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f472b6"/>
+      <stop offset="100%" stop-color="#ec4899"/>
+    </linearGradient>
+    <linearGradient id="routerBg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fbbf24"/>
+      <stop offset="100%" stop-color="#f59e0b"/>
+    </linearGradient>
+    <linearGradient id="kbBg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#4ade80"/>
+      <stop offset="100%" stop-color="#22c55e"/>
+    </linearGradient>
+    <linearGradient id="busBg" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#06b6d4"/>
+      <stop offset="100%" stop-color="#0891b2"/>
+    </linearGradient>
+    <linearGradient id="verifyBg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fb923c"/>
+      <stop offset="100%" stop-color="#f97316"/>
+    </linearGradient>
+    <linearGradient id="contextBg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#c084fc"/>
+      <stop offset="100%" stop-color="#a855f7"/>
+    </linearGradient>
+    <filter id="shadow" x="-4%" y="-4%" width="108%" height="116%">
+      <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#000" flood-opacity="0.10"/>
+    </filter>
+    <filter id="shadowSm" x="-4%" y="-4%" width="108%" height="116%">
+      <feDropShadow dx="0" dy="1" stdDeviation="2" flood-color="#000" flood-opacity="0.08"/>
+    </filter>
+    <marker id="arrowGray" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <polygon points="0,0 8,3 0,6" fill="#94a3b8"/>
+    </marker>
+    <marker id="arrowPink" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <polygon points="0,0 8,3 0,6" fill="#ec4899"/>
+    </marker>
+    <marker id="arrowCyan" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <polygon points="0,0 8,3 0,6" fill="#0891b2"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="960" height="680" fill="#f8fafc" rx="6"/>
+
+  <!-- Title -->
+  <text x="480" y="30" text-anchor="middle" font-size="18" fill="#0f172a" font-weight="700">Phase 5: Agentic Pipeline Orchestrator</text>
+  <text x="480" y="48" text-anchor="middle" font-size="11" fill="#64748b">Event-driven DAG with feedback loops, adaptive routing, and cross-run learning</text>
+
+  <!-- ============ EVENT BUS (horizontal bar) ============ -->
+  <g filter="url(#shadowSm)">
+    <rect x="60" y="62" width="840" height="28" rx="6" fill="url(#busBg)"/>
+  </g>
+  <text x="480" y="81" text-anchor="middle" font-size="11" fill="#fff" font-weight="600" letter-spacing="2">EVENT BUS (Pub/Sub)</text>
+
+  <!-- Bus drop lines -->
+  <line x1="165" y1="90" x2="165" y2="108" stroke="#0891b2" stroke-width="1.2" stroke-dasharray="3,2"/>
+  <line x1="350" y1="90" x2="350" y2="108" stroke="#0891b2" stroke-width="1.2" stroke-dasharray="3,2"/>
+  <line x1="530" y1="90" x2="530" y2="108" stroke="#0891b2" stroke-width="1.2" stroke-dasharray="3,2"/>
+  <line x1="710" y1="90" x2="710" y2="108" stroke="#0891b2" stroke-width="1.2" stroke-dasharray="3,2"/>
+
+  <!-- ============ DAG ORCHESTRATOR ============ -->
+  <g filter="url(#shadow)">
+    <rect x="60" y="108" width="840" height="50" rx="10" fill="url(#orchBg)"/>
+  </g>
+  <text x="130" y="138" font-size="14" fill="#f1f5f9" font-weight="700">DAG Orchestrator</text>
+  <text x="310" y="131" font-size="10" fill="#94a3b8">Topological Execution</text>
+  <text x="310" y="145" font-size="10" fill="#94a3b8">Parallel Stage Groups</text>
+  <text x="500" y="131" font-size="10" fill="#94a3b8">Task State Tracking</text>
+  <text x="500" y="145" font-size="10" fill="#94a3b8">Dependency Resolution</text>
+  <text x="690" y="131" font-size="10" fill="#94a3b8">Retry Coordination</text>
+  <text x="690" y="145" font-size="10" fill="#94a3b8">Result Aggregation</text>
+
+  <!-- ============ PIPELINE STAGES (main flow) ============ -->
+  <!-- Arrow down from orchestrator -->
+  <line x1="480" y1="158" x2="480" y2="178" stroke="#94a3b8" stroke-width="2"/>
+
+  <!-- Horizontal rail -->
+  <line x1="105" y1="178" x2="855" y2="178" stroke="#cbd5e1" stroke-width="1.5"/>
+
+  <!-- Drop lines to stages -->
+  <line x1="105" y1="178" x2="105" y2="196" stroke="#cbd5e1" stroke-width="1.5"/>
+  <line x1="285" y1="178" x2="285" y2="196" stroke="#cbd5e1" stroke-width="1.5"/>
+  <line x1="480" y1="178" x2="480" y2="196" stroke="#cbd5e1" stroke-width="1.5"/>
+  <line x1="665" y1="178" x2="665" y2="196" stroke="#cbd5e1" stroke-width="1.5"/>
+  <line x1="855" y1="178" x2="855" y2="196" stroke="#cbd5e1" stroke-width="1.5"/>
+
+  <!-- Arrowheads -->
+  <polygon points="100,192 105,202 110,192" fill="#cbd5e1"/>
+  <polygon points="280,192 285,202 290,192" fill="#cbd5e1"/>
+  <polygon points="475,192 480,202 485,192" fill="#cbd5e1"/>
+  <polygon points="660,192 665,202 670,192" fill="#cbd5e1"/>
+  <polygon points="850,192 855,202 860,192" fill="#cbd5e1"/>
+
+  <!-- Stage 1: Validate -->
+  <g filter="url(#shadowSm)">
+    <rect x="40" y="202" width="130" height="50" rx="8" fill="url(#stageBg)"/>
+  </g>
+  <text x="105" y="222" text-anchor="middle" font-size="10" fill="#e0e7ff" font-weight="500" letter-spacing="1">STAGE 1</text>
+  <text x="105" y="240" text-anchor="middle" font-size="13" fill="#fff" font-weight="700">Validate</text>
+
+  <!-- Stage 2: Diff -->
+  <g filter="url(#shadowSm)">
+    <rect x="220" y="202" width="130" height="50" rx="8" fill="url(#stageBg)"/>
+  </g>
+  <text x="285" y="222" text-anchor="middle" font-size="10" fill="#e0e7ff" font-weight="500" letter-spacing="1">STAGE 2</text>
+  <text x="285" y="240" text-anchor="middle" font-size="13" fill="#fff" font-weight="700">Diff</text>
+
+  <!-- Stage 3: Generate (parallel) -->
+  <g filter="url(#shadowSm)">
+    <rect x="405" y="202" width="150" height="50" rx="8" fill="url(#stageBg)"/>
+  </g>
+  <text x="480" y="222" text-anchor="middle" font-size="10" fill="#e0e7ff" font-weight="500" letter-spacing="1">STAGE 3</text>
+  <text x="480" y="240" text-anchor="middle" font-size="13" fill="#fff" font-weight="700">Generate x5</text>
+
+  <!-- Stage 4: Verify -->
+  <g filter="url(#shadowSm)">
+    <rect x="600" y="202" width="130" height="50" rx="8" fill="url(#stageBg)"/>
+  </g>
+  <text x="665" y="222" text-anchor="middle" font-size="10" fill="#e0e7ff" font-weight="500" letter-spacing="1">STAGE 4</text>
+  <text x="665" y="240" text-anchor="middle" font-size="13" fill="#fff" font-weight="700">Verify</text>
+
+  <!-- Stage 5: Report -->
+  <g filter="url(#shadowSm)">
+    <rect x="790" y="202" width="130" height="50" rx="8" fill="url(#stageBg)"/>
+  </g>
+  <text x="855" y="222" text-anchor="middle" font-size="10" fill="#e0e7ff" font-weight="500" letter-spacing="1">STAGE 5</text>
+  <text x="855" y="240" text-anchor="middle" font-size="13" fill="#fff" font-weight="700">Report</text>
+
+  <!-- Stage-to-stage arrows -->
+  <line x1="170" y1="227" x2="218" y2="227" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrowGray)"/>
+  <line x1="350" y1="227" x2="403" y2="227" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrowGray)"/>
+  <line x1="555" y1="227" x2="598" y2="227" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrowGray)"/>
+  <line x1="730" y1="227" x2="788" y2="227" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrowGray)"/>
+
+  <!-- ============ FEEDBACK LOOP (curved back from Verify to Generate) ============ -->
+  <path d="M 665 252 L 665 280 Q 665 296 649 296 L 496 296 Q 480 296 480 280 L 480 254"
+        fill="none" stroke="#ec4899" stroke-width="2" stroke-dasharray="6,3" marker-end="url(#arrowPink)"/>
+  <g filter="url(#shadowSm)">
+    <rect x="520" y="284" width="120" height="24" rx="6" fill="url(#feedBg)"/>
+  </g>
+  <text x="580" y="300" text-anchor="middle" font-size="10" fill="#fff" font-weight="600">Feedback Loop</text>
+
+  <!-- ============ SUBSYSTEM CARDS (below stages) ============ -->
+
+  <!-- Deep Verify (below Verify stage) -->
+  <line x1="665" y1="252" x2="665" y2="322" stroke="#f97316" stroke-width="1.5"/>
+  <polygon points="660,318 665,328 670,318" fill="#f97316"/>
+  <g filter="url(#shadowSm)">
+    <rect x="595" y="328" width="140" height="50" rx="8" fill="url(#verifyBg)"/>
+  </g>
+  <text x="665" y="348" text-anchor="middle" font-size="10" fill="#fff" font-weight="500" letter-spacing="1">DEEP VERIFY</text>
+  <text x="665" y="366" text-anchor="middle" font-size="9.5" fill="#fff7ed">pytest / gcc / cargo / node</text>
+
+  <!-- Cross-Language Consistency (below Deep Verify) -->
+  <line x1="665" y1="378" x2="665" y2="396" stroke="#f97316" stroke-width="1.2"/>
+  <polygon points="660,392 665,402 670,392" fill="#f97316"/>
+  <g filter="url(#shadowSm)">
+    <rect x="595" y="402" width="140" height="44" rx="8" fill="#fed7aa" stroke="#f97316" stroke-width="1"/>
+  </g>
+  <text x="665" y="420" text-anchor="middle" font-size="10" fill="#9a3412" font-weight="600">Consistency Check</text>
+  <text x="665" y="434" text-anchor="middle" font-size="9" fill="#c2410c">5 language extractors</text>
+
+  <!-- ============ LEFT COLUMN: Adaptive Router + Token Engine ============ -->
+
+  <!-- Adaptive Router -->
+  <g filter="url(#shadowSm)">
+    <rect x="40" y="328" width="150" height="56" rx="8" fill="url(#routerBg)"/>
+  </g>
+  <text x="115" y="348" text-anchor="middle" font-size="10" fill="#78350f" font-weight="500" letter-spacing="1">ADAPTIVE ROUTER</text>
+  <text x="115" y="363" text-anchor="middle" font-size="9.5" fill="#92400e">Complexity + History</text>
+  <text x="115" y="375" text-anchor="middle" font-size="9.5" fill="#92400e">Budget Pressure</text>
+
+  <!-- Connect router to Generate -->
+  <line x1="190" y1="350" x2="405" y2="240" stroke="#f59e0b" stroke-width="1.2" stroke-dasharray="4,2"/>
+
+  <!-- Token Engine -->
+  <g filter="url(#shadowSm)">
+    <rect x="40" y="400" width="150" height="56" rx="8" fill="url(#contextBg)"/>
+  </g>
+  <text x="115" y="420" text-anchor="middle" font-size="10" fill="#faf5ff" font-weight="500" letter-spacing="1">TOKEN ENGINE</text>
+  <text x="115" y="435" text-anchor="middle" font-size="9.5" fill="#e9d5ff">Predictor + Cache</text>
+  <text x="115" y="447" text-anchor="middle" font-size="9.5" fill="#e9d5ff">Context Compressor</text>
+
+  <!-- ============ CENTER: Error KB + Field Diff ============ -->
+
+  <!-- Error Knowledge Base -->
+  <g filter="url(#shadowSm)">
+    <rect x="230" y="328" width="150" height="56" rx="8" fill="url(#kbBg)"/>
+  </g>
+  <text x="305" y="348" text-anchor="middle" font-size="10" fill="#14532d" font-weight="500" letter-spacing="1">ERROR KB</text>
+  <text x="305" y="363" text-anchor="middle" font-size="9.5" fill="#166534">Fuzzy Match + Learn</text>
+  <text x="305" y="375" text-anchor="middle" font-size="9.5" fill="#166534">Seed Patterns</text>
+
+  <!-- Connect KB to Feedback -->
+  <line x1="380" y1="345" x2="518" y2="296" stroke="#22c55e" stroke-width="1.2" stroke-dasharray="4,2"/>
+
+  <!-- Field Diff -->
+  <g filter="url(#shadowSm)">
+    <rect x="230" y="400" width="150" height="56" rx="8" fill="#d1fae5" stroke="#22c55e" stroke-width="1"/>
+  </g>
+  <text x="305" y="420" text-anchor="middle" font-size="10" fill="#14532d" font-weight="600">Field-Level Diff</text>
+  <text x="305" y="435" text-anchor="middle" font-size="9.5" fill="#166534">Structural comparison</text>
+  <text x="305" y="447" text-anchor="middle" font-size="9.5" fill="#166534">JSON path tracking</text>
+
+  <!-- ============ RIGHT COLUMN: Parallel Executor + Agents ============ -->
+
+  <!-- Parallel Executor -->
+  <g filter="url(#shadowSm)">
+    <rect x="790" y="328" width="130" height="56" rx="8" fill="url(#orchBg)"/>
+  </g>
+  <text x="855" y="345" text-anchor="middle" font-size="10" fill="#e2e8f0" font-weight="500" letter-spacing="1">PARALLEL</text>
+  <text x="855" y="360" text-anchor="middle" font-size="10" fill="#e2e8f0" font-weight="500" letter-spacing="1">EXECUTOR</text>
+  <text x="855" y="375" text-anchor="middle" font-size="9.5" fill="#94a3b8">ThreadPool workers</text>
+
+  <!-- Connect parallel executor to Generate -->
+  <line x1="855" y1="328" x2="555" y2="252" stroke="#475569" stroke-width="1.2" stroke-dasharray="4,2"/>
+
+  <!-- Regression Gate -->
+  <g filter="url(#shadowSm)">
+    <rect x="790" y="400" width="130" height="44" rx="8" fill="#fef3c7" stroke="#f59e0b" stroke-width="1"/>
+  </g>
+  <text x="855" y="418" text-anchor="middle" font-size="10" fill="#78350f" font-weight="600">Regression Gate</text>
+  <text x="855" y="432" text-anchor="middle" font-size="9" fill="#92400e">Baseline + EMA</text>
+
+  <!-- ============ BOTTOM SECTION: Metrics + Context + Self-Optimization ============ -->
+
+  <!-- Horizontal separator -->
+  <line x1="60" y1="475" x2="900" y2="475" stroke="#e2e8f0" stroke-width="1"/>
+
+  <!-- Bottom row: 3 cards -->
+
+  <!-- Metrics Analyzer -->
+  <g filter="url(#shadowSm)">
+    <rect x="60" y="490" width="250" height="58" rx="8" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1"/>
+  </g>
+  <text x="185" y="512" text-anchor="middle" font-size="11" fill="#334155" font-weight="700">Cross-Run Metrics</text>
+  <text x="185" y="528" text-anchor="middle" font-size="9.5" fill="#64748b">Moving averages, anomaly detection, trend analysis</text>
+  <text x="185" y="540" text-anchor="middle" font-size="9.5" fill="#64748b">Regression severity: critical / warning / info</text>
+
+  <!-- Intelligent Context -->
+  <g filter="url(#shadowSm)">
+    <rect x="340" y="490" width="250" height="58" rx="8" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1"/>
+  </g>
+  <text x="465" y="512" text-anchor="middle" font-size="11" fill="#334155" font-weight="700">Intelligent Context</text>
+  <text x="465" y="528" text-anchor="middle" font-size="9.5" fill="#64748b">Segment tracking with relevance scoring</text>
+  <text x="465" y="540" text-anchor="middle" font-size="9.5" fill="#64748b">Stale eviction, cold-start support, budget limits</text>
+
+  <!-- Self-Optimizer -->
+  <g filter="url(#shadowSm)">
+    <rect x="620" y="490" width="280" height="58" rx="8" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1"/>
+  </g>
+  <text x="760" y="512" text-anchor="middle" font-size="11" fill="#334155" font-weight="700">Self-Optimization Engine</text>
+  <text x="760" y="528" text-anchor="middle" font-size="9.5" fill="#64748b">Auto-tune workers, retry depth, model routing</text>
+  <text x="760" y="540" text-anchor="middle" font-size="9.5" fill="#64748b">Bottleneck analysis, KB expansion, error trends</text>
+
+  <!-- ============ BOTTOM ANNOTATION ============ -->
+  <rect x="200" y="570" width="560" height="56" rx="8" fill="#f1f5f9" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="480" y="592" text-anchor="middle" font-size="12" fill="#334155" font-weight="600">25 modules, 242 tests, 16 pipeline tasks (T5.1-T5.16)</text>
+  <text x="480" y="610" text-anchor="middle" font-size="11" fill="#64748b">Transforms Phase 4C linear pipeline into self-improving agentic orchestrator</text>
+
+  <!-- ============ LEGEND ============ -->
+  <rect x="60" y="636" width="840" height="30" rx="4" fill="#f8fafc" stroke="#e2e8f0" stroke-width="0.5"/>
+  <rect x="80" y="646" width="10" height="10" rx="2" fill="#6366f1"/>
+  <text x="96" y="655" font-size="9" fill="#475569">Pipeline Stage</text>
+  <rect x="190" y="646" width="10" height="10" rx="2" fill="#ec4899"/>
+  <text x="206" y="655" font-size="9" fill="#475569">Feedback Loop</text>
+  <rect x="300" y="646" width="10" height="10" rx="2" fill="#f59e0b"/>
+  <text x="316" y="655" font-size="9" fill="#475569">Adaptive Routing</text>
+  <rect x="420" y="646" width="10" height="10" rx="2" fill="#22c55e"/>
+  <text x="436" y="655" font-size="9" fill="#475569">Knowledge Base</text>
+  <rect x="540" y="646" width="10" height="10" rx="2" fill="#f97316"/>
+  <text x="556" y="655" font-size="9" fill="#475569">Deep Verification</text>
+  <rect x="670" y="646" width="10" height="10" rx="2" fill="#0891b2"/>
+  <text x="686" y="655" font-size="9" fill="#475569">Event Bus</text>
+  <rect x="760" y="646" width="10" height="10" rx="2" fill="#a855f7"/>
+  <text x="776" y="655" font-size="9" fill="#475569">Token/Context</text>
+
+</svg>

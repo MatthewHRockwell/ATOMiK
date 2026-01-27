@@ -1,0 +1,683 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
+<title>atomik_sdk.pipeline.coordinator API documentation</title>
+<meta name="description" content="Coordinator Agent …">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>atomik_sdk.pipeline.coordinator</code></h1>
+</header>
+<section id="section-intro">
+<p>Coordinator Agent</p>
+<p>Top-level coordinator that receives pipeline work requests, decomposes
+them via the task decomposer, dispatches subtasks to specialists via
+the registry, collects and aggregates results, and resolves conflicts
+when specialists produce inconsistent outputs.</p>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="atomik_sdk.pipeline.coordinator.Coordinator"><code class="flex name class">
+<span>class <span class="ident">Coordinator</span></span>
+<span>(</span><span>registry: AgentRegistry,<br>decomposer: TaskDecomposer | None = None,<br>consensus_resolver: ConsensusResolver | None = None,<br>event_bus: EventBus | None = None,<br>max_workers: int = 4,<br>specialist_timeout: float = 60.0)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Coordinator:
+    &#34;&#34;&#34;
+    Top-level coordinator agent for pipeline work dispatch.
+
+    Decomposes pipeline requests into subtasks, dispatches each
+    to the best-fit specialist via the registry, collects results,
+    and runs consensus resolution on overlapping outputs.
+
+    Example:
+        &gt;&gt;&gt; coord = Coordinator(registry, decomposer)
+        &gt;&gt;&gt; result = coord.dispatch_generation(schema, context)
+        &gt;&gt;&gt; if result.consensus and not result.consensus.agreed:
+        ...     print(&#34;Interface conflicts detected&#34;)
+    &#34;&#34;&#34;
+
+    def __init__(
+        self,
+        registry: AgentRegistry,
+        decomposer: TaskDecomposer | None = None,
+        consensus_resolver: ConsensusResolver | None = None,
+        event_bus: EventBus | None = None,
+        max_workers: int = 4,
+        specialist_timeout: float = 60.0,
+    ) -&gt; None:
+        self.registry = registry
+        self.decomposer = decomposer or TaskDecomposer()
+        self.consensus = consensus_resolver or ConsensusResolver()
+        self.event_bus = event_bus
+        self.max_workers = min(max_workers, 8)
+        self.specialist_timeout = specialist_timeout
+
+    def dispatch_generation(
+        self,
+        schema: dict[str, Any],
+        context: dict[str, Any],
+        languages: list[str] | None = None,
+    ) -&gt; CoordinatorResult:
+        &#34;&#34;&#34;
+        Decompose and dispatch code generation to specialists.
+
+        Args:
+            schema: Parsed schema dict.
+            context: Execution context (config, manifests, etc.).
+            languages: Languages to generate (None = all).
+
+        Returns:
+            CoordinatorResult with per-language results and consensus.
+        &#34;&#34;&#34;
+        plan = self.decomposer.decompose_generation(languages)
+        return self._execute_plan(plan, schema, context)
+
+    def dispatch_verification(
+        self,
+        schema: dict[str, Any],
+        context: dict[str, Any],
+        languages: list[str] | None = None,
+    ) -&gt; CoordinatorResult:
+        &#34;&#34;&#34;Decompose and dispatch verification to specialists.&#34;&#34;&#34;
+        plan = self.decomposer.decompose_verification(languages)
+        return self._execute_plan(plan, schema, context)
+
+    def dispatch_full_pipeline(
+        self,
+        schema: dict[str, Any],
+        context: dict[str, Any],
+        languages: list[str] | None = None,
+        include_hardware: bool = True,
+    ) -&gt; CoordinatorResult:
+        &#34;&#34;&#34;Decompose and dispatch a full pipeline run.&#34;&#34;&#34;
+        plan = self.decomposer.decompose_full_pipeline(
+            languages, include_hardware
+        )
+        return self._execute_plan(plan, schema, context)
+
+    def _execute_plan(
+        self,
+        plan: DecompositionPlan,
+        schema: dict[str, Any],
+        context: dict[str, Any],
+    ) -&gt; CoordinatorResult:
+        &#34;&#34;&#34;Execute a decomposition plan by dispatching to specialists.&#34;&#34;&#34;
+        coord_start = time.perf_counter()
+        result = CoordinatorResult()
+        sequential_time = 0.0
+
+        for group in plan.parallel_groups:
+            group_tasks = [
+                t for t in plan.tasks if t.task_id in group
+            ]
+            if not group_tasks:
+                continue
+
+            group_results = self._dispatch_group(group_tasks, schema, context)
+            result.subtask_results.extend(group_results)
+
+            for sr in group_results:
+                sequential_time += sr.duration_ms
+                result.total_tokens += sr.tokens_consumed
+                if not sr.success:
+                    result.success = False
+
+        result.total_duration_ms = (time.perf_counter() - coord_start) * 1000
+
+        # Compute parallel speedup
+        if result.total_duration_ms &gt; 0:
+            result.parallel_speedup = sequential_time / result.total_duration_ms
+        else:
+            result.parallel_speedup = 1.0
+
+        # Run consensus if we have generation results from multiple languages
+        gen_results = {
+            r.language: r.output
+            for r in result.subtask_results
+            if r.success and r.output and r.language
+        }
+        if len(gen_results) &gt; 1:
+            result.consensus = self.consensus.resolve(gen_results)
+
+        return result
+
+    def _dispatch_group(
+        self,
+        tasks: list[ParallelTask],
+        schema: dict[str, Any],
+        context: dict[str, Any],
+    ) -&gt; list[SubtaskResult]:
+        &#34;&#34;&#34;Dispatch a group of tasks in parallel.&#34;&#34;&#34;
+        if len(tasks) == 1:
+            return [self._dispatch_single(tasks[0], schema, context)]
+
+        results: list[SubtaskResult] = []
+        with ThreadPoolExecutor(max_workers=self.max_workers) as pool:
+            futures = {
+                pool.submit(
+                    self._dispatch_single, task, schema, context
+                ): task
+                for task in tasks
+            }
+
+            for future in futures:
+                try:
+                    sr = future.result(timeout=self.specialist_timeout)
+                    results.append(sr)
+                except FuturesTimeout:
+                    task = futures[future]
+                    results.append(SubtaskResult(
+                        task_id=task.task_id,
+                        language=task.language,
+                        agent_name=&#34;timeout&#34;,
+                        success=False,
+                        error=f&#34;Specialist timeout after {self.specialist_timeout}s&#34;,
+                    ))
+                except Exception as e:
+                    task = futures[future]
+                    results.append(SubtaskResult(
+                        task_id=task.task_id,
+                        language=task.language,
+                        agent_name=&#34;error&#34;,
+                        success=False,
+                        error=str(e),
+                    ))
+
+        return results
+
+    def _dispatch_single(
+        self,
+        task: ParallelTask,
+        schema: dict[str, Any],
+        context: dict[str, Any],
+    ) -&gt; SubtaskResult:
+        &#34;&#34;&#34;Dispatch a single task to the best-fit specialist.&#34;&#34;&#34;
+        start = time.perf_counter()
+
+        agent = self.registry.find(task.task_type, language=task.language)
+        if agent is None:
+            return SubtaskResult(
+                task_id=task.task_id,
+                language=task.language,
+                agent_name=&#34;none&#34;,
+                success=False,
+                error=f&#34;No specialist for {task.task_type}/{task.language}&#34;,
+                duration_ms=(time.perf_counter() - start) * 1000,
+            )
+
+        if self.event_bus:
+            self.event_bus.emit(Event(
+                EventType.TASK_STARTED,
+                {
+                    &#34;task_id&#34;: task.task_id,
+                    &#34;agent&#34;: agent.name,
+                    &#34;language&#34;: task.language,
+                },
+                source=&#34;coordinator&#34;,
+            ))
+
+        try:
+            task_desc = {
+                &#34;task_id&#34;: task.task_id,
+                &#34;task_type&#34;: task.task_type,
+                &#34;language&#34;: task.language,
+                &#34;schema&#34;: schema,
+                **task.metadata,
+            }
+            output = agent.execute(task_desc, context)
+            duration_ms = (time.perf_counter() - start) * 1000
+
+            sr = SubtaskResult(
+                task_id=task.task_id,
+                language=task.language,
+                agent_name=agent.name,
+                success=True,
+                output=output,
+                duration_ms=duration_ms,
+                tokens_consumed=output.get(&#34;tokens_consumed&#34;, 0),
+            )
+
+            if self.event_bus:
+                self.event_bus.emit(Event(
+                    EventType.TASK_COMPLETED,
+                    {&#34;task_id&#34;: task.task_id, &#34;agent&#34;: agent.name},
+                    source=&#34;coordinator&#34;,
+                ))
+
+            return sr
+
+        except Exception as e:
+            duration_ms = (time.perf_counter() - start) * 1000
+
+            if self.event_bus:
+                self.event_bus.emit(Event(
+                    EventType.TASK_FAILED,
+                    {
+                        &#34;task_id&#34;: task.task_id,
+                        &#34;agent&#34;: agent.name,
+                        &#34;error&#34;: str(e),
+                    },
+                    source=&#34;coordinator&#34;,
+                ))
+
+            return SubtaskResult(
+                task_id=task.task_id,
+                language=task.language,
+                agent_name=agent.name,
+                success=False,
+                error=str(e),
+                duration_ms=duration_ms,
+            )
+
+    def get_specialist_status(self) -&gt; list[dict[str, Any]]:
+        &#34;&#34;&#34;Get the status of all registered specialists.&#34;&#34;&#34;
+        return self.registry.list_agents()</code></pre>
+</details>
+<div class="desc"><p>Top-level coordinator agent for pipeline work dispatch.</p>
+<p>Decomposes pipeline requests into subtasks, dispatches each
+to the best-fit specialist via the registry, collects results,
+and runs consensus resolution on overlapping outputs.</p>
+<h2 id="example">Example</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; coord = Coordinator(registry, decomposer)
+&gt;&gt;&gt; result = coord.dispatch_generation(schema, context)
+&gt;&gt;&gt; if result.consensus and not result.consensus.agreed:
+...     print(&quot;Interface conflicts detected&quot;)
+</code></pre></div>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.coordinator.Coordinator.dispatch_full_pipeline"><code class="name flex">
+<span>def <span class="ident">dispatch_full_pipeline</span></span>(<span>self,<br>schema: dict[str, Any],<br>context: dict[str, Any],<br>languages: list[str] | None = None,<br>include_hardware: bool = True) ‑> <a title="atomik_sdk.pipeline.coordinator.CoordinatorResult" href="#atomik_sdk.pipeline.coordinator.CoordinatorResult">CoordinatorResult</a></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def dispatch_full_pipeline(
+    self,
+    schema: dict[str, Any],
+    context: dict[str, Any],
+    languages: list[str] | None = None,
+    include_hardware: bool = True,
+) -&gt; CoordinatorResult:
+    &#34;&#34;&#34;Decompose and dispatch a full pipeline run.&#34;&#34;&#34;
+    plan = self.decomposer.decompose_full_pipeline(
+        languages, include_hardware
+    )
+    return self._execute_plan(plan, schema, context)</code></pre>
+</details>
+<div class="desc"><p>Decompose and dispatch a full pipeline run.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.coordinator.Coordinator.dispatch_generation"><code class="name flex">
+<span>def <span class="ident">dispatch_generation</span></span>(<span>self,<br>schema: dict[str, Any],<br>context: dict[str, Any],<br>languages: list[str] | None = None) ‑> <a title="atomik_sdk.pipeline.coordinator.CoordinatorResult" href="#atomik_sdk.pipeline.coordinator.CoordinatorResult">CoordinatorResult</a></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def dispatch_generation(
+    self,
+    schema: dict[str, Any],
+    context: dict[str, Any],
+    languages: list[str] | None = None,
+) -&gt; CoordinatorResult:
+    &#34;&#34;&#34;
+    Decompose and dispatch code generation to specialists.
+
+    Args:
+        schema: Parsed schema dict.
+        context: Execution context (config, manifests, etc.).
+        languages: Languages to generate (None = all).
+
+    Returns:
+        CoordinatorResult with per-language results and consensus.
+    &#34;&#34;&#34;
+    plan = self.decomposer.decompose_generation(languages)
+    return self._execute_plan(plan, schema, context)</code></pre>
+</details>
+<div class="desc"><p>Decompose and dispatch code generation to specialists.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>schema</code></strong></dt>
+<dd>Parsed schema dict.</dd>
+<dt><strong><code>context</code></strong></dt>
+<dd>Execution context (config, manifests, etc.).</dd>
+<dt><strong><code>languages</code></strong></dt>
+<dd>Languages to generate (None = all).</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>CoordinatorResult with per-language results and consensus.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.coordinator.Coordinator.dispatch_verification"><code class="name flex">
+<span>def <span class="ident">dispatch_verification</span></span>(<span>self,<br>schema: dict[str, Any],<br>context: dict[str, Any],<br>languages: list[str] | None = None) ‑> <a title="atomik_sdk.pipeline.coordinator.CoordinatorResult" href="#atomik_sdk.pipeline.coordinator.CoordinatorResult">CoordinatorResult</a></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def dispatch_verification(
+    self,
+    schema: dict[str, Any],
+    context: dict[str, Any],
+    languages: list[str] | None = None,
+) -&gt; CoordinatorResult:
+    &#34;&#34;&#34;Decompose and dispatch verification to specialists.&#34;&#34;&#34;
+    plan = self.decomposer.decompose_verification(languages)
+    return self._execute_plan(plan, schema, context)</code></pre>
+</details>
+<div class="desc"><p>Decompose and dispatch verification to specialists.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.coordinator.Coordinator.get_specialist_status"><code class="name flex">
+<span>def <span class="ident">get_specialist_status</span></span>(<span>self) ‑> list[dict[str, typing.Any]]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_specialist_status(self) -&gt; list[dict[str, Any]]:
+    &#34;&#34;&#34;Get the status of all registered specialists.&#34;&#34;&#34;
+    return self.registry.list_agents()</code></pre>
+</details>
+<div class="desc"><p>Get the status of all registered specialists.</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.pipeline.coordinator.CoordinatorResult"><code class="flex name class">
+<span>class <span class="ident">CoordinatorResult</span></span>
+<span>(</span><span>success: bool = True,<br>subtask_results: list[<a title="atomik_sdk.pipeline.coordinator.SubtaskResult" href="#atomik_sdk.pipeline.coordinator.SubtaskResult">SubtaskResult</a>] = &lt;factory&gt;,<br>consensus: ConsensusResult | None = None,<br>total_tokens: int = 0,<br>total_duration_ms: float = 0.0,<br>parallel_speedup: float = 1.0)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass
+class CoordinatorResult:
+    &#34;&#34;&#34;Aggregated result from the coordinator.&#34;&#34;&#34;
+    success: bool = True
+    subtask_results: list[SubtaskResult] = field(default_factory=list)
+    consensus: ConsensusResult | None = None
+    total_tokens: int = 0
+    total_duration_ms: float = 0.0
+    parallel_speedup: float = 1.0
+
+    @property
+    def failed_count(self) -&gt; int:
+        return sum(1 for r in self.subtask_results if not r.success)
+
+    def to_dict(self) -&gt; dict[str, Any]:
+        return {
+            &#34;success&#34;: self.success,
+            &#34;subtask_count&#34;: len(self.subtask_results),
+            &#34;failed_count&#34;: self.failed_count,
+            &#34;total_tokens&#34;: self.total_tokens,
+            &#34;total_duration_ms&#34;: round(self.total_duration_ms, 1),
+            &#34;parallel_speedup&#34;: round(self.parallel_speedup, 2),
+            &#34;subtasks&#34;: [r.to_dict() for r in self.subtask_results],
+            &#34;consensus&#34;: self.consensus.to_dict() if self.consensus else None,
+        }</code></pre>
+</details>
+<div class="desc"><p>Aggregated result from the coordinator.</p></div>
+<h3>Instance variables</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.coordinator.CoordinatorResult.consensus"><code class="name">var <span class="ident">consensus</span> : <a title="atomik_sdk.pipeline.consensus.ConsensusResult" href="consensus.html#atomik_sdk.pipeline.consensus.ConsensusResult">ConsensusResult</a> | None</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.coordinator.CoordinatorResult.failed_count"><code class="name">prop <span class="ident">failed_count</span> : int</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def failed_count(self) -&gt; int:
+    return sum(1 for r in self.subtask_results if not r.success)</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.coordinator.CoordinatorResult.parallel_speedup"><code class="name">var <span class="ident">parallel_speedup</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.coordinator.CoordinatorResult.subtask_results"><code class="name">var <span class="ident">subtask_results</span> : list[<a title="atomik_sdk.pipeline.coordinator.SubtaskResult" href="#atomik_sdk.pipeline.coordinator.SubtaskResult">SubtaskResult</a>]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.coordinator.CoordinatorResult.success"><code class="name">var <span class="ident">success</span> : bool</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.coordinator.CoordinatorResult.total_duration_ms"><code class="name">var <span class="ident">total_duration_ms</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.coordinator.CoordinatorResult.total_tokens"><code class="name">var <span class="ident">total_tokens</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.coordinator.CoordinatorResult.to_dict"><code class="name flex">
+<span>def <span class="ident">to_dict</span></span>(<span>self) ‑> dict[str, typing.Any]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_dict(self) -&gt; dict[str, Any]:
+    return {
+        &#34;success&#34;: self.success,
+        &#34;subtask_count&#34;: len(self.subtask_results),
+        &#34;failed_count&#34;: self.failed_count,
+        &#34;total_tokens&#34;: self.total_tokens,
+        &#34;total_duration_ms&#34;: round(self.total_duration_ms, 1),
+        &#34;parallel_speedup&#34;: round(self.parallel_speedup, 2),
+        &#34;subtasks&#34;: [r.to_dict() for r in self.subtask_results],
+        &#34;consensus&#34;: self.consensus.to_dict() if self.consensus else None,
+    }</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.pipeline.coordinator.SubtaskResult"><code class="flex name class">
+<span>class <span class="ident">SubtaskResult</span></span>
+<span>(</span><span>task_id: str,<br>language: str,<br>agent_name: str,<br>success: bool,<br>output: dict[str, Any] = &lt;factory&gt;,<br>error: str = '',<br>duration_ms: float = 0.0,<br>tokens_consumed: int = 0)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass
+class SubtaskResult:
+    &#34;&#34;&#34;Result from a single specialist subtask.&#34;&#34;&#34;
+    task_id: str
+    language: str
+    agent_name: str
+    success: bool
+    output: dict[str, Any] = field(default_factory=dict)
+    error: str = &#34;&#34;
+    duration_ms: float = 0.0
+    tokens_consumed: int = 0
+
+    def to_dict(self) -&gt; dict[str, Any]:
+        return {
+            &#34;task_id&#34;: self.task_id,
+            &#34;language&#34;: self.language,
+            &#34;agent_name&#34;: self.agent_name,
+            &#34;success&#34;: self.success,
+            &#34;output&#34;: self.output,
+            &#34;error&#34;: self.error,
+            &#34;duration_ms&#34;: round(self.duration_ms, 1),
+            &#34;tokens_consumed&#34;: self.tokens_consumed,
+        }</code></pre>
+</details>
+<div class="desc"><p>Result from a single specialist subtask.</p></div>
+<h3>Instance variables</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.coordinator.SubtaskResult.agent_name"><code class="name">var <span class="ident">agent_name</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.coordinator.SubtaskResult.duration_ms"><code class="name">var <span class="ident">duration_ms</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.coordinator.SubtaskResult.error"><code class="name">var <span class="ident">error</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.coordinator.SubtaskResult.language"><code class="name">var <span class="ident">language</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.coordinator.SubtaskResult.output"><code class="name">var <span class="ident">output</span> : dict[str, typing.Any]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.coordinator.SubtaskResult.success"><code class="name">var <span class="ident">success</span> : bool</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.coordinator.SubtaskResult.task_id"><code class="name">var <span class="ident">task_id</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.coordinator.SubtaskResult.tokens_consumed"><code class="name">var <span class="ident">tokens_consumed</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.coordinator.SubtaskResult.to_dict"><code class="name flex">
+<span>def <span class="ident">to_dict</span></span>(<span>self) ‑> dict[str, typing.Any]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_dict(self) -&gt; dict[str, Any]:
+    return {
+        &#34;task_id&#34;: self.task_id,
+        &#34;language&#34;: self.language,
+        &#34;agent_name&#34;: self.agent_name,
+        &#34;success&#34;: self.success,
+        &#34;output&#34;: self.output,
+        &#34;error&#34;: self.error,
+        &#34;duration_ms&#34;: round(self.duration_ms, 1),
+        &#34;tokens_consumed&#34;: self.tokens_consumed,
+    }</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="atomik_sdk.pipeline" href="index.html">atomik_sdk.pipeline</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="atomik_sdk.pipeline.coordinator.Coordinator" href="#atomik_sdk.pipeline.coordinator.Coordinator">Coordinator</a></code></h4>
+<ul class="">
+<li><code><a title="atomik_sdk.pipeline.coordinator.Coordinator.dispatch_full_pipeline" href="#atomik_sdk.pipeline.coordinator.Coordinator.dispatch_full_pipeline">dispatch_full_pipeline</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.coordinator.Coordinator.dispatch_generation" href="#atomik_sdk.pipeline.coordinator.Coordinator.dispatch_generation">dispatch_generation</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.coordinator.Coordinator.dispatch_verification" href="#atomik_sdk.pipeline.coordinator.Coordinator.dispatch_verification">dispatch_verification</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.coordinator.Coordinator.get_specialist_status" href="#atomik_sdk.pipeline.coordinator.Coordinator.get_specialist_status">get_specialist_status</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.pipeline.coordinator.CoordinatorResult" href="#atomik_sdk.pipeline.coordinator.CoordinatorResult">CoordinatorResult</a></code></h4>
+<ul class="two-column">
+<li><code><a title="atomik_sdk.pipeline.coordinator.CoordinatorResult.consensus" href="#atomik_sdk.pipeline.coordinator.CoordinatorResult.consensus">consensus</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.coordinator.CoordinatorResult.failed_count" href="#atomik_sdk.pipeline.coordinator.CoordinatorResult.failed_count">failed_count</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.coordinator.CoordinatorResult.parallel_speedup" href="#atomik_sdk.pipeline.coordinator.CoordinatorResult.parallel_speedup">parallel_speedup</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.coordinator.CoordinatorResult.subtask_results" href="#atomik_sdk.pipeline.coordinator.CoordinatorResult.subtask_results">subtask_results</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.coordinator.CoordinatorResult.success" href="#atomik_sdk.pipeline.coordinator.CoordinatorResult.success">success</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.coordinator.CoordinatorResult.to_dict" href="#atomik_sdk.pipeline.coordinator.CoordinatorResult.to_dict">to_dict</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.coordinator.CoordinatorResult.total_duration_ms" href="#atomik_sdk.pipeline.coordinator.CoordinatorResult.total_duration_ms">total_duration_ms</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.coordinator.CoordinatorResult.total_tokens" href="#atomik_sdk.pipeline.coordinator.CoordinatorResult.total_tokens">total_tokens</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.pipeline.coordinator.SubtaskResult" href="#atomik_sdk.pipeline.coordinator.SubtaskResult">SubtaskResult</a></code></h4>
+<ul class="two-column">
+<li><code><a title="atomik_sdk.pipeline.coordinator.SubtaskResult.agent_name" href="#atomik_sdk.pipeline.coordinator.SubtaskResult.agent_name">agent_name</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.coordinator.SubtaskResult.duration_ms" href="#atomik_sdk.pipeline.coordinator.SubtaskResult.duration_ms">duration_ms</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.coordinator.SubtaskResult.error" href="#atomik_sdk.pipeline.coordinator.SubtaskResult.error">error</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.coordinator.SubtaskResult.language" href="#atomik_sdk.pipeline.coordinator.SubtaskResult.language">language</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.coordinator.SubtaskResult.output" href="#atomik_sdk.pipeline.coordinator.SubtaskResult.output">output</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.coordinator.SubtaskResult.success" href="#atomik_sdk.pipeline.coordinator.SubtaskResult.success">success</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.coordinator.SubtaskResult.task_id" href="#atomik_sdk.pipeline.coordinator.SubtaskResult.task_id">task_id</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.coordinator.SubtaskResult.to_dict" href="#atomik_sdk.pipeline.coordinator.SubtaskResult.to_dict">to_dict</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.coordinator.SubtaskResult.tokens_consumed" href="#atomik_sdk.pipeline.coordinator.SubtaskResult.tokens_consumed">tokens_consumed</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+</body>
+</html>

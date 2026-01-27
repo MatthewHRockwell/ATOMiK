@@ -1,0 +1,809 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
+<title>atomik_sdk.pipeline.controller API documentation</title>
+<meta name="description" content="ATOMiK Pipeline Controller …">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>atomik_sdk.pipeline.controller</code></h1>
+</header>
+<section id="section-intro">
+<p>ATOMiK Pipeline Controller</p>
+<p>Orchestrates the autonomous pipeline: schema intake, stage dispatch,
+token accounting, metrics aggregation, and failure routing.</p>
+<p>Supports both sequential (Phase 4C) and event-driven DAG (Phase 5)
+execution modes. The orchestrator is used when use_orchestrator=True
+in PipelineConfig.</p>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="atomik_sdk.pipeline.controller.Pipeline"><code class="flex name class">
+<span>class <span class="ident">Pipeline</span></span>
+<span>(</span><span>config: <a title="atomik_sdk.pipeline.controller.PipelineConfig" href="#atomik_sdk.pipeline.controller.PipelineConfig">PipelineConfig</a> | None = None)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Pipeline:
+    &#34;&#34;&#34;
+    Autonomous pipeline controller.
+
+    Dispatches work through a sequence of stages, tracks progress,
+    manages token budgets, and produces structured reports.
+
+    Example:
+        &gt;&gt;&gt; pipeline = Pipeline()
+        &gt;&gt;&gt; result = pipeline.run(&#34;sdk/schemas/domains/video-h264-delta.json&#34;)
+        &gt;&gt;&gt; print(f&#34;Success: {result.success}, Files: {result.files_generated}&#34;)
+    &#34;&#34;&#34;
+
+    # Default stage ordering
+    STAGE_ORDER = [
+        &#34;validate&#34;,
+        &#34;diff&#34;,
+        &#34;generate&#34;,
+        &#34;verify&#34;,
+        &#34;hardware&#34;,
+        &#34;metrics&#34;,
+    ]
+
+    def __init__(self, config: PipelineConfig | None = None):
+        self.config = config or PipelineConfig()
+        self._stages: dict[str, BaseStage] = {}
+        self._stage_deps: dict[str, list[str]] = {}
+        self._results: list[PipelineResult] = []
+
+    def register_stage(
+        self, stage: BaseStage, dependencies: list[str] | None = None
+    ) -&gt; None:
+        &#34;&#34;&#34;Register a pipeline stage with optional dependencies.&#34;&#34;&#34;
+        self._stages[stage.name] = stage
+        if dependencies is not None:
+            self._stage_deps[stage.name] = dependencies
+
+    def run(self, schema_path: str | Path) -&gt; PipelineResult:
+        &#34;&#34;&#34;
+        Execute the full pipeline on a single schema.
+
+        Args:
+            schema_path: Path to schema JSON file.
+
+        Returns:
+            PipelineResult with per-stage results and aggregate metrics.
+        &#34;&#34;&#34;
+        schema_path = Path(schema_path)
+        result = PipelineResult(schema=schema_path.name, success=True)
+        start = time.perf_counter()
+
+        # Load schema
+        try:
+            with open(schema_path, encoding=&#34;utf-8&#34;) as f:
+                schema = json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError) as e:
+            result.success = False
+            result.errors.append(f&#34;Schema load failed: {e}&#34;)
+            return result
+
+        if self.config.verbose:
+            print(f&#34;Pipeline: processing {schema_path.name}&#34;)
+
+        if self.config.dry_run:
+            return self._dry_run(schema, str(schema_path), result)
+
+        # Delegate to orchestrator when enabled
+        if self.config.use_orchestrator:
+            return self._run_orchestrated(schema, str(schema_path), result, start)
+
+        # Execute stages in order (Phase 4C sequential mode)
+        previous_manifest = None
+        for stage_name in self.STAGE_ORDER:
+            stage = self._stages.get(stage_name)
+            if stage is None:
+                continue
+
+            # Check token budget before each stage
+            if self.config.token_budget is not None:
+                spent = sum(s.tokens_consumed for s in result.stages)
+                if spent &gt;= self.config.token_budget:
+                    result.errors.append(
+                        f&#34;Token budget exhausted ({spent}/{self.config.token_budget})&#34;
+                    )
+                    result.success = False
+                    break
+
+            if self.config.verbose:
+                print(f&#34;  Stage: {stage_name}...&#34;)
+
+            manifest = stage.execute(
+                schema, str(schema_path), previous_manifest, self.config
+            )
+            result.stages.append(manifest)
+
+            if self.config.verbose:
+                status = manifest.status.value.upper()
+                ms = round(manifest.duration_ms, 1)
+                print(f&#34;  Stage: {stage_name} -&gt; {status} ({ms}ms)&#34;)
+
+            # Abort pipeline on failure (unless skipped)
+            if manifest.status == StageStatus.FAILED:
+                result.success = False
+                result.errors.extend(manifest.errors)
+                break
+
+            # Propagate short-circuit from diff stage
+            if manifest.status == StageStatus.SKIPPED:
+                if self.config.verbose:
+                    reason = manifest.metrics.get(&#34;skip_reason&#34;, &#34;up-to-date&#34;)
+                    print(f&#34;  Pipeline short-circuited: {reason}&#34;)
+                break
+
+            previous_manifest = manifest
+
+        # Aggregate metrics
+        result.total_time_ms = (time.perf_counter() - start) * 1000
+        result.total_tokens = sum(s.tokens_consumed for s in result.stages)
+
+        for stage in result.stages:
+            result.files_generated += stage.metrics.get(&#34;files_generated&#34;, 0)
+            result.lines_generated += stage.metrics.get(&#34;lines_generated&#34;, 0)
+
+        # Determine validation level from hardware stage
+        hw_stages = [s for s in result.stages if s.stage == &#34;hardware&#34;]
+        if hw_stages:
+            result.validation_level = hw_stages[0].validation_level
+        else:
+            verify_stages = [s for s in result.stages if s.stage == &#34;verify&#34;]
+            if verify_stages and verify_stages[0].success:
+                result.validation_level = &#34;sw_verified&#34;
+
+        self._results.append(result)
+
+        # Write report if requested
+        if self.config.report_path:
+            self._write_report(result)
+
+        return result
+
+    def run_batch(self, directory: str | Path) -&gt; list[PipelineResult]:
+        &#34;&#34;&#34;
+        Execute the pipeline on all schemas in a directory.
+
+        Args:
+            directory: Path to directory containing schema JSON files.
+
+        Returns:
+            List of PipelineResult for each schema.
+        &#34;&#34;&#34;
+        directory = Path(directory)
+        schemas = sorted(directory.glob(&#34;*.json&#34;))
+
+        if not schemas:
+            return []
+
+        if self.config.verbose:
+            print(f&#34;Pipeline: batch processing {len(schemas)} schema(s)&#34;)
+
+        results = []
+        for schema_path in schemas:
+            result = self.run(schema_path)
+            results.append(result)
+
+        return results
+
+    def _dry_run(
+        self, schema: dict[str, Any], schema_path: str, result: PipelineResult
+    ) -&gt; PipelineResult:
+        &#34;&#34;&#34;Show what would be done without executing.&#34;&#34;&#34;
+        catalogue = schema.get(&#34;catalogue&#34;, {})
+        ns = f&#34;{catalogue.get(&#39;vertical&#39;)}.{catalogue.get(&#39;field&#39;)}.{catalogue.get(&#39;object&#39;)}&#34;
+
+        print(f&#34;Dry run for: {result.schema}&#34;)
+        print(f&#34;  Namespace: {ns}&#34;)
+        print(f&#34;  Stages: {&#39;, &#39;.join(self.STAGE_ORDER)}&#34;)
+        print(f&#34;  Languages: {self.config.languages or &#39;all&#39;}&#34;)
+        print(f&#34;  Output: {self.config.output_dir}&#34;)
+
+        registered = list(self._stages.keys())
+        missing = [s for s in self.STAGE_ORDER if s not in registered]
+        if missing:
+            print(f&#34;  Missing stages: {&#39;, &#39;.join(missing)}&#34;)
+
+        return result
+
+    def _write_report(self, result: PipelineResult) -&gt; None:
+        &#34;&#34;&#34;Write pipeline report to JSON file.&#34;&#34;&#34;
+        path = Path(self.config.report_path)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with open(path, &#34;w&#34;, encoding=&#34;utf-8&#34;) as f:
+            json.dump(result.to_dict(), f, indent=2)
+
+    def _run_orchestrated(
+        self,
+        schema: dict[str, Any],
+        schema_path: str,
+        result: PipelineResult,
+        start: float,
+    ) -&gt; PipelineResult:
+        &#34;&#34;&#34;Execute pipeline via the event-driven orchestrator.&#34;&#34;&#34;
+        from .orchestrator import Orchestrator
+
+        orch = Orchestrator(max_workers=self.config.max_workers)
+
+        # Build default linear dependencies if none declared
+        if not self._stage_deps:
+            prev = None
+            for name in self.STAGE_ORDER:
+                if name in self._stages:
+                    deps = [prev] if prev else []
+                    self._stage_deps[name] = deps
+                    prev = name
+
+        for name, stage in self._stages.items():
+            deps = self._stage_deps.get(name, [])
+            orch.register_stage(stage, dependencies=deps)
+
+        manifests = orch.execute(schema, schema_path, self.config)
+
+        # Convert orchestrator output to PipelineResult
+        for stage_name in self.STAGE_ORDER:
+            if stage_name in manifests:
+                result.stages.append(manifests[stage_name])
+
+        # Check for failures
+        for manifest in result.stages:
+            if manifest.status == StageStatus.FAILED:
+                result.success = False
+                result.errors.extend(manifest.errors)
+
+        # Aggregate metrics
+        result.total_time_ms = (time.perf_counter() - start) * 1000
+        result.total_tokens = sum(s.tokens_consumed for s in result.stages)
+
+        for stage in result.stages:
+            result.files_generated += stage.metrics.get(&#34;files_generated&#34;, 0)
+            result.lines_generated += stage.metrics.get(&#34;lines_generated&#34;, 0)
+
+        # Determine validation level
+        hw_stages = [s for s in result.stages if s.stage == &#34;hardware&#34;]
+        if hw_stages:
+            result.validation_level = hw_stages[0].validation_level
+        else:
+            verify_stages = [s for s in result.stages if s.stage == &#34;verify&#34;]
+            if verify_stages and verify_stages[0].success:
+                result.validation_level = &#34;sw_verified&#34;
+
+        self._results.append(result)
+
+        if self.config.report_path:
+            self._write_report(result)
+
+        return result
+
+    def get_status(self) -&gt; dict[str, Any]:
+        &#34;&#34;&#34;Get current pipeline status summary.&#34;&#34;&#34;
+        return {
+            &#34;total_runs&#34;: len(self._results),
+            &#34;successful&#34;: sum(1 for r in self._results if r.success),
+            &#34;failed&#34;: sum(1 for r in self._results if not r.success),
+            &#34;total_tokens&#34;: sum(r.total_tokens for r in self._results),
+            &#34;total_files&#34;: sum(r.files_generated for r in self._results),
+            &#34;stages_registered&#34;: list(self._stages.keys()),
+        }</code></pre>
+</details>
+<div class="desc"><p>Autonomous pipeline controller.</p>
+<p>Dispatches work through a sequence of stages, tracks progress,
+manages token budgets, and produces structured reports.</p>
+<h2 id="example">Example</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; pipeline = Pipeline()
+&gt;&gt;&gt; result = pipeline.run(&quot;sdk/schemas/domains/video-h264-delta.json&quot;)
+&gt;&gt;&gt; print(f&quot;Success: {result.success}, Files: {result.files_generated}&quot;)
+</code></pre></div>
+<h3>Class variables</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.controller.Pipeline.STAGE_ORDER"><code class="name">var <span class="ident">STAGE_ORDER</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.controller.Pipeline.get_status"><code class="name flex">
+<span>def <span class="ident">get_status</span></span>(<span>self) ‑> dict[str, typing.Any]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_status(self) -&gt; dict[str, Any]:
+    &#34;&#34;&#34;Get current pipeline status summary.&#34;&#34;&#34;
+    return {
+        &#34;total_runs&#34;: len(self._results),
+        &#34;successful&#34;: sum(1 for r in self._results if r.success),
+        &#34;failed&#34;: sum(1 for r in self._results if not r.success),
+        &#34;total_tokens&#34;: sum(r.total_tokens for r in self._results),
+        &#34;total_files&#34;: sum(r.files_generated for r in self._results),
+        &#34;stages_registered&#34;: list(self._stages.keys()),
+    }</code></pre>
+</details>
+<div class="desc"><p>Get current pipeline status summary.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.controller.Pipeline.register_stage"><code class="name flex">
+<span>def <span class="ident">register_stage</span></span>(<span>self, stage: BaseStage, dependencies: list[str] | None = None) ‑> None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def register_stage(
+    self, stage: BaseStage, dependencies: list[str] | None = None
+) -&gt; None:
+    &#34;&#34;&#34;Register a pipeline stage with optional dependencies.&#34;&#34;&#34;
+    self._stages[stage.name] = stage
+    if dependencies is not None:
+        self._stage_deps[stage.name] = dependencies</code></pre>
+</details>
+<div class="desc"><p>Register a pipeline stage with optional dependencies.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.controller.Pipeline.run"><code class="name flex">
+<span>def <span class="ident">run</span></span>(<span>self, schema_path: str | Path) ‑> <a title="atomik_sdk.pipeline.controller.PipelineResult" href="#atomik_sdk.pipeline.controller.PipelineResult">PipelineResult</a></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def run(self, schema_path: str | Path) -&gt; PipelineResult:
+    &#34;&#34;&#34;
+    Execute the full pipeline on a single schema.
+
+    Args:
+        schema_path: Path to schema JSON file.
+
+    Returns:
+        PipelineResult with per-stage results and aggregate metrics.
+    &#34;&#34;&#34;
+    schema_path = Path(schema_path)
+    result = PipelineResult(schema=schema_path.name, success=True)
+    start = time.perf_counter()
+
+    # Load schema
+    try:
+        with open(schema_path, encoding=&#34;utf-8&#34;) as f:
+            schema = json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError) as e:
+        result.success = False
+        result.errors.append(f&#34;Schema load failed: {e}&#34;)
+        return result
+
+    if self.config.verbose:
+        print(f&#34;Pipeline: processing {schema_path.name}&#34;)
+
+    if self.config.dry_run:
+        return self._dry_run(schema, str(schema_path), result)
+
+    # Delegate to orchestrator when enabled
+    if self.config.use_orchestrator:
+        return self._run_orchestrated(schema, str(schema_path), result, start)
+
+    # Execute stages in order (Phase 4C sequential mode)
+    previous_manifest = None
+    for stage_name in self.STAGE_ORDER:
+        stage = self._stages.get(stage_name)
+        if stage is None:
+            continue
+
+        # Check token budget before each stage
+        if self.config.token_budget is not None:
+            spent = sum(s.tokens_consumed for s in result.stages)
+            if spent &gt;= self.config.token_budget:
+                result.errors.append(
+                    f&#34;Token budget exhausted ({spent}/{self.config.token_budget})&#34;
+                )
+                result.success = False
+                break
+
+        if self.config.verbose:
+            print(f&#34;  Stage: {stage_name}...&#34;)
+
+        manifest = stage.execute(
+            schema, str(schema_path), previous_manifest, self.config
+        )
+        result.stages.append(manifest)
+
+        if self.config.verbose:
+            status = manifest.status.value.upper()
+            ms = round(manifest.duration_ms, 1)
+            print(f&#34;  Stage: {stage_name} -&gt; {status} ({ms}ms)&#34;)
+
+        # Abort pipeline on failure (unless skipped)
+        if manifest.status == StageStatus.FAILED:
+            result.success = False
+            result.errors.extend(manifest.errors)
+            break
+
+        # Propagate short-circuit from diff stage
+        if manifest.status == StageStatus.SKIPPED:
+            if self.config.verbose:
+                reason = manifest.metrics.get(&#34;skip_reason&#34;, &#34;up-to-date&#34;)
+                print(f&#34;  Pipeline short-circuited: {reason}&#34;)
+            break
+
+        previous_manifest = manifest
+
+    # Aggregate metrics
+    result.total_time_ms = (time.perf_counter() - start) * 1000
+    result.total_tokens = sum(s.tokens_consumed for s in result.stages)
+
+    for stage in result.stages:
+        result.files_generated += stage.metrics.get(&#34;files_generated&#34;, 0)
+        result.lines_generated += stage.metrics.get(&#34;lines_generated&#34;, 0)
+
+    # Determine validation level from hardware stage
+    hw_stages = [s for s in result.stages if s.stage == &#34;hardware&#34;]
+    if hw_stages:
+        result.validation_level = hw_stages[0].validation_level
+    else:
+        verify_stages = [s for s in result.stages if s.stage == &#34;verify&#34;]
+        if verify_stages and verify_stages[0].success:
+            result.validation_level = &#34;sw_verified&#34;
+
+    self._results.append(result)
+
+    # Write report if requested
+    if self.config.report_path:
+        self._write_report(result)
+
+    return result</code></pre>
+</details>
+<div class="desc"><p>Execute the full pipeline on a single schema.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>schema_path</code></strong></dt>
+<dd>Path to schema JSON file.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>PipelineResult with per-stage results and aggregate metrics.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.controller.Pipeline.run_batch"><code class="name flex">
+<span>def <span class="ident">run_batch</span></span>(<span>self, directory: str | Path) ‑> list[<a title="atomik_sdk.pipeline.controller.PipelineResult" href="#atomik_sdk.pipeline.controller.PipelineResult">PipelineResult</a>]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def run_batch(self, directory: str | Path) -&gt; list[PipelineResult]:
+    &#34;&#34;&#34;
+    Execute the pipeline on all schemas in a directory.
+
+    Args:
+        directory: Path to directory containing schema JSON files.
+
+    Returns:
+        List of PipelineResult for each schema.
+    &#34;&#34;&#34;
+    directory = Path(directory)
+    schemas = sorted(directory.glob(&#34;*.json&#34;))
+
+    if not schemas:
+        return []
+
+    if self.config.verbose:
+        print(f&#34;Pipeline: batch processing {len(schemas)} schema(s)&#34;)
+
+    results = []
+    for schema_path in schemas:
+        result = self.run(schema_path)
+        results.append(result)
+
+    return results</code></pre>
+</details>
+<div class="desc"><p>Execute the pipeline on all schemas in a directory.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>directory</code></strong></dt>
+<dd>Path to directory containing schema JSON files.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>List of PipelineResult for each schema.</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.pipeline.controller.PipelineConfig"><code class="flex name class">
+<span>class <span class="ident">PipelineConfig</span></span>
+<span>(</span><span>output_dir: str = 'generated',<br>languages: list[str] | None = None,<br>verbose: bool = False,<br>report_path: str | None = None,<br>checkpoint_dir: str = '.atomik',<br>metrics_csv: str = '.atomik/metrics.csv',<br>com_port: str | None = None,<br>token_budget: int | None = None,<br>sim_only: bool = False,<br>skip_synthesis: bool = False,<br>dry_run: bool = False,<br>use_orchestrator: bool = False,<br>max_workers: int = 1,<br>fail_on_regression: bool = False)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass
+class PipelineConfig:
+    &#34;&#34;&#34;Configuration for a pipeline run.&#34;&#34;&#34;
+    output_dir: str = &#34;generated&#34;
+    languages: list[str] | None = None
+    verbose: bool = False
+    report_path: str | None = None
+    checkpoint_dir: str = &#34;.atomik&#34;
+    metrics_csv: str = &#34;.atomik/metrics.csv&#34;
+    com_port: str | None = None
+    token_budget: int | None = None
+    sim_only: bool = False
+    skip_synthesis: bool = False
+    dry_run: bool = False
+    use_orchestrator: bool = False
+    max_workers: int = 1
+    fail_on_regression: bool = False</code></pre>
+</details>
+<div class="desc"><p>Configuration for a pipeline run.</p></div>
+<h3>Instance variables</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.controller.PipelineConfig.checkpoint_dir"><code class="name">var <span class="ident">checkpoint_dir</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.controller.PipelineConfig.com_port"><code class="name">var <span class="ident">com_port</span> : str | None</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.controller.PipelineConfig.dry_run"><code class="name">var <span class="ident">dry_run</span> : bool</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.controller.PipelineConfig.fail_on_regression"><code class="name">var <span class="ident">fail_on_regression</span> : bool</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.controller.PipelineConfig.languages"><code class="name">var <span class="ident">languages</span> : list[str] | None</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.controller.PipelineConfig.max_workers"><code class="name">var <span class="ident">max_workers</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.controller.PipelineConfig.metrics_csv"><code class="name">var <span class="ident">metrics_csv</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.controller.PipelineConfig.output_dir"><code class="name">var <span class="ident">output_dir</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.controller.PipelineConfig.report_path"><code class="name">var <span class="ident">report_path</span> : str | None</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.controller.PipelineConfig.sim_only"><code class="name">var <span class="ident">sim_only</span> : bool</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.controller.PipelineConfig.skip_synthesis"><code class="name">var <span class="ident">skip_synthesis</span> : bool</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.controller.PipelineConfig.token_budget"><code class="name">var <span class="ident">token_budget</span> : int | None</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.controller.PipelineConfig.use_orchestrator"><code class="name">var <span class="ident">use_orchestrator</span> : bool</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.controller.PipelineConfig.verbose"><code class="name">var <span class="ident">verbose</span> : bool</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.pipeline.controller.PipelineResult"><code class="flex name class">
+<span>class <span class="ident">PipelineResult</span></span>
+<span>(</span><span>schema: str,<br>success: bool,<br>stages: list[StageManifest] = &lt;factory&gt;,<br>total_time_ms: float = 0.0,<br>total_tokens: int = 0,<br>files_generated: int = 0,<br>lines_generated: int = 0,<br>validation_level: str = 'none',<br>errors: list[str] = &lt;factory&gt;)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass
+class PipelineResult:
+    &#34;&#34;&#34;Result of a complete pipeline run.&#34;&#34;&#34;
+    schema: str
+    success: bool
+    stages: list[StageManifest] = field(default_factory=list)
+    total_time_ms: float = 0.0
+    total_tokens: int = 0
+    files_generated: int = 0
+    lines_generated: int = 0
+    validation_level: str = &#34;none&#34;
+    errors: list[str] = field(default_factory=list)
+
+    def to_dict(self) -&gt; dict[str, Any]:
+        return {
+            &#34;schema&#34;: self.schema,
+            &#34;success&#34;: self.success,
+            &#34;total_time_ms&#34;: round(self.total_time_ms, 1),
+            &#34;total_tokens&#34;: self.total_tokens,
+            &#34;files_generated&#34;: self.files_generated,
+            &#34;lines_generated&#34;: self.lines_generated,
+            &#34;validation_level&#34;: self.validation_level,
+            &#34;stages&#34;: [s.to_dict() for s in self.stages],
+            &#34;errors&#34;: self.errors,
+        }</code></pre>
+</details>
+<div class="desc"><p>Result of a complete pipeline run.</p></div>
+<h3>Instance variables</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.controller.PipelineResult.errors"><code class="name">var <span class="ident">errors</span> : list[str]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.controller.PipelineResult.files_generated"><code class="name">var <span class="ident">files_generated</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.controller.PipelineResult.lines_generated"><code class="name">var <span class="ident">lines_generated</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.controller.PipelineResult.schema"><code class="name">var <span class="ident">schema</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.controller.PipelineResult.stages"><code class="name">var <span class="ident">stages</span> : list[<a title="atomik_sdk.pipeline.stages.StageManifest" href="stages/index.html#atomik_sdk.pipeline.stages.StageManifest">StageManifest</a>]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.controller.PipelineResult.success"><code class="name">var <span class="ident">success</span> : bool</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.controller.PipelineResult.total_time_ms"><code class="name">var <span class="ident">total_time_ms</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.controller.PipelineResult.total_tokens"><code class="name">var <span class="ident">total_tokens</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.controller.PipelineResult.validation_level"><code class="name">var <span class="ident">validation_level</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.controller.PipelineResult.to_dict"><code class="name flex">
+<span>def <span class="ident">to_dict</span></span>(<span>self) ‑> dict[str, typing.Any]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_dict(self) -&gt; dict[str, Any]:
+    return {
+        &#34;schema&#34;: self.schema,
+        &#34;success&#34;: self.success,
+        &#34;total_time_ms&#34;: round(self.total_time_ms, 1),
+        &#34;total_tokens&#34;: self.total_tokens,
+        &#34;files_generated&#34;: self.files_generated,
+        &#34;lines_generated&#34;: self.lines_generated,
+        &#34;validation_level&#34;: self.validation_level,
+        &#34;stages&#34;: [s.to_dict() for s in self.stages],
+        &#34;errors&#34;: self.errors,
+    }</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="atomik_sdk.pipeline" href="index.html">atomik_sdk.pipeline</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="atomik_sdk.pipeline.controller.Pipeline" href="#atomik_sdk.pipeline.controller.Pipeline">Pipeline</a></code></h4>
+<ul class="">
+<li><code><a title="atomik_sdk.pipeline.controller.Pipeline.STAGE_ORDER" href="#atomik_sdk.pipeline.controller.Pipeline.STAGE_ORDER">STAGE_ORDER</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.controller.Pipeline.get_status" href="#atomik_sdk.pipeline.controller.Pipeline.get_status">get_status</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.controller.Pipeline.register_stage" href="#atomik_sdk.pipeline.controller.Pipeline.register_stage">register_stage</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.controller.Pipeline.run" href="#atomik_sdk.pipeline.controller.Pipeline.run">run</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.controller.Pipeline.run_batch" href="#atomik_sdk.pipeline.controller.Pipeline.run_batch">run_batch</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.pipeline.controller.PipelineConfig" href="#atomik_sdk.pipeline.controller.PipelineConfig">PipelineConfig</a></code></h4>
+<ul class="two-column">
+<li><code><a title="atomik_sdk.pipeline.controller.PipelineConfig.checkpoint_dir" href="#atomik_sdk.pipeline.controller.PipelineConfig.checkpoint_dir">checkpoint_dir</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.controller.PipelineConfig.com_port" href="#atomik_sdk.pipeline.controller.PipelineConfig.com_port">com_port</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.controller.PipelineConfig.dry_run" href="#atomik_sdk.pipeline.controller.PipelineConfig.dry_run">dry_run</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.controller.PipelineConfig.fail_on_regression" href="#atomik_sdk.pipeline.controller.PipelineConfig.fail_on_regression">fail_on_regression</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.controller.PipelineConfig.languages" href="#atomik_sdk.pipeline.controller.PipelineConfig.languages">languages</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.controller.PipelineConfig.max_workers" href="#atomik_sdk.pipeline.controller.PipelineConfig.max_workers">max_workers</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.controller.PipelineConfig.metrics_csv" href="#atomik_sdk.pipeline.controller.PipelineConfig.metrics_csv">metrics_csv</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.controller.PipelineConfig.output_dir" href="#atomik_sdk.pipeline.controller.PipelineConfig.output_dir">output_dir</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.controller.PipelineConfig.report_path" href="#atomik_sdk.pipeline.controller.PipelineConfig.report_path">report_path</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.controller.PipelineConfig.sim_only" href="#atomik_sdk.pipeline.controller.PipelineConfig.sim_only">sim_only</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.controller.PipelineConfig.skip_synthesis" href="#atomik_sdk.pipeline.controller.PipelineConfig.skip_synthesis">skip_synthesis</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.controller.PipelineConfig.token_budget" href="#atomik_sdk.pipeline.controller.PipelineConfig.token_budget">token_budget</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.controller.PipelineConfig.use_orchestrator" href="#atomik_sdk.pipeline.controller.PipelineConfig.use_orchestrator">use_orchestrator</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.controller.PipelineConfig.verbose" href="#atomik_sdk.pipeline.controller.PipelineConfig.verbose">verbose</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.pipeline.controller.PipelineResult" href="#atomik_sdk.pipeline.controller.PipelineResult">PipelineResult</a></code></h4>
+<ul class="two-column">
+<li><code><a title="atomik_sdk.pipeline.controller.PipelineResult.errors" href="#atomik_sdk.pipeline.controller.PipelineResult.errors">errors</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.controller.PipelineResult.files_generated" href="#atomik_sdk.pipeline.controller.PipelineResult.files_generated">files_generated</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.controller.PipelineResult.lines_generated" href="#atomik_sdk.pipeline.controller.PipelineResult.lines_generated">lines_generated</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.controller.PipelineResult.schema" href="#atomik_sdk.pipeline.controller.PipelineResult.schema">schema</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.controller.PipelineResult.stages" href="#atomik_sdk.pipeline.controller.PipelineResult.stages">stages</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.controller.PipelineResult.success" href="#atomik_sdk.pipeline.controller.PipelineResult.success">success</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.controller.PipelineResult.to_dict" href="#atomik_sdk.pipeline.controller.PipelineResult.to_dict">to_dict</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.controller.PipelineResult.total_time_ms" href="#atomik_sdk.pipeline.controller.PipelineResult.total_time_ms">total_time_ms</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.controller.PipelineResult.total_tokens" href="#atomik_sdk.pipeline.controller.PipelineResult.total_tokens">total_tokens</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.controller.PipelineResult.validation_level" href="#atomik_sdk.pipeline.controller.PipelineResult.validation_level">validation_level</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+</body>
+</html>

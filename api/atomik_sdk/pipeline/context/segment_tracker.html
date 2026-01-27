@@ -1,0 +1,657 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
+<title>atomik_sdk.pipeline.context.segment_tracker API documentation</title>
+<meta name="description" content="Context Segment Tracker …">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>atomik_sdk.pipeline.context.segment_tracker</code></h1>
+</header>
+<section id="section-intro">
+<p>Context Segment Tracker</p>
+<p>Tracks context segments with usage statistics and relevance scores.
+Each segment represents a portion of the context window (schema section,
+KB entry, previous output) with metadata about its recency, task
+affinity, and access frequency.</p>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="atomik_sdk.pipeline.context.segment_tracker.ContextSegment"><code class="flex name class">
+<span>class <span class="ident">ContextSegment</span></span>
+<span>(</span><span>segment_id: str,<br>content: str,<br>segment_type: str,<br>task_affinity: list[str] = &lt;factory&gt;,<br>token_count: int = 0,<br>created_at: float = 0.0,<br>last_accessed: float = 0.0,<br>access_count: int = 0,<br>relevance_score: float = 1.0)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass
+class ContextSegment:
+    &#34;&#34;&#34;A tracked context segment with usage metadata.&#34;&#34;&#34;
+    segment_id: str
+    content: str
+    segment_type: str       # &#34;schema&#34;, &#34;kb_entry&#34;, &#34;previous_output&#34;, &#34;error_context&#34;
+    task_affinity: list[str] = field(default_factory=list)  # Task types this is relevant to
+    token_count: int = 0
+    created_at: float = 0.0
+    last_accessed: float = 0.0
+    access_count: int = 0
+    relevance_score: float = 1.0
+
+    def __post_init__(self) -&gt; None:
+        now = time.time()
+        if self.created_at == 0.0:
+            self.created_at = now
+        if self.last_accessed == 0.0:
+            self.last_accessed = now
+        if self.token_count == 0:
+            self.token_count = len(self.content) // 4  # Rough token estimate
+
+    def touch(self) -&gt; None:
+        &#34;&#34;&#34;Mark this segment as accessed.&#34;&#34;&#34;
+        self.last_accessed = time.time()
+        self.access_count += 1
+
+    @property
+    def age_seconds(self) -&gt; float:
+        return time.time() - self.last_accessed
+
+    @property
+    def is_stale(self) -&gt; bool:
+        &#34;&#34;&#34;A segment is stale if not accessed recently (heuristic).&#34;&#34;&#34;
+        return self.access_count == 0 and self.age_seconds &gt; 300
+
+    def to_dict(self) -&gt; dict[str, Any]:
+        return {
+            &#34;segment_id&#34;: self.segment_id,
+            &#34;segment_type&#34;: self.segment_type,
+            &#34;token_count&#34;: self.token_count,
+            &#34;access_count&#34;: self.access_count,
+            &#34;relevance_score&#34;: round(self.relevance_score, 3),
+            &#34;age_seconds&#34;: round(self.age_seconds, 1),
+            &#34;task_affinity&#34;: self.task_affinity,
+        }</code></pre>
+</details>
+<div class="desc"><p>A tracked context segment with usage metadata.</p></div>
+<h3>Instance variables</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.context.segment_tracker.ContextSegment.access_count"><code class="name">var <span class="ident">access_count</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.context.segment_tracker.ContextSegment.age_seconds"><code class="name">prop <span class="ident">age_seconds</span> : float</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def age_seconds(self) -&gt; float:
+    return time.time() - self.last_accessed</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.context.segment_tracker.ContextSegment.content"><code class="name">var <span class="ident">content</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.context.segment_tracker.ContextSegment.created_at"><code class="name">var <span class="ident">created_at</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.context.segment_tracker.ContextSegment.is_stale"><code class="name">prop <span class="ident">is_stale</span> : bool</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def is_stale(self) -&gt; bool:
+    &#34;&#34;&#34;A segment is stale if not accessed recently (heuristic).&#34;&#34;&#34;
+    return self.access_count == 0 and self.age_seconds &gt; 300</code></pre>
+</details>
+<div class="desc"><p>A segment is stale if not accessed recently (heuristic).</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.context.segment_tracker.ContextSegment.last_accessed"><code class="name">var <span class="ident">last_accessed</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.context.segment_tracker.ContextSegment.relevance_score"><code class="name">var <span class="ident">relevance_score</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.context.segment_tracker.ContextSegment.segment_id"><code class="name">var <span class="ident">segment_id</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.context.segment_tracker.ContextSegment.segment_type"><code class="name">var <span class="ident">segment_type</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.context.segment_tracker.ContextSegment.task_affinity"><code class="name">var <span class="ident">task_affinity</span> : list[str]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.context.segment_tracker.ContextSegment.token_count"><code class="name">var <span class="ident">token_count</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.context.segment_tracker.ContextSegment.to_dict"><code class="name flex">
+<span>def <span class="ident">to_dict</span></span>(<span>self) ‑> dict[str, typing.Any]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_dict(self) -&gt; dict[str, Any]:
+    return {
+        &#34;segment_id&#34;: self.segment_id,
+        &#34;segment_type&#34;: self.segment_type,
+        &#34;token_count&#34;: self.token_count,
+        &#34;access_count&#34;: self.access_count,
+        &#34;relevance_score&#34;: round(self.relevance_score, 3),
+        &#34;age_seconds&#34;: round(self.age_seconds, 1),
+        &#34;task_affinity&#34;: self.task_affinity,
+    }</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.context.segment_tracker.ContextSegment.touch"><code class="name flex">
+<span>def <span class="ident">touch</span></span>(<span>self) ‑> None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def touch(self) -&gt; None:
+    &#34;&#34;&#34;Mark this segment as accessed.&#34;&#34;&#34;
+    self.last_accessed = time.time()
+    self.access_count += 1</code></pre>
+</details>
+<div class="desc"><p>Mark this segment as accessed.</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.pipeline.context.segment_tracker.SegmentTracker"><code class="flex name class">
+<span>class <span class="ident">SegmentTracker</span></span>
+<span>(</span><span>stale_threshold_tasks: int = 3)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class SegmentTracker:
+    &#34;&#34;&#34;
+    Tracks context segments with usage statistics.
+
+    Maintains a registry of context segments, computes relevance
+    scores based on recency, task affinity, and access frequency,
+    and identifies segments for eviction.
+
+    Example:
+        &gt;&gt;&gt; tracker = SegmentTracker()
+        &gt;&gt;&gt; tracker.add(&#34;schema_fields&#34;, content, &#34;schema&#34;, [&#34;generate&#34;])
+        &gt;&gt;&gt; ranked = tracker.rank_by_relevance(&#34;generate&#34;)
+    &#34;&#34;&#34;
+
+    def __init__(self, stale_threshold_tasks: int = 3) -&gt; None:
+        self._segments: dict[str, ContextSegment] = {}
+        self._task_counter: int = 0
+        self._segment_task_last_used: dict[str, int] = {}
+        self.stale_threshold = stale_threshold_tasks
+
+    def add(
+        self,
+        segment_id: str,
+        content: str,
+        segment_type: str,
+        task_affinity: list[str] | None = None,
+    ) -&gt; ContextSegment:
+        &#34;&#34;&#34;Add or update a context segment.&#34;&#34;&#34;
+        if segment_id in self._segments:
+            seg = self._segments[segment_id]
+            seg.content = content
+            seg.token_count = len(content) // 4
+            seg.touch()
+        else:
+            seg = ContextSegment(
+                segment_id=segment_id,
+                content=content,
+                segment_type=segment_type,
+                task_affinity=task_affinity or [],
+            )
+            self._segments[segment_id] = seg
+
+        self._segment_task_last_used[segment_id] = self._task_counter
+        return seg
+
+    def get(self, segment_id: str) -&gt; ContextSegment | None:
+        &#34;&#34;&#34;Get a segment by ID, marking it as accessed.&#34;&#34;&#34;
+        seg = self._segments.get(segment_id)
+        if seg:
+            seg.touch()
+            self._segment_task_last_used[segment_id] = self._task_counter
+        return seg
+
+    def remove(self, segment_id: str) -&gt; bool:
+        &#34;&#34;&#34;Remove a segment. Returns True if found.&#34;&#34;&#34;
+        if segment_id in self._segments:
+            del self._segments[segment_id]
+            self._segment_task_last_used.pop(segment_id, None)
+            return True
+        return False
+
+    def advance_task(self) -&gt; None:
+        &#34;&#34;&#34;Signal that a new task has started (for staleness tracking).&#34;&#34;&#34;
+        self._task_counter += 1
+
+    def rank_by_relevance(
+        self,
+        current_task_type: str = &#34;&#34;,
+    ) -&gt; list[ContextSegment]:
+        &#34;&#34;&#34;
+        Rank segments by relevance to the current task.
+
+        Relevance is computed from:
+        - Task affinity (2x weight if matching)
+        - Recency (higher score for recently accessed)
+        - Access frequency (log scale)
+
+        Returns segments sorted by relevance (highest first).
+        &#34;&#34;&#34;
+        for seg in self._segments.values():
+            seg.relevance_score = self._compute_relevance(
+                seg, current_task_type
+            )
+
+        return sorted(
+            self._segments.values(),
+            key=lambda s: s.relevance_score,
+            reverse=True,
+        )
+
+    def get_stale_segments(self) -&gt; list[ContextSegment]:
+        &#34;&#34;&#34;Get segments not accessed in the last N tasks.&#34;&#34;&#34;
+        stale = []
+        for seg_id, seg in self._segments.items():
+            last_used = self._segment_task_last_used.get(seg_id, 0)
+            tasks_since = self._task_counter - last_used
+            if tasks_since &gt;= self.stale_threshold:
+                stale.append(seg)
+        return stale
+
+    def evict_stale(self) -&gt; list[str]:
+        &#34;&#34;&#34;Remove stale segments and return their IDs.&#34;&#34;&#34;
+        stale = self.get_stale_segments()
+        evicted = []
+        for seg in stale:
+            self.remove(seg.segment_id)
+            evicted.append(seg.segment_id)
+        return evicted
+
+    def total_tokens(self) -&gt; int:
+        &#34;&#34;&#34;Total token count across all segments.&#34;&#34;&#34;
+        return sum(s.token_count for s in self._segments.values())
+
+    @property
+    def count(self) -&gt; int:
+        return len(self._segments)
+
+    def summary(self) -&gt; dict[str, Any]:
+        &#34;&#34;&#34;Summary of tracked segments.&#34;&#34;&#34;
+        return {
+            &#34;segment_count&#34;: self.count,
+            &#34;total_tokens&#34;: self.total_tokens(),
+            &#34;task_counter&#34;: self._task_counter,
+            &#34;segments&#34;: [s.to_dict() for s in self._segments.values()],
+        }
+
+    def _compute_relevance(
+        self,
+        segment: ContextSegment,
+        current_task_type: str,
+    ) -&gt; float:
+        &#34;&#34;&#34;Compute relevance score for a segment.&#34;&#34;&#34;
+        score = 1.0
+
+        # Task affinity bonus (2x)
+        if current_task_type and current_task_type in segment.task_affinity:
+            score *= 2.0
+
+        # Recency: decay based on tasks since last use
+        last_used = self._segment_task_last_used.get(segment.segment_id, 0)
+        tasks_since = self._task_counter - last_used
+        if tasks_since &gt; 0:
+            score *= 1.0 / (1.0 + 0.3 * tasks_since)
+
+        # Frequency bonus (diminishing returns)
+        if segment.access_count &gt; 1:
+            import math
+            score *= 1.0 + 0.2 * math.log(segment.access_count)
+
+        return score</code></pre>
+</details>
+<div class="desc"><p>Tracks context segments with usage statistics.</p>
+<p>Maintains a registry of context segments, computes relevance
+scores based on recency, task affinity, and access frequency,
+and identifies segments for eviction.</p>
+<h2 id="example">Example</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; tracker = SegmentTracker()
+&gt;&gt;&gt; tracker.add(&quot;schema_fields&quot;, content, &quot;schema&quot;, [&quot;generate&quot;])
+&gt;&gt;&gt; ranked = tracker.rank_by_relevance(&quot;generate&quot;)
+</code></pre></div>
+<h3>Instance variables</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.context.segment_tracker.SegmentTracker.count"><code class="name">prop <span class="ident">count</span> : int</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def count(self) -&gt; int:
+    return len(self._segments)</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.context.segment_tracker.SegmentTracker.add"><code class="name flex">
+<span>def <span class="ident">add</span></span>(<span>self,<br>segment_id: str,<br>content: str,<br>segment_type: str,<br>task_affinity: list[str] | None = None) ‑> <a title="atomik_sdk.pipeline.context.segment_tracker.ContextSegment" href="#atomik_sdk.pipeline.context.segment_tracker.ContextSegment">ContextSegment</a></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add(
+    self,
+    segment_id: str,
+    content: str,
+    segment_type: str,
+    task_affinity: list[str] | None = None,
+) -&gt; ContextSegment:
+    &#34;&#34;&#34;Add or update a context segment.&#34;&#34;&#34;
+    if segment_id in self._segments:
+        seg = self._segments[segment_id]
+        seg.content = content
+        seg.token_count = len(content) // 4
+        seg.touch()
+    else:
+        seg = ContextSegment(
+            segment_id=segment_id,
+            content=content,
+            segment_type=segment_type,
+            task_affinity=task_affinity or [],
+        )
+        self._segments[segment_id] = seg
+
+    self._segment_task_last_used[segment_id] = self._task_counter
+    return seg</code></pre>
+</details>
+<div class="desc"><p>Add or update a context segment.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.context.segment_tracker.SegmentTracker.advance_task"><code class="name flex">
+<span>def <span class="ident">advance_task</span></span>(<span>self) ‑> None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def advance_task(self) -&gt; None:
+    &#34;&#34;&#34;Signal that a new task has started (for staleness tracking).&#34;&#34;&#34;
+    self._task_counter += 1</code></pre>
+</details>
+<div class="desc"><p>Signal that a new task has started (for staleness tracking).</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.context.segment_tracker.SegmentTracker.evict_stale"><code class="name flex">
+<span>def <span class="ident">evict_stale</span></span>(<span>self) ‑> list[str]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def evict_stale(self) -&gt; list[str]:
+    &#34;&#34;&#34;Remove stale segments and return their IDs.&#34;&#34;&#34;
+    stale = self.get_stale_segments()
+    evicted = []
+    for seg in stale:
+        self.remove(seg.segment_id)
+        evicted.append(seg.segment_id)
+    return evicted</code></pre>
+</details>
+<div class="desc"><p>Remove stale segments and return their IDs.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.context.segment_tracker.SegmentTracker.get"><code class="name flex">
+<span>def <span class="ident">get</span></span>(<span>self, segment_id: str) ‑> <a title="atomik_sdk.pipeline.context.segment_tracker.ContextSegment" href="#atomik_sdk.pipeline.context.segment_tracker.ContextSegment">ContextSegment</a> | None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get(self, segment_id: str) -&gt; ContextSegment | None:
+    &#34;&#34;&#34;Get a segment by ID, marking it as accessed.&#34;&#34;&#34;
+    seg = self._segments.get(segment_id)
+    if seg:
+        seg.touch()
+        self._segment_task_last_used[segment_id] = self._task_counter
+    return seg</code></pre>
+</details>
+<div class="desc"><p>Get a segment by ID, marking it as accessed.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.context.segment_tracker.SegmentTracker.get_stale_segments"><code class="name flex">
+<span>def <span class="ident">get_stale_segments</span></span>(<span>self) ‑> list[<a title="atomik_sdk.pipeline.context.segment_tracker.ContextSegment" href="#atomik_sdk.pipeline.context.segment_tracker.ContextSegment">ContextSegment</a>]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_stale_segments(self) -&gt; list[ContextSegment]:
+    &#34;&#34;&#34;Get segments not accessed in the last N tasks.&#34;&#34;&#34;
+    stale = []
+    for seg_id, seg in self._segments.items():
+        last_used = self._segment_task_last_used.get(seg_id, 0)
+        tasks_since = self._task_counter - last_used
+        if tasks_since &gt;= self.stale_threshold:
+            stale.append(seg)
+    return stale</code></pre>
+</details>
+<div class="desc"><p>Get segments not accessed in the last N tasks.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.context.segment_tracker.SegmentTracker.rank_by_relevance"><code class="name flex">
+<span>def <span class="ident">rank_by_relevance</span></span>(<span>self, current_task_type: str = '') ‑> list[<a title="atomik_sdk.pipeline.context.segment_tracker.ContextSegment" href="#atomik_sdk.pipeline.context.segment_tracker.ContextSegment">ContextSegment</a>]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def rank_by_relevance(
+    self,
+    current_task_type: str = &#34;&#34;,
+) -&gt; list[ContextSegment]:
+    &#34;&#34;&#34;
+    Rank segments by relevance to the current task.
+
+    Relevance is computed from:
+    - Task affinity (2x weight if matching)
+    - Recency (higher score for recently accessed)
+    - Access frequency (log scale)
+
+    Returns segments sorted by relevance (highest first).
+    &#34;&#34;&#34;
+    for seg in self._segments.values():
+        seg.relevance_score = self._compute_relevance(
+            seg, current_task_type
+        )
+
+    return sorted(
+        self._segments.values(),
+        key=lambda s: s.relevance_score,
+        reverse=True,
+    )</code></pre>
+</details>
+<div class="desc"><p>Rank segments by relevance to the current task.</p>
+<p>Relevance is computed from:
+- Task affinity (2x weight if matching)
+- Recency (higher score for recently accessed)
+- Access frequency (log scale)</p>
+<p>Returns segments sorted by relevance (highest first).</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.context.segment_tracker.SegmentTracker.remove"><code class="name flex">
+<span>def <span class="ident">remove</span></span>(<span>self, segment_id: str) ‑> bool</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def remove(self, segment_id: str) -&gt; bool:
+    &#34;&#34;&#34;Remove a segment. Returns True if found.&#34;&#34;&#34;
+    if segment_id in self._segments:
+        del self._segments[segment_id]
+        self._segment_task_last_used.pop(segment_id, None)
+        return True
+    return False</code></pre>
+</details>
+<div class="desc"><p>Remove a segment. Returns True if found.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.context.segment_tracker.SegmentTracker.summary"><code class="name flex">
+<span>def <span class="ident">summary</span></span>(<span>self) ‑> dict[str, typing.Any]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def summary(self) -&gt; dict[str, Any]:
+    &#34;&#34;&#34;Summary of tracked segments.&#34;&#34;&#34;
+    return {
+        &#34;segment_count&#34;: self.count,
+        &#34;total_tokens&#34;: self.total_tokens(),
+        &#34;task_counter&#34;: self._task_counter,
+        &#34;segments&#34;: [s.to_dict() for s in self._segments.values()],
+    }</code></pre>
+</details>
+<div class="desc"><p>Summary of tracked segments.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.context.segment_tracker.SegmentTracker.total_tokens"><code class="name flex">
+<span>def <span class="ident">total_tokens</span></span>(<span>self) ‑> int</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def total_tokens(self) -&gt; int:
+    &#34;&#34;&#34;Total token count across all segments.&#34;&#34;&#34;
+    return sum(s.token_count for s in self._segments.values())</code></pre>
+</details>
+<div class="desc"><p>Total token count across all segments.</p></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="atomik_sdk.pipeline.context" href="index.html">atomik_sdk.pipeline.context</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="atomik_sdk.pipeline.context.segment_tracker.ContextSegment" href="#atomik_sdk.pipeline.context.segment_tracker.ContextSegment">ContextSegment</a></code></h4>
+<ul class="two-column">
+<li><code><a title="atomik_sdk.pipeline.context.segment_tracker.ContextSegment.access_count" href="#atomik_sdk.pipeline.context.segment_tracker.ContextSegment.access_count">access_count</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.context.segment_tracker.ContextSegment.age_seconds" href="#atomik_sdk.pipeline.context.segment_tracker.ContextSegment.age_seconds">age_seconds</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.context.segment_tracker.ContextSegment.content" href="#atomik_sdk.pipeline.context.segment_tracker.ContextSegment.content">content</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.context.segment_tracker.ContextSegment.created_at" href="#atomik_sdk.pipeline.context.segment_tracker.ContextSegment.created_at">created_at</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.context.segment_tracker.ContextSegment.is_stale" href="#atomik_sdk.pipeline.context.segment_tracker.ContextSegment.is_stale">is_stale</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.context.segment_tracker.ContextSegment.last_accessed" href="#atomik_sdk.pipeline.context.segment_tracker.ContextSegment.last_accessed">last_accessed</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.context.segment_tracker.ContextSegment.relevance_score" href="#atomik_sdk.pipeline.context.segment_tracker.ContextSegment.relevance_score">relevance_score</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.context.segment_tracker.ContextSegment.segment_id" href="#atomik_sdk.pipeline.context.segment_tracker.ContextSegment.segment_id">segment_id</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.context.segment_tracker.ContextSegment.segment_type" href="#atomik_sdk.pipeline.context.segment_tracker.ContextSegment.segment_type">segment_type</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.context.segment_tracker.ContextSegment.task_affinity" href="#atomik_sdk.pipeline.context.segment_tracker.ContextSegment.task_affinity">task_affinity</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.context.segment_tracker.ContextSegment.to_dict" href="#atomik_sdk.pipeline.context.segment_tracker.ContextSegment.to_dict">to_dict</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.context.segment_tracker.ContextSegment.token_count" href="#atomik_sdk.pipeline.context.segment_tracker.ContextSegment.token_count">token_count</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.context.segment_tracker.ContextSegment.touch" href="#atomik_sdk.pipeline.context.segment_tracker.ContextSegment.touch">touch</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.pipeline.context.segment_tracker.SegmentTracker" href="#atomik_sdk.pipeline.context.segment_tracker.SegmentTracker">SegmentTracker</a></code></h4>
+<ul class="two-column">
+<li><code><a title="atomik_sdk.pipeline.context.segment_tracker.SegmentTracker.add" href="#atomik_sdk.pipeline.context.segment_tracker.SegmentTracker.add">add</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.context.segment_tracker.SegmentTracker.advance_task" href="#atomik_sdk.pipeline.context.segment_tracker.SegmentTracker.advance_task">advance_task</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.context.segment_tracker.SegmentTracker.count" href="#atomik_sdk.pipeline.context.segment_tracker.SegmentTracker.count">count</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.context.segment_tracker.SegmentTracker.evict_stale" href="#atomik_sdk.pipeline.context.segment_tracker.SegmentTracker.evict_stale">evict_stale</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.context.segment_tracker.SegmentTracker.get" href="#atomik_sdk.pipeline.context.segment_tracker.SegmentTracker.get">get</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.context.segment_tracker.SegmentTracker.get_stale_segments" href="#atomik_sdk.pipeline.context.segment_tracker.SegmentTracker.get_stale_segments">get_stale_segments</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.context.segment_tracker.SegmentTracker.rank_by_relevance" href="#atomik_sdk.pipeline.context.segment_tracker.SegmentTracker.rank_by_relevance">rank_by_relevance</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.context.segment_tracker.SegmentTracker.remove" href="#atomik_sdk.pipeline.context.segment_tracker.SegmentTracker.remove">remove</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.context.segment_tracker.SegmentTracker.summary" href="#atomik_sdk.pipeline.context.segment_tracker.SegmentTracker.summary">summary</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.context.segment_tracker.SegmentTracker.total_tokens" href="#atomik_sdk.pipeline.context.segment_tracker.SegmentTracker.total_tokens">total_tokens</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+</body>
+</html>

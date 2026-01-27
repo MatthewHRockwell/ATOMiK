@@ -1,0 +1,3855 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
+<title>atomik_sdk.pipeline API documentation</title>
+<meta name="description" content="ATOMiK Autonomous Pipeline System …">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>atomik_sdk.pipeline</code></h1>
+</header>
+<section id="section-intro">
+<p>ATOMiK Autonomous Pipeline System</p>
+<p>Orchestrates schema validation, code generation, verification,
+hardware-in-the-loop testing, and performance metrics collection
+through a stage-based autonomous pipeline.</p>
+<p>Phase 5 adds event-driven DAG orchestration, feedback loops,
+adaptive model routing, multi-agent parallelism, deep verification,
+and cross-run learning.</p>
+</section>
+<section>
+<h2 class="section-title" id="header-submodules">Sub-modules</h2>
+<dl>
+<dt><code class="name"><a title="atomik_sdk.pipeline.agents" href="agents/index.html">atomik_sdk.pipeline.agents</a></code></dt>
+<dd>
+<div class="desc"><p>Pipeline agents: model routing, token budgeting, and self-correction.</p></div>
+</dd>
+<dt><code class="name"><a title="atomik_sdk.pipeline.analysis" href="analysis/index.html">atomik_sdk.pipeline.analysis</a></code></dt>
+<dd>
+<div class="desc"><p>Field-level differential analysis and cross-run metrics.</p></div>
+</dd>
+<dt><code class="name"><a title="atomik_sdk.pipeline.consensus" href="consensus.html">atomik_sdk.pipeline.consensus</a></code></dt>
+<dd>
+<div class="desc"><p>Consensus Resolution …</p></div>
+</dd>
+<dt><code class="name"><a title="atomik_sdk.pipeline.context" href="context/index.html">atomik_sdk.pipeline.context</a></code></dt>
+<dd>
+<div class="desc"><p>Pipeline context management: manifests, caching, and checkpoints.</p></div>
+</dd>
+<dt><code class="name"><a title="atomik_sdk.pipeline.controller" href="controller.html">atomik_sdk.pipeline.controller</a></code></dt>
+<dd>
+<div class="desc"><p>ATOMiK Pipeline Controller …</p></div>
+</dd>
+<dt><code class="name"><a title="atomik_sdk.pipeline.coordinator" href="coordinator.html">atomik_sdk.pipeline.coordinator</a></code></dt>
+<dd>
+<div class="desc"><p>Coordinator Agent …</p></div>
+</dd>
+<dt><code class="name"><a title="atomik_sdk.pipeline.dag" href="dag.html">atomik_sdk.pipeline.dag</a></code></dt>
+<dd>
+<div class="desc"><p>Task DAG Builder …</p></div>
+</dd>
+<dt><code class="name"><a title="atomik_sdk.pipeline.diagnosis" href="diagnosis.html">atomik_sdk.pipeline.diagnosis</a></code></dt>
+<dd>
+<div class="desc"><p>Error Diagnosis …</p></div>
+</dd>
+<dt><code class="name"><a title="atomik_sdk.pipeline.event_bus" href="event_bus.html">atomik_sdk.pipeline.event_bus</a></code></dt>
+<dd>
+<div class="desc"><p>Event Bus …</p></div>
+</dd>
+<dt><code class="name"><a title="atomik_sdk.pipeline.feedback" href="feedback.html">atomik_sdk.pipeline.feedback</a></code></dt>
+<dd>
+<div class="desc"><p>Feedback Loop Engine …</p></div>
+</dd>
+<dt><code class="name"><a title="atomik_sdk.pipeline.knowledge" href="knowledge/index.html">atomik_sdk.pipeline.knowledge</a></code></dt>
+<dd>
+<div class="desc"><p>Error pattern knowledge base with fuzzy matching and learning.</p></div>
+</dd>
+<dt><code class="name"><a title="atomik_sdk.pipeline.metrics" href="metrics/index.html">atomik_sdk.pipeline.metrics</a></code></dt>
+<dd>
+<div class="desc"><p>Pipeline metrics collection, benchmarking, and reporting.</p></div>
+</dd>
+<dt><code class="name"><a title="atomik_sdk.pipeline.optimization" href="optimization/index.html">atomik_sdk.pipeline.optimization</a></code></dt>
+<dd>
+<div class="desc"><p>Pipeline self-optimization engine with bottleneck analysis and auto-tuning.</p></div>
+</dd>
+<dt><code class="name"><a title="atomik_sdk.pipeline.orchestrator" href="orchestrator.html">atomik_sdk.pipeline.orchestrator</a></code></dt>
+<dd>
+<div class="desc"><p>Event-Driven Pipeline Orchestrator …</p></div>
+</dd>
+<dt><code class="name"><a title="atomik_sdk.pipeline.parallel" href="parallel/index.html">atomik_sdk.pipeline.parallel</a></code></dt>
+<dd>
+<div class="desc"><p>Parallel task decomposition and execution.</p></div>
+</dd>
+<dt><code class="name"><a title="atomik_sdk.pipeline.regression" href="regression/index.html">atomik_sdk.pipeline.regression</a></code></dt>
+<dd>
+<div class="desc"><p>Regression detection system with baseline management.</p></div>
+</dd>
+<dt><code class="name"><a title="atomik_sdk.pipeline.reports" href="reports/index.html">atomik_sdk.pipeline.reports</a></code></dt>
+<dd>
+<div class="desc"><p>Pipeline report generation.</p></div>
+</dd>
+<dt><code class="name"><a title="atomik_sdk.pipeline.stages" href="stages/index.html">atomik_sdk.pipeline.stages</a></code></dt>
+<dd>
+<div class="desc"><p>Pipeline Stage Protocol …</p></div>
+</dd>
+<dt><code class="name"><a title="atomik_sdk.pipeline.verification" href="verification/index.html">atomik_sdk.pipeline.verification</a></code></dt>
+<dd>
+<div class="desc"><p>Deep verification engine with native toolchain runners and consistency checking.</p></div>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="atomik_sdk.pipeline.ConsensusResolver"><code class="flex name class">
+<span>class <span class="ident">ConsensusResolver</span></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class ConsensusResolver:
+    &#34;&#34;&#34;
+    Resolves conflicts between specialist agent outputs.
+
+    When multiple specialists contribute to overlapping artifacts
+    (e.g., interface definitions across languages), the resolver
+    detects inconsistencies and applies resolution strategies:
+
+    1. Majority vote: If 3+ agents agree and 1 disagrees, majority wins.
+    2. Field merge: Non-conflicting fields merged from all agents.
+    3. Escalation: Irreconcilable conflicts flagged for human review.
+
+    Example:
+        &gt;&gt;&gt; resolver = ConsensusResolver()
+        &gt;&gt;&gt; result = resolver.resolve({&#34;agent_a&#34;: output_a, &#34;agent_b&#34;: output_b})
+        &gt;&gt;&gt; if not result.agreed:
+        ...     print(f&#34;{result.conflict_count} conflicts found&#34;)
+    &#34;&#34;&#34;
+
+    def resolve(
+        self,
+        agent_outputs: dict[str, dict[str, Any]],
+    ) -&gt; ConsensusResult:
+        &#34;&#34;&#34;
+        Resolve conflicts across agent outputs.
+
+        Args:
+            agent_outputs: Map of agent_name -&gt; output dict.
+
+        Returns:
+            ConsensusResult with merged output and conflict details.
+        &#34;&#34;&#34;
+        result = ConsensusResult()
+
+        if len(agent_outputs) &lt;= 1:
+            if agent_outputs:
+                result.merged_output = next(iter(agent_outputs.values()))
+            return result
+
+        # Collect all unique field paths across agents
+        all_fields = self._collect_all_fields(agent_outputs)
+
+        for field_path in sorted(all_fields):
+            values: dict[str, Any] = {}
+            for agent_name, output in agent_outputs.items():
+                val = self._get_nested(output, field_path)
+                if val is not None:
+                    values[agent_name] = val
+
+            if not values:
+                continue
+
+            unique_values = set(self._hashable(v) for v in values.values())
+
+            if len(unique_values) == 1:
+                # All agents agree
+                self._set_nested(
+                    result.merged_output,
+                    field_path,
+                    next(iter(values.values())),
+                )
+            else:
+                # Conflict detected
+                result.agreed = False
+                conflict = ConflictItem(
+                    field_path=field_path,
+                    values=values,
+                )
+
+                resolved = self._try_majority_vote(values)
+                if resolved is not None:
+                    conflict.resolution = &#34;majority&#34;
+                    conflict.resolved_value = resolved
+                    self._set_nested(result.merged_output, field_path, resolved)
+                else:
+                    conflict.resolution = &#34;escalated&#34;
+                    result.escalated.append(field_path)
+
+                result.conflicts.append(conflict)
+
+        return result
+
+    def resolve_interface_fields(
+        self,
+        language_fields: dict[str, list[str]],
+    ) -&gt; ConsensusResult:
+        &#34;&#34;&#34;
+        Check interface consistency across languages.
+
+        Verifies that all languages implement the same set of fields
+        (accounting for naming convention differences).
+
+        Args:
+            language_fields: Map of language -&gt; list of field names.
+
+        Returns:
+            ConsensusResult with any missing field conflicts.
+        &#34;&#34;&#34;
+        result = ConsensusResult()
+
+        if len(language_fields) &lt;= 1:
+            return result
+
+        # Normalize field names to snake_case for comparison
+        normalized: dict[str, set[str]] = {}
+        for lang, fields in language_fields.items():
+            normalized[lang] = {self._normalize_name(f) for f in fields}
+
+        # Find the union of all fields
+        all_fields = set()
+        for fields in normalized.values():
+            all_fields |= fields
+
+        # Check each language for missing fields
+        for field_name in sorted(all_fields):
+            missing_in: list[str] = []
+            present_in: list[str] = []
+
+            for lang, fields in normalized.items():
+                if field_name in fields:
+                    present_in.append(lang)
+                else:
+                    missing_in.append(lang)
+
+            if missing_in:
+                result.agreed = False
+                conflict = ConflictItem(
+                    field_path=field_name,
+                    values={
+                        lang: &#34;present&#34; if lang in present_in else &#34;missing&#34;
+                        for lang in language_fields
+                    },
+                    resolution=&#34;escalated&#34;,
+                )
+                result.conflicts.append(conflict)
+                result.escalated.append(
+                    f&#34;{field_name} missing in: {&#39;, &#39;.join(missing_in)}&#34;
+                )
+
+        return result
+
+    def _collect_all_fields(
+        self, agent_outputs: dict[str, dict[str, Any]]
+    ) -&gt; set[str]:
+        &#34;&#34;&#34;Collect all dotted field paths across agent outputs.&#34;&#34;&#34;
+        paths: set[str] = set()
+        for output in agent_outputs.values():
+            self._flatten_paths(output, &#34;&#34;, paths)
+        return paths
+
+    def _flatten_paths(
+        self,
+        obj: Any,
+        prefix: str,
+        paths: set[str],
+    ) -&gt; None:
+        &#34;&#34;&#34;Recursively flatten a dict into dotted paths.&#34;&#34;&#34;
+        if isinstance(obj, dict):
+            for key, val in obj.items():
+                path = f&#34;{prefix}.{key}&#34; if prefix else key
+                if isinstance(val, dict):
+                    self._flatten_paths(val, path, paths)
+                else:
+                    paths.add(path)
+        elif prefix:
+            paths.add(prefix)
+
+    def _get_nested(self, obj: dict[str, Any], path: str) -&gt; Any:
+        &#34;&#34;&#34;Get a value from a nested dict using dotted path.&#34;&#34;&#34;
+        parts = path.split(&#34;.&#34;)
+        current: Any = obj
+        for part in parts:
+            if isinstance(current, dict) and part in current:
+                current = current[part]
+            else:
+                return None
+        return current
+
+    def _set_nested(self, obj: dict[str, Any], path: str, value: Any) -&gt; None:
+        &#34;&#34;&#34;Set a value in a nested dict using dotted path.&#34;&#34;&#34;
+        parts = path.split(&#34;.&#34;)
+        current = obj
+        for part in parts[:-1]:
+            if part not in current:
+                current[part] = {}
+            current = current[part]
+        current[parts[-1]] = value
+
+    def _try_majority_vote(self, values: dict[str, Any]) -&gt; Any | None:
+        &#34;&#34;&#34;Try to resolve a conflict by majority vote.&#34;&#34;&#34;
+        if len(values) &lt; 3:
+            return None
+
+        # Count occurrences of each value
+        counts: dict[Any, int] = {}
+        val_map: dict[Any, Any] = {}
+        for val in values.values():
+            key = self._hashable(val)
+            counts[key] = counts.get(key, 0) + 1
+            val_map[key] = val
+
+        # Find the most common value
+        max_count = max(counts.values())
+        if max_count &gt; len(values) / 2:
+            for key, count in counts.items():
+                if count == max_count:
+                    return val_map[key]
+        return None
+
+    @staticmethod
+    def _hashable(val: Any) -&gt; Any:
+        &#34;&#34;&#34;Convert a value to a hashable representation.&#34;&#34;&#34;
+        if isinstance(val, dict):
+            return tuple(sorted(val.items()))
+        if isinstance(val, list):
+            return tuple(val)
+        return val
+
+    @staticmethod
+    def _normalize_name(name: str) -&gt; str:
+        &#34;&#34;&#34;Normalize a field name to snake_case for comparison.&#34;&#34;&#34;
+        result = []
+        for i, ch in enumerate(name):
+            if ch.isupper() and i &gt; 0:
+                result.append(&#34;_&#34;)
+            result.append(ch.lower())
+        return &#34;&#34;.join(result).replace(&#34;-&#34;, &#34;_&#34;)</code></pre>
+</details>
+<div class="desc"><p>Resolves conflicts between specialist agent outputs.</p>
+<p>When multiple specialists contribute to overlapping artifacts
+(e.g., interface definitions across languages), the resolver
+detects inconsistencies and applies resolution strategies:</p>
+<ol>
+<li>Majority vote: If 3+ agents agree and 1 disagrees, majority wins.</li>
+<li>Field merge: Non-conflicting fields merged from all agents.</li>
+<li>Escalation: Irreconcilable conflicts flagged for human review.</li>
+</ol>
+<h2 id="example">Example</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; resolver = ConsensusResolver()
+&gt;&gt;&gt; result = resolver.resolve({&quot;agent_a&quot;: output_a, &quot;agent_b&quot;: output_b})
+&gt;&gt;&gt; if not result.agreed:
+...     print(f&quot;{result.conflict_count} conflicts found&quot;)
+</code></pre></div>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.ConsensusResolver.resolve"><code class="name flex">
+<span>def <span class="ident">resolve</span></span>(<span>self, agent_outputs: dict[str, dict[str, Any]]) ‑> <a title="atomik_sdk.pipeline.consensus.ConsensusResult" href="consensus.html#atomik_sdk.pipeline.consensus.ConsensusResult">ConsensusResult</a></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def resolve(
+    self,
+    agent_outputs: dict[str, dict[str, Any]],
+) -&gt; ConsensusResult:
+    &#34;&#34;&#34;
+    Resolve conflicts across agent outputs.
+
+    Args:
+        agent_outputs: Map of agent_name -&gt; output dict.
+
+    Returns:
+        ConsensusResult with merged output and conflict details.
+    &#34;&#34;&#34;
+    result = ConsensusResult()
+
+    if len(agent_outputs) &lt;= 1:
+        if agent_outputs:
+            result.merged_output = next(iter(agent_outputs.values()))
+        return result
+
+    # Collect all unique field paths across agents
+    all_fields = self._collect_all_fields(agent_outputs)
+
+    for field_path in sorted(all_fields):
+        values: dict[str, Any] = {}
+        for agent_name, output in agent_outputs.items():
+            val = self._get_nested(output, field_path)
+            if val is not None:
+                values[agent_name] = val
+
+        if not values:
+            continue
+
+        unique_values = set(self._hashable(v) for v in values.values())
+
+        if len(unique_values) == 1:
+            # All agents agree
+            self._set_nested(
+                result.merged_output,
+                field_path,
+                next(iter(values.values())),
+            )
+        else:
+            # Conflict detected
+            result.agreed = False
+            conflict = ConflictItem(
+                field_path=field_path,
+                values=values,
+            )
+
+            resolved = self._try_majority_vote(values)
+            if resolved is not None:
+                conflict.resolution = &#34;majority&#34;
+                conflict.resolved_value = resolved
+                self._set_nested(result.merged_output, field_path, resolved)
+            else:
+                conflict.resolution = &#34;escalated&#34;
+                result.escalated.append(field_path)
+
+            result.conflicts.append(conflict)
+
+    return result</code></pre>
+</details>
+<div class="desc"><p>Resolve conflicts across agent outputs.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>agent_outputs</code></strong></dt>
+<dd>Map of agent_name -&gt; output dict.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>ConsensusResult with merged output and conflict details.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.ConsensusResolver.resolve_interface_fields"><code class="name flex">
+<span>def <span class="ident">resolve_interface_fields</span></span>(<span>self, language_fields: dict[str, list[str]]) ‑> <a title="atomik_sdk.pipeline.consensus.ConsensusResult" href="consensus.html#atomik_sdk.pipeline.consensus.ConsensusResult">ConsensusResult</a></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def resolve_interface_fields(
+    self,
+    language_fields: dict[str, list[str]],
+) -&gt; ConsensusResult:
+    &#34;&#34;&#34;
+    Check interface consistency across languages.
+
+    Verifies that all languages implement the same set of fields
+    (accounting for naming convention differences).
+
+    Args:
+        language_fields: Map of language -&gt; list of field names.
+
+    Returns:
+        ConsensusResult with any missing field conflicts.
+    &#34;&#34;&#34;
+    result = ConsensusResult()
+
+    if len(language_fields) &lt;= 1:
+        return result
+
+    # Normalize field names to snake_case for comparison
+    normalized: dict[str, set[str]] = {}
+    for lang, fields in language_fields.items():
+        normalized[lang] = {self._normalize_name(f) for f in fields}
+
+    # Find the union of all fields
+    all_fields = set()
+    for fields in normalized.values():
+        all_fields |= fields
+
+    # Check each language for missing fields
+    for field_name in sorted(all_fields):
+        missing_in: list[str] = []
+        present_in: list[str] = []
+
+        for lang, fields in normalized.items():
+            if field_name in fields:
+                present_in.append(lang)
+            else:
+                missing_in.append(lang)
+
+        if missing_in:
+            result.agreed = False
+            conflict = ConflictItem(
+                field_path=field_name,
+                values={
+                    lang: &#34;present&#34; if lang in present_in else &#34;missing&#34;
+                    for lang in language_fields
+                },
+                resolution=&#34;escalated&#34;,
+            )
+            result.conflicts.append(conflict)
+            result.escalated.append(
+                f&#34;{field_name} missing in: {&#39;, &#39;.join(missing_in)}&#34;
+            )
+
+    return result</code></pre>
+</details>
+<div class="desc"><p>Check interface consistency across languages.</p>
+<p>Verifies that all languages implement the same set of fields
+(accounting for naming convention differences).</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>language_fields</code></strong></dt>
+<dd>Map of language -&gt; list of field names.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>ConsensusResult with any missing field conflicts.</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.pipeline.ConsensusResult"><code class="flex name class">
+<span>class <span class="ident">ConsensusResult</span></span>
+<span>(</span><span>agreed: bool = True,<br>conflicts: list[ConflictItem] = &lt;factory&gt;,<br>merged_output: dict[str, Any] = &lt;factory&gt;,<br>escalated: list[str] = &lt;factory&gt;)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass
+class ConsensusResult:
+    &#34;&#34;&#34;Result of consensus resolution across specialist outputs.&#34;&#34;&#34;
+    agreed: bool = True
+    conflicts: list[ConflictItem] = field(default_factory=list)
+    merged_output: dict[str, Any] = field(default_factory=dict)
+    escalated: list[str] = field(default_factory=list)
+
+    @property
+    def conflict_count(self) -&gt; int:
+        return len(self.conflicts)
+
+    def to_dict(self) -&gt; dict[str, Any]:
+        return {
+            &#34;agreed&#34;: self.agreed,
+            &#34;conflict_count&#34;: self.conflict_count,
+            &#34;conflicts&#34;: [c.to_dict() for c in self.conflicts],
+            &#34;escalated_fields&#34;: self.escalated,
+        }</code></pre>
+</details>
+<div class="desc"><p>Result of consensus resolution across specialist outputs.</p></div>
+<h3>Instance variables</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.ConsensusResult.agreed"><code class="name">var <span class="ident">agreed</span> : bool</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.ConsensusResult.conflict_count"><code class="name">prop <span class="ident">conflict_count</span> : int</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def conflict_count(self) -&gt; int:
+    return len(self.conflicts)</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.ConsensusResult.conflicts"><code class="name">var <span class="ident">conflicts</span> : list[<a title="atomik_sdk.pipeline.consensus.ConflictItem" href="consensus.html#atomik_sdk.pipeline.consensus.ConflictItem">ConflictItem</a>]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.ConsensusResult.escalated"><code class="name">var <span class="ident">escalated</span> : list[str]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.ConsensusResult.merged_output"><code class="name">var <span class="ident">merged_output</span> : dict[str, typing.Any]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.ConsensusResult.to_dict"><code class="name flex">
+<span>def <span class="ident">to_dict</span></span>(<span>self) ‑> dict[str, typing.Any]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_dict(self) -&gt; dict[str, Any]:
+    return {
+        &#34;agreed&#34;: self.agreed,
+        &#34;conflict_count&#34;: self.conflict_count,
+        &#34;conflicts&#34;: [c.to_dict() for c in self.conflicts],
+        &#34;escalated_fields&#34;: self.escalated,
+    }</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.pipeline.Coordinator"><code class="flex name class">
+<span>class <span class="ident">Coordinator</span></span>
+<span>(</span><span>registry: AgentRegistry,<br>decomposer: TaskDecomposer | None = None,<br>consensus_resolver: <a title="atomik_sdk.pipeline.ConsensusResolver" href="#atomik_sdk.pipeline.ConsensusResolver">ConsensusResolver</a> | None = None,<br>event_bus: <a title="atomik_sdk.pipeline.EventBus" href="#atomik_sdk.pipeline.EventBus">EventBus</a> | None = None,<br>max_workers: int = 4,<br>specialist_timeout: float = 60.0)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Coordinator:
+    &#34;&#34;&#34;
+    Top-level coordinator agent for pipeline work dispatch.
+
+    Decomposes pipeline requests into subtasks, dispatches each
+    to the best-fit specialist via the registry, collects results,
+    and runs consensus resolution on overlapping outputs.
+
+    Example:
+        &gt;&gt;&gt; coord = Coordinator(registry, decomposer)
+        &gt;&gt;&gt; result = coord.dispatch_generation(schema, context)
+        &gt;&gt;&gt; if result.consensus and not result.consensus.agreed:
+        ...     print(&#34;Interface conflicts detected&#34;)
+    &#34;&#34;&#34;
+
+    def __init__(
+        self,
+        registry: AgentRegistry,
+        decomposer: TaskDecomposer | None = None,
+        consensus_resolver: ConsensusResolver | None = None,
+        event_bus: EventBus | None = None,
+        max_workers: int = 4,
+        specialist_timeout: float = 60.0,
+    ) -&gt; None:
+        self.registry = registry
+        self.decomposer = decomposer or TaskDecomposer()
+        self.consensus = consensus_resolver or ConsensusResolver()
+        self.event_bus = event_bus
+        self.max_workers = min(max_workers, 8)
+        self.specialist_timeout = specialist_timeout
+
+    def dispatch_generation(
+        self,
+        schema: dict[str, Any],
+        context: dict[str, Any],
+        languages: list[str] | None = None,
+    ) -&gt; CoordinatorResult:
+        &#34;&#34;&#34;
+        Decompose and dispatch code generation to specialists.
+
+        Args:
+            schema: Parsed schema dict.
+            context: Execution context (config, manifests, etc.).
+            languages: Languages to generate (None = all).
+
+        Returns:
+            CoordinatorResult with per-language results and consensus.
+        &#34;&#34;&#34;
+        plan = self.decomposer.decompose_generation(languages)
+        return self._execute_plan(plan, schema, context)
+
+    def dispatch_verification(
+        self,
+        schema: dict[str, Any],
+        context: dict[str, Any],
+        languages: list[str] | None = None,
+    ) -&gt; CoordinatorResult:
+        &#34;&#34;&#34;Decompose and dispatch verification to specialists.&#34;&#34;&#34;
+        plan = self.decomposer.decompose_verification(languages)
+        return self._execute_plan(plan, schema, context)
+
+    def dispatch_full_pipeline(
+        self,
+        schema: dict[str, Any],
+        context: dict[str, Any],
+        languages: list[str] | None = None,
+        include_hardware: bool = True,
+    ) -&gt; CoordinatorResult:
+        &#34;&#34;&#34;Decompose and dispatch a full pipeline run.&#34;&#34;&#34;
+        plan = self.decomposer.decompose_full_pipeline(
+            languages, include_hardware
+        )
+        return self._execute_plan(plan, schema, context)
+
+    def _execute_plan(
+        self,
+        plan: DecompositionPlan,
+        schema: dict[str, Any],
+        context: dict[str, Any],
+    ) -&gt; CoordinatorResult:
+        &#34;&#34;&#34;Execute a decomposition plan by dispatching to specialists.&#34;&#34;&#34;
+        coord_start = time.perf_counter()
+        result = CoordinatorResult()
+        sequential_time = 0.0
+
+        for group in plan.parallel_groups:
+            group_tasks = [
+                t for t in plan.tasks if t.task_id in group
+            ]
+            if not group_tasks:
+                continue
+
+            group_results = self._dispatch_group(group_tasks, schema, context)
+            result.subtask_results.extend(group_results)
+
+            for sr in group_results:
+                sequential_time += sr.duration_ms
+                result.total_tokens += sr.tokens_consumed
+                if not sr.success:
+                    result.success = False
+
+        result.total_duration_ms = (time.perf_counter() - coord_start) * 1000
+
+        # Compute parallel speedup
+        if result.total_duration_ms &gt; 0:
+            result.parallel_speedup = sequential_time / result.total_duration_ms
+        else:
+            result.parallel_speedup = 1.0
+
+        # Run consensus if we have generation results from multiple languages
+        gen_results = {
+            r.language: r.output
+            for r in result.subtask_results
+            if r.success and r.output and r.language
+        }
+        if len(gen_results) &gt; 1:
+            result.consensus = self.consensus.resolve(gen_results)
+
+        return result
+
+    def _dispatch_group(
+        self,
+        tasks: list[ParallelTask],
+        schema: dict[str, Any],
+        context: dict[str, Any],
+    ) -&gt; list[SubtaskResult]:
+        &#34;&#34;&#34;Dispatch a group of tasks in parallel.&#34;&#34;&#34;
+        if len(tasks) == 1:
+            return [self._dispatch_single(tasks[0], schema, context)]
+
+        results: list[SubtaskResult] = []
+        with ThreadPoolExecutor(max_workers=self.max_workers) as pool:
+            futures = {
+                pool.submit(
+                    self._dispatch_single, task, schema, context
+                ): task
+                for task in tasks
+            }
+
+            for future in futures:
+                try:
+                    sr = future.result(timeout=self.specialist_timeout)
+                    results.append(sr)
+                except FuturesTimeout:
+                    task = futures[future]
+                    results.append(SubtaskResult(
+                        task_id=task.task_id,
+                        language=task.language,
+                        agent_name=&#34;timeout&#34;,
+                        success=False,
+                        error=f&#34;Specialist timeout after {self.specialist_timeout}s&#34;,
+                    ))
+                except Exception as e:
+                    task = futures[future]
+                    results.append(SubtaskResult(
+                        task_id=task.task_id,
+                        language=task.language,
+                        agent_name=&#34;error&#34;,
+                        success=False,
+                        error=str(e),
+                    ))
+
+        return results
+
+    def _dispatch_single(
+        self,
+        task: ParallelTask,
+        schema: dict[str, Any],
+        context: dict[str, Any],
+    ) -&gt; SubtaskResult:
+        &#34;&#34;&#34;Dispatch a single task to the best-fit specialist.&#34;&#34;&#34;
+        start = time.perf_counter()
+
+        agent = self.registry.find(task.task_type, language=task.language)
+        if agent is None:
+            return SubtaskResult(
+                task_id=task.task_id,
+                language=task.language,
+                agent_name=&#34;none&#34;,
+                success=False,
+                error=f&#34;No specialist for {task.task_type}/{task.language}&#34;,
+                duration_ms=(time.perf_counter() - start) * 1000,
+            )
+
+        if self.event_bus:
+            self.event_bus.emit(Event(
+                EventType.TASK_STARTED,
+                {
+                    &#34;task_id&#34;: task.task_id,
+                    &#34;agent&#34;: agent.name,
+                    &#34;language&#34;: task.language,
+                },
+                source=&#34;coordinator&#34;,
+            ))
+
+        try:
+            task_desc = {
+                &#34;task_id&#34;: task.task_id,
+                &#34;task_type&#34;: task.task_type,
+                &#34;language&#34;: task.language,
+                &#34;schema&#34;: schema,
+                **task.metadata,
+            }
+            output = agent.execute(task_desc, context)
+            duration_ms = (time.perf_counter() - start) * 1000
+
+            sr = SubtaskResult(
+                task_id=task.task_id,
+                language=task.language,
+                agent_name=agent.name,
+                success=True,
+                output=output,
+                duration_ms=duration_ms,
+                tokens_consumed=output.get(&#34;tokens_consumed&#34;, 0),
+            )
+
+            if self.event_bus:
+                self.event_bus.emit(Event(
+                    EventType.TASK_COMPLETED,
+                    {&#34;task_id&#34;: task.task_id, &#34;agent&#34;: agent.name},
+                    source=&#34;coordinator&#34;,
+                ))
+
+            return sr
+
+        except Exception as e:
+            duration_ms = (time.perf_counter() - start) * 1000
+
+            if self.event_bus:
+                self.event_bus.emit(Event(
+                    EventType.TASK_FAILED,
+                    {
+                        &#34;task_id&#34;: task.task_id,
+                        &#34;agent&#34;: agent.name,
+                        &#34;error&#34;: str(e),
+                    },
+                    source=&#34;coordinator&#34;,
+                ))
+
+            return SubtaskResult(
+                task_id=task.task_id,
+                language=task.language,
+                agent_name=agent.name,
+                success=False,
+                error=str(e),
+                duration_ms=duration_ms,
+            )
+
+    def get_specialist_status(self) -&gt; list[dict[str, Any]]:
+        &#34;&#34;&#34;Get the status of all registered specialists.&#34;&#34;&#34;
+        return self.registry.list_agents()</code></pre>
+</details>
+<div class="desc"><p>Top-level coordinator agent for pipeline work dispatch.</p>
+<p>Decomposes pipeline requests into subtasks, dispatches each
+to the best-fit specialist via the registry, collects results,
+and runs consensus resolution on overlapping outputs.</p>
+<h2 id="example">Example</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; coord = Coordinator(registry, decomposer)
+&gt;&gt;&gt; result = coord.dispatch_generation(schema, context)
+&gt;&gt;&gt; if result.consensus and not result.consensus.agreed:
+...     print(&quot;Interface conflicts detected&quot;)
+</code></pre></div>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.Coordinator.dispatch_full_pipeline"><code class="name flex">
+<span>def <span class="ident">dispatch_full_pipeline</span></span>(<span>self,<br>schema: dict[str, Any],<br>context: dict[str, Any],<br>languages: list[str] | None = None,<br>include_hardware: bool = True) ‑> <a title="atomik_sdk.pipeline.coordinator.CoordinatorResult" href="coordinator.html#atomik_sdk.pipeline.coordinator.CoordinatorResult">CoordinatorResult</a></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def dispatch_full_pipeline(
+    self,
+    schema: dict[str, Any],
+    context: dict[str, Any],
+    languages: list[str] | None = None,
+    include_hardware: bool = True,
+) -&gt; CoordinatorResult:
+    &#34;&#34;&#34;Decompose and dispatch a full pipeline run.&#34;&#34;&#34;
+    plan = self.decomposer.decompose_full_pipeline(
+        languages, include_hardware
+    )
+    return self._execute_plan(plan, schema, context)</code></pre>
+</details>
+<div class="desc"><p>Decompose and dispatch a full pipeline run.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.Coordinator.dispatch_generation"><code class="name flex">
+<span>def <span class="ident">dispatch_generation</span></span>(<span>self,<br>schema: dict[str, Any],<br>context: dict[str, Any],<br>languages: list[str] | None = None) ‑> <a title="atomik_sdk.pipeline.coordinator.CoordinatorResult" href="coordinator.html#atomik_sdk.pipeline.coordinator.CoordinatorResult">CoordinatorResult</a></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def dispatch_generation(
+    self,
+    schema: dict[str, Any],
+    context: dict[str, Any],
+    languages: list[str] | None = None,
+) -&gt; CoordinatorResult:
+    &#34;&#34;&#34;
+    Decompose and dispatch code generation to specialists.
+
+    Args:
+        schema: Parsed schema dict.
+        context: Execution context (config, manifests, etc.).
+        languages: Languages to generate (None = all).
+
+    Returns:
+        CoordinatorResult with per-language results and consensus.
+    &#34;&#34;&#34;
+    plan = self.decomposer.decompose_generation(languages)
+    return self._execute_plan(plan, schema, context)</code></pre>
+</details>
+<div class="desc"><p>Decompose and dispatch code generation to specialists.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>schema</code></strong></dt>
+<dd>Parsed schema dict.</dd>
+<dt><strong><code>context</code></strong></dt>
+<dd>Execution context (config, manifests, etc.).</dd>
+<dt><strong><code>languages</code></strong></dt>
+<dd>Languages to generate (None = all).</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>CoordinatorResult with per-language results and consensus.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.Coordinator.dispatch_verification"><code class="name flex">
+<span>def <span class="ident">dispatch_verification</span></span>(<span>self,<br>schema: dict[str, Any],<br>context: dict[str, Any],<br>languages: list[str] | None = None) ‑> <a title="atomik_sdk.pipeline.coordinator.CoordinatorResult" href="coordinator.html#atomik_sdk.pipeline.coordinator.CoordinatorResult">CoordinatorResult</a></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def dispatch_verification(
+    self,
+    schema: dict[str, Any],
+    context: dict[str, Any],
+    languages: list[str] | None = None,
+) -&gt; CoordinatorResult:
+    &#34;&#34;&#34;Decompose and dispatch verification to specialists.&#34;&#34;&#34;
+    plan = self.decomposer.decompose_verification(languages)
+    return self._execute_plan(plan, schema, context)</code></pre>
+</details>
+<div class="desc"><p>Decompose and dispatch verification to specialists.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.Coordinator.get_specialist_status"><code class="name flex">
+<span>def <span class="ident">get_specialist_status</span></span>(<span>self) ‑> list[dict[str, typing.Any]]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_specialist_status(self) -&gt; list[dict[str, Any]]:
+    &#34;&#34;&#34;Get the status of all registered specialists.&#34;&#34;&#34;
+    return self.registry.list_agents()</code></pre>
+</details>
+<div class="desc"><p>Get the status of all registered specialists.</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.pipeline.CoordinatorResult"><code class="flex name class">
+<span>class <span class="ident">CoordinatorResult</span></span>
+<span>(</span><span>success: bool = True,<br>subtask_results: list[SubtaskResult] = &lt;factory&gt;,<br>consensus: <a title="atomik_sdk.pipeline.ConsensusResult" href="#atomik_sdk.pipeline.ConsensusResult">ConsensusResult</a> | None = None,<br>total_tokens: int = 0,<br>total_duration_ms: float = 0.0,<br>parallel_speedup: float = 1.0)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass
+class CoordinatorResult:
+    &#34;&#34;&#34;Aggregated result from the coordinator.&#34;&#34;&#34;
+    success: bool = True
+    subtask_results: list[SubtaskResult] = field(default_factory=list)
+    consensus: ConsensusResult | None = None
+    total_tokens: int = 0
+    total_duration_ms: float = 0.0
+    parallel_speedup: float = 1.0
+
+    @property
+    def failed_count(self) -&gt; int:
+        return sum(1 for r in self.subtask_results if not r.success)
+
+    def to_dict(self) -&gt; dict[str, Any]:
+        return {
+            &#34;success&#34;: self.success,
+            &#34;subtask_count&#34;: len(self.subtask_results),
+            &#34;failed_count&#34;: self.failed_count,
+            &#34;total_tokens&#34;: self.total_tokens,
+            &#34;total_duration_ms&#34;: round(self.total_duration_ms, 1),
+            &#34;parallel_speedup&#34;: round(self.parallel_speedup, 2),
+            &#34;subtasks&#34;: [r.to_dict() for r in self.subtask_results],
+            &#34;consensus&#34;: self.consensus.to_dict() if self.consensus else None,
+        }</code></pre>
+</details>
+<div class="desc"><p>Aggregated result from the coordinator.</p></div>
+<h3>Instance variables</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.CoordinatorResult.consensus"><code class="name">var <span class="ident">consensus</span> : <a title="atomik_sdk.pipeline.consensus.ConsensusResult" href="consensus.html#atomik_sdk.pipeline.consensus.ConsensusResult">ConsensusResult</a> | None</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.CoordinatorResult.failed_count"><code class="name">prop <span class="ident">failed_count</span> : int</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def failed_count(self) -&gt; int:
+    return sum(1 for r in self.subtask_results if not r.success)</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.CoordinatorResult.parallel_speedup"><code class="name">var <span class="ident">parallel_speedup</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.CoordinatorResult.subtask_results"><code class="name">var <span class="ident">subtask_results</span> : list[<a title="atomik_sdk.pipeline.coordinator.SubtaskResult" href="coordinator.html#atomik_sdk.pipeline.coordinator.SubtaskResult">SubtaskResult</a>]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.CoordinatorResult.success"><code class="name">var <span class="ident">success</span> : bool</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.CoordinatorResult.total_duration_ms"><code class="name">var <span class="ident">total_duration_ms</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.CoordinatorResult.total_tokens"><code class="name">var <span class="ident">total_tokens</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.CoordinatorResult.to_dict"><code class="name flex">
+<span>def <span class="ident">to_dict</span></span>(<span>self) ‑> dict[str, typing.Any]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_dict(self) -&gt; dict[str, Any]:
+    return {
+        &#34;success&#34;: self.success,
+        &#34;subtask_count&#34;: len(self.subtask_results),
+        &#34;failed_count&#34;: self.failed_count,
+        &#34;total_tokens&#34;: self.total_tokens,
+        &#34;total_duration_ms&#34;: round(self.total_duration_ms, 1),
+        &#34;parallel_speedup&#34;: round(self.parallel_speedup, 2),
+        &#34;subtasks&#34;: [r.to_dict() for r in self.subtask_results],
+        &#34;consensus&#34;: self.consensus.to_dict() if self.consensus else None,
+    }</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.pipeline.CycleError"><code class="flex name class">
+<span>class <span class="ident">CycleError</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class CycleError(Exception):
+    &#34;&#34;&#34;Raised when a cycle is detected in the task DAG.&#34;&#34;&#34;</code></pre>
+</details>
+<div class="desc"><p>Raised when a cycle is detected in the task DAG.</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="atomik_sdk.pipeline.DAGTask"><code class="flex name class">
+<span>class <span class="ident">DAGTask</span></span>
+<span>(</span><span>task_id: str,<br>task_type: str,<br>dependencies: list[str] = &lt;factory&gt;,<br>state: <a title="atomik_sdk.pipeline.TaskState" href="#atomik_sdk.pipeline.TaskState">TaskState</a> = TaskState.PENDING,<br>metadata: dict[str, Any] = &lt;factory&gt;,<br>estimated_tokens: int = 0,<br>result: dict[str, Any] | None = None)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass
+class DAGTask:
+    &#34;&#34;&#34;A node in the task DAG.&#34;&#34;&#34;
+    task_id: str
+    task_type: str
+    dependencies: list[str] = field(default_factory=list)
+    state: TaskState = TaskState.PENDING
+    metadata: dict[str, Any] = field(default_factory=dict)
+    estimated_tokens: int = 0
+    result: dict[str, Any] | None = None
+
+    @property
+    def is_terminal(self) -&gt; bool:
+        return self.state in (TaskState.COMPLETED, TaskState.FAILED, TaskState.SKIPPED)
+
+    def to_dict(self) -&gt; dict[str, Any]:
+        return {
+            &#34;task_id&#34;: self.task_id,
+            &#34;task_type&#34;: self.task_type,
+            &#34;dependencies&#34;: self.dependencies,
+            &#34;state&#34;: self.state.value,
+            &#34;estimated_tokens&#34;: self.estimated_tokens,
+            &#34;metadata&#34;: self.metadata,
+        }</code></pre>
+</details>
+<div class="desc"><p>A node in the task DAG.</p></div>
+<h3>Instance variables</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.DAGTask.dependencies"><code class="name">var <span class="ident">dependencies</span> : list[str]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.DAGTask.estimated_tokens"><code class="name">var <span class="ident">estimated_tokens</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.DAGTask.is_terminal"><code class="name">prop <span class="ident">is_terminal</span> : bool</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def is_terminal(self) -&gt; bool:
+    return self.state in (TaskState.COMPLETED, TaskState.FAILED, TaskState.SKIPPED)</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.DAGTask.metadata"><code class="name">var <span class="ident">metadata</span> : dict[str, typing.Any]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.DAGTask.result"><code class="name">var <span class="ident">result</span> : dict[str, typing.Any] | None</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.DAGTask.state"><code class="name">var <span class="ident">state</span> : <a title="atomik_sdk.pipeline.dag.TaskState" href="dag.html#atomik_sdk.pipeline.dag.TaskState">TaskState</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.DAGTask.task_id"><code class="name">var <span class="ident">task_id</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.DAGTask.task_type"><code class="name">var <span class="ident">task_type</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.DAGTask.to_dict"><code class="name flex">
+<span>def <span class="ident">to_dict</span></span>(<span>self) ‑> dict[str, typing.Any]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_dict(self) -&gt; dict[str, Any]:
+    return {
+        &#34;task_id&#34;: self.task_id,
+        &#34;task_type&#34;: self.task_type,
+        &#34;dependencies&#34;: self.dependencies,
+        &#34;state&#34;: self.state.value,
+        &#34;estimated_tokens&#34;: self.estimated_tokens,
+        &#34;metadata&#34;: self.metadata,
+    }</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.pipeline.Event"><code class="flex name class">
+<span>class <span class="ident">Event</span></span>
+<span>(</span><span>event_type: <a title="atomik_sdk.pipeline.EventType" href="#atomik_sdk.pipeline.EventType">EventType</a>,<br>payload: dict[str, Any] = &lt;factory&gt;,<br>timestamp: str = '',<br>source: str = '')</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass
+class Event:
+    &#34;&#34;&#34;A typed event with payload.&#34;&#34;&#34;
+    event_type: EventType
+    payload: dict[str, Any] = field(default_factory=dict)
+    timestamp: str = &#34;&#34;
+    source: str = &#34;&#34;
+
+    def __post_init__(self) -&gt; None:
+        if not self.timestamp:
+            self.timestamp = time.strftime(&#34;%Y-%m-%dT%H:%M:%SZ&#34;, time.gmtime())
+
+    def to_dict(self) -&gt; dict[str, Any]:
+        return {
+            &#34;event_type&#34;: self.event_type.value,
+            &#34;payload&#34;: self.payload,
+            &#34;timestamp&#34;: self.timestamp,
+            &#34;source&#34;: self.source,
+        }</code></pre>
+</details>
+<div class="desc"><p>A typed event with payload.</p></div>
+<h3>Instance variables</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.Event.event_type"><code class="name">var <span class="ident">event_type</span> : <a title="atomik_sdk.pipeline.event_bus.EventType" href="event_bus.html#atomik_sdk.pipeline.event_bus.EventType">EventType</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.Event.payload"><code class="name">var <span class="ident">payload</span> : dict[str, typing.Any]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.Event.source"><code class="name">var <span class="ident">source</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.Event.timestamp"><code class="name">var <span class="ident">timestamp</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.Event.to_dict"><code class="name flex">
+<span>def <span class="ident">to_dict</span></span>(<span>self) ‑> dict[str, typing.Any]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_dict(self) -&gt; dict[str, Any]:
+    return {
+        &#34;event_type&#34;: self.event_type.value,
+        &#34;payload&#34;: self.payload,
+        &#34;timestamp&#34;: self.timestamp,
+        &#34;source&#34;: self.source,
+    }</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.pipeline.EventBus"><code class="flex name class">
+<span>class <span class="ident">EventBus</span></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class EventBus:
+    &#34;&#34;&#34;
+    Publish-subscribe event bus for pipeline orchestration.
+
+    Handlers subscribe to specific event types and are invoked
+    synchronously when events are emitted. Thread-safe for
+    concurrent stage execution.
+
+    Example:
+        &gt;&gt;&gt; bus = EventBus()
+        &gt;&gt;&gt; results = []
+        &gt;&gt;&gt; bus.subscribe(EventType.TASK_COMPLETED, lambda e: results.append(e))
+        &gt;&gt;&gt; bus.emit(Event(EventType.TASK_COMPLETED, {&#34;task_id&#34;: &#34;gen_python&#34;}))
+        &gt;&gt;&gt; assert len(results) == 1
+    &#34;&#34;&#34;
+
+    def __init__(self) -&gt; None:
+        self._handlers: dict[EventType, list[EventHandler]] = defaultdict(list)
+        self._history: list[Event] = []
+        self._lock = threading.Lock()
+
+    def subscribe(self, event_type: EventType, handler: EventHandler) -&gt; None:
+        &#34;&#34;&#34;Register a handler for an event type.&#34;&#34;&#34;
+        with self._lock:
+            self._handlers[event_type].append(handler)
+
+    def unsubscribe(self, event_type: EventType, handler: EventHandler) -&gt; None:
+        &#34;&#34;&#34;Remove a handler for an event type.&#34;&#34;&#34;
+        with self._lock:
+            handlers = self._handlers.get(event_type, [])
+            if handler in handlers:
+                handlers.remove(handler)
+
+    def emit(self, event: Event) -&gt; None:
+        &#34;&#34;&#34;
+        Emit an event to all subscribed handlers.
+
+        Handlers are invoked synchronously in subscription order.
+        &#34;&#34;&#34;
+        with self._lock:
+            self._history.append(event)
+            handlers = list(self._handlers.get(event.event_type, []))
+
+        # Invoke handlers outside lock to prevent deadlocks
+        for handler in handlers:
+            handler(event)
+
+    def get_history(self, event_type: EventType | None = None) -&gt; list[Event]:
+        &#34;&#34;&#34;Get event history, optionally filtered by type.&#34;&#34;&#34;
+        with self._lock:
+            if event_type is None:
+                return list(self._history)
+            return [e for e in self._history if e.event_type == event_type]
+
+    def clear_history(self) -&gt; None:
+        &#34;&#34;&#34;Clear the event history.&#34;&#34;&#34;
+        with self._lock:
+            self._history.clear()
+
+    def clear_all(self) -&gt; None:
+        &#34;&#34;&#34;Clear all handlers and history.&#34;&#34;&#34;
+        with self._lock:
+            self._handlers.clear()
+            self._history.clear()</code></pre>
+</details>
+<div class="desc"><p>Publish-subscribe event bus for pipeline orchestration.</p>
+<p>Handlers subscribe to specific event types and are invoked
+synchronously when events are emitted. Thread-safe for
+concurrent stage execution.</p>
+<h2 id="example">Example</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; bus = EventBus()
+&gt;&gt;&gt; results = []
+&gt;&gt;&gt; bus.subscribe(EventType.TASK_COMPLETED, lambda e: results.append(e))
+&gt;&gt;&gt; bus.emit(Event(EventType.TASK_COMPLETED, {&quot;task_id&quot;: &quot;gen_python&quot;}))
+&gt;&gt;&gt; assert len(results) == 1
+</code></pre></div>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.EventBus.clear_all"><code class="name flex">
+<span>def <span class="ident">clear_all</span></span>(<span>self) ‑> None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def clear_all(self) -&gt; None:
+    &#34;&#34;&#34;Clear all handlers and history.&#34;&#34;&#34;
+    with self._lock:
+        self._handlers.clear()
+        self._history.clear()</code></pre>
+</details>
+<div class="desc"><p>Clear all handlers and history.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.EventBus.clear_history"><code class="name flex">
+<span>def <span class="ident">clear_history</span></span>(<span>self) ‑> None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def clear_history(self) -&gt; None:
+    &#34;&#34;&#34;Clear the event history.&#34;&#34;&#34;
+    with self._lock:
+        self._history.clear()</code></pre>
+</details>
+<div class="desc"><p>Clear the event history.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.EventBus.emit"><code class="name flex">
+<span>def <span class="ident">emit</span></span>(<span>self,<br>event: <a title="atomik_sdk.pipeline.Event" href="#atomik_sdk.pipeline.Event">Event</a>) ‑> None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def emit(self, event: Event) -&gt; None:
+    &#34;&#34;&#34;
+    Emit an event to all subscribed handlers.
+
+    Handlers are invoked synchronously in subscription order.
+    &#34;&#34;&#34;
+    with self._lock:
+        self._history.append(event)
+        handlers = list(self._handlers.get(event.event_type, []))
+
+    # Invoke handlers outside lock to prevent deadlocks
+    for handler in handlers:
+        handler(event)</code></pre>
+</details>
+<div class="desc"><p>Emit an event to all subscribed handlers.</p>
+<p>Handlers are invoked synchronously in subscription order.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.EventBus.get_history"><code class="name flex">
+<span>def <span class="ident">get_history</span></span>(<span>self,<br>event_type: <a title="atomik_sdk.pipeline.EventType" href="#atomik_sdk.pipeline.EventType">EventType</a> | None = None) ‑> list[<a title="atomik_sdk.pipeline.event_bus.Event" href="event_bus.html#atomik_sdk.pipeline.event_bus.Event">Event</a>]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_history(self, event_type: EventType | None = None) -&gt; list[Event]:
+    &#34;&#34;&#34;Get event history, optionally filtered by type.&#34;&#34;&#34;
+    with self._lock:
+        if event_type is None:
+            return list(self._history)
+        return [e for e in self._history if e.event_type == event_type]</code></pre>
+</details>
+<div class="desc"><p>Get event history, optionally filtered by type.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.EventBus.subscribe"><code class="name flex">
+<span>def <span class="ident">subscribe</span></span>(<span>self,<br>event_type: <a title="atomik_sdk.pipeline.EventType" href="#atomik_sdk.pipeline.EventType">EventType</a>,<br>handler: EventHandler) ‑> None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def subscribe(self, event_type: EventType, handler: EventHandler) -&gt; None:
+    &#34;&#34;&#34;Register a handler for an event type.&#34;&#34;&#34;
+    with self._lock:
+        self._handlers[event_type].append(handler)</code></pre>
+</details>
+<div class="desc"><p>Register a handler for an event type.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.EventBus.unsubscribe"><code class="name flex">
+<span>def <span class="ident">unsubscribe</span></span>(<span>self,<br>event_type: <a title="atomik_sdk.pipeline.EventType" href="#atomik_sdk.pipeline.EventType">EventType</a>,<br>handler: EventHandler) ‑> None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def unsubscribe(self, event_type: EventType, handler: EventHandler) -&gt; None:
+    &#34;&#34;&#34;Remove a handler for an event type.&#34;&#34;&#34;
+    with self._lock:
+        handlers = self._handlers.get(event_type, [])
+        if handler in handlers:
+            handlers.remove(handler)</code></pre>
+</details>
+<div class="desc"><p>Remove a handler for an event type.</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.pipeline.EventType"><code class="flex name class">
+<span>class <span class="ident">EventType</span></span>
+<span>(</span><span>*args, **kwds)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class EventType(Enum):
+    &#34;&#34;&#34;Pipeline event types.&#34;&#34;&#34;
+    TASK_READY = &#34;task_ready&#34;
+    TASK_STARTED = &#34;task_started&#34;
+    TASK_COMPLETED = &#34;task_completed&#34;
+    TASK_FAILED = &#34;task_failed&#34;
+    FEEDBACK_START = &#34;feedback_start&#34;
+    FEEDBACK_RESULT = &#34;feedback_result&#34;
+    BUDGET_WARNING = &#34;budget_warning&#34;
+    REGRESSION_ALERT = &#34;regression_alert&#34;
+    PIPELINE_DONE = &#34;pipeline_done&#34;</code></pre>
+</details>
+<div class="desc"><p>Pipeline event types.</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.EventType.BUDGET_WARNING"><code class="name">var <span class="ident">BUDGET_WARNING</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.EventType.FEEDBACK_RESULT"><code class="name">var <span class="ident">FEEDBACK_RESULT</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.EventType.FEEDBACK_START"><code class="name">var <span class="ident">FEEDBACK_START</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.EventType.PIPELINE_DONE"><code class="name">var <span class="ident">PIPELINE_DONE</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.EventType.REGRESSION_ALERT"><code class="name">var <span class="ident">REGRESSION_ALERT</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.EventType.TASK_COMPLETED"><code class="name">var <span class="ident">TASK_COMPLETED</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.EventType.TASK_FAILED"><code class="name">var <span class="ident">TASK_FAILED</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.EventType.TASK_READY"><code class="name">var <span class="ident">TASK_READY</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.EventType.TASK_STARTED"><code class="name">var <span class="ident">TASK_STARTED</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.pipeline.Orchestrator"><code class="flex name class">
+<span>class <span class="ident">Orchestrator</span></span>
+<span>(</span><span>max_workers: int = 1)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Orchestrator:
+    &#34;&#34;&#34;
+    Event-driven DAG orchestrator for the pipeline.
+
+    Builds a task DAG from registered stages and their declared
+    dependencies, dispatches ready tasks (potentially in parallel),
+    and reacts to completion/failure events.
+
+    When the DAG degenerates to a linear chain (all stages depend
+    on the previous), behavior is identical to Phase 4C sequential
+    execution.
+
+    Example:
+        &gt;&gt;&gt; orch = Orchestrator()
+        &gt;&gt;&gt; orch.register_stage(validate_stage)
+        &gt;&gt;&gt; orch.register_stage(generate_stage, dependencies=[&#34;validate&#34;])
+        &gt;&gt;&gt; result = orch.execute(schema, schema_path, config)
+    &#34;&#34;&#34;
+
+    def __init__(self, max_workers: int = 1) -&gt; None:
+        self.event_bus = EventBus()
+        self.max_workers = max_workers
+        self._stages: dict[str, BaseStage] = {}
+        self._stage_deps: dict[str, list[str]] = {}
+        self._manifests: dict[str, StageManifest] = {}
+
+    def register_stage(
+        self,
+        stage: BaseStage,
+        dependencies: list[str] | None = None,
+    ) -&gt; None:
+        &#34;&#34;&#34;
+        Register a pipeline stage with its dependencies.
+
+        Args:
+            stage: The stage to register.
+            dependencies: Stage names that must complete before this stage.
+        &#34;&#34;&#34;
+        self._stages[stage.name] = stage
+        self._stage_deps[stage.name] = dependencies or []
+
+    def build_dag(self) -&gt; TaskDAG:
+        &#34;&#34;&#34;
+        Build a task DAG from registered stages and their dependencies.
+
+        Returns:
+            TaskDAG ready for execution.
+
+        Raises:
+            CycleError: If stage dependencies form a cycle.
+            ValueError: If a dependency references an unregistered stage.
+        &#34;&#34;&#34;
+        dag = TaskDAG()
+
+        # Sort stages topologically by inserting in dependency order
+        added: set[str] = set()
+        to_add = list(self._stages.keys())
+
+        while to_add:
+            progress = False
+            remaining = []
+            for name in to_add:
+                deps = self._stage_deps.get(name, [])
+                if all(d in added for d in deps):
+                    dag.add_task(
+                        task_id=name,
+                        task_type=&#34;stage&#34;,
+                        dependencies=deps,
+                    )
+                    added.add(name)
+                    progress = True
+                else:
+                    remaining.append(name)
+            to_add = remaining
+            if not progress and to_add:
+                raise CycleError(
+                    f&#34;Circular dependencies among stages: {to_add}&#34;
+                )
+
+        return dag
+
+    def execute(
+        self,
+        schema: dict[str, Any],
+        schema_path: str,
+        config: Any,
+    ) -&gt; dict[str, StageManifest]:
+        &#34;&#34;&#34;
+        Execute the pipeline DAG.
+
+        Dispatches ready tasks, waits for completion, and continues
+        until all tasks reach a terminal state or a failure aborts
+        the pipeline.
+
+        Args:
+            schema: Parsed schema dict.
+            schema_path: Path to the schema file.
+            config: Pipeline configuration.
+
+        Returns:
+            Dict mapping stage names to their StageManifest results.
+        &#34;&#34;&#34;
+        dag = self.build_dag()
+        self._manifests.clear()
+
+        self.event_bus.emit(Event(
+            EventType.PIPELINE_DONE,
+            {&#34;status&#34;: &#34;started&#34;, &#34;tasks&#34;: len(dag.get_all_tasks())},
+            source=&#34;orchestrator&#34;,
+        ))
+
+        if self.max_workers &gt; 1:
+            self._execute_parallel(dag, schema, schema_path, config)
+        else:
+            self._execute_sequential(dag, schema, schema_path, config)
+
+        status = &#34;success&#34; if not dag.has_failures() else &#34;failed&#34;
+        self.event_bus.emit(Event(
+            EventType.PIPELINE_DONE,
+            {&#34;status&#34;: status, &#34;stages_completed&#34;: len(self._manifests)},
+            source=&#34;orchestrator&#34;,
+        ))
+
+        return dict(self._manifests)
+
+    def _execute_sequential(
+        self,
+        dag: TaskDAG,
+        schema: dict[str, Any],
+        schema_path: str,
+        config: Any,
+    ) -&gt; None:
+        &#34;&#34;&#34;Execute DAG tasks sequentially in topological order.&#34;&#34;&#34;
+        order = dag.topological_order()
+
+        for task_id in order:
+            task = dag.get_task(task_id)
+            if task is None:
+                continue
+
+            # Check if any dependency failed
+            if self._any_dep_failed(task, dag):
+                dag.mark_skipped(task_id)
+                continue
+
+            self._run_stage_task(task, dag, schema, schema_path, config)
+
+            # Abort on failure (preserves Phase 4C behavior)
+            if task.state == TaskState.FAILED:
+                # Skip remaining tasks
+                for remaining_id in order[order.index(task_id) + 1:]:
+                    dag.mark_skipped(remaining_id)
+                break
+
+            # Handle short-circuit (diff stage returns SKIPPED)
+            manifest = self._manifests.get(task_id)
+            if manifest and manifest.status == StageStatus.SKIPPED:
+                for remaining_id in order[order.index(task_id) + 1:]:
+                    dag.mark_skipped(remaining_id)
+                break
+
+    def _execute_parallel(
+        self,
+        dag: TaskDAG,
+        schema: dict[str, Any],
+        schema_path: str,
+        config: Any,
+    ) -&gt; None:
+        &#34;&#34;&#34;Execute DAG tasks with parallel dispatch of independent tasks.&#34;&#34;&#34;
+        with ThreadPoolExecutor(max_workers=self.max_workers) as pool:
+            futures: dict[str, Future] = {}
+
+            while not dag.is_complete():
+                ready = dag.get_ready_tasks()
+
+                if not ready and not futures:
+                    # No ready tasks and no running tasks -- deadlock or done
+                    break
+
+                # Dispatch ready tasks
+                for task in ready:
+                    dag.mark_running(task.task_id)
+                    self.event_bus.emit(Event(
+                        EventType.TASK_STARTED,
+                        {&#34;task_id&#34;: task.task_id},
+                        source=&#34;orchestrator&#34;,
+                    ))
+                    future = pool.submit(
+                        self._run_stage_task,
+                        task, dag, schema, schema_path, config,
+                    )
+                    futures[task.task_id] = future
+
+                # Wait for at least one future to complete
+                if futures:
+                    done_ids = []
+                    for tid, fut in futures.items():
+                        if fut.done():
+                            done_ids.append(tid)
+
+                    if not done_ids:
+                        # Wait for any one to finish
+                        next_id = next(iter(futures))
+                        futures[next_id].result()
+                        done_ids.append(next_id)
+
+                    for tid in done_ids:
+                        del futures[tid]
+
+                    # Check for abort conditions
+                    if dag.has_failures():
+                        # Cancel pending tasks
+                        for task in dag.get_all_tasks():
+                            if task.state == TaskState.PENDING:
+                                dag.mark_skipped(task.task_id)
+                        break
+
+    def _run_stage_task(
+        self,
+        task: DAGTask,
+        dag: TaskDAG,
+        schema: dict[str, Any],
+        schema_path: str,
+        config: Any,
+    ) -&gt; None:
+        &#34;&#34;&#34;Execute a single stage task.&#34;&#34;&#34;
+        stage = self._stages.get(task.task_id)
+        if stage is None:
+            dag.mark_failed(task.task_id, {&#34;error&#34;: f&#34;No stage: {task.task_id}&#34;})
+            return
+
+        dag.mark_running(task.task_id)
+        self.event_bus.emit(Event(
+            EventType.TASK_STARTED,
+            {&#34;task_id&#34;: task.task_id, &#34;task_type&#34;: task.task_type},
+            source=&#34;orchestrator&#34;,
+        ))
+
+        # Get the previous manifest (from last completed dependency)
+        previous_manifest = self._get_previous_manifest(task)
+
+        manifest = stage.execute(schema, schema_path, previous_manifest, config)
+        self._manifests[task.task_id] = manifest
+
+        if manifest.status == StageStatus.FAILED:
+            dag.mark_failed(task.task_id, manifest.to_dict())
+            self.event_bus.emit(Event(
+                EventType.TASK_FAILED,
+                {
+                    &#34;task_id&#34;: task.task_id,
+                    &#34;errors&#34;: manifest.errors,
+                },
+                source=&#34;orchestrator&#34;,
+            ))
+        else:
+            dag.mark_completed(task.task_id, manifest.to_dict())
+            self.event_bus.emit(Event(
+                EventType.TASK_COMPLETED,
+                {
+                    &#34;task_id&#34;: task.task_id,
+                    &#34;duration_ms&#34;: manifest.duration_ms,
+                    &#34;tokens_consumed&#34;: manifest.tokens_consumed,
+                },
+                source=&#34;orchestrator&#34;,
+            ))
+
+    def _get_previous_manifest(self, task: DAGTask) -&gt; StageManifest | None:
+        &#34;&#34;&#34;Get the manifest from the last dependency (for stage input).&#34;&#34;&#34;
+        for dep in reversed(task.dependencies):
+            if dep in self._manifests:
+                return self._manifests[dep]
+        return None
+
+    def _any_dep_failed(self, task: DAGTask, dag: TaskDAG) -&gt; bool:
+        &#34;&#34;&#34;Check if any dependency of a task has failed.&#34;&#34;&#34;
+        for dep_id in task.dependencies:
+            dep = dag.get_task(dep_id)
+            if dep and dep.state == TaskState.FAILED:
+                return True
+        return False
+
+    def get_manifests(self) -&gt; dict[str, StageManifest]:
+        &#34;&#34;&#34;Get all stage manifests produced during execution.&#34;&#34;&#34;
+        return dict(self._manifests)
+
+    def get_event_history(self) -&gt; list[dict[str, Any]]:
+        &#34;&#34;&#34;Get the event history for reporting.&#34;&#34;&#34;
+        return [e.to_dict() for e in self.event_bus.get_history()]
+
+    def set_coordinator(self, coordinator: Any) -&gt; None:
+        &#34;&#34;&#34;
+        Set a coordinator for specialist-based dispatch.
+
+        When a coordinator is set, the orchestrator delegates
+        generation and verification stages to the coordinator
+        for parallel specialist dispatch.
+
+        Args:
+            coordinator: A Coordinator instance.
+        &#34;&#34;&#34;
+        self._coordinator = coordinator
+
+    @property
+    def has_coordinator(self) -&gt; bool:
+        &#34;&#34;&#34;Check if a coordinator is configured.&#34;&#34;&#34;
+        return hasattr(self, &#34;_coordinator&#34;) and self._coordinator is not None
+
+    def apply_tuning(self, tuning_results: list[dict[str, Any]]) -&gt; list[str]:
+        &#34;&#34;&#34;
+        Apply tuning recommendations from the self-optimizer.
+
+        Args:
+            tuning_results: List of TuningResult dicts from optimizer.
+
+        Returns:
+            List of applied parameter names.
+        &#34;&#34;&#34;
+        applied = []
+        for result in tuning_results:
+            param = result.get(&#34;parameter&#34;, &#34;&#34;)
+            new_value = result.get(&#34;new_value&#34;)
+            if param == &#34;max_workers&#34; and isinstance(new_value, int):
+                self.max_workers = max(1, min(8, new_value))
+                applied.append(param)
+        return applied</code></pre>
+</details>
+<div class="desc"><p>Event-driven DAG orchestrator for the pipeline.</p>
+<p>Builds a task DAG from registered stages and their declared
+dependencies, dispatches ready tasks (potentially in parallel),
+and reacts to completion/failure events.</p>
+<p>When the DAG degenerates to a linear chain (all stages depend
+on the previous), behavior is identical to Phase 4C sequential
+execution.</p>
+<h2 id="example">Example</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; orch = Orchestrator()
+&gt;&gt;&gt; orch.register_stage(validate_stage)
+&gt;&gt;&gt; orch.register_stage(generate_stage, dependencies=[&quot;validate&quot;])
+&gt;&gt;&gt; result = orch.execute(schema, schema_path, config)
+</code></pre></div>
+<h3>Instance variables</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.Orchestrator.has_coordinator"><code class="name">prop <span class="ident">has_coordinator</span> : bool</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def has_coordinator(self) -&gt; bool:
+    &#34;&#34;&#34;Check if a coordinator is configured.&#34;&#34;&#34;
+    return hasattr(self, &#34;_coordinator&#34;) and self._coordinator is not None</code></pre>
+</details>
+<div class="desc"><p>Check if a coordinator is configured.</p></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.Orchestrator.apply_tuning"><code class="name flex">
+<span>def <span class="ident">apply_tuning</span></span>(<span>self, tuning_results: list[dict[str, Any]]) ‑> list[str]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def apply_tuning(self, tuning_results: list[dict[str, Any]]) -&gt; list[str]:
+    &#34;&#34;&#34;
+    Apply tuning recommendations from the self-optimizer.
+
+    Args:
+        tuning_results: List of TuningResult dicts from optimizer.
+
+    Returns:
+        List of applied parameter names.
+    &#34;&#34;&#34;
+    applied = []
+    for result in tuning_results:
+        param = result.get(&#34;parameter&#34;, &#34;&#34;)
+        new_value = result.get(&#34;new_value&#34;)
+        if param == &#34;max_workers&#34; and isinstance(new_value, int):
+            self.max_workers = max(1, min(8, new_value))
+            applied.append(param)
+    return applied</code></pre>
+</details>
+<div class="desc"><p>Apply tuning recommendations from the self-optimizer.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>tuning_results</code></strong></dt>
+<dd>List of TuningResult dicts from optimizer.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>List of applied parameter names.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.Orchestrator.build_dag"><code class="name flex">
+<span>def <span class="ident">build_dag</span></span>(<span>self) ‑> <a title="atomik_sdk.pipeline.dag.TaskDAG" href="dag.html#atomik_sdk.pipeline.dag.TaskDAG">TaskDAG</a></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def build_dag(self) -&gt; TaskDAG:
+    &#34;&#34;&#34;
+    Build a task DAG from registered stages and their dependencies.
+
+    Returns:
+        TaskDAG ready for execution.
+
+    Raises:
+        CycleError: If stage dependencies form a cycle.
+        ValueError: If a dependency references an unregistered stage.
+    &#34;&#34;&#34;
+    dag = TaskDAG()
+
+    # Sort stages topologically by inserting in dependency order
+    added: set[str] = set()
+    to_add = list(self._stages.keys())
+
+    while to_add:
+        progress = False
+        remaining = []
+        for name in to_add:
+            deps = self._stage_deps.get(name, [])
+            if all(d in added for d in deps):
+                dag.add_task(
+                    task_id=name,
+                    task_type=&#34;stage&#34;,
+                    dependencies=deps,
+                )
+                added.add(name)
+                progress = True
+            else:
+                remaining.append(name)
+        to_add = remaining
+        if not progress and to_add:
+            raise CycleError(
+                f&#34;Circular dependencies among stages: {to_add}&#34;
+            )
+
+    return dag</code></pre>
+</details>
+<div class="desc"><p>Build a task DAG from registered stages and their dependencies.</p>
+<h2 id="returns">Returns</h2>
+<p>TaskDAG ready for execution.</p>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code><a title="atomik_sdk.pipeline.CycleError" href="#atomik_sdk.pipeline.CycleError">CycleError</a></code></dt>
+<dd>If stage dependencies form a cycle.</dd>
+<dt><code>ValueError</code></dt>
+<dd>If a dependency references an unregistered stage.</dd>
+</dl></div>
+</dd>
+<dt id="atomik_sdk.pipeline.Orchestrator.execute"><code class="name flex">
+<span>def <span class="ident">execute</span></span>(<span>self, schema: dict[str, Any], schema_path: str, config: Any) ‑> dict[str, <a title="atomik_sdk.pipeline.stages.StageManifest" href="stages/index.html#atomik_sdk.pipeline.stages.StageManifest">StageManifest</a>]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def execute(
+    self,
+    schema: dict[str, Any],
+    schema_path: str,
+    config: Any,
+) -&gt; dict[str, StageManifest]:
+    &#34;&#34;&#34;
+    Execute the pipeline DAG.
+
+    Dispatches ready tasks, waits for completion, and continues
+    until all tasks reach a terminal state or a failure aborts
+    the pipeline.
+
+    Args:
+        schema: Parsed schema dict.
+        schema_path: Path to the schema file.
+        config: Pipeline configuration.
+
+    Returns:
+        Dict mapping stage names to their StageManifest results.
+    &#34;&#34;&#34;
+    dag = self.build_dag()
+    self._manifests.clear()
+
+    self.event_bus.emit(Event(
+        EventType.PIPELINE_DONE,
+        {&#34;status&#34;: &#34;started&#34;, &#34;tasks&#34;: len(dag.get_all_tasks())},
+        source=&#34;orchestrator&#34;,
+    ))
+
+    if self.max_workers &gt; 1:
+        self._execute_parallel(dag, schema, schema_path, config)
+    else:
+        self._execute_sequential(dag, schema, schema_path, config)
+
+    status = &#34;success&#34; if not dag.has_failures() else &#34;failed&#34;
+    self.event_bus.emit(Event(
+        EventType.PIPELINE_DONE,
+        {&#34;status&#34;: status, &#34;stages_completed&#34;: len(self._manifests)},
+        source=&#34;orchestrator&#34;,
+    ))
+
+    return dict(self._manifests)</code></pre>
+</details>
+<div class="desc"><p>Execute the pipeline DAG.</p>
+<p>Dispatches ready tasks, waits for completion, and continues
+until all tasks reach a terminal state or a failure aborts
+the pipeline.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>schema</code></strong></dt>
+<dd>Parsed schema dict.</dd>
+<dt><strong><code>schema_path</code></strong></dt>
+<dd>Path to the schema file.</dd>
+<dt><strong><code>config</code></strong></dt>
+<dd>Pipeline configuration.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>Dict mapping stage names to their StageManifest results.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.Orchestrator.get_event_history"><code class="name flex">
+<span>def <span class="ident">get_event_history</span></span>(<span>self) ‑> list[dict[str, typing.Any]]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_event_history(self) -&gt; list[dict[str, Any]]:
+    &#34;&#34;&#34;Get the event history for reporting.&#34;&#34;&#34;
+    return [e.to_dict() for e in self.event_bus.get_history()]</code></pre>
+</details>
+<div class="desc"><p>Get the event history for reporting.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.Orchestrator.get_manifests"><code class="name flex">
+<span>def <span class="ident">get_manifests</span></span>(<span>self) ‑> dict[str, <a title="atomik_sdk.pipeline.stages.StageManifest" href="stages/index.html#atomik_sdk.pipeline.stages.StageManifest">StageManifest</a>]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_manifests(self) -&gt; dict[str, StageManifest]:
+    &#34;&#34;&#34;Get all stage manifests produced during execution.&#34;&#34;&#34;
+    return dict(self._manifests)</code></pre>
+</details>
+<div class="desc"><p>Get all stage manifests produced during execution.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.Orchestrator.register_stage"><code class="name flex">
+<span>def <span class="ident">register_stage</span></span>(<span>self, stage: BaseStage, dependencies: list[str] | None = None) ‑> None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def register_stage(
+    self,
+    stage: BaseStage,
+    dependencies: list[str] | None = None,
+) -&gt; None:
+    &#34;&#34;&#34;
+    Register a pipeline stage with its dependencies.
+
+    Args:
+        stage: The stage to register.
+        dependencies: Stage names that must complete before this stage.
+    &#34;&#34;&#34;
+    self._stages[stage.name] = stage
+    self._stage_deps[stage.name] = dependencies or []</code></pre>
+</details>
+<div class="desc"><p>Register a pipeline stage with its dependencies.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>stage</code></strong></dt>
+<dd>The stage to register.</dd>
+<dt><strong><code>dependencies</code></strong></dt>
+<dd>Stage names that must complete before this stage.</dd>
+</dl></div>
+</dd>
+<dt id="atomik_sdk.pipeline.Orchestrator.set_coordinator"><code class="name flex">
+<span>def <span class="ident">set_coordinator</span></span>(<span>self, coordinator: Any) ‑> None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def set_coordinator(self, coordinator: Any) -&gt; None:
+    &#34;&#34;&#34;
+    Set a coordinator for specialist-based dispatch.
+
+    When a coordinator is set, the orchestrator delegates
+    generation and verification stages to the coordinator
+    for parallel specialist dispatch.
+
+    Args:
+        coordinator: A Coordinator instance.
+    &#34;&#34;&#34;
+    self._coordinator = coordinator</code></pre>
+</details>
+<div class="desc"><p>Set a coordinator for specialist-based dispatch.</p>
+<p>When a coordinator is set, the orchestrator delegates
+generation and verification stages to the coordinator
+for parallel specialist dispatch.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>coordinator</code></strong></dt>
+<dd>A Coordinator instance.</dd>
+</dl></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.pipeline.Pipeline"><code class="flex name class">
+<span>class <span class="ident">Pipeline</span></span>
+<span>(</span><span>config: <a title="atomik_sdk.pipeline.PipelineConfig" href="#atomik_sdk.pipeline.PipelineConfig">PipelineConfig</a> | None = None)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Pipeline:
+    &#34;&#34;&#34;
+    Autonomous pipeline controller.
+
+    Dispatches work through a sequence of stages, tracks progress,
+    manages token budgets, and produces structured reports.
+
+    Example:
+        &gt;&gt;&gt; pipeline = Pipeline()
+        &gt;&gt;&gt; result = pipeline.run(&#34;sdk/schemas/domains/video-h264-delta.json&#34;)
+        &gt;&gt;&gt; print(f&#34;Success: {result.success}, Files: {result.files_generated}&#34;)
+    &#34;&#34;&#34;
+
+    # Default stage ordering
+    STAGE_ORDER = [
+        &#34;validate&#34;,
+        &#34;diff&#34;,
+        &#34;generate&#34;,
+        &#34;verify&#34;,
+        &#34;hardware&#34;,
+        &#34;metrics&#34;,
+    ]
+
+    def __init__(self, config: PipelineConfig | None = None):
+        self.config = config or PipelineConfig()
+        self._stages: dict[str, BaseStage] = {}
+        self._stage_deps: dict[str, list[str]] = {}
+        self._results: list[PipelineResult] = []
+
+    def register_stage(
+        self, stage: BaseStage, dependencies: list[str] | None = None
+    ) -&gt; None:
+        &#34;&#34;&#34;Register a pipeline stage with optional dependencies.&#34;&#34;&#34;
+        self._stages[stage.name] = stage
+        if dependencies is not None:
+            self._stage_deps[stage.name] = dependencies
+
+    def run(self, schema_path: str | Path) -&gt; PipelineResult:
+        &#34;&#34;&#34;
+        Execute the full pipeline on a single schema.
+
+        Args:
+            schema_path: Path to schema JSON file.
+
+        Returns:
+            PipelineResult with per-stage results and aggregate metrics.
+        &#34;&#34;&#34;
+        schema_path = Path(schema_path)
+        result = PipelineResult(schema=schema_path.name, success=True)
+        start = time.perf_counter()
+
+        # Load schema
+        try:
+            with open(schema_path, encoding=&#34;utf-8&#34;) as f:
+                schema = json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError) as e:
+            result.success = False
+            result.errors.append(f&#34;Schema load failed: {e}&#34;)
+            return result
+
+        if self.config.verbose:
+            print(f&#34;Pipeline: processing {schema_path.name}&#34;)
+
+        if self.config.dry_run:
+            return self._dry_run(schema, str(schema_path), result)
+
+        # Delegate to orchestrator when enabled
+        if self.config.use_orchestrator:
+            return self._run_orchestrated(schema, str(schema_path), result, start)
+
+        # Execute stages in order (Phase 4C sequential mode)
+        previous_manifest = None
+        for stage_name in self.STAGE_ORDER:
+            stage = self._stages.get(stage_name)
+            if stage is None:
+                continue
+
+            # Check token budget before each stage
+            if self.config.token_budget is not None:
+                spent = sum(s.tokens_consumed for s in result.stages)
+                if spent &gt;= self.config.token_budget:
+                    result.errors.append(
+                        f&#34;Token budget exhausted ({spent}/{self.config.token_budget})&#34;
+                    )
+                    result.success = False
+                    break
+
+            if self.config.verbose:
+                print(f&#34;  Stage: {stage_name}...&#34;)
+
+            manifest = stage.execute(
+                schema, str(schema_path), previous_manifest, self.config
+            )
+            result.stages.append(manifest)
+
+            if self.config.verbose:
+                status = manifest.status.value.upper()
+                ms = round(manifest.duration_ms, 1)
+                print(f&#34;  Stage: {stage_name} -&gt; {status} ({ms}ms)&#34;)
+
+            # Abort pipeline on failure (unless skipped)
+            if manifest.status == StageStatus.FAILED:
+                result.success = False
+                result.errors.extend(manifest.errors)
+                break
+
+            # Propagate short-circuit from diff stage
+            if manifest.status == StageStatus.SKIPPED:
+                if self.config.verbose:
+                    reason = manifest.metrics.get(&#34;skip_reason&#34;, &#34;up-to-date&#34;)
+                    print(f&#34;  Pipeline short-circuited: {reason}&#34;)
+                break
+
+            previous_manifest = manifest
+
+        # Aggregate metrics
+        result.total_time_ms = (time.perf_counter() - start) * 1000
+        result.total_tokens = sum(s.tokens_consumed for s in result.stages)
+
+        for stage in result.stages:
+            result.files_generated += stage.metrics.get(&#34;files_generated&#34;, 0)
+            result.lines_generated += stage.metrics.get(&#34;lines_generated&#34;, 0)
+
+        # Determine validation level from hardware stage
+        hw_stages = [s for s in result.stages if s.stage == &#34;hardware&#34;]
+        if hw_stages:
+            result.validation_level = hw_stages[0].validation_level
+        else:
+            verify_stages = [s for s in result.stages if s.stage == &#34;verify&#34;]
+            if verify_stages and verify_stages[0].success:
+                result.validation_level = &#34;sw_verified&#34;
+
+        self._results.append(result)
+
+        # Write report if requested
+        if self.config.report_path:
+            self._write_report(result)
+
+        return result
+
+    def run_batch(self, directory: str | Path) -&gt; list[PipelineResult]:
+        &#34;&#34;&#34;
+        Execute the pipeline on all schemas in a directory.
+
+        Args:
+            directory: Path to directory containing schema JSON files.
+
+        Returns:
+            List of PipelineResult for each schema.
+        &#34;&#34;&#34;
+        directory = Path(directory)
+        schemas = sorted(directory.glob(&#34;*.json&#34;))
+
+        if not schemas:
+            return []
+
+        if self.config.verbose:
+            print(f&#34;Pipeline: batch processing {len(schemas)} schema(s)&#34;)
+
+        results = []
+        for schema_path in schemas:
+            result = self.run(schema_path)
+            results.append(result)
+
+        return results
+
+    def _dry_run(
+        self, schema: dict[str, Any], schema_path: str, result: PipelineResult
+    ) -&gt; PipelineResult:
+        &#34;&#34;&#34;Show what would be done without executing.&#34;&#34;&#34;
+        catalogue = schema.get(&#34;catalogue&#34;, {})
+        ns = f&#34;{catalogue.get(&#39;vertical&#39;)}.{catalogue.get(&#39;field&#39;)}.{catalogue.get(&#39;object&#39;)}&#34;
+
+        print(f&#34;Dry run for: {result.schema}&#34;)
+        print(f&#34;  Namespace: {ns}&#34;)
+        print(f&#34;  Stages: {&#39;, &#39;.join(self.STAGE_ORDER)}&#34;)
+        print(f&#34;  Languages: {self.config.languages or &#39;all&#39;}&#34;)
+        print(f&#34;  Output: {self.config.output_dir}&#34;)
+
+        registered = list(self._stages.keys())
+        missing = [s for s in self.STAGE_ORDER if s not in registered]
+        if missing:
+            print(f&#34;  Missing stages: {&#39;, &#39;.join(missing)}&#34;)
+
+        return result
+
+    def _write_report(self, result: PipelineResult) -&gt; None:
+        &#34;&#34;&#34;Write pipeline report to JSON file.&#34;&#34;&#34;
+        path = Path(self.config.report_path)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with open(path, &#34;w&#34;, encoding=&#34;utf-8&#34;) as f:
+            json.dump(result.to_dict(), f, indent=2)
+
+    def _run_orchestrated(
+        self,
+        schema: dict[str, Any],
+        schema_path: str,
+        result: PipelineResult,
+        start: float,
+    ) -&gt; PipelineResult:
+        &#34;&#34;&#34;Execute pipeline via the event-driven orchestrator.&#34;&#34;&#34;
+        from .orchestrator import Orchestrator
+
+        orch = Orchestrator(max_workers=self.config.max_workers)
+
+        # Build default linear dependencies if none declared
+        if not self._stage_deps:
+            prev = None
+            for name in self.STAGE_ORDER:
+                if name in self._stages:
+                    deps = [prev] if prev else []
+                    self._stage_deps[name] = deps
+                    prev = name
+
+        for name, stage in self._stages.items():
+            deps = self._stage_deps.get(name, [])
+            orch.register_stage(stage, dependencies=deps)
+
+        manifests = orch.execute(schema, schema_path, self.config)
+
+        # Convert orchestrator output to PipelineResult
+        for stage_name in self.STAGE_ORDER:
+            if stage_name in manifests:
+                result.stages.append(manifests[stage_name])
+
+        # Check for failures
+        for manifest in result.stages:
+            if manifest.status == StageStatus.FAILED:
+                result.success = False
+                result.errors.extend(manifest.errors)
+
+        # Aggregate metrics
+        result.total_time_ms = (time.perf_counter() - start) * 1000
+        result.total_tokens = sum(s.tokens_consumed for s in result.stages)
+
+        for stage in result.stages:
+            result.files_generated += stage.metrics.get(&#34;files_generated&#34;, 0)
+            result.lines_generated += stage.metrics.get(&#34;lines_generated&#34;, 0)
+
+        # Determine validation level
+        hw_stages = [s for s in result.stages if s.stage == &#34;hardware&#34;]
+        if hw_stages:
+            result.validation_level = hw_stages[0].validation_level
+        else:
+            verify_stages = [s for s in result.stages if s.stage == &#34;verify&#34;]
+            if verify_stages and verify_stages[0].success:
+                result.validation_level = &#34;sw_verified&#34;
+
+        self._results.append(result)
+
+        if self.config.report_path:
+            self._write_report(result)
+
+        return result
+
+    def get_status(self) -&gt; dict[str, Any]:
+        &#34;&#34;&#34;Get current pipeline status summary.&#34;&#34;&#34;
+        return {
+            &#34;total_runs&#34;: len(self._results),
+            &#34;successful&#34;: sum(1 for r in self._results if r.success),
+            &#34;failed&#34;: sum(1 for r in self._results if not r.success),
+            &#34;total_tokens&#34;: sum(r.total_tokens for r in self._results),
+            &#34;total_files&#34;: sum(r.files_generated for r in self._results),
+            &#34;stages_registered&#34;: list(self._stages.keys()),
+        }</code></pre>
+</details>
+<div class="desc"><p>Autonomous pipeline controller.</p>
+<p>Dispatches work through a sequence of stages, tracks progress,
+manages token budgets, and produces structured reports.</p>
+<h2 id="example">Example</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; pipeline = Pipeline()
+&gt;&gt;&gt; result = pipeline.run(&quot;sdk/schemas/domains/video-h264-delta.json&quot;)
+&gt;&gt;&gt; print(f&quot;Success: {result.success}, Files: {result.files_generated}&quot;)
+</code></pre></div>
+<h3>Class variables</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.Pipeline.STAGE_ORDER"><code class="name">var <span class="ident">STAGE_ORDER</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.Pipeline.get_status"><code class="name flex">
+<span>def <span class="ident">get_status</span></span>(<span>self) ‑> dict[str, typing.Any]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_status(self) -&gt; dict[str, Any]:
+    &#34;&#34;&#34;Get current pipeline status summary.&#34;&#34;&#34;
+    return {
+        &#34;total_runs&#34;: len(self._results),
+        &#34;successful&#34;: sum(1 for r in self._results if r.success),
+        &#34;failed&#34;: sum(1 for r in self._results if not r.success),
+        &#34;total_tokens&#34;: sum(r.total_tokens for r in self._results),
+        &#34;total_files&#34;: sum(r.files_generated for r in self._results),
+        &#34;stages_registered&#34;: list(self._stages.keys()),
+    }</code></pre>
+</details>
+<div class="desc"><p>Get current pipeline status summary.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.Pipeline.register_stage"><code class="name flex">
+<span>def <span class="ident">register_stage</span></span>(<span>self, stage: BaseStage, dependencies: list[str] | None = None) ‑> None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def register_stage(
+    self, stage: BaseStage, dependencies: list[str] | None = None
+) -&gt; None:
+    &#34;&#34;&#34;Register a pipeline stage with optional dependencies.&#34;&#34;&#34;
+    self._stages[stage.name] = stage
+    if dependencies is not None:
+        self._stage_deps[stage.name] = dependencies</code></pre>
+</details>
+<div class="desc"><p>Register a pipeline stage with optional dependencies.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.Pipeline.run"><code class="name flex">
+<span>def <span class="ident">run</span></span>(<span>self, schema_path: str | Path) ‑> <a title="atomik_sdk.pipeline.controller.PipelineResult" href="controller.html#atomik_sdk.pipeline.controller.PipelineResult">PipelineResult</a></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def run(self, schema_path: str | Path) -&gt; PipelineResult:
+    &#34;&#34;&#34;
+    Execute the full pipeline on a single schema.
+
+    Args:
+        schema_path: Path to schema JSON file.
+
+    Returns:
+        PipelineResult with per-stage results and aggregate metrics.
+    &#34;&#34;&#34;
+    schema_path = Path(schema_path)
+    result = PipelineResult(schema=schema_path.name, success=True)
+    start = time.perf_counter()
+
+    # Load schema
+    try:
+        with open(schema_path, encoding=&#34;utf-8&#34;) as f:
+            schema = json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError) as e:
+        result.success = False
+        result.errors.append(f&#34;Schema load failed: {e}&#34;)
+        return result
+
+    if self.config.verbose:
+        print(f&#34;Pipeline: processing {schema_path.name}&#34;)
+
+    if self.config.dry_run:
+        return self._dry_run(schema, str(schema_path), result)
+
+    # Delegate to orchestrator when enabled
+    if self.config.use_orchestrator:
+        return self._run_orchestrated(schema, str(schema_path), result, start)
+
+    # Execute stages in order (Phase 4C sequential mode)
+    previous_manifest = None
+    for stage_name in self.STAGE_ORDER:
+        stage = self._stages.get(stage_name)
+        if stage is None:
+            continue
+
+        # Check token budget before each stage
+        if self.config.token_budget is not None:
+            spent = sum(s.tokens_consumed for s in result.stages)
+            if spent &gt;= self.config.token_budget:
+                result.errors.append(
+                    f&#34;Token budget exhausted ({spent}/{self.config.token_budget})&#34;
+                )
+                result.success = False
+                break
+
+        if self.config.verbose:
+            print(f&#34;  Stage: {stage_name}...&#34;)
+
+        manifest = stage.execute(
+            schema, str(schema_path), previous_manifest, self.config
+        )
+        result.stages.append(manifest)
+
+        if self.config.verbose:
+            status = manifest.status.value.upper()
+            ms = round(manifest.duration_ms, 1)
+            print(f&#34;  Stage: {stage_name} -&gt; {status} ({ms}ms)&#34;)
+
+        # Abort pipeline on failure (unless skipped)
+        if manifest.status == StageStatus.FAILED:
+            result.success = False
+            result.errors.extend(manifest.errors)
+            break
+
+        # Propagate short-circuit from diff stage
+        if manifest.status == StageStatus.SKIPPED:
+            if self.config.verbose:
+                reason = manifest.metrics.get(&#34;skip_reason&#34;, &#34;up-to-date&#34;)
+                print(f&#34;  Pipeline short-circuited: {reason}&#34;)
+            break
+
+        previous_manifest = manifest
+
+    # Aggregate metrics
+    result.total_time_ms = (time.perf_counter() - start) * 1000
+    result.total_tokens = sum(s.tokens_consumed for s in result.stages)
+
+    for stage in result.stages:
+        result.files_generated += stage.metrics.get(&#34;files_generated&#34;, 0)
+        result.lines_generated += stage.metrics.get(&#34;lines_generated&#34;, 0)
+
+    # Determine validation level from hardware stage
+    hw_stages = [s for s in result.stages if s.stage == &#34;hardware&#34;]
+    if hw_stages:
+        result.validation_level = hw_stages[0].validation_level
+    else:
+        verify_stages = [s for s in result.stages if s.stage == &#34;verify&#34;]
+        if verify_stages and verify_stages[0].success:
+            result.validation_level = &#34;sw_verified&#34;
+
+    self._results.append(result)
+
+    # Write report if requested
+    if self.config.report_path:
+        self._write_report(result)
+
+    return result</code></pre>
+</details>
+<div class="desc"><p>Execute the full pipeline on a single schema.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>schema_path</code></strong></dt>
+<dd>Path to schema JSON file.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>PipelineResult with per-stage results and aggregate metrics.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.Pipeline.run_batch"><code class="name flex">
+<span>def <span class="ident">run_batch</span></span>(<span>self, directory: str | Path) ‑> list[<a title="atomik_sdk.pipeline.controller.PipelineResult" href="controller.html#atomik_sdk.pipeline.controller.PipelineResult">PipelineResult</a>]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def run_batch(self, directory: str | Path) -&gt; list[PipelineResult]:
+    &#34;&#34;&#34;
+    Execute the pipeline on all schemas in a directory.
+
+    Args:
+        directory: Path to directory containing schema JSON files.
+
+    Returns:
+        List of PipelineResult for each schema.
+    &#34;&#34;&#34;
+    directory = Path(directory)
+    schemas = sorted(directory.glob(&#34;*.json&#34;))
+
+    if not schemas:
+        return []
+
+    if self.config.verbose:
+        print(f&#34;Pipeline: batch processing {len(schemas)} schema(s)&#34;)
+
+    results = []
+    for schema_path in schemas:
+        result = self.run(schema_path)
+        results.append(result)
+
+    return results</code></pre>
+</details>
+<div class="desc"><p>Execute the pipeline on all schemas in a directory.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>directory</code></strong></dt>
+<dd>Path to directory containing schema JSON files.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>List of PipelineResult for each schema.</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.pipeline.PipelineConfig"><code class="flex name class">
+<span>class <span class="ident">PipelineConfig</span></span>
+<span>(</span><span>output_dir: str = 'generated',<br>languages: list[str] | None = None,<br>verbose: bool = False,<br>report_path: str | None = None,<br>checkpoint_dir: str = '.atomik',<br>metrics_csv: str = '.atomik/metrics.csv',<br>com_port: str | None = None,<br>token_budget: int | None = None,<br>sim_only: bool = False,<br>skip_synthesis: bool = False,<br>dry_run: bool = False,<br>use_orchestrator: bool = False,<br>max_workers: int = 1,<br>fail_on_regression: bool = False)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass
+class PipelineConfig:
+    &#34;&#34;&#34;Configuration for a pipeline run.&#34;&#34;&#34;
+    output_dir: str = &#34;generated&#34;
+    languages: list[str] | None = None
+    verbose: bool = False
+    report_path: str | None = None
+    checkpoint_dir: str = &#34;.atomik&#34;
+    metrics_csv: str = &#34;.atomik/metrics.csv&#34;
+    com_port: str | None = None
+    token_budget: int | None = None
+    sim_only: bool = False
+    skip_synthesis: bool = False
+    dry_run: bool = False
+    use_orchestrator: bool = False
+    max_workers: int = 1
+    fail_on_regression: bool = False</code></pre>
+</details>
+<div class="desc"><p>Configuration for a pipeline run.</p></div>
+<h3>Instance variables</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.PipelineConfig.checkpoint_dir"><code class="name">var <span class="ident">checkpoint_dir</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.PipelineConfig.com_port"><code class="name">var <span class="ident">com_port</span> : str | None</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.PipelineConfig.dry_run"><code class="name">var <span class="ident">dry_run</span> : bool</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.PipelineConfig.fail_on_regression"><code class="name">var <span class="ident">fail_on_regression</span> : bool</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.PipelineConfig.languages"><code class="name">var <span class="ident">languages</span> : list[str] | None</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.PipelineConfig.max_workers"><code class="name">var <span class="ident">max_workers</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.PipelineConfig.metrics_csv"><code class="name">var <span class="ident">metrics_csv</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.PipelineConfig.output_dir"><code class="name">var <span class="ident">output_dir</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.PipelineConfig.report_path"><code class="name">var <span class="ident">report_path</span> : str | None</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.PipelineConfig.sim_only"><code class="name">var <span class="ident">sim_only</span> : bool</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.PipelineConfig.skip_synthesis"><code class="name">var <span class="ident">skip_synthesis</span> : bool</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.PipelineConfig.token_budget"><code class="name">var <span class="ident">token_budget</span> : int | None</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.PipelineConfig.use_orchestrator"><code class="name">var <span class="ident">use_orchestrator</span> : bool</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.PipelineConfig.verbose"><code class="name">var <span class="ident">verbose</span> : bool</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.pipeline.PipelineResult"><code class="flex name class">
+<span>class <span class="ident">PipelineResult</span></span>
+<span>(</span><span>schema: str,<br>success: bool,<br>stages: list[StageManifest] = &lt;factory&gt;,<br>total_time_ms: float = 0.0,<br>total_tokens: int = 0,<br>files_generated: int = 0,<br>lines_generated: int = 0,<br>validation_level: str = 'none',<br>errors: list[str] = &lt;factory&gt;)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass
+class PipelineResult:
+    &#34;&#34;&#34;Result of a complete pipeline run.&#34;&#34;&#34;
+    schema: str
+    success: bool
+    stages: list[StageManifest] = field(default_factory=list)
+    total_time_ms: float = 0.0
+    total_tokens: int = 0
+    files_generated: int = 0
+    lines_generated: int = 0
+    validation_level: str = &#34;none&#34;
+    errors: list[str] = field(default_factory=list)
+
+    def to_dict(self) -&gt; dict[str, Any]:
+        return {
+            &#34;schema&#34;: self.schema,
+            &#34;success&#34;: self.success,
+            &#34;total_time_ms&#34;: round(self.total_time_ms, 1),
+            &#34;total_tokens&#34;: self.total_tokens,
+            &#34;files_generated&#34;: self.files_generated,
+            &#34;lines_generated&#34;: self.lines_generated,
+            &#34;validation_level&#34;: self.validation_level,
+            &#34;stages&#34;: [s.to_dict() for s in self.stages],
+            &#34;errors&#34;: self.errors,
+        }</code></pre>
+</details>
+<div class="desc"><p>Result of a complete pipeline run.</p></div>
+<h3>Instance variables</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.PipelineResult.errors"><code class="name">var <span class="ident">errors</span> : list[str]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.PipelineResult.files_generated"><code class="name">var <span class="ident">files_generated</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.PipelineResult.lines_generated"><code class="name">var <span class="ident">lines_generated</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.PipelineResult.schema"><code class="name">var <span class="ident">schema</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.PipelineResult.stages"><code class="name">var <span class="ident">stages</span> : list[<a title="atomik_sdk.pipeline.stages.StageManifest" href="stages/index.html#atomik_sdk.pipeline.stages.StageManifest">StageManifest</a>]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.PipelineResult.success"><code class="name">var <span class="ident">success</span> : bool</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.PipelineResult.total_time_ms"><code class="name">var <span class="ident">total_time_ms</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.PipelineResult.total_tokens"><code class="name">var <span class="ident">total_tokens</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.PipelineResult.validation_level"><code class="name">var <span class="ident">validation_level</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.PipelineResult.to_dict"><code class="name flex">
+<span>def <span class="ident">to_dict</span></span>(<span>self) ‑> dict[str, typing.Any]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_dict(self) -&gt; dict[str, Any]:
+    return {
+        &#34;schema&#34;: self.schema,
+        &#34;success&#34;: self.success,
+        &#34;total_time_ms&#34;: round(self.total_time_ms, 1),
+        &#34;total_tokens&#34;: self.total_tokens,
+        &#34;files_generated&#34;: self.files_generated,
+        &#34;lines_generated&#34;: self.lines_generated,
+        &#34;validation_level&#34;: self.validation_level,
+        &#34;stages&#34;: [s.to_dict() for s in self.stages],
+        &#34;errors&#34;: self.errors,
+    }</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.pipeline.TaskDAG"><code class="flex name class">
+<span>class <span class="ident">TaskDAG</span></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class TaskDAG:
+    &#34;&#34;&#34;
+    Directed acyclic graph of pipeline tasks.
+
+    Provides:
+    - Task registration with explicit dependencies
+    - Cycle detection at construction time
+    - Topological ordering for sequential fallback
+    - Ready-task discovery for parallel dispatch
+    - Critical path analysis for budget estimation
+
+    Example:
+        &gt;&gt;&gt; dag = TaskDAG()
+        &gt;&gt;&gt; dag.add_task(&#34;validate&#34;, &#34;stage&#34;)
+        &gt;&gt;&gt; dag.add_task(&#34;generate&#34;, &#34;stage&#34;, dependencies=[&#34;validate&#34;])
+        &gt;&gt;&gt; dag.add_task(&#34;verify&#34;, &#34;stage&#34;, dependencies=[&#34;generate&#34;])
+        &gt;&gt;&gt; ready = dag.get_ready_tasks()
+        &gt;&gt;&gt; assert [t.task_id for t in ready] == [&#34;validate&#34;]
+    &#34;&#34;&#34;
+
+    def __init__(self) -&gt; None:
+        self._tasks: dict[str, DAGTask] = {}
+
+    def add_task(
+        self,
+        task_id: str,
+        task_type: str,
+        dependencies: list[str] | None = None,
+        estimated_tokens: int = 0,
+        metadata: dict[str, Any] | None = None,
+    ) -&gt; DAGTask:
+        &#34;&#34;&#34;
+        Add a task to the DAG.
+
+        Args:
+            task_id: Unique identifier for this task.
+            task_type: Type of task (e.g., &#34;stage&#34;, &#34;generation&#34;, &#34;verification&#34;).
+            dependencies: List of task IDs that must complete before this task.
+            estimated_tokens: Estimated token cost for this task.
+            metadata: Arbitrary metadata attached to the task.
+
+        Returns:
+            The created DAGTask.
+
+        Raises:
+            CycleError: If adding this task would create a cycle.
+            ValueError: If a dependency references an unknown task.
+        &#34;&#34;&#34;
+        deps = dependencies or []
+        for dep in deps:
+            if dep not in self._tasks:
+                raise ValueError(f&#34;Unknown dependency: {dep}&#34;)
+
+        task = DAGTask(
+            task_id=task_id,
+            task_type=task_type,
+            dependencies=list(deps),
+            estimated_tokens=estimated_tokens,
+            metadata=metadata or {},
+        )
+        self._tasks[task_id] = task
+
+        # Check for cycles after adding
+        if self._has_cycle():
+            del self._tasks[task_id]
+            raise CycleError(f&#34;Adding task &#39;{task_id}&#39; would create a cycle&#34;)
+
+        return task
+
+    def get_task(self, task_id: str) -&gt; DAGTask | None:
+        &#34;&#34;&#34;Get a task by ID.&#34;&#34;&#34;
+        return self._tasks.get(task_id)
+
+    def get_all_tasks(self) -&gt; list[DAGTask]:
+        &#34;&#34;&#34;Get all tasks in insertion order.&#34;&#34;&#34;
+        return list(self._tasks.values())
+
+    def get_ready_tasks(self) -&gt; list[DAGTask]:
+        &#34;&#34;&#34;
+        Get all tasks whose dependencies are satisfied and that
+        are not yet running or complete.
+
+        Returns:
+            List of tasks ready for execution.
+        &#34;&#34;&#34;
+        ready = []
+        for task in self._tasks.values():
+            if task.state != TaskState.PENDING:
+                continue
+            deps_met = all(
+                self._tasks[dep].state in (TaskState.COMPLETED, TaskState.SKIPPED)
+                for dep in task.dependencies
+                if dep in self._tasks
+            )
+            if deps_met:
+                ready.append(task)
+        return ready
+
+    def mark_ready(self, task_id: str) -&gt; None:
+        &#34;&#34;&#34;Mark a task as ready for execution.&#34;&#34;&#34;
+        task = self._tasks.get(task_id)
+        if task and task.state == TaskState.PENDING:
+            task.state = TaskState.READY
+
+    def mark_running(self, task_id: str) -&gt; None:
+        &#34;&#34;&#34;Mark a task as currently executing.&#34;&#34;&#34;
+        task = self._tasks.get(task_id)
+        if task:
+            task.state = TaskState.RUNNING
+
+    def mark_completed(self, task_id: str, result: dict[str, Any] | None = None) -&gt; None:
+        &#34;&#34;&#34;Mark a task as successfully completed.&#34;&#34;&#34;
+        task = self._tasks.get(task_id)
+        if task:
+            task.state = TaskState.COMPLETED
+            task.result = result
+
+    def mark_failed(self, task_id: str, result: dict[str, Any] | None = None) -&gt; None:
+        &#34;&#34;&#34;Mark a task as failed.&#34;&#34;&#34;
+        task = self._tasks.get(task_id)
+        if task:
+            task.state = TaskState.FAILED
+            task.result = result
+
+    def mark_skipped(self, task_id: str) -&gt; None:
+        &#34;&#34;&#34;Mark a task as skipped.&#34;&#34;&#34;
+        task = self._tasks.get(task_id)
+        if task:
+            task.state = TaskState.SKIPPED
+
+    def is_complete(self) -&gt; bool:
+        &#34;&#34;&#34;Check if all tasks have reached a terminal state.&#34;&#34;&#34;
+        return all(t.is_terminal for t in self._tasks.values())
+
+    def has_failures(self) -&gt; bool:
+        &#34;&#34;&#34;Check if any tasks have failed.&#34;&#34;&#34;
+        return any(t.state == TaskState.FAILED for t in self._tasks.values())
+
+    def topological_order(self) -&gt; list[str]:
+        &#34;&#34;&#34;
+        Return task IDs in topological order (dependencies first).
+
+        Raises:
+            CycleError: If the graph contains a cycle.
+        &#34;&#34;&#34;
+        in_degree: dict[str, int] = {tid: 0 for tid in self._tasks}
+        for task in self._tasks.values():
+            for dep in task.dependencies:
+                if dep in in_degree:
+                    in_degree[task.task_id] = in_degree.get(task.task_id, 0)
+
+        # Compute actual in-degrees from reverse edges
+        in_degree = {tid: 0 for tid in self._tasks}
+        for task in self._tasks.values():
+            for dep in task.dependencies:
+                if dep in self._tasks:
+                    # task depends on dep, so dep -&gt; task edge
+                    # in_degree of task increases
+                    pass  # handled below
+
+        # Recompute properly: in_degree[t] = number of tasks that t depends on
+        # that haven&#39;t been processed
+        adj: dict[str, list[str]] = {tid: [] for tid in self._tasks}
+        in_degree = {tid: 0 for tid in self._tasks}
+
+        for task in self._tasks.values():
+            for dep in task.dependencies:
+                if dep in self._tasks:
+                    adj[dep].append(task.task_id)
+                    in_degree[task.task_id] += 1
+
+        queue = deque(tid for tid, deg in in_degree.items() if deg == 0)
+        order: list[str] = []
+
+        while queue:
+            tid = queue.popleft()
+            order.append(tid)
+            for neighbor in adj[tid]:
+                in_degree[neighbor] -= 1
+                if in_degree[neighbor] == 0:
+                    queue.append(neighbor)
+
+        if len(order) != len(self._tasks):
+            raise CycleError(&#34;DAG contains a cycle&#34;)
+
+        return order
+
+    def critical_path(self) -&gt; list[str]:
+        &#34;&#34;&#34;
+        Compute the critical path (longest dependency chain).
+
+        Returns:
+            List of task IDs on the critical path.
+        &#34;&#34;&#34;
+        if not self._tasks:
+            return []
+
+        order = self.topological_order()
+
+        # Compute longest path to each node
+        dist: dict[str, int] = {tid: 0 for tid in self._tasks}
+        prev: dict[str, str | None] = {tid: None for tid in self._tasks}
+
+        for tid in order:
+            task = self._tasks[tid]
+            for dep in task.dependencies:
+                if dep in dist:
+                    new_dist = dist[dep] + 1
+                    if new_dist &gt; dist[tid]:
+                        dist[tid] = new_dist
+                        prev[tid] = dep
+
+        # Find the node with maximum distance
+        end = max(dist, key=lambda t: dist[t])
+        path: list[str] = []
+        current: str | None = end
+        while current is not None:
+            path.append(current)
+            current = prev[current]
+
+        path.reverse()
+        return path
+
+    def critical_path_tokens(self) -&gt; int:
+        &#34;&#34;&#34;Estimated tokens on the critical path.&#34;&#34;&#34;
+        return sum(
+            self._tasks[tid].estimated_tokens
+            for tid in self.critical_path()
+            if tid in self._tasks
+        )
+
+    def get_dependents(self, task_id: str) -&gt; list[str]:
+        &#34;&#34;&#34;Get tasks that depend on the given task.&#34;&#34;&#34;
+        return [
+            t.task_id for t in self._tasks.values()
+            if task_id in t.dependencies
+        ]
+
+    def _has_cycle(self) -&gt; bool:
+        &#34;&#34;&#34;Detect cycles using Kahn&#39;s algorithm.&#34;&#34;&#34;
+        try:
+            self.topological_order()
+            return False
+        except CycleError:
+            return True
+
+    def summary(self) -&gt; dict[str, Any]:
+        &#34;&#34;&#34;Get a summary of the DAG state.&#34;&#34;&#34;
+        states = {}
+        for task in self._tasks.values():
+            s = task.state.value
+            states[s] = states.get(s, 0) + 1
+
+        return {
+            &#34;total_tasks&#34;: len(self._tasks),
+            &#34;states&#34;: states,
+            &#34;is_complete&#34;: self.is_complete(),
+            &#34;has_failures&#34;: self.has_failures(),
+            &#34;critical_path&#34;: self.critical_path(),
+            &#34;critical_path_tokens&#34;: self.critical_path_tokens(),
+        }</code></pre>
+</details>
+<div class="desc"><p>Directed acyclic graph of pipeline tasks.</p>
+<p>Provides:
+- Task registration with explicit dependencies
+- Cycle detection at construction time
+- Topological ordering for sequential fallback
+- Ready-task discovery for parallel dispatch
+- Critical path analysis for budget estimation</p>
+<h2 id="example">Example</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; dag = TaskDAG()
+&gt;&gt;&gt; dag.add_task(&quot;validate&quot;, &quot;stage&quot;)
+&gt;&gt;&gt; dag.add_task(&quot;generate&quot;, &quot;stage&quot;, dependencies=[&quot;validate&quot;])
+&gt;&gt;&gt; dag.add_task(&quot;verify&quot;, &quot;stage&quot;, dependencies=[&quot;generate&quot;])
+&gt;&gt;&gt; ready = dag.get_ready_tasks()
+&gt;&gt;&gt; assert [t.task_id for t in ready] == [&quot;validate&quot;]
+</code></pre></div>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.TaskDAG.add_task"><code class="name flex">
+<span>def <span class="ident">add_task</span></span>(<span>self,<br>task_id: str,<br>task_type: str,<br>dependencies: list[str] | None = None,<br>estimated_tokens: int = 0,<br>metadata: dict[str, Any] | None = None) ‑> <a title="atomik_sdk.pipeline.dag.DAGTask" href="dag.html#atomik_sdk.pipeline.dag.DAGTask">DAGTask</a></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_task(
+    self,
+    task_id: str,
+    task_type: str,
+    dependencies: list[str] | None = None,
+    estimated_tokens: int = 0,
+    metadata: dict[str, Any] | None = None,
+) -&gt; DAGTask:
+    &#34;&#34;&#34;
+    Add a task to the DAG.
+
+    Args:
+        task_id: Unique identifier for this task.
+        task_type: Type of task (e.g., &#34;stage&#34;, &#34;generation&#34;, &#34;verification&#34;).
+        dependencies: List of task IDs that must complete before this task.
+        estimated_tokens: Estimated token cost for this task.
+        metadata: Arbitrary metadata attached to the task.
+
+    Returns:
+        The created DAGTask.
+
+    Raises:
+        CycleError: If adding this task would create a cycle.
+        ValueError: If a dependency references an unknown task.
+    &#34;&#34;&#34;
+    deps = dependencies or []
+    for dep in deps:
+        if dep not in self._tasks:
+            raise ValueError(f&#34;Unknown dependency: {dep}&#34;)
+
+    task = DAGTask(
+        task_id=task_id,
+        task_type=task_type,
+        dependencies=list(deps),
+        estimated_tokens=estimated_tokens,
+        metadata=metadata or {},
+    )
+    self._tasks[task_id] = task
+
+    # Check for cycles after adding
+    if self._has_cycle():
+        del self._tasks[task_id]
+        raise CycleError(f&#34;Adding task &#39;{task_id}&#39; would create a cycle&#34;)
+
+    return task</code></pre>
+</details>
+<div class="desc"><p>Add a task to the DAG.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>task_id</code></strong></dt>
+<dd>Unique identifier for this task.</dd>
+<dt><strong><code>task_type</code></strong></dt>
+<dd>Type of task (e.g., "stage", "generation", "verification").</dd>
+<dt><strong><code>dependencies</code></strong></dt>
+<dd>List of task IDs that must complete before this task.</dd>
+<dt><strong><code>estimated_tokens</code></strong></dt>
+<dd>Estimated token cost for this task.</dd>
+<dt><strong><code>metadata</code></strong></dt>
+<dd>Arbitrary metadata attached to the task.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>The created DAGTask.</p>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code><a title="atomik_sdk.pipeline.CycleError" href="#atomik_sdk.pipeline.CycleError">CycleError</a></code></dt>
+<dd>If adding this task would create a cycle.</dd>
+<dt><code>ValueError</code></dt>
+<dd>If a dependency references an unknown task.</dd>
+</dl></div>
+</dd>
+<dt id="atomik_sdk.pipeline.TaskDAG.critical_path"><code class="name flex">
+<span>def <span class="ident">critical_path</span></span>(<span>self) ‑> list[str]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def critical_path(self) -&gt; list[str]:
+    &#34;&#34;&#34;
+    Compute the critical path (longest dependency chain).
+
+    Returns:
+        List of task IDs on the critical path.
+    &#34;&#34;&#34;
+    if not self._tasks:
+        return []
+
+    order = self.topological_order()
+
+    # Compute longest path to each node
+    dist: dict[str, int] = {tid: 0 for tid in self._tasks}
+    prev: dict[str, str | None] = {tid: None for tid in self._tasks}
+
+    for tid in order:
+        task = self._tasks[tid]
+        for dep in task.dependencies:
+            if dep in dist:
+                new_dist = dist[dep] + 1
+                if new_dist &gt; dist[tid]:
+                    dist[tid] = new_dist
+                    prev[tid] = dep
+
+    # Find the node with maximum distance
+    end = max(dist, key=lambda t: dist[t])
+    path: list[str] = []
+    current: str | None = end
+    while current is not None:
+        path.append(current)
+        current = prev[current]
+
+    path.reverse()
+    return path</code></pre>
+</details>
+<div class="desc"><p>Compute the critical path (longest dependency chain).</p>
+<h2 id="returns">Returns</h2>
+<p>List of task IDs on the critical path.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.TaskDAG.critical_path_tokens"><code class="name flex">
+<span>def <span class="ident">critical_path_tokens</span></span>(<span>self) ‑> int</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def critical_path_tokens(self) -&gt; int:
+    &#34;&#34;&#34;Estimated tokens on the critical path.&#34;&#34;&#34;
+    return sum(
+        self._tasks[tid].estimated_tokens
+        for tid in self.critical_path()
+        if tid in self._tasks
+    )</code></pre>
+</details>
+<div class="desc"><p>Estimated tokens on the critical path.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.TaskDAG.get_all_tasks"><code class="name flex">
+<span>def <span class="ident">get_all_tasks</span></span>(<span>self) ‑> list[<a title="atomik_sdk.pipeline.dag.DAGTask" href="dag.html#atomik_sdk.pipeline.dag.DAGTask">DAGTask</a>]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_all_tasks(self) -&gt; list[DAGTask]:
+    &#34;&#34;&#34;Get all tasks in insertion order.&#34;&#34;&#34;
+    return list(self._tasks.values())</code></pre>
+</details>
+<div class="desc"><p>Get all tasks in insertion order.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.TaskDAG.get_dependents"><code class="name flex">
+<span>def <span class="ident">get_dependents</span></span>(<span>self, task_id: str) ‑> list[str]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_dependents(self, task_id: str) -&gt; list[str]:
+    &#34;&#34;&#34;Get tasks that depend on the given task.&#34;&#34;&#34;
+    return [
+        t.task_id for t in self._tasks.values()
+        if task_id in t.dependencies
+    ]</code></pre>
+</details>
+<div class="desc"><p>Get tasks that depend on the given task.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.TaskDAG.get_ready_tasks"><code class="name flex">
+<span>def <span class="ident">get_ready_tasks</span></span>(<span>self) ‑> list[<a title="atomik_sdk.pipeline.dag.DAGTask" href="dag.html#atomik_sdk.pipeline.dag.DAGTask">DAGTask</a>]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_ready_tasks(self) -&gt; list[DAGTask]:
+    &#34;&#34;&#34;
+    Get all tasks whose dependencies are satisfied and that
+    are not yet running or complete.
+
+    Returns:
+        List of tasks ready for execution.
+    &#34;&#34;&#34;
+    ready = []
+    for task in self._tasks.values():
+        if task.state != TaskState.PENDING:
+            continue
+        deps_met = all(
+            self._tasks[dep].state in (TaskState.COMPLETED, TaskState.SKIPPED)
+            for dep in task.dependencies
+            if dep in self._tasks
+        )
+        if deps_met:
+            ready.append(task)
+    return ready</code></pre>
+</details>
+<div class="desc"><p>Get all tasks whose dependencies are satisfied and that
+are not yet running or complete.</p>
+<h2 id="returns">Returns</h2>
+<p>List of tasks ready for execution.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.TaskDAG.get_task"><code class="name flex">
+<span>def <span class="ident">get_task</span></span>(<span>self, task_id: str) ‑> <a title="atomik_sdk.pipeline.dag.DAGTask" href="dag.html#atomik_sdk.pipeline.dag.DAGTask">DAGTask</a> | None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_task(self, task_id: str) -&gt; DAGTask | None:
+    &#34;&#34;&#34;Get a task by ID.&#34;&#34;&#34;
+    return self._tasks.get(task_id)</code></pre>
+</details>
+<div class="desc"><p>Get a task by ID.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.TaskDAG.has_failures"><code class="name flex">
+<span>def <span class="ident">has_failures</span></span>(<span>self) ‑> bool</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def has_failures(self) -&gt; bool:
+    &#34;&#34;&#34;Check if any tasks have failed.&#34;&#34;&#34;
+    return any(t.state == TaskState.FAILED for t in self._tasks.values())</code></pre>
+</details>
+<div class="desc"><p>Check if any tasks have failed.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.TaskDAG.is_complete"><code class="name flex">
+<span>def <span class="ident">is_complete</span></span>(<span>self) ‑> bool</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def is_complete(self) -&gt; bool:
+    &#34;&#34;&#34;Check if all tasks have reached a terminal state.&#34;&#34;&#34;
+    return all(t.is_terminal for t in self._tasks.values())</code></pre>
+</details>
+<div class="desc"><p>Check if all tasks have reached a terminal state.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.TaskDAG.mark_completed"><code class="name flex">
+<span>def <span class="ident">mark_completed</span></span>(<span>self, task_id: str, result: dict[str, Any] | None = None) ‑> None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def mark_completed(self, task_id: str, result: dict[str, Any] | None = None) -&gt; None:
+    &#34;&#34;&#34;Mark a task as successfully completed.&#34;&#34;&#34;
+    task = self._tasks.get(task_id)
+    if task:
+        task.state = TaskState.COMPLETED
+        task.result = result</code></pre>
+</details>
+<div class="desc"><p>Mark a task as successfully completed.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.TaskDAG.mark_failed"><code class="name flex">
+<span>def <span class="ident">mark_failed</span></span>(<span>self, task_id: str, result: dict[str, Any] | None = None) ‑> None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def mark_failed(self, task_id: str, result: dict[str, Any] | None = None) -&gt; None:
+    &#34;&#34;&#34;Mark a task as failed.&#34;&#34;&#34;
+    task = self._tasks.get(task_id)
+    if task:
+        task.state = TaskState.FAILED
+        task.result = result</code></pre>
+</details>
+<div class="desc"><p>Mark a task as failed.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.TaskDAG.mark_ready"><code class="name flex">
+<span>def <span class="ident">mark_ready</span></span>(<span>self, task_id: str) ‑> None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def mark_ready(self, task_id: str) -&gt; None:
+    &#34;&#34;&#34;Mark a task as ready for execution.&#34;&#34;&#34;
+    task = self._tasks.get(task_id)
+    if task and task.state == TaskState.PENDING:
+        task.state = TaskState.READY</code></pre>
+</details>
+<div class="desc"><p>Mark a task as ready for execution.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.TaskDAG.mark_running"><code class="name flex">
+<span>def <span class="ident">mark_running</span></span>(<span>self, task_id: str) ‑> None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def mark_running(self, task_id: str) -&gt; None:
+    &#34;&#34;&#34;Mark a task as currently executing.&#34;&#34;&#34;
+    task = self._tasks.get(task_id)
+    if task:
+        task.state = TaskState.RUNNING</code></pre>
+</details>
+<div class="desc"><p>Mark a task as currently executing.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.TaskDAG.mark_skipped"><code class="name flex">
+<span>def <span class="ident">mark_skipped</span></span>(<span>self, task_id: str) ‑> None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def mark_skipped(self, task_id: str) -&gt; None:
+    &#34;&#34;&#34;Mark a task as skipped.&#34;&#34;&#34;
+    task = self._tasks.get(task_id)
+    if task:
+        task.state = TaskState.SKIPPED</code></pre>
+</details>
+<div class="desc"><p>Mark a task as skipped.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.TaskDAG.summary"><code class="name flex">
+<span>def <span class="ident">summary</span></span>(<span>self) ‑> dict[str, typing.Any]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def summary(self) -&gt; dict[str, Any]:
+    &#34;&#34;&#34;Get a summary of the DAG state.&#34;&#34;&#34;
+    states = {}
+    for task in self._tasks.values():
+        s = task.state.value
+        states[s] = states.get(s, 0) + 1
+
+    return {
+        &#34;total_tasks&#34;: len(self._tasks),
+        &#34;states&#34;: states,
+        &#34;is_complete&#34;: self.is_complete(),
+        &#34;has_failures&#34;: self.has_failures(),
+        &#34;critical_path&#34;: self.critical_path(),
+        &#34;critical_path_tokens&#34;: self.critical_path_tokens(),
+    }</code></pre>
+</details>
+<div class="desc"><p>Get a summary of the DAG state.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.TaskDAG.topological_order"><code class="name flex">
+<span>def <span class="ident">topological_order</span></span>(<span>self) ‑> list[str]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def topological_order(self) -&gt; list[str]:
+    &#34;&#34;&#34;
+    Return task IDs in topological order (dependencies first).
+
+    Raises:
+        CycleError: If the graph contains a cycle.
+    &#34;&#34;&#34;
+    in_degree: dict[str, int] = {tid: 0 for tid in self._tasks}
+    for task in self._tasks.values():
+        for dep in task.dependencies:
+            if dep in in_degree:
+                in_degree[task.task_id] = in_degree.get(task.task_id, 0)
+
+    # Compute actual in-degrees from reverse edges
+    in_degree = {tid: 0 for tid in self._tasks}
+    for task in self._tasks.values():
+        for dep in task.dependencies:
+            if dep in self._tasks:
+                # task depends on dep, so dep -&gt; task edge
+                # in_degree of task increases
+                pass  # handled below
+
+    # Recompute properly: in_degree[t] = number of tasks that t depends on
+    # that haven&#39;t been processed
+    adj: dict[str, list[str]] = {tid: [] for tid in self._tasks}
+    in_degree = {tid: 0 for tid in self._tasks}
+
+    for task in self._tasks.values():
+        for dep in task.dependencies:
+            if dep in self._tasks:
+                adj[dep].append(task.task_id)
+                in_degree[task.task_id] += 1
+
+    queue = deque(tid for tid, deg in in_degree.items() if deg == 0)
+    order: list[str] = []
+
+    while queue:
+        tid = queue.popleft()
+        order.append(tid)
+        for neighbor in adj[tid]:
+            in_degree[neighbor] -= 1
+            if in_degree[neighbor] == 0:
+                queue.append(neighbor)
+
+    if len(order) != len(self._tasks):
+        raise CycleError(&#34;DAG contains a cycle&#34;)
+
+    return order</code></pre>
+</details>
+<div class="desc"><p>Return task IDs in topological order (dependencies first).</p>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code><a title="atomik_sdk.pipeline.CycleError" href="#atomik_sdk.pipeline.CycleError">CycleError</a></code></dt>
+<dd>If the graph contains a cycle.</dd>
+</dl></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.pipeline.TaskState"><code class="flex name class">
+<span>class <span class="ident">TaskState</span></span>
+<span>(</span><span>*args, **kwds)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class TaskState(Enum):
+    &#34;&#34;&#34;Execution state of a DAG task.&#34;&#34;&#34;
+    PENDING = &#34;pending&#34;
+    READY = &#34;ready&#34;       # All dependencies satisfied
+    RUNNING = &#34;running&#34;
+    COMPLETED = &#34;completed&#34;
+    FAILED = &#34;failed&#34;
+    SKIPPED = &#34;skipped&#34;</code></pre>
+</details>
+<div class="desc"><p>Execution state of a DAG task.</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.TaskState.COMPLETED"><code class="name">var <span class="ident">COMPLETED</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.TaskState.FAILED"><code class="name">var <span class="ident">FAILED</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.TaskState.PENDING"><code class="name">var <span class="ident">PENDING</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.TaskState.READY"><code class="name">var <span class="ident">READY</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.TaskState.RUNNING"><code class="name">var <span class="ident">RUNNING</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.TaskState.SKIPPED"><code class="name">var <span class="ident">SKIPPED</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="atomik_sdk" href="../index.html">atomik_sdk</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-submodules">Sub-modules</a></h3>
+<ul>
+<li><code><a title="atomik_sdk.pipeline.agents" href="agents/index.html">atomik_sdk.pipeline.agents</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.analysis" href="analysis/index.html">atomik_sdk.pipeline.analysis</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.consensus" href="consensus.html">atomik_sdk.pipeline.consensus</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.context" href="context/index.html">atomik_sdk.pipeline.context</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.controller" href="controller.html">atomik_sdk.pipeline.controller</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.coordinator" href="coordinator.html">atomik_sdk.pipeline.coordinator</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.dag" href="dag.html">atomik_sdk.pipeline.dag</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.diagnosis" href="diagnosis.html">atomik_sdk.pipeline.diagnosis</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.event_bus" href="event_bus.html">atomik_sdk.pipeline.event_bus</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.feedback" href="feedback.html">atomik_sdk.pipeline.feedback</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.knowledge" href="knowledge/index.html">atomik_sdk.pipeline.knowledge</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.metrics" href="metrics/index.html">atomik_sdk.pipeline.metrics</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.optimization" href="optimization/index.html">atomik_sdk.pipeline.optimization</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.orchestrator" href="orchestrator.html">atomik_sdk.pipeline.orchestrator</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.parallel" href="parallel/index.html">atomik_sdk.pipeline.parallel</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.regression" href="regression/index.html">atomik_sdk.pipeline.regression</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.reports" href="reports/index.html">atomik_sdk.pipeline.reports</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.stages" href="stages/index.html">atomik_sdk.pipeline.stages</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.verification" href="verification/index.html">atomik_sdk.pipeline.verification</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="atomik_sdk.pipeline.ConsensusResolver" href="#atomik_sdk.pipeline.ConsensusResolver">ConsensusResolver</a></code></h4>
+<ul class="">
+<li><code><a title="atomik_sdk.pipeline.ConsensusResolver.resolve" href="#atomik_sdk.pipeline.ConsensusResolver.resolve">resolve</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.ConsensusResolver.resolve_interface_fields" href="#atomik_sdk.pipeline.ConsensusResolver.resolve_interface_fields">resolve_interface_fields</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.pipeline.ConsensusResult" href="#atomik_sdk.pipeline.ConsensusResult">ConsensusResult</a></code></h4>
+<ul class="two-column">
+<li><code><a title="atomik_sdk.pipeline.ConsensusResult.agreed" href="#atomik_sdk.pipeline.ConsensusResult.agreed">agreed</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.ConsensusResult.conflict_count" href="#atomik_sdk.pipeline.ConsensusResult.conflict_count">conflict_count</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.ConsensusResult.conflicts" href="#atomik_sdk.pipeline.ConsensusResult.conflicts">conflicts</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.ConsensusResult.escalated" href="#atomik_sdk.pipeline.ConsensusResult.escalated">escalated</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.ConsensusResult.merged_output" href="#atomik_sdk.pipeline.ConsensusResult.merged_output">merged_output</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.ConsensusResult.to_dict" href="#atomik_sdk.pipeline.ConsensusResult.to_dict">to_dict</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.pipeline.Coordinator" href="#atomik_sdk.pipeline.Coordinator">Coordinator</a></code></h4>
+<ul class="">
+<li><code><a title="atomik_sdk.pipeline.Coordinator.dispatch_full_pipeline" href="#atomik_sdk.pipeline.Coordinator.dispatch_full_pipeline">dispatch_full_pipeline</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.Coordinator.dispatch_generation" href="#atomik_sdk.pipeline.Coordinator.dispatch_generation">dispatch_generation</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.Coordinator.dispatch_verification" href="#atomik_sdk.pipeline.Coordinator.dispatch_verification">dispatch_verification</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.Coordinator.get_specialist_status" href="#atomik_sdk.pipeline.Coordinator.get_specialist_status">get_specialist_status</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.pipeline.CoordinatorResult" href="#atomik_sdk.pipeline.CoordinatorResult">CoordinatorResult</a></code></h4>
+<ul class="two-column">
+<li><code><a title="atomik_sdk.pipeline.CoordinatorResult.consensus" href="#atomik_sdk.pipeline.CoordinatorResult.consensus">consensus</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.CoordinatorResult.failed_count" href="#atomik_sdk.pipeline.CoordinatorResult.failed_count">failed_count</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.CoordinatorResult.parallel_speedup" href="#atomik_sdk.pipeline.CoordinatorResult.parallel_speedup">parallel_speedup</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.CoordinatorResult.subtask_results" href="#atomik_sdk.pipeline.CoordinatorResult.subtask_results">subtask_results</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.CoordinatorResult.success" href="#atomik_sdk.pipeline.CoordinatorResult.success">success</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.CoordinatorResult.to_dict" href="#atomik_sdk.pipeline.CoordinatorResult.to_dict">to_dict</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.CoordinatorResult.total_duration_ms" href="#atomik_sdk.pipeline.CoordinatorResult.total_duration_ms">total_duration_ms</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.CoordinatorResult.total_tokens" href="#atomik_sdk.pipeline.CoordinatorResult.total_tokens">total_tokens</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.pipeline.CycleError" href="#atomik_sdk.pipeline.CycleError">CycleError</a></code></h4>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.pipeline.DAGTask" href="#atomik_sdk.pipeline.DAGTask">DAGTask</a></code></h4>
+<ul class="two-column">
+<li><code><a title="atomik_sdk.pipeline.DAGTask.dependencies" href="#atomik_sdk.pipeline.DAGTask.dependencies">dependencies</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.DAGTask.estimated_tokens" href="#atomik_sdk.pipeline.DAGTask.estimated_tokens">estimated_tokens</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.DAGTask.is_terminal" href="#atomik_sdk.pipeline.DAGTask.is_terminal">is_terminal</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.DAGTask.metadata" href="#atomik_sdk.pipeline.DAGTask.metadata">metadata</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.DAGTask.result" href="#atomik_sdk.pipeline.DAGTask.result">result</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.DAGTask.state" href="#atomik_sdk.pipeline.DAGTask.state">state</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.DAGTask.task_id" href="#atomik_sdk.pipeline.DAGTask.task_id">task_id</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.DAGTask.task_type" href="#atomik_sdk.pipeline.DAGTask.task_type">task_type</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.DAGTask.to_dict" href="#atomik_sdk.pipeline.DAGTask.to_dict">to_dict</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.pipeline.Event" href="#atomik_sdk.pipeline.Event">Event</a></code></h4>
+<ul class="">
+<li><code><a title="atomik_sdk.pipeline.Event.event_type" href="#atomik_sdk.pipeline.Event.event_type">event_type</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.Event.payload" href="#atomik_sdk.pipeline.Event.payload">payload</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.Event.source" href="#atomik_sdk.pipeline.Event.source">source</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.Event.timestamp" href="#atomik_sdk.pipeline.Event.timestamp">timestamp</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.Event.to_dict" href="#atomik_sdk.pipeline.Event.to_dict">to_dict</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.pipeline.EventBus" href="#atomik_sdk.pipeline.EventBus">EventBus</a></code></h4>
+<ul class="two-column">
+<li><code><a title="atomik_sdk.pipeline.EventBus.clear_all" href="#atomik_sdk.pipeline.EventBus.clear_all">clear_all</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.EventBus.clear_history" href="#atomik_sdk.pipeline.EventBus.clear_history">clear_history</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.EventBus.emit" href="#atomik_sdk.pipeline.EventBus.emit">emit</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.EventBus.get_history" href="#atomik_sdk.pipeline.EventBus.get_history">get_history</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.EventBus.subscribe" href="#atomik_sdk.pipeline.EventBus.subscribe">subscribe</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.EventBus.unsubscribe" href="#atomik_sdk.pipeline.EventBus.unsubscribe">unsubscribe</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.pipeline.EventType" href="#atomik_sdk.pipeline.EventType">EventType</a></code></h4>
+<ul class="two-column">
+<li><code><a title="atomik_sdk.pipeline.EventType.BUDGET_WARNING" href="#atomik_sdk.pipeline.EventType.BUDGET_WARNING">BUDGET_WARNING</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.EventType.FEEDBACK_RESULT" href="#atomik_sdk.pipeline.EventType.FEEDBACK_RESULT">FEEDBACK_RESULT</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.EventType.FEEDBACK_START" href="#atomik_sdk.pipeline.EventType.FEEDBACK_START">FEEDBACK_START</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.EventType.PIPELINE_DONE" href="#atomik_sdk.pipeline.EventType.PIPELINE_DONE">PIPELINE_DONE</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.EventType.REGRESSION_ALERT" href="#atomik_sdk.pipeline.EventType.REGRESSION_ALERT">REGRESSION_ALERT</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.EventType.TASK_COMPLETED" href="#atomik_sdk.pipeline.EventType.TASK_COMPLETED">TASK_COMPLETED</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.EventType.TASK_FAILED" href="#atomik_sdk.pipeline.EventType.TASK_FAILED">TASK_FAILED</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.EventType.TASK_READY" href="#atomik_sdk.pipeline.EventType.TASK_READY">TASK_READY</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.EventType.TASK_STARTED" href="#atomik_sdk.pipeline.EventType.TASK_STARTED">TASK_STARTED</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.pipeline.Orchestrator" href="#atomik_sdk.pipeline.Orchestrator">Orchestrator</a></code></h4>
+<ul class="two-column">
+<li><code><a title="atomik_sdk.pipeline.Orchestrator.apply_tuning" href="#atomik_sdk.pipeline.Orchestrator.apply_tuning">apply_tuning</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.Orchestrator.build_dag" href="#atomik_sdk.pipeline.Orchestrator.build_dag">build_dag</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.Orchestrator.execute" href="#atomik_sdk.pipeline.Orchestrator.execute">execute</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.Orchestrator.get_event_history" href="#atomik_sdk.pipeline.Orchestrator.get_event_history">get_event_history</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.Orchestrator.get_manifests" href="#atomik_sdk.pipeline.Orchestrator.get_manifests">get_manifests</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.Orchestrator.has_coordinator" href="#atomik_sdk.pipeline.Orchestrator.has_coordinator">has_coordinator</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.Orchestrator.register_stage" href="#atomik_sdk.pipeline.Orchestrator.register_stage">register_stage</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.Orchestrator.set_coordinator" href="#atomik_sdk.pipeline.Orchestrator.set_coordinator">set_coordinator</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.pipeline.Pipeline" href="#atomik_sdk.pipeline.Pipeline">Pipeline</a></code></h4>
+<ul class="">
+<li><code><a title="atomik_sdk.pipeline.Pipeline.STAGE_ORDER" href="#atomik_sdk.pipeline.Pipeline.STAGE_ORDER">STAGE_ORDER</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.Pipeline.get_status" href="#atomik_sdk.pipeline.Pipeline.get_status">get_status</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.Pipeline.register_stage" href="#atomik_sdk.pipeline.Pipeline.register_stage">register_stage</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.Pipeline.run" href="#atomik_sdk.pipeline.Pipeline.run">run</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.Pipeline.run_batch" href="#atomik_sdk.pipeline.Pipeline.run_batch">run_batch</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.pipeline.PipelineConfig" href="#atomik_sdk.pipeline.PipelineConfig">PipelineConfig</a></code></h4>
+<ul class="two-column">
+<li><code><a title="atomik_sdk.pipeline.PipelineConfig.checkpoint_dir" href="#atomik_sdk.pipeline.PipelineConfig.checkpoint_dir">checkpoint_dir</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.PipelineConfig.com_port" href="#atomik_sdk.pipeline.PipelineConfig.com_port">com_port</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.PipelineConfig.dry_run" href="#atomik_sdk.pipeline.PipelineConfig.dry_run">dry_run</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.PipelineConfig.fail_on_regression" href="#atomik_sdk.pipeline.PipelineConfig.fail_on_regression">fail_on_regression</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.PipelineConfig.languages" href="#atomik_sdk.pipeline.PipelineConfig.languages">languages</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.PipelineConfig.max_workers" href="#atomik_sdk.pipeline.PipelineConfig.max_workers">max_workers</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.PipelineConfig.metrics_csv" href="#atomik_sdk.pipeline.PipelineConfig.metrics_csv">metrics_csv</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.PipelineConfig.output_dir" href="#atomik_sdk.pipeline.PipelineConfig.output_dir">output_dir</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.PipelineConfig.report_path" href="#atomik_sdk.pipeline.PipelineConfig.report_path">report_path</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.PipelineConfig.sim_only" href="#atomik_sdk.pipeline.PipelineConfig.sim_only">sim_only</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.PipelineConfig.skip_synthesis" href="#atomik_sdk.pipeline.PipelineConfig.skip_synthesis">skip_synthesis</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.PipelineConfig.token_budget" href="#atomik_sdk.pipeline.PipelineConfig.token_budget">token_budget</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.PipelineConfig.use_orchestrator" href="#atomik_sdk.pipeline.PipelineConfig.use_orchestrator">use_orchestrator</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.PipelineConfig.verbose" href="#atomik_sdk.pipeline.PipelineConfig.verbose">verbose</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.pipeline.PipelineResult" href="#atomik_sdk.pipeline.PipelineResult">PipelineResult</a></code></h4>
+<ul class="two-column">
+<li><code><a title="atomik_sdk.pipeline.PipelineResult.errors" href="#atomik_sdk.pipeline.PipelineResult.errors">errors</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.PipelineResult.files_generated" href="#atomik_sdk.pipeline.PipelineResult.files_generated">files_generated</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.PipelineResult.lines_generated" href="#atomik_sdk.pipeline.PipelineResult.lines_generated">lines_generated</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.PipelineResult.schema" href="#atomik_sdk.pipeline.PipelineResult.schema">schema</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.PipelineResult.stages" href="#atomik_sdk.pipeline.PipelineResult.stages">stages</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.PipelineResult.success" href="#atomik_sdk.pipeline.PipelineResult.success">success</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.PipelineResult.to_dict" href="#atomik_sdk.pipeline.PipelineResult.to_dict">to_dict</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.PipelineResult.total_time_ms" href="#atomik_sdk.pipeline.PipelineResult.total_time_ms">total_time_ms</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.PipelineResult.total_tokens" href="#atomik_sdk.pipeline.PipelineResult.total_tokens">total_tokens</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.PipelineResult.validation_level" href="#atomik_sdk.pipeline.PipelineResult.validation_level">validation_level</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.pipeline.TaskDAG" href="#atomik_sdk.pipeline.TaskDAG">TaskDAG</a></code></h4>
+<ul class="">
+<li><code><a title="atomik_sdk.pipeline.TaskDAG.add_task" href="#atomik_sdk.pipeline.TaskDAG.add_task">add_task</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.TaskDAG.critical_path" href="#atomik_sdk.pipeline.TaskDAG.critical_path">critical_path</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.TaskDAG.critical_path_tokens" href="#atomik_sdk.pipeline.TaskDAG.critical_path_tokens">critical_path_tokens</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.TaskDAG.get_all_tasks" href="#atomik_sdk.pipeline.TaskDAG.get_all_tasks">get_all_tasks</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.TaskDAG.get_dependents" href="#atomik_sdk.pipeline.TaskDAG.get_dependents">get_dependents</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.TaskDAG.get_ready_tasks" href="#atomik_sdk.pipeline.TaskDAG.get_ready_tasks">get_ready_tasks</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.TaskDAG.get_task" href="#atomik_sdk.pipeline.TaskDAG.get_task">get_task</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.TaskDAG.has_failures" href="#atomik_sdk.pipeline.TaskDAG.has_failures">has_failures</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.TaskDAG.is_complete" href="#atomik_sdk.pipeline.TaskDAG.is_complete">is_complete</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.TaskDAG.mark_completed" href="#atomik_sdk.pipeline.TaskDAG.mark_completed">mark_completed</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.TaskDAG.mark_failed" href="#atomik_sdk.pipeline.TaskDAG.mark_failed">mark_failed</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.TaskDAG.mark_ready" href="#atomik_sdk.pipeline.TaskDAG.mark_ready">mark_ready</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.TaskDAG.mark_running" href="#atomik_sdk.pipeline.TaskDAG.mark_running">mark_running</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.TaskDAG.mark_skipped" href="#atomik_sdk.pipeline.TaskDAG.mark_skipped">mark_skipped</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.TaskDAG.summary" href="#atomik_sdk.pipeline.TaskDAG.summary">summary</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.TaskDAG.topological_order" href="#atomik_sdk.pipeline.TaskDAG.topological_order">topological_order</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.pipeline.TaskState" href="#atomik_sdk.pipeline.TaskState">TaskState</a></code></h4>
+<ul class="two-column">
+<li><code><a title="atomik_sdk.pipeline.TaskState.COMPLETED" href="#atomik_sdk.pipeline.TaskState.COMPLETED">COMPLETED</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.TaskState.FAILED" href="#atomik_sdk.pipeline.TaskState.FAILED">FAILED</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.TaskState.PENDING" href="#atomik_sdk.pipeline.TaskState.PENDING">PENDING</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.TaskState.READY" href="#atomik_sdk.pipeline.TaskState.READY">READY</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.TaskState.RUNNING" href="#atomik_sdk.pipeline.TaskState.RUNNING">RUNNING</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.TaskState.SKIPPED" href="#atomik_sdk.pipeline.TaskState.SKIPPED">SKIPPED</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+</body>
+</html>

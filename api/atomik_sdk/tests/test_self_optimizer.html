@@ -1,0 +1,837 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
+<title>atomik_sdk.tests.test_self_optimizer API documentation</title>
+<meta name="description" content="Tests for pipeline self-optimization engine.">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>atomik_sdk.tests.test_self_optimizer</code></h1>
+</header>
+<section id="section-intro">
+<p>Tests for pipeline self-optimization engine.</p>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="atomik_sdk.tests.test_self_optimizer.TestBaselineManager"><code class="flex name class">
+<span>class <span class="ident">TestBaselineManager</span></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class TestBaselineManager:
+    def test_create_and_get(self, tmp_path):
+        mgr = BaselineManager(tmp_path / &#34;baselines&#34;)
+        snapshot = mgr.create_baseline(&#34;test_schema&#34;, {&#34;fmax_mhz&#34;: 100.0})
+        assert snapshot.schema_name == &#34;test_schema&#34;
+        loaded = mgr.get_baseline(&#34;test_schema&#34;)
+        assert loaded is not None
+        assert loaded.metrics[&#34;fmax_mhz&#34;] == 100.0
+
+    def test_create_if_missing(self, tmp_path):
+        mgr = BaselineManager(tmp_path / &#34;baselines&#34;)
+        snap, created = mgr.create_if_missing(&#34;new&#34;, {&#34;m&#34;: 1.0})
+        assert created
+        snap2, created2 = mgr.create_if_missing(&#34;new&#34;, {&#34;m&#34;: 2.0})
+        assert not created2
+        assert snap2.metrics[&#34;m&#34;] == 1.0  # Unchanged
+
+    def test_update_baseline_ema(self, tmp_path):
+        mgr = BaselineManager(tmp_path / &#34;baselines&#34;)
+        mgr.create_baseline(&#34;test&#34;, {&#34;value&#34;: 100.0})
+        updated = mgr.update_baseline(&#34;test&#34;, {&#34;value&#34;: 200.0})
+        # EMA: 100*0.7 + 200*0.3 = 130
+        assert 125 &lt; updated.metrics[&#34;value&#34;] &lt; 135
+
+    def test_list_baselines(self, tmp_path):
+        mgr = BaselineManager(tmp_path / &#34;baselines&#34;)
+        mgr.create_baseline(&#34;schema_a&#34;, {&#34;m&#34;: 1.0})
+        mgr.create_baseline(&#34;schema_b&#34;, {&#34;m&#34;: 2.0})
+        names = mgr.list_baselines()
+        assert len(names) == 2</code></pre>
+</details>
+<div class="desc"></div>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.tests.test_self_optimizer.TestBaselineManager.test_create_and_get"><code class="name flex">
+<span>def <span class="ident">test_create_and_get</span></span>(<span>self, tmp_path)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_create_and_get(self, tmp_path):
+    mgr = BaselineManager(tmp_path / &#34;baselines&#34;)
+    snapshot = mgr.create_baseline(&#34;test_schema&#34;, {&#34;fmax_mhz&#34;: 100.0})
+    assert snapshot.schema_name == &#34;test_schema&#34;
+    loaded = mgr.get_baseline(&#34;test_schema&#34;)
+    assert loaded is not None
+    assert loaded.metrics[&#34;fmax_mhz&#34;] == 100.0</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.tests.test_self_optimizer.TestBaselineManager.test_create_if_missing"><code class="name flex">
+<span>def <span class="ident">test_create_if_missing</span></span>(<span>self, tmp_path)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_create_if_missing(self, tmp_path):
+    mgr = BaselineManager(tmp_path / &#34;baselines&#34;)
+    snap, created = mgr.create_if_missing(&#34;new&#34;, {&#34;m&#34;: 1.0})
+    assert created
+    snap2, created2 = mgr.create_if_missing(&#34;new&#34;, {&#34;m&#34;: 2.0})
+    assert not created2
+    assert snap2.metrics[&#34;m&#34;] == 1.0  # Unchanged</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.tests.test_self_optimizer.TestBaselineManager.test_list_baselines"><code class="name flex">
+<span>def <span class="ident">test_list_baselines</span></span>(<span>self, tmp_path)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_list_baselines(self, tmp_path):
+    mgr = BaselineManager(tmp_path / &#34;baselines&#34;)
+    mgr.create_baseline(&#34;schema_a&#34;, {&#34;m&#34;: 1.0})
+    mgr.create_baseline(&#34;schema_b&#34;, {&#34;m&#34;: 2.0})
+    names = mgr.list_baselines()
+    assert len(names) == 2</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.tests.test_self_optimizer.TestBaselineManager.test_update_baseline_ema"><code class="name flex">
+<span>def <span class="ident">test_update_baseline_ema</span></span>(<span>self, tmp_path)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_update_baseline_ema(self, tmp_path):
+    mgr = BaselineManager(tmp_path / &#34;baselines&#34;)
+    mgr.create_baseline(&#34;test&#34;, {&#34;value&#34;: 100.0})
+    updated = mgr.update_baseline(&#34;test&#34;, {&#34;value&#34;: 200.0})
+    # EMA: 100*0.7 + 200*0.3 = 130
+    assert 125 &lt; updated.metrics[&#34;value&#34;] &lt; 135</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.tests.test_self_optimizer.TestConfigTuner"><code class="flex name class">
+<span>class <span class="ident">TestConfigTuner</span></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class TestConfigTuner:
+    def test_tune_workers_diminishing(self):
+        tuner = ConfigTuner()
+        history = [
+            {&#34;parallel_speedup&#34;: 1.5},
+            {&#34;parallel_speedup&#34;: 1.6},
+            {&#34;parallel_speedup&#34;: 1.4},
+        ]
+        result = tuner.tune_workers(history, current_workers=4)
+        # Efficiency = 1.5/4 = 37.5%, should suggest decrease
+        assert result is not None
+        assert result.new_value &lt; 4
+
+    def test_tune_workers_efficient(self):
+        tuner = ConfigTuner()
+        history = [
+            {&#34;parallel_speedup&#34;: 3.5},
+            {&#34;parallel_speedup&#34;: 3.8},
+        ]
+        result = tuner.tune_workers(history, current_workers=4)
+        # Efficiency = 3.65/4 = 91%, should suggest increase
+        assert result is not None
+        assert result.new_value &gt; 4
+
+    def test_tune_retry_depth(self):
+        tuner = ConfigTuner()
+        history = [
+            {&#34;feedback_iterations&#34;: [
+                {&#34;iteration&#34;: 1, &#34;re_verify_passed&#34;: True},
+            ]},
+            {&#34;feedback_iterations&#34;: [
+                {&#34;iteration&#34;: 1, &#34;re_verify_passed&#34;: True},
+            ]},
+        ]
+        result = tuner.tune_retry_depth(history, current_depth=5)
+        # All fixes at depth 1, should suggest reducing
+        assert result is not None
+        assert result.new_value &lt;= 3</code></pre>
+</details>
+<div class="desc"></div>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.tests.test_self_optimizer.TestConfigTuner.test_tune_retry_depth"><code class="name flex">
+<span>def <span class="ident">test_tune_retry_depth</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_tune_retry_depth(self):
+    tuner = ConfigTuner()
+    history = [
+        {&#34;feedback_iterations&#34;: [
+            {&#34;iteration&#34;: 1, &#34;re_verify_passed&#34;: True},
+        ]},
+        {&#34;feedback_iterations&#34;: [
+            {&#34;iteration&#34;: 1, &#34;re_verify_passed&#34;: True},
+        ]},
+    ]
+    result = tuner.tune_retry_depth(history, current_depth=5)
+    # All fixes at depth 1, should suggest reducing
+    assert result is not None
+    assert result.new_value &lt;= 3</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.tests.test_self_optimizer.TestConfigTuner.test_tune_workers_diminishing"><code class="name flex">
+<span>def <span class="ident">test_tune_workers_diminishing</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_tune_workers_diminishing(self):
+    tuner = ConfigTuner()
+    history = [
+        {&#34;parallel_speedup&#34;: 1.5},
+        {&#34;parallel_speedup&#34;: 1.6},
+        {&#34;parallel_speedup&#34;: 1.4},
+    ]
+    result = tuner.tune_workers(history, current_workers=4)
+    # Efficiency = 1.5/4 = 37.5%, should suggest decrease
+    assert result is not None
+    assert result.new_value &lt; 4</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.tests.test_self_optimizer.TestConfigTuner.test_tune_workers_efficient"><code class="name flex">
+<span>def <span class="ident">test_tune_workers_efficient</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_tune_workers_efficient(self):
+    tuner = ConfigTuner()
+    history = [
+        {&#34;parallel_speedup&#34;: 3.5},
+        {&#34;parallel_speedup&#34;: 3.8},
+    ]
+    result = tuner.tune_workers(history, current_workers=4)
+    # Efficiency = 3.65/4 = 91%, should suggest increase
+    assert result is not None
+    assert result.new_value &gt; 4</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.tests.test_self_optimizer.TestConsensusResolver"><code class="flex name class">
+<span>class <span class="ident">TestConsensusResolver</span></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class TestConsensusResolver:
+    def test_all_agree(self):
+        resolver = ConsensusResolver()
+        result = resolver.resolve({
+            &#34;agent_a&#34;: {&#34;field&#34;: &#34;value&#34;},
+            &#34;agent_b&#34;: {&#34;field&#34;: &#34;value&#34;},
+        })
+        assert result.agreed
+        assert result.merged_output == {&#34;field&#34;: &#34;value&#34;}
+
+    def test_conflict_detected(self):
+        resolver = ConsensusResolver()
+        result = resolver.resolve({
+            &#34;agent_a&#34;: {&#34;field&#34;: &#34;value_a&#34;},
+            &#34;agent_b&#34;: {&#34;field&#34;: &#34;value_b&#34;},
+        })
+        assert not result.agreed
+        assert result.conflict_count &gt;= 1
+
+    def test_majority_vote(self):
+        resolver = ConsensusResolver()
+        result = resolver.resolve({
+            &#34;agent_a&#34;: {&#34;field&#34;: &#34;correct&#34;},
+            &#34;agent_b&#34;: {&#34;field&#34;: &#34;correct&#34;},
+            &#34;agent_c&#34;: {&#34;field&#34;: &#34;wrong&#34;},
+        })
+        assert result.merged_output[&#34;field&#34;] == &#34;correct&#34;
+
+    def test_interface_field_check(self):
+        resolver = ConsensusResolver()
+        result = resolver.resolve_interface_fields({
+            &#34;python&#34;: [&#34;price_delta&#34;, &#34;volume&#34;],
+            &#34;rust&#34;: [&#34;price_delta&#34;],
+        })
+        assert not result.agreed
+        assert len(result.escalated) &gt;= 1</code></pre>
+</details>
+<div class="desc"></div>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.tests.test_self_optimizer.TestConsensusResolver.test_all_agree"><code class="name flex">
+<span>def <span class="ident">test_all_agree</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_all_agree(self):
+    resolver = ConsensusResolver()
+    result = resolver.resolve({
+        &#34;agent_a&#34;: {&#34;field&#34;: &#34;value&#34;},
+        &#34;agent_b&#34;: {&#34;field&#34;: &#34;value&#34;},
+    })
+    assert result.agreed
+    assert result.merged_output == {&#34;field&#34;: &#34;value&#34;}</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.tests.test_self_optimizer.TestConsensusResolver.test_conflict_detected"><code class="name flex">
+<span>def <span class="ident">test_conflict_detected</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_conflict_detected(self):
+    resolver = ConsensusResolver()
+    result = resolver.resolve({
+        &#34;agent_a&#34;: {&#34;field&#34;: &#34;value_a&#34;},
+        &#34;agent_b&#34;: {&#34;field&#34;: &#34;value_b&#34;},
+    })
+    assert not result.agreed
+    assert result.conflict_count &gt;= 1</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.tests.test_self_optimizer.TestConsensusResolver.test_interface_field_check"><code class="name flex">
+<span>def <span class="ident">test_interface_field_check</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_interface_field_check(self):
+    resolver = ConsensusResolver()
+    result = resolver.resolve_interface_fields({
+        &#34;python&#34;: [&#34;price_delta&#34;, &#34;volume&#34;],
+        &#34;rust&#34;: [&#34;price_delta&#34;],
+    })
+    assert not result.agreed
+    assert len(result.escalated) &gt;= 1</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.tests.test_self_optimizer.TestConsensusResolver.test_majority_vote"><code class="name flex">
+<span>def <span class="ident">test_majority_vote</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_majority_vote(self):
+    resolver = ConsensusResolver()
+    result = resolver.resolve({
+        &#34;agent_a&#34;: {&#34;field&#34;: &#34;correct&#34;},
+        &#34;agent_b&#34;: {&#34;field&#34;: &#34;correct&#34;},
+        &#34;agent_c&#34;: {&#34;field&#34;: &#34;wrong&#34;},
+    })
+    assert result.merged_output[&#34;field&#34;] == &#34;correct&#34;</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.tests.test_self_optimizer.TestIntelligentContextManager"><code class="flex name class">
+<span>class <span class="ident">TestIntelligentContextManager</span></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class TestIntelligentContextManager:
+    def test_add_and_build(self):
+        mgr = IntelligentContextManager(max_tokens=10000)
+        mgr.add_segment(&#34;s1&#34;, &#34;hello world&#34;, &#34;schema&#34;)
+        context = mgr.build_context()
+        assert &#34;hello world&#34; in context
+
+    def test_cold_start(self):
+        mgr = IntelligentContextManager(max_tokens=10000)
+        mgr.add_segment(&#34;s1&#34;, &#34;schema data&#34;, &#34;schema&#34;)
+        mgr.add_segment(&#34;s2&#34;, &#34;kb data&#34;, &#34;kb_entry&#34;)
+        cold = mgr.get_context_for_cold_start()
+        assert len(cold) &gt; 0
+
+    def test_budget_utilization(self):
+        mgr = IntelligentContextManager(max_tokens=100, utilization_limit=0.8)
+        mgr.add_segment(&#34;s1&#34;, &#34;x&#34; * 400, &#34;schema&#34;)  # ~100 tokens
+        util = mgr.get_utilization()
+        assert util[&#34;budget&#34;][&#34;utilization&#34;] &gt; 0</code></pre>
+</details>
+<div class="desc"></div>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.tests.test_self_optimizer.TestIntelligentContextManager.test_add_and_build"><code class="name flex">
+<span>def <span class="ident">test_add_and_build</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_add_and_build(self):
+    mgr = IntelligentContextManager(max_tokens=10000)
+    mgr.add_segment(&#34;s1&#34;, &#34;hello world&#34;, &#34;schema&#34;)
+    context = mgr.build_context()
+    assert &#34;hello world&#34; in context</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.tests.test_self_optimizer.TestIntelligentContextManager.test_budget_utilization"><code class="name flex">
+<span>def <span class="ident">test_budget_utilization</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_budget_utilization(self):
+    mgr = IntelligentContextManager(max_tokens=100, utilization_limit=0.8)
+    mgr.add_segment(&#34;s1&#34;, &#34;x&#34; * 400, &#34;schema&#34;)  # ~100 tokens
+    util = mgr.get_utilization()
+    assert util[&#34;budget&#34;][&#34;utilization&#34;] &gt; 0</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.tests.test_self_optimizer.TestIntelligentContextManager.test_cold_start"><code class="name flex">
+<span>def <span class="ident">test_cold_start</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_cold_start(self):
+    mgr = IntelligentContextManager(max_tokens=10000)
+    mgr.add_segment(&#34;s1&#34;, &#34;schema data&#34;, &#34;schema&#34;)
+    mgr.add_segment(&#34;s2&#34;, &#34;kb data&#34;, &#34;kb_entry&#34;)
+    cold = mgr.get_context_for_cold_start()
+    assert len(cold) &gt; 0</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.tests.test_self_optimizer.TestRegressionGate"><code class="flex name class">
+<span>class <span class="ident">TestRegressionGate</span></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class TestRegressionGate:
+    def test_first_run_creates_baseline(self, tmp_path):
+        gate = RegressionGate(
+            baseline_manager=BaselineManager(tmp_path / &#34;baselines&#34;),
+        )
+        result = gate.check(&#34;test&#34;, {&#34;fmax_mhz&#34;: 100.0})
+        assert result.baseline_created
+        assert result.passed
+
+    def test_no_regression(self, tmp_path):
+        mgr = BaselineManager(tmp_path / &#34;baselines&#34;)
+        mgr.create_baseline(&#34;test&#34;, {&#34;fmax_mhz&#34;: 100.0})
+        gate = RegressionGate(baseline_manager=mgr)
+        result = gate.check(&#34;test&#34;, {&#34;fmax_mhz&#34;: 100.0})
+        assert result.passed
+        assert not result.blocked</code></pre>
+</details>
+<div class="desc"></div>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.tests.test_self_optimizer.TestRegressionGate.test_first_run_creates_baseline"><code class="name flex">
+<span>def <span class="ident">test_first_run_creates_baseline</span></span>(<span>self, tmp_path)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_first_run_creates_baseline(self, tmp_path):
+    gate = RegressionGate(
+        baseline_manager=BaselineManager(tmp_path / &#34;baselines&#34;),
+    )
+    result = gate.check(&#34;test&#34;, {&#34;fmax_mhz&#34;: 100.0})
+    assert result.baseline_created
+    assert result.passed</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.tests.test_self_optimizer.TestRegressionGate.test_no_regression"><code class="name flex">
+<span>def <span class="ident">test_no_regression</span></span>(<span>self, tmp_path)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_no_regression(self, tmp_path):
+    mgr = BaselineManager(tmp_path / &#34;baselines&#34;)
+    mgr.create_baseline(&#34;test&#34;, {&#34;fmax_mhz&#34;: 100.0})
+    gate = RegressionGate(baseline_manager=mgr)
+    result = gate.check(&#34;test&#34;, {&#34;fmax_mhz&#34;: 100.0})
+    assert result.passed
+    assert not result.blocked</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.tests.test_self_optimizer.TestSegmentTracker"><code class="flex name class">
+<span>class <span class="ident">TestSegmentTracker</span></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class TestSegmentTracker:
+    def test_add_and_get(self):
+        tracker = SegmentTracker()
+        seg = tracker.add(&#34;s1&#34;, &#34;content&#34;, &#34;schema&#34;)
+        assert seg.segment_id == &#34;s1&#34;
+        retrieved = tracker.get(&#34;s1&#34;)
+        assert retrieved is not None
+
+    def test_rank_by_relevance(self):
+        tracker = SegmentTracker()
+        tracker.add(&#34;s1&#34;, &#34;content&#34;, &#34;schema&#34;, [&#34;generate&#34;])
+        tracker.add(&#34;s2&#34;, &#34;content&#34;, &#34;kb_entry&#34;, [&#34;verify&#34;])
+        ranked = tracker.rank_by_relevance(&#34;generate&#34;)
+        assert ranked[0].segment_id == &#34;s1&#34;  # Higher affinity
+
+    def test_stale_eviction(self):
+        tracker = SegmentTracker(stale_threshold_tasks=2)
+        tracker.add(&#34;s1&#34;, &#34;content&#34;, &#34;schema&#34;)
+        tracker.advance_task()
+        tracker.advance_task()
+        stale = tracker.get_stale_segments()
+        assert len(stale) &gt;= 1
+        evicted = tracker.evict_stale()
+        assert &#34;s1&#34; in evicted</code></pre>
+</details>
+<div class="desc"></div>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.tests.test_self_optimizer.TestSegmentTracker.test_add_and_get"><code class="name flex">
+<span>def <span class="ident">test_add_and_get</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_add_and_get(self):
+    tracker = SegmentTracker()
+    seg = tracker.add(&#34;s1&#34;, &#34;content&#34;, &#34;schema&#34;)
+    assert seg.segment_id == &#34;s1&#34;
+    retrieved = tracker.get(&#34;s1&#34;)
+    assert retrieved is not None</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.tests.test_self_optimizer.TestSegmentTracker.test_rank_by_relevance"><code class="name flex">
+<span>def <span class="ident">test_rank_by_relevance</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_rank_by_relevance(self):
+    tracker = SegmentTracker()
+    tracker.add(&#34;s1&#34;, &#34;content&#34;, &#34;schema&#34;, [&#34;generate&#34;])
+    tracker.add(&#34;s2&#34;, &#34;content&#34;, &#34;kb_entry&#34;, [&#34;verify&#34;])
+    ranked = tracker.rank_by_relevance(&#34;generate&#34;)
+    assert ranked[0].segment_id == &#34;s1&#34;  # Higher affinity</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.tests.test_self_optimizer.TestSegmentTracker.test_stale_eviction"><code class="name flex">
+<span>def <span class="ident">test_stale_eviction</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_stale_eviction(self):
+    tracker = SegmentTracker(stale_threshold_tasks=2)
+    tracker.add(&#34;s1&#34;, &#34;content&#34;, &#34;schema&#34;)
+    tracker.advance_task()
+    tracker.advance_task()
+    stale = tracker.get_stale_segments()
+    assert len(stale) &gt;= 1
+    evicted = tracker.evict_stale()
+    assert &#34;s1&#34; in evicted</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.tests.test_self_optimizer.TestSelfOptimizer"><code class="flex name class">
+<span>class <span class="ident">TestSelfOptimizer</span></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class TestSelfOptimizer:
+    def test_should_report(self):
+        optimizer = SelfOptimizer(report_every=3)
+        assert not optimizer.should_report()
+        optimizer.record_run({&#34;metric&#34;: 1})
+        optimizer.record_run({&#34;metric&#34;: 2})
+        optimizer.record_run({&#34;metric&#34;: 3})
+        assert optimizer.should_report()
+
+    def test_generate_report(self):
+        optimizer = SelfOptimizer(report_every=2)
+        optimizer.record_run({
+            &#34;stage_durations&#34;: {&#34;validate&#34;: 100, &#34;generate&#34;: 500, &#34;verify&#34;: 200},
+        })
+        optimizer.record_run({
+            &#34;stage_durations&#34;: {&#34;validate&#34;: 120, &#34;generate&#34;: 480, &#34;verify&#34;: 210},
+        })
+        report = optimizer.generate_report()
+        assert isinstance(report, OptimizationReport)
+        assert report.run_count_analyzed == 2
+        assert report.bottleneck_stage == &#34;generate&#34;
+
+    def test_bottleneck_recommendation(self):
+        optimizer = SelfOptimizer(report_every=1)
+        optimizer.record_run({
+            &#34;stage_durations&#34;: {&#34;validate&#34;: 50, &#34;generate&#34;: 900, &#34;verify&#34;: 50},
+        })
+        report = optimizer.generate_report()
+        assert report.bottleneck_pct &gt; 50
+        bottleneck_recs = [r for r in report.recommendations if r.category == &#34;bottleneck&#34;]
+        assert len(bottleneck_recs) &gt;= 1</code></pre>
+</details>
+<div class="desc"></div>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.tests.test_self_optimizer.TestSelfOptimizer.test_bottleneck_recommendation"><code class="name flex">
+<span>def <span class="ident">test_bottleneck_recommendation</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_bottleneck_recommendation(self):
+    optimizer = SelfOptimizer(report_every=1)
+    optimizer.record_run({
+        &#34;stage_durations&#34;: {&#34;validate&#34;: 50, &#34;generate&#34;: 900, &#34;verify&#34;: 50},
+    })
+    report = optimizer.generate_report()
+    assert report.bottleneck_pct &gt; 50
+    bottleneck_recs = [r for r in report.recommendations if r.category == &#34;bottleneck&#34;]
+    assert len(bottleneck_recs) &gt;= 1</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.tests.test_self_optimizer.TestSelfOptimizer.test_generate_report"><code class="name flex">
+<span>def <span class="ident">test_generate_report</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_generate_report(self):
+    optimizer = SelfOptimizer(report_every=2)
+    optimizer.record_run({
+        &#34;stage_durations&#34;: {&#34;validate&#34;: 100, &#34;generate&#34;: 500, &#34;verify&#34;: 200},
+    })
+    optimizer.record_run({
+        &#34;stage_durations&#34;: {&#34;validate&#34;: 120, &#34;generate&#34;: 480, &#34;verify&#34;: 210},
+    })
+    report = optimizer.generate_report()
+    assert isinstance(report, OptimizationReport)
+    assert report.run_count_analyzed == 2
+    assert report.bottleneck_stage == &#34;generate&#34;</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.tests.test_self_optimizer.TestSelfOptimizer.test_should_report"><code class="name flex">
+<span>def <span class="ident">test_should_report</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_should_report(self):
+    optimizer = SelfOptimizer(report_every=3)
+    assert not optimizer.should_report()
+    optimizer.record_run({&#34;metric&#34;: 1})
+    optimizer.record_run({&#34;metric&#34;: 2})
+    optimizer.record_run({&#34;metric&#34;: 3})
+    assert optimizer.should_report()</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="atomik_sdk.tests" href="index.html">atomik_sdk.tests</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="atomik_sdk.tests.test_self_optimizer.TestBaselineManager" href="#atomik_sdk.tests.test_self_optimizer.TestBaselineManager">TestBaselineManager</a></code></h4>
+<ul class="">
+<li><code><a title="atomik_sdk.tests.test_self_optimizer.TestBaselineManager.test_create_and_get" href="#atomik_sdk.tests.test_self_optimizer.TestBaselineManager.test_create_and_get">test_create_and_get</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_self_optimizer.TestBaselineManager.test_create_if_missing" href="#atomik_sdk.tests.test_self_optimizer.TestBaselineManager.test_create_if_missing">test_create_if_missing</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_self_optimizer.TestBaselineManager.test_list_baselines" href="#atomik_sdk.tests.test_self_optimizer.TestBaselineManager.test_list_baselines">test_list_baselines</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_self_optimizer.TestBaselineManager.test_update_baseline_ema" href="#atomik_sdk.tests.test_self_optimizer.TestBaselineManager.test_update_baseline_ema">test_update_baseline_ema</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.tests.test_self_optimizer.TestConfigTuner" href="#atomik_sdk.tests.test_self_optimizer.TestConfigTuner">TestConfigTuner</a></code></h4>
+<ul class="">
+<li><code><a title="atomik_sdk.tests.test_self_optimizer.TestConfigTuner.test_tune_retry_depth" href="#atomik_sdk.tests.test_self_optimizer.TestConfigTuner.test_tune_retry_depth">test_tune_retry_depth</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_self_optimizer.TestConfigTuner.test_tune_workers_diminishing" href="#atomik_sdk.tests.test_self_optimizer.TestConfigTuner.test_tune_workers_diminishing">test_tune_workers_diminishing</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_self_optimizer.TestConfigTuner.test_tune_workers_efficient" href="#atomik_sdk.tests.test_self_optimizer.TestConfigTuner.test_tune_workers_efficient">test_tune_workers_efficient</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.tests.test_self_optimizer.TestConsensusResolver" href="#atomik_sdk.tests.test_self_optimizer.TestConsensusResolver">TestConsensusResolver</a></code></h4>
+<ul class="">
+<li><code><a title="atomik_sdk.tests.test_self_optimizer.TestConsensusResolver.test_all_agree" href="#atomik_sdk.tests.test_self_optimizer.TestConsensusResolver.test_all_agree">test_all_agree</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_self_optimizer.TestConsensusResolver.test_conflict_detected" href="#atomik_sdk.tests.test_self_optimizer.TestConsensusResolver.test_conflict_detected">test_conflict_detected</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_self_optimizer.TestConsensusResolver.test_interface_field_check" href="#atomik_sdk.tests.test_self_optimizer.TestConsensusResolver.test_interface_field_check">test_interface_field_check</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_self_optimizer.TestConsensusResolver.test_majority_vote" href="#atomik_sdk.tests.test_self_optimizer.TestConsensusResolver.test_majority_vote">test_majority_vote</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.tests.test_self_optimizer.TestIntelligentContextManager" href="#atomik_sdk.tests.test_self_optimizer.TestIntelligentContextManager">TestIntelligentContextManager</a></code></h4>
+<ul class="">
+<li><code><a title="atomik_sdk.tests.test_self_optimizer.TestIntelligentContextManager.test_add_and_build" href="#atomik_sdk.tests.test_self_optimizer.TestIntelligentContextManager.test_add_and_build">test_add_and_build</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_self_optimizer.TestIntelligentContextManager.test_budget_utilization" href="#atomik_sdk.tests.test_self_optimizer.TestIntelligentContextManager.test_budget_utilization">test_budget_utilization</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_self_optimizer.TestIntelligentContextManager.test_cold_start" href="#atomik_sdk.tests.test_self_optimizer.TestIntelligentContextManager.test_cold_start">test_cold_start</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.tests.test_self_optimizer.TestRegressionGate" href="#atomik_sdk.tests.test_self_optimizer.TestRegressionGate">TestRegressionGate</a></code></h4>
+<ul class="">
+<li><code><a title="atomik_sdk.tests.test_self_optimizer.TestRegressionGate.test_first_run_creates_baseline" href="#atomik_sdk.tests.test_self_optimizer.TestRegressionGate.test_first_run_creates_baseline">test_first_run_creates_baseline</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_self_optimizer.TestRegressionGate.test_no_regression" href="#atomik_sdk.tests.test_self_optimizer.TestRegressionGate.test_no_regression">test_no_regression</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.tests.test_self_optimizer.TestSegmentTracker" href="#atomik_sdk.tests.test_self_optimizer.TestSegmentTracker">TestSegmentTracker</a></code></h4>
+<ul class="">
+<li><code><a title="atomik_sdk.tests.test_self_optimizer.TestSegmentTracker.test_add_and_get" href="#atomik_sdk.tests.test_self_optimizer.TestSegmentTracker.test_add_and_get">test_add_and_get</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_self_optimizer.TestSegmentTracker.test_rank_by_relevance" href="#atomik_sdk.tests.test_self_optimizer.TestSegmentTracker.test_rank_by_relevance">test_rank_by_relevance</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_self_optimizer.TestSegmentTracker.test_stale_eviction" href="#atomik_sdk.tests.test_self_optimizer.TestSegmentTracker.test_stale_eviction">test_stale_eviction</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.tests.test_self_optimizer.TestSelfOptimizer" href="#atomik_sdk.tests.test_self_optimizer.TestSelfOptimizer">TestSelfOptimizer</a></code></h4>
+<ul class="">
+<li><code><a title="atomik_sdk.tests.test_self_optimizer.TestSelfOptimizer.test_bottleneck_recommendation" href="#atomik_sdk.tests.test_self_optimizer.TestSelfOptimizer.test_bottleneck_recommendation">test_bottleneck_recommendation</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_self_optimizer.TestSelfOptimizer.test_generate_report" href="#atomik_sdk.tests.test_self_optimizer.TestSelfOptimizer.test_generate_report">test_generate_report</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_self_optimizer.TestSelfOptimizer.test_should_report" href="#atomik_sdk.tests.test_self_optimizer.TestSelfOptimizer.test_should_report">test_should_report</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+</body>
+</html>

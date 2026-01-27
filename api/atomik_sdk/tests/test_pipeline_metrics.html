@@ -1,0 +1,731 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
+<title>atomik_sdk.tests.test_pipeline_metrics API documentation</title>
+<meta name="description" content="Tests for ATOMiK Pipeline Metrics Framework …">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>atomik_sdk.tests.test_pipeline_metrics</code></h1>
+</header>
+<section id="section-intro">
+<p>Tests for ATOMiK Pipeline Metrics Framework</p>
+<p>Tests cover:
+- Metrics collector API
+- Hardware benchmark parsing
+- Pipeline benchmark recording
+- Metrics reporter formatting
+- CSV export
+- Cross-schema comparison</p>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="atomik_sdk.tests.test_pipeline_metrics.TestHardwareBenchmark"><code class="flex name class">
+<span>class <span class="ident">TestHardwareBenchmark</span></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class TestHardwareBenchmark:
+    def test_create_benchmark(self):
+        bench = HardwareBenchmark()
+        assert bench.DEVICE_CAPACITY[&#34;lut_total&#34;] == 8640
+
+    def test_compute_runtime_metrics(self):
+        bench = HardwareBenchmark()
+        metrics = bench.compute_runtime_metrics(fmax_mhz=94.9, data_width=64)
+        assert metrics[&#34;ops_per_second&#34;] == 94_900_000
+        assert metrics[&#34;latency_ns&#34;] &gt; 0
+        assert metrics[&#34;throughput_gbps&#34;] &gt; 0
+
+    def test_phase3_comparison(self):
+        bench = HardwareBenchmark()
+        current = {&#34;fmax_mhz&#34;: 95.0, &#34;lut_pct&#34;: 8}
+        comparison = bench.get_phase3_comparison(current)
+        assert &#34;fmax_mhz&#34; in comparison
+        assert comparison[&#34;fmax_mhz&#34;][&#34;baseline&#34;] == 94.9
+        assert comparison[&#34;fmax_mhz&#34;][&#34;current&#34;] == 95.0
+        assert comparison[&#34;fmax_mhz&#34;][&#34;delta&#34;] == pytest.approx(0.1, abs=0.01)
+
+    def test_runtime_zero_fmax(self):
+        bench = HardwareBenchmark()
+        metrics = bench.compute_runtime_metrics(fmax_mhz=0, data_width=64)
+        assert metrics == {}</code></pre>
+</details>
+<div class="desc"></div>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.tests.test_pipeline_metrics.TestHardwareBenchmark.test_compute_runtime_metrics"><code class="name flex">
+<span>def <span class="ident">test_compute_runtime_metrics</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_compute_runtime_metrics(self):
+    bench = HardwareBenchmark()
+    metrics = bench.compute_runtime_metrics(fmax_mhz=94.9, data_width=64)
+    assert metrics[&#34;ops_per_second&#34;] == 94_900_000
+    assert metrics[&#34;latency_ns&#34;] &gt; 0
+    assert metrics[&#34;throughput_gbps&#34;] &gt; 0</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.tests.test_pipeline_metrics.TestHardwareBenchmark.test_create_benchmark"><code class="name flex">
+<span>def <span class="ident">test_create_benchmark</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_create_benchmark(self):
+    bench = HardwareBenchmark()
+    assert bench.DEVICE_CAPACITY[&#34;lut_total&#34;] == 8640</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.tests.test_pipeline_metrics.TestHardwareBenchmark.test_phase3_comparison"><code class="name flex">
+<span>def <span class="ident">test_phase3_comparison</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_phase3_comparison(self):
+    bench = HardwareBenchmark()
+    current = {&#34;fmax_mhz&#34;: 95.0, &#34;lut_pct&#34;: 8}
+    comparison = bench.get_phase3_comparison(current)
+    assert &#34;fmax_mhz&#34; in comparison
+    assert comparison[&#34;fmax_mhz&#34;][&#34;baseline&#34;] == 94.9
+    assert comparison[&#34;fmax_mhz&#34;][&#34;current&#34;] == 95.0
+    assert comparison[&#34;fmax_mhz&#34;][&#34;delta&#34;] == pytest.approx(0.1, abs=0.01)</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.tests.test_pipeline_metrics.TestHardwareBenchmark.test_runtime_zero_fmax"><code class="name flex">
+<span>def <span class="ident">test_runtime_zero_fmax</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_runtime_zero_fmax(self):
+    bench = HardwareBenchmark()
+    metrics = bench.compute_runtime_metrics(fmax_mhz=0, data_width=64)
+    assert metrics == {}</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.tests.test_pipeline_metrics.TestMetricsCollector"><code class="flex name class">
+<span>class <span class="ident">TestMetricsCollector</span></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class TestMetricsCollector:
+    def test_create_collector(self):
+        collector = MetricsCollector()
+        assert collector.get_all() == []
+
+    def test_record_metric(self):
+        collector = MetricsCollector()
+        collector.record(&#34;test_metric&#34;, 42, unit=&#34;count&#34;, category=&#34;pipeline&#34;)
+        entries = collector.get_all()
+        assert len(entries) == 1
+        assert entries[0][&#34;name&#34;] == &#34;test_metric&#34;
+        assert entries[0][&#34;value&#34;] == 42
+
+    def test_record_pipeline(self):
+        collector = MetricsCollector()
+        collector.record_pipeline(tokens=0, time_ms=100)
+        by_cat = collector.get_by_category(&#34;pipeline&#34;)
+        assert len(by_cat) == 2
+
+    def test_record_hardware(self):
+        collector = MetricsCollector()
+        collector.record_hardware(lut_pct=7, ff_pct=9, fmax=94.9)
+        summary = collector.get_summary()
+        assert &#34;hardware&#34; in summary
+        assert summary[&#34;hardware&#34;][&#34;fmax&#34;] == 94.9
+
+    def test_record_runtime(self):
+        collector = MetricsCollector()
+        collector.record_runtime(ops_per_second=94_500_000)
+        flat = collector.to_flat_dict()
+        assert flat[&#34;ops_per_second&#34;] == 94_500_000
+
+    def test_record_quality(self):
+        collector = MetricsCollector()
+        collector.record_quality(tests_passed=10, tests_total=10)
+        summary = collector.get_summary()
+        assert summary[&#34;quality&#34;][&#34;tests_passed&#34;] == 10
+
+    def test_merge_collectors(self):
+        c1 = MetricsCollector()
+        c1.record(&#34;a&#34;, 1)
+        c2 = MetricsCollector()
+        c2.record(&#34;b&#34;, 2)
+        c1.merge(c2)
+        assert len(c1.get_all()) == 2
+
+    def test_clear(self):
+        collector = MetricsCollector()
+        collector.record(&#34;a&#34;, 1)
+        collector.clear()
+        assert len(collector.get_all()) == 0</code></pre>
+</details>
+<div class="desc"></div>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.tests.test_pipeline_metrics.TestMetricsCollector.test_clear"><code class="name flex">
+<span>def <span class="ident">test_clear</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_clear(self):
+    collector = MetricsCollector()
+    collector.record(&#34;a&#34;, 1)
+    collector.clear()
+    assert len(collector.get_all()) == 0</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.tests.test_pipeline_metrics.TestMetricsCollector.test_create_collector"><code class="name flex">
+<span>def <span class="ident">test_create_collector</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_create_collector(self):
+    collector = MetricsCollector()
+    assert collector.get_all() == []</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.tests.test_pipeline_metrics.TestMetricsCollector.test_merge_collectors"><code class="name flex">
+<span>def <span class="ident">test_merge_collectors</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_merge_collectors(self):
+    c1 = MetricsCollector()
+    c1.record(&#34;a&#34;, 1)
+    c2 = MetricsCollector()
+    c2.record(&#34;b&#34;, 2)
+    c1.merge(c2)
+    assert len(c1.get_all()) == 2</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.tests.test_pipeline_metrics.TestMetricsCollector.test_record_hardware"><code class="name flex">
+<span>def <span class="ident">test_record_hardware</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_record_hardware(self):
+    collector = MetricsCollector()
+    collector.record_hardware(lut_pct=7, ff_pct=9, fmax=94.9)
+    summary = collector.get_summary()
+    assert &#34;hardware&#34; in summary
+    assert summary[&#34;hardware&#34;][&#34;fmax&#34;] == 94.9</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.tests.test_pipeline_metrics.TestMetricsCollector.test_record_metric"><code class="name flex">
+<span>def <span class="ident">test_record_metric</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_record_metric(self):
+    collector = MetricsCollector()
+    collector.record(&#34;test_metric&#34;, 42, unit=&#34;count&#34;, category=&#34;pipeline&#34;)
+    entries = collector.get_all()
+    assert len(entries) == 1
+    assert entries[0][&#34;name&#34;] == &#34;test_metric&#34;
+    assert entries[0][&#34;value&#34;] == 42</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.tests.test_pipeline_metrics.TestMetricsCollector.test_record_pipeline"><code class="name flex">
+<span>def <span class="ident">test_record_pipeline</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_record_pipeline(self):
+    collector = MetricsCollector()
+    collector.record_pipeline(tokens=0, time_ms=100)
+    by_cat = collector.get_by_category(&#34;pipeline&#34;)
+    assert len(by_cat) == 2</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.tests.test_pipeline_metrics.TestMetricsCollector.test_record_quality"><code class="name flex">
+<span>def <span class="ident">test_record_quality</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_record_quality(self):
+    collector = MetricsCollector()
+    collector.record_quality(tests_passed=10, tests_total=10)
+    summary = collector.get_summary()
+    assert summary[&#34;quality&#34;][&#34;tests_passed&#34;] == 10</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.tests.test_pipeline_metrics.TestMetricsCollector.test_record_runtime"><code class="name flex">
+<span>def <span class="ident">test_record_runtime</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_record_runtime(self):
+    collector = MetricsCollector()
+    collector.record_runtime(ops_per_second=94_500_000)
+    flat = collector.to_flat_dict()
+    assert flat[&#34;ops_per_second&#34;] == 94_500_000</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.tests.test_pipeline_metrics.TestMetricsReporter"><code class="flex name class">
+<span>class <span class="ident">TestMetricsReporter</span></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class TestMetricsReporter:
+    def test_text_report(self):
+        reporter = MetricsReporter()
+        report = reporter.format_text_report(&#34;video-h264-delta&#34;, {
+            &#34;pipeline_total_time_ms&#34;: 4500,
+            &#34;tokens_consumed&#34;: 0,
+            &#34;token_efficiency_pct&#34;: 100,
+            &#34;files_generated&#34;: 19,
+            &#34;lines_generated&#34;: 850,
+            &#34;validation_level&#34;: &#34;hw_validated&#34;,
+            &#34;sim_tests_passed&#34;: 10,
+            &#34;sim_tests_total&#34;: 10,
+            &#34;hw_tests_passed&#34;: 10,
+            &#34;hw_tests_total&#34;: 10,
+            &#34;lint_errors_found&#34;: 0,
+            &#34;self_correction_count&#34;: 0,
+        })
+        assert &#34;video-h264-delta&#34; in report
+        assert &#34;Pipeline Efficiency&#34; in report
+        assert &#34;Hardware Validation&#34; in report
+        assert &#34;HW_VALIDATED&#34; in report
+
+    def test_comparison_table(self):
+        reporter = MetricsReporter()
+        schemas = {
+            &#34;video&#34;: {&#34;time_ms&#34;: 4500, &#34;tokens&#34;: 0, &#34;files&#34;: 19, &#34;lines&#34;: 850, &#34;efficiency&#34;: 100},
+            &#34;sensor&#34;: {&#34;time_ms&#34;: 3800, &#34;tokens&#34;: 0, &#34;files&#34;: 19, &#34;lines&#34;: 720, &#34;efficiency&#34;: 100},
+        }
+        table = reporter.format_comparison_table(schemas)
+        assert &#34;video&#34; in table
+        assert &#34;sensor&#34; in table
+        assert &#34;Pipeline time&#34; in table
+
+    def test_empty_comparison(self):
+        reporter = MetricsReporter()
+        table = reporter.format_comparison_table({})
+        assert &#34;No data&#34; in table
+
+    def test_json_report(self, tmp_path):
+        reporter = MetricsReporter()
+        path = tmp_path / &#34;report.json&#34;
+        reporter.write_json_report(path, {&#34;schema&#34;: &#34;test&#34;, &#34;success&#34;: True})
+        assert path.exists()
+        data = json.loads(path.read_text())
+        assert data[&#34;success&#34;] is True
+
+    def test_csv_history(self, tmp_path):
+        import csv
+        csv_path = tmp_path / &#34;history.csv&#34;
+        with open(csv_path, &#34;w&#34;, newline=&#34;&#34;) as f:
+            writer = csv.DictWriter(f, fieldnames=[&#34;schema&#34;, &#34;tokens&#34;])
+            writer.writeheader()
+            writer.writerow({&#34;schema&#34;: &#34;video&#34;, &#34;tokens&#34;: &#34;0&#34;})
+            writer.writerow({&#34;schema&#34;: &#34;sensor&#34;, &#34;tokens&#34;: &#34;0&#34;})
+
+        reporter = MetricsReporter()
+        history = reporter.read_csv_history(csv_path)
+        assert len(history) == 2
+        assert history[0][&#34;schema&#34;] == &#34;video&#34;</code></pre>
+</details>
+<div class="desc"></div>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.tests.test_pipeline_metrics.TestMetricsReporter.test_comparison_table"><code class="name flex">
+<span>def <span class="ident">test_comparison_table</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_comparison_table(self):
+    reporter = MetricsReporter()
+    schemas = {
+        &#34;video&#34;: {&#34;time_ms&#34;: 4500, &#34;tokens&#34;: 0, &#34;files&#34;: 19, &#34;lines&#34;: 850, &#34;efficiency&#34;: 100},
+        &#34;sensor&#34;: {&#34;time_ms&#34;: 3800, &#34;tokens&#34;: 0, &#34;files&#34;: 19, &#34;lines&#34;: 720, &#34;efficiency&#34;: 100},
+    }
+    table = reporter.format_comparison_table(schemas)
+    assert &#34;video&#34; in table
+    assert &#34;sensor&#34; in table
+    assert &#34;Pipeline time&#34; in table</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.tests.test_pipeline_metrics.TestMetricsReporter.test_csv_history"><code class="name flex">
+<span>def <span class="ident">test_csv_history</span></span>(<span>self, tmp_path)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_csv_history(self, tmp_path):
+    import csv
+    csv_path = tmp_path / &#34;history.csv&#34;
+    with open(csv_path, &#34;w&#34;, newline=&#34;&#34;) as f:
+        writer = csv.DictWriter(f, fieldnames=[&#34;schema&#34;, &#34;tokens&#34;])
+        writer.writeheader()
+        writer.writerow({&#34;schema&#34;: &#34;video&#34;, &#34;tokens&#34;: &#34;0&#34;})
+        writer.writerow({&#34;schema&#34;: &#34;sensor&#34;, &#34;tokens&#34;: &#34;0&#34;})
+
+    reporter = MetricsReporter()
+    history = reporter.read_csv_history(csv_path)
+    assert len(history) == 2
+    assert history[0][&#34;schema&#34;] == &#34;video&#34;</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.tests.test_pipeline_metrics.TestMetricsReporter.test_empty_comparison"><code class="name flex">
+<span>def <span class="ident">test_empty_comparison</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_empty_comparison(self):
+    reporter = MetricsReporter()
+    table = reporter.format_comparison_table({})
+    assert &#34;No data&#34; in table</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.tests.test_pipeline_metrics.TestMetricsReporter.test_json_report"><code class="name flex">
+<span>def <span class="ident">test_json_report</span></span>(<span>self, tmp_path)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_json_report(self, tmp_path):
+    reporter = MetricsReporter()
+    path = tmp_path / &#34;report.json&#34;
+    reporter.write_json_report(path, {&#34;schema&#34;: &#34;test&#34;, &#34;success&#34;: True})
+    assert path.exists()
+    data = json.loads(path.read_text())
+    assert data[&#34;success&#34;] is True</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.tests.test_pipeline_metrics.TestMetricsReporter.test_text_report"><code class="name flex">
+<span>def <span class="ident">test_text_report</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_text_report(self):
+    reporter = MetricsReporter()
+    report = reporter.format_text_report(&#34;video-h264-delta&#34;, {
+        &#34;pipeline_total_time_ms&#34;: 4500,
+        &#34;tokens_consumed&#34;: 0,
+        &#34;token_efficiency_pct&#34;: 100,
+        &#34;files_generated&#34;: 19,
+        &#34;lines_generated&#34;: 850,
+        &#34;validation_level&#34;: &#34;hw_validated&#34;,
+        &#34;sim_tests_passed&#34;: 10,
+        &#34;sim_tests_total&#34;: 10,
+        &#34;hw_tests_passed&#34;: 10,
+        &#34;hw_tests_total&#34;: 10,
+        &#34;lint_errors_found&#34;: 0,
+        &#34;self_correction_count&#34;: 0,
+    })
+    assert &#34;video-h264-delta&#34; in report
+    assert &#34;Pipeline Efficiency&#34; in report
+    assert &#34;Hardware Validation&#34; in report
+    assert &#34;HW_VALIDATED&#34; in report</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.tests.test_pipeline_metrics.TestPipelineBenchmark"><code class="flex name class">
+<span>class <span class="ident">TestPipelineBenchmark</span></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class TestPipelineBenchmark:
+    def test_record_run(self):
+        bench = PipelineBenchmark()
+        metrics = bench.record_run(
+            schema_name=&#34;video&#34;,
+            total_time_ms=4500,
+            tokens_consumed=0,
+            tokens_saved=12000,
+            files_generated=19,
+            lines_generated=850,
+            self_corrections=0,
+            self_correction_successes=0,
+        )
+        assert metrics[&#34;token_efficiency_pct&#34;] == 100.0
+        assert metrics[&#34;cost_per_line&#34;] == 0
+
+    def test_nonzero_tokens(self):
+        bench = PipelineBenchmark()
+        metrics = bench.record_run(
+            schema_name=&#34;test&#34;,
+            total_time_ms=5000,
+            tokens_consumed=2000,
+            tokens_saved=10000,
+            files_generated=19,
+            lines_generated=850,
+            self_corrections=1,
+            self_correction_successes=1,
+        )
+        # efficiency = 10000 / (10000 + 2000) = 83.3%
+        assert metrics[&#34;token_efficiency_pct&#34;] == pytest.approx(83.3, abs=0.1)
+        assert metrics[&#34;cost_per_line&#34;] == pytest.approx(2.35, abs=0.01)
+
+    def test_compare_schemas(self):
+        bench = PipelineBenchmark()
+        runs = [
+            {&#34;schema&#34;: &#34;video&#34;, &#34;pipeline_total_time_ms&#34;: 4500, &#34;files_generated&#34;: 19},
+            {&#34;schema&#34;: &#34;sensor&#34;, &#34;pipeline_total_time_ms&#34;: 3800, &#34;files_generated&#34;: 19},
+        ]
+        comparison = bench.compare_schemas(runs)
+        assert &#34;video&#34; in comparison
+        assert &#34;sensor&#34; in comparison
+        assert comparison[&#34;video&#34;][&#34;time_ms&#34;] == 4500</code></pre>
+</details>
+<div class="desc"></div>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.tests.test_pipeline_metrics.TestPipelineBenchmark.test_compare_schemas"><code class="name flex">
+<span>def <span class="ident">test_compare_schemas</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_compare_schemas(self):
+    bench = PipelineBenchmark()
+    runs = [
+        {&#34;schema&#34;: &#34;video&#34;, &#34;pipeline_total_time_ms&#34;: 4500, &#34;files_generated&#34;: 19},
+        {&#34;schema&#34;: &#34;sensor&#34;, &#34;pipeline_total_time_ms&#34;: 3800, &#34;files_generated&#34;: 19},
+    ]
+    comparison = bench.compare_schemas(runs)
+    assert &#34;video&#34; in comparison
+    assert &#34;sensor&#34; in comparison
+    assert comparison[&#34;video&#34;][&#34;time_ms&#34;] == 4500</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.tests.test_pipeline_metrics.TestPipelineBenchmark.test_nonzero_tokens"><code class="name flex">
+<span>def <span class="ident">test_nonzero_tokens</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_nonzero_tokens(self):
+    bench = PipelineBenchmark()
+    metrics = bench.record_run(
+        schema_name=&#34;test&#34;,
+        total_time_ms=5000,
+        tokens_consumed=2000,
+        tokens_saved=10000,
+        files_generated=19,
+        lines_generated=850,
+        self_corrections=1,
+        self_correction_successes=1,
+    )
+    # efficiency = 10000 / (10000 + 2000) = 83.3%
+    assert metrics[&#34;token_efficiency_pct&#34;] == pytest.approx(83.3, abs=0.1)
+    assert metrics[&#34;cost_per_line&#34;] == pytest.approx(2.35, abs=0.01)</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.tests.test_pipeline_metrics.TestPipelineBenchmark.test_record_run"><code class="name flex">
+<span>def <span class="ident">test_record_run</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_record_run(self):
+    bench = PipelineBenchmark()
+    metrics = bench.record_run(
+        schema_name=&#34;video&#34;,
+        total_time_ms=4500,
+        tokens_consumed=0,
+        tokens_saved=12000,
+        files_generated=19,
+        lines_generated=850,
+        self_corrections=0,
+        self_correction_successes=0,
+    )
+    assert metrics[&#34;token_efficiency_pct&#34;] == 100.0
+    assert metrics[&#34;cost_per_line&#34;] == 0</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="atomik_sdk.tests" href="index.html">atomik_sdk.tests</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="atomik_sdk.tests.test_pipeline_metrics.TestHardwareBenchmark" href="#atomik_sdk.tests.test_pipeline_metrics.TestHardwareBenchmark">TestHardwareBenchmark</a></code></h4>
+<ul class="">
+<li><code><a title="atomik_sdk.tests.test_pipeline_metrics.TestHardwareBenchmark.test_compute_runtime_metrics" href="#atomik_sdk.tests.test_pipeline_metrics.TestHardwareBenchmark.test_compute_runtime_metrics">test_compute_runtime_metrics</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_pipeline_metrics.TestHardwareBenchmark.test_create_benchmark" href="#atomik_sdk.tests.test_pipeline_metrics.TestHardwareBenchmark.test_create_benchmark">test_create_benchmark</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_pipeline_metrics.TestHardwareBenchmark.test_phase3_comparison" href="#atomik_sdk.tests.test_pipeline_metrics.TestHardwareBenchmark.test_phase3_comparison">test_phase3_comparison</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_pipeline_metrics.TestHardwareBenchmark.test_runtime_zero_fmax" href="#atomik_sdk.tests.test_pipeline_metrics.TestHardwareBenchmark.test_runtime_zero_fmax">test_runtime_zero_fmax</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.tests.test_pipeline_metrics.TestMetricsCollector" href="#atomik_sdk.tests.test_pipeline_metrics.TestMetricsCollector">TestMetricsCollector</a></code></h4>
+<ul class="">
+<li><code><a title="atomik_sdk.tests.test_pipeline_metrics.TestMetricsCollector.test_clear" href="#atomik_sdk.tests.test_pipeline_metrics.TestMetricsCollector.test_clear">test_clear</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_pipeline_metrics.TestMetricsCollector.test_create_collector" href="#atomik_sdk.tests.test_pipeline_metrics.TestMetricsCollector.test_create_collector">test_create_collector</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_pipeline_metrics.TestMetricsCollector.test_merge_collectors" href="#atomik_sdk.tests.test_pipeline_metrics.TestMetricsCollector.test_merge_collectors">test_merge_collectors</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_pipeline_metrics.TestMetricsCollector.test_record_hardware" href="#atomik_sdk.tests.test_pipeline_metrics.TestMetricsCollector.test_record_hardware">test_record_hardware</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_pipeline_metrics.TestMetricsCollector.test_record_metric" href="#atomik_sdk.tests.test_pipeline_metrics.TestMetricsCollector.test_record_metric">test_record_metric</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_pipeline_metrics.TestMetricsCollector.test_record_pipeline" href="#atomik_sdk.tests.test_pipeline_metrics.TestMetricsCollector.test_record_pipeline">test_record_pipeline</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_pipeline_metrics.TestMetricsCollector.test_record_quality" href="#atomik_sdk.tests.test_pipeline_metrics.TestMetricsCollector.test_record_quality">test_record_quality</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_pipeline_metrics.TestMetricsCollector.test_record_runtime" href="#atomik_sdk.tests.test_pipeline_metrics.TestMetricsCollector.test_record_runtime">test_record_runtime</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.tests.test_pipeline_metrics.TestMetricsReporter" href="#atomik_sdk.tests.test_pipeline_metrics.TestMetricsReporter">TestMetricsReporter</a></code></h4>
+<ul class="">
+<li><code><a title="atomik_sdk.tests.test_pipeline_metrics.TestMetricsReporter.test_comparison_table" href="#atomik_sdk.tests.test_pipeline_metrics.TestMetricsReporter.test_comparison_table">test_comparison_table</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_pipeline_metrics.TestMetricsReporter.test_csv_history" href="#atomik_sdk.tests.test_pipeline_metrics.TestMetricsReporter.test_csv_history">test_csv_history</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_pipeline_metrics.TestMetricsReporter.test_empty_comparison" href="#atomik_sdk.tests.test_pipeline_metrics.TestMetricsReporter.test_empty_comparison">test_empty_comparison</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_pipeline_metrics.TestMetricsReporter.test_json_report" href="#atomik_sdk.tests.test_pipeline_metrics.TestMetricsReporter.test_json_report">test_json_report</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_pipeline_metrics.TestMetricsReporter.test_text_report" href="#atomik_sdk.tests.test_pipeline_metrics.TestMetricsReporter.test_text_report">test_text_report</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.tests.test_pipeline_metrics.TestPipelineBenchmark" href="#atomik_sdk.tests.test_pipeline_metrics.TestPipelineBenchmark">TestPipelineBenchmark</a></code></h4>
+<ul class="">
+<li><code><a title="atomik_sdk.tests.test_pipeline_metrics.TestPipelineBenchmark.test_compare_schemas" href="#atomik_sdk.tests.test_pipeline_metrics.TestPipelineBenchmark.test_compare_schemas">test_compare_schemas</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_pipeline_metrics.TestPipelineBenchmark.test_nonzero_tokens" href="#atomik_sdk.tests.test_pipeline_metrics.TestPipelineBenchmark.test_nonzero_tokens">test_nonzero_tokens</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_pipeline_metrics.TestPipelineBenchmark.test_record_run" href="#atomik_sdk.tests.test_pipeline_metrics.TestPipelineBenchmark.test_record_run">test_record_run</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+</body>
+</html>

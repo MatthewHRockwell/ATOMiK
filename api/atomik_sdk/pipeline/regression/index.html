@@ -1,0 +1,1122 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
+<title>atomik_sdk.pipeline.regression API documentation</title>
+<meta name="description" content="Regression detection system with baseline management.">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>atomik_sdk.pipeline.regression</code></h1>
+</header>
+<section id="section-intro">
+<p>Regression detection system with baseline management.</p>
+</section>
+<section>
+<h2 class="section-title" id="header-submodules">Sub-modules</h2>
+<dl>
+<dt><code class="name"><a title="atomik_sdk.pipeline.regression.baseline" href="baseline.html">atomik_sdk.pipeline.regression.baseline</a></code></dt>
+<dd>
+<div class="desc"><p>Baseline Snapshot Management …</p></div>
+</dd>
+<dt><code class="name"><a title="atomik_sdk.pipeline.regression.detector" href="detector.html">atomik_sdk.pipeline.regression.detector</a></code></dt>
+<dd>
+<div class="desc"><p>Pipeline-Level Regression Detection …</p></div>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="atomik_sdk.pipeline.regression.BaselineManager"><code class="flex name class">
+<span>class <span class="ident">BaselineManager</span></span>
+<span>(</span><span>baseline_dir: str | Path = '.atomik/baselines')</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class BaselineManager:
+    &#34;&#34;&#34;
+    Manages baseline snapshots for regression detection.
+
+    Baselines are stored as JSON files in a configurable directory.
+    Each schema has its own baseline file. Baselines are created
+    automatically after the first successful run and can be updated
+    explicitly.
+
+    Example:
+        &gt;&gt;&gt; manager = BaselineManager(&#34;.atomik/baselines&#34;)
+        &gt;&gt;&gt; manager.create_baseline(&#34;trade_packet&#34;, current_metrics)
+        &gt;&gt;&gt; baseline = manager.get_baseline(&#34;trade_packet&#34;)
+        &gt;&gt;&gt; if baseline:
+        ...     print(f&#34;Baseline from {baseline.created_at}&#34;)
+    &#34;&#34;&#34;
+
+    def __init__(self, baseline_dir: str | Path = &#34;.atomik/baselines&#34;) -&gt; None:
+        self.baseline_dir = Path(baseline_dir)
+        self.baseline_dir.mkdir(parents=True, exist_ok=True)
+
+    def _baseline_path(self, schema_name: str) -&gt; Path:
+        return self.baseline_dir / f&#34;{schema_name}_baseline.json&#34;
+
+    def get_baseline(self, schema_name: str) -&gt; BaselineSnapshot | None:
+        &#34;&#34;&#34;Load a baseline snapshot for a schema.&#34;&#34;&#34;
+        path = self._baseline_path(schema_name)
+        if not path.exists():
+            return None
+        with open(path, encoding=&#34;utf-8&#34;) as f:
+            data = json.load(f)
+        return BaselineSnapshot.from_dict(data)
+
+    def create_baseline(
+        self,
+        schema_name: str,
+        metrics: dict[str, Any],
+        test_counts: dict[str, int] | None = None,
+        hardware_metrics: dict[str, float] | None = None,
+    ) -&gt; BaselineSnapshot:
+        &#34;&#34;&#34;
+        Create a new baseline snapshot.
+
+        Args:
+            schema_name: Schema identifier.
+            metrics: Current run metrics.
+            test_counts: Test pass/fail counts per language.
+            hardware_metrics: Hardware synthesis metrics.
+
+        Returns:
+            The created BaselineSnapshot.
+        &#34;&#34;&#34;
+        # Convert all metric values to float
+        float_metrics: dict[str, float] = {}
+        for k, v in metrics.items():
+            try:
+                float_metrics[k] = float(v)
+            except (ValueError, TypeError):
+                pass
+
+        snapshot = BaselineSnapshot(
+            schema_name=schema_name,
+            run_count=1,
+            metrics=float_metrics,
+            test_counts=test_counts or {},
+            hardware_metrics=hardware_metrics or {},
+        )
+
+        self._save(snapshot)
+        return snapshot
+
+    def update_baseline(
+        self,
+        schema_name: str,
+        metrics: dict[str, Any],
+        test_counts: dict[str, int] | None = None,
+        hardware_metrics: dict[str, float] | None = None,
+    ) -&gt; BaselineSnapshot:
+        &#34;&#34;&#34;
+        Update an existing baseline with new metrics.
+
+        If no baseline exists, creates one. Otherwise updates
+        the baseline using exponential moving average to smooth
+        over run-to-run variance.
+
+        Args:
+            schema_name: Schema identifier.
+            metrics: New run metrics.
+            test_counts: Updated test counts.
+            hardware_metrics: Updated hardware metrics.
+
+        Returns:
+            Updated BaselineSnapshot.
+        &#34;&#34;&#34;
+        existing = self.get_baseline(schema_name)
+        if existing is None:
+            return self.create_baseline(
+                schema_name, metrics, test_counts, hardware_metrics
+            )
+
+        # EMA with alpha=0.3 (70% old, 30% new)
+        alpha = 0.3
+        for k, v in metrics.items():
+            try:
+                new_val = float(v)
+            except (ValueError, TypeError):
+                continue
+            old_val = existing.metrics.get(k, new_val)
+            existing.metrics[k] = old_val * (1 - alpha) + new_val * alpha
+
+        if test_counts:
+            existing.test_counts.update(test_counts)
+        if hardware_metrics:
+            for k, v in hardware_metrics.items():
+                old_val = existing.hardware_metrics.get(k, v)
+                existing.hardware_metrics[k] = old_val * (1 - alpha) + v * alpha
+
+        existing.run_count += 1
+        self._save(existing)
+        return existing
+
+    def create_if_missing(
+        self,
+        schema_name: str,
+        metrics: dict[str, Any],
+        test_counts: dict[str, int] | None = None,
+        hardware_metrics: dict[str, float] | None = None,
+    ) -&gt; tuple[BaselineSnapshot, bool]:
+        &#34;&#34;&#34;
+        Create a baseline only if none exists.
+
+        Returns:
+            Tuple of (snapshot, created) where created is True if new.
+        &#34;&#34;&#34;
+        existing = self.get_baseline(schema_name)
+        if existing is not None:
+            return existing, False
+        snapshot = self.create_baseline(
+            schema_name, metrics, test_counts, hardware_metrics
+        )
+        return snapshot, True
+
+    def delete_baseline(self, schema_name: str) -&gt; bool:
+        &#34;&#34;&#34;Delete a baseline snapshot. Returns True if found.&#34;&#34;&#34;
+        path = self._baseline_path(schema_name)
+        if path.exists():
+            path.unlink()
+            return True
+        return False
+
+    def list_baselines(self) -&gt; list[str]:
+        &#34;&#34;&#34;List all schema names that have baselines.&#34;&#34;&#34;
+        return [
+            p.stem.replace(&#34;_baseline&#34;, &#34;&#34;)
+            for p in self.baseline_dir.glob(&#34;*_baseline.json&#34;)
+        ]
+
+    def _save(self, snapshot: BaselineSnapshot) -&gt; None:
+        &#34;&#34;&#34;Persist a baseline snapshot to disk.&#34;&#34;&#34;
+        path = self._baseline_path(snapshot.schema_name)
+        with open(path, &#34;w&#34;, encoding=&#34;utf-8&#34;) as f:
+            json.dump(snapshot.to_dict(), f, indent=2)</code></pre>
+</details>
+<div class="desc"><p>Manages baseline snapshots for regression detection.</p>
+<p>Baselines are stored as JSON files in a configurable directory.
+Each schema has its own baseline file. Baselines are created
+automatically after the first successful run and can be updated
+explicitly.</p>
+<h2 id="example">Example</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; manager = BaselineManager(&quot;.atomik/baselines&quot;)
+&gt;&gt;&gt; manager.create_baseline(&quot;trade_packet&quot;, current_metrics)
+&gt;&gt;&gt; baseline = manager.get_baseline(&quot;trade_packet&quot;)
+&gt;&gt;&gt; if baseline:
+...     print(f&quot;Baseline from {baseline.created_at}&quot;)
+</code></pre></div>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.regression.BaselineManager.create_baseline"><code class="name flex">
+<span>def <span class="ident">create_baseline</span></span>(<span>self,<br>schema_name: str,<br>metrics: dict[str, Any],<br>test_counts: dict[str, int] | None = None,<br>hardware_metrics: dict[str, float] | None = None) ‑> <a title="atomik_sdk.pipeline.regression.baseline.BaselineSnapshot" href="baseline.html#atomik_sdk.pipeline.regression.baseline.BaselineSnapshot">BaselineSnapshot</a></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def create_baseline(
+    self,
+    schema_name: str,
+    metrics: dict[str, Any],
+    test_counts: dict[str, int] | None = None,
+    hardware_metrics: dict[str, float] | None = None,
+) -&gt; BaselineSnapshot:
+    &#34;&#34;&#34;
+    Create a new baseline snapshot.
+
+    Args:
+        schema_name: Schema identifier.
+        metrics: Current run metrics.
+        test_counts: Test pass/fail counts per language.
+        hardware_metrics: Hardware synthesis metrics.
+
+    Returns:
+        The created BaselineSnapshot.
+    &#34;&#34;&#34;
+    # Convert all metric values to float
+    float_metrics: dict[str, float] = {}
+    for k, v in metrics.items():
+        try:
+            float_metrics[k] = float(v)
+        except (ValueError, TypeError):
+            pass
+
+    snapshot = BaselineSnapshot(
+        schema_name=schema_name,
+        run_count=1,
+        metrics=float_metrics,
+        test_counts=test_counts or {},
+        hardware_metrics=hardware_metrics or {},
+    )
+
+    self._save(snapshot)
+    return snapshot</code></pre>
+</details>
+<div class="desc"><p>Create a new baseline snapshot.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>schema_name</code></strong></dt>
+<dd>Schema identifier.</dd>
+<dt><strong><code>metrics</code></strong></dt>
+<dd>Current run metrics.</dd>
+<dt><strong><code>test_counts</code></strong></dt>
+<dd>Test pass/fail counts per language.</dd>
+<dt><strong><code>hardware_metrics</code></strong></dt>
+<dd>Hardware synthesis metrics.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>The created BaselineSnapshot.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.regression.BaselineManager.create_if_missing"><code class="name flex">
+<span>def <span class="ident">create_if_missing</span></span>(<span>self,<br>schema_name: str,<br>metrics: dict[str, Any],<br>test_counts: dict[str, int] | None = None,<br>hardware_metrics: dict[str, float] | None = None) ‑> tuple[<a title="atomik_sdk.pipeline.regression.baseline.BaselineSnapshot" href="baseline.html#atomik_sdk.pipeline.regression.baseline.BaselineSnapshot">BaselineSnapshot</a>, bool]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def create_if_missing(
+    self,
+    schema_name: str,
+    metrics: dict[str, Any],
+    test_counts: dict[str, int] | None = None,
+    hardware_metrics: dict[str, float] | None = None,
+) -&gt; tuple[BaselineSnapshot, bool]:
+    &#34;&#34;&#34;
+    Create a baseline only if none exists.
+
+    Returns:
+        Tuple of (snapshot, created) where created is True if new.
+    &#34;&#34;&#34;
+    existing = self.get_baseline(schema_name)
+    if existing is not None:
+        return existing, False
+    snapshot = self.create_baseline(
+        schema_name, metrics, test_counts, hardware_metrics
+    )
+    return snapshot, True</code></pre>
+</details>
+<div class="desc"><p>Create a baseline only if none exists.</p>
+<h2 id="returns">Returns</h2>
+<p>Tuple of (snapshot, created) where created is True if new.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.regression.BaselineManager.delete_baseline"><code class="name flex">
+<span>def <span class="ident">delete_baseline</span></span>(<span>self, schema_name: str) ‑> bool</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def delete_baseline(self, schema_name: str) -&gt; bool:
+    &#34;&#34;&#34;Delete a baseline snapshot. Returns True if found.&#34;&#34;&#34;
+    path = self._baseline_path(schema_name)
+    if path.exists():
+        path.unlink()
+        return True
+    return False</code></pre>
+</details>
+<div class="desc"><p>Delete a baseline snapshot. Returns True if found.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.regression.BaselineManager.get_baseline"><code class="name flex">
+<span>def <span class="ident">get_baseline</span></span>(<span>self, schema_name: str) ‑> <a title="atomik_sdk.pipeline.regression.baseline.BaselineSnapshot" href="baseline.html#atomik_sdk.pipeline.regression.baseline.BaselineSnapshot">BaselineSnapshot</a> | None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_baseline(self, schema_name: str) -&gt; BaselineSnapshot | None:
+    &#34;&#34;&#34;Load a baseline snapshot for a schema.&#34;&#34;&#34;
+    path = self._baseline_path(schema_name)
+    if not path.exists():
+        return None
+    with open(path, encoding=&#34;utf-8&#34;) as f:
+        data = json.load(f)
+    return BaselineSnapshot.from_dict(data)</code></pre>
+</details>
+<div class="desc"><p>Load a baseline snapshot for a schema.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.regression.BaselineManager.list_baselines"><code class="name flex">
+<span>def <span class="ident">list_baselines</span></span>(<span>self) ‑> list[str]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def list_baselines(self) -&gt; list[str]:
+    &#34;&#34;&#34;List all schema names that have baselines.&#34;&#34;&#34;
+    return [
+        p.stem.replace(&#34;_baseline&#34;, &#34;&#34;)
+        for p in self.baseline_dir.glob(&#34;*_baseline.json&#34;)
+    ]</code></pre>
+</details>
+<div class="desc"><p>List all schema names that have baselines.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.regression.BaselineManager.update_baseline"><code class="name flex">
+<span>def <span class="ident">update_baseline</span></span>(<span>self,<br>schema_name: str,<br>metrics: dict[str, Any],<br>test_counts: dict[str, int] | None = None,<br>hardware_metrics: dict[str, float] | None = None) ‑> <a title="atomik_sdk.pipeline.regression.baseline.BaselineSnapshot" href="baseline.html#atomik_sdk.pipeline.regression.baseline.BaselineSnapshot">BaselineSnapshot</a></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def update_baseline(
+    self,
+    schema_name: str,
+    metrics: dict[str, Any],
+    test_counts: dict[str, int] | None = None,
+    hardware_metrics: dict[str, float] | None = None,
+) -&gt; BaselineSnapshot:
+    &#34;&#34;&#34;
+    Update an existing baseline with new metrics.
+
+    If no baseline exists, creates one. Otherwise updates
+    the baseline using exponential moving average to smooth
+    over run-to-run variance.
+
+    Args:
+        schema_name: Schema identifier.
+        metrics: New run metrics.
+        test_counts: Updated test counts.
+        hardware_metrics: Updated hardware metrics.
+
+    Returns:
+        Updated BaselineSnapshot.
+    &#34;&#34;&#34;
+    existing = self.get_baseline(schema_name)
+    if existing is None:
+        return self.create_baseline(
+            schema_name, metrics, test_counts, hardware_metrics
+        )
+
+    # EMA with alpha=0.3 (70% old, 30% new)
+    alpha = 0.3
+    for k, v in metrics.items():
+        try:
+            new_val = float(v)
+        except (ValueError, TypeError):
+            continue
+        old_val = existing.metrics.get(k, new_val)
+        existing.metrics[k] = old_val * (1 - alpha) + new_val * alpha
+
+    if test_counts:
+        existing.test_counts.update(test_counts)
+    if hardware_metrics:
+        for k, v in hardware_metrics.items():
+            old_val = existing.hardware_metrics.get(k, v)
+            existing.hardware_metrics[k] = old_val * (1 - alpha) + v * alpha
+
+    existing.run_count += 1
+    self._save(existing)
+    return existing</code></pre>
+</details>
+<div class="desc"><p>Update an existing baseline with new metrics.</p>
+<p>If no baseline exists, creates one. Otherwise updates
+the baseline using exponential moving average to smooth
+over run-to-run variance.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>schema_name</code></strong></dt>
+<dd>Schema identifier.</dd>
+<dt><strong><code>metrics</code></strong></dt>
+<dd>New run metrics.</dd>
+<dt><strong><code>test_counts</code></strong></dt>
+<dd>Updated test counts.</dd>
+<dt><strong><code>hardware_metrics</code></strong></dt>
+<dd>Updated hardware metrics.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>Updated BaselineSnapshot.</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.pipeline.regression.BaselineSnapshot"><code class="flex name class">
+<span>class <span class="ident">BaselineSnapshot</span></span>
+<span>(</span><span>schema_name: str,<br>created_at: str = '',<br>run_count: int = 0,<br>metrics: dict[str, float] = &lt;factory&gt;,<br>test_counts: dict[str, int] = &lt;factory&gt;,<br>hardware_metrics: dict[str, float] = &lt;factory&gt;)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass
+class BaselineSnapshot:
+    &#34;&#34;&#34;A baseline snapshot of pipeline metrics for a schema.&#34;&#34;&#34;
+    schema_name: str
+    created_at: str = &#34;&#34;
+    run_count: int = 0
+    metrics: dict[str, float] = field(default_factory=dict)
+    test_counts: dict[str, int] = field(default_factory=dict)
+    hardware_metrics: dict[str, float] = field(default_factory=dict)
+
+    def __post_init__(self) -&gt; None:
+        if not self.created_at:
+            self.created_at = time.strftime(&#34;%Y-%m-%dT%H:%M:%SZ&#34;, time.gmtime())
+
+    def to_dict(self) -&gt; dict[str, Any]:
+        return {
+            &#34;schema_name&#34;: self.schema_name,
+            &#34;created_at&#34;: self.created_at,
+            &#34;run_count&#34;: self.run_count,
+            &#34;metrics&#34;: self.metrics,
+            &#34;test_counts&#34;: self.test_counts,
+            &#34;hardware_metrics&#34;: self.hardware_metrics,
+        }
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -&gt; BaselineSnapshot:
+        return cls(
+            schema_name=data.get(&#34;schema_name&#34;, &#34;&#34;),
+            created_at=data.get(&#34;created_at&#34;, &#34;&#34;),
+            run_count=data.get(&#34;run_count&#34;, 0),
+            metrics=data.get(&#34;metrics&#34;, {}),
+            test_counts=data.get(&#34;test_counts&#34;, {}),
+            hardware_metrics=data.get(&#34;hardware_metrics&#34;, {}),
+        )</code></pre>
+</details>
+<div class="desc"><p>A baseline snapshot of pipeline metrics for a schema.</p></div>
+<h3>Static methods</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.regression.BaselineSnapshot.from_dict"><code class="name flex">
+<span>def <span class="ident">from_dict</span></span>(<span>data: dict[str, Any]) ‑> <a title="atomik_sdk.pipeline.regression.baseline.BaselineSnapshot" href="baseline.html#atomik_sdk.pipeline.regression.baseline.BaselineSnapshot">BaselineSnapshot</a></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Instance variables</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.regression.BaselineSnapshot.created_at"><code class="name">var <span class="ident">created_at</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.regression.BaselineSnapshot.hardware_metrics"><code class="name">var <span class="ident">hardware_metrics</span> : dict[str, float]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.regression.BaselineSnapshot.metrics"><code class="name">var <span class="ident">metrics</span> : dict[str, float]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.regression.BaselineSnapshot.run_count"><code class="name">var <span class="ident">run_count</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.regression.BaselineSnapshot.schema_name"><code class="name">var <span class="ident">schema_name</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.regression.BaselineSnapshot.test_counts"><code class="name">var <span class="ident">test_counts</span> : dict[str, int]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.regression.BaselineSnapshot.to_dict"><code class="name flex">
+<span>def <span class="ident">to_dict</span></span>(<span>self) ‑> dict[str, typing.Any]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_dict(self) -&gt; dict[str, Any]:
+    return {
+        &#34;schema_name&#34;: self.schema_name,
+        &#34;created_at&#34;: self.created_at,
+        &#34;run_count&#34;: self.run_count,
+        &#34;metrics&#34;: self.metrics,
+        &#34;test_counts&#34;: self.test_counts,
+        &#34;hardware_metrics&#34;: self.hardware_metrics,
+    }</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.pipeline.regression.GateResult"><code class="flex name class">
+<span>class <span class="ident">GateResult</span></span>
+<span>(</span><span>passed: bool = True,<br>blocked: bool = False,<br>report: RegressionReport | None = None,<br>baseline_created: bool = False,<br>message: str = '')</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass
+class GateResult:
+    &#34;&#34;&#34;Result of a regression gate check.&#34;&#34;&#34;
+    passed: bool = True
+    blocked: bool = False
+    report: RegressionReport | None = None
+    baseline_created: bool = False
+    message: str = &#34;&#34;
+
+    def to_dict(self) -&gt; dict[str, Any]:
+        return {
+            &#34;passed&#34;: self.passed,
+            &#34;blocked&#34;: self.blocked,
+            &#34;baseline_created&#34;: self.baseline_created,
+            &#34;message&#34;: self.message,
+            &#34;report&#34;: self.report.to_dict() if self.report else None,
+        }</code></pre>
+</details>
+<div class="desc"><p>Result of a regression gate check.</p></div>
+<h3>Instance variables</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.regression.GateResult.baseline_created"><code class="name">var <span class="ident">baseline_created</span> : bool</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.regression.GateResult.blocked"><code class="name">var <span class="ident">blocked</span> : bool</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.regression.GateResult.message"><code class="name">var <span class="ident">message</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.regression.GateResult.passed"><code class="name">var <span class="ident">passed</span> : bool</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.regression.GateResult.report"><code class="name">var <span class="ident">report</span> : <a title="atomik_sdk.pipeline.analysis.regression_detector.RegressionReport" href="../analysis/regression_detector.html#atomik_sdk.pipeline.analysis.regression_detector.RegressionReport">RegressionReport</a> | None</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.regression.GateResult.to_dict"><code class="name flex">
+<span>def <span class="ident">to_dict</span></span>(<span>self) ‑> dict[str, typing.Any]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_dict(self) -&gt; dict[str, Any]:
+    return {
+        &#34;passed&#34;: self.passed,
+        &#34;blocked&#34;: self.blocked,
+        &#34;baseline_created&#34;: self.baseline_created,
+        &#34;message&#34;: self.message,
+        &#34;report&#34;: self.report.to_dict() if self.report else None,
+    }</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.pipeline.regression.PipelineRegressionDetector"><code class="flex name class">
+<span>class <span class="ident">PipelineRegressionDetector</span></span>
+<span>(</span><span>baseline_dir: str = '.atomik/baselines',<br>fail_on_regression: bool = False,<br>event_bus: EventBus | None = None)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class PipelineRegressionDetector:
+    &#34;&#34;&#34;
+    High-level regression detector for pipeline integration.
+
+    Combines baseline management, regression detection, and
+    gate checking into a single interface used by the pipeline
+    controller.
+
+    Example:
+        &gt;&gt;&gt; prd = PipelineRegressionDetector()
+        &gt;&gt;&gt; gate_result = prd.check_and_gate(&#34;trade_packet&#34;, metrics)
+    &#34;&#34;&#34;
+
+    def __init__(
+        self,
+        baseline_dir: str = &#34;.atomik/baselines&#34;,
+        fail_on_regression: bool = False,
+        event_bus: EventBus | None = None,
+    ) -&gt; None:
+        self.baseline_manager = BaselineManager(baseline_dir)
+        self.gate = RegressionGate(
+            baseline_manager=self.baseline_manager,
+            event_bus=event_bus,
+            fail_on_regression=fail_on_regression,
+        )
+        self._history: dict[str, list[dict[str, Any]]] = {}
+
+    def record_run(self, schema_name: str, metrics: dict[str, Any]) -&gt; None:
+        &#34;&#34;&#34;Record a run&#39;s metrics for history tracking.&#34;&#34;&#34;
+        if schema_name not in self._history:
+            self._history[schema_name] = []
+        self._history[schema_name].append(dict(metrics))
+
+    def check_and_gate(
+        self,
+        schema_name: str,
+        current_metrics: dict[str, Any],
+    ) -&gt; GateResult:
+        &#34;&#34;&#34;
+        Record metrics, check for regressions, and apply gate.
+
+        Args:
+            schema_name: Schema being checked.
+            current_metrics: Metrics from the current run.
+
+        Returns:
+            GateResult with pass/block status.
+        &#34;&#34;&#34;
+        history = self._history.get(schema_name, [])
+        result = self.gate.check(schema_name, current_metrics, history or None)
+        self.record_run(schema_name, current_metrics)
+        return result
+
+    def get_baseline(self, schema_name: str) -&gt; BaselineSnapshot | None:
+        &#34;&#34;&#34;Get the current baseline for a schema.&#34;&#34;&#34;
+        return self.baseline_manager.get_baseline(schema_name)
+
+    def reset_baseline(self, schema_name: str) -&gt; bool:
+        &#34;&#34;&#34;Delete the baseline for a schema (next run creates fresh one).&#34;&#34;&#34;
+        return self.baseline_manager.delete_baseline(schema_name)</code></pre>
+</details>
+<div class="desc"><p>High-level regression detector for pipeline integration.</p>
+<p>Combines baseline management, regression detection, and
+gate checking into a single interface used by the pipeline
+controller.</p>
+<h2 id="example">Example</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; prd = PipelineRegressionDetector()
+&gt;&gt;&gt; gate_result = prd.check_and_gate(&quot;trade_packet&quot;, metrics)
+</code></pre></div>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.regression.PipelineRegressionDetector.check_and_gate"><code class="name flex">
+<span>def <span class="ident">check_and_gate</span></span>(<span>self, schema_name: str, current_metrics: dict[str, Any]) ‑> <a title="atomik_sdk.pipeline.regression.detector.GateResult" href="detector.html#atomik_sdk.pipeline.regression.detector.GateResult">GateResult</a></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def check_and_gate(
+    self,
+    schema_name: str,
+    current_metrics: dict[str, Any],
+) -&gt; GateResult:
+    &#34;&#34;&#34;
+    Record metrics, check for regressions, and apply gate.
+
+    Args:
+        schema_name: Schema being checked.
+        current_metrics: Metrics from the current run.
+
+    Returns:
+        GateResult with pass/block status.
+    &#34;&#34;&#34;
+    history = self._history.get(schema_name, [])
+    result = self.gate.check(schema_name, current_metrics, history or None)
+    self.record_run(schema_name, current_metrics)
+    return result</code></pre>
+</details>
+<div class="desc"><p>Record metrics, check for regressions, and apply gate.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>schema_name</code></strong></dt>
+<dd>Schema being checked.</dd>
+<dt><strong><code>current_metrics</code></strong></dt>
+<dd>Metrics from the current run.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>GateResult with pass/block status.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.regression.PipelineRegressionDetector.get_baseline"><code class="name flex">
+<span>def <span class="ident">get_baseline</span></span>(<span>self, schema_name: str) ‑> <a title="atomik_sdk.pipeline.regression.baseline.BaselineSnapshot" href="baseline.html#atomik_sdk.pipeline.regression.baseline.BaselineSnapshot">BaselineSnapshot</a> | None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_baseline(self, schema_name: str) -&gt; BaselineSnapshot | None:
+    &#34;&#34;&#34;Get the current baseline for a schema.&#34;&#34;&#34;
+    return self.baseline_manager.get_baseline(schema_name)</code></pre>
+</details>
+<div class="desc"><p>Get the current baseline for a schema.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.regression.PipelineRegressionDetector.record_run"><code class="name flex">
+<span>def <span class="ident">record_run</span></span>(<span>self, schema_name: str, metrics: dict[str, Any]) ‑> None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def record_run(self, schema_name: str, metrics: dict[str, Any]) -&gt; None:
+    &#34;&#34;&#34;Record a run&#39;s metrics for history tracking.&#34;&#34;&#34;
+    if schema_name not in self._history:
+        self._history[schema_name] = []
+    self._history[schema_name].append(dict(metrics))</code></pre>
+</details>
+<div class="desc"><p>Record a run's metrics for history tracking.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.regression.PipelineRegressionDetector.reset_baseline"><code class="name flex">
+<span>def <span class="ident">reset_baseline</span></span>(<span>self, schema_name: str) ‑> bool</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def reset_baseline(self, schema_name: str) -&gt; bool:
+    &#34;&#34;&#34;Delete the baseline for a schema (next run creates fresh one).&#34;&#34;&#34;
+    return self.baseline_manager.delete_baseline(schema_name)</code></pre>
+</details>
+<div class="desc"><p>Delete the baseline for a schema (next run creates fresh one).</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.pipeline.regression.RegressionGate"><code class="flex name class">
+<span>class <span class="ident">RegressionGate</span></span>
+<span>(</span><span>baseline_manager: <a title="atomik_sdk.pipeline.regression.BaselineManager" href="#atomik_sdk.pipeline.regression.BaselineManager">BaselineManager</a> | None = None,<br>detector: RegressionDetector | None = None,<br>event_bus: EventBus | None = None,<br>fail_on_regression: bool = False)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class RegressionGate:
+    &#34;&#34;&#34;
+    Pipeline gate that blocks on critical regressions.
+
+    Wraps the analysis-level RegressionDetector with baseline
+    management. After each run, checks for regressions against
+    the baseline. If `fail_on_regression` is True, critical
+    regressions block pipeline completion.
+
+    Example:
+        &gt;&gt;&gt; gate = RegressionGate(fail_on_regression=True)
+        &gt;&gt;&gt; result = gate.check(&#34;trade_packet&#34;, current_metrics, history)
+        &gt;&gt;&gt; if result.blocked:
+        ...     print(f&#34;Pipeline blocked: {result.message}&#34;)
+    &#34;&#34;&#34;
+
+    def __init__(
+        self,
+        baseline_manager: BaselineManager | None = None,
+        detector: RegressionDetector | None = None,
+        event_bus: EventBus | None = None,
+        fail_on_regression: bool = False,
+    ) -&gt; None:
+        self.baselines = baseline_manager or BaselineManager()
+        self.detector = detector or RegressionDetector()
+        self.event_bus = event_bus
+        self.fail_on_regression = fail_on_regression
+
+    def check(
+        self,
+        schema_name: str,
+        current_metrics: dict[str, Any],
+        history: list[dict[str, Any]] | None = None,
+    ) -&gt; GateResult:
+        &#34;&#34;&#34;
+        Check for regressions against baseline and history.
+
+        If no baseline exists, creates one and passes. Otherwise
+        runs regression detection and optionally blocks.
+
+        Args:
+            schema_name: Schema being checked.
+            current_metrics: Metrics from the current run.
+            history: Optional run history for trend analysis.
+
+        Returns:
+            GateResult with pass/block status and report.
+        &#34;&#34;&#34;
+        result = GateResult()
+
+        # Auto-create baseline if missing
+        baseline, created = self.baselines.create_if_missing(
+            schema_name, current_metrics
+        )
+        if created:
+            result.baseline_created = True
+            result.message = &#34;Baseline created (first run)&#34;
+            return result
+
+        # Build history from baseline if not provided
+        if history is None:
+            history = [baseline.metrics]
+
+        # Run regression detection
+        report = self.detector.detect(history, current_metrics)
+        result.report = report
+
+        if report.count == 0:
+            result.message = &#34;No regressions detected&#34;
+            # Update baseline with successful metrics
+            self.baselines.update_baseline(schema_name, current_metrics)
+            return result
+
+        result.passed = not report.has_critical
+        result.message = (
+            f&#34;{report.count} regression(s) detected&#34;
+            f&#34; ({sum(1 for r in report.regressions if r.severity == RegressionSeverity.CRITICAL)} critical)&#34;
+        )
+
+        if report.has_critical and self.fail_on_regression:
+            result.blocked = True
+            result.message += &#34; -- pipeline blocked&#34;
+
+            if self.event_bus:
+                self.event_bus.emit(Event(
+                    EventType.REGRESSION_ALERT,
+                    {
+                        &#34;schema&#34;: schema_name,
+                        &#34;critical_count&#34;: sum(
+                            1 for r in report.regressions
+                            if r.severity == RegressionSeverity.CRITICAL
+                        ),
+                        &#34;blocked&#34;: True,
+                    },
+                    source=&#34;regression_gate&#34;,
+                ))
+        else:
+            # Update baseline even with non-critical regressions
+            if not report.has_critical:
+                self.baselines.update_baseline(schema_name, current_metrics)
+
+        return result</code></pre>
+</details>
+<div class="desc"><p>Pipeline gate that blocks on critical regressions.</p>
+<p>Wraps the analysis-level RegressionDetector with baseline
+management. After each run, checks for regressions against
+the baseline. If <code>fail_on_regression</code> is True, critical
+regressions block pipeline completion.</p>
+<h2 id="example">Example</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; gate = RegressionGate(fail_on_regression=True)
+&gt;&gt;&gt; result = gate.check(&quot;trade_packet&quot;, current_metrics, history)
+&gt;&gt;&gt; if result.blocked:
+...     print(f&quot;Pipeline blocked: {result.message}&quot;)
+</code></pre></div>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.regression.RegressionGate.check"><code class="name flex">
+<span>def <span class="ident">check</span></span>(<span>self,<br>schema_name: str,<br>current_metrics: dict[str, Any],<br>history: list[dict[str, Any]] | None = None) ‑> <a title="atomik_sdk.pipeline.regression.detector.GateResult" href="detector.html#atomik_sdk.pipeline.regression.detector.GateResult">GateResult</a></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def check(
+    self,
+    schema_name: str,
+    current_metrics: dict[str, Any],
+    history: list[dict[str, Any]] | None = None,
+) -&gt; GateResult:
+    &#34;&#34;&#34;
+    Check for regressions against baseline and history.
+
+    If no baseline exists, creates one and passes. Otherwise
+    runs regression detection and optionally blocks.
+
+    Args:
+        schema_name: Schema being checked.
+        current_metrics: Metrics from the current run.
+        history: Optional run history for trend analysis.
+
+    Returns:
+        GateResult with pass/block status and report.
+    &#34;&#34;&#34;
+    result = GateResult()
+
+    # Auto-create baseline if missing
+    baseline, created = self.baselines.create_if_missing(
+        schema_name, current_metrics
+    )
+    if created:
+        result.baseline_created = True
+        result.message = &#34;Baseline created (first run)&#34;
+        return result
+
+    # Build history from baseline if not provided
+    if history is None:
+        history = [baseline.metrics]
+
+    # Run regression detection
+    report = self.detector.detect(history, current_metrics)
+    result.report = report
+
+    if report.count == 0:
+        result.message = &#34;No regressions detected&#34;
+        # Update baseline with successful metrics
+        self.baselines.update_baseline(schema_name, current_metrics)
+        return result
+
+    result.passed = not report.has_critical
+    result.message = (
+        f&#34;{report.count} regression(s) detected&#34;
+        f&#34; ({sum(1 for r in report.regressions if r.severity == RegressionSeverity.CRITICAL)} critical)&#34;
+    )
+
+    if report.has_critical and self.fail_on_regression:
+        result.blocked = True
+        result.message += &#34; -- pipeline blocked&#34;
+
+        if self.event_bus:
+            self.event_bus.emit(Event(
+                EventType.REGRESSION_ALERT,
+                {
+                    &#34;schema&#34;: schema_name,
+                    &#34;critical_count&#34;: sum(
+                        1 for r in report.regressions
+                        if r.severity == RegressionSeverity.CRITICAL
+                    ),
+                    &#34;blocked&#34;: True,
+                },
+                source=&#34;regression_gate&#34;,
+            ))
+    else:
+        # Update baseline even with non-critical regressions
+        if not report.has_critical:
+            self.baselines.update_baseline(schema_name, current_metrics)
+
+    return result</code></pre>
+</details>
+<div class="desc"><p>Check for regressions against baseline and history.</p>
+<p>If no baseline exists, creates one and passes. Otherwise
+runs regression detection and optionally blocks.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>schema_name</code></strong></dt>
+<dd>Schema being checked.</dd>
+<dt><strong><code>current_metrics</code></strong></dt>
+<dd>Metrics from the current run.</dd>
+<dt><strong><code>history</code></strong></dt>
+<dd>Optional run history for trend analysis.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>GateResult with pass/block status and report.</p></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="atomik_sdk.pipeline" href="../index.html">atomik_sdk.pipeline</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-submodules">Sub-modules</a></h3>
+<ul>
+<li><code><a title="atomik_sdk.pipeline.regression.baseline" href="baseline.html">atomik_sdk.pipeline.regression.baseline</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.regression.detector" href="detector.html">atomik_sdk.pipeline.regression.detector</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="atomik_sdk.pipeline.regression.BaselineManager" href="#atomik_sdk.pipeline.regression.BaselineManager">BaselineManager</a></code></h4>
+<ul class="two-column">
+<li><code><a title="atomik_sdk.pipeline.regression.BaselineManager.create_baseline" href="#atomik_sdk.pipeline.regression.BaselineManager.create_baseline">create_baseline</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.regression.BaselineManager.create_if_missing" href="#atomik_sdk.pipeline.regression.BaselineManager.create_if_missing">create_if_missing</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.regression.BaselineManager.delete_baseline" href="#atomik_sdk.pipeline.regression.BaselineManager.delete_baseline">delete_baseline</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.regression.BaselineManager.get_baseline" href="#atomik_sdk.pipeline.regression.BaselineManager.get_baseline">get_baseline</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.regression.BaselineManager.list_baselines" href="#atomik_sdk.pipeline.regression.BaselineManager.list_baselines">list_baselines</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.regression.BaselineManager.update_baseline" href="#atomik_sdk.pipeline.regression.BaselineManager.update_baseline">update_baseline</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.pipeline.regression.BaselineSnapshot" href="#atomik_sdk.pipeline.regression.BaselineSnapshot">BaselineSnapshot</a></code></h4>
+<ul class="two-column">
+<li><code><a title="atomik_sdk.pipeline.regression.BaselineSnapshot.created_at" href="#atomik_sdk.pipeline.regression.BaselineSnapshot.created_at">created_at</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.regression.BaselineSnapshot.from_dict" href="#atomik_sdk.pipeline.regression.BaselineSnapshot.from_dict">from_dict</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.regression.BaselineSnapshot.hardware_metrics" href="#atomik_sdk.pipeline.regression.BaselineSnapshot.hardware_metrics">hardware_metrics</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.regression.BaselineSnapshot.metrics" href="#atomik_sdk.pipeline.regression.BaselineSnapshot.metrics">metrics</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.regression.BaselineSnapshot.run_count" href="#atomik_sdk.pipeline.regression.BaselineSnapshot.run_count">run_count</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.regression.BaselineSnapshot.schema_name" href="#atomik_sdk.pipeline.regression.BaselineSnapshot.schema_name">schema_name</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.regression.BaselineSnapshot.test_counts" href="#atomik_sdk.pipeline.regression.BaselineSnapshot.test_counts">test_counts</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.regression.BaselineSnapshot.to_dict" href="#atomik_sdk.pipeline.regression.BaselineSnapshot.to_dict">to_dict</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.pipeline.regression.GateResult" href="#atomik_sdk.pipeline.regression.GateResult">GateResult</a></code></h4>
+<ul class="two-column">
+<li><code><a title="atomik_sdk.pipeline.regression.GateResult.baseline_created" href="#atomik_sdk.pipeline.regression.GateResult.baseline_created">baseline_created</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.regression.GateResult.blocked" href="#atomik_sdk.pipeline.regression.GateResult.blocked">blocked</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.regression.GateResult.message" href="#atomik_sdk.pipeline.regression.GateResult.message">message</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.regression.GateResult.passed" href="#atomik_sdk.pipeline.regression.GateResult.passed">passed</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.regression.GateResult.report" href="#atomik_sdk.pipeline.regression.GateResult.report">report</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.regression.GateResult.to_dict" href="#atomik_sdk.pipeline.regression.GateResult.to_dict">to_dict</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.pipeline.regression.PipelineRegressionDetector" href="#atomik_sdk.pipeline.regression.PipelineRegressionDetector">PipelineRegressionDetector</a></code></h4>
+<ul class="">
+<li><code><a title="atomik_sdk.pipeline.regression.PipelineRegressionDetector.check_and_gate" href="#atomik_sdk.pipeline.regression.PipelineRegressionDetector.check_and_gate">check_and_gate</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.regression.PipelineRegressionDetector.get_baseline" href="#atomik_sdk.pipeline.regression.PipelineRegressionDetector.get_baseline">get_baseline</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.regression.PipelineRegressionDetector.record_run" href="#atomik_sdk.pipeline.regression.PipelineRegressionDetector.record_run">record_run</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.regression.PipelineRegressionDetector.reset_baseline" href="#atomik_sdk.pipeline.regression.PipelineRegressionDetector.reset_baseline">reset_baseline</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.pipeline.regression.RegressionGate" href="#atomik_sdk.pipeline.regression.RegressionGate">RegressionGate</a></code></h4>
+<ul class="">
+<li><code><a title="atomik_sdk.pipeline.regression.RegressionGate.check" href="#atomik_sdk.pipeline.regression.RegressionGate.check">check</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+</body>
+</html>

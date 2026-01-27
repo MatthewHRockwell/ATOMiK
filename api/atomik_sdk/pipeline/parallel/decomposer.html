@@ -1,0 +1,640 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
+<title>atomik_sdk.pipeline.parallel.decomposer API documentation</title>
+<meta name="description" content="Task Decomposer …">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>atomik_sdk.pipeline.parallel.decomposer</code></h1>
+</header>
+<section id="section-intro">
+<p>Task Decomposer</p>
+<p>Decomposes pipeline work into fine-grained tasks that can execute
+in parallel. Each language becomes an independent generation task;
+each language's test suite is an independent verification task.</p>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="atomik_sdk.pipeline.parallel.decomposer.DecompositionPlan"><code class="flex name class">
+<span>class <span class="ident">DecompositionPlan</span></span>
+<span>(</span><span>tasks: list[<a title="atomik_sdk.pipeline.parallel.decomposer.ParallelTask" href="#atomik_sdk.pipeline.parallel.decomposer.ParallelTask">ParallelTask</a>] = &lt;factory&gt;,<br>parallel_groups: list[list[str]] = &lt;factory&gt;)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass
+class DecompositionPlan:
+    &#34;&#34;&#34;A plan of parallel and sequential tasks.&#34;&#34;&#34;
+    tasks: list[ParallelTask] = field(default_factory=list)
+    parallel_groups: list[list[str]] = field(default_factory=list)
+
+    @property
+    def task_count(self) -&gt; int:
+        return len(self.tasks)
+
+    @property
+    def max_parallelism(self) -&gt; int:
+        if not self.parallel_groups:
+            return 1
+        return max(len(g) for g in self.parallel_groups)
+
+    def to_dict(self) -&gt; dict[str, Any]:
+        return {
+            &#34;task_count&#34;: self.task_count,
+            &#34;max_parallelism&#34;: self.max_parallelism,
+            &#34;tasks&#34;: [t.to_dict() for t in self.tasks],
+            &#34;parallel_groups&#34;: self.parallel_groups,
+        }</code></pre>
+</details>
+<div class="desc"><p>A plan of parallel and sequential tasks.</p></div>
+<h3>Instance variables</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.parallel.decomposer.DecompositionPlan.max_parallelism"><code class="name">prop <span class="ident">max_parallelism</span> : int</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def max_parallelism(self) -&gt; int:
+    if not self.parallel_groups:
+        return 1
+    return max(len(g) for g in self.parallel_groups)</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.parallel.decomposer.DecompositionPlan.parallel_groups"><code class="name">var <span class="ident">parallel_groups</span> : list[list[str]]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.parallel.decomposer.DecompositionPlan.task_count"><code class="name">prop <span class="ident">task_count</span> : int</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def task_count(self) -&gt; int:
+    return len(self.tasks)</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.parallel.decomposer.DecompositionPlan.tasks"><code class="name">var <span class="ident">tasks</span> : list[<a title="atomik_sdk.pipeline.parallel.decomposer.ParallelTask" href="#atomik_sdk.pipeline.parallel.decomposer.ParallelTask">ParallelTask</a>]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.parallel.decomposer.DecompositionPlan.to_dict"><code class="name flex">
+<span>def <span class="ident">to_dict</span></span>(<span>self) ‑> dict[str, typing.Any]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_dict(self) -&gt; dict[str, Any]:
+    return {
+        &#34;task_count&#34;: self.task_count,
+        &#34;max_parallelism&#34;: self.max_parallelism,
+        &#34;tasks&#34;: [t.to_dict() for t in self.tasks],
+        &#34;parallel_groups&#34;: self.parallel_groups,
+    }</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.pipeline.parallel.decomposer.ParallelTask"><code class="flex name class">
+<span>class <span class="ident">ParallelTask</span></span>
+<span>(</span><span>task_id: str,<br>task_type: str,<br>language: str = '',<br>dependencies: list[str] = &lt;factory&gt;,<br>metadata: dict[str, Any] = &lt;factory&gt;)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass
+class ParallelTask:
+    &#34;&#34;&#34;A decomposed task ready for parallel execution.&#34;&#34;&#34;
+    task_id: str
+    task_type: str        # &#34;generate&#34;, &#34;verify&#34;, &#34;synthesize&#34;
+    language: str = &#34;&#34;     # Language this task targets (empty for language-agnostic)
+    dependencies: list[str] = field(default_factory=list)
+    metadata: dict[str, Any] = field(default_factory=dict)
+
+    def to_dict(self) -&gt; dict[str, Any]:
+        return {
+            &#34;task_id&#34;: self.task_id,
+            &#34;task_type&#34;: self.task_type,
+            &#34;language&#34;: self.language,
+            &#34;dependencies&#34;: self.dependencies,
+            &#34;metadata&#34;: self.metadata,
+        }</code></pre>
+</details>
+<div class="desc"><p>A decomposed task ready for parallel execution.</p></div>
+<h3>Instance variables</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.parallel.decomposer.ParallelTask.dependencies"><code class="name">var <span class="ident">dependencies</span> : list[str]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.parallel.decomposer.ParallelTask.language"><code class="name">var <span class="ident">language</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.parallel.decomposer.ParallelTask.metadata"><code class="name">var <span class="ident">metadata</span> : dict[str, typing.Any]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.parallel.decomposer.ParallelTask.task_id"><code class="name">var <span class="ident">task_id</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.parallel.decomposer.ParallelTask.task_type"><code class="name">var <span class="ident">task_type</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.parallel.decomposer.ParallelTask.to_dict"><code class="name flex">
+<span>def <span class="ident">to_dict</span></span>(<span>self) ‑> dict[str, typing.Any]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_dict(self) -&gt; dict[str, Any]:
+    return {
+        &#34;task_id&#34;: self.task_id,
+        &#34;task_type&#34;: self.task_type,
+        &#34;language&#34;: self.language,
+        &#34;dependencies&#34;: self.dependencies,
+        &#34;metadata&#34;: self.metadata,
+    }</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.pipeline.parallel.decomposer.TaskDecomposer"><code class="flex name class">
+<span>class <span class="ident">TaskDecomposer</span></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class TaskDecomposer:
+    &#34;&#34;&#34;
+    Decomposes pipeline stages into parallel tasks.
+
+    For code generation, each language becomes an independent task.
+    For verification, each language&#39;s checks run independently.
+    Hardware simulation and synthesis can overlap with software
+    verification.
+
+    Example:
+        &gt;&gt;&gt; decomposer = TaskDecomposer()
+        &gt;&gt;&gt; plan = decomposer.decompose_generation([&#34;python&#34;, &#34;rust&#34;, &#34;verilog&#34;])
+        &gt;&gt;&gt; assert plan.max_parallelism == 3
+    &#34;&#34;&#34;
+
+    def decompose_generation(
+        self,
+        languages: list[str] | None = None,
+    ) -&gt; DecompositionPlan:
+        &#34;&#34;&#34;
+        Decompose code generation into per-language parallel tasks.
+
+        Args:
+            languages: Languages to generate (None = all 5).
+
+        Returns:
+            DecompositionPlan with one task per language.
+        &#34;&#34;&#34;
+        langs = languages or list(ALL_LANGUAGES)
+        plan = DecompositionPlan()
+
+        task_ids = []
+        for lang in langs:
+            task = ParallelTask(
+                task_id=f&#34;gen_{lang}&#34;,
+                task_type=&#34;generate&#34;,
+                language=lang,
+            )
+            plan.tasks.append(task)
+            task_ids.append(task.task_id)
+
+        plan.parallel_groups.append(task_ids)
+        return plan
+
+    def decompose_verification(
+        self,
+        languages: list[str] | None = None,
+        gen_task_ids: list[str] | None = None,
+    ) -&gt; DecompositionPlan:
+        &#34;&#34;&#34;
+        Decompose verification into per-language parallel tasks.
+
+        Each verification task depends on its language&#39;s generation task.
+        &#34;&#34;&#34;
+        langs = languages or list(ALL_LANGUAGES)
+        plan = DecompositionPlan()
+
+        task_ids = []
+        for lang in langs:
+            deps = [f&#34;gen_{lang}&#34;] if gen_task_ids is None else [
+                tid for tid in gen_task_ids if lang in tid
+            ]
+            task = ParallelTask(
+                task_id=f&#34;verify_{lang}&#34;,
+                task_type=&#34;verify&#34;,
+                language=lang,
+                dependencies=deps,
+            )
+            plan.tasks.append(task)
+            task_ids.append(task.task_id)
+
+        plan.parallel_groups.append(task_ids)
+        return plan
+
+    def decompose_full_pipeline(
+        self,
+        languages: list[str] | None = None,
+        include_hardware: bool = True,
+    ) -&gt; DecompositionPlan:
+        &#34;&#34;&#34;
+        Decompose a full pipeline run into parallel task groups.
+
+        Groups:
+        1. Validate (sequential)
+        2. Diff (sequential, depends on validate)
+        3. Generate per-language (parallel)
+        4. Verify per-language (parallel) + Hardware sim (parallel with SW verify)
+        5. Metrics (sequential, after all verification)
+
+        Returns:
+            DecompositionPlan with all task groups.
+        &#34;&#34;&#34;
+        langs = languages or list(ALL_LANGUAGES)
+        plan = DecompositionPlan()
+
+        # Group 1: validate
+        plan.tasks.append(ParallelTask(
+            task_id=&#34;validate&#34;,
+            task_type=&#34;stage&#34;,
+        ))
+        plan.parallel_groups.append([&#34;validate&#34;])
+
+        # Group 2: diff
+        plan.tasks.append(ParallelTask(
+            task_id=&#34;diff&#34;,
+            task_type=&#34;stage&#34;,
+            dependencies=[&#34;validate&#34;],
+        ))
+        plan.parallel_groups.append([&#34;diff&#34;])
+
+        # Group 3: generate per language
+        gen_ids = []
+        for lang in langs:
+            tid = f&#34;gen_{lang}&#34;
+            plan.tasks.append(ParallelTask(
+                task_id=tid,
+                task_type=&#34;generate&#34;,
+                language=lang,
+                dependencies=[&#34;diff&#34;],
+            ))
+            gen_ids.append(tid)
+        plan.parallel_groups.append(gen_ids)
+
+        # Group 4: verify per language + hardware
+        verify_ids = []
+        for lang in langs:
+            tid = f&#34;verify_{lang}&#34;
+            plan.tasks.append(ParallelTask(
+                task_id=tid,
+                task_type=&#34;verify&#34;,
+                language=lang,
+                dependencies=[f&#34;gen_{lang}&#34;],
+            ))
+            verify_ids.append(tid)
+
+        if include_hardware:
+            hw_tid = &#34;hardware_sim&#34;
+            plan.tasks.append(ParallelTask(
+                task_id=hw_tid,
+                task_type=&#34;synthesize&#34;,
+                language=&#34;verilog&#34;,
+                dependencies=[&#34;gen_verilog&#34;],
+            ))
+            verify_ids.append(hw_tid)
+
+        plan.parallel_groups.append(verify_ids)
+
+        # Group 5: metrics
+        plan.tasks.append(ParallelTask(
+            task_id=&#34;metrics&#34;,
+            task_type=&#34;stage&#34;,
+            dependencies=verify_ids,
+        ))
+        plan.parallel_groups.append([&#34;metrics&#34;])
+
+        return plan</code></pre>
+</details>
+<div class="desc"><p>Decomposes pipeline stages into parallel tasks.</p>
+<p>For code generation, each language becomes an independent task.
+For verification, each language's checks run independently.
+Hardware simulation and synthesis can overlap with software
+verification.</p>
+<h2 id="example">Example</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; decomposer = TaskDecomposer()
+&gt;&gt;&gt; plan = decomposer.decompose_generation([&quot;python&quot;, &quot;rust&quot;, &quot;verilog&quot;])
+&gt;&gt;&gt; assert plan.max_parallelism == 3
+</code></pre></div>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.parallel.decomposer.TaskDecomposer.decompose_full_pipeline"><code class="name flex">
+<span>def <span class="ident">decompose_full_pipeline</span></span>(<span>self, languages: list[str] | None = None, include_hardware: bool = True) ‑> <a title="atomik_sdk.pipeline.parallel.decomposer.DecompositionPlan" href="#atomik_sdk.pipeline.parallel.decomposer.DecompositionPlan">DecompositionPlan</a></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def decompose_full_pipeline(
+    self,
+    languages: list[str] | None = None,
+    include_hardware: bool = True,
+) -&gt; DecompositionPlan:
+    &#34;&#34;&#34;
+    Decompose a full pipeline run into parallel task groups.
+
+    Groups:
+    1. Validate (sequential)
+    2. Diff (sequential, depends on validate)
+    3. Generate per-language (parallel)
+    4. Verify per-language (parallel) + Hardware sim (parallel with SW verify)
+    5. Metrics (sequential, after all verification)
+
+    Returns:
+        DecompositionPlan with all task groups.
+    &#34;&#34;&#34;
+    langs = languages or list(ALL_LANGUAGES)
+    plan = DecompositionPlan()
+
+    # Group 1: validate
+    plan.tasks.append(ParallelTask(
+        task_id=&#34;validate&#34;,
+        task_type=&#34;stage&#34;,
+    ))
+    plan.parallel_groups.append([&#34;validate&#34;])
+
+    # Group 2: diff
+    plan.tasks.append(ParallelTask(
+        task_id=&#34;diff&#34;,
+        task_type=&#34;stage&#34;,
+        dependencies=[&#34;validate&#34;],
+    ))
+    plan.parallel_groups.append([&#34;diff&#34;])
+
+    # Group 3: generate per language
+    gen_ids = []
+    for lang in langs:
+        tid = f&#34;gen_{lang}&#34;
+        plan.tasks.append(ParallelTask(
+            task_id=tid,
+            task_type=&#34;generate&#34;,
+            language=lang,
+            dependencies=[&#34;diff&#34;],
+        ))
+        gen_ids.append(tid)
+    plan.parallel_groups.append(gen_ids)
+
+    # Group 4: verify per language + hardware
+    verify_ids = []
+    for lang in langs:
+        tid = f&#34;verify_{lang}&#34;
+        plan.tasks.append(ParallelTask(
+            task_id=tid,
+            task_type=&#34;verify&#34;,
+            language=lang,
+            dependencies=[f&#34;gen_{lang}&#34;],
+        ))
+        verify_ids.append(tid)
+
+    if include_hardware:
+        hw_tid = &#34;hardware_sim&#34;
+        plan.tasks.append(ParallelTask(
+            task_id=hw_tid,
+            task_type=&#34;synthesize&#34;,
+            language=&#34;verilog&#34;,
+            dependencies=[&#34;gen_verilog&#34;],
+        ))
+        verify_ids.append(hw_tid)
+
+    plan.parallel_groups.append(verify_ids)
+
+    # Group 5: metrics
+    plan.tasks.append(ParallelTask(
+        task_id=&#34;metrics&#34;,
+        task_type=&#34;stage&#34;,
+        dependencies=verify_ids,
+    ))
+    plan.parallel_groups.append([&#34;metrics&#34;])
+
+    return plan</code></pre>
+</details>
+<div class="desc"><p>Decompose a full pipeline run into parallel task groups.</p>
+<p>Groups:
+1. Validate (sequential)
+2. Diff (sequential, depends on validate)
+3. Generate per-language (parallel)
+4. Verify per-language (parallel) + Hardware sim (parallel with SW verify)
+5. Metrics (sequential, after all verification)</p>
+<h2 id="returns">Returns</h2>
+<p>DecompositionPlan with all task groups.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.parallel.decomposer.TaskDecomposer.decompose_generation"><code class="name flex">
+<span>def <span class="ident">decompose_generation</span></span>(<span>self, languages: list[str] | None = None) ‑> <a title="atomik_sdk.pipeline.parallel.decomposer.DecompositionPlan" href="#atomik_sdk.pipeline.parallel.decomposer.DecompositionPlan">DecompositionPlan</a></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def decompose_generation(
+    self,
+    languages: list[str] | None = None,
+) -&gt; DecompositionPlan:
+    &#34;&#34;&#34;
+    Decompose code generation into per-language parallel tasks.
+
+    Args:
+        languages: Languages to generate (None = all 5).
+
+    Returns:
+        DecompositionPlan with one task per language.
+    &#34;&#34;&#34;
+    langs = languages or list(ALL_LANGUAGES)
+    plan = DecompositionPlan()
+
+    task_ids = []
+    for lang in langs:
+        task = ParallelTask(
+            task_id=f&#34;gen_{lang}&#34;,
+            task_type=&#34;generate&#34;,
+            language=lang,
+        )
+        plan.tasks.append(task)
+        task_ids.append(task.task_id)
+
+    plan.parallel_groups.append(task_ids)
+    return plan</code></pre>
+</details>
+<div class="desc"><p>Decompose code generation into per-language parallel tasks.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>languages</code></strong></dt>
+<dd>Languages to generate (None = all 5).</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>DecompositionPlan with one task per language.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.parallel.decomposer.TaskDecomposer.decompose_verification"><code class="name flex">
+<span>def <span class="ident">decompose_verification</span></span>(<span>self, languages: list[str] | None = None, gen_task_ids: list[str] | None = None) ‑> <a title="atomik_sdk.pipeline.parallel.decomposer.DecompositionPlan" href="#atomik_sdk.pipeline.parallel.decomposer.DecompositionPlan">DecompositionPlan</a></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def decompose_verification(
+    self,
+    languages: list[str] | None = None,
+    gen_task_ids: list[str] | None = None,
+) -&gt; DecompositionPlan:
+    &#34;&#34;&#34;
+    Decompose verification into per-language parallel tasks.
+
+    Each verification task depends on its language&#39;s generation task.
+    &#34;&#34;&#34;
+    langs = languages or list(ALL_LANGUAGES)
+    plan = DecompositionPlan()
+
+    task_ids = []
+    for lang in langs:
+        deps = [f&#34;gen_{lang}&#34;] if gen_task_ids is None else [
+            tid for tid in gen_task_ids if lang in tid
+        ]
+        task = ParallelTask(
+            task_id=f&#34;verify_{lang}&#34;,
+            task_type=&#34;verify&#34;,
+            language=lang,
+            dependencies=deps,
+        )
+        plan.tasks.append(task)
+        task_ids.append(task.task_id)
+
+    plan.parallel_groups.append(task_ids)
+    return plan</code></pre>
+</details>
+<div class="desc"><p>Decompose verification into per-language parallel tasks.</p>
+<p>Each verification task depends on its language's generation task.</p></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="atomik_sdk.pipeline.parallel" href="index.html">atomik_sdk.pipeline.parallel</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="atomik_sdk.pipeline.parallel.decomposer.DecompositionPlan" href="#atomik_sdk.pipeline.parallel.decomposer.DecompositionPlan">DecompositionPlan</a></code></h4>
+<ul class="">
+<li><code><a title="atomik_sdk.pipeline.parallel.decomposer.DecompositionPlan.max_parallelism" href="#atomik_sdk.pipeline.parallel.decomposer.DecompositionPlan.max_parallelism">max_parallelism</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.parallel.decomposer.DecompositionPlan.parallel_groups" href="#atomik_sdk.pipeline.parallel.decomposer.DecompositionPlan.parallel_groups">parallel_groups</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.parallel.decomposer.DecompositionPlan.task_count" href="#atomik_sdk.pipeline.parallel.decomposer.DecompositionPlan.task_count">task_count</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.parallel.decomposer.DecompositionPlan.tasks" href="#atomik_sdk.pipeline.parallel.decomposer.DecompositionPlan.tasks">tasks</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.parallel.decomposer.DecompositionPlan.to_dict" href="#atomik_sdk.pipeline.parallel.decomposer.DecompositionPlan.to_dict">to_dict</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.pipeline.parallel.decomposer.ParallelTask" href="#atomik_sdk.pipeline.parallel.decomposer.ParallelTask">ParallelTask</a></code></h4>
+<ul class="two-column">
+<li><code><a title="atomik_sdk.pipeline.parallel.decomposer.ParallelTask.dependencies" href="#atomik_sdk.pipeline.parallel.decomposer.ParallelTask.dependencies">dependencies</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.parallel.decomposer.ParallelTask.language" href="#atomik_sdk.pipeline.parallel.decomposer.ParallelTask.language">language</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.parallel.decomposer.ParallelTask.metadata" href="#atomik_sdk.pipeline.parallel.decomposer.ParallelTask.metadata">metadata</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.parallel.decomposer.ParallelTask.task_id" href="#atomik_sdk.pipeline.parallel.decomposer.ParallelTask.task_id">task_id</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.parallel.decomposer.ParallelTask.task_type" href="#atomik_sdk.pipeline.parallel.decomposer.ParallelTask.task_type">task_type</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.parallel.decomposer.ParallelTask.to_dict" href="#atomik_sdk.pipeline.parallel.decomposer.ParallelTask.to_dict">to_dict</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.pipeline.parallel.decomposer.TaskDecomposer" href="#atomik_sdk.pipeline.parallel.decomposer.TaskDecomposer">TaskDecomposer</a></code></h4>
+<ul class="">
+<li><code><a title="atomik_sdk.pipeline.parallel.decomposer.TaskDecomposer.decompose_full_pipeline" href="#atomik_sdk.pipeline.parallel.decomposer.TaskDecomposer.decompose_full_pipeline">decompose_full_pipeline</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.parallel.decomposer.TaskDecomposer.decompose_generation" href="#atomik_sdk.pipeline.parallel.decomposer.TaskDecomposer.decompose_generation">decompose_generation</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.parallel.decomposer.TaskDecomposer.decompose_verification" href="#atomik_sdk.pipeline.parallel.decomposer.TaskDecomposer.decompose_verification">decompose_verification</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+</body>
+</html>

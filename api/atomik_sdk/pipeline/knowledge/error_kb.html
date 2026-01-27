@@ -1,0 +1,969 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
+<title>atomik_sdk.pipeline.knowledge.error_kb API documentation</title>
+<meta name="description" content="Error Pattern Knowledge Base …">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>atomik_sdk.pipeline.knowledge.error_kb</code></h1>
+</header>
+<section id="section-intro">
+<p>Error Pattern Knowledge Base</p>
+<p>Persistent, versioned knowledge base of error patterns and their
+proven fixes. Supports CRUD operations, fuzzy matching, and
+auto-learning from successful LLM-diagnosed fixes.</p>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="atomik_sdk.pipeline.knowledge.error_kb.ErrorKnowledgeBase"><code class="flex name class">
+<span>class <span class="ident">ErrorKnowledgeBase</span></span>
+<span>(</span><span>min_confidence: float = 0.3, fuzzy_threshold: float = 0.6)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class ErrorKnowledgeBase:
+    &#34;&#34;&#34;
+    Persistent error pattern knowledge base.
+
+    Stores known error patterns with fix templates, supports fuzzy
+    matching for near-miss patterns, and auto-learns from successful
+    LLM-diagnosed fixes.
+
+    Example:
+        &gt;&gt;&gt; kb = ErrorKnowledgeBase()
+        &gt;&gt;&gt; kb.load_seed()
+        &gt;&gt;&gt; result = kb.lookup(&#34;python&#34;, &#34;import_error&#34;, &#34;ModuleNotFoundError: atomik&#34;)
+        &gt;&gt;&gt; if result.found:
+        ...     print(f&#34;Fix: {result.pattern.fix_template}&#34;)
+    &#34;&#34;&#34;
+
+    def __init__(
+        self,
+        min_confidence: float = 0.3,
+        fuzzy_threshold: float = 0.6,
+    ) -&gt; None:
+        self._patterns: dict[str, ErrorPattern] = {}
+        self._min_confidence = min_confidence
+        self._fuzzy_threshold = fuzzy_threshold
+
+    def add_pattern(self, pattern: ErrorPattern) -&gt; None:
+        &#34;&#34;&#34;Add a pattern to the knowledge base.&#34;&#34;&#34;
+        if not pattern.created_at:
+            pattern.created_at = time.strftime(
+                &#34;%Y-%m-%dT%H:%M:%SZ&#34;, time.gmtime()
+            )
+        self._patterns[pattern.pattern_id] = pattern
+
+    def remove_pattern(self, pattern_id: str) -&gt; bool:
+        &#34;&#34;&#34;Remove a pattern by ID. Returns True if found and removed.&#34;&#34;&#34;
+        return self._patterns.pop(pattern_id, None) is not None
+
+    def get_pattern(self, pattern_id: str) -&gt; ErrorPattern | None:
+        &#34;&#34;&#34;Get a pattern by ID.&#34;&#34;&#34;
+        return self._patterns.get(pattern_id)
+
+    def get_all_patterns(self) -&gt; list[ErrorPattern]:
+        &#34;&#34;&#34;Get all patterns.&#34;&#34;&#34;
+        return list(self._patterns.values())
+
+    def lookup(
+        self,
+        language: str,
+        error_class: str,
+        error_message: str,
+    ) -&gt; KBLookupResult:
+        &#34;&#34;&#34;
+        Look up a known fix for an error.
+
+        First attempts exact substring match, then fuzzy match.
+        Filters by language and error class, then scores by signature.
+
+        Args:
+            language: Language of the failing code.
+            error_class: Classified error type.
+            error_message: The actual error message.
+
+        Returns:
+            KBLookupResult with the best matching pattern.
+        &#34;&#34;&#34;
+        candidates = [
+            p for p in self._patterns.values()
+            if (not p.language or p.language == language)
+            and p.confidence &gt;= self._min_confidence
+        ]
+
+        if not candidates:
+            return KBLookupResult(found=False, match_type=&#34;none&#34;)
+
+        # Score candidates
+        best: ErrorPattern | None = None
+        best_score = 0.0
+        best_type = &#34;none&#34;
+
+        for pattern in candidates:
+            # Exact class + signature match
+            if pattern.error_class == error_class:
+                sig_lower = pattern.signature.lower()
+                msg_lower = error_message.lower()
+                if sig_lower in msg_lower:
+                    score = 1.0
+                    match_type = &#34;exact&#34;
+                else:
+                    score = fuzzy_score(error_message, pattern.signature)
+                    match_type = &#34;fuzzy&#34;
+
+                if score &gt; best_score:
+                    best_score = score
+                    best = pattern
+                    best_type = match_type
+
+            # Cross-class fuzzy match
+            else:
+                score = fuzzy_score(error_message, pattern.signature) * 0.7
+                if score &gt; best_score:
+                    best_score = score
+                    best = pattern
+                    best_type = &#34;fuzzy&#34;
+
+        if best and best_score &gt;= self._fuzzy_threshold:
+            best.last_matched = time.strftime(
+                &#34;%Y-%m-%dT%H:%M:%SZ&#34;, time.gmtime()
+            )
+            return KBLookupResult(
+                found=True,
+                pattern=best,
+                match_score=best_score,
+                match_type=best_type,
+            )
+
+        return KBLookupResult(found=False, match_type=&#34;none&#34;, match_score=best_score)
+
+    def record_success(self, pattern_id: str) -&gt; None:
+        &#34;&#34;&#34;Record a successful fix application.&#34;&#34;&#34;
+        pattern = self._patterns.get(pattern_id)
+        if pattern:
+            pattern.success_count += 1
+
+    def record_failure(self, pattern_id: str) -&gt; None:
+        &#34;&#34;&#34;Record a failed fix application.&#34;&#34;&#34;
+        pattern = self._patterns.get(pattern_id)
+        if pattern:
+            pattern.failure_count += 1
+
+    def learn(
+        self,
+        language: str,
+        error_class: str,
+        error_message: str,
+        fix_description: str,
+        fix_type: str = &#34;learned&#34;,
+    ) -&gt; ErrorPattern:
+        &#34;&#34;&#34;
+        Learn a new pattern from a successful LLM-diagnosed fix.
+
+        Creates a new pattern entry with the error signature and fix.
+        &#34;&#34;&#34;
+        pattern_id = f&#34;learned_{len(self._patterns)}_{int(time.time())}&#34;
+        pattern = ErrorPattern(
+            pattern_id=pattern_id,
+            language=language,
+            error_class=error_class,
+            signature=error_message[:200],  # Truncate long messages
+            fix_template=fix_description,
+            fix_type=fix_type,
+            success_count=1,  # Already succeeded
+            source=&#34;learned&#34;,
+        )
+        self.add_pattern(pattern)
+        return pattern
+
+    def load_seed(self, seed_path: str | Path | None = None) -&gt; int:
+        &#34;&#34;&#34;
+        Load seed patterns from JSON file.
+
+        Returns number of patterns loaded.
+        &#34;&#34;&#34;
+        if seed_path is None:
+            seed_path = Path(__file__).parent / &#34;error_patterns.json&#34;
+
+        path = Path(seed_path)
+        if not path.exists():
+            return 0
+
+        with open(path, encoding=&#34;utf-8&#34;) as f:
+            data = json.load(f)
+
+        patterns = data.get(&#34;patterns&#34;, [])
+        for p_data in patterns:
+            pattern = ErrorPattern.from_dict(p_data)
+            self.add_pattern(pattern)
+
+        return len(patterns)
+
+    def save(self, path: str | Path) -&gt; None:
+        &#34;&#34;&#34;Save knowledge base to JSON file.&#34;&#34;&#34;
+        path = Path(path)
+        path.parent.mkdir(parents=True, exist_ok=True)
+
+        data = {
+            &#34;version&#34;: KB_SCHEMA_VERSION,
+            &#34;saved_at&#34;: time.strftime(&#34;%Y-%m-%dT%H:%M:%SZ&#34;, time.gmtime()),
+            &#34;pattern_count&#34;: len(self._patterns),
+            &#34;patterns&#34;: [p.to_dict() for p in self._patterns.values()],
+        }
+
+        with open(path, &#34;w&#34;, encoding=&#34;utf-8&#34;) as f:
+            json.dump(data, f, indent=2)
+
+    def load(self, path: str | Path) -&gt; int:
+        &#34;&#34;&#34;Load knowledge base from JSON file. Returns pattern count.&#34;&#34;&#34;
+        path = Path(path)
+        if not path.exists():
+            return 0
+
+        with open(path, encoding=&#34;utf-8&#34;) as f:
+            data = json.load(f)
+
+        self._patterns.clear()
+        for p_data in data.get(&#34;patterns&#34;, []):
+            pattern = ErrorPattern.from_dict(p_data)
+            self._patterns[pattern.pattern_id] = pattern
+
+        return len(self._patterns)
+
+    def summary(self) -&gt; dict[str, Any]:
+        &#34;&#34;&#34;Get knowledge base summary.&#34;&#34;&#34;
+        patterns = list(self._patterns.values())
+        seed = [p for p in patterns if p.source == &#34;seed&#34;]
+        learned = [p for p in patterns if p.source == &#34;learned&#34;]
+
+        return {
+            &#34;version&#34;: KB_SCHEMA_VERSION,
+            &#34;total_patterns&#34;: len(patterns),
+            &#34;seed_patterns&#34;: len(seed),
+            &#34;learned_patterns&#34;: len(learned),
+            &#34;avg_confidence&#34;: (
+                sum(p.confidence for p in patterns) / len(patterns)
+                if patterns else 0.0
+            ),
+            &#34;total_matches&#34;: sum(
+                p.success_count + p.failure_count for p in patterns
+            ),
+        }</code></pre>
+</details>
+<div class="desc"><p>Persistent error pattern knowledge base.</p>
+<p>Stores known error patterns with fix templates, supports fuzzy
+matching for near-miss patterns, and auto-learns from successful
+LLM-diagnosed fixes.</p>
+<h2 id="example">Example</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; kb = ErrorKnowledgeBase()
+&gt;&gt;&gt; kb.load_seed()
+&gt;&gt;&gt; result = kb.lookup(&quot;python&quot;, &quot;import_error&quot;, &quot;ModuleNotFoundError: atomik&quot;)
+&gt;&gt;&gt; if result.found:
+...     print(f&quot;Fix: {result.pattern.fix_template}&quot;)
+</code></pre></div>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.knowledge.error_kb.ErrorKnowledgeBase.add_pattern"><code class="name flex">
+<span>def <span class="ident">add_pattern</span></span>(<span>self,<br>pattern: <a title="atomik_sdk.pipeline.knowledge.error_kb.ErrorPattern" href="#atomik_sdk.pipeline.knowledge.error_kb.ErrorPattern">ErrorPattern</a>) ‑> None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_pattern(self, pattern: ErrorPattern) -&gt; None:
+    &#34;&#34;&#34;Add a pattern to the knowledge base.&#34;&#34;&#34;
+    if not pattern.created_at:
+        pattern.created_at = time.strftime(
+            &#34;%Y-%m-%dT%H:%M:%SZ&#34;, time.gmtime()
+        )
+    self._patterns[pattern.pattern_id] = pattern</code></pre>
+</details>
+<div class="desc"><p>Add a pattern to the knowledge base.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.knowledge.error_kb.ErrorKnowledgeBase.get_all_patterns"><code class="name flex">
+<span>def <span class="ident">get_all_patterns</span></span>(<span>self) ‑> list[<a title="atomik_sdk.pipeline.knowledge.error_kb.ErrorPattern" href="#atomik_sdk.pipeline.knowledge.error_kb.ErrorPattern">ErrorPattern</a>]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_all_patterns(self) -&gt; list[ErrorPattern]:
+    &#34;&#34;&#34;Get all patterns.&#34;&#34;&#34;
+    return list(self._patterns.values())</code></pre>
+</details>
+<div class="desc"><p>Get all patterns.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.knowledge.error_kb.ErrorKnowledgeBase.get_pattern"><code class="name flex">
+<span>def <span class="ident">get_pattern</span></span>(<span>self, pattern_id: str) ‑> <a title="atomik_sdk.pipeline.knowledge.error_kb.ErrorPattern" href="#atomik_sdk.pipeline.knowledge.error_kb.ErrorPattern">ErrorPattern</a> | None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_pattern(self, pattern_id: str) -&gt; ErrorPattern | None:
+    &#34;&#34;&#34;Get a pattern by ID.&#34;&#34;&#34;
+    return self._patterns.get(pattern_id)</code></pre>
+</details>
+<div class="desc"><p>Get a pattern by ID.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.knowledge.error_kb.ErrorKnowledgeBase.learn"><code class="name flex">
+<span>def <span class="ident">learn</span></span>(<span>self,<br>language: str,<br>error_class: str,<br>error_message: str,<br>fix_description: str,<br>fix_type: str = 'learned') ‑> <a title="atomik_sdk.pipeline.knowledge.error_kb.ErrorPattern" href="#atomik_sdk.pipeline.knowledge.error_kb.ErrorPattern">ErrorPattern</a></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def learn(
+    self,
+    language: str,
+    error_class: str,
+    error_message: str,
+    fix_description: str,
+    fix_type: str = &#34;learned&#34;,
+) -&gt; ErrorPattern:
+    &#34;&#34;&#34;
+    Learn a new pattern from a successful LLM-diagnosed fix.
+
+    Creates a new pattern entry with the error signature and fix.
+    &#34;&#34;&#34;
+    pattern_id = f&#34;learned_{len(self._patterns)}_{int(time.time())}&#34;
+    pattern = ErrorPattern(
+        pattern_id=pattern_id,
+        language=language,
+        error_class=error_class,
+        signature=error_message[:200],  # Truncate long messages
+        fix_template=fix_description,
+        fix_type=fix_type,
+        success_count=1,  # Already succeeded
+        source=&#34;learned&#34;,
+    )
+    self.add_pattern(pattern)
+    return pattern</code></pre>
+</details>
+<div class="desc"><p>Learn a new pattern from a successful LLM-diagnosed fix.</p>
+<p>Creates a new pattern entry with the error signature and fix.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.knowledge.error_kb.ErrorKnowledgeBase.load"><code class="name flex">
+<span>def <span class="ident">load</span></span>(<span>self, path: str | Path) ‑> int</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def load(self, path: str | Path) -&gt; int:
+    &#34;&#34;&#34;Load knowledge base from JSON file. Returns pattern count.&#34;&#34;&#34;
+    path = Path(path)
+    if not path.exists():
+        return 0
+
+    with open(path, encoding=&#34;utf-8&#34;) as f:
+        data = json.load(f)
+
+    self._patterns.clear()
+    for p_data in data.get(&#34;patterns&#34;, []):
+        pattern = ErrorPattern.from_dict(p_data)
+        self._patterns[pattern.pattern_id] = pattern
+
+    return len(self._patterns)</code></pre>
+</details>
+<div class="desc"><p>Load knowledge base from JSON file. Returns pattern count.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.knowledge.error_kb.ErrorKnowledgeBase.load_seed"><code class="name flex">
+<span>def <span class="ident">load_seed</span></span>(<span>self, seed_path: str | Path | None = None) ‑> int</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def load_seed(self, seed_path: str | Path | None = None) -&gt; int:
+    &#34;&#34;&#34;
+    Load seed patterns from JSON file.
+
+    Returns number of patterns loaded.
+    &#34;&#34;&#34;
+    if seed_path is None:
+        seed_path = Path(__file__).parent / &#34;error_patterns.json&#34;
+
+    path = Path(seed_path)
+    if not path.exists():
+        return 0
+
+    with open(path, encoding=&#34;utf-8&#34;) as f:
+        data = json.load(f)
+
+    patterns = data.get(&#34;patterns&#34;, [])
+    for p_data in patterns:
+        pattern = ErrorPattern.from_dict(p_data)
+        self.add_pattern(pattern)
+
+    return len(patterns)</code></pre>
+</details>
+<div class="desc"><p>Load seed patterns from JSON file.</p>
+<p>Returns number of patterns loaded.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.knowledge.error_kb.ErrorKnowledgeBase.lookup"><code class="name flex">
+<span>def <span class="ident">lookup</span></span>(<span>self, language: str, error_class: str, error_message: str) ‑> <a title="atomik_sdk.pipeline.knowledge.error_kb.KBLookupResult" href="#atomik_sdk.pipeline.knowledge.error_kb.KBLookupResult">KBLookupResult</a></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def lookup(
+    self,
+    language: str,
+    error_class: str,
+    error_message: str,
+) -&gt; KBLookupResult:
+    &#34;&#34;&#34;
+    Look up a known fix for an error.
+
+    First attempts exact substring match, then fuzzy match.
+    Filters by language and error class, then scores by signature.
+
+    Args:
+        language: Language of the failing code.
+        error_class: Classified error type.
+        error_message: The actual error message.
+
+    Returns:
+        KBLookupResult with the best matching pattern.
+    &#34;&#34;&#34;
+    candidates = [
+        p for p in self._patterns.values()
+        if (not p.language or p.language == language)
+        and p.confidence &gt;= self._min_confidence
+    ]
+
+    if not candidates:
+        return KBLookupResult(found=False, match_type=&#34;none&#34;)
+
+    # Score candidates
+    best: ErrorPattern | None = None
+    best_score = 0.0
+    best_type = &#34;none&#34;
+
+    for pattern in candidates:
+        # Exact class + signature match
+        if pattern.error_class == error_class:
+            sig_lower = pattern.signature.lower()
+            msg_lower = error_message.lower()
+            if sig_lower in msg_lower:
+                score = 1.0
+                match_type = &#34;exact&#34;
+            else:
+                score = fuzzy_score(error_message, pattern.signature)
+                match_type = &#34;fuzzy&#34;
+
+            if score &gt; best_score:
+                best_score = score
+                best = pattern
+                best_type = match_type
+
+        # Cross-class fuzzy match
+        else:
+            score = fuzzy_score(error_message, pattern.signature) * 0.7
+            if score &gt; best_score:
+                best_score = score
+                best = pattern
+                best_type = &#34;fuzzy&#34;
+
+    if best and best_score &gt;= self._fuzzy_threshold:
+        best.last_matched = time.strftime(
+            &#34;%Y-%m-%dT%H:%M:%SZ&#34;, time.gmtime()
+        )
+        return KBLookupResult(
+            found=True,
+            pattern=best,
+            match_score=best_score,
+            match_type=best_type,
+        )
+
+    return KBLookupResult(found=False, match_type=&#34;none&#34;, match_score=best_score)</code></pre>
+</details>
+<div class="desc"><p>Look up a known fix for an error.</p>
+<p>First attempts exact substring match, then fuzzy match.
+Filters by language and error class, then scores by signature.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>language</code></strong></dt>
+<dd>Language of the failing code.</dd>
+<dt><strong><code>error_class</code></strong></dt>
+<dd>Classified error type.</dd>
+<dt><strong><code>error_message</code></strong></dt>
+<dd>The actual error message.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>KBLookupResult with the best matching pattern.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.knowledge.error_kb.ErrorKnowledgeBase.record_failure"><code class="name flex">
+<span>def <span class="ident">record_failure</span></span>(<span>self, pattern_id: str) ‑> None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def record_failure(self, pattern_id: str) -&gt; None:
+    &#34;&#34;&#34;Record a failed fix application.&#34;&#34;&#34;
+    pattern = self._patterns.get(pattern_id)
+    if pattern:
+        pattern.failure_count += 1</code></pre>
+</details>
+<div class="desc"><p>Record a failed fix application.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.knowledge.error_kb.ErrorKnowledgeBase.record_success"><code class="name flex">
+<span>def <span class="ident">record_success</span></span>(<span>self, pattern_id: str) ‑> None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def record_success(self, pattern_id: str) -&gt; None:
+    &#34;&#34;&#34;Record a successful fix application.&#34;&#34;&#34;
+    pattern = self._patterns.get(pattern_id)
+    if pattern:
+        pattern.success_count += 1</code></pre>
+</details>
+<div class="desc"><p>Record a successful fix application.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.knowledge.error_kb.ErrorKnowledgeBase.remove_pattern"><code class="name flex">
+<span>def <span class="ident">remove_pattern</span></span>(<span>self, pattern_id: str) ‑> bool</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def remove_pattern(self, pattern_id: str) -&gt; bool:
+    &#34;&#34;&#34;Remove a pattern by ID. Returns True if found and removed.&#34;&#34;&#34;
+    return self._patterns.pop(pattern_id, None) is not None</code></pre>
+</details>
+<div class="desc"><p>Remove a pattern by ID. Returns True if found and removed.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.knowledge.error_kb.ErrorKnowledgeBase.save"><code class="name flex">
+<span>def <span class="ident">save</span></span>(<span>self, path: str | Path) ‑> None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def save(self, path: str | Path) -&gt; None:
+    &#34;&#34;&#34;Save knowledge base to JSON file.&#34;&#34;&#34;
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+
+    data = {
+        &#34;version&#34;: KB_SCHEMA_VERSION,
+        &#34;saved_at&#34;: time.strftime(&#34;%Y-%m-%dT%H:%M:%SZ&#34;, time.gmtime()),
+        &#34;pattern_count&#34;: len(self._patterns),
+        &#34;patterns&#34;: [p.to_dict() for p in self._patterns.values()],
+    }
+
+    with open(path, &#34;w&#34;, encoding=&#34;utf-8&#34;) as f:
+        json.dump(data, f, indent=2)</code></pre>
+</details>
+<div class="desc"><p>Save knowledge base to JSON file.</p></div>
+</dd>
+<dt id="atomik_sdk.pipeline.knowledge.error_kb.ErrorKnowledgeBase.summary"><code class="name flex">
+<span>def <span class="ident">summary</span></span>(<span>self) ‑> dict[str, typing.Any]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def summary(self) -&gt; dict[str, Any]:
+    &#34;&#34;&#34;Get knowledge base summary.&#34;&#34;&#34;
+    patterns = list(self._patterns.values())
+    seed = [p for p in patterns if p.source == &#34;seed&#34;]
+    learned = [p for p in patterns if p.source == &#34;learned&#34;]
+
+    return {
+        &#34;version&#34;: KB_SCHEMA_VERSION,
+        &#34;total_patterns&#34;: len(patterns),
+        &#34;seed_patterns&#34;: len(seed),
+        &#34;learned_patterns&#34;: len(learned),
+        &#34;avg_confidence&#34;: (
+            sum(p.confidence for p in patterns) / len(patterns)
+            if patterns else 0.0
+        ),
+        &#34;total_matches&#34;: sum(
+            p.success_count + p.failure_count for p in patterns
+        ),
+    }</code></pre>
+</details>
+<div class="desc"><p>Get knowledge base summary.</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.pipeline.knowledge.error_kb.ErrorPattern"><code class="flex name class">
+<span>class <span class="ident">ErrorPattern</span></span>
+<span>(</span><span>pattern_id: str,<br>language: str,<br>error_class: str,<br>signature: str,<br>fix_template: str,<br>fix_type: str,<br>success_count: int = 0,<br>failure_count: int = 0,<br>source: str = 'seed',<br>created_at: str = '',<br>last_matched: str = '')</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass
+class ErrorPattern:
+    &#34;&#34;&#34;A known error pattern with its fix.&#34;&#34;&#34;
+    pattern_id: str
+    language: str             # &#34;&#34; for any language
+    error_class: str
+    signature: str            # Regex/substring signature for matching
+    fix_template: str         # Description of the fix to apply
+    fix_type: str             # &#34;append_semicolon&#34;, &#34;add_import&#34;, etc.
+    success_count: int = 0
+    failure_count: int = 0
+    source: str = &#34;seed&#34;      # &#34;seed&#34; or &#34;learned&#34;
+    created_at: str = &#34;&#34;
+    last_matched: str = &#34;&#34;
+
+    @property
+    def confidence(self) -&gt; float:
+        total = self.success_count + self.failure_count
+        if total == 0:
+            return 0.5
+        return self.success_count / total
+
+    def to_dict(self) -&gt; dict[str, Any]:
+        return {
+            &#34;pattern_id&#34;: self.pattern_id,
+            &#34;language&#34;: self.language,
+            &#34;error_class&#34;: self.error_class,
+            &#34;signature&#34;: self.signature,
+            &#34;fix_template&#34;: self.fix_template,
+            &#34;fix_type&#34;: self.fix_type,
+            &#34;success_count&#34;: self.success_count,
+            &#34;failure_count&#34;: self.failure_count,
+            &#34;confidence&#34;: round(self.confidence, 3),
+            &#34;source&#34;: self.source,
+            &#34;created_at&#34;: self.created_at,
+            &#34;last_matched&#34;: self.last_matched,
+        }
+
+    @staticmethod
+    def from_dict(data: dict[str, Any]) -&gt; ErrorPattern:
+        return ErrorPattern(
+            pattern_id=data[&#34;pattern_id&#34;],
+            language=data.get(&#34;language&#34;, &#34;&#34;),
+            error_class=data[&#34;error_class&#34;],
+            signature=data[&#34;signature&#34;],
+            fix_template=data[&#34;fix_template&#34;],
+            fix_type=data[&#34;fix_type&#34;],
+            success_count=data.get(&#34;success_count&#34;, 0),
+            failure_count=data.get(&#34;failure_count&#34;, 0),
+            source=data.get(&#34;source&#34;, &#34;seed&#34;),
+            created_at=data.get(&#34;created_at&#34;, &#34;&#34;),
+            last_matched=data.get(&#34;last_matched&#34;, &#34;&#34;),
+        )</code></pre>
+</details>
+<div class="desc"><p>A known error pattern with its fix.</p></div>
+<h3>Static methods</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.knowledge.error_kb.ErrorPattern.from_dict"><code class="name flex">
+<span>def <span class="ident">from_dict</span></span>(<span>data: dict[str, Any]) ‑> <a title="atomik_sdk.pipeline.knowledge.error_kb.ErrorPattern" href="#atomik_sdk.pipeline.knowledge.error_kb.ErrorPattern">ErrorPattern</a></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@staticmethod
+def from_dict(data: dict[str, Any]) -&gt; ErrorPattern:
+    return ErrorPattern(
+        pattern_id=data[&#34;pattern_id&#34;],
+        language=data.get(&#34;language&#34;, &#34;&#34;),
+        error_class=data[&#34;error_class&#34;],
+        signature=data[&#34;signature&#34;],
+        fix_template=data[&#34;fix_template&#34;],
+        fix_type=data[&#34;fix_type&#34;],
+        success_count=data.get(&#34;success_count&#34;, 0),
+        failure_count=data.get(&#34;failure_count&#34;, 0),
+        source=data.get(&#34;source&#34;, &#34;seed&#34;),
+        created_at=data.get(&#34;created_at&#34;, &#34;&#34;),
+        last_matched=data.get(&#34;last_matched&#34;, &#34;&#34;),
+    )</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Instance variables</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.knowledge.error_kb.ErrorPattern.confidence"><code class="name">prop <span class="ident">confidence</span> : float</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def confidence(self) -&gt; float:
+    total = self.success_count + self.failure_count
+    if total == 0:
+        return 0.5
+    return self.success_count / total</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.knowledge.error_kb.ErrorPattern.created_at"><code class="name">var <span class="ident">created_at</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.knowledge.error_kb.ErrorPattern.error_class"><code class="name">var <span class="ident">error_class</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.knowledge.error_kb.ErrorPattern.failure_count"><code class="name">var <span class="ident">failure_count</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.knowledge.error_kb.ErrorPattern.fix_template"><code class="name">var <span class="ident">fix_template</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.knowledge.error_kb.ErrorPattern.fix_type"><code class="name">var <span class="ident">fix_type</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.knowledge.error_kb.ErrorPattern.language"><code class="name">var <span class="ident">language</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.knowledge.error_kb.ErrorPattern.last_matched"><code class="name">var <span class="ident">last_matched</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.knowledge.error_kb.ErrorPattern.pattern_id"><code class="name">var <span class="ident">pattern_id</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.knowledge.error_kb.ErrorPattern.signature"><code class="name">var <span class="ident">signature</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.knowledge.error_kb.ErrorPattern.source"><code class="name">var <span class="ident">source</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.knowledge.error_kb.ErrorPattern.success_count"><code class="name">var <span class="ident">success_count</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.knowledge.error_kb.ErrorPattern.to_dict"><code class="name flex">
+<span>def <span class="ident">to_dict</span></span>(<span>self) ‑> dict[str, typing.Any]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_dict(self) -&gt; dict[str, Any]:
+    return {
+        &#34;pattern_id&#34;: self.pattern_id,
+        &#34;language&#34;: self.language,
+        &#34;error_class&#34;: self.error_class,
+        &#34;signature&#34;: self.signature,
+        &#34;fix_template&#34;: self.fix_template,
+        &#34;fix_type&#34;: self.fix_type,
+        &#34;success_count&#34;: self.success_count,
+        &#34;failure_count&#34;: self.failure_count,
+        &#34;confidence&#34;: round(self.confidence, 3),
+        &#34;source&#34;: self.source,
+        &#34;created_at&#34;: self.created_at,
+        &#34;last_matched&#34;: self.last_matched,
+    }</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.pipeline.knowledge.error_kb.KBLookupResult"><code class="flex name class">
+<span>class <span class="ident">KBLookupResult</span></span>
+<span>(</span><span>found: bool,<br>pattern: <a title="atomik_sdk.pipeline.knowledge.error_kb.ErrorPattern" href="#atomik_sdk.pipeline.knowledge.error_kb.ErrorPattern">ErrorPattern</a> | None = None,<br>match_score: float = 0.0,<br>match_type: str = '')</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass
+class KBLookupResult:
+    &#34;&#34;&#34;Result of a knowledge base lookup.&#34;&#34;&#34;
+    found: bool
+    pattern: ErrorPattern | None = None
+    match_score: float = 0.0
+    match_type: str = &#34;&#34;  # &#34;exact&#34;, &#34;fuzzy&#34;, &#34;none&#34;
+
+    def to_dict(self) -&gt; dict[str, Any]:
+        return {
+            &#34;found&#34;: self.found,
+            &#34;pattern_id&#34;: self.pattern.pattern_id if self.pattern else None,
+            &#34;match_score&#34;: round(self.match_score, 3),
+            &#34;match_type&#34;: self.match_type,
+        }</code></pre>
+</details>
+<div class="desc"><p>Result of a knowledge base lookup.</p></div>
+<h3>Instance variables</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.knowledge.error_kb.KBLookupResult.found"><code class="name">var <span class="ident">found</span> : bool</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.knowledge.error_kb.KBLookupResult.match_score"><code class="name">var <span class="ident">match_score</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.knowledge.error_kb.KBLookupResult.match_type"><code class="name">var <span class="ident">match_type</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.knowledge.error_kb.KBLookupResult.pattern"><code class="name">var <span class="ident">pattern</span> : <a title="atomik_sdk.pipeline.knowledge.error_kb.ErrorPattern" href="#atomik_sdk.pipeline.knowledge.error_kb.ErrorPattern">ErrorPattern</a> | None</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.knowledge.error_kb.KBLookupResult.to_dict"><code class="name flex">
+<span>def <span class="ident">to_dict</span></span>(<span>self) ‑> dict[str, typing.Any]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_dict(self) -&gt; dict[str, Any]:
+    return {
+        &#34;found&#34;: self.found,
+        &#34;pattern_id&#34;: self.pattern.pattern_id if self.pattern else None,
+        &#34;match_score&#34;: round(self.match_score, 3),
+        &#34;match_type&#34;: self.match_type,
+    }</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="atomik_sdk.pipeline.knowledge" href="index.html">atomik_sdk.pipeline.knowledge</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="atomik_sdk.pipeline.knowledge.error_kb.ErrorKnowledgeBase" href="#atomik_sdk.pipeline.knowledge.error_kb.ErrorKnowledgeBase">ErrorKnowledgeBase</a></code></h4>
+<ul class="two-column">
+<li><code><a title="atomik_sdk.pipeline.knowledge.error_kb.ErrorKnowledgeBase.add_pattern" href="#atomik_sdk.pipeline.knowledge.error_kb.ErrorKnowledgeBase.add_pattern">add_pattern</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.knowledge.error_kb.ErrorKnowledgeBase.get_all_patterns" href="#atomik_sdk.pipeline.knowledge.error_kb.ErrorKnowledgeBase.get_all_patterns">get_all_patterns</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.knowledge.error_kb.ErrorKnowledgeBase.get_pattern" href="#atomik_sdk.pipeline.knowledge.error_kb.ErrorKnowledgeBase.get_pattern">get_pattern</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.knowledge.error_kb.ErrorKnowledgeBase.learn" href="#atomik_sdk.pipeline.knowledge.error_kb.ErrorKnowledgeBase.learn">learn</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.knowledge.error_kb.ErrorKnowledgeBase.load" href="#atomik_sdk.pipeline.knowledge.error_kb.ErrorKnowledgeBase.load">load</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.knowledge.error_kb.ErrorKnowledgeBase.load_seed" href="#atomik_sdk.pipeline.knowledge.error_kb.ErrorKnowledgeBase.load_seed">load_seed</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.knowledge.error_kb.ErrorKnowledgeBase.lookup" href="#atomik_sdk.pipeline.knowledge.error_kb.ErrorKnowledgeBase.lookup">lookup</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.knowledge.error_kb.ErrorKnowledgeBase.record_failure" href="#atomik_sdk.pipeline.knowledge.error_kb.ErrorKnowledgeBase.record_failure">record_failure</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.knowledge.error_kb.ErrorKnowledgeBase.record_success" href="#atomik_sdk.pipeline.knowledge.error_kb.ErrorKnowledgeBase.record_success">record_success</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.knowledge.error_kb.ErrorKnowledgeBase.remove_pattern" href="#atomik_sdk.pipeline.knowledge.error_kb.ErrorKnowledgeBase.remove_pattern">remove_pattern</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.knowledge.error_kb.ErrorKnowledgeBase.save" href="#atomik_sdk.pipeline.knowledge.error_kb.ErrorKnowledgeBase.save">save</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.knowledge.error_kb.ErrorKnowledgeBase.summary" href="#atomik_sdk.pipeline.knowledge.error_kb.ErrorKnowledgeBase.summary">summary</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.pipeline.knowledge.error_kb.ErrorPattern" href="#atomik_sdk.pipeline.knowledge.error_kb.ErrorPattern">ErrorPattern</a></code></h4>
+<ul class="two-column">
+<li><code><a title="atomik_sdk.pipeline.knowledge.error_kb.ErrorPattern.confidence" href="#atomik_sdk.pipeline.knowledge.error_kb.ErrorPattern.confidence">confidence</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.knowledge.error_kb.ErrorPattern.created_at" href="#atomik_sdk.pipeline.knowledge.error_kb.ErrorPattern.created_at">created_at</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.knowledge.error_kb.ErrorPattern.error_class" href="#atomik_sdk.pipeline.knowledge.error_kb.ErrorPattern.error_class">error_class</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.knowledge.error_kb.ErrorPattern.failure_count" href="#atomik_sdk.pipeline.knowledge.error_kb.ErrorPattern.failure_count">failure_count</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.knowledge.error_kb.ErrorPattern.fix_template" href="#atomik_sdk.pipeline.knowledge.error_kb.ErrorPattern.fix_template">fix_template</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.knowledge.error_kb.ErrorPattern.fix_type" href="#atomik_sdk.pipeline.knowledge.error_kb.ErrorPattern.fix_type">fix_type</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.knowledge.error_kb.ErrorPattern.from_dict" href="#atomik_sdk.pipeline.knowledge.error_kb.ErrorPattern.from_dict">from_dict</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.knowledge.error_kb.ErrorPattern.language" href="#atomik_sdk.pipeline.knowledge.error_kb.ErrorPattern.language">language</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.knowledge.error_kb.ErrorPattern.last_matched" href="#atomik_sdk.pipeline.knowledge.error_kb.ErrorPattern.last_matched">last_matched</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.knowledge.error_kb.ErrorPattern.pattern_id" href="#atomik_sdk.pipeline.knowledge.error_kb.ErrorPattern.pattern_id">pattern_id</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.knowledge.error_kb.ErrorPattern.signature" href="#atomik_sdk.pipeline.knowledge.error_kb.ErrorPattern.signature">signature</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.knowledge.error_kb.ErrorPattern.source" href="#atomik_sdk.pipeline.knowledge.error_kb.ErrorPattern.source">source</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.knowledge.error_kb.ErrorPattern.success_count" href="#atomik_sdk.pipeline.knowledge.error_kb.ErrorPattern.success_count">success_count</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.knowledge.error_kb.ErrorPattern.to_dict" href="#atomik_sdk.pipeline.knowledge.error_kb.ErrorPattern.to_dict">to_dict</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.pipeline.knowledge.error_kb.KBLookupResult" href="#atomik_sdk.pipeline.knowledge.error_kb.KBLookupResult">KBLookupResult</a></code></h4>
+<ul class="">
+<li><code><a title="atomik_sdk.pipeline.knowledge.error_kb.KBLookupResult.found" href="#atomik_sdk.pipeline.knowledge.error_kb.KBLookupResult.found">found</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.knowledge.error_kb.KBLookupResult.match_score" href="#atomik_sdk.pipeline.knowledge.error_kb.KBLookupResult.match_score">match_score</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.knowledge.error_kb.KBLookupResult.match_type" href="#atomik_sdk.pipeline.knowledge.error_kb.KBLookupResult.match_type">match_type</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.knowledge.error_kb.KBLookupResult.pattern" href="#atomik_sdk.pipeline.knowledge.error_kb.KBLookupResult.pattern">pattern</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.knowledge.error_kb.KBLookupResult.to_dict" href="#atomik_sdk.pipeline.knowledge.error_kb.KBLookupResult.to_dict">to_dict</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+</body>
+</html>
