@@ -72,7 +72,7 @@ class NamespaceMapper:
         # Convert to lowercase for case-sensitive languages
         vertical_lower = vertical.lower()
         field_lower = field.lower()
-        obj.lower()
+        _obj_lower = obj.lower()  # noqa: F841 — reserved for future language targets
 
         # Convert PascalCase to snake_case for C
         obj_snake = NamespaceMapper._to_snake_case(obj)

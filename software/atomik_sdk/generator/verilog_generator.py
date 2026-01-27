@@ -188,7 +188,7 @@ class VerilogGenerator(CodeEmitter):
             lines.append("        end else if (rollback_en && history_count > 0) begin")
             lines.append("            // Rollback: XOR out the last delta")
             lines.append(f"            history_head <= (history_head - 1 + {history_depth}) % {history_depth};")
-            lines.append("            accumulator <= accumulator ^ history[history_head - 1];")
+            lines.append(f"            accumulator <= accumulator ^ history[(history_head - 1 + {history_depth}) % {history_depth}];")
             lines.append("            history_count <= history_count - 1;")
         lines.append("        end")
         lines.append("    end")
@@ -295,7 +295,7 @@ class VerilogGenerator(CodeEmitter):
         # Test sequence
         lines.append("    // Test sequence")
         lines.append("    initial begin")
-        lines.append('        $display("=== Starting testbench for %s ===", dut.INST_NAME);')
+        lines.append(f'        $display("=== Starting testbench for {module_name} ===");')
         lines.append("")
         lines.append("        // Initialize signals")
         lines.append("        rst_n = 0;")

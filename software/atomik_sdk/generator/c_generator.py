@@ -223,7 +223,7 @@ class CGenerator(CodeEmitter):
 
         # Init function
         lines.append(f"void atomik_{obj_snake}_init(atomik_{obj_snake}_t *manager) {{")
-        lines.append("    memset(manager, 0, sizeof(atomik_{obj_snake}_t));")
+        lines.append(f"    memset(manager, 0, sizeof(atomik_{obj_snake}_t));")
         lines.append("}")
         lines.append("")
 
