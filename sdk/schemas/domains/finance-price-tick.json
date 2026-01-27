@@ -1,0 +1,66 @@
+{
+  "catalogue": {
+    "vertical": "Finance",
+    "field": "Trading",
+    "object": "PriceTick",
+    "version": "1.0.0",
+    "author": "ATOMiK Project",
+    "license": "Apache-2.0",
+    "description": "High-frequency price tick delta processing. Tracks bid/ask price changes and order volume deltas with deep rollback for transaction replay and audit."
+  },
+  "schema": {
+    "delta_fields": {
+      "price_delta": {
+        "type": "parameter_delta",
+        "width": 64,
+        "encoding": "raw",
+        "compression": "none",
+        "default_value": 0
+      },
+      "volume_delta": {
+        "type": "delta_stream",
+        "width": 64,
+        "encoding": "raw",
+        "compression": "xor",
+        "default_value": 0
+      },
+      "trade_flags": {
+        "type": "bitmask_delta",
+        "width": 64,
+        "encoding": "raw",
+        "compression": "none",
+        "default_value": 0
+      }
+    },
+    "operations": {
+      "accumulate": {
+        "enabled": true,
+        "latency_cycles": 1
+      },
+      "reconstruct": {
+        "enabled": true,
+        "latency_cycles": 1
+      },
+      "rollback": {
+        "enabled": true,
+        "history_depth": 4096
+      }
+    },
+    "constraints": {
+      "max_memory_mb": 512,
+      "update_latency_ms": 1,
+      "target_frequency_mhz": 400.0
+    }
+  },
+  "hardware": {
+    "target_device": "GW1NR-9",
+    "rtl_params": {
+      "DATA_WIDTH": 64,
+      "ENABLE_PARALLEL": true,
+      "CLOCK_DOMAIN": "trade_clk"
+    },
+    "synthesis_options": {
+      "optimization_goal": "speed"
+    }
+  }
+}

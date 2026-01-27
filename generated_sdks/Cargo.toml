@@ -1,0 +1,10 @@
+[package]
+name = "atomik-video-streaming"
+version = "1.0.0"
+edition = "2021"
+description = "Delta-based video frame processing for H.264 streams. Tracks frame deltas and motion vectors using XOR accumulation for bandwidth-efficient video transport."
+license = "MIT"
+
+[dependencies]
+
+[dev-dependencies]

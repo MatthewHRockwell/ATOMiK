@@ -1,0 +1,22 @@
+{
+  "name": "@atomik/video-streaming",
+  "version": "1.0.0",
+  "description": "Delta-based video frame processing for H.264 streams. Tracks frame deltas and motion vectors using XOR accumulation for bandwidth-efficient video transport.",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "node test/H264Delta.test.js"
+  },
+  "keywords": [
+    "atomik",
+    "delta-state",
+    "xor",
+    "video",
+    "streaming"
+  ],
+  "author": "ATOMiK SDK Generator",
+  "license": "MIT",
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

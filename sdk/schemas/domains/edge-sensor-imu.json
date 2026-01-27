@@ -1,0 +1,60 @@
+{
+  "catalogue": {
+    "vertical": "Edge",
+    "field": "Sensor",
+    "object": "IMUFusion",
+    "version": "1.0.0",
+    "author": "ATOMiK Project",
+    "license": "Apache-2.0",
+    "description": "Edge sensor fusion for IMU devices. Accumulates accelerometer and gyroscope deltas with bitmask alert tracking for anomaly detection."
+  },
+  "schema": {
+    "delta_fields": {
+      "motion_delta": {
+        "type": "delta_stream",
+        "width": 64,
+        "encoding": "raw",
+        "compression": "none",
+        "default_value": 0
+      },
+      "alert_flags": {
+        "type": "bitmask_delta",
+        "width": 64,
+        "encoding": "raw",
+        "compression": "none",
+        "default_value": 0
+      }
+    },
+    "operations": {
+      "accumulate": {
+        "enabled": true,
+        "latency_cycles": 1
+      },
+      "reconstruct": {
+        "enabled": true,
+        "latency_cycles": 1
+      },
+      "rollback": {
+        "enabled": true,
+        "history_depth": 1024
+      }
+    },
+    "constraints": {
+      "max_memory_mb": 16,
+      "max_power_mw": 500,
+      "update_latency_ms": 10,
+      "target_frequency_mhz": 100.0
+    }
+  },
+  "hardware": {
+    "target_device": "GW1NR-9",
+    "rtl_params": {
+      "DATA_WIDTH": 64,
+      "ENABLE_PARALLEL": false,
+      "CLOCK_DOMAIN": "sensor_clk"
+    },
+    "synthesis_options": {
+      "optimization_goal": "power"
+    }
+  }
+}

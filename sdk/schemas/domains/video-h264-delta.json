@@ -1,0 +1,59 @@
+{
+  "catalogue": {
+    "vertical": "Video",
+    "field": "Streaming",
+    "object": "H264Delta",
+    "version": "1.0.0",
+    "author": "ATOMiK Project",
+    "license": "Apache-2.0",
+    "description": "Delta-based video frame processing for H.264 streams. Tracks frame deltas and motion vectors using XOR accumulation for bandwidth-efficient video transport."
+  },
+  "schema": {
+    "delta_fields": {
+      "frame_delta": {
+        "type": "delta_stream",
+        "width": 256,
+        "encoding": "spatiotemporal_4x4x4",
+        "compression": "xor",
+        "default_value": 0
+      },
+      "motion_vector": {
+        "type": "parameter_delta",
+        "width": 256,
+        "encoding": "raw",
+        "compression": "none",
+        "default_value": 0
+      }
+    },
+    "operations": {
+      "accumulate": {
+        "enabled": true,
+        "latency_cycles": 1
+      },
+      "reconstruct": {
+        "enabled": true,
+        "latency_cycles": 1
+      },
+      "rollback": {
+        "enabled": true,
+        "history_depth": 512
+      }
+    },
+    "constraints": {
+      "max_memory_mb": 256,
+      "update_latency_ms": 33,
+      "target_frequency_mhz": 150.0
+    }
+  },
+  "hardware": {
+    "target_device": "GW1NR-9",
+    "rtl_params": {
+      "DATA_WIDTH": 256,
+      "ENABLE_PARALLEL": true,
+      "CLOCK_DOMAIN": "video_clk"
+    },
+    "synthesis_options": {
+      "optimization_goal": "speed"
+    }
+  }
+}

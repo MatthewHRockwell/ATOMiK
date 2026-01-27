@@ -1,0 +1,11 @@
+# Constraint file for atomik_video_streaming_h264_delta
+# 
+# Target: Generic FPGA
+# Clock: 27 MHz input, 94.5 MHz PLL output (matches Phase 3)
+
+# Clock constraint
+# create_clock -name clk -period 10.582 [get_ports clk]  # 94.5 MHz
+
+# I/O constraints
+# set_property IOSTANDARD LVCMOS33 [get_ports clk]
+# set_property IOSTANDARD LVCMOS33 [get_ports rst_n]
