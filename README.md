@@ -264,30 +264,30 @@ cd vscode-extension/atomik-vscode && npm install && npm run compile
 
 ```text
 ATOMiK/
-├── math/proofs/            # ✅ Lean4 formal proofs (92 theorems)
-├── rtl/                    # ✅ Verilog source (Phase 3 complete)
-│   ├── atomik_delta_acc.v  # Delta accumulator module
-│   ├── atomik_state_rec.v  # State reconstructor module  
-│   ├── atomik_core_v2.v    # Core v2 integration
-│   └── atomik_top.v        # Top-level with UART interface
-├── experiments/            # ✅ Phase 2 benchmarks (360 measurements)
-├── constraints/            # ✅ FPGA timing and physical constraints
-├── synth/                  # ✅ Synthesis scripts (Gowin EDA)
-├── scripts/                # ✅ Hardware validation + FPGA pipeline + SDK generation
-├── software/              # ✅ Python SDK + 5-language generators
+├── math/proofs/                 # ✅ Lean4 formal proofs (92 theorems)
+├── rtl/                         # ✅ Verilog source (Phase 3 complete)
+│   ├── atomik_delta_acc.v       # Delta accumulator module
+│   ├── atomik_state_rec.v       # State reconstructor module  
+│   ├── atomik_core_v2.v         # Core v2 integration
+│   └── atomik_top.v             # Top-level with UART interface
+├── experiments/                 # ✅ Phase 2 benchmarks (360 measurements)
+├── constraints/                 # ✅ FPGA timing and physical constraints
+├── synth/                       # ✅ Synthesis scripts (Gowin EDA)
+├── scripts/                     # ✅ Hardware validation + FPGA pipeline + SDK generation
+├── software/                    # ✅ Python SDK + 5-language generators
 │   ├── atomik_sdk/cli.py        # atomik-gen CLI tool (pip-installable entry point)
 │   ├── atomik_sdk/generator/    # Schema-driven code generators (Py/Rust/C/JS/Verilog)
 │   └── atomik_sdk/tests/        # Generator test suite (algebraic property verification)
-├── vscode-extension/       # ✅ VS Code extension (schema intellisense + commands)
+├── vscode-extension/            # ✅ VS Code extension (schema intellisense + commands)
 │   └── atomik-vscode/           # Extension source (TypeScript, snippets, schema)
-├── sdk/schemas/            # ✅ Schema definitions
-│   ├── examples/              # Reference schemas (terminal-io, p2p-delta, matrix-ops)
-│   └── domains/               # Domain SDK schemas (video, edge-sensor, finance)
-├── generated_sdks/         # ✅ Phase 4B generated code (3 domains x 5 languages)
-├── docs/                   # SDK documentation and guides
-├── specs/                  # Formal model and RTL architecture
-├── archive/                # Phase completion reports (historical)
-└── impl/pnr/ATOMiK.fs      # ✅ FPGA bitstream (Tang Nano 9K)
+├── sdk/schemas/                 # ✅ Schema definitions
+│   ├── examples/                # Reference schemas (terminal-io, p2p-delta, matrix-ops)
+│   └── domains/                 # Domain SDK schemas (video, edge-sensor, finance)
+├── generated_sdks/              # ✅ Phase 4B generated code (3 domains x 5 languages)
+├── docs/                        # SDK documentation and guides
+├── specs/                       # Formal model and RTL architecture
+├── archive/                     # Phase completion reports (historical)
+└── impl/pnr/ATOMiK.fs           # ✅ FPGA bitstream (Tang Nano 9K)
 ```
 
 ---
