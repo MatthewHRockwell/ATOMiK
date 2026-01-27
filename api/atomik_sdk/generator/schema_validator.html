@@ -1,0 +1,560 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
+<title>atomik_sdk.generator.schema_validator API documentation</title>
+<meta name="description" content="ATOMiK Schema Validator …">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>atomik_sdk.generator.schema_validator</code></h1>
+</header>
+<section id="section-intro">
+<p>ATOMiK Schema Validator</p>
+<p>Validates ATOMiK JSON schemas against the specification and enforces
+cross-field dependencies and semantic rules.</p>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="atomik_sdk.generator.schema_validator.SchemaValidator"><code class="flex name class">
+<span>class <span class="ident">SchemaValidator</span></span>
+<span>(</span><span>schema_spec_path: str | Path = None)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class SchemaValidator:
+    &#34;&#34;&#34;
+    Validates ATOMiK schemas against specification.
+
+    Performs JSON Schema Draft 7 validation and enforces additional
+    semantic rules specific to ATOMiK schemas.
+
+    Example:
+        &gt;&gt;&gt; validator = SchemaValidator()
+        &gt;&gt;&gt; result = validator.validate_file(&#34;terminal-io.json&#34;)
+        &gt;&gt;&gt; if result:
+        &gt;&gt;&gt;     print(&#34;Schema is valid!&#34;)
+        &gt;&gt;&gt; else:
+        &gt;&gt;&gt;     for error in result.errors:
+        &gt;&gt;&gt;         print(f&#34;Error: {error}&#34;)
+    &#34;&#34;&#34;
+
+    def __init__(self, schema_spec_path: str | Path = None):
+        &#34;&#34;&#34;
+        Initialize validator with schema specification.
+
+        Args:
+            schema_spec_path: Path to atomik_schema_v1.json.
+                            If None, uses default location.
+        &#34;&#34;&#34;
+        if schema_spec_path is None:
+            # Default to specs/atomik_schema_v1.json relative to project root
+            project_root = Path(__file__).parent.parent.parent.parent
+            schema_spec_path = project_root / &#34;specs&#34; / &#34;atomik_schema_v1.json&#34;
+
+        self.schema_spec_path = Path(schema_spec_path)
+        self.schema_spec = self._load_schema_spec()
+
+        if HAS_JSONSCHEMA:
+            self.validator = jsonschema.Draft7Validator(self.schema_spec)
+        else:
+            self.validator = None
+
+    def _load_schema_spec(self) -&gt; dict[str, Any]:
+        &#34;&#34;&#34;Load the ATOMiK schema specification.&#34;&#34;&#34;
+        try:
+            with open(self.schema_spec_path, encoding=&#39;utf-8&#39;) as f:
+                return json.load(f)
+        except FileNotFoundError:
+            raise FileNotFoundError(
+                f&#34;Schema specification not found: {self.schema_spec_path}&#34;
+            )
+        except json.JSONDecodeError as e:
+            raise ValueError(
+                f&#34;Invalid JSON in schema specification: {e}&#34;
+            )
+
+    def validate_file(self, schema_path: str | Path) -&gt; ValidationResult:
+        &#34;&#34;&#34;
+        Validate a schema file.
+
+        Args:
+            schema_path: Path to the schema JSON file to validate.
+
+        Returns:
+            ValidationResult with validity status and any errors/warnings.
+        &#34;&#34;&#34;
+        try:
+            with open(schema_path, encoding=&#39;utf-8&#39;) as f:
+                schema = json.load(f)
+        except FileNotFoundError:
+            return ValidationResult(False, [f&#34;File not found: {schema_path}&#34;])
+        except json.JSONDecodeError as e:
+            return ValidationResult(False, [f&#34;Invalid JSON: {e}&#34;])
+
+        return self.validate(schema)
+
+    def validate(self, schema: dict[str, Any]) -&gt; ValidationResult:
+        &#34;&#34;&#34;
+        Validate a schema dictionary.
+
+        Args:
+            schema: The schema dictionary to validate.
+
+        Returns:
+            ValidationResult with validity status and any errors/warnings.
+        &#34;&#34;&#34;
+        errors = []
+        warnings = []
+
+        # JSON Schema validation (if library available)
+        if self.validator:
+            for error in self.validator.iter_errors(schema):
+                path = &#34;.&#34;.join(str(p) for p in error.path) if error.path else &#34;root&#34;
+                errors.append(f&#34;{path}: {error.message}&#34;)
+        else:
+            # Basic structural validation without jsonschema
+            basic_errors = self._basic_validation(schema)
+            errors.extend(basic_errors)
+
+        # Cross-field dependency validation
+        cross_field_errors = self._validate_cross_field_dependencies(schema)
+        errors.extend(cross_field_errors)
+
+        # Semantic validation
+        semantic_warnings = self._validate_semantics(schema)
+        warnings.extend(semantic_warnings)
+
+        return ValidationResult(len(errors) == 0, errors, warnings)
+
+    def _basic_validation(self, schema: dict[str, Any]) -&gt; list[str]:
+        &#34;&#34;&#34;Basic validation without jsonschema library.&#34;&#34;&#34;
+        errors = []
+
+        # Required top-level keys
+        if &#39;catalogue&#39; not in schema:
+            errors.append(&#34;Missing required &#39;catalogue&#39; section&#34;)
+        if &#39;schema&#39; not in schema:
+            errors.append(&#34;Missing required &#39;schema&#39; section&#34;)
+
+        # Catalogue validation
+        if &#39;catalogue&#39; in schema:
+            catalogue = schema[&#39;catalogue&#39;]
+            required_catalogue = [&#39;vertical&#39;, &#39;field&#39;, &#39;object&#39;, &#39;version&#39;]
+            for field in required_catalogue:
+                if field not in catalogue:
+                    errors.append(f&#34;Missing catalogue.{field}&#34;)
+
+        # Schema validation
+        if &#39;schema&#39; in schema:
+            schema_section = schema[&#39;schema&#39;]
+
+            if &#39;delta_fields&#39; not in schema_section:
+                errors.append(&#34;Missing schema.delta_fields&#34;)
+            elif not schema_section[&#39;delta_fields&#39;]:
+                errors.append(&#34;schema.delta_fields must have at least one field&#34;)
+
+            if &#39;operations&#39; not in schema_section:
+                errors.append(&#34;Missing schema.operations&#34;)
+            elif &#39;accumulate&#39; not in schema_section[&#39;operations&#39;]:
+                errors.append(&#34;Missing schema.operations.accumulate (required)&#34;)
+            else:
+                accum = schema_section[&#39;operations&#39;][&#39;accumulate&#39;]
+                if not accum.get(&#39;enabled&#39;, False):
+                    errors.append(&#34;schema.operations.accumulate.enabled must be true&#34;)
+
+        return errors
+
+    def _validate_cross_field_dependencies(self, schema: dict[str, Any]) -&gt; list[str]:
+        &#34;&#34;&#34;
+        Validate cross-field dependencies.
+
+        Enforces rules like:
+        - hardware.rtl_params.DATA_WIDTH must match delta field widths
+        - rollback.enabled requires history_depth
+        &#34;&#34;&#34;
+        errors = []
+
+        schema_section = schema.get(&#39;schema&#39;, {})
+        delta_fields = schema_section.get(&#39;delta_fields&#39;, {})
+        operations = schema_section.get(&#39;operations&#39;, {})
+        hardware = schema.get(&#39;hardware&#39;, {})
+
+        # Rule 1: Hardware DATA_WIDTH must match all delta field widths
+        if &#39;rtl_params&#39; in hardware and &#39;DATA_WIDTH&#39; in hardware[&#39;rtl_params&#39;]:
+            data_width = hardware[&#39;rtl_params&#39;][&#39;DATA_WIDTH&#39;]
+
+            for field_name, field_spec in delta_fields.items():
+                field_width = field_spec.get(&#39;width&#39;)
+                if field_width != data_width:
+                    errors.append(
+                        f&#34;hardware.rtl_params.DATA_WIDTH ({data_width}) &#34;
+                        f&#34;does not match delta_fields.{field_name}.width ({field_width})&#34;
+                    )
+
+        # Rule 2: Multiple delta fields with different widths require comment
+        widths = [field.get(&#39;width&#39;) for field in delta_fields.values()]
+        if len(set(widths)) &gt; 1 and hardware:
+            errors.append(
+                &#34;Multiple delta fields with different widths cannot have &#34;
+                &#34;hardware mapping (RTL expects uniform width)&#34;
+            )
+
+        # Rule 3: Rollback enabled requires history_depth
+        if &#39;rollback&#39; in operations:
+            rollback = operations[&#39;rollback&#39;]
+            if rollback.get(&#39;enabled&#39;) and &#39;history_depth&#39; not in rollback:
+                errors.append(
+                    &#34;operations.rollback.enabled=true requires history_depth&#34;
+                )
+
+        return errors
+
+    def _validate_semantics(self, schema: dict[str, Any]) -&gt; list[str]:
+        &#34;&#34;&#34;
+        Validate semantic rules and generate warnings.
+
+        Checks for potential issues like:
+        - Very large history depths
+        - Unusual delta widths
+        - Missing optional but recommended fields
+        &#34;&#34;&#34;
+        warnings = []
+
+        catalogue = schema.get(&#39;catalogue&#39;, {})
+        schema_section = schema.get(&#39;schema&#39;, {})
+        operations = schema_section.get(&#39;operations&#39;, {})
+        constraints = schema_section.get(&#39;constraints&#39;, {})
+
+        # Warn about missing optional metadata
+        if &#39;author&#39; not in catalogue:
+            warnings.append(&#34;Recommended field &#39;catalogue.author&#39; is missing&#34;)
+        if &#39;license&#39; not in catalogue:
+            warnings.append(&#34;Recommended field &#39;catalogue.license&#39; is missing&#34;)
+        if &#39;description&#39; not in catalogue:
+            warnings.append(&#34;Recommended field &#39;catalogue.description&#39; is missing&#34;)
+
+        # Warn about very large history depths
+        if &#39;rollback&#39; in operations:
+            rollback = operations[&#39;rollback&#39;]
+            if rollback.get(&#39;enabled&#39;):
+                history = rollback.get(&#39;history_depth&#39;, 0)
+                if history &gt; 10000:
+                    warnings.append(
+                        f&#34;Very large history_depth ({history}) may consume &#34;
+                        &#34;significant memory&#34;
+                    )
+
+        # Warn about missing constraints
+        if not constraints:
+            warnings.append(
+                &#34;No constraints specified - consider adding resource limits&#34;
+            )
+
+        # Warn about reconstruct disabled
+        if &#39;reconstruct&#39; in operations:
+            if not operations[&#39;reconstruct&#39;].get(&#39;enabled&#39;, True):
+                warnings.append(
+                    &#34;reconstruct operation disabled - reading state will not work&#34;
+                )
+
+        return warnings
+
+    def validate_namespace_uniqueness(
+        self,
+        schemas: list[dict[str, Any]]
+    ) -&gt; tuple[bool, list[str]]:
+        &#34;&#34;&#34;
+        Validate that all schemas have unique namespaces.
+
+        Args:
+            schemas: List of schema dictionaries to check.
+
+        Returns:
+            Tuple of (all_unique: bool, conflicts: List[str])
+        &#34;&#34;&#34;
+        namespaces = {}
+        conflicts = []
+
+        for i, schema in enumerate(schemas):
+            catalogue = schema.get(&#39;catalogue&#39;, {})
+            namespace = (
+                f&#34;{catalogue.get(&#39;vertical&#39;, &#39;Unknown&#39;)}.&#34;
+                f&#34;{catalogue.get(&#39;field&#39;, &#39;Unknown&#39;)}.&#34;
+                f&#34;{catalogue.get(&#39;object&#39;, &#39;Unknown&#39;)}&#34;
+            )
+
+            if namespace in namespaces:
+                conflicts.append(
+                    f&#34;Duplicate namespace &#39;{namespace}&#39; at indices &#34;
+                    f&#34;{namespaces[namespace]} and {i}&#34;
+                )
+            else:
+                namespaces[namespace] = i
+
+        return len(conflicts) == 0, conflicts</code></pre>
+</details>
+<div class="desc"><p>Validates ATOMiK schemas against specification.</p>
+<p>Performs JSON Schema Draft 7 validation and enforces additional
+semantic rules specific to ATOMiK schemas.</p>
+<h2 id="example">Example</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; validator = SchemaValidator()
+&gt;&gt;&gt; result = validator.validate_file(&quot;terminal-io.json&quot;)
+&gt;&gt;&gt; if result:
+&gt;&gt;&gt;     print(&quot;Schema is valid!&quot;)
+&gt;&gt;&gt; else:
+&gt;&gt;&gt;     for error in result.errors:
+&gt;&gt;&gt;         print(f&quot;Error: {error}&quot;)
+</code></pre>
+<p>Initialize validator with schema specification.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>schema_spec_path</code></strong></dt>
+<dd>Path to atomik_schema_v1.json.
+If None, uses default location.</dd>
+</dl></div>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.generator.schema_validator.SchemaValidator.validate"><code class="name flex">
+<span>def <span class="ident">validate</span></span>(<span>self, schema: dict[str, Any]) ‑> <a title="atomik_sdk.generator.schema_validator.ValidationResult" href="#atomik_sdk.generator.schema_validator.ValidationResult">ValidationResult</a></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def validate(self, schema: dict[str, Any]) -&gt; ValidationResult:
+    &#34;&#34;&#34;
+    Validate a schema dictionary.
+
+    Args:
+        schema: The schema dictionary to validate.
+
+    Returns:
+        ValidationResult with validity status and any errors/warnings.
+    &#34;&#34;&#34;
+    errors = []
+    warnings = []
+
+    # JSON Schema validation (if library available)
+    if self.validator:
+        for error in self.validator.iter_errors(schema):
+            path = &#34;.&#34;.join(str(p) for p in error.path) if error.path else &#34;root&#34;
+            errors.append(f&#34;{path}: {error.message}&#34;)
+    else:
+        # Basic structural validation without jsonschema
+        basic_errors = self._basic_validation(schema)
+        errors.extend(basic_errors)
+
+    # Cross-field dependency validation
+    cross_field_errors = self._validate_cross_field_dependencies(schema)
+    errors.extend(cross_field_errors)
+
+    # Semantic validation
+    semantic_warnings = self._validate_semantics(schema)
+    warnings.extend(semantic_warnings)
+
+    return ValidationResult(len(errors) == 0, errors, warnings)</code></pre>
+</details>
+<div class="desc"><p>Validate a schema dictionary.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>schema</code></strong></dt>
+<dd>The schema dictionary to validate.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>ValidationResult with validity status and any errors/warnings.</p></div>
+</dd>
+<dt id="atomik_sdk.generator.schema_validator.SchemaValidator.validate_file"><code class="name flex">
+<span>def <span class="ident">validate_file</span></span>(<span>self, schema_path: str | Path) ‑> <a title="atomik_sdk.generator.schema_validator.ValidationResult" href="#atomik_sdk.generator.schema_validator.ValidationResult">ValidationResult</a></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def validate_file(self, schema_path: str | Path) -&gt; ValidationResult:
+    &#34;&#34;&#34;
+    Validate a schema file.
+
+    Args:
+        schema_path: Path to the schema JSON file to validate.
+
+    Returns:
+        ValidationResult with validity status and any errors/warnings.
+    &#34;&#34;&#34;
+    try:
+        with open(schema_path, encoding=&#39;utf-8&#39;) as f:
+            schema = json.load(f)
+    except FileNotFoundError:
+        return ValidationResult(False, [f&#34;File not found: {schema_path}&#34;])
+    except json.JSONDecodeError as e:
+        return ValidationResult(False, [f&#34;Invalid JSON: {e}&#34;])
+
+    return self.validate(schema)</code></pre>
+</details>
+<div class="desc"><p>Validate a schema file.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>schema_path</code></strong></dt>
+<dd>Path to the schema JSON file to validate.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>ValidationResult with validity status and any errors/warnings.</p></div>
+</dd>
+<dt id="atomik_sdk.generator.schema_validator.SchemaValidator.validate_namespace_uniqueness"><code class="name flex">
+<span>def <span class="ident">validate_namespace_uniqueness</span></span>(<span>self, schemas: list[dict[str, Any]]) ‑> tuple[bool, list[str]]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def validate_namespace_uniqueness(
+    self,
+    schemas: list[dict[str, Any]]
+) -&gt; tuple[bool, list[str]]:
+    &#34;&#34;&#34;
+    Validate that all schemas have unique namespaces.
+
+    Args:
+        schemas: List of schema dictionaries to check.
+
+    Returns:
+        Tuple of (all_unique: bool, conflicts: List[str])
+    &#34;&#34;&#34;
+    namespaces = {}
+    conflicts = []
+
+    for i, schema in enumerate(schemas):
+        catalogue = schema.get(&#39;catalogue&#39;, {})
+        namespace = (
+            f&#34;{catalogue.get(&#39;vertical&#39;, &#39;Unknown&#39;)}.&#34;
+            f&#34;{catalogue.get(&#39;field&#39;, &#39;Unknown&#39;)}.&#34;
+            f&#34;{catalogue.get(&#39;object&#39;, &#39;Unknown&#39;)}&#34;
+        )
+
+        if namespace in namespaces:
+            conflicts.append(
+                f&#34;Duplicate namespace &#39;{namespace}&#39; at indices &#34;
+                f&#34;{namespaces[namespace]} and {i}&#34;
+            )
+        else:
+            namespaces[namespace] = i
+
+    return len(conflicts) == 0, conflicts</code></pre>
+</details>
+<div class="desc"><p>Validate that all schemas have unique namespaces.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>schemas</code></strong></dt>
+<dd>List of schema dictionaries to check.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>Tuple of (all_unique: bool, conflicts: List[str])</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.generator.schema_validator.ValidationResult"><code class="flex name class">
+<span>class <span class="ident">ValidationResult</span></span>
+<span>(</span><span>valid: bool, errors: list[str] = None, warnings: list[str] = None)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class ValidationResult:
+    &#34;&#34;&#34;Result of schema validation.&#34;&#34;&#34;
+
+    def __init__(self, valid: bool, errors: list[str] = None, warnings: list[str] = None):
+        self.valid = valid
+        self.errors = errors or []
+        self.warnings = warnings or []
+
+    def __bool__(self) -&gt; bool:
+        return self.valid
+
+    def __str__(self) -&gt; str:
+        if self.valid:
+            status = &#34;VALID&#34;
+            if self.warnings:
+                status += f&#34; (with {len(self.warnings)} warning(s))&#34;
+            return status
+        else:
+            return f&#34;INVALID: {len(self.errors)} error(s)&#34;</code></pre>
+</details>
+<div class="desc"><p>Result of schema validation.</p></div>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="atomik_sdk.generator" href="index.html">atomik_sdk.generator</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="atomik_sdk.generator.schema_validator.SchemaValidator" href="#atomik_sdk.generator.schema_validator.SchemaValidator">SchemaValidator</a></code></h4>
+<ul class="">
+<li><code><a title="atomik_sdk.generator.schema_validator.SchemaValidator.validate" href="#atomik_sdk.generator.schema_validator.SchemaValidator.validate">validate</a></code></li>
+<li><code><a title="atomik_sdk.generator.schema_validator.SchemaValidator.validate_file" href="#atomik_sdk.generator.schema_validator.SchemaValidator.validate_file">validate_file</a></code></li>
+<li><code><a title="atomik_sdk.generator.schema_validator.SchemaValidator.validate_namespace_uniqueness" href="#atomik_sdk.generator.schema_validator.SchemaValidator.validate_namespace_uniqueness">validate_namespace_uniqueness</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.generator.schema_validator.ValidationResult" href="#atomik_sdk.generator.schema_validator.ValidationResult">ValidationResult</a></code></h4>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+</body>
+</html>

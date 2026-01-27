@@ -1,0 +1,786 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
+<title>atomik_sdk.generator.core API documentation</title>
+<meta name="description" content="ATOMiK SDK Generator Core …">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>atomik_sdk.generator.core</code></h1>
+</header>
+<section id="section-intro">
+<p>ATOMiK SDK Generator Core</p>
+<p>Main generator engine that orchestrates schema loading, validation,
+and multi-language code generation.</p>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="atomik_sdk.generator.core.GeneratorConfig"><code class="flex name class">
+<span>class <span class="ident">GeneratorConfig</span></span>
+<span>(</span><span>output_dir: str | Path = 'generated',<br>validate_schemas: bool = True,<br>verbose: bool = False)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class GeneratorConfig:
+    &#34;&#34;&#34;Configuration for the generator.&#34;&#34;&#34;
+
+    def __init__(
+        self,
+        output_dir: str | Path = &#34;generated&#34;,
+        validate_schemas: bool = True,
+        verbose: bool = False
+    ):
+        &#34;&#34;&#34;
+        Initialize generator configuration.
+
+        Args:
+            output_dir: Directory for generated code
+            validate_schemas: Whether to validate schemas before generation
+            verbose: Enable verbose logging
+        &#34;&#34;&#34;
+        self.output_dir = Path(output_dir)
+        self.validate_schemas = validate_schemas
+        self.verbose = verbose</code></pre>
+</details>
+<div class="desc"><p>Configuration for the generator.</p>
+<p>Initialize generator configuration.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>output_dir</code></strong></dt>
+<dd>Directory for generated code</dd>
+<dt><strong><code>validate_schemas</code></strong></dt>
+<dd>Whether to validate schemas before generation</dd>
+<dt><strong><code>verbose</code></strong></dt>
+<dd>Enable verbose logging</dd>
+</dl></div>
+</dd>
+<dt id="atomik_sdk.generator.core.GeneratorEngine"><code class="flex name class">
+<span>class <span class="ident">GeneratorEngine</span></span>
+<span>(</span><span>config: <a title="atomik_sdk.generator.core.GeneratorConfig" href="#atomik_sdk.generator.core.GeneratorConfig">GeneratorConfig</a> | None = None)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class GeneratorEngine:
+    &#34;&#34;&#34;
+    Main SDK generator engine.
+
+    Coordinates the entire code generation pipeline:
+    1. Load schema
+    2. Validate schema
+    3. Extract metadata
+    4. Generate code for target languages
+    5. Write output files
+
+    Example:
+        &gt;&gt;&gt; engine = GeneratorEngine()
+        &gt;&gt;&gt; engine.load_schema(&#34;terminal-io.json&#34;)
+        &gt;&gt;&gt; result = engine.generate(target_languages=[&#39;python&#39;, &#39;rust&#39;])
+        &gt;&gt;&gt; if result:
+        &gt;&gt;&gt;     print(f&#34;Generated {len(result.files)} files&#34;)
+    &#34;&#34;&#34;
+
+    def __init__(self, config: GeneratorConfig | None = None):
+        &#34;&#34;&#34;
+        Initialize generator engine.
+
+        Args:
+            config: Generator configuration (uses defaults if None)
+        &#34;&#34;&#34;
+        self.config = config or GeneratorConfig()
+        self.validator = SchemaValidator()
+        self.mapper = NamespaceMapper()
+        self.emitter = MultiLanguageEmitter()
+
+        self.schema: dict[str, Any] | None = None
+        self.schema_path: Path | None = None
+        self.namespace: NamespaceMapping | None = None
+
+    def load_schema(self, schema_path: str | Path) -&gt; ValidationResult:
+        &#34;&#34;&#34;
+        Load and optionally validate a schema file.
+
+        Args:
+            schema_path: Path to the schema JSON file
+
+        Returns:
+            ValidationResult with validity status
+
+        Raises:
+            FileNotFoundError: If schema file doesn&#39;t exist
+            ValueError: If schema JSON is invalid
+        &#34;&#34;&#34;
+        self.schema_path = Path(schema_path)
+
+        # Load JSON
+        try:
+            with open(self.schema_path, encoding=&#39;utf-8&#39;) as f:
+                self.schema = json.load(f)
+        except FileNotFoundError:
+            raise FileNotFoundError(f&#34;Schema file not found: {schema_path}&#34;)
+        except json.JSONDecodeError as e:
+            raise ValueError(f&#34;Invalid JSON in schema: {e}&#34;)
+
+        if self.config.verbose:
+            print(f&#34;Loaded schema: {self.schema_path}&#34;)
+
+        # Validate if enabled
+        if self.config.validate_schemas:
+            result = self.validator.validate(self.schema)
+
+            if result.errors and self.config.verbose:
+                print(&#34;Validation errors:&#34;)
+                for error in result.errors:
+                    print(f&#34;  - {error}&#34;)
+
+            if result.warnings and self.config.verbose:
+                print(&#34;Validation warnings:&#34;)
+                for warning in result.warnings:
+                    print(f&#34;  - {warning}&#34;)
+
+            return result
+
+        return ValidationResult(valid=True)
+
+    def extract_metadata(self) -&gt; NamespaceMapping:
+        &#34;&#34;&#34;
+        Extract catalogue metadata and generate namespace mapping.
+
+        Returns:
+            NamespaceMapping for the loaded schema
+
+        Raises:
+            ValueError: If no schema is loaded
+        &#34;&#34;&#34;
+        if self.schema is None:
+            raise ValueError(&#34;No schema loaded. Call load_schema() first.&#34;)
+
+        catalogue = self.schema.get(&#39;catalogue&#39;, {})
+        self.namespace = self.mapper.map_catalogue(catalogue)
+
+        if self.config.verbose:
+            print(f&#34;Extracted namespace: {self.namespace.vertical}.&#34;
+                  f&#34;{self.namespace.field}.{self.namespace.object}&#34;)
+
+        return self.namespace
+
+    def register_generator(self, language: str, generator: CodeEmitter) -&gt; None:
+        &#34;&#34;&#34;
+        Register a code generator for a target language.
+
+        Args:
+            language: Target language name
+            generator: CodeEmitter instance for the language
+        &#34;&#34;&#34;
+        self.emitter.register(language, generator)
+
+        if self.config.verbose:
+            print(f&#34;Registered generator for: {language}&#34;)
+
+    def generate(
+        self,
+        target_languages: list[str] | None = None
+    ) -&gt; dict[str, GenerationResult]:
+        &#34;&#34;&#34;
+        Generate code for target languages.
+
+        Args:
+            target_languages: List of languages to generate (None = all registered)
+
+        Returns:
+            Dictionary mapping language to GenerationResult
+
+        Raises:
+            ValueError: If no schema is loaded or no generators registered
+        &#34;&#34;&#34;
+        if self.schema is None:
+            raise ValueError(&#34;No schema loaded. Call load_schema() first.&#34;)
+
+        if self.namespace is None:
+            self.extract_metadata()
+
+        if not self.emitter.generators:
+            raise ValueError(&#34;No generators registered. Call register_generator() first.&#34;)
+
+        # Filter generators if specific languages requested
+        if target_languages:
+            generators_to_use = {
+                lang: gen
+                for lang, gen in self.emitter.generators.items()
+                if lang in target_languages
+            }
+
+            if not generators_to_use:
+                raise ValueError(f&#34;None of the requested languages are registered: &#34;
+                                 f&#34;{target_languages}&#34;)
+
+            # Temporarily replace generators
+            original_generators = self.emitter.generators
+            self.emitter.generators = generators_to_use
+
+        if self.config.verbose:
+            print(f&#34;Generating code for: {&#39;, &#39;.join(self.emitter.generators.keys())}&#34;)
+
+        # Generate code
+        results = self.emitter.generate_all(self.schema, self.namespace)
+
+        # Restore original generators if filtered
+        if target_languages:
+            self.emitter.generators = original_generators
+
+        # Report results
+        if self.config.verbose:
+            for language, result in results.items():
+                if result.success:
+                    print(f&#34;  {language}: Generated {len(result.files)} file(s)&#34;)
+                else:
+                    print(f&#34;  {language}: FAILED with {len(result.errors)} error(s)&#34;)
+
+        return results
+
+    def write_output(self, results: dict[str, GenerationResult]) -&gt; list[str]:
+        &#34;&#34;&#34;
+        Write generated files to disk.
+
+        Args:
+            results: Dictionary of generation results by language
+
+        Returns:
+            List of written file paths
+        &#34;&#34;&#34;
+        written_files = self.emitter.write_generated_files(
+            results,
+            self.config.output_dir
+        )
+
+        if self.config.verbose:
+            print(f&#34;Wrote {len(written_files)} file(s) to {self.config.output_dir}&#34;)
+
+        return written_files
+
+    def generate_and_write(
+        self,
+        schema_path: str | Path,
+        target_languages: list[str] | None = None
+    ) -&gt; tuple[dict[str, GenerationResult], list[str]]:
+        &#34;&#34;&#34;
+        Complete pipeline: load, validate, generate, and write.
+
+        Args:
+            schema_path: Path to schema file
+            target_languages: List of target languages (None = all registered)
+
+        Returns:
+            Tuple of (results dict, written file paths list)
+        &#34;&#34;&#34;
+        # Load and validate
+        validation = self.load_schema(schema_path)
+        if not validation:
+            raise ValueError(f&#34;Schema validation failed: {validation.errors}&#34;)
+
+        # Generate
+        results = self.generate(target_languages)
+
+        # Write
+        files = self.write_output(results)
+
+        return results, files
+
+    def get_schema_summary(self) -&gt; dict[str, Any]:
+        &#34;&#34;&#34;
+        Get summary information about the loaded schema.
+
+        Returns:
+            Dictionary with schema summary
+
+        Raises:
+            ValueError: If no schema is loaded
+        &#34;&#34;&#34;
+        if self.schema is None:
+            raise ValueError(&#34;No schema loaded&#34;)
+
+        catalogue = self.schema.get(&#39;catalogue&#39;, {})
+        schema_section = self.schema.get(&#39;schema&#39;, {})
+        delta_fields = schema_section.get(&#39;delta_fields&#39;, {})
+        operations = schema_section.get(&#39;operations&#39;, {})
+
+        return {
+            &#39;catalogue&#39;: {
+                &#39;vertical&#39;: catalogue.get(&#39;vertical&#39;),
+                &#39;field&#39;: catalogue.get(&#39;field&#39;),
+                &#39;object&#39;: catalogue.get(&#39;object&#39;),
+                &#39;version&#39;: catalogue.get(&#39;version&#39;)
+            },
+            &#39;delta_fields&#39;: {
+                name: {
+                    &#39;type&#39;: spec.get(&#39;type&#39;),
+                    &#39;width&#39;: spec.get(&#39;width&#39;)
+                }
+                for name, spec in delta_fields.items()
+            },
+            &#39;operations&#39;: list(operations.keys()),
+            &#39;has_hardware&#39;: &#39;hardware&#39; in self.schema
+        }</code></pre>
+</details>
+<div class="desc"><p>Main SDK generator engine.</p>
+<p>Coordinates the entire code generation pipeline:
+1. Load schema
+2. Validate schema
+3. Extract metadata
+4. Generate code for target languages
+5. Write output files</p>
+<h2 id="example">Example</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; engine = GeneratorEngine()
+&gt;&gt;&gt; engine.load_schema(&quot;terminal-io.json&quot;)
+&gt;&gt;&gt; result = engine.generate(target_languages=['python', 'rust'])
+&gt;&gt;&gt; if result:
+&gt;&gt;&gt;     print(f&quot;Generated {len(result.files)} files&quot;)
+</code></pre>
+<p>Initialize generator engine.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>config</code></strong></dt>
+<dd>Generator configuration (uses defaults if None)</dd>
+</dl></div>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.generator.core.GeneratorEngine.extract_metadata"><code class="name flex">
+<span>def <span class="ident">extract_metadata</span></span>(<span>self) ‑> <a title="atomik_sdk.generator.namespace_mapper.NamespaceMapping" href="namespace_mapper.html#atomik_sdk.generator.namespace_mapper.NamespaceMapping">NamespaceMapping</a></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def extract_metadata(self) -&gt; NamespaceMapping:
+    &#34;&#34;&#34;
+    Extract catalogue metadata and generate namespace mapping.
+
+    Returns:
+        NamespaceMapping for the loaded schema
+
+    Raises:
+        ValueError: If no schema is loaded
+    &#34;&#34;&#34;
+    if self.schema is None:
+        raise ValueError(&#34;No schema loaded. Call load_schema() first.&#34;)
+
+    catalogue = self.schema.get(&#39;catalogue&#39;, {})
+    self.namespace = self.mapper.map_catalogue(catalogue)
+
+    if self.config.verbose:
+        print(f&#34;Extracted namespace: {self.namespace.vertical}.&#34;
+              f&#34;{self.namespace.field}.{self.namespace.object}&#34;)
+
+    return self.namespace</code></pre>
+</details>
+<div class="desc"><p>Extract catalogue metadata and generate namespace mapping.</p>
+<h2 id="returns">Returns</h2>
+<p>NamespaceMapping for the loaded schema</p>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If no schema is loaded</dd>
+</dl></div>
+</dd>
+<dt id="atomik_sdk.generator.core.GeneratorEngine.generate"><code class="name flex">
+<span>def <span class="ident">generate</span></span>(<span>self, target_languages: list[str] | None = None) ‑> dict[str, <a title="atomik_sdk.generator.code_emitter.GenerationResult" href="code_emitter.html#atomik_sdk.generator.code_emitter.GenerationResult">GenerationResult</a>]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def generate(
+    self,
+    target_languages: list[str] | None = None
+) -&gt; dict[str, GenerationResult]:
+    &#34;&#34;&#34;
+    Generate code for target languages.
+
+    Args:
+        target_languages: List of languages to generate (None = all registered)
+
+    Returns:
+        Dictionary mapping language to GenerationResult
+
+    Raises:
+        ValueError: If no schema is loaded or no generators registered
+    &#34;&#34;&#34;
+    if self.schema is None:
+        raise ValueError(&#34;No schema loaded. Call load_schema() first.&#34;)
+
+    if self.namespace is None:
+        self.extract_metadata()
+
+    if not self.emitter.generators:
+        raise ValueError(&#34;No generators registered. Call register_generator() first.&#34;)
+
+    # Filter generators if specific languages requested
+    if target_languages:
+        generators_to_use = {
+            lang: gen
+            for lang, gen in self.emitter.generators.items()
+            if lang in target_languages
+        }
+
+        if not generators_to_use:
+            raise ValueError(f&#34;None of the requested languages are registered: &#34;
+                             f&#34;{target_languages}&#34;)
+
+        # Temporarily replace generators
+        original_generators = self.emitter.generators
+        self.emitter.generators = generators_to_use
+
+    if self.config.verbose:
+        print(f&#34;Generating code for: {&#39;, &#39;.join(self.emitter.generators.keys())}&#34;)
+
+    # Generate code
+    results = self.emitter.generate_all(self.schema, self.namespace)
+
+    # Restore original generators if filtered
+    if target_languages:
+        self.emitter.generators = original_generators
+
+    # Report results
+    if self.config.verbose:
+        for language, result in results.items():
+            if result.success:
+                print(f&#34;  {language}: Generated {len(result.files)} file(s)&#34;)
+            else:
+                print(f&#34;  {language}: FAILED with {len(result.errors)} error(s)&#34;)
+
+    return results</code></pre>
+</details>
+<div class="desc"><p>Generate code for target languages.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>target_languages</code></strong></dt>
+<dd>List of languages to generate (None = all registered)</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>Dictionary mapping language to GenerationResult</p>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If no schema is loaded or no generators registered</dd>
+</dl></div>
+</dd>
+<dt id="atomik_sdk.generator.core.GeneratorEngine.generate_and_write"><code class="name flex">
+<span>def <span class="ident">generate_and_write</span></span>(<span>self, schema_path: str | Path, target_languages: list[str] | None = None) ‑> tuple[dict[str, <a title="atomik_sdk.generator.code_emitter.GenerationResult" href="code_emitter.html#atomik_sdk.generator.code_emitter.GenerationResult">GenerationResult</a>], list[str]]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def generate_and_write(
+    self,
+    schema_path: str | Path,
+    target_languages: list[str] | None = None
+) -&gt; tuple[dict[str, GenerationResult], list[str]]:
+    &#34;&#34;&#34;
+    Complete pipeline: load, validate, generate, and write.
+
+    Args:
+        schema_path: Path to schema file
+        target_languages: List of target languages (None = all registered)
+
+    Returns:
+        Tuple of (results dict, written file paths list)
+    &#34;&#34;&#34;
+    # Load and validate
+    validation = self.load_schema(schema_path)
+    if not validation:
+        raise ValueError(f&#34;Schema validation failed: {validation.errors}&#34;)
+
+    # Generate
+    results = self.generate(target_languages)
+
+    # Write
+    files = self.write_output(results)
+
+    return results, files</code></pre>
+</details>
+<div class="desc"><p>Complete pipeline: load, validate, generate, and write.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>schema_path</code></strong></dt>
+<dd>Path to schema file</dd>
+<dt><strong><code>target_languages</code></strong></dt>
+<dd>List of target languages (None = all registered)</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>Tuple of (results dict, written file paths list)</p></div>
+</dd>
+<dt id="atomik_sdk.generator.core.GeneratorEngine.get_schema_summary"><code class="name flex">
+<span>def <span class="ident">get_schema_summary</span></span>(<span>self) ‑> dict[str, typing.Any]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_schema_summary(self) -&gt; dict[str, Any]:
+    &#34;&#34;&#34;
+    Get summary information about the loaded schema.
+
+    Returns:
+        Dictionary with schema summary
+
+    Raises:
+        ValueError: If no schema is loaded
+    &#34;&#34;&#34;
+    if self.schema is None:
+        raise ValueError(&#34;No schema loaded&#34;)
+
+    catalogue = self.schema.get(&#39;catalogue&#39;, {})
+    schema_section = self.schema.get(&#39;schema&#39;, {})
+    delta_fields = schema_section.get(&#39;delta_fields&#39;, {})
+    operations = schema_section.get(&#39;operations&#39;, {})
+
+    return {
+        &#39;catalogue&#39;: {
+            &#39;vertical&#39;: catalogue.get(&#39;vertical&#39;),
+            &#39;field&#39;: catalogue.get(&#39;field&#39;),
+            &#39;object&#39;: catalogue.get(&#39;object&#39;),
+            &#39;version&#39;: catalogue.get(&#39;version&#39;)
+        },
+        &#39;delta_fields&#39;: {
+            name: {
+                &#39;type&#39;: spec.get(&#39;type&#39;),
+                &#39;width&#39;: spec.get(&#39;width&#39;)
+            }
+            for name, spec in delta_fields.items()
+        },
+        &#39;operations&#39;: list(operations.keys()),
+        &#39;has_hardware&#39;: &#39;hardware&#39; in self.schema
+    }</code></pre>
+</details>
+<div class="desc"><p>Get summary information about the loaded schema.</p>
+<h2 id="returns">Returns</h2>
+<p>Dictionary with schema summary</p>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If no schema is loaded</dd>
+</dl></div>
+</dd>
+<dt id="atomik_sdk.generator.core.GeneratorEngine.load_schema"><code class="name flex">
+<span>def <span class="ident">load_schema</span></span>(<span>self, schema_path: str | Path) ‑> <a title="atomik_sdk.generator.schema_validator.ValidationResult" href="schema_validator.html#atomik_sdk.generator.schema_validator.ValidationResult">ValidationResult</a></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def load_schema(self, schema_path: str | Path) -&gt; ValidationResult:
+    &#34;&#34;&#34;
+    Load and optionally validate a schema file.
+
+    Args:
+        schema_path: Path to the schema JSON file
+
+    Returns:
+        ValidationResult with validity status
+
+    Raises:
+        FileNotFoundError: If schema file doesn&#39;t exist
+        ValueError: If schema JSON is invalid
+    &#34;&#34;&#34;
+    self.schema_path = Path(schema_path)
+
+    # Load JSON
+    try:
+        with open(self.schema_path, encoding=&#39;utf-8&#39;) as f:
+            self.schema = json.load(f)
+    except FileNotFoundError:
+        raise FileNotFoundError(f&#34;Schema file not found: {schema_path}&#34;)
+    except json.JSONDecodeError as e:
+        raise ValueError(f&#34;Invalid JSON in schema: {e}&#34;)
+
+    if self.config.verbose:
+        print(f&#34;Loaded schema: {self.schema_path}&#34;)
+
+    # Validate if enabled
+    if self.config.validate_schemas:
+        result = self.validator.validate(self.schema)
+
+        if result.errors and self.config.verbose:
+            print(&#34;Validation errors:&#34;)
+            for error in result.errors:
+                print(f&#34;  - {error}&#34;)
+
+        if result.warnings and self.config.verbose:
+            print(&#34;Validation warnings:&#34;)
+            for warning in result.warnings:
+                print(f&#34;  - {warning}&#34;)
+
+        return result
+
+    return ValidationResult(valid=True)</code></pre>
+</details>
+<div class="desc"><p>Load and optionally validate a schema file.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>schema_path</code></strong></dt>
+<dd>Path to the schema JSON file</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>ValidationResult with validity status</p>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>FileNotFoundError</code></dt>
+<dd>If schema file doesn't exist</dd>
+<dt><code>ValueError</code></dt>
+<dd>If schema JSON is invalid</dd>
+</dl></div>
+</dd>
+<dt id="atomik_sdk.generator.core.GeneratorEngine.register_generator"><code class="name flex">
+<span>def <span class="ident">register_generator</span></span>(<span>self, language: str, generator: CodeEmitter) ‑> None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def register_generator(self, language: str, generator: CodeEmitter) -&gt; None:
+    &#34;&#34;&#34;
+    Register a code generator for a target language.
+
+    Args:
+        language: Target language name
+        generator: CodeEmitter instance for the language
+    &#34;&#34;&#34;
+    self.emitter.register(language, generator)
+
+    if self.config.verbose:
+        print(f&#34;Registered generator for: {language}&#34;)</code></pre>
+</details>
+<div class="desc"><p>Register a code generator for a target language.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>language</code></strong></dt>
+<dd>Target language name</dd>
+<dt><strong><code>generator</code></strong></dt>
+<dd>CodeEmitter instance for the language</dd>
+</dl></div>
+</dd>
+<dt id="atomik_sdk.generator.core.GeneratorEngine.write_output"><code class="name flex">
+<span>def <span class="ident">write_output</span></span>(<span>self, results: dict[str, GenerationResult]) ‑> list[str]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def write_output(self, results: dict[str, GenerationResult]) -&gt; list[str]:
+    &#34;&#34;&#34;
+    Write generated files to disk.
+
+    Args:
+        results: Dictionary of generation results by language
+
+    Returns:
+        List of written file paths
+    &#34;&#34;&#34;
+    written_files = self.emitter.write_generated_files(
+        results,
+        self.config.output_dir
+    )
+
+    if self.config.verbose:
+        print(f&#34;Wrote {len(written_files)} file(s) to {self.config.output_dir}&#34;)
+
+    return written_files</code></pre>
+</details>
+<div class="desc"><p>Write generated files to disk.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>results</code></strong></dt>
+<dd>Dictionary of generation results by language</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>List of written file paths</p></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="atomik_sdk.generator" href="index.html">atomik_sdk.generator</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="atomik_sdk.generator.core.GeneratorConfig" href="#atomik_sdk.generator.core.GeneratorConfig">GeneratorConfig</a></code></h4>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.generator.core.GeneratorEngine" href="#atomik_sdk.generator.core.GeneratorEngine">GeneratorEngine</a></code></h4>
+<ul class="two-column">
+<li><code><a title="atomik_sdk.generator.core.GeneratorEngine.extract_metadata" href="#atomik_sdk.generator.core.GeneratorEngine.extract_metadata">extract_metadata</a></code></li>
+<li><code><a title="atomik_sdk.generator.core.GeneratorEngine.generate" href="#atomik_sdk.generator.core.GeneratorEngine.generate">generate</a></code></li>
+<li><code><a title="atomik_sdk.generator.core.GeneratorEngine.generate_and_write" href="#atomik_sdk.generator.core.GeneratorEngine.generate_and_write">generate_and_write</a></code></li>
+<li><code><a title="atomik_sdk.generator.core.GeneratorEngine.get_schema_summary" href="#atomik_sdk.generator.core.GeneratorEngine.get_schema_summary">get_schema_summary</a></code></li>
+<li><code><a title="atomik_sdk.generator.core.GeneratorEngine.load_schema" href="#atomik_sdk.generator.core.GeneratorEngine.load_schema">load_schema</a></code></li>
+<li><code><a title="atomik_sdk.generator.core.GeneratorEngine.register_generator" href="#atomik_sdk.generator.core.GeneratorEngine.register_generator">register_generator</a></code></li>
+<li><code><a title="atomik_sdk.generator.core.GeneratorEngine.write_output" href="#atomik_sdk.generator.core.GeneratorEngine.write_output">write_output</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+</body>
+</html>

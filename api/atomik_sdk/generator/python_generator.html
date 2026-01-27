@@ -1,0 +1,630 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
+<title>atomik_sdk.generator.python_generator API documentation</title>
+<meta name="description" content="Python SDK Generator …">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>atomik_sdk.generator.python_generator</code></h1>
+</header>
+<section id="section-intro">
+<p>Python SDK Generator</p>
+<p>Generates Python modules with type hints and docstrings from ATOMiK schemas.</p>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="atomik_sdk.generator.python_generator.PythonGenerator"><code class="flex name class">
+<span>class <span class="ident">PythonGenerator</span></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class PythonGenerator(CodeEmitter):
+    &#34;&#34;&#34;
+    Generates Python SDK code from ATOMiK schemas.
+
+    Produces:
+    - Module structure following catalogue namespace
+    - Delta operation classes with type hints
+    - Docstrings for all public APIs
+    - Unit test templates
+    &#34;&#34;&#34;
+
+    def __init__(self):
+        &#34;&#34;&#34;Initialize Python generator.&#34;&#34;&#34;
+        super().__init__(&#39;python&#39;)
+
+    def generate(
+        self,
+        schema: dict[str, Any],
+        namespace: NamespaceMapping
+    ) -&gt; GenerationResult:
+        &#34;&#34;&#34;
+        Generate Python code from schema.
+
+        Args:
+            schema: Validated ATOMiK schema
+            namespace: Namespace mapping
+
+        Returns:
+            GenerationResult with generated Python files
+        &#34;&#34;&#34;
+        try:
+            files = []
+            errors = []
+            warnings = []
+
+            # Extract schema components
+            catalogue = schema.get(&#39;catalogue&#39;, {})
+            delta_fields = self._extract_delta_fields(schema)
+            operations = self._extract_operations(schema)
+            constraints = self._extract_constraints(schema)
+
+            # Generate main module file
+            module_content = self._generate_module(
+                namespace, catalogue, delta_fields, operations, constraints
+            )
+
+            module_path = self._get_module_path(namespace)
+            files.append(GeneratedFile(
+                relative_path=module_path,
+                content=module_content,
+                language=&#39;python&#39;,
+                description=f&#34;Python module for {namespace.object}&#34;
+            ))
+
+            # Generate __init__.py for package
+            init_content = self._generate_init(namespace)
+            init_path = str(Path(module_path).parent / &#34;__init__.py&#34;)
+            files.append(GeneratedFile(
+                relative_path=init_path,
+                content=init_content,
+                language=&#39;python&#39;,
+                description=f&#34;Package initializer for {namespace.vertical}.{namespace.field}&#34;
+            ))
+
+            # Generate test file
+            test_content = self._generate_test(namespace, delta_fields, operations)
+            test_path = self._get_test_path(namespace)
+            files.append(GeneratedFile(
+                relative_path=test_path,
+                content=test_content,
+                language=&#39;python&#39;,
+                description=f&#34;Unit tests for {namespace.object}&#34;
+            ))
+
+            return GenerationResult(
+                success=True,
+                files=files,
+                errors=errors,
+                warnings=warnings
+            )
+
+        except Exception as e:
+            return GenerationResult(
+                success=False,
+                files=[],
+                errors=[f&#34;Python generation failed: {str(e)}&#34;],
+                warnings=[]
+            )
+
+    def _generate_module(
+        self,
+        namespace: NamespaceMapping,
+        catalogue: dict[str, Any],
+        delta_fields: dict[str, dict[str, Any]],
+        operations: dict[str, dict[str, Any]],
+        constraints: dict[str, Any]
+    ) -&gt; str:
+        &#34;&#34;&#34;Generate main Python module content.&#34;&#34;&#34;
+        lines = []
+
+        # Header
+        header = self._generate_header(
+            namespace.object,
+            catalogue.get(&#39;description&#39;, &#39;ATOMiK delta-state module&#39;),
+            &#39;hash&#39;
+        )
+        lines.append(header)
+        lines.append(&#39;&#39;)
+
+        # Imports
+        lines.append(&#39;from __future__ import annotations&#39;)
+        lines.append(&#39;&#39;)
+        lines.append(&#39;from typing import Optional&#39;)
+        lines.append(&#39;&#39;)
+
+        # Class definition
+        lines.append(f&#39;class {namespace.object}:&#39;)
+        lines.append(self._indent(&#39;&#34;&#34;&#34;&#39;))
+        lines.append(self._indent(catalogue.get(&#39;description&#39;, f&#39;{namespace.object} implementation.&#39;)))
+        lines.append(self._indent(&#39;&#39;))
+
+        # Add field documentation
+        if delta_fields:
+            lines.append(self._indent(&#39;Delta Fields:&#39;))
+            for field_name, field_spec in delta_fields.items():
+                field_type = field_spec.get(&#39;type&#39;, &#39;unknown&#39;)
+                field_width = field_spec.get(&#39;width&#39;, 0)
+                lines.append(self._indent(f&#39;    {field_name}: {field_type} ({field_width}-bit)&#39;))
+            lines.append(self._indent(&#39;&#39;))
+
+        # Add operations documentation
+        if operations:
+            lines.append(self._indent(&#39;Operations:&#39;))
+            for op_name in operations.keys():
+                lines.append(self._indent(f&#39;    {op_name}: Available&#39;))
+            lines.append(self._indent(&#39;&#39;))
+
+        lines.append(self._indent(&#39;&#34;&#34;&#34;&#39;))
+        lines.append(&#39;&#39;)
+
+        # __init__ method
+        lines.append(self._indent(&#39;def __init__(self):&#39;))
+        lines.append(self._indent(&#39;&#34;&#34;&#34;Initialize delta-state module.&#34;&#34;&#34;&#39;, 8))
+
+        # Initialize fields
+        for field_name, field_spec in delta_fields.items():
+            width = field_spec.get(&#39;width&#39;, 64)
+            default = field_spec.get(&#39;default_value&#39;, 0)
+            lines.append(self._indent(f&#39;self._{field_name}_initial: int = {default}&#39;, 8))
+            lines.append(self._indent(f&#39;self._{field_name}_accumulator: int = 0&#39;, 8))
+
+        # Add rollback history if enabled
+        if operations.get(&#39;rollback&#39;, {}).get(&#39;enabled&#39;):
+            history_depth = operations[&#39;rollback&#39;].get(&#39;history_depth&#39;, 100)
+            for field_name in delta_fields.keys():
+                lines.append(self._indent(f&#39;self._{field_name}_history: list[int] = []&#39;, 8))
+                lines.append(self._indent(f&#39;self._history_depth = {history_depth}&#39;, 8))
+
+        lines.append(&#39;&#39;)
+
+        # Generate methods for each delta field
+        for field_name, field_spec in delta_fields.items():
+            width = field_spec.get(&#39;width&#39;, 64)
+            mask = (1 &lt;&lt; width) - 1
+
+            # Load initial state
+            lines.extend(self._generate_load_method(field_name, width, mask))
+            lines.append(&#39;&#39;)
+
+            # Accumulate delta
+            lines.extend(self._generate_accumulate_method(
+                field_name, width, mask,
+                operations.get(&#39;rollback&#39;, {}).get(&#39;enabled&#39;, False)
+            ))
+            lines.append(&#39;&#39;)
+
+            # Reconstruct state
+            if operations.get(&#39;reconstruct&#39;, {}).get(&#39;enabled&#39;, True):
+                lines.extend(self._generate_reconstruct_method(field_name, mask))
+                lines.append(&#39;&#39;)
+
+        # Rollback method if enabled
+        if operations.get(&#39;rollback&#39;, {}).get(&#39;enabled&#39;):
+            lines.extend(self._generate_rollback_method(list(delta_fields.keys())))
+            lines.append(&#39;&#39;)
+
+        # Status methods
+        lines.extend(self._generate_status_methods(list(delta_fields.keys())))
+
+        return &#39;\n&#39;.join(lines)
+
+    def _generate_load_method(self, field_name: str, width: int, mask: int) -&gt; list[str]:
+        &#34;&#34;&#34;Generate load_initial_state method.&#34;&#34;&#34;
+        method_name = f&#39;load_{field_name}&#39;
+        lines = []
+        lines.append(self._indent(f&#39;def {method_name}(self, initial_state: int) -&gt; None:&#39;))
+        lines.append(self._indent(&#39;&#34;&#34;&#34;&#39;, 8))
+        lines.append(self._indent(f&#39;Load initial state for {field_name}.&#39;, 8))
+        lines.append(self._indent(&#39;&#39;, 8))
+        lines.append(self._indent(&#39;Args:&#39;, 8))
+        lines.append(self._indent(f&#39;    initial_state: Initial {width}-bit state value&#39;, 8))
+        lines.append(self._indent(&#39;&#34;&#34;&#34;&#39;, 8))
+        lines.append(self._indent(f&#39;self._{field_name}_initial = initial_state &amp; {hex(mask)}&#39;, 8))
+        return lines
+
+    def _generate_accumulate_method(
+        self, field_name: str, width: int, mask: int, has_rollback: bool
+    ) -&gt; list[str]:
+        &#34;&#34;&#34;Generate accumulate_delta method.&#34;&#34;&#34;
+        method_name = f&#39;accumulate_{field_name}&#39;
+        lines = []
+        lines.append(self._indent(f&#39;def {method_name}(self, delta: int) -&gt; int:&#39;))
+        lines.append(self._indent(&#39;&#34;&#34;&#34;&#39;, 8))
+        lines.append(self._indent(f&#39;Accumulate delta for {field_name} via XOR.&#39;, 8))
+        lines.append(self._indent(&#39;&#39;, 8))
+        lines.append(self._indent(&#39;Args:&#39;, 8))
+        lines.append(self._indent(f&#39;    delta: {width}-bit delta value&#39;, 8))
+        lines.append(self._indent(&#39;&#39;, 8))
+        lines.append(self._indent(&#39;Returns:&#39;, 8))
+        lines.append(self._indent(&#39;    Updated accumulator value&#39;, 8))
+        lines.append(self._indent(&#39;&#34;&#34;&#34;&#39;, 8))
+
+        if has_rollback:
+            lines.append(self._indent(&#39;# Save to history&#39;, 8))
+            lines.append(self._indent(f&#39;self._{field_name}_history.append(delta)&#39;, 8))
+            lines.append(self._indent(f&#39;if len(self._{field_name}_history) &gt; self._history_depth:&#39;, 8))
+            lines.append(self._indent(f&#39;    self._{field_name}_history.pop(0)&#39;, 12))
+            lines.append(self._indent(&#39;&#39;, 8))
+
+        lines.append(self._indent(f&#39;self._{field_name}_accumulator ^= (delta &amp; {hex(mask)})&#39;, 8))
+        lines.append(self._indent(f&#39;return self._{field_name}_accumulator&#39;, 8))
+        return lines
+
+    def _generate_reconstruct_method(self, field_name: str, mask: int) -&gt; list[str]:
+        &#34;&#34;&#34;Generate reconstruct_state method.&#34;&#34;&#34;
+        method_name = f&#39;reconstruct_{field_name}&#39;
+        lines = []
+        lines.append(self._indent(f&#39;def {method_name}(self) -&gt; int:&#39;))
+        lines.append(self._indent(&#39;&#34;&#34;&#34;&#39;, 8))
+        lines.append(self._indent(f&#39;Reconstruct current state for {field_name}.&#39;, 8))
+        lines.append(self._indent(&#39;&#39;, 8))
+        lines.append(self._indent(&#39;Returns:&#39;, 8))
+        lines.append(self._indent(&#39;    Current state value&#39;, 8))
+        lines.append(self._indent(&#39;&#34;&#34;&#34;&#39;, 8))
+        lines.append(self._indent(
+            f&#39;return (self._{field_name}_initial ^ self._{field_name}_accumulator) &amp; {hex(mask)}&#39;,
+            8
+        ))
+        return lines
+
+    def _generate_rollback_method(self, field_names: list[str]) -&gt; list[str]:
+        &#34;&#34;&#34;Generate rollback method.&#34;&#34;&#34;
+        lines = []
+        lines.append(self._indent(&#39;def rollback(self, steps: int = 1) -&gt; bool:&#39;))
+        lines.append(self._indent(&#39;&#34;&#34;&#34;&#39;, 8))
+        lines.append(self._indent(&#39;Rollback state by reversing recent deltas.&#39;, 8))
+        lines.append(self._indent(&#39;&#39;, 8))
+        lines.append(self._indent(&#39;Args:&#39;, 8))
+        lines.append(self._indent(&#39;    steps: Number of deltas to rollback&#39;, 8))
+        lines.append(self._indent(&#39;&#39;, 8))
+        lines.append(self._indent(&#39;Returns:&#39;, 8))
+        lines.append(self._indent(&#39;    True if rollback successful&#39;, 8))
+        lines.append(self._indent(&#39;&#34;&#34;&#34;&#39;, 8))
+
+        # Use first field for history check (all fields should have same history)
+        first_field = field_names[0]
+        lines.append(self._indent(f&#39;if steps &gt; len(self._{first_field}_history):&#39;, 8))
+        lines.append(self._indent(&#39;return False&#39;, 12))
+        lines.append(self._indent(&#39;&#39;, 8))
+
+        lines.append(self._indent(&#39;for _ in range(steps):&#39;, 8))
+        for field_name in field_names:
+            lines.append(self._indent(f&#39;delta = self._{field_name}_history.pop()&#39;, 12))
+            lines.append(self._indent(f&#39;self._{field_name}_accumulator ^= delta&#39;, 12))
+        lines.append(self._indent(&#39;&#39;, 8))
+        lines.append(self._indent(&#39;return True&#39;, 8))
+        return lines
+
+    def _generate_status_methods(self, field_names: list[str]) -&gt; list[str]:
+        &#34;&#34;&#34;Generate status check methods.&#34;&#34;&#34;
+        lines = []
+
+        # is_accumulator_zero method
+        lines.append(self._indent(&#39;def is_accumulator_zero(self, field_name: Optional[str] = None) -&gt; bool:&#39;))
+        lines.append(self._indent(&#39;&#34;&#34;&#34;&#39;, 8))
+        lines.append(self._indent(&#39;Check if accumulator is zero (no pending deltas).&#39;, 8))
+        lines.append(self._indent(&#39;&#39;, 8))
+        lines.append(self._indent(&#39;Args:&#39;, 8))
+        lines.append(self._indent(&#39;    field_name: Optional field name to check (None = check all)&#39;, 8))
+        lines.append(self._indent(&#39;&#39;, 8))
+        lines.append(self._indent(&#39;Returns:&#39;, 8))
+        lines.append(self._indent(&#39;    True if accumulator(s) are zero&#39;, 8))
+        lines.append(self._indent(&#39;&#34;&#34;&#34;&#39;, 8))
+        lines.append(self._indent(&#39;if field_name:&#39;, 8))
+        lines.append(self._indent(&#39;    return getattr(self, f&#34;_{field_name}_accumulator&#34;) == 0&#39;, 8))
+        lines.append(self._indent(&#39;&#39;, 8))
+
+        # Check all fields
+        checks = &#39; and &#39;.join([f&#39;self._{fn}_accumulator == 0&#39; for fn in field_names])
+        lines.append(self._indent(f&#39;return {checks}&#39;, 8))
+
+        return lines
+
+    def _generate_init(self, namespace: NamespaceMapping) -&gt; str:
+        &#34;&#34;&#34;Generate __init__.py for package.&#34;&#34;&#34;
+        lines = []
+        lines.append(&#39;&#34;&#34;&#34;&#39;)
+        lines.append(f&#39;{namespace.vertical}.{namespace.field} package.&#39;)
+        lines.append(&#39;&#34;&#34;&#34;&#39;)
+        lines.append(&#39;&#39;)
+        lines.append(f&#39;from .{namespace.object.lower()} import {namespace.object}&#39;)
+        lines.append(&#39;&#39;)
+        lines.append(f&#39;__all__ = [&#34;{namespace.object}&#34;]&#39;)
+        lines.append(&#39;&#39;)
+        return &#39;\n&#39;.join(lines)
+
+    def _generate_test(
+        self,
+        namespace: NamespaceMapping,
+        delta_fields: dict[str, dict[str, Any]],
+        operations: dict[str, dict[str, Any]]
+    ) -&gt; str:
+        &#34;&#34;&#34;Generate unit test file.&#34;&#34;&#34;
+        lines = []
+
+        # Header
+        lines.append(&#39;&#34;&#34;&#34;&#39;)
+        lines.append(f&#39;Tests for {namespace.object}&#39;)
+        lines.append(&#39;&#34;&#34;&#34;&#39;)
+        lines.append(&#39;&#39;)
+        lines.append(&#39;import unittest&#39;)
+        lines.append(&#39;&#39;)
+        lines.append(f&#39;from atomik.{namespace.vertical}.{namespace.field} import {namespace.object}&#39;)
+        lines.append(&#39;&#39;)
+        lines.append(&#39;&#39;)
+
+        # Test class
+        lines.append(f&#39;class Test{namespace.object}(unittest.TestCase):&#39;)
+        lines.append(self._indent(f&#39;&#34;&#34;&#34;Test cases for {namespace.object}.&#34;&#34;&#34;&#39;))
+        lines.append(&#39;&#39;)
+
+        # Test initialization
+        lines.append(self._indent(&#39;def test_initialization(self):&#39;))
+        lines.append(self._indent(&#39;&#34;&#34;&#34;Test module initialization.&#34;&#34;&#34;&#39;, 8))
+        lines.append(self._indent(f&#39;module = {namespace.object}()&#39;, 8))
+        lines.append(self._indent(&#39;self.assertIsNotNone(module)&#39;, 8))
+        lines.append(&#39;&#39;)
+
+        # Test each field
+        for field_name, field_spec in delta_fields.items():
+            width = field_spec.get(&#39;width&#39;, 64)
+
+            # Test load and reconstruct
+            lines.append(self._indent(f&#39;def test_{field_name}_load_reconstruct(self):&#39;))
+            lines.append(self._indent(f&#39;&#34;&#34;&#34;Test load and reconstruct for {field_name}.&#34;&#34;&#34;&#39;, 8))
+            lines.append(self._indent(f&#39;module = {namespace.object}()&#39;, 8))
+            lines.append(self._indent(f&#39;initial = 0x{&#34;1&#34; * (width // 4)}&#39;, 8))
+            lines.append(self._indent(f&#39;module.load_{field_name}(initial)&#39;, 8))
+            lines.append(self._indent(f&#39;state = module.reconstruct_{field_name}()&#39;, 8))
+            lines.append(self._indent(&#39;self.assertEqual(state, initial)&#39;, 8))
+            lines.append(&#39;&#39;)
+
+            # Test accumulate
+            lines.append(self._indent(f&#39;def test_{field_name}_accumulate(self):&#39;))
+            lines.append(self._indent(f&#39;&#34;&#34;&#34;Test delta accumulation for {field_name}.&#34;&#34;&#34;&#39;, 8))
+            lines.append(self._indent(f&#39;module = {namespace.object}()&#39;, 8))
+            lines.append(self._indent(f&#39;module.load_{field_name}(0)&#39;, 8))
+            lines.append(self._indent(&#39;delta1 = 0xFF&#39;, 8))
+            lines.append(self._indent(&#39;delta2 = 0xAA&#39;, 8))
+            lines.append(self._indent(f&#39;module.accumulate_{field_name}(delta1)&#39;, 8))
+            lines.append(self._indent(f&#39;module.accumulate_{field_name}(delta2)&#39;, 8))
+            lines.append(self._indent(f&#39;state = module.reconstruct_{field_name}()&#39;, 8))
+            lines.append(self._indent(&#39;self.assertEqual(state, delta1 ^ delta2)&#39;, 8))
+            lines.append(&#39;&#39;)
+
+            # Test self-inverse property
+            lines.append(self._indent(f&#39;def test_{field_name}_self_inverse(self):&#39;))
+            lines.append(self._indent(f&#39;&#34;&#34;&#34;Test delta self-inverse property for {field_name}.&#34;&#34;&#34;&#39;, 8))
+            lines.append(self._indent(f&#39;module = {namespace.object}()&#39;, 8))
+            lines.append(self._indent(&#39;initial = 0x123456&#39;, 8))
+            lines.append(self._indent(f&#39;module.load_{field_name}(initial)&#39;, 8))
+            lines.append(self._indent(&#39;delta = 0xABCDEF&#39;, 8))
+            lines.append(self._indent(f&#39;module.accumulate_{field_name}(delta)&#39;, 8))
+            lines.append(self._indent(f&#39;module.accumulate_{field_name}(delta)  # Apply same delta twice&#39;, 8))
+            lines.append(self._indent(f&#39;state = module.reconstruct_{field_name}()&#39;, 8))
+            lines.append(self._indent(&#39;self.assertEqual(state, initial)  # Should cancel out&#39;, 8))
+            lines.append(&#39;&#39;)
+
+        # Test accumulator zero
+        lines.append(self._indent(&#39;def test_accumulator_zero(self):&#39;))
+        lines.append(self._indent(&#39;&#34;&#34;&#34;Test accumulator zero detection.&#34;&#34;&#34;&#39;, 8))
+        lines.append(self._indent(f&#39;module = {namespace.object}()&#39;, 8))
+        lines.append(self._indent(&#39;self.assertTrue(module.is_accumulator_zero())&#39;, 8))
+        if delta_fields:
+            first_field = list(delta_fields.keys())[0]
+            lines.append(self._indent(f&#39;module.accumulate_{first_field}(0x100)&#39;, 8))
+            lines.append(self._indent(&#39;self.assertFalse(module.is_accumulator_zero())&#39;, 8))
+        lines.append(&#39;&#39;)
+
+        # Test rollback if enabled
+        if operations.get(&#39;rollback&#39;, {}).get(&#39;enabled&#39;):
+            lines.append(self._indent(&#39;def test_rollback(self):&#39;))
+            lines.append(self._indent(&#39;&#34;&#34;&#34;Test rollback functionality.&#34;&#34;&#34;&#39;, 8))
+            lines.append(self._indent(f&#39;module = {namespace.object}()&#39;, 8))
+            if delta_fields:
+                first_field = list(delta_fields.keys())[0]
+                lines.append(self._indent(f&#39;module.load_{first_field}(0)&#39;, 8))
+                lines.append(self._indent(f&#39;module.accumulate_{first_field}(0x10)&#39;, 8))
+                lines.append(self._indent(f&#39;module.accumulate_{first_field}(0x20)&#39;, 8))
+                lines.append(self._indent(f&#39;state_before = module.reconstruct_{first_field}()&#39;, 8))
+                lines.append(self._indent(&#39;success = module.rollback(1)&#39;, 8))
+                lines.append(self._indent(&#39;self.assertTrue(success)&#39;, 8))
+                lines.append(self._indent(f&#39;state_after = module.reconstruct_{first_field}()&#39;, 8))
+                lines.append(self._indent(&#39;self.assertNotEqual(state_before, state_after)&#39;, 8))
+            lines.append(&#39;&#39;)
+
+        # Main
+        lines.append(&#39;&#39;)
+        lines.append(&#39;if __name__ == &#34;__main__&#34;:&#39;)
+        lines.append(self._indent(&#39;unittest.main()&#39;))
+        lines.append(&#39;&#39;)
+
+        return &#39;\n&#39;.join(lines)
+
+    def _get_module_path(self, namespace: NamespaceMapping) -&gt; str:
+        &#34;&#34;&#34;Get relative path for module file.&#34;&#34;&#34;
+        return f&#34;atomik/{namespace.vertical}/{namespace.field}/{namespace.object.lower()}.py&#34;
+
+    def _get_test_path(self, namespace: NamespaceMapping) -&gt; str:
+        &#34;&#34;&#34;Get relative path for test file.&#34;&#34;&#34;
+        return f&#34;tests/test_{namespace.object.lower()}.py&#34;</code></pre>
+</details>
+<div class="desc"><p>Generates Python SDK code from ATOMiK schemas.</p>
+<p>Produces:
+- Module structure following catalogue namespace
+- Delta operation classes with type hints
+- Docstrings for all public APIs
+- Unit test templates</p>
+<p>Initialize Python generator.</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="atomik_sdk.generator.code_emitter.CodeEmitter" href="code_emitter.html#atomik_sdk.generator.code_emitter.CodeEmitter">CodeEmitter</a></li>
+<li>abc.ABC</li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.generator.python_generator.PythonGenerator.generate"><code class="name flex">
+<span>def <span class="ident">generate</span></span>(<span>self, schema: dict[str, Any], namespace: NamespaceMapping) ‑> <a title="atomik_sdk.generator.code_emitter.GenerationResult" href="code_emitter.html#atomik_sdk.generator.code_emitter.GenerationResult">GenerationResult</a></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def generate(
+    self,
+    schema: dict[str, Any],
+    namespace: NamespaceMapping
+) -&gt; GenerationResult:
+    &#34;&#34;&#34;
+    Generate Python code from schema.
+
+    Args:
+        schema: Validated ATOMiK schema
+        namespace: Namespace mapping
+
+    Returns:
+        GenerationResult with generated Python files
+    &#34;&#34;&#34;
+    try:
+        files = []
+        errors = []
+        warnings = []
+
+        # Extract schema components
+        catalogue = schema.get(&#39;catalogue&#39;, {})
+        delta_fields = self._extract_delta_fields(schema)
+        operations = self._extract_operations(schema)
+        constraints = self._extract_constraints(schema)
+
+        # Generate main module file
+        module_content = self._generate_module(
+            namespace, catalogue, delta_fields, operations, constraints
+        )
+
+        module_path = self._get_module_path(namespace)
+        files.append(GeneratedFile(
+            relative_path=module_path,
+            content=module_content,
+            language=&#39;python&#39;,
+            description=f&#34;Python module for {namespace.object}&#34;
+        ))
+
+        # Generate __init__.py for package
+        init_content = self._generate_init(namespace)
+        init_path = str(Path(module_path).parent / &#34;__init__.py&#34;)
+        files.append(GeneratedFile(
+            relative_path=init_path,
+            content=init_content,
+            language=&#39;python&#39;,
+            description=f&#34;Package initializer for {namespace.vertical}.{namespace.field}&#34;
+        ))
+
+        # Generate test file
+        test_content = self._generate_test(namespace, delta_fields, operations)
+        test_path = self._get_test_path(namespace)
+        files.append(GeneratedFile(
+            relative_path=test_path,
+            content=test_content,
+            language=&#39;python&#39;,
+            description=f&#34;Unit tests for {namespace.object}&#34;
+        ))
+
+        return GenerationResult(
+            success=True,
+            files=files,
+            errors=errors,
+            warnings=warnings
+        )
+
+    except Exception as e:
+        return GenerationResult(
+            success=False,
+            files=[],
+            errors=[f&#34;Python generation failed: {str(e)}&#34;],
+            warnings=[]
+        )</code></pre>
+</details>
+<div class="desc"><p>Generate Python code from schema.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>schema</code></strong></dt>
+<dd>Validated ATOMiK schema</dd>
+<dt><strong><code>namespace</code></strong></dt>
+<dd>Namespace mapping</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>GenerationResult with generated Python files</p></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="atomik_sdk.generator" href="index.html">atomik_sdk.generator</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="atomik_sdk.generator.python_generator.PythonGenerator" href="#atomik_sdk.generator.python_generator.PythonGenerator">PythonGenerator</a></code></h4>
+<ul class="">
+<li><code><a title="atomik_sdk.generator.python_generator.PythonGenerator.generate" href="#atomik_sdk.generator.python_generator.PythonGenerator.generate">generate</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+</body>
+</html>

@@ -1,0 +1,480 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
+<title>atomik_sdk.tests.test_integration API documentation</title>
+<meta name="description" content="ATOMiK SDK Integration Tests …">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>atomik_sdk.tests.test_integration</code></h1>
+</header>
+<section id="section-intro">
+<p>ATOMiK SDK Integration Tests</p>
+<p>Tests cross-language consistency and semantic equivalence.
+Validates that all generators produce code with matching behavior.</p>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="atomik_sdk.tests.test_integration.main"><code class="name flex">
+<span>def <span class="ident">main</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def main():
+    &#34;&#34;&#34;Run all integration tests.&#34;&#34;&#34;
+    print()
+    print(&#34;*&#34; * 70)
+    print(&#34;ATOMiK SDK - COMPREHENSIVE INTEGRATION TEST SUITE&#34;)
+    print(&#34;*&#34; * 70)
+    print()
+
+    exit_code = 0
+
+    try:
+        # Test 1: Cross-language integration
+        result = test_cross_language_integration()
+        if result != 0:
+            exit_code = result
+
+        # Test 2: Schema summary
+        result = test_schema_summary()
+        if result != 0:
+            exit_code = result
+
+        # Test 3: Multi-language generation
+        result = test_multi_language_generation()
+        if result != 0:
+            exit_code = result
+
+        print()
+        print(&#34;*&#34; * 70)
+        if exit_code == 0:
+            print(&#34;ALL INTEGRATION TESTS PASSED&#34;)
+        else:
+            print(&#34;SOME INTEGRATION TESTS FAILED&#34;)
+        print(&#34;*&#34; * 70)
+
+    except Exception as e:
+        print(f&#34;FATAL ERROR: {e}&#34;)
+        import traceback
+        traceback.print_exc()
+        exit_code = 1
+
+    return exit_code</code></pre>
+</details>
+<div class="desc"><p>Run all integration tests.</p></div>
+</dd>
+<dt id="atomik_sdk.tests.test_integration.test_cross_language_integration"><code class="name flex">
+<span>def <span class="ident">test_cross_language_integration</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_cross_language_integration():
+    &#34;&#34;&#34;Test that all languages generate consistent code from same schema.&#34;&#34;&#34;
+    print(&#34;=&#34; * 70)
+    print(&#34;ATOMiK SDK Integration Tests&#34;)
+    print(&#34;=&#34; * 70)
+    print()
+
+    project_root = Path(__file__).parent.parent.parent.parent
+    examples_dir = project_root / &#34;sdk&#34; / &#34;schemas&#34; / &#34;examples&#34;
+
+    if not examples_dir.exists():
+        print(f&#34;[WARN] Examples directory not found: {examples_dir}&#34;)
+        return 1
+
+    # Test each example schema
+    examples = list(examples_dir.glob(&#34;*.json&#34;))
+    if not examples:
+        print(&#34;[WARN] No example schemas found&#34;)
+        return 1
+
+    all_passed = True
+
+    for example_path in examples:
+        print(f&#34;Testing {example_path.name}...&#34;)
+        print(&#34;-&#34; * 70)
+
+        # Load schema once
+        with open(example_path) as f:
+            schema = json.load(f)
+
+        catalogue = schema.get(&#39;catalogue&#39;, {})
+        vertical = catalogue.get(&#39;vertical&#39;, &#39;Unknown&#39;)
+        field = catalogue.get(&#39;field&#39;, &#39;Unknown&#39;)
+        obj = catalogue.get(&#39;object&#39;, &#39;Unknown&#39;)
+
+        print(f&#34;  Schema: {vertical}/{field}/{obj}&#34;)
+        print(f&#34;  Version: {catalogue.get(&#39;version&#39;, &#39;N/A&#39;)}&#34;)
+
+        # Create temporary output directory
+        with tempfile.TemporaryDirectory() as temp_dir:
+            output_dir = Path(temp_dir)
+
+            # Create engine with all generators
+            engine = GeneratorEngine(GeneratorConfig(
+                output_dir=output_dir,
+                validate_schemas=True,
+                verbose=False
+            ))
+
+            # Register all generators
+            engine.register_generator(&#39;python&#39;, PythonGenerator())
+            engine.register_generator(&#39;rust&#39;, RustGenerator())
+            engine.register_generator(&#39;c&#39;, CGenerator())
+            engine.register_generator(&#39;verilog&#39;, VerilogGenerator())
+            engine.register_generator(&#39;javascript&#39;, JavaScriptGenerator())
+
+            # Load schema
+            try:
+                validation = engine.load_schema(example_path)
+                if not validation.valid:
+                    print(&#34;  [FAIL] Schema validation failed:&#34;)
+                    for error in validation.errors:
+                        print(f&#34;    - {error}&#34;)
+                    all_passed = False
+                    continue
+
+                print(&#34;  [PASS] Schema validated&#34;)
+
+                # Generate all languages
+                results = engine.generate(target_languages=[
+                    &#39;python&#39;, &#39;rust&#39;, &#39;c&#39;, &#39;verilog&#39;, &#39;javascript&#39;
+                ])
+
+                # Check all languages generated successfully
+                expected_languages = [&#39;python&#39;, &#39;rust&#39;, &#39;c&#39;, &#39;verilog&#39;, &#39;javascript&#39;]
+                for lang in expected_languages:
+                    if lang not in results:
+                        print(f&#34;  [FAIL] {lang} generation missing&#34;)
+                        all_passed = False
+                        continue
+
+                    result = results[lang]
+                    if not result.success:
+                        print(f&#34;  [FAIL] {lang} generation errors:&#34;)
+                        for error in result.errors:
+                            print(f&#34;    - {error}&#34;)
+                        all_passed = False
+                        continue
+
+                    print(f&#34;  [PASS] {lang}: {len(result.files)} files&#34;)
+
+                # Write all files
+                files = engine.write_output(results)
+                print(f&#34;  [PASS] Total files written: {len(files)}&#34;)
+
+                # Verify namespace consistency
+                namespace = engine.extract_metadata()
+                if namespace:
+                    print(f&#34;  [INFO] Python: {namespace.python_import_statement}&#34;)
+                    print(f&#34;  [INFO] Rust: {namespace.rust_use_statement}&#34;)
+                    print(f&#34;  [INFO] C: {namespace.c_include_statement}&#34;)
+                    print(f&#34;  [INFO] JavaScript: {namespace.javascript_require_statement}&#34;)
+                    print(f&#34;  [INFO] Verilog: module {namespace.verilog_module_name}&#34;)
+                    print(&#34;  [PASS] Namespace mapping consistent&#34;)
+
+                # Check that all languages have consistent file counts
+                file_counts = {lang: len(results[lang].files) for lang in expected_languages}
+                print(f&#34;  [INFO] File counts: {file_counts}&#34;)
+
+                # Verify key operations are present in generated files
+                operations_present = test_operations_present(output_dir, results)
+                if operations_present:
+                    print(&#34;  [PASS] All operations present in generated code&#34;)
+                else:
+                    print(&#34;  [WARN] Some operations may be missing&#34;)
+
+                print(&#34;  [PASS] Integration test successful&#34;)
+
+            except Exception as e:
+                print(f&#34;  [FAIL] Exception: {e}&#34;)
+                import traceback
+                traceback.print_exc()
+                all_passed = False
+                continue
+
+        print()
+
+    print(&#34;=&#34; * 70)
+    if all_passed:
+        print(&#34;All integration tests PASSED&#34;)
+    else:
+        print(&#34;Some integration tests FAILED&#34;)
+    print(&#34;=&#34; * 70)
+
+    return 0 if all_passed else 1</code></pre>
+</details>
+<div class="desc"><p>Test that all languages generate consistent code from same schema.</p></div>
+</dd>
+<dt id="atomik_sdk.tests.test_integration.test_multi_language_generation"><code class="name flex">
+<span>def <span class="ident">test_multi_language_generation</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_multi_language_generation():
+    &#34;&#34;&#34;Test generating multiple languages simultaneously.&#34;&#34;&#34;
+    print(&#34;=&#34; * 70)
+    print(&#34;Testing Multi-Language Generation&#34;)
+    print(&#34;=&#34; * 70)
+    print()
+
+    project_root = Path(__file__).parent.parent.parent.parent
+    schema_path = project_root / &#34;sdk&#34; / &#34;schemas&#34; / &#34;examples&#34; / &#34;terminal-io.json&#34;
+
+    if not schema_path.exists():
+        print(&#34;[WARN] terminal-io.json not found&#34;)
+        return 1
+
+    with tempfile.TemporaryDirectory() as temp_dir:
+        output_dir = Path(temp_dir)
+
+        engine = GeneratorEngine(GeneratorConfig(
+            output_dir=output_dir,
+            validate_schemas=True,
+            verbose=False
+        ))
+
+        # Register all generators
+        engine.register_generator(&#39;python&#39;, PythonGenerator())
+        engine.register_generator(&#39;rust&#39;, RustGenerator())
+        engine.register_generator(&#39;c&#39;, CGenerator())
+        engine.register_generator(&#39;verilog&#39;, VerilogGenerator())
+        engine.register_generator(&#39;javascript&#39;, JavaScriptGenerator())
+
+        # Generate all languages at once
+        results, files = engine.generate_and_write(
+            schema_path,
+            target_languages=[&#39;python&#39;, &#39;rust&#39;, &#39;c&#39;, &#39;verilog&#39;, &#39;javascript&#39;]
+        )
+
+        print(f&#34;Generated {len(files)} total files across 5 languages&#34;)
+
+        # Count files by language
+        file_extensions = {}
+        for file_path in files:
+            ext = Path(file_path).suffix
+            file_extensions[ext] = file_extensions.get(ext, 0) + 1
+
+        print(&#34;File breakdown:&#34;)
+        for ext, count in sorted(file_extensions.items()):
+            print(f&#34;  {ext or &#39;no extension&#39;}: {count} files&#34;)
+
+        print(&#34;[PASS] Multi-language generation successful&#34;)
+
+    print()
+    print(&#34;=&#34; * 70)
+    print(&#34;Multi-language generation tests complete&#34;)
+    print(&#34;=&#34; * 70)
+    return 0</code></pre>
+</details>
+<div class="desc"><p>Test generating multiple languages simultaneously.</p></div>
+</dd>
+<dt id="atomik_sdk.tests.test_integration.test_operations_present"><code class="name flex">
+<span>def <span class="ident">test_operations_present</span></span>(<span>output_dir: pathlib.Path, results: dict) ‑> bool</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_operations_present(output_dir: Path, results: dict) -&gt; bool:
+    &#34;&#34;&#34;Verify that key operations are present in generated code.&#34;&#34;&#34;
+    operations_to_check = [&#39;load&#39;, &#39;accumulate&#39;, &#39;reconstruct&#39;]
+    all_present = True
+
+    # Check Python files
+    python_files = list(output_dir.glob(&#34;atomik/**/*.py&#34;))
+    if python_files:
+        for pyfile in python_files:
+            if pyfile.name == &#39;__init__.py&#39;:
+                continue
+            with open(pyfile) as f:
+                content = f.read().lower()
+                for op in operations_to_check:
+                    if op not in content:
+                        all_present = False
+
+    # Check Rust files
+    rust_files = list(output_dir.glob(&#34;src/**/*.rs&#34;))
+    if rust_files:
+        for rsfile in rust_files:
+            if rsfile.name == &#39;lib.rs&#39; or rsfile.name == &#39;mod.rs&#39;:
+                continue
+            with open(rsfile) as f:
+                content = f.read().lower()
+                for op in operations_to_check:
+                    if op not in content:
+                        all_present = False
+
+    # Check C files
+    c_files = list(output_dir.glob(&#34;atomik/**/*.c&#34;))
+    if c_files:
+        for cfile in c_files:
+            with open(cfile) as f:
+                content = f.read().lower()
+                for op in operations_to_check:
+                    if op not in content:
+                        all_present = False
+
+    # Check Verilog files
+    verilog_files = list(output_dir.glob(&#34;rtl/**/*.v&#34;))
+    if verilog_files:
+        for vfile in verilog_files:
+            if vfile.name.startswith(&#39;tb_&#39;):
+                continue
+            with open(vfile) as f:
+                content = f.read().lower()
+                # Verilog uses different names
+                verilog_ops = [&#39;load&#39;, &#39;accumulate&#39;, &#39;read&#39;]
+                for op in verilog_ops:
+                    if op not in content:
+                        all_present = False
+
+    # Check JavaScript files
+    js_files = list(output_dir.glob(&#34;src/**/*.js&#34;))
+    if js_files:
+        for jsfile in js_files:
+            with open(jsfile) as f:
+                content = f.read().lower()
+                for op in operations_to_check:
+                    if op not in content:
+                        all_present = False
+
+    return all_present</code></pre>
+</details>
+<div class="desc"><p>Verify that key operations are present in generated code.</p></div>
+</dd>
+<dt id="atomik_sdk.tests.test_integration.test_schema_summary"><code class="name flex">
+<span>def <span class="ident">test_schema_summary</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_schema_summary():
+    &#34;&#34;&#34;Test schema summary generation.&#34;&#34;&#34;
+    print(&#34;=&#34; * 70)
+    print(&#34;Testing Schema Summary Generation&#34;)
+    print(&#34;=&#34; * 70)
+    print()
+
+    project_root = Path(__file__).parent.parent.parent.parent
+    examples_dir = project_root / &#34;sdk&#34; / &#34;schemas&#34; / &#34;examples&#34;
+
+    if not examples_dir.exists():
+        print(&#34;[WARN] Examples directory not found&#34;)
+        return 1
+
+    examples = list(examples_dir.glob(&#34;*.json&#34;))
+    if not examples:
+        print(&#34;[WARN] No example schemas found&#34;)
+        return 1
+
+    for example_path in examples:
+        print(f&#34;Schema: {example_path.name}&#34;)
+        print(&#34;-&#34; * 70)
+
+        engine = GeneratorEngine(GeneratorConfig(verbose=False))
+        engine.load_schema(example_path)
+
+        summary = engine.get_schema_summary()
+
+        print(&#34;  Catalogue:&#34;)
+        print(f&#34;    Vertical: {summary[&#39;catalogue&#39;][&#39;vertical&#39;]}&#34;)
+        print(f&#34;    Field: {summary[&#39;catalogue&#39;][&#39;field&#39;]}&#34;)
+        print(f&#34;    Object: {summary[&#39;catalogue&#39;][&#39;object&#39;]}&#34;)
+        print(f&#34;    Version: {summary[&#39;catalogue&#39;][&#39;version&#39;]}&#34;)
+
+        print(f&#34;  Delta Fields: {len(summary[&#39;delta_fields&#39;])}&#34;)
+        for field_name, field_spec in summary[&#39;delta_fields&#39;].items():
+            print(f&#34;    - {field_name}: {field_spec.get(&#39;type&#39;)} ({field_spec.get(&#39;width&#39;)} bits)&#34;)
+
+        print(f&#34;  Operations: {&#39;, &#39;.join(summary[&#39;operations&#39;])}&#34;)
+
+        if summary.get(&#39;has_hardware&#39;):
+            print(&#34;  Hardware: Yes&#34;)
+
+        print()
+
+    print(&#34;=&#34; * 70)
+    print(&#34;Schema summary tests complete&#34;)
+    print(&#34;=&#34; * 70)
+    return 0</code></pre>
+</details>
+<div class="desc"><p>Test schema summary generation.</p></div>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="atomik_sdk.tests" href="index.html">atomik_sdk.tests</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="atomik_sdk.tests.test_integration.main" href="#atomik_sdk.tests.test_integration.main">main</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_integration.test_cross_language_integration" href="#atomik_sdk.tests.test_integration.test_cross_language_integration">test_cross_language_integration</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_integration.test_multi_language_generation" href="#atomik_sdk.tests.test_integration.test_multi_language_generation">test_multi_language_generation</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_integration.test_operations_present" href="#atomik_sdk.tests.test_integration.test_operations_present">test_operations_present</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_integration.test_schema_summary" href="#atomik_sdk.tests.test_integration.test_schema_summary">test_schema_summary</a></code></li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+</body>
+</html>

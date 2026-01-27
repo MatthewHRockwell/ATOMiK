@@ -1,0 +1,642 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
+<title>atomik_sdk.generator.c_generator API documentation</title>
+<meta name="description" content="ATOMiK C SDK Generator …">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>atomik_sdk.generator.c_generator</code></h1>
+</header>
+<section id="section-intro">
+<p>ATOMiK C SDK Generator</p>
+<p>Generates C header and implementation files from ATOMiK schemas.</p>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="atomik_sdk.generator.c_generator.CGenerator"><code class="flex name class">
+<span>class <span class="ident">CGenerator</span></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class CGenerator(CodeEmitter):
+    &#34;&#34;&#34;
+    Generates C SDK code from ATOMiK schemas.
+
+    Generates:
+    - atomik/{vertical}/{field}/{object}.h - Header file
+    - atomik/{vertical}/{field}/{object}.c - Implementation file
+    - tests/test_{object}.c - Test program
+    - Makefile - Build configuration
+    &#34;&#34;&#34;
+
+    def __init__(self):
+        &#34;&#34;&#34;Initialize C code generator.&#34;&#34;&#34;
+        super().__init__(&#39;c&#39;)
+
+    def generate(self, schema: dict[str, Any], namespace: NamespaceMapping) -&gt; GenerationResult:
+        &#34;&#34;&#34;Generate C SDK code from schema.&#34;&#34;&#34;
+        try:
+            files = []
+            errors = []
+            warnings = []
+
+            # Extract schema components
+            schema.get(&#39;catalogue&#39;, {})
+            schema_def = schema.get(&#39;schema&#39;, {})
+            delta_fields = schema_def.get(&#39;delta_fields&#39;, {})
+            operations = schema_def.get(&#39;operations&#39;, {})
+            hardware = schema.get(&#39;hardware&#39;, {})
+
+            # Generate header file
+            header_file = self._generate_header(namespace, delta_fields, operations)
+            files.append(header_file)
+
+            # Generate implementation file
+            impl_file = self._generate_implementation(
+                namespace, delta_fields, operations, hardware
+            )
+            files.append(impl_file)
+
+            # Generate test file
+            test_file = self._generate_test(namespace, delta_fields, operations)
+            files.append(test_file)
+
+            # Generate Makefile
+            makefile = self._generate_makefile(namespace)
+            files.append(makefile)
+
+            return GenerationResult(
+                success=True,
+                files=files,
+                errors=errors,
+                warnings=warnings
+            )
+
+        except Exception as e:
+            return GenerationResult(
+                success=False,
+                files=[],
+                errors=[f&#34;C generation failed: {str(e)}&#34;],
+                warnings=[]
+            )
+
+    def _generate_header(
+        self,
+        namespace: NamespaceMapping,
+        delta_fields: dict[str, Any],
+        operations: dict[str, Any]
+    ) -&gt; GeneratedFile:
+        &#34;&#34;&#34;Generate C header file.&#34;&#34;&#34;
+
+        obj_snake = self._to_snake_case(namespace.object)
+        vertical_lower = namespace.vertical.lower()
+        field_lower = namespace.field.lower()
+
+        # Header guard
+        guard = f&#34;ATOMIK_{vertical_lower.upper()}_{field_lower.upper()}_{obj_snake.upper()}_H&#34;
+
+        # Determine delta type
+        delta_type = self._get_c_type(delta_fields)
+
+        lines = []
+
+        # Header guard start
+        lines.append(f&#34;#ifndef {guard}&#34;)
+        lines.append(f&#34;#define {guard}&#34;)
+        lines.append(&#34;&#34;)
+
+        # Includes
+        lines.append(&#34;#include &lt;stdint.h&gt;&#34;)
+        lines.append(&#34;#include &lt;stdbool.h&gt;&#34;)
+        lines.append(&#34;&#34;)
+
+        # Rollback support requires additional includes
+        if operations.get(&#39;rollback&#39;, {}).get(&#39;enabled&#39;, False):
+            lines.append(&#34;/* History buffer for rollback */&#34;)
+            history_depth = operations[&#39;rollback&#39;].get(&#39;history_depth&#39;, 10)
+            lines.append(f&#34;#define ATOMIK_HISTORY_DEPTH {history_depth}&#34;)
+            lines.append(&#34;&#34;)
+
+        # Struct definition
+        lines.append(&#34;/**&#34;)
+        lines.append(f&#34; * {namespace.object} - Delta-state manager&#34;)
+        lines.append(&#34; *&#34;)
+        lines.append(&#34; * Manages delta-state operations using XOR algebra.&#34;)
+        lines.append(&#34; */&#34;)
+        lines.append(&#34;typedef struct {&#34;)
+        lines.append(f&#34;    {delta_type} initial_state;  /**&lt; Initial state */&#34;)
+        lines.append(f&#34;    {delta_type} accumulator;    /**&lt; Delta accumulator (XOR of all deltas) */&#34;)
+
+        if operations.get(&#39;rollback&#39;, {}).get(&#39;enabled&#39;, False):
+            lines.append(f&#34;    {delta_type} history[ATOMIK_HISTORY_DEPTH];  /**&lt; Delta history */&#34;)
+            lines.append(&#34;    size_t history_count;      /**&lt; Number of deltas in history */&#34;)
+            lines.append(&#34;    size_t history_head;       /**&lt; History buffer head index */&#34;)
+
+        lines.append(f&#34;}} atomik_{obj_snake}_t;&#34;)
+        lines.append(&#34;&#34;)
+
+        # Function prototypes
+        lines.append(&#34;/**&#34;)
+        lines.append(f&#34; * Initialize a new {namespace.object} instance&#34;)
+        lines.append(&#34; */&#34;)
+        lines.append(f&#34;void atomik_{obj_snake}_init(atomik_{obj_snake}_t *manager);&#34;)
+        lines.append(&#34;&#34;)
+
+        lines.append(&#34;/**&#34;)
+        lines.append(&#34; * Load initial state (LOAD operation)&#34;)
+        lines.append(&#34; */&#34;)
+        lines.append(f&#34;void atomik_{obj_snake}_load(atomik_{obj_snake}_t *manager, {delta_type} initial_state);&#34;)
+        lines.append(&#34;&#34;)
+
+        lines.append(&#34;/**&#34;)
+        lines.append(&#34; * Accumulate delta (ACCUMULATE operation)&#34;)
+        lines.append(&#34; *&#34;)
+        lines.append(&#34; * XORs the delta into the accumulator.&#34;)
+        lines.append(&#34; */&#34;)
+        lines.append(f&#34;void atomik_{obj_snake}_accumulate(atomik_{obj_snake}_t *manager, {delta_type} delta);&#34;)
+        lines.append(&#34;&#34;)
+
+        lines.append(&#34;/**&#34;)
+        lines.append(&#34; * Reconstruct current state (READ operation)&#34;)
+        lines.append(&#34; *&#34;)
+        lines.append(&#34; * Returns current_state = initial_state XOR accumulator&#34;)
+        lines.append(&#34; */&#34;)
+        lines.append(f&#34;{delta_type} atomik_{obj_snake}_reconstruct(const atomik_{obj_snake}_t *manager);&#34;)
+        lines.append(&#34;&#34;)
+
+        lines.append(&#34;/**&#34;)
+        lines.append(&#34; * Check if accumulator is zero (STATUS operation)&#34;)
+        lines.append(&#34; */&#34;)
+        lines.append(f&#34;bool atomik_{obj_snake}_is_accumulator_zero(const atomik_{obj_snake}_t *manager);&#34;)
+        lines.append(&#34;&#34;)
+
+        if operations.get(&#39;rollback&#39;, {}).get(&#39;enabled&#39;, False):
+            lines.append(&#34;/**&#34;)
+            lines.append(&#34; * Rollback the last N delta operations&#34;)
+            lines.append(&#34; *&#34;)
+            lines.append(&#34; * Returns the number of deltas actually rolled back.&#34;)
+            lines.append(&#34; */&#34;)
+            lines.append(f&#34;size_t atomik_{obj_snake}_rollback(atomik_{obj_snake}_t *manager, size_t count);&#34;)
+            lines.append(&#34;&#34;)
+
+        # Getter functions
+        lines.append(&#34;/**&#34;)
+        lines.append(&#34; * Get the current accumulator value&#34;)
+        lines.append(&#34; */&#34;)
+        lines.append(f&#34;{delta_type} atomik_{obj_snake}_get_accumulator(const atomik_{obj_snake}_t *manager);&#34;)
+        lines.append(&#34;&#34;)
+
+        lines.append(&#34;/**&#34;)
+        lines.append(&#34; * Get the initial state&#34;)
+        lines.append(&#34; */&#34;)
+        lines.append(f&#34;{delta_type} atomik_{obj_snake}_get_initial_state(const atomik_{obj_snake}_t *manager);&#34;)
+        lines.append(&#34;&#34;)
+
+        # Header guard end
+        lines.append(f&#34;#endif /* {guard} */&#34;)
+        lines.append(&#34;&#34;)
+
+        content = &#34;\n&#34;.join(lines)
+
+        return GeneratedFile(
+            relative_path=f&#34;atomik/{vertical_lower}/{field_lower}/{obj_snake}.h&#34;,
+            content=content,
+            language=&#39;c&#39;,
+            description=f&#34;C header file for {namespace.object}&#34;
+        )
+
+    def _generate_implementation(
+        self,
+        namespace: NamespaceMapping,
+        delta_fields: dict[str, Any],
+        operations: dict[str, Any],
+        hardware: dict[str, Any]
+    ) -&gt; GeneratedFile:
+        &#34;&#34;&#34;Generate C implementation file.&#34;&#34;&#34;
+
+        obj_snake = self._to_snake_case(namespace.object)
+        vertical_lower = namespace.vertical.lower()
+        field_lower = namespace.field.lower()
+
+        delta_type = self._get_c_type(delta_fields)
+
+        lines = []
+
+        # Includes
+        lines.append(f&#34;#include \&#34;{obj_snake}.h\&#34;&#34;)
+        lines.append(&#34;#include &lt;string.h&gt;&#34;)
+        lines.append(&#34;&#34;)
+
+        # Init function
+        lines.append(f&#34;void atomik_{obj_snake}_init(atomik_{obj_snake}_t *manager) {{&#34;)
+        lines.append(&#34;    memset(manager, 0, sizeof(atomik_{obj_snake}_t));&#34;)
+        lines.append(&#34;}&#34;)
+        lines.append(&#34;&#34;)
+
+        # Load function
+        lines.append(f&#34;void atomik_{obj_snake}_load(atomik_{obj_snake}_t *manager, {delta_type} initial_state) {{&#34;)
+        lines.append(&#34;    manager-&gt;initial_state = initial_state;&#34;)
+        lines.append(&#34;    manager-&gt;accumulator = 0;&#34;)
+        if operations.get(&#39;rollback&#39;, {}).get(&#39;enabled&#39;, False):
+            lines.append(&#34;    manager-&gt;history_count = 0;&#34;)
+            lines.append(&#34;    manager-&gt;history_head = 0;&#34;)
+        lines.append(&#34;}&#34;)
+        lines.append(&#34;&#34;)
+
+        # Accumulate function
+        lines.append(f&#34;void atomik_{obj_snake}_accumulate(atomik_{obj_snake}_t *manager, {delta_type} delta) {{&#34;)
+        if operations.get(&#39;rollback&#39;, {}).get(&#39;enabled&#39;, False):
+            lines.append(&#34;    /* Save to history */&#34;)
+            lines.append(&#34;    manager-&gt;history[manager-&gt;history_head] = delta;&#34;)
+            lines.append(&#34;    manager-&gt;history_head = (manager-&gt;history_head + 1) % ATOMIK_HISTORY_DEPTH;&#34;)
+            lines.append(&#34;    if (manager-&gt;history_count &lt; ATOMIK_HISTORY_DEPTH) {&#34;)
+            lines.append(&#34;        manager-&gt;history_count++;&#34;)
+            lines.append(&#34;    }&#34;)
+            lines.append(&#34;&#34;)
+        lines.append(&#34;    /* XOR delta into accumulator */&#34;)
+        lines.append(&#34;    manager-&gt;accumulator ^= delta;&#34;)
+        lines.append(&#34;}&#34;)
+        lines.append(&#34;&#34;)
+
+        # Reconstruct function
+        lines.append(f&#34;{delta_type} atomik_{obj_snake}_reconstruct(const atomik_{obj_snake}_t *manager) {{&#34;)
+        lines.append(&#34;    return manager-&gt;initial_state ^ manager-&gt;accumulator;&#34;)
+        lines.append(&#34;}&#34;)
+        lines.append(&#34;&#34;)
+
+        # Status function
+        lines.append(f&#34;bool atomik_{obj_snake}_is_accumulator_zero(const atomik_{obj_snake}_t *manager) {{&#34;)
+        lines.append(&#34;    return manager-&gt;accumulator == 0;&#34;)
+        lines.append(&#34;}&#34;)
+        lines.append(&#34;&#34;)
+
+        # Rollback function
+        if operations.get(&#39;rollback&#39;, {}).get(&#39;enabled&#39;, False):
+            lines.append(f&#34;size_t atomik_{obj_snake}_rollback(atomik_{obj_snake}_t *manager, size_t count) {{&#34;)
+            lines.append(&#34;    size_t actual_count = (count &lt; manager-&gt;history_count) ? count : manager-&gt;history_count;&#34;)
+            lines.append(&#34;    &#34;)
+            lines.append(&#34;    for (size_t i = 0; i &lt; actual_count; i++) {&#34;)
+            lines.append(&#34;        /* Calculate index (going backwards from head) */&#34;)
+            lines.append(&#34;        size_t index = (manager-&gt;history_head + ATOMIK_HISTORY_DEPTH - 1 - i) % ATOMIK_HISTORY_DEPTH;&#34;)
+            lines.append(&#34;        &#34;)
+            lines.append(&#34;        /* XOR removes the delta (self-inverse property) */&#34;)
+            lines.append(&#34;        manager-&gt;accumulator ^= manager-&gt;history[index];&#34;)
+            lines.append(&#34;    }&#34;)
+            lines.append(&#34;    &#34;)
+            lines.append(&#34;    /* Update history tracking */&#34;)
+            lines.append(&#34;    manager-&gt;history_count -= actual_count;&#34;)
+            lines.append(&#34;    manager-&gt;history_head = (manager-&gt;history_head + ATOMIK_HISTORY_DEPTH - actual_count) % ATOMIK_HISTORY_DEPTH;&#34;)
+            lines.append(&#34;    &#34;)
+            lines.append(&#34;    return actual_count;&#34;)
+            lines.append(&#34;}&#34;)
+            lines.append(&#34;&#34;)
+
+        # Getter functions
+        lines.append(f&#34;{delta_type} atomik_{obj_snake}_get_accumulator(const atomik_{obj_snake}_t *manager) {{&#34;)
+        lines.append(&#34;    return manager-&gt;accumulator;&#34;)
+        lines.append(&#34;}&#34;)
+        lines.append(&#34;&#34;)
+
+        lines.append(f&#34;{delta_type} atomik_{obj_snake}_get_initial_state(const atomik_{obj_snake}_t *manager) {{&#34;)
+        lines.append(&#34;    return manager-&gt;initial_state;&#34;)
+        lines.append(&#34;}&#34;)
+        lines.append(&#34;&#34;)
+
+        content = &#34;\n&#34;.join(lines)
+
+        return GeneratedFile(
+            relative_path=f&#34;atomik/{vertical_lower}/{field_lower}/{obj_snake}.c&#34;,
+            content=content,
+            language=&#39;c&#39;,
+            description=f&#34;C implementation for {namespace.object}&#34;
+        )
+
+    def _generate_test(
+        self,
+        namespace: NamespaceMapping,
+        delta_fields: dict[str, Any],
+        operations: dict[str, Any]
+    ) -&gt; GeneratedFile:
+        &#34;&#34;&#34;Generate C test file.&#34;&#34;&#34;
+
+        obj_snake = self._to_snake_case(namespace.object)
+        vertical_lower = namespace.vertical.lower()
+        field_lower = namespace.field.lower()
+
+        delta_type = self._get_c_type(delta_fields)
+
+        lines = []
+
+        # Includes
+        lines.append(&#34;#include &lt;stdio.h&gt;&#34;)
+        lines.append(&#34;#include &lt;assert.h&gt;&#34;)
+        lines.append(f&#34;#include \&#34;../atomik/{vertical_lower}/{field_lower}/{obj_snake}.h\&#34;&#34;)
+        lines.append(&#34;&#34;)
+
+        # Test functions
+        lines.append(&#34;void test_load() {&#34;)
+        lines.append(f&#34;    atomik_{obj_snake}_t manager;&#34;)
+        lines.append(f&#34;    atomik_{obj_snake}_init(&amp;manager);&#34;)
+        lines.append(f&#34;    atomik_{obj_snake}_load(&amp;manager, 0x1234567890ABCDEFULL);&#34;)
+        lines.append(&#34;    &#34;)
+        lines.append(f&#34;    assert(atomik_{obj_snake}_get_initial_state(&amp;manager) == 0x1234567890ABCDEFULL);&#34;)
+        lines.append(f&#34;    assert(atomik_{obj_snake}_get_accumulator(&amp;manager) == 0);&#34;)
+        lines.append(&#39;    printf(&#34;[PASS] test_load\\n&#34;);&#39;)
+        lines.append(&#34;}&#34;)
+        lines.append(&#34;&#34;)
+
+        lines.append(&#34;void test_accumulate() {&#34;)
+        lines.append(f&#34;    atomik_{obj_snake}_t manager;&#34;)
+        lines.append(f&#34;    atomik_{obj_snake}_init(&amp;manager);&#34;)
+        lines.append(f&#34;    atomik_{obj_snake}_load(&amp;manager, 0);&#34;)
+        lines.append(&#34;    &#34;)
+        lines.append(f&#34;    atomik_{obj_snake}_accumulate(&amp;manager, 0x1111111111111111ULL);&#34;)
+        lines.append(f&#34;    assert(atomik_{obj_snake}_get_accumulator(&amp;manager) == 0x1111111111111111ULL);&#34;)
+        lines.append(&#34;    &#34;)
+        lines.append(f&#34;    atomik_{obj_snake}_accumulate(&amp;manager, 0x2222222222222222ULL);&#34;)
+        lines.append(f&#34;    assert(atomik_{obj_snake}_get_accumulator(&amp;manager) == 0x3333333333333333ULL);&#34;)
+        lines.append(&#39;    printf(&#34;[PASS] test_accumulate\\n&#34;);&#39;)
+        lines.append(&#34;}&#34;)
+        lines.append(&#34;&#34;)
+
+        lines.append(&#34;void test_reconstruct() {&#34;)
+        lines.append(f&#34;    atomik_{obj_snake}_t manager;&#34;)
+        lines.append(f&#34;    atomik_{obj_snake}_init(&amp;manager);&#34;)
+        lines.append(f&#34;    atomik_{obj_snake}_load(&amp;manager, 0xAAAAAAAAAAAAAAAAULL);&#34;)
+        lines.append(f&#34;    atomik_{obj_snake}_accumulate(&amp;manager, 0x5555555555555555ULL);&#34;)
+        lines.append(&#34;    &#34;)
+        lines.append(&#34;    /* 0xAAAA XOR 0x5555 = 0xFFFF */&#34;)
+        lines.append(f&#34;    assert(atomik_{obj_snake}_reconstruct(&amp;manager) == 0xFFFFFFFFFFFFFFFFULL);&#34;)
+        lines.append(&#39;    printf(&#34;[PASS] test_reconstruct\\n&#34;);&#39;)
+        lines.append(&#34;}&#34;)
+        lines.append(&#34;&#34;)
+
+        lines.append(&#34;void test_self_inverse() {&#34;)
+        lines.append(f&#34;    atomik_{obj_snake}_t manager;&#34;)
+        lines.append(f&#34;    atomik_{obj_snake}_init(&amp;manager);&#34;)
+        lines.append(f&#34;    atomik_{obj_snake}_load(&amp;manager, 0xAAAAAAAAAAAAAAAAULL);&#34;)
+        lines.append(&#34;    &#34;)
+        lines.append(f&#34;    {delta_type} delta = 0x1234567890ABCDEFULL;&#34;)
+        lines.append(f&#34;    atomik_{obj_snake}_accumulate(&amp;manager, delta);&#34;)
+        lines.append(f&#34;    atomik_{obj_snake}_accumulate(&amp;manager, delta);  /* Apply same delta twice */&#34;)
+        lines.append(&#34;    &#34;)
+        lines.append(&#34;    /* Self-inverse: delta XOR delta = 0 */&#34;)
+        lines.append(f&#34;    assert(atomik_{obj_snake}_is_accumulator_zero(&amp;manager));&#34;)
+        lines.append(f&#34;    assert(atomik_{obj_snake}_reconstruct(&amp;manager) == 0xAAAAAAAAAAAAAAAAULL);&#34;)
+        lines.append(&#39;    printf(&#34;[PASS] test_self_inverse\\n&#34;);&#39;)
+        lines.append(&#34;}&#34;)
+        lines.append(&#34;&#34;)
+
+        if operations.get(&#39;rollback&#39;, {}).get(&#39;enabled&#39;, False):
+            lines.append(&#34;void test_rollback() {&#34;)
+            lines.append(f&#34;    atomik_{obj_snake}_t manager;&#34;)
+            lines.append(f&#34;    atomik_{obj_snake}_init(&amp;manager);&#34;)
+            lines.append(f&#34;    atomik_{obj_snake}_load(&amp;manager, 0);&#34;)
+            lines.append(&#34;    &#34;)
+            lines.append(f&#34;    atomik_{obj_snake}_accumulate(&amp;manager, 0x1111111111111111ULL);&#34;)
+            lines.append(f&#34;    atomik_{obj_snake}_accumulate(&amp;manager, 0x2222222222222222ULL);&#34;)
+            lines.append(f&#34;    atomik_{obj_snake}_accumulate(&amp;manager, 0x4444444444444444ULL);&#34;)
+            lines.append(f&#34;    assert(atomik_{obj_snake}_get_accumulator(&amp;manager) == 0x7777777777777777ULL);&#34;)
+            lines.append(&#34;    &#34;)
+            lines.append(&#34;    /* Rollback last 2 operations */&#34;)
+            lines.append(f&#34;    size_t count = atomik_{obj_snake}_rollback(&amp;manager, 2);&#34;)
+            lines.append(&#34;    assert(count == 2);&#34;)
+            lines.append(f&#34;    assert(atomik_{obj_snake}_get_accumulator(&amp;manager) == 0x1111111111111111ULL);&#34;)
+            lines.append(&#39;    printf(&#34;[PASS] test_rollback\\n&#34;);&#39;)
+            lines.append(&#34;}&#34;)
+            lines.append(&#34;&#34;)
+
+        # Main function
+        lines.append(&#34;int main() {&#34;)
+        lines.append(f&#39;    printf(&#34;Testing {namespace.object}...\\n&#34;);&#39;)
+        lines.append(&#34;&#34;)
+        lines.append(&#34;    test_load();&#34;)
+        lines.append(&#34;    test_accumulate();&#34;)
+        lines.append(&#34;    test_reconstruct();&#34;)
+        lines.append(&#34;    test_self_inverse();&#34;)
+        if operations.get(&#39;rollback&#39;, {}).get(&#39;enabled&#39;, False):
+            lines.append(&#34;    test_rollback();&#34;)
+        lines.append(&#34;&#34;)
+        lines.append(&#39;    printf(&#34;\\nAll tests passed!\\n&#34;);&#39;)
+        lines.append(&#34;    return 0;&#34;)
+        lines.append(&#34;}&#34;)
+        lines.append(&#34;&#34;)
+
+        content = &#34;\n&#34;.join(lines)
+
+        return GeneratedFile(
+            relative_path=f&#34;tests/test_{obj_snake}.c&#34;,
+            content=content,
+            language=&#39;c&#39;,
+            description=f&#34;C tests for {namespace.object}&#34;
+        )
+
+    def _generate_makefile(self, namespace: NamespaceMapping) -&gt; GeneratedFile:
+        &#34;&#34;&#34;Generate Makefile for building.&#34;&#34;&#34;
+
+        obj_snake = self._to_snake_case(namespace.object)
+        vertical_lower = namespace.vertical.lower()
+        field_lower = namespace.field.lower()
+
+        lines = []
+        lines.append(&#34;# Makefile for ATOMiK C SDK&#34;)
+        lines.append(&#34;&#34;)
+        lines.append(&#34;CC = gcc&#34;)
+        lines.append(&#34;CFLAGS = -Wall -Wextra -std=c99 -I.&#34;)
+        lines.append(&#34;&#34;)
+        lines.append(f&#34;SRC = atomik/{vertical_lower}/{field_lower}/{obj_snake}.c&#34;)
+        lines.append(f&#34;TEST = tests/test_{obj_snake}.c&#34;)
+        lines.append(f&#34;TARGET = test_{obj_snake}&#34;)
+        lines.append(&#34;&#34;)
+        lines.append(&#34;all: $(TARGET)&#34;)
+        lines.append(&#34;&#34;)
+        lines.append(&#34;$(TARGET): $(SRC) $(TEST)&#34;)
+        lines.append(&#34;\t$(CC) $(CFLAGS) -o $(TARGET) $(SRC) $(TEST)&#34;)
+        lines.append(&#34;&#34;)
+        lines.append(&#34;clean:&#34;)
+        lines.append(&#34;\trm -f $(TARGET)&#34;)
+        lines.append(&#34;&#34;)
+        lines.append(&#34;.PHONY: all clean&#34;)
+        lines.append(&#34;&#34;)
+
+        content = &#34;\n&#34;.join(lines)
+
+        return GeneratedFile(
+            relative_path=&#34;Makefile&#34;,
+            content=content,
+            language=&#39;c&#39;,
+            description=&#34;Build configuration for C SDK&#34;
+        )
+
+    @staticmethod
+    def _get_c_type(delta_fields: dict[str, Any]) -&gt; str:
+        &#34;&#34;&#34;Determine C type based on delta field widths.&#34;&#34;&#34;
+        max_width = 64
+        for field_name, field_spec in delta_fields.items():
+            width = field_spec.get(&#39;width&#39;, 64)
+            max_width = max(max_width, width)
+
+        if max_width &lt;= 64:
+            return &#34;uint64_t&#34;
+        elif max_width &lt;= 128:
+            # Note: uint128_t is not standard C, would need __uint128_t (GCC) or custom implementation
+            return &#34;uint64_t&#34;  # Simplified for now
+        else:
+            return &#34;uint64_t&#34;  # Simplified for now
+
+    @staticmethod
+    def _to_snake_case(name: str) -&gt; str:
+        &#34;&#34;&#34;Convert PascalCase to snake_case.&#34;&#34;&#34;
+        result = []
+        for i, char in enumerate(name):
+            if char.isupper() and i &gt; 0:
+                prev_is_lower = name[i-1].islower()
+                next_is_lower = i + 1 &lt; len(name) and name[i+1].islower()
+                if prev_is_lower or next_is_lower:
+                    if result and result[-1] != &#39;_&#39;:
+                        result.append(&#39;_&#39;)
+            result.append(char.lower())
+        return &#39;&#39;.join(result)</code></pre>
+</details>
+<div class="desc"><p>Generates C SDK code from ATOMiK schemas.</p>
+<p>Generates:
+- atomik/{vertical}/{field}/{object}.h - Header file
+- atomik/{vertical}/{field}/{object}.c - Implementation file
+- tests/test_{object}.c - Test program
+- Makefile - Build configuration</p>
+<p>Initialize C code generator.</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="atomik_sdk.generator.code_emitter.CodeEmitter" href="code_emitter.html#atomik_sdk.generator.code_emitter.CodeEmitter">CodeEmitter</a></li>
+<li>abc.ABC</li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.generator.c_generator.CGenerator.generate"><code class="name flex">
+<span>def <span class="ident">generate</span></span>(<span>self, schema: dict[str, Any], namespace: NamespaceMapping) ‑> <a title="atomik_sdk.generator.code_emitter.GenerationResult" href="code_emitter.html#atomik_sdk.generator.code_emitter.GenerationResult">GenerationResult</a></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def generate(self, schema: dict[str, Any], namespace: NamespaceMapping) -&gt; GenerationResult:
+    &#34;&#34;&#34;Generate C SDK code from schema.&#34;&#34;&#34;
+    try:
+        files = []
+        errors = []
+        warnings = []
+
+        # Extract schema components
+        schema.get(&#39;catalogue&#39;, {})
+        schema_def = schema.get(&#39;schema&#39;, {})
+        delta_fields = schema_def.get(&#39;delta_fields&#39;, {})
+        operations = schema_def.get(&#39;operations&#39;, {})
+        hardware = schema.get(&#39;hardware&#39;, {})
+
+        # Generate header file
+        header_file = self._generate_header(namespace, delta_fields, operations)
+        files.append(header_file)
+
+        # Generate implementation file
+        impl_file = self._generate_implementation(
+            namespace, delta_fields, operations, hardware
+        )
+        files.append(impl_file)
+
+        # Generate test file
+        test_file = self._generate_test(namespace, delta_fields, operations)
+        files.append(test_file)
+
+        # Generate Makefile
+        makefile = self._generate_makefile(namespace)
+        files.append(makefile)
+
+        return GenerationResult(
+            success=True,
+            files=files,
+            errors=errors,
+            warnings=warnings
+        )
+
+    except Exception as e:
+        return GenerationResult(
+            success=False,
+            files=[],
+            errors=[f&#34;C generation failed: {str(e)}&#34;],
+            warnings=[]
+        )</code></pre>
+</details>
+<div class="desc"><p>Generate C SDK code from schema.</p></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="atomik_sdk.generator" href="index.html">atomik_sdk.generator</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="atomik_sdk.generator.c_generator.CGenerator" href="#atomik_sdk.generator.c_generator.CGenerator">CGenerator</a></code></h4>
+<ul class="">
+<li><code><a title="atomik_sdk.generator.c_generator.CGenerator.generate" href="#atomik_sdk.generator.c_generator.CGenerator.generate">generate</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+</body>
+</html>

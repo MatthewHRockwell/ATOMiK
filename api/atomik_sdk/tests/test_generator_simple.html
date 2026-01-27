@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
+<title>atomik_sdk.tests.test_generator_simple API documentation</title>
+<meta name="description" content="Simple tests for ATOMiK SDK Generator Framework (no pytest required)">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>atomik_sdk.tests.test_generator_simple</code></h1>
+</header>
+<section id="section-intro">
+<p>Simple tests for ATOMiK SDK Generator Framework (no pytest required)</p>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="atomik_sdk.tests.test_generator_simple.main"><code class="name flex">
+<span>def <span class="ident">main</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def main():
+    &#34;&#34;&#34;Run all tests.&#34;&#34;&#34;
+    print(&#34;=&#34; * 70)
+    print(&#34;ATOMiK SDK Generator Framework Tests&#34;)
+    print(&#34;=&#34; * 70)
+    print()
+
+    try:
+        test_schema_validator()
+        test_namespace_mapper()
+        test_generator_engine()
+        test_example_schemas()
+
+        print(&#34;=&#34; * 70)
+        print(&#34;ALL TESTS PASSED&#34;)
+        print(&#34;=&#34; * 70)
+        return 0
+
+    except AssertionError as e:
+        print()
+        print(&#34;=&#34; * 70)
+        print(f&#34;TEST FAILED: {e}&#34;)
+        print(&#34;=&#34; * 70)
+        return 1
+    except Exception as e:
+        print()
+        print(&#34;=&#34; * 70)
+        print(f&#34;ERROR: {e}&#34;)
+        import traceback
+        traceback.print_exc()
+        print(&#34;=&#34; * 70)
+        return 1</code></pre>
+</details>
+<div class="desc"><p>Run all tests.</p></div>
+</dd>
+<dt id="atomik_sdk.tests.test_generator_simple.test_example_schemas"><code class="name flex">
+<span>def <span class="ident">test_example_schemas</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_example_schemas():
+    &#34;&#34;&#34;Test all example schemas validate.&#34;&#34;&#34;
+    print(&#34;Testing example schemas...&#34;)
+
+    project_root = Path(__file__).parent.parent.parent.parent
+    examples_dir = project_root / &#34;sdk&#34; / &#34;schemas&#34; / &#34;examples&#34;
+
+    if not examples_dir.exists():
+        print(f&#34;  [WARN] Examples directory not found: {examples_dir}&#34;)
+        return
+
+    validator = SchemaValidator()
+
+    examples = list(examples_dir.glob(&#34;*.json&#34;))
+    if not examples:
+        print(f&#34;  [WARN] No example schemas found in {examples_dir}&#34;)
+        return
+
+    for example_path in examples:
+        result = validator.validate_file(example_path)
+        if result.valid:
+            print(f&#34;  [PASS] {example_path.name} validates&#34;)
+        else:
+            print(f&#34;  [FAIL] {example_path.name} FAILED:&#34;)
+            for error in result.errors:
+                print(f&#34;      {error}&#34;)
+            raise AssertionError(f&#34;{example_path.name} failed validation&#34;)
+
+    print(&#34;Example schemas: PASS\n&#34;)</code></pre>
+</details>
+<div class="desc"><p>Test all example schemas validate.</p></div>
+</dd>
+<dt id="atomik_sdk.tests.test_generator_simple.test_generator_engine"><code class="name flex">
+<span>def <span class="ident">test_generator_engine</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_generator_engine():
+    &#34;&#34;&#34;Test generator engine.&#34;&#34;&#34;
+    print(&#34;Testing GeneratorEngine...&#34;)
+
+    # Get project root and test schema path
+    project_root = Path(__file__).parent.parent.parent.parent
+    schema_path = project_root / &#34;sdk&#34; / &#34;schemas&#34; / &#34;examples&#34; / &#34;terminal-io.json&#34;
+
+    if not schema_path.exists():
+        print(f&#34;  [WARN] Schema file not found: {schema_path}&#34;)
+        print(&#34;  Skipping GeneratorEngine test&#34;)
+        return
+
+    engine = GeneratorEngine(GeneratorConfig(verbose=False))
+
+    # Test loading schema
+    result = engine.load_schema(schema_path)
+    assert result.valid, f&#34;Schema validation failed: {result.errors}&#34;
+    print(&#34;  [PASS] Schema loaded successfully&#34;)
+
+    # Test metadata extraction
+    namespace = engine.extract_metadata()
+    assert namespace is not None
+    assert namespace.vertical == &#34;System&#34;
+    assert namespace.field == &#34;Terminal&#34;
+    assert namespace.object == &#34;TerminalIO&#34;
+    print(&#34;  [PASS] Metadata extracted correctly&#34;)
+
+    # Test schema summary
+    summary = engine.get_schema_summary()
+    assert &#39;catalogue&#39; in summary
+    assert &#39;delta_fields&#39; in summary
+    assert summary[&#39;catalogue&#39;][&#39;vertical&#39;] == &#39;System&#39;
+    print(&#34;  [PASS] Schema summary generated&#34;)
+
+    print(&#34;GeneratorEngine: PASS\n&#34;)</code></pre>
+</details>
+<div class="desc"><p>Test generator engine.</p></div>
+</dd>
+<dt id="atomik_sdk.tests.test_generator_simple.test_namespace_mapper"><code class="name flex">
+<span>def <span class="ident">test_namespace_mapper</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_namespace_mapper():
+    &#34;&#34;&#34;Test namespace mapping.&#34;&#34;&#34;
+    print(&#34;Testing NamespaceMapper...&#34;)
+
+    mapper = NamespaceMapper()
+
+    catalogue = {
+        &#34;vertical&#34;: &#34;Video&#34;,
+        &#34;field&#34;: &#34;Stream&#34;,
+        &#34;object&#34;: &#34;H264Delta&#34;
+    }
+
+    mapping = mapper.map_catalogue(catalogue)
+
+    assert mapping.vertical == &#34;Video&#34;
+    assert mapping.python_import_statement == &#34;from atomik.Video.Stream import H264Delta&#34;
+    assert &#34;video::stream&#34; in mapping.rust_path.lower()
+    assert &#34;h264_delta.h&#34; in mapping.c_include_path
+    assert mapping.verilog_module_name == &#34;atomik_video_stream_h264_delta&#34;
+
+    print(&#34;  [PASS] Python namespace correct&#34;)
+    print(&#34;  [PASS] Rust namespace correct&#34;)
+    print(&#34;  [PASS] C namespace correct&#34;)
+    print(&#34;  [PASS] Verilog namespace correct&#34;)
+
+    # Test snake_case conversion
+    result1 = NamespaceMapper._to_snake_case(&#34;TerminalIO&#34;)
+    result2 = NamespaceMapper._to_snake_case(&#34;H264Delta&#34;)
+    assert result1 == &#34;terminal_io&#34;, f&#34;Expected &#39;terminal_io&#39;, got &#39;{result1}&#39;&#34;
+    assert result2 == &#34;h264_delta&#34;, f&#34;Expected &#39;h264_delta&#39;, got &#39;{result2}&#39;&#34;
+    print(&#34;  [PASS] Snake case conversion correct&#34;)
+
+    # Test identifier validation
+    valid, _ = NamespaceMapper.validate_identifier(&#34;TerminalIO&#34;)
+    assert valid, &#34;Valid identifier rejected&#34;
+    print(&#34;  [PASS] Identifier validation correct&#34;)
+
+    print(&#34;NamespaceMapper: PASS\n&#34;)</code></pre>
+</details>
+<div class="desc"><p>Test namespace mapping.</p></div>
+</dd>
+<dt id="atomik_sdk.tests.test_generator_simple.test_schema_validator"><code class="name flex">
+<span>def <span class="ident">test_schema_validator</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_schema_validator():
+    &#34;&#34;&#34;Test schema validation.&#34;&#34;&#34;
+    print(&#34;Testing SchemaValidator...&#34;)
+
+    validator = SchemaValidator()
+
+    # Test valid schema
+    valid_schema = {
+        &#34;catalogue&#34;: {
+            &#34;vertical&#34;: &#34;System&#34;,
+            &#34;field&#34;: &#34;Test&#34;,
+            &#34;object&#34;: &#34;TestModule&#34;,
+            &#34;version&#34;: &#34;1.0.0&#34;
+        },
+        &#34;schema&#34;: {
+            &#34;delta_fields&#34;: {
+                &#34;test_delta&#34;: {
+                    &#34;type&#34;: &#34;delta_stream&#34;,
+                    &#34;width&#34;: 64
+                }
+            },
+            &#34;operations&#34;: {
+                &#34;accumulate&#34;: {
+                    &#34;enabled&#34;: True
+                }
+            }
+        }
+    }
+
+    result = validator.validate(valid_schema)
+    assert result.valid, f&#34;Valid schema failed validation: {result.errors}&#34;
+    print(&#34;  [PASS] Valid schema passes&#34;)
+
+    # Test invalid schema (missing catalogue)
+    invalid_schema = {&#34;schema&#34;: {}}
+    result = validator.validate(invalid_schema)
+    assert not result.valid, &#34;Invalid schema passed validation&#34;
+    print(&#34;  [PASS] Invalid schema correctly rejected&#34;)
+
+    print(&#34;SchemaValidator: PASS\n&#34;)</code></pre>
+</details>
+<div class="desc"><p>Test schema validation.</p></div>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="atomik_sdk.tests" href="index.html">atomik_sdk.tests</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="atomik_sdk.tests.test_generator_simple.main" href="#atomik_sdk.tests.test_generator_simple.main">main</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_generator_simple.test_example_schemas" href="#atomik_sdk.tests.test_generator_simple.test_example_schemas">test_example_schemas</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_generator_simple.test_generator_engine" href="#atomik_sdk.tests.test_generator_simple.test_generator_engine">test_generator_engine</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_generator_simple.test_namespace_mapper" href="#atomik_sdk.tests.test_generator_simple.test_namespace_mapper">test_namespace_mapper</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_generator_simple.test_schema_validator" href="#atomik_sdk.tests.test_generator_simple.test_schema_validator">test_schema_validator</a></code></li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+</body>
+</html>

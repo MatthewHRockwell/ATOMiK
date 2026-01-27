@@ -1,0 +1,664 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
+<title>atomik_sdk.generator.code_emitter API documentation</title>
+<meta name="description" content="ATOMiK Code Emitter …">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>atomik_sdk.generator.code_emitter</code></h1>
+</header>
+<section id="section-intro">
+<p>ATOMiK Code Emitter</p>
+<p>Base class and utilities for language-specific code generation.</p>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="atomik_sdk.generator.code_emitter.CodeEmitter"><code class="flex name class">
+<span>class <span class="ident">CodeEmitter</span></span>
+<span>(</span><span>language: str)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class CodeEmitter(ABC):
+    &#34;&#34;&#34;
+    Abstract base class for language-specific code generation.
+
+    Subclasses implement generate() method to produce code for their
+    target language.
+
+    Example subclass:
+        class PythonGenerator(CodeEmitter):
+            def generate(self, schema, namespace):
+                # Generate Python code
+                return GenerationResult(...)
+    &#34;&#34;&#34;
+
+    def __init__(self, language: str):
+        &#34;&#34;&#34;
+        Initialize code emitter.
+
+        Args:
+            language: Target language name (python, rust, c, javascript, verilog)
+        &#34;&#34;&#34;
+        self.language = language
+
+    @abstractmethod
+    def generate(
+        self,
+        schema: dict[str, Any],
+        namespace: NamespaceMapping
+    ) -&gt; GenerationResult:
+        &#34;&#34;&#34;
+        Generate code from schema.
+
+        Args:
+            schema: Validated ATOMiK schema dictionary
+            namespace: Namespace mapping for the schema
+
+        Returns:
+            GenerationResult with generated files and status
+        &#34;&#34;&#34;
+        pass
+
+    def _extract_delta_fields(self, schema: dict[str, Any]) -&gt; dict[str, dict[str, Any]]:
+        &#34;&#34;&#34;
+        Extract delta fields from schema.
+
+        Args:
+            schema: Schema dictionary
+
+        Returns:
+            Dictionary of field_name -&gt; field_spec
+        &#34;&#34;&#34;
+        return schema.get(&#39;schema&#39;, {}).get(&#39;delta_fields&#39;, {})
+
+    def _extract_operations(self, schema: dict[str, Any]) -&gt; dict[str, dict[str, Any]]:
+        &#34;&#34;&#34;
+        Extract operations from schema.
+
+        Args:
+            schema: Schema dictionary
+
+        Returns:
+            Dictionary of operation_name -&gt; operation_spec
+        &#34;&#34;&#34;
+        return schema.get(&#39;schema&#39;, {}).get(&#39;operations&#39;, {})
+
+    def _extract_constraints(self, schema: dict[str, Any]) -&gt; dict[str, Any]:
+        &#34;&#34;&#34;
+        Extract constraints from schema.
+
+        Args:
+            schema: Schema dictionary
+
+        Returns:
+            Dictionary of constraint specifications
+        &#34;&#34;&#34;
+        return schema.get(&#39;schema&#39;, {}).get(&#39;constraints&#39;, {})
+
+    def _extract_hardware(self, schema: dict[str, Any]) -&gt; dict[str, Any]:
+        &#34;&#34;&#34;
+        Extract hardware mapping from schema.
+
+        Args:
+            schema: Schema dictionary
+
+        Returns:
+            Dictionary of hardware specifications (empty if not present)
+        &#34;&#34;&#34;
+        return schema.get(&#39;hardware&#39;, {})
+
+    def _indent(self, text: str, spaces: int = 4) -&gt; str:
+        &#34;&#34;&#34;
+        Indent text by specified number of spaces.
+
+        Args:
+            text: Text to indent
+            spaces: Number of spaces per indent level
+
+        Returns:
+            Indented text
+        &#34;&#34;&#34;
+        indent_str = &#39; &#39; * spaces
+        lines = text.split(&#39;\n&#39;)
+        return &#39;\n&#39;.join(indent_str + line if line.strip() else line for line in lines)
+
+    def _comment_block(self, text: str, style: str = &#39;hash&#39;) -&gt; str:
+        &#34;&#34;&#34;
+        Generate a comment block in the target language style.
+
+        Args:
+            text: Comment text
+            style: Comment style (&#39;hash&#39; for #, &#39;slash&#39; for //, &#39;c&#39; for /* */)
+
+        Returns:
+            Formatted comment block
+        &#34;&#34;&#34;
+        lines = text.strip().split(&#39;\n&#39;)
+
+        if style == &#39;hash&#39;:
+            # Python, Ruby, shell
+            return &#39;\n&#39;.join(f&#34;# {line}&#34; for line in lines)
+        elif style == &#39;slash&#39;:
+            # C++, Rust, JavaScript
+            return &#39;\n&#39;.join(f&#34;// {line}&#34; for line in lines)
+        elif style == &#39;c&#39;:
+            # C, Verilog multi-line
+            result = &#34;/*\n&#34;
+            result += &#39;\n&#39;.join(f&#34; * {line}&#34; for line in lines)
+            result += &#34;\n */&#34;
+            return result
+        else:
+            raise ValueError(f&#34;Unknown comment style: {style}&#34;)
+
+    def _generate_header(
+        self,
+        title: str,
+        description: str,
+        style: str = &#39;hash&#39;
+    ) -&gt; str:
+        &#34;&#34;&#34;
+        Generate file header with title and description.
+
+        Args:
+            title: File title
+            description: File description
+            style: Comment style
+
+        Returns:
+            Formatted header
+        &#34;&#34;&#34;
+        header_text = f&#34;{title}\n\n{description}\n\nGenerated by ATOMiK SDK Generator&#34;
+        return self._comment_block(header_text, style)</code></pre>
+</details>
+<div class="desc"><p>Abstract base class for language-specific code generation.</p>
+<p>Subclasses implement generate() method to produce code for their
+target language.</p>
+<p>Example subclass:
+class PythonGenerator(CodeEmitter):
+def generate(self, schema, namespace):
+# Generate Python code
+return GenerationResult(&hellip;)</p>
+<p>Initialize code emitter.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>language</code></strong></dt>
+<dd>Target language name (python, rust, c, javascript, verilog)</dd>
+</dl></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>abc.ABC</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="atomik_sdk.generator.c_generator.CGenerator" href="c_generator.html#atomik_sdk.generator.c_generator.CGenerator">CGenerator</a></li>
+<li><a title="atomik_sdk.generator.javascript_generator.JavaScriptGenerator" href="javascript_generator.html#atomik_sdk.generator.javascript_generator.JavaScriptGenerator">JavaScriptGenerator</a></li>
+<li><a title="atomik_sdk.generator.python_generator.PythonGenerator" href="python_generator.html#atomik_sdk.generator.python_generator.PythonGenerator">PythonGenerator</a></li>
+<li><a title="atomik_sdk.generator.rust_generator.RustGenerator" href="rust_generator.html#atomik_sdk.generator.rust_generator.RustGenerator">RustGenerator</a></li>
+<li><a title="atomik_sdk.generator.verilog_generator.VerilogGenerator" href="verilog_generator.html#atomik_sdk.generator.verilog_generator.VerilogGenerator">VerilogGenerator</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.generator.code_emitter.CodeEmitter.generate"><code class="name flex">
+<span>def <span class="ident">generate</span></span>(<span>self, schema: dict[str, Any], namespace: NamespaceMapping) ‑> <a title="atomik_sdk.generator.code_emitter.GenerationResult" href="#atomik_sdk.generator.code_emitter.GenerationResult">GenerationResult</a></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@abstractmethod
+def generate(
+    self,
+    schema: dict[str, Any],
+    namespace: NamespaceMapping
+) -&gt; GenerationResult:
+    &#34;&#34;&#34;
+    Generate code from schema.
+
+    Args:
+        schema: Validated ATOMiK schema dictionary
+        namespace: Namespace mapping for the schema
+
+    Returns:
+        GenerationResult with generated files and status
+    &#34;&#34;&#34;
+    pass</code></pre>
+</details>
+<div class="desc"><p>Generate code from schema.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>schema</code></strong></dt>
+<dd>Validated ATOMiK schema dictionary</dd>
+<dt><strong><code>namespace</code></strong></dt>
+<dd>Namespace mapping for the schema</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>GenerationResult with generated files and status</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.generator.code_emitter.GeneratedFile"><code class="flex name class">
+<span>class <span class="ident">GeneratedFile</span></span>
+<span>(</span><span>relative_path: str, content: str, language: str, description: str)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass
+class GeneratedFile:
+    &#34;&#34;&#34;Represents a generated source code file.&#34;&#34;&#34;
+
+    relative_path: str  # Relative path from output root
+    content: str  # File content
+    language: str  # Target language (python, rust, c, javascript, verilog)
+    description: str  # Human-readable description</code></pre>
+</details>
+<div class="desc"><p>Represents a generated source code file.</p></div>
+<h3>Instance variables</h3>
+<dl>
+<dt id="atomik_sdk.generator.code_emitter.GeneratedFile.content"><code class="name">var <span class="ident">content</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.generator.code_emitter.GeneratedFile.description"><code class="name">var <span class="ident">description</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.generator.code_emitter.GeneratedFile.language"><code class="name">var <span class="ident">language</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.generator.code_emitter.GeneratedFile.relative_path"><code class="name">var <span class="ident">relative_path</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.generator.code_emitter.GenerationResult"><code class="flex name class">
+<span>class <span class="ident">GenerationResult</span></span>
+<span>(</span><span>success: bool,<br>files: list[<a title="atomik_sdk.generator.code_emitter.GeneratedFile" href="#atomik_sdk.generator.code_emitter.GeneratedFile">GeneratedFile</a>],<br>errors: list[str],<br>warnings: list[str])</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass
+class GenerationResult:
+    &#34;&#34;&#34;Result of code generation.&#34;&#34;&#34;
+
+    success: bool
+    files: list[GeneratedFile]
+    errors: list[str]
+    warnings: list[str]
+
+    def __bool__(self) -&gt; bool:
+        return self.success</code></pre>
+</details>
+<div class="desc"><p>Result of code generation.</p></div>
+<h3>Instance variables</h3>
+<dl>
+<dt id="atomik_sdk.generator.code_emitter.GenerationResult.errors"><code class="name">var <span class="ident">errors</span> : list[str]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.generator.code_emitter.GenerationResult.files"><code class="name">var <span class="ident">files</span> : list[<a title="atomik_sdk.generator.code_emitter.GeneratedFile" href="#atomik_sdk.generator.code_emitter.GeneratedFile">GeneratedFile</a>]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.generator.code_emitter.GenerationResult.success"><code class="name">var <span class="ident">success</span> : bool</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.generator.code_emitter.GenerationResult.warnings"><code class="name">var <span class="ident">warnings</span> : list[str]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.generator.code_emitter.MultiLanguageEmitter"><code class="flex name class">
+<span>class <span class="ident">MultiLanguageEmitter</span></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class MultiLanguageEmitter:
+    &#34;&#34;&#34;
+    Coordinates code generation across multiple languages.
+
+    Example:
+        &gt;&gt;&gt; emitter = MultiLanguageEmitter()
+        &gt;&gt;&gt; emitter.register(&#39;python&#39;, PythonGenerator())
+        &gt;&gt;&gt; emitter.register(&#39;rust&#39;, RustGenerator())
+        &gt;&gt;&gt; results = emitter.generate_all(schema, namespace)
+    &#34;&#34;&#34;
+
+    def __init__(self):
+        &#34;&#34;&#34;Initialize multi-language emitter.&#34;&#34;&#34;
+        self.generators: dict[str, CodeEmitter] = {}
+
+    def register(self, language: str, generator: CodeEmitter) -&gt; None:
+        &#34;&#34;&#34;
+        Register a code generator for a language.
+
+        Args:
+            language: Target language name
+            generator: CodeEmitter instance
+        &#34;&#34;&#34;
+        self.generators[language] = generator
+
+    def generate_all(
+        self,
+        schema: dict[str, Any],
+        namespace: NamespaceMapping
+    ) -&gt; dict[str, GenerationResult]:
+        &#34;&#34;&#34;
+        Generate code for all registered languages.
+
+        Args:
+            schema: Validated schema dictionary
+            namespace: Namespace mapping
+
+        Returns:
+            Dictionary mapping language to GenerationResult
+        &#34;&#34;&#34;
+        results = {}
+
+        for language, generator in self.generators.items():
+            try:
+                result = generator.generate(schema, namespace)
+                results[language] = result
+            except Exception as e:
+                results[language] = GenerationResult(
+                    success=False,
+                    files=[],
+                    errors=[f&#34;Exception during generation: {str(e)}&#34;],
+                    warnings=[]
+                )
+
+        return results
+
+    def write_generated_files(
+        self,
+        results: dict[str, GenerationResult],
+        output_dir: str | Path
+    ) -&gt; list[str]:
+        &#34;&#34;&#34;
+        Write generated files to disk.
+
+        Args:
+            results: Dictionary of GenerationResults by language
+            output_dir: Output directory root
+
+        Returns:
+            List of written file paths
+        &#34;&#34;&#34;
+        output_path = Path(output_dir)
+        output_path.mkdir(parents=True, exist_ok=True)
+
+        written_files = []
+
+        for language, result in results.items():
+            if not result.success:
+                continue
+
+            for gen_file in result.files:
+                file_path = output_path / gen_file.relative_path
+
+                # Create parent directories
+                file_path.parent.mkdir(parents=True, exist_ok=True)
+
+                # Write file
+                with open(file_path, &#39;w&#39;, encoding=&#39;utf-8&#39;) as f:
+                    f.write(gen_file.content)
+
+                written_files.append(str(file_path))
+
+        return written_files</code></pre>
+</details>
+<div class="desc"><p>Coordinates code generation across multiple languages.</p>
+<h2 id="example">Example</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; emitter = MultiLanguageEmitter()
+&gt;&gt;&gt; emitter.register('python', PythonGenerator())
+&gt;&gt;&gt; emitter.register('rust', RustGenerator())
+&gt;&gt;&gt; results = emitter.generate_all(schema, namespace)
+</code></pre>
+<p>Initialize multi-language emitter.</p></div>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.generator.code_emitter.MultiLanguageEmitter.generate_all"><code class="name flex">
+<span>def <span class="ident">generate_all</span></span>(<span>self, schema: dict[str, Any], namespace: NamespaceMapping) ‑> dict[str, <a title="atomik_sdk.generator.code_emitter.GenerationResult" href="#atomik_sdk.generator.code_emitter.GenerationResult">GenerationResult</a>]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def generate_all(
+    self,
+    schema: dict[str, Any],
+    namespace: NamespaceMapping
+) -&gt; dict[str, GenerationResult]:
+    &#34;&#34;&#34;
+    Generate code for all registered languages.
+
+    Args:
+        schema: Validated schema dictionary
+        namespace: Namespace mapping
+
+    Returns:
+        Dictionary mapping language to GenerationResult
+    &#34;&#34;&#34;
+    results = {}
+
+    for language, generator in self.generators.items():
+        try:
+            result = generator.generate(schema, namespace)
+            results[language] = result
+        except Exception as e:
+            results[language] = GenerationResult(
+                success=False,
+                files=[],
+                errors=[f&#34;Exception during generation: {str(e)}&#34;],
+                warnings=[]
+            )
+
+    return results</code></pre>
+</details>
+<div class="desc"><p>Generate code for all registered languages.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>schema</code></strong></dt>
+<dd>Validated schema dictionary</dd>
+<dt><strong><code>namespace</code></strong></dt>
+<dd>Namespace mapping</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>Dictionary mapping language to GenerationResult</p></div>
+</dd>
+<dt id="atomik_sdk.generator.code_emitter.MultiLanguageEmitter.register"><code class="name flex">
+<span>def <span class="ident">register</span></span>(<span>self,<br>language: str,<br>generator: <a title="atomik_sdk.generator.code_emitter.CodeEmitter" href="#atomik_sdk.generator.code_emitter.CodeEmitter">CodeEmitter</a>) ‑> None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def register(self, language: str, generator: CodeEmitter) -&gt; None:
+    &#34;&#34;&#34;
+    Register a code generator for a language.
+
+    Args:
+        language: Target language name
+        generator: CodeEmitter instance
+    &#34;&#34;&#34;
+    self.generators[language] = generator</code></pre>
+</details>
+<div class="desc"><p>Register a code generator for a language.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>language</code></strong></dt>
+<dd>Target language name</dd>
+<dt><strong><code>generator</code></strong></dt>
+<dd>CodeEmitter instance</dd>
+</dl></div>
+</dd>
+<dt id="atomik_sdk.generator.code_emitter.MultiLanguageEmitter.write_generated_files"><code class="name flex">
+<span>def <span class="ident">write_generated_files</span></span>(<span>self,<br>results: dict[str, <a title="atomik_sdk.generator.code_emitter.GenerationResult" href="#atomik_sdk.generator.code_emitter.GenerationResult">GenerationResult</a>],<br>output_dir: str | Path) ‑> list[str]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def write_generated_files(
+    self,
+    results: dict[str, GenerationResult],
+    output_dir: str | Path
+) -&gt; list[str]:
+    &#34;&#34;&#34;
+    Write generated files to disk.
+
+    Args:
+        results: Dictionary of GenerationResults by language
+        output_dir: Output directory root
+
+    Returns:
+        List of written file paths
+    &#34;&#34;&#34;
+    output_path = Path(output_dir)
+    output_path.mkdir(parents=True, exist_ok=True)
+
+    written_files = []
+
+    for language, result in results.items():
+        if not result.success:
+            continue
+
+        for gen_file in result.files:
+            file_path = output_path / gen_file.relative_path
+
+            # Create parent directories
+            file_path.parent.mkdir(parents=True, exist_ok=True)
+
+            # Write file
+            with open(file_path, &#39;w&#39;, encoding=&#39;utf-8&#39;) as f:
+                f.write(gen_file.content)
+
+            written_files.append(str(file_path))
+
+    return written_files</code></pre>
+</details>
+<div class="desc"><p>Write generated files to disk.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>results</code></strong></dt>
+<dd>Dictionary of GenerationResults by language</dd>
+<dt><strong><code>output_dir</code></strong></dt>
+<dd>Output directory root</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>List of written file paths</p></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="atomik_sdk.generator" href="index.html">atomik_sdk.generator</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="atomik_sdk.generator.code_emitter.CodeEmitter" href="#atomik_sdk.generator.code_emitter.CodeEmitter">CodeEmitter</a></code></h4>
+<ul class="">
+<li><code><a title="atomik_sdk.generator.code_emitter.CodeEmitter.generate" href="#atomik_sdk.generator.code_emitter.CodeEmitter.generate">generate</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.generator.code_emitter.GeneratedFile" href="#atomik_sdk.generator.code_emitter.GeneratedFile">GeneratedFile</a></code></h4>
+<ul class="">
+<li><code><a title="atomik_sdk.generator.code_emitter.GeneratedFile.content" href="#atomik_sdk.generator.code_emitter.GeneratedFile.content">content</a></code></li>
+<li><code><a title="atomik_sdk.generator.code_emitter.GeneratedFile.description" href="#atomik_sdk.generator.code_emitter.GeneratedFile.description">description</a></code></li>
+<li><code><a title="atomik_sdk.generator.code_emitter.GeneratedFile.language" href="#atomik_sdk.generator.code_emitter.GeneratedFile.language">language</a></code></li>
+<li><code><a title="atomik_sdk.generator.code_emitter.GeneratedFile.relative_path" href="#atomik_sdk.generator.code_emitter.GeneratedFile.relative_path">relative_path</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.generator.code_emitter.GenerationResult" href="#atomik_sdk.generator.code_emitter.GenerationResult">GenerationResult</a></code></h4>
+<ul class="">
+<li><code><a title="atomik_sdk.generator.code_emitter.GenerationResult.errors" href="#atomik_sdk.generator.code_emitter.GenerationResult.errors">errors</a></code></li>
+<li><code><a title="atomik_sdk.generator.code_emitter.GenerationResult.files" href="#atomik_sdk.generator.code_emitter.GenerationResult.files">files</a></code></li>
+<li><code><a title="atomik_sdk.generator.code_emitter.GenerationResult.success" href="#atomik_sdk.generator.code_emitter.GenerationResult.success">success</a></code></li>
+<li><code><a title="atomik_sdk.generator.code_emitter.GenerationResult.warnings" href="#atomik_sdk.generator.code_emitter.GenerationResult.warnings">warnings</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.generator.code_emitter.MultiLanguageEmitter" href="#atomik_sdk.generator.code_emitter.MultiLanguageEmitter">MultiLanguageEmitter</a></code></h4>
+<ul class="">
+<li><code><a title="atomik_sdk.generator.code_emitter.MultiLanguageEmitter.generate_all" href="#atomik_sdk.generator.code_emitter.MultiLanguageEmitter.generate_all">generate_all</a></code></li>
+<li><code><a title="atomik_sdk.generator.code_emitter.MultiLanguageEmitter.register" href="#atomik_sdk.generator.code_emitter.MultiLanguageEmitter.register">register</a></code></li>
+<li><code><a title="atomik_sdk.generator.code_emitter.MultiLanguageEmitter.write_generated_files" href="#atomik_sdk.generator.code_emitter.MultiLanguageEmitter.write_generated_files">write_generated_files</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+</body>
+</html>

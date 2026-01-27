@@ -1,0 +1,603 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
+<title>atomik_sdk.generator.rust_generator API documentation</title>
+<meta name="description" content="ATOMiK Rust SDK Generator …">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>atomik_sdk.generator.rust_generator</code></h1>
+</header>
+<section id="section-intro">
+<p>ATOMiK Rust SDK Generator</p>
+<p>Generates Rust modules from ATOMiK schemas with proper Rust idioms.</p>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="atomik_sdk.generator.rust_generator.RustGenerator"><code class="flex name class">
+<span>class <span class="ident">RustGenerator</span></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class RustGenerator(CodeEmitter):
+    &#34;&#34;&#34;
+    Generates Rust SDK code from ATOMiK schemas.
+
+    Generates:
+    - src/{vertical}/{field}/mod.rs - Module definition
+    - src/{vertical}/{field}/{object}.rs - Main implementation
+    - Cargo.toml metadata
+    - tests/{object}_test.rs - Integration tests
+    &#34;&#34;&#34;
+
+    def __init__(self):
+        &#34;&#34;&#34;Initialize Rust code generator.&#34;&#34;&#34;
+        super().__init__(&#39;rust&#39;)
+
+    def generate(self, schema: dict[str, Any], namespace: NamespaceMapping) -&gt; GenerationResult:
+        &#34;&#34;&#34;Generate Rust SDK code from schema.&#34;&#34;&#34;
+        try:
+            files = []
+            errors = []
+            warnings = []
+
+            # Extract schema components
+            catalogue = schema.get(&#39;catalogue&#39;, {})
+            schema_def = schema.get(&#39;schema&#39;, {})
+            delta_fields = schema_def.get(&#39;delta_fields&#39;, {})
+            operations = schema_def.get(&#39;operations&#39;, {})
+            hardware = schema.get(&#39;hardware&#39;, {})
+
+            # Generate main module file
+            module_file = self._generate_module(
+                namespace, delta_fields, operations, hardware
+            )
+            files.append(module_file)
+
+            # Generate mod.rs for the field module
+            mod_file = self._generate_mod_file(namespace)
+            files.append(mod_file)
+
+            # Generate lib.rs entry point
+            lib_file = self._generate_lib_file(namespace)
+            files.append(lib_file)
+
+            # Generate Cargo.toml
+            cargo_file = self._generate_cargo_toml(catalogue, namespace)
+            files.append(cargo_file)
+
+            # Generate integration tests
+            test_file = self._generate_tests(namespace, delta_fields, operations)
+            files.append(test_file)
+
+            return GenerationResult(
+                success=True,
+                files=files,
+                errors=errors,
+                warnings=warnings
+            )
+
+        except Exception as e:
+            return GenerationResult(
+                success=False,
+                files=[],
+                errors=[f&#34;Rust generation failed: {str(e)}&#34;],
+                warnings=[]
+            )
+
+    def _generate_module(
+        self,
+        namespace: NamespaceMapping,
+        delta_fields: dict[str, Any],
+        operations: dict[str, Any],
+        hardware: dict[str, Any]
+    ) -&gt; GeneratedFile:
+        &#34;&#34;&#34;Generate the main Rust module implementation.&#34;&#34;&#34;
+
+        obj_snake = self._to_snake_case(namespace.object)
+        vertical_lower = namespace.vertical.lower()
+        field_lower = namespace.field.lower()
+
+        # Determine delta type based on width
+        delta_type = self._get_rust_type(delta_fields)
+
+        lines = []
+
+        # Module header
+        lines.append(&#34;//! ATOMiK Delta-State Module&#34;)
+        lines.append(f&#34;//! Generated from schema: {namespace.vertical}/{namespace.field}/{namespace.object}&#34;)
+        lines.append(&#34;//!&#34;)
+        lines.append(&#34;//! This module provides delta-state operations based on XOR algebra.&#34;)
+        lines.append(&#34;&#34;)
+        lines.append(&#34;use std::collections::VecDeque;&#34;)
+        lines.append(&#34;&#34;)
+
+        # Generate struct
+        lines.append(f&#34;/// {namespace.object} delta-state manager&#34;)
+        lines.append(&#34;#[derive(Debug, Clone)]&#34;)
+        lines.append(f&#34;pub struct {namespace.object} {{&#34;)
+        lines.append(&#34;    /// Initial state&#34;)
+        lines.append(f&#34;    initial_state: {delta_type},&#34;)
+        lines.append(&#34;    /// Delta accumulator (XOR of all deltas)&#34;)
+        lines.append(f&#34;    accumulator: {delta_type},&#34;)
+
+        # Add history for rollback if enabled
+        if operations.get(&#39;rollback&#39;, {}).get(&#39;enabled&#39;, False):
+            lines.append(&#34;    /// Delta history for rollback&#34;)
+            lines.append(f&#34;    history: VecDeque&lt;{delta_type}&gt;,&#34;)
+            history_depth = operations[&#39;rollback&#39;].get(&#39;history_depth&#39;, 10)
+            lines.append(&#34;    /// Maximum history depth&#34;)
+            lines.append(&#34;    max_history: usize,&#34;)
+
+        lines.append(&#34;}&#34;)
+        lines.append(&#34;&#34;)
+
+        # Implement methods
+        lines.append(f&#34;impl {namespace.object} {{&#34;)
+
+        # Constructor
+        lines.append(&#34;    /// Create a new delta-state manager&#34;)
+        lines.append(&#34;    pub fn new() -&gt; Self {&#34;)
+        lines.append(&#34;        Self {&#34;)
+        lines.append(&#34;            initial_state: 0,&#34;)
+        lines.append(&#34;            accumulator: 0,&#34;)
+        if operations.get(&#39;rollback&#39;, {}).get(&#39;enabled&#39;, False):
+            lines.append(&#34;            history: VecDeque::new(),&#34;)
+            lines.append(f&#34;            max_history: {history_depth},&#34;)
+        lines.append(&#34;        }&#34;)
+        lines.append(&#34;    }&#34;)
+        lines.append(&#34;&#34;)
+
+        # Load operation
+        lines.append(&#34;    /// Load initial state (LOAD operation)&#34;)
+        lines.append(f&#34;    pub fn load(&amp;mut self, initial_state: {delta_type}) {{&#34;)
+        lines.append(&#34;        self.initial_state = initial_state;&#34;)
+        lines.append(&#34;        self.accumulator = 0;&#34;)
+        if operations.get(&#39;rollback&#39;, {}).get(&#39;enabled&#39;, False):
+            lines.append(&#34;        self.history.clear();&#34;)
+        lines.append(&#34;    }&#34;)
+        lines.append(&#34;&#34;)
+
+        # Accumulate operation
+        lines.append(&#34;    /// Accumulate delta (ACCUMULATE operation)&#34;)
+        lines.append(&#34;    ///&#34;)
+        lines.append(&#34;    /// XORs the delta into the accumulator.&#34;)
+        lines.append(f&#34;    pub fn accumulate(&amp;mut self, delta: {delta_type}) {{&#34;)
+        if operations.get(&#39;rollback&#39;, {}).get(&#39;enabled&#39;, False):
+            lines.append(&#34;        // Save to history&#34;)
+            lines.append(&#34;        self.history.push_back(delta);&#34;)
+            lines.append(&#34;        if self.history.len() &gt; self.max_history {&#34;)
+            lines.append(&#34;            self.history.pop_front();&#34;)
+            lines.append(&#34;        }&#34;)
+        lines.append(&#34;        // XOR delta into accumulator&#34;)
+        lines.append(&#34;        self.accumulator ^= delta;&#34;)
+        lines.append(&#34;    }&#34;)
+        lines.append(&#34;&#34;)
+
+        # Reconstruct operation
+        lines.append(&#34;    /// Reconstruct current state (READ operation)&#34;)
+        lines.append(&#34;    ///&#34;)
+        lines.append(&#34;    /// Returns current_state = initial_state XOR accumulator&#34;)
+        lines.append(f&#34;    pub fn reconstruct(&amp;self) -&gt; {delta_type} {{&#34;)
+        lines.append(&#34;        self.initial_state ^ self.accumulator&#34;)
+        lines.append(&#34;    }&#34;)
+        lines.append(&#34;&#34;)
+
+        # Status operation
+        lines.append(&#34;    /// Check if accumulator is zero (STATUS operation)&#34;)
+        lines.append(&#34;    pub fn is_accumulator_zero(&amp;self) -&gt; bool {&#34;)
+        lines.append(&#34;        self.accumulator == 0&#34;)
+        lines.append(&#34;    }&#34;)
+        lines.append(&#34;&#34;)
+
+        # Rollback operation if enabled
+        if operations.get(&#39;rollback&#39;, {}).get(&#39;enabled&#39;, False):
+            lines.append(&#34;    /// Rollback the last N delta operations&#34;)
+            lines.append(&#34;    ///&#34;)
+            lines.append(&#34;    /// Returns the number of deltas actually rolled back.&#34;)
+            lines.append(&#34;    pub fn rollback(&amp;mut self, count: usize) -&gt; usize {&#34;)
+            lines.append(&#34;        let actual_count = count.min(self.history.len());&#34;)
+            lines.append(&#34;        for _ in 0..actual_count {&#34;)
+            lines.append(&#34;            if let Some(delta) = self.history.pop_back() {&#34;)
+            lines.append(&#34;                // XOR removes the delta (self-inverse property)&#34;)
+            lines.append(&#34;                self.accumulator ^= delta;&#34;)
+            lines.append(&#34;            }&#34;)
+            lines.append(&#34;        }&#34;)
+            lines.append(&#34;        actual_count&#34;)
+            lines.append(&#34;    }&#34;)
+            lines.append(&#34;&#34;)
+
+        # Getter methods
+        lines.append(&#34;    /// Get the current accumulator value&#34;)
+        lines.append(f&#34;    pub fn get_accumulator(&amp;self) -&gt; {delta_type} {{&#34;)
+        lines.append(&#34;        self.accumulator&#34;)
+        lines.append(&#34;    }&#34;)
+        lines.append(&#34;&#34;)
+
+        lines.append(&#34;    /// Get the initial state&#34;)
+        lines.append(f&#34;    pub fn get_initial_state(&amp;self) -&gt; {delta_type} {{&#34;)
+        lines.append(&#34;        self.initial_state&#34;)
+        lines.append(&#34;    }&#34;)
+        lines.append(&#34;&#34;)
+
+        if operations.get(&#39;rollback&#39;, {}).get(&#39;enabled&#39;, False):
+            lines.append(&#34;    /// Get the number of deltas in history&#34;)
+            lines.append(&#34;    pub fn history_size(&amp;self) -&gt; usize {&#34;)
+            lines.append(&#34;        self.history.len()&#34;)
+            lines.append(&#34;    }&#34;)
+            lines.append(&#34;&#34;)
+
+        lines.append(&#34;}&#34;)
+        lines.append(&#34;&#34;)
+
+        # Default trait
+        lines.append(f&#34;impl Default for {namespace.object} {{&#34;)
+        lines.append(&#34;    fn default() -&gt; Self {&#34;)
+        lines.append(&#34;        Self::new()&#34;)
+        lines.append(&#34;    }&#34;)
+        lines.append(&#34;}&#34;)
+        lines.append(&#34;&#34;)
+
+        content = &#34;\n&#34;.join(lines)
+
+        return GeneratedFile(
+            relative_path=f&#34;src/{vertical_lower}/{field_lower}/{obj_snake}.rs&#34;,
+            content=content,
+            language=&#39;rust&#39;,
+            description=f&#34;Rust module for {namespace.object}&#34;
+        )
+
+    def _generate_mod_file(self, namespace: NamespaceMapping) -&gt; GeneratedFile:
+        &#34;&#34;&#34;Generate mod.rs for the field module.&#34;&#34;&#34;
+
+        obj_snake = self._to_snake_case(namespace.object)
+        vertical_lower = namespace.vertical.lower()
+        field_lower = namespace.field.lower()
+
+        lines = []
+        lines.append(f&#34;//! {namespace.field} module&#34;)
+        lines.append(&#34;&#34;)
+        lines.append(f&#34;pub mod {obj_snake};&#34;)
+        lines.append(&#34;&#34;)
+        lines.append(f&#34;pub use {obj_snake}::{namespace.object};&#34;)
+        lines.append(&#34;&#34;)
+
+        content = &#34;\n&#34;.join(lines)
+
+        return GeneratedFile(
+            relative_path=f&#34;src/{vertical_lower}/{field_lower}/mod.rs&#34;,
+            content=content,
+            language=&#39;rust&#39;,
+            description=f&#34;Module definition for {namespace.field}&#34;
+        )
+
+    def _generate_lib_file(self, namespace: NamespaceMapping) -&gt; GeneratedFile:
+        &#34;&#34;&#34;Generate lib.rs entry point.&#34;&#34;&#34;
+
+        vertical_lower = namespace.vertical.lower()
+        field_lower = namespace.field.lower()
+
+        lines = []
+        lines.append(&#34;//! ATOMiK Rust SDK&#34;)
+        lines.append(&#34;//!&#34;)
+        lines.append(&#34;//! Delta-state computing primitives based on XOR algebra.&#34;)
+        lines.append(&#34;&#34;)
+        lines.append(f&#34;pub mod {vertical_lower} {{&#34;)
+        lines.append(f&#34;    pub mod {field_lower};&#34;)
+        lines.append(&#34;}&#34;)
+        lines.append(&#34;&#34;)
+        lines.append(f&#34;pub use {vertical_lower}::{field_lower}::{namespace.object};&#34;)
+        lines.append(&#34;&#34;)
+
+        content = &#34;\n&#34;.join(lines)
+
+        return GeneratedFile(
+            relative_path=&#34;src/lib.rs&#34;,
+            content=content,
+            language=&#39;rust&#39;,
+            description=&#34;Rust library entry point&#34;
+        )
+
+    def _generate_cargo_toml(
+        self,
+        catalogue: dict[str, Any],
+        namespace: NamespaceMapping
+    ) -&gt; GeneratedFile:
+        &#34;&#34;&#34;Generate Cargo.toml manifest.&#34;&#34;&#34;
+
+        vertical_lower = namespace.vertical.lower()
+        field_lower = namespace.field.lower()
+        self._to_snake_case(namespace.object)
+
+        version = catalogue.get(&#39;version&#39;, &#39;0.1.0&#39;)
+        description = catalogue.get(&#39;description&#39;, f&#39;{namespace.object} delta-state module&#39;)
+
+        lines = []
+        lines.append(&#34;[package]&#34;)
+        lines.append(f&#39;name = &#34;atomik-{vertical_lower}-{field_lower}&#34;&#39;)
+        lines.append(f&#39;version = &#34;{version}&#34;&#39;)
+        lines.append(&#39;edition = &#34;2021&#34;&#39;)
+        lines.append(f&#39;description = &#34;{description}&#34;&#39;)
+        lines.append(&#39;license = &#34;MIT&#34;&#39;)
+        lines.append(&#34;&#34;)
+        lines.append(&#34;[dependencies]&#34;)
+        lines.append(&#34;&#34;)
+        lines.append(&#34;[dev-dependencies]&#34;)
+        lines.append(&#34;&#34;)
+
+        content = &#34;\n&#34;.join(lines)
+
+        return GeneratedFile(
+            relative_path=&#34;Cargo.toml&#34;,
+            content=content,
+            language=&#39;rust&#39;,
+            description=&#34;Cargo package manifest&#34;
+        )
+
+    def _generate_tests(
+        self,
+        namespace: NamespaceMapping,
+        delta_fields: dict[str, Any],
+        operations: dict[str, Any]
+    ) -&gt; GeneratedFile:
+        &#34;&#34;&#34;Generate integration tests.&#34;&#34;&#34;
+
+        obj_snake = self._to_snake_case(namespace.object)
+        vertical_lower = namespace.vertical.lower()
+        field_lower = namespace.field.lower()
+
+        lines = []
+        lines.append(f&#34;//! Integration tests for {namespace.object}&#34;)
+        lines.append(&#34;&#34;)
+        lines.append(f&#34;use atomik_{vertical_lower}_{field_lower}::{namespace.object};&#34;)
+        lines.append(&#34;&#34;)
+
+        # Test load operation
+        lines.append(&#34;#[test]&#34;)
+        lines.append(&#34;fn test_load() {&#34;)
+        lines.append(f&#34;    let mut manager = {namespace.object}::new();&#34;)
+        lines.append(&#34;    manager.load(0x1234567890ABCDEF);&#34;)
+        lines.append(&#34;    assert_eq!(manager.get_initial_state(), 0x1234567890ABCDEF);&#34;)
+        lines.append(&#34;    assert_eq!(manager.get_accumulator(), 0);&#34;)
+        lines.append(&#34;}&#34;)
+        lines.append(&#34;&#34;)
+
+        # Test accumulate operation
+        lines.append(&#34;#[test]&#34;)
+        lines.append(&#34;fn test_accumulate() {&#34;)
+        lines.append(f&#34;    let mut manager = {namespace.object}::new();&#34;)
+        lines.append(&#34;    manager.load(0);&#34;)
+        lines.append(&#34;    manager.accumulate(0x1111111111111111);&#34;)
+        lines.append(&#34;    assert_eq!(manager.get_accumulator(), 0x1111111111111111);&#34;)
+        lines.append(&#34;    manager.accumulate(0x2222222222222222);&#34;)
+        lines.append(&#34;    assert_eq!(manager.get_accumulator(), 0x3333333333333333);&#34;)
+        lines.append(&#34;}&#34;)
+        lines.append(&#34;&#34;)
+
+        # Test reconstruct operation
+        lines.append(&#34;#[test]&#34;)
+        lines.append(&#34;fn test_reconstruct() {&#34;)
+        lines.append(f&#34;    let mut manager = {namespace.object}::new();&#34;)
+        lines.append(&#34;    manager.load(0xAAAAAAAAAAAAAAAA);&#34;)
+        lines.append(&#34;    manager.accumulate(0x5555555555555555);&#34;)
+        lines.append(&#34;    // 0xAAAA XOR 0x5555 = 0xFFFF&#34;)
+        lines.append(&#34;    assert_eq!(manager.reconstruct(), 0xFFFFFFFFFFFFFFFF);&#34;)
+        lines.append(&#34;}&#34;)
+        lines.append(&#34;&#34;)
+
+        # Test self-inverse property
+        lines.append(&#34;#[test]&#34;)
+        lines.append(&#34;fn test_self_inverse() {&#34;)
+        lines.append(f&#34;    let mut manager = {namespace.object}::new();&#34;)
+        lines.append(&#34;    manager.load(0xAAAAAAAAAAAAAAAA);&#34;)
+        lines.append(&#34;    let delta = 0x1234567890ABCDEF;&#34;)
+        lines.append(&#34;    manager.accumulate(delta);&#34;)
+        lines.append(&#34;    manager.accumulate(delta);  // Apply same delta twice&#34;)
+        lines.append(&#34;    // Self-inverse: delta XOR delta = 0&#34;)
+        lines.append(&#34;    assert!(manager.is_accumulator_zero());&#34;)
+        lines.append(&#34;    assert_eq!(manager.reconstruct(), 0xAAAAAAAAAAAAAAAA);&#34;)
+        lines.append(&#34;}&#34;)
+        lines.append(&#34;&#34;)
+
+        # Test rollback if enabled
+        if operations.get(&#39;rollback&#39;, {}).get(&#39;enabled&#39;, False):
+            lines.append(&#34;#[test]&#34;)
+            lines.append(&#34;fn test_rollback() {&#34;)
+            lines.append(f&#34;    let mut manager = {namespace.object}::new();&#34;)
+            lines.append(&#34;    manager.load(0);&#34;)
+            lines.append(&#34;    manager.accumulate(0x1111111111111111);&#34;)
+            lines.append(&#34;    manager.accumulate(0x2222222222222222);&#34;)
+            lines.append(&#34;    manager.accumulate(0x4444444444444444);&#34;)
+            lines.append(&#34;    assert_eq!(manager.get_accumulator(), 0x7777777777777777);&#34;)
+            lines.append(&#34;    &#34;)
+            lines.append(&#34;    // Rollback last 2 operations&#34;)
+            lines.append(&#34;    let count = manager.rollback(2);&#34;)
+            lines.append(&#34;    assert_eq!(count, 2);&#34;)
+            lines.append(&#34;    assert_eq!(manager.get_accumulator(), 0x1111111111111111);&#34;)
+            lines.append(&#34;}&#34;)
+            lines.append(&#34;&#34;)
+
+        content = &#34;\n&#34;.join(lines)
+
+        return GeneratedFile(
+            relative_path=f&#34;tests/{obj_snake}_test.rs&#34;,
+            content=content,
+            language=&#39;rust&#39;,
+            description=f&#34;Integration tests for {namespace.object}&#34;
+        )
+
+    @staticmethod
+    def _get_rust_type(delta_fields: dict[str, Any]) -&gt; str:
+        &#34;&#34;&#34;Determine Rust type based on delta field widths.&#34;&#34;&#34;
+        max_width = 64
+        for field_name, field_spec in delta_fields.items():
+            width = field_spec.get(&#39;width&#39;, 64)
+            max_width = max(max_width, width)
+
+        if max_width &lt;= 64:
+            return &#34;u64&#34;
+        elif max_width &lt;= 128:
+            return &#34;u128&#34;
+        else:
+            # For &gt;128 bits, would need external crate like num-bigint
+            return &#34;u128&#34;  # Simplified for now
+
+    @staticmethod
+    def _to_snake_case(name: str) -&gt; str:
+        &#34;&#34;&#34;Convert PascalCase to snake_case.&#34;&#34;&#34;
+        result = []
+        for i, char in enumerate(name):
+            if char.isupper() and i &gt; 0:
+                prev_is_lower = name[i-1].islower()
+                next_is_lower = i + 1 &lt; len(name) and name[i+1].islower()
+                if prev_is_lower or next_is_lower:
+                    if result and result[-1] != &#39;_&#39;:
+                        result.append(&#39;_&#39;)
+            result.append(char.lower())
+        return &#39;&#39;.join(result)</code></pre>
+</details>
+<div class="desc"><p>Generates Rust SDK code from ATOMiK schemas.</p>
+<p>Generates:
+- src/{vertical}/{field}/mod.rs - Module definition
+- src/{vertical}/{field}/{object}.rs - Main implementation
+- Cargo.toml metadata
+- tests/{object}_test.rs - Integration tests</p>
+<p>Initialize Rust code generator.</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="atomik_sdk.generator.code_emitter.CodeEmitter" href="code_emitter.html#atomik_sdk.generator.code_emitter.CodeEmitter">CodeEmitter</a></li>
+<li>abc.ABC</li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.generator.rust_generator.RustGenerator.generate"><code class="name flex">
+<span>def <span class="ident">generate</span></span>(<span>self, schema: dict[str, Any], namespace: NamespaceMapping) ‑> <a title="atomik_sdk.generator.code_emitter.GenerationResult" href="code_emitter.html#atomik_sdk.generator.code_emitter.GenerationResult">GenerationResult</a></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def generate(self, schema: dict[str, Any], namespace: NamespaceMapping) -&gt; GenerationResult:
+    &#34;&#34;&#34;Generate Rust SDK code from schema.&#34;&#34;&#34;
+    try:
+        files = []
+        errors = []
+        warnings = []
+
+        # Extract schema components
+        catalogue = schema.get(&#39;catalogue&#39;, {})
+        schema_def = schema.get(&#39;schema&#39;, {})
+        delta_fields = schema_def.get(&#39;delta_fields&#39;, {})
+        operations = schema_def.get(&#39;operations&#39;, {})
+        hardware = schema.get(&#39;hardware&#39;, {})
+
+        # Generate main module file
+        module_file = self._generate_module(
+            namespace, delta_fields, operations, hardware
+        )
+        files.append(module_file)
+
+        # Generate mod.rs for the field module
+        mod_file = self._generate_mod_file(namespace)
+        files.append(mod_file)
+
+        # Generate lib.rs entry point
+        lib_file = self._generate_lib_file(namespace)
+        files.append(lib_file)
+
+        # Generate Cargo.toml
+        cargo_file = self._generate_cargo_toml(catalogue, namespace)
+        files.append(cargo_file)
+
+        # Generate integration tests
+        test_file = self._generate_tests(namespace, delta_fields, operations)
+        files.append(test_file)
+
+        return GenerationResult(
+            success=True,
+            files=files,
+            errors=errors,
+            warnings=warnings
+        )
+
+    except Exception as e:
+        return GenerationResult(
+            success=False,
+            files=[],
+            errors=[f&#34;Rust generation failed: {str(e)}&#34;],
+            warnings=[]
+        )</code></pre>
+</details>
+<div class="desc"><p>Generate Rust SDK code from schema.</p></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="atomik_sdk.generator" href="index.html">atomik_sdk.generator</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="atomik_sdk.generator.rust_generator.RustGenerator" href="#atomik_sdk.generator.rust_generator.RustGenerator">RustGenerator</a></code></h4>
+<ul class="">
+<li><code><a title="atomik_sdk.generator.rust_generator.RustGenerator.generate" href="#atomik_sdk.generator.rust_generator.RustGenerator.generate">generate</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+</body>
+</html>

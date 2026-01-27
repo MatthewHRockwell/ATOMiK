@@ -1,0 +1,607 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
+<title>atomik_sdk.generator.namespace_mapper API documentation</title>
+<meta name="description" content="ATOMiK Namespace Mapper …">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>atomik_sdk.generator.namespace_mapper</code></h1>
+</header>
+<section id="section-intro">
+<p>ATOMiK Namespace Mapper</p>
+<p>Maps catalogue metadata to language-specific namespaces and import paths.</p>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="atomik_sdk.generator.namespace_mapper.NamespaceMapper"><code class="flex name class">
+<span>class <span class="ident">NamespaceMapper</span></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class NamespaceMapper:
+    &#34;&#34;&#34;
+    Maps ATOMiK catalogue metadata to target language namespaces.
+
+    Example:
+        &gt;&gt;&gt; mapper = NamespaceMapper()
+        &gt;&gt;&gt; catalogue = {
+        ...     &#34;vertical&#34;: &#34;Video&#34;,
+        ...     &#34;field&#34;: &#34;Stream&#34;,
+        ...     &#34;object&#34;: &#34;H264Delta&#34;
+        ... }
+        &gt;&gt;&gt; mapping = mapper.map_catalogue(catalogue)
+        &gt;&gt;&gt; print(mapping.python_import_statement)
+        from atomik.Video.Stream import H264Delta
+    &#34;&#34;&#34;
+
+    @staticmethod
+    def map_catalogue(catalogue: dict[str, Any]) -&gt; NamespaceMapping:
+        &#34;&#34;&#34;
+        Map catalogue metadata to language-specific namespaces.
+
+        Args:
+            catalogue: Dictionary containing vertical, field, object keys.
+
+        Returns:
+            NamespaceMapping with paths for all target languages.
+        &#34;&#34;&#34;
+        vertical = catalogue.get(&#39;vertical&#39;, &#39;Unknown&#39;)
+        field = catalogue.get(&#39;field&#39;, &#39;Unknown&#39;)
+        obj = catalogue.get(&#39;object&#39;, &#39;Unknown&#39;)
+
+        # Convert to lowercase for case-sensitive languages
+        vertical_lower = vertical.lower()
+        field_lower = field.lower()
+        obj.lower()
+
+        # Convert PascalCase to snake_case for C
+        obj_snake = NamespaceMapper._to_snake_case(obj)
+
+        # Python (preserves PascalCase for classes)
+        python_module_path = f&#34;atomik.{vertical}.{field}&#34;
+        python_import = f&#34;from atomik.{vertical}.{field} import {obj}&#34;
+
+        # Rust (uses lowercase with :: separators)
+        rust_path = f&#34;atomik::{vertical_lower}::{field_lower}::{obj}&#34;
+        rust_use = f&#34;use atomik::{vertical_lower}::{field_lower}::{obj};&#34;
+
+        # C (uses lowercase with / separators and snake_case for filenames)
+        c_include_path = f&#34;atomik/{vertical_lower}/{field_lower}/{obj_snake}.h&#34;
+        c_include = f&#34;#include &lt;atomik/{vertical_lower}/{field_lower}/{obj_snake}.h&gt;&#34;
+
+        # JavaScript (uses lowercase with / separators, scoped package)
+        javascript_package = f&#34;@atomik/{vertical_lower}/{field_lower}&#34;
+        javascript_require = (
+            f&#34;const {{{obj}}} = require(&#39;@atomik/{vertical_lower}/{field_lower}&#39;);&#34;
+        )
+
+        # Verilog (uses snake_case with underscores)
+        verilog_module = f&#34;atomik_{vertical_lower}_{field_lower}_{obj_snake}&#34;
+
+        return NamespaceMapping(
+            vertical=vertical,
+            field=field,
+            object=obj,
+            python_module_path=python_module_path,
+            python_import_statement=python_import,
+            rust_path=rust_path,
+            rust_use_statement=rust_use,
+            c_include_path=c_include_path,
+            c_include_statement=c_include,
+            javascript_package=javascript_package,
+            javascript_require_statement=javascript_require,
+            verilog_module_name=verilog_module
+        )
+
+    @staticmethod
+    def _to_snake_case(name: str) -&gt; str:
+        &#34;&#34;&#34;
+        Convert PascalCase or camelCase to snake_case.
+
+        Args:
+            name: PascalCase string.
+
+        Returns:
+            snake_case string.
+
+        Example:
+            &gt;&gt;&gt; NamespaceMapper._to_snake_case(&#34;H264Delta&#34;)
+            &#39;h264_delta&#39;
+            &gt;&gt;&gt; NamespaceMapper._to_snake_case(&#34;TerminalIO&#34;)
+            &#39;terminal_io&#39;
+        &#34;&#34;&#34;
+        result = []
+        for i, char in enumerate(name):
+            if char.isupper() and i &gt; 0:
+                # Check if previous char is lowercase or current is followed by lowercase
+                # This handles cases like &#34;IO&#34; staying together
+                prev_is_lower = name[i-1].islower()
+                next_is_lower = i + 1 &lt; len(name) and name[i+1].islower()
+
+                # Add underscore only if transitioning from lowercase to uppercase
+                # or if this uppercase is the start of a new word (followed by lowercase)
+                if prev_is_lower or next_is_lower:
+                    if result and result[-1] != &#39;_&#39;:
+                        result.append(&#39;_&#39;)
+
+            result.append(char.lower())
+
+        return &#39;&#39;.join(result)
+
+    @staticmethod
+    def validate_identifier(name: str) -&gt; tuple[bool, str | None]:
+        &#34;&#34;&#34;
+        Validate that an identifier is valid across all target languages.
+
+        Args:
+            name: Identifier name to validate.
+
+        Returns:
+            Tuple of (valid: bool, error_message: str | None)
+        &#34;&#34;&#34;
+        # Reserved keywords across all languages
+        reserved_keywords = {
+            # Python
+            &#39;False&#39;, &#39;None&#39;, &#39;True&#39;, &#39;and&#39;, &#39;as&#39;, &#39;assert&#39;, &#39;async&#39;, &#39;await&#39;,
+            &#39;break&#39;, &#39;class&#39;, &#39;continue&#39;, &#39;def&#39;, &#39;del&#39;, &#39;elif&#39;, &#39;else&#39;, &#39;except&#39;,
+            &#39;finally&#39;, &#39;for&#39;, &#39;from&#39;, &#39;global&#39;, &#39;if&#39;, &#39;import&#39;, &#39;in&#39;, &#39;is&#39;,
+            &#39;lambda&#39;, &#39;nonlocal&#39;, &#39;not&#39;, &#39;or&#39;, &#39;pass&#39;, &#39;raise&#39;, &#39;return&#39;, &#39;try&#39;,
+            &#39;while&#39;, &#39;with&#39;, &#39;yield&#39;,
+            # Rust
+            &#39;as&#39;, &#39;break&#39;, &#39;const&#39;, &#39;continue&#39;, &#39;crate&#39;, &#39;else&#39;, &#39;enum&#39;, &#39;extern&#39;,
+            &#39;false&#39;, &#39;fn&#39;, &#39;for&#39;, &#39;if&#39;, &#39;impl&#39;, &#39;in&#39;, &#39;let&#39;, &#39;loop&#39;, &#39;match&#39;,
+            &#39;mod&#39;, &#39;move&#39;, &#39;mut&#39;, &#39;pub&#39;, &#39;ref&#39;, &#39;return&#39;, &#39;self&#39;, &#39;Self&#39;,
+            &#39;static&#39;, &#39;struct&#39;, &#39;super&#39;, &#39;trait&#39;, &#39;true&#39;, &#39;type&#39;, &#39;unsafe&#39;,
+            &#39;use&#39;, &#39;where&#39;, &#39;while&#39;,
+            # C
+            &#39;auto&#39;, &#39;break&#39;, &#39;case&#39;, &#39;char&#39;, &#39;const&#39;, &#39;continue&#39;, &#39;default&#39;,
+            &#39;do&#39;, &#39;double&#39;, &#39;else&#39;, &#39;enum&#39;, &#39;extern&#39;, &#39;float&#39;, &#39;for&#39;, &#39;goto&#39;,
+            &#39;if&#39;, &#39;int&#39;, &#39;long&#39;, &#39;register&#39;, &#39;return&#39;, &#39;short&#39;, &#39;signed&#39;,
+            &#39;sizeof&#39;, &#39;static&#39;, &#39;struct&#39;, &#39;switch&#39;, &#39;typedef&#39;, &#39;union&#39;,
+            &#39;unsigned&#39;, &#39;void&#39;, &#39;volatile&#39;, &#39;while&#39;,
+            # JavaScript
+            &#39;abstract&#39;, &#39;arguments&#39;, &#39;boolean&#39;, &#39;break&#39;, &#39;byte&#39;, &#39;case&#39;, &#39;catch&#39;,
+            &#39;char&#39;, &#39;class&#39;, &#39;const&#39;, &#39;continue&#39;, &#39;debugger&#39;, &#39;default&#39;, &#39;delete&#39;,
+            &#39;do&#39;, &#39;double&#39;, &#39;else&#39;, &#39;enum&#39;, &#39;eval&#39;, &#39;export&#39;, &#39;extends&#39;, &#39;false&#39;,
+            &#39;final&#39;, &#39;finally&#39;, &#39;float&#39;, &#39;for&#39;, &#39;function&#39;, &#39;goto&#39;, &#39;if&#39;,
+            &#39;implements&#39;, &#39;import&#39;, &#39;in&#39;, &#39;instanceof&#39;, &#39;int&#39;, &#39;interface&#39;, &#39;let&#39;,
+            &#39;long&#39;, &#39;native&#39;, &#39;new&#39;, &#39;null&#39;, &#39;package&#39;, &#39;private&#39;, &#39;protected&#39;,
+            &#39;public&#39;, &#39;return&#39;, &#39;short&#39;, &#39;static&#39;, &#39;super&#39;, &#39;switch&#39;,
+            &#39;synchronized&#39;, &#39;this&#39;, &#39;throw&#39;, &#39;throws&#39;, &#39;transient&#39;, &#39;true&#39;, &#39;try&#39;,
+            &#39;typeof&#39;, &#39;var&#39;, &#39;void&#39;, &#39;volatile&#39;, &#39;while&#39;, &#39;with&#39;, &#39;yield&#39;,
+            # Verilog
+            &#39;module&#39;, &#39;endmodule&#39;, &#39;input&#39;, &#39;output&#39;, &#39;inout&#39;, &#39;wire&#39;, &#39;reg&#39;,
+            &#39;parameter&#39;, &#39;localparam&#39;, &#39;assign&#39;, &#39;always&#39;, &#39;initial&#39;, &#39;begin&#39;,
+            &#39;end&#39;, &#39;if&#39;, &#39;else&#39;, &#39;case&#39;, &#39;endcase&#39;, &#39;for&#39;, &#39;while&#39;, &#39;repeat&#39;,
+            &#39;forever&#39;, &#39;function&#39;, &#39;endfunction&#39;, &#39;task&#39;, &#39;endtask&#39;
+        }
+
+        # Must start with uppercase letter (PascalCase)
+        if not name[0].isupper():
+            return False, &#34;Identifier must start with an uppercase letter (PascalCase)&#34;
+
+        # Must be alphanumeric only
+        if not name.isalnum():
+            return False, &#34;Identifier must contain only alphanumeric characters&#34;
+
+        # Check for reserved keywords
+        if name in reserved_keywords or name.lower() in reserved_keywords:
+            return False, f&#34;&#39;{name}&#39; is a reserved keyword in one or more target languages&#34;
+
+        # Length check
+        if len(name) &lt; 2:
+            return False, &#34;Identifier must be at least 2 characters long&#34;
+        if len(name) &gt; 64:
+            return False, &#34;Identifier must be 64 characters or less&#34;
+
+        return True, None
+
+    @staticmethod
+    def generate_directory_structure(mapping: NamespaceMapping) -&gt; dict[str, str]:
+        &#34;&#34;&#34;
+        Generate directory structure for each language target.
+
+        Args:
+            mapping: NamespaceMapping instance.
+
+        Returns:
+            Dictionary mapping language to relative directory path.
+        &#34;&#34;&#34;
+        return {
+            &#39;python&#39;: f&#34;atomik/{mapping.vertical}/{mapping.field}&#34;,
+            &#39;rust&#39;: f&#34;src/{mapping.vertical.lower()}/{mapping.field.lower()}&#34;,
+            &#39;c&#39;: f&#34;atomik/{mapping.vertical.lower()}/{mapping.field.lower()}&#34;,
+            &#39;javascript&#39;: f&#34;packages/{mapping.vertical.lower()}/{mapping.field.lower()}&#34;,
+            &#39;verilog&#39;: f&#34;rtl/{mapping.vertical.lower()}/{mapping.field.lower()}&#34;
+        }</code></pre>
+</details>
+<div class="desc"><p>Maps ATOMiK catalogue metadata to target language namespaces.</p>
+<h2 id="example">Example</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; mapper = NamespaceMapper()
+&gt;&gt;&gt; catalogue = {
+...     &quot;vertical&quot;: &quot;Video&quot;,
+...     &quot;field&quot;: &quot;Stream&quot;,
+...     &quot;object&quot;: &quot;H264Delta&quot;
+... }
+&gt;&gt;&gt; mapping = mapper.map_catalogue(catalogue)
+&gt;&gt;&gt; print(mapping.python_import_statement)
+from atomik.Video.Stream import H264Delta
+</code></pre></div>
+<h3>Static methods</h3>
+<dl>
+<dt id="atomik_sdk.generator.namespace_mapper.NamespaceMapper.generate_directory_structure"><code class="name flex">
+<span>def <span class="ident">generate_directory_structure</span></span>(<span>mapping: <a title="atomik_sdk.generator.namespace_mapper.NamespaceMapping" href="#atomik_sdk.generator.namespace_mapper.NamespaceMapping">NamespaceMapping</a>) ‑> dict[str, str]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@staticmethod
+def generate_directory_structure(mapping: NamespaceMapping) -&gt; dict[str, str]:
+    &#34;&#34;&#34;
+    Generate directory structure for each language target.
+
+    Args:
+        mapping: NamespaceMapping instance.
+
+    Returns:
+        Dictionary mapping language to relative directory path.
+    &#34;&#34;&#34;
+    return {
+        &#39;python&#39;: f&#34;atomik/{mapping.vertical}/{mapping.field}&#34;,
+        &#39;rust&#39;: f&#34;src/{mapping.vertical.lower()}/{mapping.field.lower()}&#34;,
+        &#39;c&#39;: f&#34;atomik/{mapping.vertical.lower()}/{mapping.field.lower()}&#34;,
+        &#39;javascript&#39;: f&#34;packages/{mapping.vertical.lower()}/{mapping.field.lower()}&#34;,
+        &#39;verilog&#39;: f&#34;rtl/{mapping.vertical.lower()}/{mapping.field.lower()}&#34;
+    }</code></pre>
+</details>
+<div class="desc"><p>Generate directory structure for each language target.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>mapping</code></strong></dt>
+<dd>NamespaceMapping instance.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>Dictionary mapping language to relative directory path.</p></div>
+</dd>
+<dt id="atomik_sdk.generator.namespace_mapper.NamespaceMapper.map_catalogue"><code class="name flex">
+<span>def <span class="ident">map_catalogue</span></span>(<span>catalogue: dict[str, Any]) ‑> <a title="atomik_sdk.generator.namespace_mapper.NamespaceMapping" href="#atomik_sdk.generator.namespace_mapper.NamespaceMapping">NamespaceMapping</a></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@staticmethod
+def map_catalogue(catalogue: dict[str, Any]) -&gt; NamespaceMapping:
+    &#34;&#34;&#34;
+    Map catalogue metadata to language-specific namespaces.
+
+    Args:
+        catalogue: Dictionary containing vertical, field, object keys.
+
+    Returns:
+        NamespaceMapping with paths for all target languages.
+    &#34;&#34;&#34;
+    vertical = catalogue.get(&#39;vertical&#39;, &#39;Unknown&#39;)
+    field = catalogue.get(&#39;field&#39;, &#39;Unknown&#39;)
+    obj = catalogue.get(&#39;object&#39;, &#39;Unknown&#39;)
+
+    # Convert to lowercase for case-sensitive languages
+    vertical_lower = vertical.lower()
+    field_lower = field.lower()
+    obj.lower()
+
+    # Convert PascalCase to snake_case for C
+    obj_snake = NamespaceMapper._to_snake_case(obj)
+
+    # Python (preserves PascalCase for classes)
+    python_module_path = f&#34;atomik.{vertical}.{field}&#34;
+    python_import = f&#34;from atomik.{vertical}.{field} import {obj}&#34;
+
+    # Rust (uses lowercase with :: separators)
+    rust_path = f&#34;atomik::{vertical_lower}::{field_lower}::{obj}&#34;
+    rust_use = f&#34;use atomik::{vertical_lower}::{field_lower}::{obj};&#34;
+
+    # C (uses lowercase with / separators and snake_case for filenames)
+    c_include_path = f&#34;atomik/{vertical_lower}/{field_lower}/{obj_snake}.h&#34;
+    c_include = f&#34;#include &lt;atomik/{vertical_lower}/{field_lower}/{obj_snake}.h&gt;&#34;
+
+    # JavaScript (uses lowercase with / separators, scoped package)
+    javascript_package = f&#34;@atomik/{vertical_lower}/{field_lower}&#34;
+    javascript_require = (
+        f&#34;const {{{obj}}} = require(&#39;@atomik/{vertical_lower}/{field_lower}&#39;);&#34;
+    )
+
+    # Verilog (uses snake_case with underscores)
+    verilog_module = f&#34;atomik_{vertical_lower}_{field_lower}_{obj_snake}&#34;
+
+    return NamespaceMapping(
+        vertical=vertical,
+        field=field,
+        object=obj,
+        python_module_path=python_module_path,
+        python_import_statement=python_import,
+        rust_path=rust_path,
+        rust_use_statement=rust_use,
+        c_include_path=c_include_path,
+        c_include_statement=c_include,
+        javascript_package=javascript_package,
+        javascript_require_statement=javascript_require,
+        verilog_module_name=verilog_module
+    )</code></pre>
+</details>
+<div class="desc"><p>Map catalogue metadata to language-specific namespaces.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>catalogue</code></strong></dt>
+<dd>Dictionary containing vertical, field, object keys.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>NamespaceMapping with paths for all target languages.</p></div>
+</dd>
+<dt id="atomik_sdk.generator.namespace_mapper.NamespaceMapper.validate_identifier"><code class="name flex">
+<span>def <span class="ident">validate_identifier</span></span>(<span>name: str) ‑> tuple[bool, str | None]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@staticmethod
+def validate_identifier(name: str) -&gt; tuple[bool, str | None]:
+    &#34;&#34;&#34;
+    Validate that an identifier is valid across all target languages.
+
+    Args:
+        name: Identifier name to validate.
+
+    Returns:
+        Tuple of (valid: bool, error_message: str | None)
+    &#34;&#34;&#34;
+    # Reserved keywords across all languages
+    reserved_keywords = {
+        # Python
+        &#39;False&#39;, &#39;None&#39;, &#39;True&#39;, &#39;and&#39;, &#39;as&#39;, &#39;assert&#39;, &#39;async&#39;, &#39;await&#39;,
+        &#39;break&#39;, &#39;class&#39;, &#39;continue&#39;, &#39;def&#39;, &#39;del&#39;, &#39;elif&#39;, &#39;else&#39;, &#39;except&#39;,
+        &#39;finally&#39;, &#39;for&#39;, &#39;from&#39;, &#39;global&#39;, &#39;if&#39;, &#39;import&#39;, &#39;in&#39;, &#39;is&#39;,
+        &#39;lambda&#39;, &#39;nonlocal&#39;, &#39;not&#39;, &#39;or&#39;, &#39;pass&#39;, &#39;raise&#39;, &#39;return&#39;, &#39;try&#39;,
+        &#39;while&#39;, &#39;with&#39;, &#39;yield&#39;,
+        # Rust
+        &#39;as&#39;, &#39;break&#39;, &#39;const&#39;, &#39;continue&#39;, &#39;crate&#39;, &#39;else&#39;, &#39;enum&#39;, &#39;extern&#39;,
+        &#39;false&#39;, &#39;fn&#39;, &#39;for&#39;, &#39;if&#39;, &#39;impl&#39;, &#39;in&#39;, &#39;let&#39;, &#39;loop&#39;, &#39;match&#39;,
+        &#39;mod&#39;, &#39;move&#39;, &#39;mut&#39;, &#39;pub&#39;, &#39;ref&#39;, &#39;return&#39;, &#39;self&#39;, &#39;Self&#39;,
+        &#39;static&#39;, &#39;struct&#39;, &#39;super&#39;, &#39;trait&#39;, &#39;true&#39;, &#39;type&#39;, &#39;unsafe&#39;,
+        &#39;use&#39;, &#39;where&#39;, &#39;while&#39;,
+        # C
+        &#39;auto&#39;, &#39;break&#39;, &#39;case&#39;, &#39;char&#39;, &#39;const&#39;, &#39;continue&#39;, &#39;default&#39;,
+        &#39;do&#39;, &#39;double&#39;, &#39;else&#39;, &#39;enum&#39;, &#39;extern&#39;, &#39;float&#39;, &#39;for&#39;, &#39;goto&#39;,
+        &#39;if&#39;, &#39;int&#39;, &#39;long&#39;, &#39;register&#39;, &#39;return&#39;, &#39;short&#39;, &#39;signed&#39;,
+        &#39;sizeof&#39;, &#39;static&#39;, &#39;struct&#39;, &#39;switch&#39;, &#39;typedef&#39;, &#39;union&#39;,
+        &#39;unsigned&#39;, &#39;void&#39;, &#39;volatile&#39;, &#39;while&#39;,
+        # JavaScript
+        &#39;abstract&#39;, &#39;arguments&#39;, &#39;boolean&#39;, &#39;break&#39;, &#39;byte&#39;, &#39;case&#39;, &#39;catch&#39;,
+        &#39;char&#39;, &#39;class&#39;, &#39;const&#39;, &#39;continue&#39;, &#39;debugger&#39;, &#39;default&#39;, &#39;delete&#39;,
+        &#39;do&#39;, &#39;double&#39;, &#39;else&#39;, &#39;enum&#39;, &#39;eval&#39;, &#39;export&#39;, &#39;extends&#39;, &#39;false&#39;,
+        &#39;final&#39;, &#39;finally&#39;, &#39;float&#39;, &#39;for&#39;, &#39;function&#39;, &#39;goto&#39;, &#39;if&#39;,
+        &#39;implements&#39;, &#39;import&#39;, &#39;in&#39;, &#39;instanceof&#39;, &#39;int&#39;, &#39;interface&#39;, &#39;let&#39;,
+        &#39;long&#39;, &#39;native&#39;, &#39;new&#39;, &#39;null&#39;, &#39;package&#39;, &#39;private&#39;, &#39;protected&#39;,
+        &#39;public&#39;, &#39;return&#39;, &#39;short&#39;, &#39;static&#39;, &#39;super&#39;, &#39;switch&#39;,
+        &#39;synchronized&#39;, &#39;this&#39;, &#39;throw&#39;, &#39;throws&#39;, &#39;transient&#39;, &#39;true&#39;, &#39;try&#39;,
+        &#39;typeof&#39;, &#39;var&#39;, &#39;void&#39;, &#39;volatile&#39;, &#39;while&#39;, &#39;with&#39;, &#39;yield&#39;,
+        # Verilog
+        &#39;module&#39;, &#39;endmodule&#39;, &#39;input&#39;, &#39;output&#39;, &#39;inout&#39;, &#39;wire&#39;, &#39;reg&#39;,
+        &#39;parameter&#39;, &#39;localparam&#39;, &#39;assign&#39;, &#39;always&#39;, &#39;initial&#39;, &#39;begin&#39;,
+        &#39;end&#39;, &#39;if&#39;, &#39;else&#39;, &#39;case&#39;, &#39;endcase&#39;, &#39;for&#39;, &#39;while&#39;, &#39;repeat&#39;,
+        &#39;forever&#39;, &#39;function&#39;, &#39;endfunction&#39;, &#39;task&#39;, &#39;endtask&#39;
+    }
+
+    # Must start with uppercase letter (PascalCase)
+    if not name[0].isupper():
+        return False, &#34;Identifier must start with an uppercase letter (PascalCase)&#34;
+
+    # Must be alphanumeric only
+    if not name.isalnum():
+        return False, &#34;Identifier must contain only alphanumeric characters&#34;
+
+    # Check for reserved keywords
+    if name in reserved_keywords or name.lower() in reserved_keywords:
+        return False, f&#34;&#39;{name}&#39; is a reserved keyword in one or more target languages&#34;
+
+    # Length check
+    if len(name) &lt; 2:
+        return False, &#34;Identifier must be at least 2 characters long&#34;
+    if len(name) &gt; 64:
+        return False, &#34;Identifier must be 64 characters or less&#34;
+
+    return True, None</code></pre>
+</details>
+<div class="desc"><p>Validate that an identifier is valid across all target languages.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>name</code></strong></dt>
+<dd>Identifier name to validate.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>Tuple of (valid: bool, error_message: str | None)</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.generator.namespace_mapper.NamespaceMapping"><code class="flex name class">
+<span>class <span class="ident">NamespaceMapping</span></span>
+<span>(</span><span>vertical: str,<br>field: str,<br>object: str,<br>python_module_path: str,<br>python_import_statement: str,<br>rust_path: str,<br>rust_use_statement: str,<br>c_include_path: str,<br>c_include_statement: str,<br>javascript_package: str,<br>javascript_require_statement: str,<br>verilog_module_name: str)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass
+class NamespaceMapping:
+    &#34;&#34;&#34;Namespace mapping for different target languages.&#34;&#34;&#34;
+
+    vertical: str
+    field: str
+    object: str
+
+    # Python: from atomik.Video.Stream import H264Delta
+    python_module_path: str
+    python_import_statement: str
+
+    # Rust: use atomik::video::stream::H264Delta;
+    rust_path: str
+    rust_use_statement: str
+
+    # C: #include &lt;atomik/video/stream/h264_delta.h&gt;
+    c_include_path: str
+    c_include_statement: str
+
+    # JavaScript: const {H264Delta} = require(&#39;@atomik/video/stream&#39;);
+    javascript_package: str
+    javascript_require_statement: str
+
+    # Verilog: module atomik_video_stream_h264_delta
+    verilog_module_name: str</code></pre>
+</details>
+<div class="desc"><p>Namespace mapping for different target languages.</p></div>
+<h3>Instance variables</h3>
+<dl>
+<dt id="atomik_sdk.generator.namespace_mapper.NamespaceMapping.c_include_path"><code class="name">var <span class="ident">c_include_path</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.generator.namespace_mapper.NamespaceMapping.c_include_statement"><code class="name">var <span class="ident">c_include_statement</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.generator.namespace_mapper.NamespaceMapping.field"><code class="name">var <span class="ident">field</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.generator.namespace_mapper.NamespaceMapping.javascript_package"><code class="name">var <span class="ident">javascript_package</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.generator.namespace_mapper.NamespaceMapping.javascript_require_statement"><code class="name">var <span class="ident">javascript_require_statement</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.generator.namespace_mapper.NamespaceMapping.object"><code class="name">var <span class="ident">object</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.generator.namespace_mapper.NamespaceMapping.python_import_statement"><code class="name">var <span class="ident">python_import_statement</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.generator.namespace_mapper.NamespaceMapping.python_module_path"><code class="name">var <span class="ident">python_module_path</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.generator.namespace_mapper.NamespaceMapping.rust_path"><code class="name">var <span class="ident">rust_path</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.generator.namespace_mapper.NamespaceMapping.rust_use_statement"><code class="name">var <span class="ident">rust_use_statement</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.generator.namespace_mapper.NamespaceMapping.verilog_module_name"><code class="name">var <span class="ident">verilog_module_name</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.generator.namespace_mapper.NamespaceMapping.vertical"><code class="name">var <span class="ident">vertical</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="atomik_sdk.generator" href="index.html">atomik_sdk.generator</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="atomik_sdk.generator.namespace_mapper.NamespaceMapper" href="#atomik_sdk.generator.namespace_mapper.NamespaceMapper">NamespaceMapper</a></code></h4>
+<ul class="">
+<li><code><a title="atomik_sdk.generator.namespace_mapper.NamespaceMapper.generate_directory_structure" href="#atomik_sdk.generator.namespace_mapper.NamespaceMapper.generate_directory_structure">generate_directory_structure</a></code></li>
+<li><code><a title="atomik_sdk.generator.namespace_mapper.NamespaceMapper.map_catalogue" href="#atomik_sdk.generator.namespace_mapper.NamespaceMapper.map_catalogue">map_catalogue</a></code></li>
+<li><code><a title="atomik_sdk.generator.namespace_mapper.NamespaceMapper.validate_identifier" href="#atomik_sdk.generator.namespace_mapper.NamespaceMapper.validate_identifier">validate_identifier</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.generator.namespace_mapper.NamespaceMapping" href="#atomik_sdk.generator.namespace_mapper.NamespaceMapping">NamespaceMapping</a></code></h4>
+<ul class="">
+<li><code><a title="atomik_sdk.generator.namespace_mapper.NamespaceMapping.c_include_path" href="#atomik_sdk.generator.namespace_mapper.NamespaceMapping.c_include_path">c_include_path</a></code></li>
+<li><code><a title="atomik_sdk.generator.namespace_mapper.NamespaceMapping.c_include_statement" href="#atomik_sdk.generator.namespace_mapper.NamespaceMapping.c_include_statement">c_include_statement</a></code></li>
+<li><code><a title="atomik_sdk.generator.namespace_mapper.NamespaceMapping.field" href="#atomik_sdk.generator.namespace_mapper.NamespaceMapping.field">field</a></code></li>
+<li><code><a title="atomik_sdk.generator.namespace_mapper.NamespaceMapping.javascript_package" href="#atomik_sdk.generator.namespace_mapper.NamespaceMapping.javascript_package">javascript_package</a></code></li>
+<li><code><a title="atomik_sdk.generator.namespace_mapper.NamespaceMapping.javascript_require_statement" href="#atomik_sdk.generator.namespace_mapper.NamespaceMapping.javascript_require_statement">javascript_require_statement</a></code></li>
+<li><code><a title="atomik_sdk.generator.namespace_mapper.NamespaceMapping.object" href="#atomik_sdk.generator.namespace_mapper.NamespaceMapping.object">object</a></code></li>
+<li><code><a title="atomik_sdk.generator.namespace_mapper.NamespaceMapping.python_import_statement" href="#atomik_sdk.generator.namespace_mapper.NamespaceMapping.python_import_statement">python_import_statement</a></code></li>
+<li><code><a title="atomik_sdk.generator.namespace_mapper.NamespaceMapping.python_module_path" href="#atomik_sdk.generator.namespace_mapper.NamespaceMapping.python_module_path">python_module_path</a></code></li>
+<li><code><a title="atomik_sdk.generator.namespace_mapper.NamespaceMapping.rust_path" href="#atomik_sdk.generator.namespace_mapper.NamespaceMapping.rust_path">rust_path</a></code></li>
+<li><code><a title="atomik_sdk.generator.namespace_mapper.NamespaceMapping.rust_use_statement" href="#atomik_sdk.generator.namespace_mapper.NamespaceMapping.rust_use_statement">rust_use_statement</a></code></li>
+<li><code><a title="atomik_sdk.generator.namespace_mapper.NamespaceMapping.verilog_module_name" href="#atomik_sdk.generator.namespace_mapper.NamespaceMapping.verilog_module_name">verilog_module_name</a></code></li>
+<li><code><a title="atomik_sdk.generator.namespace_mapper.NamespaceMapping.vertical" href="#atomik_sdk.generator.namespace_mapper.NamespaceMapping.vertical">vertical</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+</body>
+</html>
