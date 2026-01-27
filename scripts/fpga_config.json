@@ -1,0 +1,16 @@
+{
+  "openFPGALoader": "openFPGALoader",
+  "iverilog": "iverilog",
+  "vvp": "vvp",
+  "board": "tangnano9k",
+  "bitstream": "impl/pnr/ATOMiK.fs",
+  "uart_baudrate": 115200,
+  "rtl_files": [
+    "rtl/atomik_delta_acc.v",
+    "rtl/atomik_state_rec.v",
+    "rtl/atomik_core_v2.v"
+  ],
+  "testbench": "sim/tb_core_v2.v",
+  "post_program_delay_s": 3.0,
+  "usb_vid_pid": ["0403:6010"]
+}

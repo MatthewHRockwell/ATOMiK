@@ -7,6 +7,8 @@ import sys
 import tempfile
 from pathlib import Path
 
+import pytest
+
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from generator.core import GeneratorConfig, GeneratorEngine
@@ -24,8 +26,7 @@ def test_python_generation():
     examples_dir = project_root / "sdk" / "schemas" / "examples"
 
     if not examples_dir.exists():
-        print(f"[WARN] Examples directory not found: {examples_dir}")
-        return 1
+        pytest.skip(f"Examples directory not found: {examples_dir}")
 
     # Create temporary output directory
     with tempfile.TemporaryDirectory() as temp_dir:
@@ -34,8 +35,7 @@ def test_python_generation():
         # Test each example schema
         examples = list(examples_dir.glob("*.json"))
         if not examples:
-            print("[WARN] No example schemas found")
-            return 1
+            pytest.skip("No example schemas found")
 
         for example_path in examples:
             print(f"Testing {example_path.name}...")
@@ -113,7 +113,6 @@ def test_python_generation():
     print("=" * 70)
     print("Python generation tests complete")
     print("=" * 70)
-    return 0
 
 
 if __name__ == "__main__":

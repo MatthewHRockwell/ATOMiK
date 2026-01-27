@@ -5,7 +5,7 @@
     "object": "TerminalIO",
     "version": "1.0.0",
     "author": "ATOMiK Project",
-    "license": "MIT",
+    "license": "Apache-2.0",
     "description": "Control primitive for terminal I/O operations using delta-based state management. Demonstrates basic command/response pattern with minimal memory footprint."
   },
   "schema": {

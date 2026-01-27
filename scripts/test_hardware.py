@@ -198,7 +198,7 @@ def run_tests(port: str):
         try:
             result = hw.read()
             expected = 0xCAFEBABE12345678  # Should return to initial
-            check(f"Self-inverse (δ ⊕ δ = 0)", result == expected,
+            check("Self-inverse (d XOR d = 0)", result == expected,
                   f"(got 0x{result:016X}, expected 0x{expected:016X})")
         except TimeoutError as e:
             check("Self-inverse", False, str(e))
@@ -216,7 +216,7 @@ def run_tests(port: str):
         try:
             result = hw.read()
             expected = 0xFEDCBA9876543210
-            check(f"Identity (δ = 0 is no-op)", result == expected,
+            check("Identity (d = 0 is no-op)", result == expected,
                   f"(got 0x{result:016X}, expected 0x{expected:016X})")
         except TimeoutError as e:
             check("Identity", False, str(e))
@@ -247,7 +247,7 @@ def run_tests(port: str):
         try:
             result = hw.read()
             expected = initial ^ delta  # Should be 0xFFFFFFFFFFFFFFFF
-            check(f"Reconstruction (S ⊕ δ)", result == expected,
+            check("Reconstruction (S XOR d)", result == expected,
                   f"(got 0x{result:016X}, expected 0x{expected:016X})")
         except TimeoutError as e:
             check("Reconstruction", False, str(e))

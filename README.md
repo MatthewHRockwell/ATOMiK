@@ -329,7 +329,7 @@ The schema-driven code generation pipeline ensures that **every new ATOMiK objec
 | [SDK Developer Guide](docs/SDK_DEVELOPER_GUIDE.md) | SDK architecture and development |
 | [Formal Model](specs/formal_model.md) | Delta-state algebra mathematical specification |
 | [RTL Architecture](specs/rtl_architecture.md) | Hardware design specification and timing |
-| [Schema Specification](docs/SCHEMA_SPECIFICATION.md) | JSON schema format for code generation targets |
+| [Schema Specification](docs/SDK_SCHEMA_GUIDE.md) | JSON schema format for code generation targets |
 | [Phase 4A Report](archive/PHASE_4A_COMPLETION_REPORT.md) | SDK development completion report |
 | [Phase 3 Report](archive/PHASE_3_COMPLETION_REPORT.md) | Hardware synthesis completion report |
 

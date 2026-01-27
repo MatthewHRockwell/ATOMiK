@@ -5,7 +5,7 @@
     "object": "DeltaExchange",
     "version": "1.0.0",
     "author": "ATOMiK Project",
-    "license": "MIT",
+    "license": "Apache-2.0",
     "description": "Peer-to-peer delta synchronization primitive for distributed state management. Enables efficient network state replication with rollback capability for conflict resolution."
   },
   "schema": {

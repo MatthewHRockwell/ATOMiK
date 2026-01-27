@@ -130,3 +130,17 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./docs
+
+  hardware-validate:
+    needs: validate
+    if: contains(github.event.head_commit.message, '[hardware]')
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run FPGA pipeline
+        run: python scripts/fpga_pipeline.py --report hw_results.json
+      - name: Upload hardware results
+        uses: actions/upload-artifact@v4
+        with:
+          name: hardware-validation
+          path: hw_results.json

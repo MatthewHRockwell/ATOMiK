@@ -5,7 +5,7 @@
     "object": "MatrixOps",
     "version": "1.0.0",
     "author": "ATOMiK Project",
-    "license": "MIT",
+    "license": "Apache-2.0",
     "description": "Matrix operations with delta-based computation for efficient incremental updates. Optimized for sparse matrix modifications and iterative algorithms."
   },
   "schema": {

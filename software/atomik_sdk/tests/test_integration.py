@@ -10,6 +10,8 @@ import sys
 import tempfile
 from pathlib import Path
 
+import pytest
+
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from generator.c_generator import CGenerator
@@ -31,14 +33,12 @@ def test_cross_language_integration():
     examples_dir = project_root / "sdk" / "schemas" / "examples"
 
     if not examples_dir.exists():
-        print(f"[WARN] Examples directory not found: {examples_dir}")
-        return 1
+        pytest.skip(f"Examples directory not found: {examples_dir}")
 
     # Test each example schema
     examples = list(examples_dir.glob("*.json"))
     if not examples:
-        print("[WARN] No example schemas found")
-        return 1
+        pytest.skip("No example schemas found")
 
     all_passed = True
 
@@ -154,7 +154,7 @@ def test_cross_language_integration():
         print("Some integration tests FAILED")
     print("=" * 70)
 
-    return 0 if all_passed else 1
+    assert all_passed, "Some cross-language integration tests failed"
 
 
 def check_operations_present(output_dir: Path, results: dict) -> bool:
@@ -234,13 +234,11 @@ def test_schema_summary():
     examples_dir = project_root / "sdk" / "schemas" / "examples"
 
     if not examples_dir.exists():
-        print("[WARN] Examples directory not found")
-        return 1
+        pytest.skip("Examples directory not found")
 
     examples = list(examples_dir.glob("*.json"))
     if not examples:
-        print("[WARN] No example schemas found")
-        return 1
+        pytest.skip("No example schemas found")
 
     for example_path in examples:
         print(f"Schema: {example_path.name}")
@@ -271,7 +269,6 @@ def test_schema_summary():
     print("=" * 70)
     print("Schema summary tests complete")
     print("=" * 70)
-    return 0
 
 
 def test_multi_language_generation():
@@ -285,8 +282,7 @@ def test_multi_language_generation():
     schema_path = project_root / "sdk" / "schemas" / "examples" / "terminal-io.json"
 
     if not schema_path.exists():
-        print("[WARN] terminal-io.json not found")
-        return 1
+        pytest.skip("terminal-io.json not found")
 
     with tempfile.TemporaryDirectory() as temp_dir:
         output_dir = Path(temp_dir)
@@ -328,7 +324,6 @@ def test_multi_language_generation():
     print("=" * 70)
     print("Multi-language generation tests complete")
     print("=" * 70)
-    return 0
 
 
 def main():
@@ -341,35 +336,40 @@ def main():
 
     exit_code = 0
 
+    # Test 1: Cross-language integration
     try:
-        # Test 1: Cross-language integration
-        result = test_cross_language_integration()
-        if result != 0:
-            exit_code = result
-
-        # Test 2: Schema summary
-        result = test_schema_summary()
-        if result != 0:
-            exit_code = result
-
-        # Test 3: Multi-language generation
-        result = test_multi_language_generation()
-        if result != 0:
-            exit_code = result
-
-        print()
-        print("*" * 70)
-        if exit_code == 0:
-            print("ALL INTEGRATION TESTS PASSED")
-        else:
-            print("SOME INTEGRATION TESTS FAILED")
-        print("*" * 70)
-
+        test_cross_language_integration()
+    except (SystemExit, KeyboardInterrupt):
+        raise
     except Exception as e:
-        print(f"FATAL ERROR: {e}")
-        import traceback
-        traceback.print_exc()
+        print(f"FAILED: {e}")
         exit_code = 1
+
+    # Test 2: Schema summary
+    try:
+        test_schema_summary()
+    except (SystemExit, KeyboardInterrupt):
+        raise
+    except Exception as e:
+        print(f"FAILED: {e}")
+        exit_code = 1
+
+    # Test 3: Multi-language generation
+    try:
+        test_multi_language_generation()
+    except (SystemExit, KeyboardInterrupt):
+        raise
+    except Exception as e:
+        print(f"FAILED: {e}")
+        exit_code = 1
+
+    print()
+    print("*" * 70)
+    if exit_code == 0:
+        print("ALL INTEGRATION TESTS PASSED")
+    else:
+        print("SOME INTEGRATION TESTS FAILED")
+    print("*" * 70)
 
     return exit_code
 
