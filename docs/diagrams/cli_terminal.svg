@@ -58,26 +58,26 @@
   <!-- === OPTIONS HEADER === -->
   <text x="42" y="272" font-size="13" fill="#cdd6f4">Options:</text>
 
-  <!-- --output-dir -->
+  <!-- output-dir option -->
   <text x="62" y="294" font-size="13" fill="#89b4fa">--output-dir</text>
   <text x="164" y="294" font-size="13" fill="#6c7086">DIR</text>
   <text x="310" y="294" font-size="13" fill="#a6adc8">Output directory (default: generated)</text>
 
-  <!-- --languages -->
+  <!-- languages option -->
   <text x="62" y="314" font-size="13" fill="#89b4fa">--languages</text>
   <text x="156" y="314" font-size="13" fill="#6c7086">LANG [...]</text>
   <text x="310" y="314" font-size="13" fill="#a6adc8">Target languages (default: all 5)</text>
 
-  <!-- --report -->
+  <!-- report option -->
   <text x="62" y="334" font-size="13" fill="#89b4fa">--report</text>
   <text x="130" y="334" font-size="13" fill="#6c7086">FILE</text>
   <text x="310" y="334" font-size="13" fill="#a6adc8">Write JSON report to file</text>
 
-  <!-- --verbose -->
+  <!-- verbose option -->
   <text x="62" y="354" font-size="13" fill="#89b4fa">-v, --verbose</text>
   <text x="310" y="354" font-size="13" fill="#a6adc8">Verbose output</text>
 
-  <!-- --version -->
+  <!-- version option -->
   <text x="62" y="374" font-size="13" fill="#89b4fa">--version</text>
   <text x="310" y="374" font-size="13" fill="#a6adc8">Show version and exit</text>
 
