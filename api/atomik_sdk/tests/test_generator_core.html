@@ -164,6 +164,9 @@ def valid_schema():
     class MockGenerator(CodeEmitter):
         &#34;&#34;&#34;Mock generator for testing.&#34;&#34;&#34;
 
+        def __init__(self):
+            super().__init__(&#39;mock&#39;)
+
         def generate(self, schema, namespace):
             files = [
                 GeneratedFile(

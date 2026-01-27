@@ -232,7 +232,7 @@ Matches the Phase 3 hardware architecture.</p>
             lines.append(&#34;        end else if (rollback_en &amp;&amp; history_count &gt; 0) begin&#34;)
             lines.append(&#34;            // Rollback: XOR out the last delta&#34;)
             lines.append(f&#34;            history_head &lt;= (history_head - 1 + {history_depth}) % {history_depth};&#34;)
-            lines.append(&#34;            accumulator &lt;= accumulator ^ history[history_head - 1];&#34;)
+            lines.append(f&#34;            accumulator &lt;= accumulator ^ history[(history_head - 1 + {history_depth}) % {history_depth}];&#34;)
             lines.append(&#34;            history_count &lt;= history_count - 1;&#34;)
         lines.append(&#34;        end&#34;)
         lines.append(&#34;    end&#34;)
@@ -339,7 +339,7 @@ Matches the Phase 3 hardware architecture.</p>
         # Test sequence
         lines.append(&#34;    // Test sequence&#34;)
         lines.append(&#34;    initial begin&#34;)
-        lines.append(&#39;        $display(&#34;=== Starting testbench for %s ===&#34;, dut.INST_NAME);&#39;)
+        lines.append(f&#39;        $display(&#34;=== Starting testbench for {module_name} ===&#34;);&#39;)
         lines.append(&#34;&#34;)
         lines.append(&#34;        // Initialize signals&#34;)
         lines.append(&#34;        rst_n = 0;&#34;)

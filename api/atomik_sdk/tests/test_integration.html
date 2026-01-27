@@ -47,6 +47,81 @@ Validates that all generators produce code with matching behavior.</p>
 <section>
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
+<dt id="atomik_sdk.tests.test_integration.check_operations_present"><code class="name flex">
+<span>def <span class="ident">check_operations_present</span></span>(<span>output_dir: pathlib.Path, results: dict) ‑> bool</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def check_operations_present(output_dir: Path, results: dict) -&gt; bool:
+    &#34;&#34;&#34;Verify that key operations are present in generated code.&#34;&#34;&#34;
+    operations_to_check = [&#39;load&#39;, &#39;accumulate&#39;, &#39;reconstruct&#39;]
+    all_present = True
+
+    # Check Python files
+    python_files = list(output_dir.glob(&#34;atomik/**/*.py&#34;))
+    if python_files:
+        for pyfile in python_files:
+            if pyfile.name == &#39;__init__.py&#39;:
+                continue
+            with open(pyfile) as f:
+                content = f.read().lower()
+                for op in operations_to_check:
+                    if op not in content:
+                        all_present = False
+
+    # Check Rust files
+    rust_files = list(output_dir.glob(&#34;src/**/*.rs&#34;))
+    if rust_files:
+        for rsfile in rust_files:
+            if rsfile.name == &#39;lib.rs&#39; or rsfile.name == &#39;mod.rs&#39;:
+                continue
+            with open(rsfile) as f:
+                content = f.read().lower()
+                for op in operations_to_check:
+                    if op not in content:
+                        all_present = False
+
+    # Check C files
+    c_files = list(output_dir.glob(&#34;atomik/**/*.c&#34;))
+    if c_files:
+        for cfile in c_files:
+            with open(cfile) as f:
+                content = f.read().lower()
+                for op in operations_to_check:
+                    if op not in content:
+                        all_present = False
+
+    # Check Verilog files
+    verilog_files = list(output_dir.glob(&#34;rtl/**/*.v&#34;))
+    if verilog_files:
+        for vfile in verilog_files:
+            if vfile.name.startswith(&#39;tb_&#39;):
+                continue
+            with open(vfile) as f:
+                content = f.read().lower()
+                # Verilog uses different names
+                verilog_ops = [&#39;load&#39;, &#39;accumulate&#39;, &#39;read&#39;]
+                for op in verilog_ops:
+                    if op not in content:
+                        all_present = False
+
+    # Check JavaScript files
+    js_files = list(output_dir.glob(&#34;src/**/*.js&#34;))
+    if js_files:
+        for jsfile in js_files:
+            with open(jsfile) as f:
+                content = f.read().lower()
+                for op in operations_to_check:
+                    if op not in content:
+                        all_present = False
+
+    return all_present</code></pre>
+</details>
+<div class="desc"><p>Verify that key operations are present in generated code.</p></div>
+</dd>
 <dt id="atomik_sdk.tests.test_integration.main"><code class="name flex">
 <span>def <span class="ident">main</span></span>(<span>)</span>
 </code></dt>
@@ -217,7 +292,7 @@ Validates that all generators produce code with matching behavior.</p>
                 print(f&#34;  [INFO] File counts: {file_counts}&#34;)
 
                 # Verify key operations are present in generated files
-                operations_present = test_operations_present(output_dir, results)
+                operations_present = check_operations_present(output_dir, results)
                 if operations_present:
                     print(&#34;  [PASS] All operations present in generated code&#34;)
                 else:
@@ -311,81 +386,6 @@ Validates that all generators produce code with matching behavior.</p>
 </details>
 <div class="desc"><p>Test generating multiple languages simultaneously.</p></div>
 </dd>
-<dt id="atomik_sdk.tests.test_integration.test_operations_present"><code class="name flex">
-<span>def <span class="ident">test_operations_present</span></span>(<span>output_dir: pathlib.Path, results: dict) ‑> bool</span>
-</code></dt>
-<dd>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def test_operations_present(output_dir: Path, results: dict) -&gt; bool:
-    &#34;&#34;&#34;Verify that key operations are present in generated code.&#34;&#34;&#34;
-    operations_to_check = [&#39;load&#39;, &#39;accumulate&#39;, &#39;reconstruct&#39;]
-    all_present = True
-
-    # Check Python files
-    python_files = list(output_dir.glob(&#34;atomik/**/*.py&#34;))
-    if python_files:
-        for pyfile in python_files:
-            if pyfile.name == &#39;__init__.py&#39;:
-                continue
-            with open(pyfile) as f:
-                content = f.read().lower()
-                for op in operations_to_check:
-                    if op not in content:
-                        all_present = False
-
-    # Check Rust files
-    rust_files = list(output_dir.glob(&#34;src/**/*.rs&#34;))
-    if rust_files:
-        for rsfile in rust_files:
-            if rsfile.name == &#39;lib.rs&#39; or rsfile.name == &#39;mod.rs&#39;:
-                continue
-            with open(rsfile) as f:
-                content = f.read().lower()
-                for op in operations_to_check:
-                    if op not in content:
-                        all_present = False
-
-    # Check C files
-    c_files = list(output_dir.glob(&#34;atomik/**/*.c&#34;))
-    if c_files:
-        for cfile in c_files:
-            with open(cfile) as f:
-                content = f.read().lower()
-                for op in operations_to_check:
-                    if op not in content:
-                        all_present = False
-
-    # Check Verilog files
-    verilog_files = list(output_dir.glob(&#34;rtl/**/*.v&#34;))
-    if verilog_files:
-        for vfile in verilog_files:
-            if vfile.name.startswith(&#39;tb_&#39;):
-                continue
-            with open(vfile) as f:
-                content = f.read().lower()
-                # Verilog uses different names
-                verilog_ops = [&#39;load&#39;, &#39;accumulate&#39;, &#39;read&#39;]
-                for op in verilog_ops:
-                    if op not in content:
-                        all_present = False
-
-    # Check JavaScript files
-    js_files = list(output_dir.glob(&#34;src/**/*.js&#34;))
-    if js_files:
-        for jsfile in js_files:
-            with open(jsfile) as f:
-                content = f.read().lower()
-                for op in operations_to_check:
-                    if op not in content:
-                        all_present = False
-
-    return all_present</code></pre>
-</details>
-<div class="desc"><p>Verify that key operations are present in generated code.</p></div>
-</dd>
 <dt id="atomik_sdk.tests.test_integration.test_schema_summary"><code class="name flex">
 <span>def <span class="ident">test_schema_summary</span></span>(<span>)</span>
 </code></dt>
@@ -463,10 +463,10 @@ Validates that all generators produce code with matching behavior.</p>
 </li>
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
+<li><code><a title="atomik_sdk.tests.test_integration.check_operations_present" href="#atomik_sdk.tests.test_integration.check_operations_present">check_operations_present</a></code></li>
 <li><code><a title="atomik_sdk.tests.test_integration.main" href="#atomik_sdk.tests.test_integration.main">main</a></code></li>
 <li><code><a title="atomik_sdk.tests.test_integration.test_cross_language_integration" href="#atomik_sdk.tests.test_integration.test_cross_language_integration">test_cross_language_integration</a></code></li>
 <li><code><a title="atomik_sdk.tests.test_integration.test_multi_language_generation" href="#atomik_sdk.tests.test_integration.test_multi_language_generation">test_multi_language_generation</a></code></li>
-<li><code><a title="atomik_sdk.tests.test_integration.test_operations_present" href="#atomik_sdk.tests.test_integration.test_operations_present">test_operations_present</a></code></li>
 <li><code><a title="atomik_sdk.tests.test_integration.test_schema_summary" href="#atomik_sdk.tests.test_integration.test_schema_summary">test_schema_summary</a></code></li>
 </ul>
 </li>
