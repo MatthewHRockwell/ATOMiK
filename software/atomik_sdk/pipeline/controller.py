@@ -3,6 +3,10 @@ ATOMiK Pipeline Controller
 
 Orchestrates the autonomous pipeline: schema intake, stage dispatch,
 token accounting, metrics aggregation, and failure routing.
+
+Supports both sequential (Phase 4C) and event-driven DAG (Phase 5)
+execution modes. The orchestrator is used when use_orchestrator=True
+in PipelineConfig.
 """
 
 from __future__ import annotations
@@ -30,6 +34,9 @@ class PipelineConfig:
     sim_only: bool = False
     skip_synthesis: bool = False
     dry_run: bool = False
+    use_orchestrator: bool = False
+    max_workers: int = 1
+    fail_on_regression: bool = False
 
 
 @dataclass
@@ -85,11 +92,16 @@ class Pipeline:
     def __init__(self, config: PipelineConfig | None = None):
         self.config = config or PipelineConfig()
         self._stages: dict[str, BaseStage] = {}
+        self._stage_deps: dict[str, list[str]] = {}
         self._results: list[PipelineResult] = []
 
-    def register_stage(self, stage: BaseStage) -> None:
-        """Register a pipeline stage."""
+    def register_stage(
+        self, stage: BaseStage, dependencies: list[str] | None = None
+    ) -> None:
+        """Register a pipeline stage with optional dependencies."""
         self._stages[stage.name] = stage
+        if dependencies is not None:
+            self._stage_deps[stage.name] = dependencies
 
     def run(self, schema_path: str | Path) -> PipelineResult:
         """
@@ -120,7 +132,11 @@ class Pipeline:
         if self.config.dry_run:
             return self._dry_run(schema, str(schema_path), result)
 
-        # Execute stages in order
+        # Delegate to orchestrator when enabled
+        if self.config.use_orchestrator:
+            return self._run_orchestrated(schema, str(schema_path), result, start)
+
+        # Execute stages in order (Phase 4C sequential mode)
         previous_manifest = None
         for stage_name in self.STAGE_ORDER:
             stage = self._stages.get(stage_name)
@@ -242,6 +258,68 @@ class Pipeline:
         path.parent.mkdir(parents=True, exist_ok=True)
         with open(path, "w", encoding="utf-8") as f:
             json.dump(result.to_dict(), f, indent=2)
+
+    def _run_orchestrated(
+        self,
+        schema: dict[str, Any],
+        schema_path: str,
+        result: PipelineResult,
+        start: float,
+    ) -> PipelineResult:
+        """Execute pipeline via the event-driven orchestrator."""
+        from .orchestrator import Orchestrator
+
+        orch = Orchestrator(max_workers=self.config.max_workers)
+
+        # Build default linear dependencies if none declared
+        if not self._stage_deps:
+            prev = None
+            for name in self.STAGE_ORDER:
+                if name in self._stages:
+                    deps = [prev] if prev else []
+                    self._stage_deps[name] = deps
+                    prev = name
+
+        for name, stage in self._stages.items():
+            deps = self._stage_deps.get(name, [])
+            orch.register_stage(stage, dependencies=deps)
+
+        manifests = orch.execute(schema, schema_path, self.config)
+
+        # Convert orchestrator output to PipelineResult
+        for stage_name in self.STAGE_ORDER:
+            if stage_name in manifests:
+                result.stages.append(manifests[stage_name])
+
+        # Check for failures
+        for manifest in result.stages:
+            if manifest.status == StageStatus.FAILED:
+                result.success = False
+                result.errors.extend(manifest.errors)
+
+        # Aggregate metrics
+        result.total_time_ms = (time.perf_counter() - start) * 1000
+        result.total_tokens = sum(s.tokens_consumed for s in result.stages)
+
+        for stage in result.stages:
+            result.files_generated += stage.metrics.get("files_generated", 0)
+            result.lines_generated += stage.metrics.get("lines_generated", 0)
+
+        # Determine validation level
+        hw_stages = [s for s in result.stages if s.stage == "hardware"]
+        if hw_stages:
+            result.validation_level = hw_stages[0].validation_level
+        else:
+            verify_stages = [s for s in result.stages if s.stage == "verify"]
+            if verify_stages and verify_stages[0].success:
+                result.validation_level = "sw_verified"
+
+        self._results.append(result)
+
+        if self.config.report_path:
+            self._write_report(result)
+
+        return result
 
     def get_status(self) -> dict[str, Any]:
         """Get current pipeline status summary."""

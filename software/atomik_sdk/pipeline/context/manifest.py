@@ -55,6 +55,23 @@ class SchemaEntry:
 
 
 @dataclass
+class SegmentMetadata:
+    """Metadata for a context segment to support intelligent loading."""
+    segment_type: str = ""        # "schema", "kb_entry", "output", "error"
+    task_affinity: list[str] = field(default_factory=list)
+    token_estimate: int = 0
+    priority: float = 1.0         # Higher = more important
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "segment_type": self.segment_type,
+            "task_affinity": self.task_affinity,
+            "token_estimate": self.token_estimate,
+            "priority": round(self.priority, 2),
+        }
+
+
+@dataclass
 class PipelineManifest:
     """
     Top-level pipeline manifest for cross-session state tracking.
@@ -62,8 +79,8 @@ class PipelineManifest:
     Designed to be serializable to <2K tokens of JSON for compact
     context loading.
     """
-    version: str = "2.0"
-    phase: str = "4C"
+    version: str = "2.1"
+    phase: str = "5"
     schemas_registered: int = 0
     languages_supported: list[str] = field(
         default_factory=lambda: ["python", "rust", "c", "javascript", "verilog"]
@@ -77,6 +94,7 @@ class PipelineManifest:
         "budget_remaining": 130.0,
     })
     pending_actions: list[str] = field(default_factory=list)
+    segment_metadata: dict[str, SegmentMetadata] = field(default_factory=dict)
 
     def register_schema(self, name: str, sha256: str, path: str, namespace: str = "") -> None:
         """Register or update a schema in the manifest."""
@@ -90,6 +108,22 @@ class PipelineManifest:
                 name=name, sha256=sha256, path=path, namespace=namespace
             )
         self.schemas_registered = len(self.schemas)
+
+    def register_segment(
+        self,
+        segment_id: str,
+        segment_type: str,
+        task_affinity: list[str] | None = None,
+        token_estimate: int = 0,
+        priority: float = 1.0,
+    ) -> None:
+        """Register segment-level metadata for intelligent context loading."""
+        self.segment_metadata[segment_id] = SegmentMetadata(
+            segment_type=segment_type,
+            task_affinity=task_affinity or [],
+            token_estimate=token_estimate,
+            priority=priority,
+        )
 
     def record_run(self, tokens_consumed: int = 0) -> None:
         """Record a pipeline run in the manifest."""
@@ -112,6 +146,9 @@ class PipelineManifest:
             "metrics_summary": self.metrics_summary,
             "token_ledger": self.token_ledger,
             "pending_actions": self.pending_actions,
+            "segment_metadata": {
+                k: v.to_dict() for k, v in self.segment_metadata.items()
+            },
         }
 
     def save(self, path: str | Path) -> None:

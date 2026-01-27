@@ -1,8 +1,8 @@
 # ATOMiK SDK Developer Guide
 
-**Version:** 1.0.0
-**Last Updated:** January 26, 2026
-**Phase:** 4A - SDK Development
+**Version:** 2.0.0
+**Last Updated:** January 27, 2026
+**Phase:** 5 - Agentic Orchestration
 
 ## Table of Contents
 
@@ -10,9 +10,10 @@
 2. [Architecture Overview](#architecture-overview)
 3. [Generator Framework](#generator-framework)
 4. [Creating Custom Generators](#creating-custom-generators)
-5. [Schema Design Guidelines](#schema-design-guidelines)
-6. [Testing](#testing)
-7. [Contributing](#contributing)
+5. [Pipeline Framework (Phase 5)](#pipeline-framework-phase-5)
+6. [Schema Design Guidelines](#schema-design-guidelines)
+7. [Testing](#testing)
+8. [Contributing](#contributing)
 
 ---
 
@@ -47,6 +48,51 @@ software/atomik_sdk/
 │   ├── c_generator.py         # C SDK generator
 │   ├── verilog_generator.py  # Verilog RTL generator
 │   └── javascript_generator.py # JavaScript SDK generator
+├── pipeline/
+│   ├── orchestrator.py          # DAG-based task orchestrator
+│   ├── dag.py                   # Task DAG with cycle detection
+│   ├── event_bus.py             # Pub/sub event system
+│   ├── feedback.py              # Generate→Verify→Fix loop
+│   ├── coordinator.py           # Multi-agent coordinator
+│   ├── consensus.py             # Consensus resolution
+│   ├── agents/
+│   │   ├── router.py            # Static model routing
+│   │   ├── adaptive_router.py   # Adaptive model routing
+│   │   ├── registry.py          # Agent registry
+│   │   ├── specialist.py        # Specialist base class
+│   │   ├── token_predictor.py   # Token usage prediction
+│   │   ├── prompt_cache.py      # Prompt caching
+│   │   ├── context_compressor.py # Context compression
+│   │   └── complexity_scorer.py # Schema complexity scoring
+│   ├── parallel/
+│   │   ├── decomposer.py        # Task decomposition
+│   │   ├── executor.py          # Parallel execution
+│   │   └── worker.py            # Worker thread management
+│   ├── verification/
+│   │   ├── deep_verify.py       # Deep verification engine
+│   │   ├── consistency.py       # Cross-language consistency
+│   │   ├── interfaces.py        # Shared interface types
+│   │   └── extractors/          # 5 language extractors
+│   ├── analysis/
+│   │   ├── field_diff.py        # Field-level diff
+│   │   ├── metrics_analyzer.py  # Cross-run metrics
+│   │   └── regression_detector.py # Regression detection
+│   ├── knowledge/
+│   │   ├── error_kb.py          # Error pattern knowledge base
+│   │   └── fuzzy_match.py       # Fuzzy matching utilities
+│   ├── context/
+│   │   ├── manifest.py          # Pipeline manifest
+│   │   ├── cache.py             # Artifact caching
+│   │   ├── segment_tracker.py   # Context segment tracking
+│   │   └── intelligent_manager.py # Intelligent context manager
+│   ├── regression/
+│   │   ├── baseline.py          # Baseline management
+│   │   └── detector.py          # Regression gate
+│   ├── optimization/
+│   │   ├── tuner.py             # Config auto-tuning
+│   │   └── self_optimizer.py    # Self-optimization engine
+│   └── reports/
+│       └── pipeline_report.py   # Pipeline reports
 ├── tests/
 │   ├── test_generator_simple.py
 │   ├── test_python_generation.py
@@ -63,17 +109,15 @@ software/atomik_sdk/
 ```
 JSON Schema
     ↓
-atomik-gen CLI  (user-facing entry point)
+DAG Orchestrator (event-driven)
     ↓
-SchemaValidator (validates schema)
-    ↓
-NamespaceMapper (extracts catalogue metadata)
-    ↓
-GeneratorEngine (orchestrates generation)
-    ↓
-CodeEmitter plugins (generate language-specific code)
-    ↓
-Generated Files (written to output directory)
+Validate → Diff → Generate ×5 → Verify → Report
+                     ↑       ↓
+                 [Adaptive  [Deep Verify]
+                  Router]       ↓
+                          [Feedback Loop]
+                              ↓
+                          [Error KB]
 ```
 
 ### CLI Tool
@@ -326,6 +370,93 @@ def test_mylanguage_generation():
 
 ---
 
+## Pipeline Framework (Phase 5)
+
+### Overview
+
+Phase 5 transforms the Phase 4C linear pipeline into a self-improving agentic orchestrator. The implementation spans 16 tasks (T5.1-T5.16), introducing 25 new modules across orchestration, routing, verification, feedback, and optimization subsystems. The full test suite includes 242 total tests validating all pipeline components end-to-end.
+
+### DAG Orchestrator
+
+The pipeline execution model is built on a directed acyclic graph (DAG) of tasks. `TaskDAG` manages task nodes and their dependencies, performs cycle detection on insertion, and computes a topological execution order. The `PipelineOrchestrator` consumes the DAG, groups independent tasks into parallel stages, and drives execution through the event bus.
+
+```python
+from pipeline.orchestrator import PipelineOrchestrator
+from pipeline.dag import TaskDAG
+
+dag = TaskDAG()
+dag.add_task("validate", "validation")
+dag.add_task("generate", "generation", dependencies=["validate"])
+order = dag.topological_order()
+```
+
+### Event Bus
+
+The `EventBus` provides a publish/subscribe event system that decouples pipeline stages. Components subscribe to typed events and react asynchronously, enabling extensible instrumentation, logging, and side-effect handling without modifying core pipeline logic.
+
+```python
+from pipeline.event_bus import EventBus, Event, EventType
+
+bus = EventBus()
+bus.subscribe(EventType.TASK_COMPLETED, lambda e: print(f"Done: {e.data}"))
+bus.emit(Event(EventType.TASK_COMPLETED, {"stage": "generate"}))
+```
+
+### Feedback Loop
+
+The feedback module implements a Generate, Verify, Diagnose, Fix, Retry cycle. When verification detects errors in generated code, the system first consults the Error Knowledge Base for a known fix pattern (KB-first diagnosis). If no matching pattern is found, it escalates to an LLM for diagnosis and repair. The loop depth is configurable via `max_depth`, preventing infinite retry spirals while maximizing autonomous recovery.
+
+### Adaptive Model Router
+
+The `AdaptiveModelRouter` extends the static `ModelRouter` with multi-signal routing decisions. It considers schema complexity scoring, recent error history, budget pressure (cumulative token spend vs. ceiling), and prompt cache hit rates to select the optimal model tier for each generation request. Four tiers are available: LOCAL (offline/fast), HAIKU (low-cost), SONNET (balanced), and OPUS (highest capability). The router continuously adjusts tier selection as pipeline state evolves across runs.
+
+### Token Efficiency
+
+Three modules work together to minimize token consumption:
+
+- **TokenPredictor**: Predicts token usage for a given schema and model tier based on historical generation data. Predictions inform the adaptive router's budget pressure calculations.
+- **PromptCache**: Maintains a schema-keyed cache of prompt fragments, avoiding redundant prompt construction for previously seen schemas or schema components.
+- **ContextCompressor**: Applies progressive compression at three pressure levels (low, medium, high) to reduce context window usage when approaching token limits, preserving the most relevant information while discarding lower-priority segments.
+
+### Error Knowledge Base
+
+The `ErrorKB` stores `ErrorPattern` records that map error signatures to known fix strategies. Pattern matching uses a combination of edit distance and token overlap (fuzzy matching) to find the closest known error, even when exact matches are unavailable. The knowledge base auto-learns from successful fixes: when the feedback loop resolves an error, the pattern and its resolution are persisted for future reuse. Seed patterns for common errors (missing imports, type mismatches, syntax violations) are loaded at initialization.
+
+### Parallel Execution
+
+The `TaskDecomposer` analyzes the DAG to create up to 5 parallel groups of independent tasks that can execute concurrently. The `ParallelExecutor` dispatches these groups using a `ThreadPoolExecutor`, managing concurrency within configured limits. Individual `Worker` threads track their own state (idle, running, completed, failed), enabling the orchestrator to monitor progress and handle partial failures without blocking the entire pipeline.
+
+### Deep Verification
+
+The deep verification engine runs generated code through native toolchain checks for each target language:
+
+- **Python**: `pytest` execution of generated test files
+- **Rust**: `cargo check` for type and borrow checking
+- **C**: `gcc` compilation with warnings-as-errors
+- **JavaScript**: `node --check` for syntax verification
+- **Verilog**: `iverilog` compilation followed by `vvp` simulation
+
+The system uses a pluggable runner architecture, allowing new verification backends to be added without modifying the core verification logic.
+
+### Multi-Agent Coordination
+
+The `Coordinator` dispatches generation and verification tasks to specialist agents based on their registered capabilities. Each specialist agent handles a specific language or verification domain. The `ConsensusResolver` handles conflicts when multiple agents produce differing results for the same task, using majority voting to select the canonical output. The `AgentRegistry` tracks agent capabilities, current load, and health status, enabling the coordinator to make informed dispatch decisions.
+
+### Context Management
+
+Four modules collaborate to manage pipeline context efficiently:
+
+- **PipelineManifest**: Tracks all schemas processed, run metadata, and artifact locations across pipeline invocations.
+- **ArtifactCache**: Caches generated artifacts with content-hash-based invalidation, skipping regeneration when inputs have not changed.
+- **SegmentTracker**: Assigns relevance scores to context segments, enabling intelligent pruning when context budgets are constrained.
+- **IntelligentContextManager**: Enforces budget limits on total context size, coordinating with the segment tracker and context compressor to maintain the most valuable information within available token budgets.
+
+### Self-Optimization
+
+The `ConfigTuner` auto-tunes pipeline configuration parameters including worker thread count, feedback loop retry depth, and model routing thresholds based on observed performance metrics. The `SelfOptimizer` generates periodic optimization reports with bottleneck analysis, identifying stages that consume disproportionate time or tokens and recommending configuration adjustments to improve throughput.
+
+---
+
 ## Schema Design Guidelines
 
 ### Catalogue Metadata
@@ -452,6 +583,15 @@ Cross-language consistency validation:
 python tests/test_integration.py
 ```
 
+### Phase 5 Pipeline Tests
+
+Phase 5 introduces 12 new test files covering all pipeline subsystems. The full suite now includes 242 tests across generator and pipeline components:
+
+```bash
+# Run the complete test suite (242 tests)
+pytest tests/ atomik_sdk/tests/ -v
+```
+
 ### Test Coverage
 
 The test suite validates:
@@ -462,6 +602,17 @@ The test suite validates:
 - Semantic equivalence across languages
 - Cross-field dependencies
 - Hardware constraints
+- DAG orchestration and cycle detection
+- Event bus pub/sub delivery
+- Feedback loop convergence
+- Adaptive model routing decisions
+- Token prediction and prompt caching
+- Error knowledge base fuzzy matching
+- Parallel execution and worker management
+- Deep verification across all toolchains
+- Multi-agent coordination and consensus
+- Context management and budget enforcement
+- Self-optimization and config tuning
 
 ---
 
@@ -566,7 +717,8 @@ npm install && npm run compile
 
 ---
 
-**Document Version:** 1.0.0
+**Document Version:** 2.0.0
 **Generator Framework Version:** 1.0.0
-**ATOMiK Phase:** 4A - SDK Development
-**Last Updated:** January 26, 2026
+**Pipeline Framework Version:** 1.0.0
+**ATOMiK Phase:** 5 - Agentic Orchestration
+**Last Updated:** January 27, 2026

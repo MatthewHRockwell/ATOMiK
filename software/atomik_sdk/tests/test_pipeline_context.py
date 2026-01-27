@@ -25,8 +25,8 @@ from pipeline.context.checkpoint import Checkpoint
 class TestPipelineManifest:
     def test_create_manifest(self):
         manifest = PipelineManifest()
-        assert manifest.version == "2.0"
-        assert manifest.phase == "4C"
+        assert manifest.version == "2.1"
+        assert manifest.phase == "5"
         assert manifest.schemas_registered == 0
 
     def test_register_schema(self):

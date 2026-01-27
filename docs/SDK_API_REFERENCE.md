@@ -1,7 +1,7 @@
 # ATOMiK SDK API Reference
 
-**Version:** 1.0.0
-**Last Updated:** January 26, 2026
+**Version:** 2.0.0
+**Last Updated:** January 27, 2026
 
 ## Table of Contents
 
@@ -12,6 +12,7 @@
 5. [C SDK API](#c-sdk-api)
 6. [JavaScript SDK API](#javascript-sdk-api)
 7. [Verilog RTL Interface](#verilog-rtl-interface)
+8. [Pipeline API (Phase 5)](#pipeline-api-phase-5)
 
 ---
 
@@ -698,6 +699,747 @@ reg [$clog2(HISTORY_DEPTH)-1:0] history_head;      // History buffer head pointe
 
 ---
 
+## Pipeline API (Phase 5)
+
+The Pipeline API provides the autonomous generation pipeline infrastructure, including orchestration, feedback loops, adaptive routing, token efficiency, parallel execution, verification, analysis, context management, and self-optimization.
+
+### Orchestrator
+
+Manages task dependency graphs and multi-stage pipeline execution.
+
+#### Class: `TaskDAG`
+
+Directed acyclic graph for tracking task dependencies and execution state.
+
+##### `add_task(task_id: str, stage: str, dependencies: list[str] = None) -> None`
+
+Register a task with its stage and optional dependencies.
+
+**Parameters:**
+- `task_id` (str): Unique identifier for the task
+- `stage` (str): Pipeline stage the task belongs to
+- `dependencies` (list[str], optional): List of task IDs that must complete before this task
+
+##### `topological_order() -> list[str]`
+
+Return all task IDs in a valid topological execution order.
+
+**Returns:**
+- list[str]: Task IDs sorted so that dependencies precede dependents
+
+##### `ready_tasks() -> list[str]`
+
+Return task IDs whose dependencies are all completed and that are not yet running or done.
+
+**Returns:**
+- list[str]: Task IDs eligible for immediate execution
+
+##### `mark_running(task_id: str) -> None`
+
+Transition a task to the running state.
+
+**Parameters:**
+- `task_id` (str): Task to mark as running
+
+##### `mark_completed(task_id: str) -> None`
+
+Transition a task to the completed state, unblocking dependent tasks.
+
+**Parameters:**
+- `task_id` (str): Task to mark as completed
+
+##### `mark_failed(task_id: str) -> None`
+
+Transition a task to the failed state.
+
+**Parameters:**
+- `task_id` (str): Task to mark as failed
+
+#### Class: `PipelineOrchestrator`
+
+Top-level orchestrator that coordinates pipeline stages end to end.
+
+##### `__init__(event_bus: EventBus = None)`
+
+Create a new orchestrator, optionally wired to an event bus for lifecycle events.
+
+**Parameters:**
+- `event_bus` (EventBus, optional): Event bus for emitting pipeline events
+
+##### `add_stage(name: str, dependencies: list[str] = None) -> None`
+
+Register a pipeline stage with optional stage-level dependencies.
+
+**Parameters:**
+- `name` (str): Stage name (e.g., "generate", "verify")
+- `dependencies` (list[str], optional): Stages that must complete before this stage runs
+
+##### `execute(runner: Callable) -> dict`
+
+Execute the full pipeline by invoking the runner for each stage in dependency order.
+
+**Parameters:**
+- `runner` (Callable): Function called for each stage to perform its work
+
+**Returns:**
+- dict: Execution summary including per-stage results, timing, and status
+
+##### `set_coordinator(coordinator: Coordinator) -> None`
+
+Attach a coordinator to manage cross-stage resource sharing and scheduling.
+
+**Parameters:**
+- `coordinator` (Coordinator): Coordinator instance
+
+##### `apply_tuning(tuning_result: TuningResult) -> None`
+
+Apply an optimization tuning result to adjust pipeline parameters at runtime.
+
+**Parameters:**
+- `tuning_result` (TuningResult): Tuning configuration produced by ConfigTuner
+
+---
+
+### Event Bus
+
+Publish-subscribe event system for decoupled communication between pipeline components.
+
+#### Class: `EventBus`
+
+Central event dispatcher supporting typed subscriptions and event history.
+
+##### `subscribe(event_type: EventType, handler: Callable) -> str`
+
+Register a handler to be called when events of the given type are emitted.
+
+**Parameters:**
+- `event_type` (EventType): The event type to listen for
+- `handler` (Callable): Callback invoked with the Event object
+
+**Returns:**
+- str: Subscription ID for later unsubscription
+
+##### `unsubscribe(subscription_id: str) -> None`
+
+Remove a previously registered subscription.
+
+**Parameters:**
+- `subscription_id` (str): ID returned by `subscribe()`
+
+##### `emit(event: Event) -> None`
+
+Dispatch an event to all matching subscribers and record it in history.
+
+**Parameters:**
+- `event` (Event): Event object to emit
+
+##### `get_history() -> list[Event]`
+
+Retrieve the full ordered list of events emitted so far.
+
+**Returns:**
+- list[Event]: All emitted events in chronological order
+
+---
+
+### Feedback Loop
+
+Iterative error diagnosis and repair loop combining knowledge base lookups and LLM-driven fixes.
+
+#### Class: `FeedbackLoop`
+
+Runs multiple correction iterations to resolve generation errors.
+
+##### `__init__(max_depth: int = 3, event_bus: EventBus = None)`
+
+Create a feedback loop with a maximum retry depth.
+
+**Parameters:**
+- `max_depth` (int): Maximum number of correction iterations (default 3)
+- `event_bus` (EventBus, optional): Event bus for emitting feedback events
+
+##### `run(language, initial_errors, classify, kb_lookup, apply_fix, llm_diagnose, verify, kb_record=None) -> FeedbackResult`
+
+Execute the feedback loop until errors are resolved or retries are exhausted.
+
+**Parameters:**
+- `language`: Target language being corrected
+- `initial_errors`: Error list from the initial generation attempt
+- `classify` (Callable): Function to classify an error into an error class
+- `kb_lookup` (Callable): Function to look up a known fix in the knowledge base
+- `apply_fix` (Callable): Function to apply a fix to the generated code
+- `llm_diagnose` (Callable): Function to invoke the LLM for diagnosis when KB has no match
+- `verify` (Callable): Function to verify the corrected code
+- `kb_record` (Callable, optional): Function to record a newly discovered fix in the KB
+
+**Returns:**
+- FeedbackResult: Outcome, iteration details, and token usage
+
+#### Class: `FeedbackResult`
+
+Result of a completed feedback loop execution.
+
+**Fields:**
+- `outcome` (FeedbackOutcome): Resolution status -- one of `FIXED_BY_KB`, `FIXED_BY_LLM`, `RETRY_EXHAUSTED`, or `IDENTICAL_ERROR`
+- `resolved` (bool): True if all errors were resolved
+- `iterations` (list[FeedbackIteration]): Per-iteration details including errors and fixes applied
+- `total_tokens` (int): Total LLM tokens consumed across all iterations
+
+---
+
+### Adaptive Router
+
+Selects the appropriate model tier for each pipeline stage based on schema complexity, budget pressure, and historical success rates.
+
+#### Class: `AdaptiveRouter`
+
+Routes pipeline tasks to model tiers dynamically.
+
+##### `route(stage_name: str, schema: dict = None, schema_hash: str = "", budget_pressure: float = 0.0, cache_hit: bool = False) -> ModelTier`
+
+Determine the model tier for a given stage and context.
+
+**Parameters:**
+- `stage_name` (str): Pipeline stage requesting a model
+- `schema` (dict, optional): Schema being processed
+- `schema_hash` (str): Hash of the schema for cache and history lookups
+- `budget_pressure` (float): Value between 0.0 (no pressure) and 1.0 (maximum pressure)
+- `cache_hit` (bool): Whether a prompt cache hit was found for this task
+
+**Returns:**
+- ModelTier: Selected model tier (e.g., FAST, STANDARD, ADVANCED)
+
+##### `record_failure(schema_hash: str) -> None`
+
+Record that a generation attempt failed for the given schema, influencing future routing.
+
+**Parameters:**
+- `schema_hash` (str): Hash of the schema that failed
+
+##### `record_success(schema_hash: str) -> None`
+
+Record that a generation attempt succeeded for the given schema.
+
+**Parameters:**
+- `schema_hash` (str): Hash of the schema that succeeded
+
+##### `get_decisions() -> list[dict]`
+
+Retrieve the log of all routing decisions made during the current session.
+
+**Returns:**
+- list[dict]: List of decision records with stage, schema hash, tier, and rationale
+
+---
+
+### Token Efficiency
+
+Tools for predicting, caching, and compressing token usage across pipeline stages.
+
+#### Class: `TokenPredictor`
+
+Predicts token consumption for pipeline tasks based on historical data.
+
+##### `predict(task_type: str) -> int`
+
+Return the predicted token count for the given task type.
+
+**Parameters:**
+- `task_type` (str): Type of task (e.g., "generate_python", "verify_rust")
+
+**Returns:**
+- int: Predicted token count
+
+##### `record_actual(task_type: str, tokens: int) -> None`
+
+Record the actual token count observed for a completed task, updating the prediction model.
+
+**Parameters:**
+- `task_type` (str): Type of task
+- `tokens` (int): Actual tokens consumed
+
+##### `predict_and_track(task_type: str) -> int`
+
+Predict token count and register a tracking entry for later reconciliation.
+
+**Parameters:**
+- `task_type` (str): Type of task
+
+**Returns:**
+- int: Predicted token count
+
+##### `predict_remaining(remaining_tasks: list[str]) -> int`
+
+Estimate the total tokens needed for all remaining tasks in the pipeline.
+
+**Parameters:**
+- `remaining_tasks` (list[str]): List of task types still to execute
+
+**Returns:**
+- int: Aggregate predicted token count
+
+#### Class: `PromptCache`
+
+In-memory cache for prompt responses keyed by task and schema hash.
+
+##### `get(task_key: str, schema_hash: str) -> str | None`
+
+Look up a cached response for the given task and schema.
+
+**Parameters:**
+- `task_key` (str): Task identifier
+- `schema_hash` (str): Hash of the schema
+
+**Returns:**
+- str | None: Cached response string, or None on cache miss
+
+##### `put(task_key: str, schema_hash: str, response: str) -> None`
+
+Store a response in the cache.
+
+**Parameters:**
+- `task_key` (str): Task identifier
+- `schema_hash` (str): Hash of the schema
+- `response` (str): Response string to cache
+
+##### `hit_rate() -> float`
+
+Return the cache hit rate as a percentage.
+
+**Returns:**
+- float: Hit rate from 0 to 100
+
+##### `invalidate_schema(schema_hash: str) -> int`
+
+Remove all cached entries for a given schema hash.
+
+**Parameters:**
+- `schema_hash` (str): Hash of the schema to invalidate
+
+**Returns:**
+- int: Number of entries removed
+
+#### Class: `ContextCompressor`
+
+Reduces context size under token budget pressure.
+
+##### `compress(text: str, budget_pressure: float) -> str`
+
+Compress a text block by removing low-priority content based on budget pressure.
+
+**Parameters:**
+- `text` (str): Input text to compress
+- `budget_pressure` (float): Value between 0.0 (no compression) and 1.0 (aggressive compression)
+
+**Returns:**
+- str: Compressed text
+
+##### `compress_schema_context(schema: dict, budget_pressure: float) -> dict`
+
+Compress a schema context dictionary, stripping optional fields under pressure.
+
+**Parameters:**
+- `schema` (dict): Schema context to compress
+- `budget_pressure` (float): Value between 0.0 (no compression) and 1.0 (aggressive compression)
+
+**Returns:**
+- dict: Compressed schema context
+
+---
+
+### Error Knowledge Base
+
+Persistent store of known error patterns and their fixes, enabling instant repair without LLM calls.
+
+#### Class: `ErrorKnowledgeBase`
+
+Stores, retrieves, and learns error-fix mappings.
+
+##### `add_pattern(pattern: ErrorPattern) -> None`
+
+Add a known error pattern and its fix to the knowledge base.
+
+**Parameters:**
+- `pattern` (ErrorPattern): Error pattern object containing language, error class, message pattern, and fix description
+
+##### `lookup(language: str, error_class: str, error_msg: str) -> KBLookupResult`
+
+Search the knowledge base for a matching fix.
+
+**Parameters:**
+- `language` (str): Programming language (e.g., "python", "rust")
+- `error_class` (str): Classified error category
+- `error_msg` (str): Raw error message text
+
+**Returns:**
+- KBLookupResult: Match result containing the fix description and confidence, or no match
+
+##### `learn(language, error_class, error_message, fix_description) -> ErrorPattern`
+
+Record a newly discovered error-fix pair learned from an LLM correction.
+
+**Parameters:**
+- `language`: Programming language
+- `error_class`: Classified error category
+- `error_message`: Error message that was resolved
+- `fix_description`: Description of the fix applied
+
+**Returns:**
+- ErrorPattern: Newly created pattern added to the knowledge base
+
+##### `load_seed() -> int`
+
+Load seed error patterns from the built-in pattern library.
+
+**Returns:**
+- int: Number of seed patterns loaded
+
+##### `record_success(pattern_id: str) -> None`
+
+Increment the success counter for a pattern, boosting its ranking in future lookups.
+
+**Parameters:**
+- `pattern_id` (str): ID of the pattern that was successfully applied
+
+---
+
+### Parallel Execution
+
+Decomposes pipeline work into independent tasks and executes them concurrently.
+
+#### Class: `TaskDecomposer`
+
+Breaks pipeline stages into parallelizable task sets.
+
+##### `decompose_generation(languages: list[str] = None) -> DecompositionPlan`
+
+Decompose the generation stage into per-language tasks that can run in parallel.
+
+**Parameters:**
+- `languages` (list[str], optional): Target languages; defaults to all configured languages
+
+**Returns:**
+- DecompositionPlan: Plan describing independent and dependent task groups
+
+##### `decompose_verification() -> DecompositionPlan`
+
+Decompose the verification stage into parallelizable verification tasks.
+
+**Returns:**
+- DecompositionPlan: Plan describing independent and dependent verification tasks
+
+##### `decompose_full_pipeline() -> DecompositionPlan`
+
+Decompose the entire pipeline into a maximal set of parallelizable tasks.
+
+**Returns:**
+- DecompositionPlan: Full pipeline decomposition plan
+
+#### Class: `ParallelExecutor`
+
+Executes a set of tasks concurrently up to a worker limit.
+
+##### `__init__(max_workers: int = 4)`
+
+Create an executor with a bounded worker pool.
+
+**Parameters:**
+- `max_workers` (int): Maximum number of concurrent workers (default 4)
+
+##### `execute(tasks: list[ParallelTask], executor_fn: Callable) -> ExecutionResults`
+
+Run all tasks using the provided executor function, respecting the worker limit.
+
+**Parameters:**
+- `tasks` (list[ParallelTask]): Tasks to execute
+- `executor_fn` (Callable): Function invoked for each task
+
+**Returns:**
+- ExecutionResults: Aggregated results including per-task outcomes, timing, and any failures
+
+#### Class: `Worker`
+
+Individual worker that runs a single task with optional timeout.
+
+##### `__init__(worker_id: str)`
+
+Create a worker with a unique identifier.
+
+**Parameters:**
+- `worker_id` (str): Unique worker identifier
+
+##### `run(fn: Callable, timeout: float = None) -> WorkerResult`
+
+Execute a function with an optional timeout.
+
+**Parameters:**
+- `fn` (Callable): Function to execute
+- `timeout` (float, optional): Maximum execution time in seconds
+
+**Returns:**
+- WorkerResult: Result containing the return value or error, plus elapsed time
+
+---
+
+### Verification
+
+Deep verification and cross-language consistency checking for generated code.
+
+#### Class: `DeepVerifier`
+
+Runs comprehensive verification across all generated languages.
+
+##### `verify_all(file_map: dict[str, list], verification_depth: str = "full") -> DeepVerifyResult`
+
+Verify all generated files across all languages.
+
+**Parameters:**
+- `file_map` (dict[str, list]): Mapping of language name to list of generated file paths
+- `verification_depth` (str): Depth of verification -- "fast", "standard", or "full" (default "full")
+
+**Returns:**
+- DeepVerifyResult: Aggregated verification result with per-language outcomes and summary
+
+##### `verify_language(language: str, files: list) -> RunnerResult`
+
+Verify the generated files for a single language.
+
+**Parameters:**
+- `language` (str): Language to verify (e.g., "python", "rust")
+- `files` (list): List of file paths to verify
+
+**Returns:**
+- RunnerResult: Verification result for the specified language
+
+#### Class: `ConsistencyChecker`
+
+Checks semantic equivalence across generated SDK implementations.
+
+##### `check(file_map: dict[str, list]) -> ConsistencyReport`
+
+Check cross-language consistency from generated file paths.
+
+**Parameters:**
+- `file_map` (dict[str, list]): Mapping of language name to list of generated file paths
+
+**Returns:**
+- ConsistencyReport: Report detailing any inconsistencies found across languages
+
+##### `check_from_interfaces(interfaces: dict[str, LanguageInterface]) -> ConsistencyReport`
+
+Check cross-language consistency from pre-parsed interface definitions.
+
+**Parameters:**
+- `interfaces` (dict[str, LanguageInterface]): Mapping of language name to parsed interface
+
+**Returns:**
+- ConsistencyReport: Report detailing any inconsistencies found across languages
+
+---
+
+### Analysis
+
+Metrics analysis, regression detection, and schema diffing for pipeline runs.
+
+#### Class: `MetricsAnalyzer`
+
+Statistical analysis utilities for pipeline metrics.
+
+##### `moving_average(values: list[float], window: int) -> list[float]`
+
+Compute a simple moving average over a series of values.
+
+**Parameters:**
+- `values` (list[float]): Input values
+- `window` (int): Window size for the moving average
+
+**Returns:**
+- list[float]: Smoothed values
+
+##### `analyze_trends(metric_history: dict) -> dict`
+
+Analyze trends across multiple metrics over time.
+
+**Parameters:**
+- `metric_history` (dict): Mapping of metric names to lists of historical values
+
+**Returns:**
+- dict: Trend analysis per metric including direction, slope, and statistical significance
+
+##### `detect_anomalies(values: list[float]) -> list[int]`
+
+Identify anomalous data points in a series.
+
+**Parameters:**
+- `values` (list[float]): Input values
+
+**Returns:**
+- list[int]: Indices of values detected as anomalies
+
+#### Class: `RegressionDetector`
+
+Detects performance or quality regressions between pipeline runs.
+
+##### `detect(history: list[dict], current: dict) -> RegressionReport`
+
+Compare the current run against historical runs to detect regressions.
+
+**Parameters:**
+- `history` (list[dict]): List of historical run summaries
+- `current` (dict): Current run summary
+
+**Returns:**
+- RegressionReport: Report listing detected regressions with severity and affected metrics
+
+#### Class: `FieldDiff`
+
+Compares schema versions to identify structural changes.
+
+##### `compare(old_schema: dict, new_schema: dict) -> FieldDiffResult`
+
+Compute a diff between two schema versions.
+
+**Parameters:**
+- `old_schema` (dict): Previous schema version
+- `new_schema` (dict): New schema version
+
+**Returns:**
+- FieldDiffResult: Diff result listing added, removed, and modified fields
+
+---
+
+### Context Management
+
+Pipeline manifest tracking and intelligent context window management.
+
+#### Class: `PipelineManifest`
+
+Tracks schemas, runs, and context segments across pipeline executions.
+
+##### `register_schema(name: str, content_hash: str, ...) -> None`
+
+Register a schema with its content hash and metadata.
+
+**Parameters:**
+- `name` (str): Schema name
+- `content_hash` (str): Hash of the schema content
+
+##### `record_run(run_data: dict) -> None`
+
+Record a completed pipeline run for historical tracking.
+
+**Parameters:**
+- `run_data` (dict): Run summary data including timing, results, and configuration
+
+##### `register_segment(segment_id: str, metadata: SegmentMetadata) -> None`
+
+Register a context segment with its metadata for intelligent context assembly.
+
+**Parameters:**
+- `segment_id` (str): Unique segment identifier
+- `metadata` (SegmentMetadata): Segment metadata including type, priority, and token estimate
+
+#### Class: `IntelligentContextManager`
+
+Assembles and manages the LLM context window to maximize utilization without overflow.
+
+##### `__init__(max_tokens: int = 128000, utilization_limit: float = 0.9)`
+
+Create a context manager with a token budget.
+
+**Parameters:**
+- `max_tokens` (int): Maximum context window size in tokens (default 128000)
+- `utilization_limit` (float): Target utilization fraction (default 0.9)
+
+##### `add_segment(segment_id: str, content: str, segment_type: str) -> None`
+
+Add a content segment to the context pool.
+
+**Parameters:**
+- `segment_id` (str): Unique segment identifier
+- `content` (str): Segment text content
+- `segment_type` (str): Type of segment (e.g., "schema", "instruction", "example")
+
+##### `build_context() -> str`
+
+Assemble the final context string from registered segments, respecting the token budget.
+
+**Returns:**
+- str: Assembled context string fitting within the token budget
+
+##### `get_context_for_cold_start() -> str`
+
+Build a minimal context suitable for cold-start scenarios with no prior run history.
+
+**Returns:**
+- str: Minimal context string for first-run initialization
+
+---
+
+### Self-Optimization
+
+Automatic performance tracking and configuration tuning across pipeline runs.
+
+#### Class: `SelfOptimizer`
+
+Tracks run metrics and generates optimization reports.
+
+##### `__init__(report_every: int = 5)`
+
+Create a self-optimizer that reports every N runs.
+
+**Parameters:**
+- `report_every` (int): Number of runs between optimization reports (default 5)
+
+##### `record_run(run_data: dict) -> None`
+
+Record metrics from a completed pipeline run.
+
+**Parameters:**
+- `run_data` (dict): Run summary including timing, token usage, and success rates
+
+##### `should_report() -> bool`
+
+Check whether enough runs have accumulated to generate a new optimization report.
+
+**Returns:**
+- bool: True if the reporting threshold has been reached
+
+##### `generate_report() -> OptimizationReport`
+
+Generate an optimization report with recommendations based on accumulated run data.
+
+**Returns:**
+- OptimizationReport: Report containing performance trends, bottleneck analysis, and tuning suggestions
+
+#### Class: `ConfigTuner`
+
+Tunes pipeline configuration parameters based on historical run data.
+
+##### `tune_workers(run_history: list[dict], current_workers: int = 4) -> TuningResult`
+
+Recommend an optimal worker count based on observed parallelism efficiency.
+
+**Parameters:**
+- `run_history` (list[dict]): Historical run summaries
+- `current_workers` (int): Current worker pool size (default 4)
+
+**Returns:**
+- TuningResult: Tuning recommendation including suggested worker count and confidence
+
+##### `tune_retry_depth(run_history: list[dict], current_depth: int = 3) -> TuningResult`
+
+Recommend an optimal feedback loop retry depth based on historical fix rates.
+
+**Parameters:**
+- `run_history` (list[dict]): Historical run summaries
+- `current_depth` (int): Current maximum retry depth (default 3)
+
+**Returns:**
+- TuningResult: Tuning recommendation including suggested retry depth and confidence
+
+---
+
 ## Cross-Language Equivalence
 
 All SDK implementations provide semantically equivalent operations:
@@ -758,6 +1500,6 @@ Hardware behavior:
 
 ---
 
-**Document Version:** 1.0.0
-**SDK Version:** 1.0.0
-**Last Updated:** January 26, 2026
+**Document Version:** 2.0.0
+**SDK Version:** 2.0.0
+**Last Updated:** January 27, 2026

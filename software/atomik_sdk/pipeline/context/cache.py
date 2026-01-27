@@ -130,6 +130,34 @@ class ArtifactCache:
         stored_hashes = {e.get("schema_hash") for e in schema_cache.values()}
         return all(h == current_hash for h in stored_hashes if h)
 
+    def get_prioritized(
+        self,
+        schema_name: str,
+        relevance_scores: dict[str, float] | None = None,
+    ) -> list[tuple[str, float]]:
+        """
+        Get cached artifact keys sorted by relevance score.
+
+        Args:
+            schema_name: Schema identifier.
+            relevance_scores: Optional map of key -> relevance score.
+                Higher scores are returned first.
+
+        Returns:
+            List of (key, score) tuples sorted by score descending.
+        """
+        schema_cache = self._index.get(schema_name, {})
+        if not schema_cache:
+            return []
+
+        scores = relevance_scores or {}
+        items = [
+            (key, scores.get(key, 0.5))
+            for key in schema_cache
+        ]
+        items.sort(key=lambda x: x[1], reverse=True)
+        return items
+
     def clear(self) -> None:
         """Clear the entire cache."""
         for schema_entries in self._index.values():

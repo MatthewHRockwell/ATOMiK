@@ -120,6 +120,25 @@ class TokenBudget:
         """Get the full token ledger."""
         return [e.to_dict() for e in self._entries]
 
+    @property
+    def budget_pressure(self) -> float:
+        """Budget utilization as a fraction (0.0 to 1.0)."""
+        if self.limit is None or self.limit == 0:
+            return 0.0
+        return min(1.0, self.total_consumed / self.limit)
+
+    def check_warnings(self) -> list[str]:
+        """Check for budget threshold warnings."""
+        warnings = []
+        pressure = self.budget_pressure
+        if pressure >= 0.9:
+            warnings.append(f"CRITICAL: Budget 90% consumed ({self.total_consumed}/{self.limit})")
+        elif pressure >= 0.75:
+            warnings.append(f"WARNING: Budget 75% consumed ({self.total_consumed}/{self.limit})")
+        elif pressure >= 0.5:
+            warnings.append(f"INFO: Budget 50% consumed ({self.total_consumed}/{self.limit})")
+        return warnings
+
     def reset(self) -> None:
         """Reset the budget for a new pipeline run."""
         self._entries.clear()

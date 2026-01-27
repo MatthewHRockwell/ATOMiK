@@ -1,0 +1,61 @@
+{
+  "version": "1.0",
+  "description": "Seed error patterns from Phase 4C known fixes",
+  "patterns": [
+    {
+      "pattern_id": "seed_missing_semicolon",
+      "language": "",
+      "error_class": "missing_semicolon",
+      "signature": "missing semicolon",
+      "fix_template": "Append semicolon at the end of the offending line",
+      "fix_type": "append_semicolon",
+      "success_count": 0,
+      "failure_count": 0,
+      "source": "seed"
+    },
+    {
+      "pattern_id": "seed_missing_import",
+      "language": "python",
+      "error_class": "import_error",
+      "signature": "undefined name",
+      "fix_template": "Add the missing import statement for the undefined name",
+      "fix_type": "add_import",
+      "success_count": 0,
+      "failure_count": 0,
+      "source": "seed"
+    },
+    {
+      "pattern_id": "seed_trailing_whitespace",
+      "language": "",
+      "error_class": "lint_warning",
+      "signature": "trailing whitespace",
+      "fix_template": "Strip trailing whitespace from all lines",
+      "fix_type": "strip_trailing",
+      "success_count": 0,
+      "failure_count": 0,
+      "source": "seed"
+    },
+    {
+      "pattern_id": "seed_unused_import",
+      "language": "",
+      "error_class": "lint_warning",
+      "signature": "imported but unused",
+      "fix_template": "Remove the unused import statement",
+      "fix_type": "remove_import",
+      "success_count": 0,
+      "failure_count": 0,
+      "source": "seed"
+    },
+    {
+      "pattern_id": "seed_brace_mismatch",
+      "language": "",
+      "error_class": "brace_mismatch",
+      "signature": "unbalanced",
+      "fix_template": "Balance delimiters by adding or removing braces/brackets",
+      "fix_type": "balance_delimiters",
+      "success_count": 0,
+      "failure_count": 0,
+      "source": "seed"
+    }
+  ]
+}

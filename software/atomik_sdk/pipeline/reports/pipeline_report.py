@@ -20,10 +20,11 @@ class PipelineReport:
         schema_name: str,
         stage_manifests: list[dict[str, Any]],
         aggregate_metrics: dict[str, Any],
+        regression_report: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
         """Generate a complete pipeline report."""
-        return {
-            "report_version": "2.0",
+        report: dict[str, Any] = {
+            "report_version": "2.1",
             "schema": schema_name,
             "summary": {
                 "success": all(
@@ -36,6 +37,20 @@ class PipelineReport:
             "metrics": aggregate_metrics,
             "stages": stage_manifests,
         }
+
+        if regression_report is not None:
+            report["regressions"] = regression_report
+            # Add severity badge to summary
+            has_critical = regression_report.get("has_critical", False)
+            count = regression_report.get("regression_count", 0)
+            if has_critical:
+                report["summary"]["regression_status"] = "CRITICAL"
+            elif count > 0:
+                report["summary"]["regression_status"] = "WARNING"
+            else:
+                report["summary"]["regression_status"] = "PASS"
+
+        return report
 
     def save(self, report: dict[str, Any], path: str | Path) -> None:
         """Save report to JSON file."""

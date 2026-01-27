@@ -23,8 +23,14 @@
 | **Phase 3** | Hardware Synthesis | ✅ **Complete** | 10/10 hardware tests, 7% LUT @ 94.5 MHz |
 | **Phase 4A** | SDK Code Generation | ✅ **Complete** | Python/Rust/C/JS/Verilog generators |
 | **Phase 4B** | Domain SDKs | ✅ **Complete** | 3 domain SDKs, 57 generated files |
+| **Phase 4C** | Autonomous Pipeline | ✅ **Complete** | 6-stage controller, hardware demos, 124 tests |
+| **Phase 5** | Agentic Orchestration | ✅ **Complete** | DAG orchestrator, feedback loops, 242 tests |
 
-**Latest**: `atomik-gen` CLI tool and VS Code extension now available. The CLI (`pip install -e ./software`) provides schema validation, code generation, and batch processing from the command line. The VS Code extension adds JSON schema intellisense, snippets, and command palette integration. See [Developer Tooling](#developer-tooling) below.
+**Latest**: Phase 5 transforms the Phase 4C linear pipeline into a self-improving agentic orchestrator with event-driven DAG execution, adaptive model routing, error pattern learning, deep verification, multi-agent coordination, and self-optimization. 25 new modules, 118 new tests (242 total).
+
+Phase 5 complete (January 27, 2026). Agentic pipeline with feedback loops, cross-language consistency checking, regression detection, intelligent context management, and self-tuning. See [`docs/PHASE_5_ROADMAP.md`](docs/PHASE_5_ROADMAP.md) for architecture details.
+
+Phase 4C complete (January 26, 2026). Autonomous 6-stage pipeline controller with hardware demos. See commit `a22095d` for details.
 
 Phase 4B complete (January 26, 2026). Three domain SDK schemas (Video, Edge Sensor, Finance) validated and used to generate 57 production-ready files across 5 languages. See [`archive/PHASE_4B_COMPLETION_REPORT.md`](archive/PHASE_4B_COMPLETION_REPORT.md) for details.
 
@@ -202,6 +208,33 @@ Each generator produces:
 2. **Test suite** — verifies algebraic properties (self-inverse, commutativity, identity) in the target language
 3. **Build configuration** — language-appropriate build files (Makefile, Cargo.toml, package.json, etc.)
 
+### Phase 5: Agentic Pipeline Orchestrator
+
+Phase 5 wraps the SDK generation pipeline in a self-improving agentic system:
+
+<p align="center">
+  <img src="docs/diagrams/phase5_pipeline.svg" alt="Phase 5 Pipeline: DAG Orchestrator with feedback loops and adaptive routing" width="860"/>
+</p>
+
+| Capability | Module | Description |
+|------------|--------|-------------|
+| **DAG Orchestration** | `pipeline/orchestrator.py` | Topological execution with parallel stage groups |
+| **Event Bus** | `pipeline/event_bus.py` | Pub/sub event system connecting all stages |
+| **Feedback Loop** | `pipeline/feedback.py` | Generate→Verify→Diagnose→Fix→Retry cycle |
+| **Adaptive Routing** | `pipeline/agents/adaptive_router.py` | Multi-signal model selection (complexity, errors, budget) |
+| **Token Efficiency** | `pipeline/agents/token_predictor.py` | Predictive budget, prompt caching, context compression |
+| **Error KB** | `pipeline/knowledge/error_kb.py` | Fuzzy matching with auto-learning from fixes |
+| **Deep Verify** | `pipeline/verification/deep_verify.py` | Native toolchain verification (pytest, gcc, cargo, node, iverilog) |
+| **Consistency** | `pipeline/verification/consistency.py` | Cross-language interface checking with 5 extractors |
+| **Parallel Execution** | `pipeline/parallel/executor.py` | Per-language parallel generation and verification |
+| **Multi-Agent** | `pipeline/coordinator.py` | Coordinator + specialist agents + consensus |
+| **Self-Optimization** | `pipeline/optimization/self_optimizer.py` | Auto-tune workers, retry depth, model routing |
+| **Regression Gate** | `pipeline/regression/detector.py` | Baseline management with EMA updates |
+
+<p align="center">
+  <img src="docs/diagrams/phase5_agents.svg" alt="Phase 5 Agent Topology: Coordinator dispatching to specialist agents" width="780"/>
+</p>
+
 ---
 
 ## Developer Tooling
@@ -274,10 +307,21 @@ ATOMiK/
 ├── constraints/                 # ✅ FPGA timing and physical constraints
 ├── synth/                       # ✅ Synthesis scripts (Gowin EDA)
 ├── scripts/                     # ✅ Hardware validation + FPGA pipeline + SDK generation
-├── software/                    # ✅ Python SDK + 5-language generators
+├── software/                    # ✅ Python SDK + pipeline + 5-language generators
 │   ├── atomik_sdk/cli.py        # atomik-gen CLI tool (pip-installable entry point)
 │   ├── atomik_sdk/generator/    # Schema-driven code generators (Py/Rust/C/JS/Verilog)
-│   └── atomik_sdk/tests/        # Generator test suite (algebraic property verification)
+│   ├── atomik_sdk/pipeline/     # ✅ Phase 5 agentic orchestration (25 modules)
+│   │   ├── orchestrator.py      # DAG-based pipeline orchestrator
+│   │   ├── feedback.py          # Feedback loop with KB + LLM diagnosis
+│   │   ├── coordinator.py       # Multi-agent coordinator
+│   │   ├── agents/              # Adaptive routing, registry, token efficiency
+│   │   ├── parallel/            # Task decomposition + parallel execution
+│   │   ├── verification/        # Deep verify + consistency checking
+│   │   ├── knowledge/           # Error pattern KB with fuzzy matching
+│   │   ├── analysis/            # Metrics, regression detection, field diff
+│   │   ├── context/             # Manifest, cache, intelligent context
+│   │   └── optimization/        # Self-tuning + bottleneck analysis
+│   └── atomik_sdk/tests/        # Test suite (242 tests)
 ├── vscode-extension/            # ✅ VS Code extension (schema intellisense + commands)
 │   └── atomik-vscode/           # Extension source (TypeScript, snippets, schema)
 ├── sdk/schemas/                 # ✅ Schema definitions
@@ -351,8 +395,9 @@ python scripts/test_hardware.py COM6
 | **Phase 3**: Hardware Synthesis | ✅ Complete | Silicon validation, single-cycle operations confirmed |
 | **Phase 4A**: SDK Code Generation | ✅ Complete | 5-language generators, 100% test coverage |
 | **Phase 4B**: Domain SDKs | ✅ Complete | 3 domain schemas (Video/Edge/Finance), 57 generated files |
-| **Phase 4C**: Hardware Demonstrators | 📋 Planned | FPGA demos for video, sensor fusion, network processing |
-| **Phase 5**: Multi-Accumulator Architecture | 📋 Planned | Parallel accumulator banks, linear throughput scaling |
+| **Phase 4C**: Autonomous Pipeline | ✅ Complete | 6-stage controller, hardware demos, 124 tests |
+| **Phase 5**: Agentic Orchestration | ✅ Complete | DAG orchestrator, feedback loops, 25 modules, 242 tests |
+| **Phase 6**: Multi-Accumulator Architecture | 📋 Planned | Parallel accumulator banks, linear throughput scaling |
 
 ### What the SDK Architecture Enables
 
@@ -364,7 +409,9 @@ The schema-driven code generation pipeline ensures that **every new ATOMiK objec
 
 **Phase 4B validated this at scale**: Three domain SDKs (Video H.264 Delta, Edge Sensor IMU Fusion, Financial Price Tick) generated 57 files across all 5 languages from 3 JSON schemas, with all algebraic properties verified in generated test suites.
 
-**Full roadmap**: [`archive/ATOMiK_DEVELOPMENT_ROADMAP.md`](archive/ATOMiK_DEVELOPMENT_ROADMAP.md) (historical)
+**Phase 5 added self-improvement**: The pipeline now features event-driven DAG orchestration, feedback loops with error pattern learning, adaptive model routing, cross-language consistency checking, regression detection, and self-optimization. 242 tests verify the full system.
+
+**Full roadmap**: [`archive/ATOMiK_DEVELOPMENT_ROADMAP.md`](archive/ATOMiK_DEVELOPMENT_ROADMAP.md) (historical) | [`docs/PHASE_5_ROADMAP.md`](docs/PHASE_5_ROADMAP.md) (current)
 
 ---
 
@@ -379,6 +426,7 @@ The schema-driven code generation pipeline ensures that **every new ATOMiK objec
 | [RTL Architecture](specs/rtl_architecture.md) | Hardware design specification and timing |
 | [Schema Specification](docs/SDK_SCHEMA_GUIDE.md) | JSON schema format for code generation targets |
 | [VS Code Extension](vscode-extension/atomik-vscode/README.md) | Schema intellisense, validation, and SDK generation |
+| [Phase 5 Roadmap](docs/PHASE_5_ROADMAP.md) | Agentic orchestration architecture and task breakdown |
 | [Phase 4B Report](archive/PHASE_4B_COMPLETION_REPORT.md) | Domain SDK generation completion report |
 | [Phase 4A Report](archive/PHASE_4A_COMPLETION_REPORT.md) | SDK framework development completion report |
 | [Phase 3 Report](archive/PHASE_3_COMPLETION_REPORT.md) | Hardware synthesis completion report |
@@ -393,4 +441,4 @@ For licensing inquiries, commercial integration, or architectural collaboration,
 
 ---
 
-*Last updated: January 26, 2026 — `atomik-gen` CLI tool + VS Code extension, Phase 4B (3 domain SDKs, 57 generated files across 5 languages)*
+*Last updated: January 27, 2026 — Phase 5 agentic orchestration (DAG orchestrator, feedback loops, 25 modules, 242 tests)*
