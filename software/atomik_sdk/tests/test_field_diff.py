@@ -1,7 +1,6 @@
 """Tests for field-level differential analysis."""
 
-import pytest
-from pipeline.analysis.field_diff import FieldDiff, FieldChange, FieldDiffResult
+from pipeline.analysis.field_diff import FieldDiff, FieldDiffResult
 
 
 class TestFieldDiff:

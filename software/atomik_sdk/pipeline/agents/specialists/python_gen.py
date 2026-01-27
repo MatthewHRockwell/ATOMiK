@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from ..specialist import SpecialistAgent, AgentCapability
+from ..specialist import AgentCapability, SpecialistAgent
 
 
 class PythonGeneratorAgent(SpecialistAgent):

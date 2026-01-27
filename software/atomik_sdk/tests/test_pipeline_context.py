@@ -9,17 +9,14 @@ Tests cover:
 - Cross-session state persistence
 """
 
-import json
 import sys
 from pathlib import Path
 
-import pytest
-
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from pipeline.context.manifest import PipelineManifest, SchemaEntry
 from pipeline.context.cache import ArtifactCache
 from pipeline.context.checkpoint import Checkpoint
+from pipeline.context.manifest import PipelineManifest
 
 
 class TestPipelineManifest:
@@ -73,7 +70,7 @@ class TestPipelineManifest:
 
 class TestArtifactCache:
     def test_create_cache(self, tmp_path):
-        cache = ArtifactCache(tmp_path / "cache")
+        ArtifactCache(tmp_path / "cache")
         assert (tmp_path / "cache").exists()
 
     def test_content_hash(self):

@@ -9,13 +9,12 @@ final pipeline report.
 from __future__ import annotations
 
 import csv
-import json
 import time
 from pathlib import Path
 from typing import Any
 
-from . import BaseStage, StageManifest, StageStatus
 from ..context.checkpoint import Checkpoint
+from . import BaseStage, StageManifest
 
 
 class MetricsStage(BaseStage):

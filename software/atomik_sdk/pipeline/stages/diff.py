@@ -8,12 +8,11 @@ the generation stage which languages/files need regeneration.
 
 from __future__ import annotations
 
-import json
 from pathlib import Path
 from typing import Any
 
-from . import BaseStage, StageManifest, StageStatus
 from ..context.checkpoint import Checkpoint
+from . import BaseStage, StageManifest, StageStatus
 
 
 class DiffStage(BaseStage):

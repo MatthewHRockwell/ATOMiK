@@ -1,8 +1,7 @@
 """Tests for specialist agent registry."""
 
-import pytest
-from pipeline.agents.specialist import SpecialistAgent, AgentCapability
 from pipeline.agents.registry import AgentRegistry
+from pipeline.agents.specialist import AgentCapability, SpecialistAgent
 
 
 class MockPythonGen(SpecialistAgent):

@@ -1,9 +1,8 @@
 """Tests for event-driven orchestrator and DAG scheduler."""
 
 import pytest
-from pipeline.dag import TaskDAG, DAGTask, TaskState, CycleError
-from pipeline.event_bus import EventBus, Event, EventType
-from pipeline.orchestrator import Orchestrator
+from pipeline.dag import CycleError, TaskDAG, TaskState
+from pipeline.event_bus import Event, EventBus, EventType
 
 
 class TestTaskDAG:
@@ -89,7 +88,10 @@ class TestEventBus:
     def test_unsubscribe(self):
         bus = EventBus()
         received = []
-        handler = lambda e: received.append(e)
+
+        def handler(e):
+            received.append(e)
+
         bus.subscribe(EventType.TASK_COMPLETED, handler)
         bus.unsubscribe(EventType.TASK_COMPLETED, handler)
         bus.emit(Event(EventType.TASK_COMPLETED))

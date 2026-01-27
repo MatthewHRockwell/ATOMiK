@@ -8,7 +8,7 @@ budget limits and reports token efficiency metrics.
 from __future__ import annotations
 
 import time
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any
 
 
@@ -96,8 +96,6 @@ class TokenBudget:
         for entry in self._entries:
             by_tier[entry.model_tier] = by_tier.get(entry.model_tier, 0) + entry.tokens
 
-        local_tokens = by_tier.get("local", 0)
-        llm_tokens = total - local_tokens
         local_stages = sum(1 for e in self._entries if e.model_tier == "local")
         total_stages = len(self._entries)
 

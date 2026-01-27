@@ -10,16 +10,15 @@ Tests cover:
 
 import json
 import sys
-import tempfile
 from pathlib import Path
 
 import pytest
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
+from pipeline.context.checkpoint import Checkpoint
 from pipeline.stages import StageManifest, StageStatus
 from pipeline.stages.diff import DiffStage
-from pipeline.context.checkpoint import Checkpoint
 
 
 @pytest.fixture

@@ -9,18 +9,16 @@ Tests cover:
 - Verification manifest generation
 """
 
-import json
 import sys
-import tempfile
 from pathlib import Path
 
 import pytest
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from pipeline.stages import StageManifest, StageStatus
+from pipeline.agents.self_correct import SelfCorrector
+from pipeline.stages import StageManifest
 from pipeline.stages.verify import VerifyStage
-from pipeline.agents.self_correct import SelfCorrector, CorrectionResult
 
 
 @pytest.fixture

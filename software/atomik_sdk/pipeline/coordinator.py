@@ -10,15 +10,15 @@ when specialists produce inconsistent outputs.
 from __future__ import annotations
 
 import time
-from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeout
+from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import TimeoutError as FuturesTimeout
 from dataclasses import dataclass, field
 from typing import Any
 
 from .agents.registry import AgentRegistry
-from .agents.specialist import SpecialistAgent
 from .consensus import ConsensusResolver, ConsensusResult
-from .event_bus import EventBus, Event, EventType
-from .parallel.decomposer import TaskDecomposer, DecompositionPlan, ParallelTask
+from .event_bus import Event, EventBus, EventType
+from .parallel.decomposer import DecompositionPlan, ParallelTask, TaskDecomposer
 
 
 @dataclass

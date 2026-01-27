@@ -8,8 +8,8 @@ and other listeners react to events to dispatch dependent work.
 
 from __future__ import annotations
 
-import time
 import threading
+import time
 from collections import defaultdict
 from dataclasses import dataclass, field
 from enum import Enum

@@ -8,13 +8,12 @@ metrics.
 
 from __future__ import annotations
 
-from pathlib import Path
 from typing import Any
 
 from atomik_sdk.generator.schema_validator import SchemaValidator
 
-from . import BaseStage, StageManifest, StageStatus
 from ..context.cache import ArtifactCache
+from . import BaseStage, StageManifest, StageStatus
 
 
 class ValidateStage(BaseStage):

@@ -1,14 +1,12 @@
 """Tests for pipeline self-optimization engine."""
 
-import pytest
-from pipeline.optimization.self_optimizer import SelfOptimizer, OptimizationReport
-from pipeline.optimization.tuner import ConfigTuner, TuningResult
-from pipeline.regression.baseline import BaselineManager, BaselineSnapshot
-from pipeline.regression.detector import RegressionGate, PipelineRegressionDetector
-from pipeline.consensus import ConsensusResolver, ConsensusResult
-from pipeline.coordinator import Coordinator, CoordinatorResult
-from pipeline.context.segment_tracker import SegmentTracker, ContextSegment
+from pipeline.consensus import ConsensusResolver
 from pipeline.context.intelligent_manager import IntelligentContextManager
+from pipeline.context.segment_tracker import SegmentTracker
+from pipeline.optimization.self_optimizer import OptimizationReport, SelfOptimizer
+from pipeline.optimization.tuner import ConfigTuner
+from pipeline.regression.baseline import BaselineManager
+from pipeline.regression.detector import RegressionGate
 
 
 class TestConfigTuner:

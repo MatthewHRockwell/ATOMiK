@@ -8,8 +8,6 @@ configurable similarity threshold.
 
 from __future__ import annotations
 
-from typing import Any
-
 
 def edit_distance(a: str, b: str) -> int:
     """Compute Levenshtein edit distance between two strings."""

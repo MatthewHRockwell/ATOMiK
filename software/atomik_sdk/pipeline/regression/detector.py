@@ -8,7 +8,7 @@ on critical regressions.
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any
 
 from ..analysis.regression_detector import (
@@ -16,7 +16,7 @@ from ..analysis.regression_detector import (
     RegressionReport,
     RegressionSeverity,
 )
-from ..event_bus import EventBus, Event, EventType
+from ..event_bus import Event, EventBus, EventType
 from .baseline import BaselineManager, BaselineSnapshot
 
 

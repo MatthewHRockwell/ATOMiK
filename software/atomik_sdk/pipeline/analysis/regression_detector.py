@@ -12,7 +12,7 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any
 
-from .metrics_analyzer import MetricsAnalyzer, HIGHER_IS_BETTER, LOWER_IS_BETTER
+from .metrics_analyzer import HIGHER_IS_BETTER, LOWER_IS_BETTER, MetricsAnalyzer
 
 
 class RegressionSeverity(Enum):

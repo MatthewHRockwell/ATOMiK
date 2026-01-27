@@ -10,12 +10,12 @@ adaptive model routing, multi-agent parallelism, deep verification,
 and cross-run learning.
 """
 
-from .controller import Pipeline, PipelineConfig, PipelineResult
-from .dag import TaskDAG, DAGTask, TaskState, CycleError
-from .event_bus import EventBus, Event, EventType
-from .orchestrator import Orchestrator
-from .coordinator import Coordinator, CoordinatorResult
 from .consensus import ConsensusResolver, ConsensusResult
+from .controller import Pipeline, PipelineConfig, PipelineResult
+from .coordinator import Coordinator, CoordinatorResult
+from .dag import CycleError, DAGTask, TaskDAG, TaskState
+from .event_bus import Event, EventBus, EventType
+from .orchestrator import Orchestrator
 
 __all__ = [
     "Pipeline", "PipelineConfig", "PipelineResult",

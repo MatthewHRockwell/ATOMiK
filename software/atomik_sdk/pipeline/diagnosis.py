@@ -10,7 +10,6 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any
 
-
 # Error class patterns for classification
 ERROR_PATTERNS: list[dict[str, Any]] = [
     {

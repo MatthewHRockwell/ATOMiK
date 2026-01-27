@@ -14,7 +14,7 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any, Callable
 
-from .event_bus import EventBus, Event, EventType
+from .event_bus import Event, EventBus, EventType
 
 
 class FeedbackOutcome(Enum):

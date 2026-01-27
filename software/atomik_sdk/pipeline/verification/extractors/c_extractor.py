@@ -5,8 +5,7 @@ from __future__ import annotations
 import re
 from typing import Any
 
-from ..interfaces import LanguageInterface, InterfaceField, InterfaceOperation
-
+from ..interfaces import InterfaceField, InterfaceOperation, LanguageInterface
 
 # C type -> approximate bit width
 C_TYPE_WIDTHS = {

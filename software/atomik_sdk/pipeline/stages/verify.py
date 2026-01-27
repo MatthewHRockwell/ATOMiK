@@ -8,12 +8,11 @@ deterministic fixes or escalation to diagnosis agent.
 
 from __future__ import annotations
 
-import subprocess
 from pathlib import Path
 from typing import Any
 
-from . import BaseStage, StageManifest, StageStatus
 from ..agents.self_correct import SelfCorrector
+from . import BaseStage, StageManifest, StageStatus
 
 
 class VerifyStage(BaseStage):

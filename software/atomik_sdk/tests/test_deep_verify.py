@@ -1,8 +1,7 @@
 """Tests for deep verification engine."""
 
-import pytest
 from pipeline.verification.deep_verify import DeepVerifier, DeepVerifyResult
-from pipeline.verification.runners.python_runner import PythonRunner, RunnerResult
+from pipeline.verification.runners.python_runner import RunnerResult
 
 
 class TestDeepVerifyResult:

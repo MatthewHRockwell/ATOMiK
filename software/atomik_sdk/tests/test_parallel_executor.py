@@ -1,7 +1,6 @@
 """Tests for parallel task execution."""
 
-import pytest
-from pipeline.parallel.decomposer import TaskDecomposer, DecompositionPlan, ParallelTask
+from pipeline.parallel.decomposer import ParallelTask, TaskDecomposer
 from pipeline.parallel.executor import ParallelExecutor
 from pipeline.parallel.worker import Worker, WorkerState
 

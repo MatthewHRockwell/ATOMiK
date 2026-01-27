@@ -3,11 +3,9 @@
 from __future__ import annotations
 
 import ast
-import re
 from typing import Any
 
-from ..interfaces import LanguageInterface, InterfaceField, InterfaceOperation
-
+from ..interfaces import InterfaceField, InterfaceOperation, LanguageInterface
 
 # Python type -> approximate bit width
 PYTHON_TYPE_WIDTHS = {

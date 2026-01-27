@@ -11,9 +11,7 @@ Tests cover:
 - Pipeline status reporting
 """
 
-import json
 import sys
-import tempfile
 from pathlib import Path
 
 import pytest
@@ -21,13 +19,12 @@ import pytest
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from pipeline.controller import Pipeline, PipelineConfig, PipelineResult
-from pipeline.stages import BaseStage, StageManifest, StageStatus
-from pipeline.stages.validate import ValidateStage
 from pipeline.stages.diff import DiffStage
 from pipeline.stages.generate import GenerateStage
-from pipeline.stages.verify import VerifyStage
 from pipeline.stages.hardware import HardwareStage
 from pipeline.stages.metrics import MetricsStage
+from pipeline.stages.validate import ValidateStage
+from pipeline.stages.verify import VerifyStage
 
 
 @pytest.fixture

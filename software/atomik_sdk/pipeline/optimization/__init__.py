@@ -1,6 +1,6 @@
 """Pipeline self-optimization engine with bottleneck analysis and auto-tuning."""
 
-from .self_optimizer import SelfOptimizer, OptimizationReport, Recommendation
+from .self_optimizer import OptimizationReport, Recommendation, SelfOptimizer
 from .tuner import ConfigTuner, TuningResult
 
 __all__ = [

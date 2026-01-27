@@ -8,11 +8,11 @@ router with adaptive scoring.
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any
 
-from .router import ModelTier, ModelRouter, TaskClass, TOKEN_ESTIMATES
-from .complexity_scorer import ComplexityScorer, ComplexityScore
+from .complexity_scorer import ComplexityScorer
+from .router import ModelRouter, ModelTier
 
 
 @dataclass

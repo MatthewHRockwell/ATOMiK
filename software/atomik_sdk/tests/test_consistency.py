@@ -1,15 +1,13 @@
 """Tests for cross-language consistency checker."""
 
-import pytest
 from pipeline.verification.consistency import (
     ConsistencyChecker,
-    ConsistencyReport,
     _normalize_to_snake,
 )
 from pipeline.verification.interfaces import (
-    LanguageInterface,
     InterfaceField,
     InterfaceOperation,
+    LanguageInterface,
 )
 
 

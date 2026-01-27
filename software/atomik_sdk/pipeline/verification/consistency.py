@@ -12,12 +12,12 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any
 
-from .interfaces import InterfaceField, InterfaceOperation, LanguageInterface
-from .extractors.python_extractor import PythonExtractor
-from .extractors.rust_extractor import RustExtractor
 from .extractors.c_extractor import CExtractor
 from .extractors.js_extractor import JavaScriptExtractor
+from .extractors.python_extractor import PythonExtractor
+from .extractors.rust_extractor import RustExtractor
 from .extractors.verilog_extractor import VerilogExtractor
+from .interfaces import LanguageInterface
 
 
 @dataclass

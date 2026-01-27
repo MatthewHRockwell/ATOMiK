@@ -1,8 +1,7 @@
 """Tests for feedback loop engine."""
 
-import pytest
-from pipeline.feedback import FeedbackLoop, FeedbackOutcome, FeedbackResult
 from pipeline.event_bus import EventBus
+from pipeline.feedback import FeedbackLoop, FeedbackOutcome
 
 
 def _mock_classifier(language, errors):
@@ -72,7 +71,7 @@ class TestFeedbackLoop:
         result = loop.run(
             "python",
             ["error1"],
-            lambda l, e: ("err_a", e[0]),
+            lambda lang, e: ("err_a", e[0]),
             _mock_kb_not_found,
             _mock_apply_success,
             _mock_llm_diagnose,

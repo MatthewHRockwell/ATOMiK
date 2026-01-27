@@ -11,7 +11,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any
 
-from .segment_tracker import SegmentTracker, ContextSegment
+from .segment_tracker import ContextSegment, SegmentTracker
 
 
 @dataclass

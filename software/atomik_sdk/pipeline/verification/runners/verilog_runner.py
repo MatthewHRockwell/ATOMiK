@@ -3,10 +3,9 @@
 from __future__ import annotations
 
 import os
-import subprocess
 import shutil
+import subprocess
 import tempfile
-from typing import Any
 
 from .python_runner import RunnerResult
 

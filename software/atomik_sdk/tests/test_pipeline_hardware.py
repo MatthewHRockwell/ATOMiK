@@ -9,7 +9,6 @@ Tests cover:
 - Validation level progression
 """
 
-import json
 import sys
 from pathlib import Path
 
@@ -17,7 +16,6 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from pipeline.stages import StageManifest, StageStatus
 from pipeline.stages.hardware import HardwareStage
 
 

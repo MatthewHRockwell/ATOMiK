@@ -163,7 +163,6 @@ class MetricsAnalyzer:
     def _compute_trend(self, name: str, values: list[float]) -> MetricTrend:
         """Compute trend for a single metric."""
         current = values[-1]
-        window_values = values[-self.window:]
         avg = self.compute_moving_average(values)
         std = self.compute_std_dev(values)
 

@@ -1,9 +1,8 @@
 """Tests for token prediction, caching, and compression."""
 
-import pytest
-from pipeline.agents.token_predictor import TokenPredictor
-from pipeline.agents.prompt_cache import PromptCache
 from pipeline.agents.context_compressor import ContextCompressor
+from pipeline.agents.prompt_cache import PromptCache
+from pipeline.agents.token_predictor import TokenPredictor
 
 
 class TestTokenPredictor:

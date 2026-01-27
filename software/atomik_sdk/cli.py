@@ -283,12 +283,12 @@ EXIT_HARDWARE_FAILURE = 4
 def _create_pipeline(args: argparse.Namespace):
     """Create and configure a Pipeline with all stages registered."""
     from atomik_sdk.pipeline.controller import Pipeline, PipelineConfig
-    from atomik_sdk.pipeline.stages.validate import ValidateStage
     from atomik_sdk.pipeline.stages.diff import DiffStage
     from atomik_sdk.pipeline.stages.generate import GenerateStage
-    from atomik_sdk.pipeline.stages.verify import VerifyStage
     from atomik_sdk.pipeline.stages.hardware import HardwareStage
     from atomik_sdk.pipeline.stages.metrics import MetricsStage
+    from atomik_sdk.pipeline.stages.validate import ValidateStage
+    from atomik_sdk.pipeline.stages.verify import VerifyStage
 
     config = PipelineConfig(
         output_dir=getattr(args, "output_dir", "generated"),
@@ -344,7 +344,7 @@ def cmd_pipeline_run(args: argparse.Namespace) -> int:
                   f"Tokens: {result.total_tokens}, "
                   f"Time: {result.total_time_ms:.0f}ms")
         else:
-            print(f"\nPipeline FAILED", file=sys.stderr)
+            print("\nPipeline FAILED", file=sys.stderr)
             for err in result.errors:
                 print(f"  - {err}", file=sys.stderr)
         return EXIT_SUCCESS if result.success else EXIT_GENERATION_FAILURE
@@ -399,8 +399,8 @@ def cmd_pipeline_status(_args: argparse.Namespace) -> int:
 
 def cmd_metrics_show(args: argparse.Namespace) -> int:
     """Show metrics for the last pipeline run."""
-    from atomik_sdk.pipeline.metrics.reporter import MetricsReporter
     from atomik_sdk.pipeline.context.checkpoint import Checkpoint
+    from atomik_sdk.pipeline.metrics.reporter import MetricsReporter
 
     checkpoint = Checkpoint(getattr(args, "checkpoint", ".atomik"))
     schema_name = getattr(args, "schema", None)
@@ -420,8 +420,8 @@ def cmd_metrics_show(args: argparse.Namespace) -> int:
 
 def cmd_metrics_compare(args: argparse.Namespace) -> int:
     """Compare metrics across schemas."""
-    from atomik_sdk.pipeline.metrics.reporter import MetricsReporter
     from atomik_sdk.pipeline.context.checkpoint import Checkpoint
+    from atomik_sdk.pipeline.metrics.reporter import MetricsReporter
 
     checkpoint = Checkpoint(getattr(args, "checkpoint", ".atomik"))
     history = checkpoint.get_metrics_history()

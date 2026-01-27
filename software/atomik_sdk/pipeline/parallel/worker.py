@@ -7,9 +7,9 @@ and structured result reporting.
 
 from __future__ import annotations
 
-import time
 import threading
-from dataclasses import dataclass, field
+import time
+from dataclasses import dataclass
 from enum import Enum
 from typing import Any, Callable
 

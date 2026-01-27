@@ -10,10 +10,10 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any
 
-from .runners.python_runner import PythonRunner, RunnerResult
-from .runners.rust_runner import RustRunner
 from .runners.c_runner import CRunner
 from .runners.js_runner import JavaScriptRunner
+from .runners.python_runner import PythonRunner, RunnerResult
+from .runners.rust_runner import RustRunner
 from .runners.verilog_runner import VerilogRunner
 
 

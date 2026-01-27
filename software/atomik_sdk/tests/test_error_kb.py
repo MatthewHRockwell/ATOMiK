@@ -1,8 +1,7 @@
 """Tests for error pattern knowledge base."""
 
-import pytest
 from pipeline.knowledge.error_kb import ErrorKnowledgeBase, ErrorPattern
-from pipeline.knowledge.fuzzy_match import edit_distance, token_overlap, fuzzy_score
+from pipeline.knowledge.fuzzy_match import edit_distance, fuzzy_score, token_overlap
 
 
 class TestFuzzyMatch:

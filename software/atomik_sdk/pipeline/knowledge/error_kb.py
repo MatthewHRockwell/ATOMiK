@@ -10,12 +10,11 @@ from __future__ import annotations
 
 import json
 import time
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
 from .fuzzy_match import fuzzy_score
-
 
 KB_SCHEMA_VERSION = "1.0"
 

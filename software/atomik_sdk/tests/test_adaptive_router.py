@@ -1,7 +1,6 @@
 """Tests for adaptive model router."""
 
-import pytest
-from pipeline.agents.adaptive_router import AdaptiveRouter, RoutingDecision
+from pipeline.agents.adaptive_router import AdaptiveRouter
 from pipeline.agents.router import ModelTier
 
 
@@ -14,7 +13,7 @@ class TestAdaptiveRouter:
     def test_high_budget_pressure_downgrades(self):
         router = AdaptiveRouter()
         # Use a non-deterministic stage so adaptive routing is applied
-        tier = router.route(
+        router.route(
             "self_correct_unknown",
             budget_pressure=0.85,
         )
@@ -26,7 +25,7 @@ class TestAdaptiveRouter:
     def test_prior_failure_escalates(self):
         router = AdaptiveRouter()
         router.record_failure("test_hash")
-        tier = router.route(
+        router.route(
             "generate",
             schema_hash="test_hash",
             budget_pressure=0.3,
@@ -37,7 +36,7 @@ class TestAdaptiveRouter:
     def test_cache_hit(self):
         router = AdaptiveRouter()
         # Use a non-deterministic stage so adaptive routing records all signals
-        tier = router.route(
+        router.route(
             "self_correct_unknown",
             budget_pressure=0.3,
             cache_hit=True,
