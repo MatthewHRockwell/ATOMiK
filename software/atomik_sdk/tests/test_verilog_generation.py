@@ -158,5 +158,98 @@ def test_verilog_generation():
     print("=" * 70)
 
 
+def test_parallel_bank_generation():
+    """Test Verilog RTL generation with N_BANKS=4 parallel accumulator banks."""
+    print("=" * 70)
+    print("Testing Parallel Bank Verilog Generation (N_BANKS=4)")
+    print("=" * 70)
+    print()
+
+    from generator.namespace_mapper import NamespaceMapping
+
+    # Build a schema with N_BANKS=4 in hardware.rtl_params
+    schema = {
+        "catalogue": {
+            "vertical": "Test",
+            "field": "Parallel",
+            "object": "BankTest",
+        },
+        "schema": {
+            "delta_fields": {
+                "value": {"width": 64, "type": "xor"},
+            },
+            "operations": {},
+        },
+        "hardware": {
+            "target_device": "GW1NR-9",
+            "rtl_params": {
+                "DATA_WIDTH": 64,
+                "N_BANKS": 4,
+            },
+        },
+    }
+
+    namespace = NamespaceMapping(
+        vertical="Test",
+        field="Parallel",
+        object="BankTest",
+        python_module_path="atomik.Test.Parallel",
+        python_import_statement="from atomik.Test.Parallel import BankTest",
+        rust_path="atomik::test::parallel",
+        rust_use_statement="use atomik::test::parallel::BankTest;",
+        c_include_path="atomik/test/parallel/bank_test.h",
+        c_include_statement='#include "atomik/test/parallel/bank_test.h"',
+        javascript_package="@atomik/test-parallel",
+        javascript_require_statement="const { BankTest } = require('@atomik/test-parallel');",
+        verilog_module_name="atomik_test_parallel_bank_test",
+    )
+
+    gen = VerilogGenerator()
+    result = gen.generate(schema, namespace)
+
+    assert result.success, f"Generation failed: {result.errors}"
+    print(f"  [PASS] Generated {len(result.files)} file(s)")
+
+    # Find the RTL module file
+    rtl_files = [f for f in result.files if f.language == "verilog" and "tb_" not in f.relative_path]
+    assert len(rtl_files) >= 1, "No RTL file generated"
+
+    rtl_content = rtl_files[0].content
+
+    # Verify parallel accumulator instantiation
+    assert "atomik_parallel_acc" in rtl_content, \
+        "Generated Verilog should contain atomik_parallel_acc instantiation"
+    print("  [PASS] Contains atomik_parallel_acc instantiation")
+
+    assert "N_BANKS" in rtl_content, \
+        "Generated Verilog should contain N_BANKS parameter"
+    print("  [PASS] Contains N_BANKS parameter")
+
+    assert "delta_parallel_in" in rtl_content, \
+        "Generated Verilog should contain delta_parallel_in port"
+    print("  [PASS] Contains delta_parallel_in port")
+
+    assert "delta_parallel_valid" in rtl_content, \
+        "Generated Verilog should contain delta_parallel_valid port"
+    print("  [PASS] Contains delta_parallel_valid port")
+
+    assert "parallel_mode" in rtl_content, \
+        "Generated Verilog should contain parallel_mode port"
+    print("  [PASS] Contains parallel_mode port")
+
+    # Verify testbench has parallel tests
+    tb_files = [f for f in result.files if "tb_" in f.relative_path]
+    assert len(tb_files) >= 1, "No testbench file generated"
+
+    tb_content = tb_files[0].content
+    assert "Parallel" in tb_content or "parallel" in tb_content, \
+        "Testbench should contain parallel mode tests"
+    print("  [PASS] Testbench contains parallel mode tests")
+
+    print()
+    print("  [PASS] Parallel bank generation test complete")
+    print("=" * 70)
+
+
 if __name__ == "__main__":
     sys.exit(test_verilog_generation())

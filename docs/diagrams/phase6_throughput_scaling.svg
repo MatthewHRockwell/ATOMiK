@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="480" viewBox="0 0 720 480"
+     font-family="Monaco, Consolas, 'Courier New', monospace">
+
+  <!-- Background -->
+  <rect width="720" height="480" rx="10" fill="#1e1e2e"/>
+
+  <!-- Title -->
+  <text x="360" y="32" text-anchor="middle" font-size="14" fill="#cdd6f4"
+        font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif">
+    Phase 6: Throughput Scaling — XOR vs Adder Parallel Banks
+  </text>
+
+  <!-- Chart area: x=100..660, y=60..390 (560 wide, 330 tall) -->
+  <!-- Y-axis: 0 to 800 Mops/sec, scale = 330/800 = 0.4125 px/Mops -->
+
+  <!-- Y-axis -->
+  <line x1="100" y1="60" x2="100" y2="390" stroke="#585b70" stroke-width="1"/>
+
+  <!-- X-axis -->
+  <line x1="100" y1="390" x2="660" y2="390" stroke="#585b70" stroke-width="1"/>
+
+  <!-- Y-axis label -->
+  <text x="18" y="225" text-anchor="middle" font-size="11" fill="#a6adc8"
+        transform="rotate(-90, 18, 225)">Throughput (Mops/sec)</text>
+
+  <!-- X-axis label -->
+  <text x="380" y="435" text-anchor="middle" font-size="11" fill="#a6adc8">Number of Parallel Banks (N)</text>
+
+  <!-- Y-axis gridlines and labels -->
+  <!-- 0 -->
+  <text x="92" y="394" text-anchor="end" font-size="9" fill="#6c7086">0</text>
+
+  <!-- 100 -->
+  <line x1="100" y1="349" x2="660" y2="349" stroke="#313244" stroke-width="0.5"/>
+  <text x="92" y="353" text-anchor="end" font-size="9" fill="#6c7086">100</text>
+
+  <!-- 200 -->
+  <line x1="100" y1="307" x2="660" y2="307" stroke="#313244" stroke-width="0.5"/>
+  <text x="92" y="311" text-anchor="end" font-size="9" fill="#6c7086">200</text>
+
+  <!-- 300 -->
+  <line x1="100" y1="266" x2="660" y2="266" stroke="#313244" stroke-width="0.5"/>
+  <text x="92" y="270" text-anchor="end" font-size="9" fill="#6c7086">300</text>
+
+  <!-- 400 -->
+  <line x1="100" y1="225" x2="660" y2="225" stroke="#313244" stroke-width="0.5"/>
+  <text x="92" y="229" text-anchor="end" font-size="9" fill="#6c7086">400</text>
+
+  <!-- 500 -->
+  <line x1="100" y1="184" x2="660" y2="184" stroke="#313244" stroke-width="0.5"/>
+  <text x="92" y="188" text-anchor="end" font-size="9" fill="#6c7086">500</text>
+
+  <!-- 600 -->
+  <line x1="100" y1="143" x2="660" y2="143" stroke="#313244" stroke-width="0.5"/>
+  <text x="92" y="147" text-anchor="end" font-size="9" fill="#6c7086">600</text>
+
+  <!-- 700 -->
+  <line x1="100" y1="101" x2="660" y2="101" stroke="#313244" stroke-width="0.5"/>
+  <text x="92" y="105" text-anchor="end" font-size="9" fill="#6c7086">700</text>
+
+  <!-- 800 -->
+  <line x1="100" y1="60" x2="660" y2="60" stroke="#313244" stroke-width="0.5"/>
+  <text x="92" y="64" text-anchor="end" font-size="9" fill="#6c7086">800</text>
+
+  <!-- Scale: 1 Mops = (390-60)/800 = 0.4125 px -->
+  <!-- Bar positions: 4 groups centered at x = 170, 310, 450, 590 -->
+  <!-- Each group: XOR bar at center-30, Adder bar at center+5, width=45 each -->
+
+  <!-- ===== N=1 Bars ===== -->
+  <!-- XOR: 94.5 Mops, height=39, y=351 -->
+  <rect x="140" y="351" width="45" height="39" rx="3" fill="#a6e3a1" opacity="0.9"/>
+  <text x="162" y="345" text-anchor="middle" font-size="8" fill="#a6e3a1">94.5</text>
+  <!-- Adder: 94.5 Mops (same baseline) -->
+  <rect x="190" y="351" width="45" height="39" rx="3" fill="#f38ba8" opacity="0.9"/>
+  <text x="212" y="345" text-anchor="middle" font-size="8" fill="#f38ba8">94.5</text>
+  <!-- X label -->
+  <text x="187" y="408" text-anchor="middle" font-size="10" fill="#cdd6f4">N=1</text>
+  <text x="187" y="420" text-anchor="middle" font-size="8" fill="#6c7086">1.0x</text>
+
+  <!-- ===== N=2 Bars ===== -->
+  <!-- XOR: 189 Mops, height=78, y=312 -->
+  <rect x="280" y="312" width="45" height="78" rx="3" fill="#a6e3a1" opacity="0.9"/>
+  <text x="302" y="306" text-anchor="middle" font-size="8" fill="#a6e3a1">189.0</text>
+  <!-- Adder: 170 Mops (85MHz*2), height=70, y=320 -->
+  <rect x="330" y="320" width="45" height="70" rx="3" fill="#f38ba8" opacity="0.9"/>
+  <text x="352" y="314" text-anchor="middle" font-size="8" fill="#f38ba8">170</text>
+  <!-- X label -->
+  <text x="327" y="408" text-anchor="middle" font-size="10" fill="#cdd6f4">N=2</text>
+  <text x="327" y="420" text-anchor="middle" font-size="8" fill="#6c7086">2.0x</text>
+
+  <!-- ===== N=4 Bars ===== -->
+  <!-- XOR: 378 Mops, height=156, y=234 -->
+  <rect x="420" y="234" width="45" height="156" rx="3" fill="#a6e3a1" opacity="0.9"/>
+  <text x="442" y="228" text-anchor="middle" font-size="8" fill="#a6e3a1">378.0</text>
+  <!-- Adder: 288 Mops (72MHz*4), height=119, y=271 -->
+  <rect x="470" y="271" width="45" height="119" rx="3" fill="#f38ba8" opacity="0.9"/>
+  <text x="492" y="265" text-anchor="middle" font-size="8" fill="#f38ba8">288</text>
+  <!-- X label -->
+  <text x="467" y="408" text-anchor="middle" font-size="10" fill="#cdd6f4">N=4</text>
+  <text x="467" y="420" text-anchor="middle" font-size="8" fill="#6c7086">4.0x</text>
+
+  <!-- ===== N=8 Bars ===== -->
+  <!-- XOR: 756 Mops, height=312, y=78 -->
+  <rect x="560" y="78" width="45" height="312" rx="3" fill="#a6e3a1" opacity="0.9"/>
+  <text x="582" y="72" text-anchor="middle" font-size="8" fill="#a6e3a1">756.0</text>
+  <!-- Adder: 464 Mops (58MHz*8), height=191, y=199 -->
+  <rect x="610" y="199" width="45" height="191" rx="3" fill="#f38ba8" opacity="0.9"/>
+  <text x="632" y="193" text-anchor="middle" font-size="8" fill="#f38ba8">464</text>
+  <!-- X label -->
+  <text x="607" y="408" text-anchor="middle" font-size="10" fill="#cdd6f4">N=8</text>
+  <text x="607" y="420" text-anchor="middle" font-size="8" fill="#6c7086">8.0x</text>
+
+  <!-- ===== Ideal Linear Reference Line ===== -->
+  <!-- Points: N=1 at (170,351), N=2 at (310,312), N=4 at (450,234), N=8 at (590,78) -->
+  <line x1="170" y1="351" x2="590" y2="78" stroke="#cdd6f4" stroke-width="1"
+        stroke-dasharray="6,4" opacity="0.5"/>
+  <text x="600" y="72" font-size="8" fill="#cdd6f4" opacity="0.6">ideal linear</text>
+
+  <!-- ===== Legend ===== -->
+  <rect x="120" y="445" width="14" height="14" rx="2" fill="#a6e3a1" opacity="0.9"/>
+  <text x="140" y="457" font-size="10" fill="#cdd6f4">ATOMiK XOR (linear, constant Fmax)</text>
+
+  <rect x="420" y="445" width="14" height="14" rx="2" fill="#f38ba8" opacity="0.9"/>
+  <text x="440" y="457" font-size="10" fill="#cdd6f4">Adder (sub-linear, Fmax degrades)</text>
+
+  <!-- ===== Key Insight Box ===== -->
+  <rect x="115" y="52" width="250" height="18" rx="3" fill="#313244" opacity="0.7"/>
+  <text x="120" y="65" font-size="9" fill="#a6e3a1">XOR: no carry propagation = constant Fmax</text>
+
+</svg>

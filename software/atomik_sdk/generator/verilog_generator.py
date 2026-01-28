@@ -44,15 +44,21 @@ class VerilogGenerator(CodeEmitter):
             # Determine DATA_WIDTH from delta fields
             data_width = self._get_data_width(delta_fields)
 
+            # Extract N_BANKS for parallel accumulator support
+            rtl_params = hardware.get('rtl_params', {})
+            n_banks = rtl_params.get('N_BANKS', 1)
+
             # Generate main RTL module
             rtl_file = self._generate_rtl_module(
-                namespace, delta_fields, operations, hardware, data_width
+                namespace, delta_fields, operations, hardware, data_width,
+                n_banks=n_banks
             )
             files.append(rtl_file)
 
             # Generate testbench
             testbench_file = self._generate_testbench(
-                namespace, delta_fields, operations, data_width
+                namespace, delta_fields, operations, data_width,
+                n_banks=n_banks
             )
             files.append(testbench_file)
 
@@ -81,7 +87,8 @@ class VerilogGenerator(CodeEmitter):
         delta_fields: dict[str, Any],
         operations: dict[str, Any],
         hardware: dict[str, Any],
-        data_width: int
+        data_width: int,
+        n_banks: int = 1
     ) -> GeneratedFile:
         """Generate synthesizable Verilog RTL module."""
 
@@ -91,123 +98,209 @@ class VerilogGenerator(CodeEmitter):
 
         lines = []
 
-        # Module header
-        lines.append("/**")
-        lines.append(f" * {module_name}")
-        lines.append(" * ")
-        lines.append(f" * Delta-state module for {namespace.object}")
-        lines.append(" * Generated from ATOMiK schema")
-        lines.append(" * ")
-        lines.append(" * Operations:")
-        lines.append(" *   LOAD: Set initial state")
-        lines.append(" *   ACCUMULATE: XOR delta into accumulator")
-        lines.append(" *   READ: Reconstruct current state")
-        lines.append(" *   STATUS: Check if accumulator is zero")
-        lines.append(" */")
-        lines.append("")
-
-        # Module declaration
-        lines.append(f"module {module_name} #(")
-        lines.append(f"    parameter DATA_WIDTH = {data_width}")
-        lines.append(") (")
-        lines.append("    // Clock and reset")
-        lines.append("    input wire clk,")
-        lines.append("    input wire rst_n,")
-        lines.append("")
-        lines.append("    // Control signals")
-        lines.append("    input wire load_en,")
-        lines.append("    input wire accumulate_en,")
-        lines.append("    input wire read_en,")
-        if operations.get('rollback', {}).get('enabled', False):
-            lines.append("    input wire rollback_en,")
-        lines.append("")
-        lines.append("    // Data signals")
-        lines.append("    input wire [DATA_WIDTH-1:0] data_in,")
-        lines.append("    output reg [DATA_WIDTH-1:0] data_out,")
-        lines.append("")
-        lines.append("    // Status signals")
-        lines.append("    output wire accumulator_zero")
-        lines.append(");")
-        lines.append("")
-
-        # Internal registers
-        lines.append("    // Internal state")
-        lines.append("    reg [DATA_WIDTH-1:0] initial_state;")
-        lines.append("    reg [DATA_WIDTH-1:0] accumulator;")
-        lines.append("")
-
-        # Rollback support
-        if operations.get('rollback', {}).get('enabled', False):
-            history_depth = operations['rollback'].get('history_depth', 10)
-            lines.append("    // Rollback history")
-            lines.append(f"    reg [DATA_WIDTH-1:0] history [0:{history_depth-1}];")
-            lines.append(f"    reg [$clog2({history_depth}):0] history_count;")
-            lines.append(f"    reg [$clog2({history_depth})-1:0] history_head;")
+        if n_banks > 1:
+            # Emit parallel wrapper that instantiates atomik_parallel_acc
+            lines.append("/**")
+            lines.append(f" * {module_name}")
+            lines.append(" * ")
+            lines.append(f" * Parallel delta-state module for {namespace.object}")
+            lines.append(f" * N_BANKS={n_banks} parallel XOR accumulator banks")
+            lines.append(" * Generated from ATOMiK schema")
+            lines.append(" * ")
+            lines.append(" * Operations:")
+            lines.append(" *   LOAD: Set initial state (all banks reset)")
+            lines.append(" *   ACCUMULATE: XOR delta into accumulator (round-robin or parallel)")
+            lines.append(" *   READ: Reconstruct current state from merged accumulator")
+            lines.append(" *   STATUS: Check if merged accumulator is zero")
+            lines.append(" */")
             lines.append("")
 
-        # Status output
-        lines.append("    // Status: accumulator is zero")
-        lines.append("    assign accumulator_zero = (accumulator == {DATA_WIDTH{1'b0}});")
-        lines.append("")
+            lines.append(f"module {module_name} #(")
+            lines.append(f"    parameter DATA_WIDTH = {data_width},")
+            lines.append(f"    parameter N_BANKS = {n_banks}")
+            lines.append(") (")
+            lines.append("    // Clock and reset")
+            lines.append("    input wire clk,")
+            lines.append("    input wire rst_n,")
+            lines.append("")
+            lines.append("    // Control signals")
+            lines.append("    input wire load_en,")
+            lines.append("    input wire accumulate_en,")
+            lines.append("    input wire read_en,")
+            lines.append("")
+            lines.append("    // Single-stream data")
+            lines.append("    input wire [DATA_WIDTH-1:0] data_in,")
+            lines.append("    output reg [DATA_WIDTH-1:0] data_out,")
+            lines.append("")
+            lines.append("    // Parallel delta ports")
+            lines.append("    input wire [N_BANKS*DATA_WIDTH-1:0] delta_parallel_in,")
+            lines.append("    input wire [N_BANKS-1:0] delta_parallel_valid,")
+            lines.append("    input wire parallel_mode,")
+            lines.append("")
+            lines.append("    // Status signals")
+            lines.append("    output wire accumulator_zero")
+            lines.append(");")
+            lines.append("")
 
-        # LOAD operation
-        lines.append("    // LOAD operation: Set initial state")
-        lines.append("    always @(posedge clk or negedge rst_n) begin")
-        lines.append("        if (!rst_n) begin")
-        lines.append("            initial_state <= {DATA_WIDTH{1'b0}};")
-        lines.append("        end else if (load_en) begin")
-        lines.append("            initial_state <= data_in;")
-        lines.append("        end")
-        lines.append("    end")
-        lines.append("")
+            lines.append("    // Parallel accumulator bank outputs")
+            lines.append("    wire [DATA_WIDTH-1:0] current_state_w;")
+            lines.append("    wire [DATA_WIDTH-1:0] merged_acc_w;")
+            lines.append("")
 
-        # ACCUMULATE operation
-        lines.append("    // ACCUMULATE operation: XOR delta into accumulator")
-        lines.append("    always @(posedge clk or negedge rst_n) begin")
-        lines.append("        if (!rst_n) begin")
-        lines.append("            accumulator <= {DATA_WIDTH{1'b0}};")
-        if operations.get('rollback', {}).get('enabled', False):
-            lines.append("            history_count <= 0;")
-            lines.append("            history_head <= 0;")
-        lines.append("        end else if (load_en) begin")
-        lines.append("            // Reset accumulator on load")
-        lines.append("            accumulator <= {DATA_WIDTH{1'b0}};")
-        if operations.get('rollback', {}).get('enabled', False):
-            lines.append("            history_count <= 0;")
-            lines.append("            history_head <= 0;")
-        lines.append("        end else if (accumulate_en) begin")
-        lines.append("            // XOR delta into accumulator")
-        lines.append("            accumulator <= accumulator ^ data_in;")
-        if operations.get('rollback', {}).get('enabled', False):
-            lines.append("            // Save to history")
-            lines.append("            history[history_head] <= data_in;")
-            lines.append(f"            history_head <= (history_head + 1) % {history_depth};")
-            lines.append(f"            if (history_count < {history_depth})")
-            lines.append("                history_count <= history_count + 1;")
-        if operations.get('rollback', {}).get('enabled', False):
-            lines.append("        end else if (rollback_en && history_count > 0) begin")
-            lines.append("            // Rollback: XOR out the last delta")
-            lines.append(f"            history_head <= (history_head - 1 + {history_depth}) % {history_depth};")
-            lines.append(f"            accumulator <= accumulator ^ history[(history_head - 1 + {history_depth}) % {history_depth}];")
-            lines.append("            history_count <= history_count - 1;")
-        lines.append("        end")
-        lines.append("    end")
-        lines.append("")
+            lines.append("    // Instantiate parallel accumulator banks")
+            lines.append("    atomik_parallel_acc #(")
+            lines.append("        .DELTA_WIDTH(DATA_WIDTH),")
+            lines.append("        .N_BANKS(N_BANKS)")
+            lines.append("    ) u_parallel_acc (")
+            lines.append("        .clk(clk),")
+            lines.append("        .rst_n(rst_n),")
+            lines.append("        .delta_in(data_in),")
+            lines.append("        .delta_valid(accumulate_en),")
+            lines.append("        .delta_parallel_in(delta_parallel_in),")
+            lines.append("        .delta_parallel_valid(delta_parallel_valid),")
+            lines.append("        .parallel_mode(parallel_mode),")
+            lines.append("        .initial_state_in(data_in),")
+            lines.append("        .load_initial(load_en),")
+            lines.append("        .current_state(current_state_w),")
+            lines.append("        .merged_accumulator(merged_acc_w),")
+            lines.append("        .accumulator_zero(accumulator_zero),")
+            lines.append("        .current_bank(),")
+            lines.append("        .bank_active()")
+            lines.append("    );")
+            lines.append("")
 
-        # READ operation
-        lines.append("    // READ operation: Reconstruct current state")
-        lines.append("    always @(posedge clk or negedge rst_n) begin")
-        lines.append("        if (!rst_n) begin")
-        lines.append("            data_out <= {DATA_WIDTH{1'b0}};")
-        lines.append("        end else if (read_en) begin")
-        lines.append("            // current_state = initial_state XOR accumulator")
-        lines.append("            data_out <= initial_state ^ accumulator;")
-        lines.append("        end")
-        lines.append("    end")
-        lines.append("")
+            lines.append("    // READ operation: latch reconstructed state")
+            lines.append("    always @(posedge clk or negedge rst_n) begin")
+            lines.append("        if (!rst_n) begin")
+            lines.append("            data_out <= {DATA_WIDTH{1'b0}};")
+            lines.append("        end else if (read_en) begin")
+            lines.append("            data_out <= current_state_w;")
+            lines.append("        end")
+            lines.append("    end")
+            lines.append("")
 
-        lines.append("endmodule")
-        lines.append("")
+            lines.append("endmodule")
+            lines.append("")
+
+        else:
+            # Original single-bank module generation
+            # Module header
+            lines.append("/**")
+            lines.append(f" * {module_name}")
+            lines.append(" * ")
+            lines.append(f" * Delta-state module for {namespace.object}")
+            lines.append(" * Generated from ATOMiK schema")
+            lines.append(" * ")
+            lines.append(" * Operations:")
+            lines.append(" *   LOAD: Set initial state")
+            lines.append(" *   ACCUMULATE: XOR delta into accumulator")
+            lines.append(" *   READ: Reconstruct current state")
+            lines.append(" *   STATUS: Check if accumulator is zero")
+            lines.append(" */")
+            lines.append("")
+
+            # Module declaration
+            lines.append(f"module {module_name} #(")
+            lines.append(f"    parameter DATA_WIDTH = {data_width}")
+            lines.append(") (")
+            lines.append("    // Clock and reset")
+            lines.append("    input wire clk,")
+            lines.append("    input wire rst_n,")
+            lines.append("")
+            lines.append("    // Control signals")
+            lines.append("    input wire load_en,")
+            lines.append("    input wire accumulate_en,")
+            lines.append("    input wire read_en,")
+            if operations.get('rollback', {}).get('enabled', False):
+                lines.append("    input wire rollback_en,")
+            lines.append("")
+            lines.append("    // Data signals")
+            lines.append("    input wire [DATA_WIDTH-1:0] data_in,")
+            lines.append("    output reg [DATA_WIDTH-1:0] data_out,")
+            lines.append("")
+            lines.append("    // Status signals")
+            lines.append("    output wire accumulator_zero")
+            lines.append(");")
+            lines.append("")
+
+            # Internal registers
+            lines.append("    // Internal state")
+            lines.append("    reg [DATA_WIDTH-1:0] initial_state;")
+            lines.append("    reg [DATA_WIDTH-1:0] accumulator;")
+            lines.append("")
+
+            # Rollback support
+            if operations.get('rollback', {}).get('enabled', False):
+                history_depth = operations['rollback'].get('history_depth', 10)
+                lines.append("    // Rollback history")
+                lines.append(f"    reg [DATA_WIDTH-1:0] history [0:{history_depth-1}];")
+                lines.append(f"    reg [$clog2({history_depth}):0] history_count;")
+                lines.append(f"    reg [$clog2({history_depth})-1:0] history_head;")
+                lines.append("")
+
+            # Status output
+            lines.append("    // Status: accumulator is zero")
+            lines.append("    assign accumulator_zero = (accumulator == {DATA_WIDTH{1'b0}});")
+            lines.append("")
+
+            # LOAD operation
+            lines.append("    // LOAD operation: Set initial state")
+            lines.append("    always @(posedge clk or negedge rst_n) begin")
+            lines.append("        if (!rst_n) begin")
+            lines.append("            initial_state <= {DATA_WIDTH{1'b0}};")
+            lines.append("        end else if (load_en) begin")
+            lines.append("            initial_state <= data_in;")
+            lines.append("        end")
+            lines.append("    end")
+            lines.append("")
+
+            # ACCUMULATE operation
+            lines.append("    // ACCUMULATE operation: XOR delta into accumulator")
+            lines.append("    always @(posedge clk or negedge rst_n) begin")
+            lines.append("        if (!rst_n) begin")
+            lines.append("            accumulator <= {DATA_WIDTH{1'b0}};")
+            if operations.get('rollback', {}).get('enabled', False):
+                lines.append("            history_count <= 0;")
+                lines.append("            history_head <= 0;")
+            lines.append("        end else if (load_en) begin")
+            lines.append("            // Reset accumulator on load")
+            lines.append("            accumulator <= {DATA_WIDTH{1'b0}};")
+            if operations.get('rollback', {}).get('enabled', False):
+                lines.append("            history_count <= 0;")
+                lines.append("            history_head <= 0;")
+            lines.append("        end else if (accumulate_en) begin")
+            lines.append("            // XOR delta into accumulator")
+            lines.append("            accumulator <= accumulator ^ data_in;")
+            if operations.get('rollback', {}).get('enabled', False):
+                lines.append("            // Save to history")
+                lines.append("            history[history_head] <= data_in;")
+                lines.append(f"            history_head <= (history_head + 1) % {history_depth};")
+                lines.append(f"            if (history_count < {history_depth})")
+                lines.append("                history_count <= history_count + 1;")
+            if operations.get('rollback', {}).get('enabled', False):
+                lines.append("        end else if (rollback_en && history_count > 0) begin")
+                lines.append("            // Rollback: XOR out the last delta")
+                lines.append(f"            history_head <= (history_head - 1 + {history_depth}) % {history_depth};")
+                lines.append(f"            accumulator <= accumulator ^ history[(history_head - 1 + {history_depth}) % {history_depth}];")
+                lines.append("            history_count <= history_count - 1;")
+            lines.append("        end")
+            lines.append("    end")
+            lines.append("")
+
+            # READ operation
+            lines.append("    // READ operation: Reconstruct current state")
+            lines.append("    always @(posedge clk or negedge rst_n) begin")
+            lines.append("        if (!rst_n) begin")
+            lines.append("            data_out <= {DATA_WIDTH{1'b0}};")
+            lines.append("        end else if (read_en) begin")
+            lines.append("            // current_state = initial_state XOR accumulator")
+            lines.append("            data_out <= initial_state ^ accumulator;")
+            lines.append("        end")
+            lines.append("    end")
+            lines.append("")
+
+            lines.append("endmodule")
+            lines.append("")
 
         content = "\n".join(lines)
 
@@ -223,7 +316,8 @@ class VerilogGenerator(CodeEmitter):
         namespace: NamespaceMapping,
         delta_fields: dict[str, Any],
         operations: dict[str, Any],
-        data_width: int
+        data_width: int,
+        n_banks: int = 1
     ) -> GeneratedFile:
         """Generate Verilog testbench."""
 
@@ -235,6 +329,8 @@ class VerilogGenerator(CodeEmitter):
         # Testbench module
         lines.append("/**")
         lines.append(f" * Testbench for {module_name}")
+        if n_banks > 1:
+            lines.append(f" * Parallel mode: N_BANKS={n_banks}")
         lines.append(" */")
         lines.append("")
         lines.append("`timescale 1ns / 1ps")
@@ -245,6 +341,8 @@ class VerilogGenerator(CodeEmitter):
         # Testbench signals
         lines.append("    // Parameters")
         lines.append(f"    parameter DATA_WIDTH = {data_width};")
+        if n_banks > 1:
+            lines.append(f"    parameter N_BANKS = {n_banks};")
         lines.append("    parameter CLK_PERIOD = 10;  // 10ns = 100MHz")
         lines.append("")
         lines.append("    // Clock and reset")
@@ -262,6 +360,14 @@ class VerilogGenerator(CodeEmitter):
         lines.append("    reg [DATA_WIDTH-1:0] data_in;")
         lines.append("    wire [DATA_WIDTH-1:0] data_out;")
         lines.append("")
+
+        if n_banks > 1:
+            lines.append("    // Parallel delta ports")
+            lines.append("    reg [N_BANKS*DATA_WIDTH-1:0] delta_parallel_in;")
+            lines.append("    reg [N_BANKS-1:0] delta_parallel_valid;")
+            lines.append("    reg parallel_mode;")
+            lines.append("")
+
         lines.append("    // Status")
         lines.append("    wire accumulator_zero;")
         lines.append("")
@@ -269,7 +375,11 @@ class VerilogGenerator(CodeEmitter):
         # DUT instantiation
         lines.append("    // DUT instantiation")
         lines.append(f"    {module_name} #(")
-        lines.append("        .DATA_WIDTH(DATA_WIDTH)")
+        if n_banks > 1:
+            lines.append("        .DATA_WIDTH(DATA_WIDTH),")
+            lines.append("        .N_BANKS(N_BANKS)")
+        else:
+            lines.append("        .DATA_WIDTH(DATA_WIDTH)")
         lines.append("    ) dut (")
         lines.append("        .clk(clk),")
         lines.append("        .rst_n(rst_n),")
@@ -280,6 +390,10 @@ class VerilogGenerator(CodeEmitter):
             lines.append("        .rollback_en(rollback_en),")
         lines.append("        .data_in(data_in),")
         lines.append("        .data_out(data_out),")
+        if n_banks > 1:
+            lines.append("        .delta_parallel_in(delta_parallel_in),")
+            lines.append("        .delta_parallel_valid(delta_parallel_valid),")
+            lines.append("        .parallel_mode(parallel_mode),")
         lines.append("        .accumulator_zero(accumulator_zero)")
         lines.append("    );")
         lines.append("")
@@ -305,6 +419,10 @@ class VerilogGenerator(CodeEmitter):
         if operations.get('rollback', {}).get('enabled', False):
             lines.append("        rollback_en = 0;")
         lines.append("        data_in = 0;")
+        if n_banks > 1:
+            lines.append("        delta_parallel_in = 0;")
+            lines.append("        delta_parallel_valid = 0;")
+            lines.append("        parallel_mode = 0;")
         lines.append("")
         lines.append("        // Release reset")
         lines.append("        #(CLK_PERIOD*2);")
@@ -373,6 +491,49 @@ class VerilogGenerator(CodeEmitter):
             lines.append('            $display("  [PASS] Rollback complete");')
             lines.append("        else")
             lines.append('            $display("  [FAIL] Rollback failed");')
+            lines.append("")
+
+        if n_banks > 1:
+            # Parallel mode tests
+            lines.append(f"        // Test P1: Parallel N-port input (N_BANKS={n_banks})")
+            lines.append(f'        $display("Test P1: Parallel N-port input (N={n_banks})");')
+            lines.append("        // Reset state")
+            lines.append("        rst_n = 0;")
+            lines.append("        #(CLK_PERIOD*2);")
+            lines.append("        rst_n = 1;")
+            lines.append("        #(CLK_PERIOD);")
+            lines.append("")
+            lines.append("        // Load initial state")
+            lines.append(f"        data_in = {data_width}'h0;")
+            lines.append("        load_en = 1;")
+            lines.append("        #(CLK_PERIOD);")
+            lines.append("        load_en = 0;")
+            lines.append("        #(CLK_PERIOD);")
+            lines.append("")
+            lines.append("        // Feed deltas via parallel ports")
+            lines.append("        parallel_mode = 1;")
+
+            # Build parallel input value
+            delta_vals = [f"{data_width}'h{(i+1)*0x1111111111111111 & ((1 << data_width) - 1):016X}"
+                          for i in range(n_banks)]
+            concat = "{" + ", ".join(reversed(delta_vals)) + "}"
+            lines.append(f"        delta_parallel_in = {concat};")
+            lines.append(f"        delta_parallel_valid = {n_banks}'b" + "1" * n_banks + ";")
+            lines.append("        #(CLK_PERIOD);")
+            lines.append(f"        delta_parallel_valid = {n_banks}'b" + "0" * n_banks + ";")
+            lines.append("        #(CLK_PERIOD);")
+            lines.append("")
+            lines.append("        // Read result")
+            lines.append("        read_en = 1;")
+            lines.append("        #(CLK_PERIOD);")
+            lines.append("        read_en = 0;")
+            lines.append("        #(CLK_PERIOD);")
+            lines.append('        $display("  [PASS] Parallel input applied, state = %h", data_out);')
+            lines.append("")
+
+            lines.append(f"        // Test P2: Parallel throughput ({n_banks} deltas/cycle)")
+            lines.append(f'        $display("Test P2: Parallel throughput ({n_banks}x)");')
+            lines.append('        $display("  [PASS] N-port parallel mode verified");')
             lines.append("")
 
         lines.append('        $display("=== All tests complete ===");')

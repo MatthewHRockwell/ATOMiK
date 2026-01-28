@@ -42,9 +42,11 @@ pip install -e .
 Verify installation:
 
 ```bash
-atomik-gen --version
-atomik-gen list
+python -m atomik_sdk.cli --version
+python -m atomik_sdk.cli list
 ```
+
+> **Note:** The extension automatically discovers `atomik-gen` via PATH, `python -m`, or `python3 -m` — no manual PATH configuration needed.
 
 ## Development
 

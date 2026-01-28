@@ -131,3 +131,50 @@ class HardwareBenchmark:
                 }
 
         return comparison
+
+    def get_phase6_comparison(
+        self, current: dict[str, Any], n_banks: int = 4
+    ) -> dict[str, Any]:
+        """Compare current metrics against Phase 6 parallel bank baseline.
+
+        Phase 6 baseline (N_BANKS=4, GW1NR-9 @ 94.5 MHz):
+          - Throughput: 378 Mops/sec (4× single-bank)
+          - LUT utilization: ~6.9%
+          - Latency: 1 cycle (constant, independent of N)
+          - Fmax: 94.5 MHz (constant, XOR merge has no carry)
+
+        Args:
+            current: Dict of current measured metrics.
+            n_banks: Number of parallel banks in the configuration.
+
+        Returns:
+            Comparison dict with baseline, current, delta, and delta_pct
+            for each metric.
+        """
+        # Per-bank scaling: throughput scales linearly with N
+        fmax_baseline = 94.5
+        baseline = {
+            "fmax_mhz": fmax_baseline,
+            "lut_pct": {1: 1.9, 2: 3.6, 4: 6.9, 8: 13.7}.get(n_banks, 6.9),
+            "ops_per_second": int(fmax_baseline * 1e6 * n_banks),
+            "throughput_mops": fmax_baseline * n_banks,
+            "latency_cycles": 1,
+            "n_banks": n_banks,
+        }
+
+        comparison: dict[str, Any] = {"n_banks": n_banks}
+        for key, base_val in baseline.items():
+            if key == "n_banks":
+                continue
+            curr_val = current.get(key, current.get(f"{key}_achieved"))
+            if curr_val is not None and isinstance(curr_val, (int, float)):
+                diff = curr_val - base_val
+                pct = round(100 * diff / base_val, 1) if base_val else 0
+                comparison[key] = {
+                    "baseline": base_val,
+                    "current": curr_val,
+                    "delta": round(diff, 2),
+                    "delta_pct": pct,
+                }
+
+        return comparison
