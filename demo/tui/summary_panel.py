@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from rich.text import Text
 from textual.widgets import Static
 
 from demo.acts.base import ActResult
@@ -18,7 +19,7 @@ class SummaryPanel(Static):
         self._snapshots: list[dict[str, Any]] = []
 
     def on_mount(self) -> None:
-        self.update(self._render())
+        self.update(Text(self._render()))
 
     def update_results(
         self,
@@ -27,7 +28,7 @@ class SummaryPanel(Static):
     ) -> None:
         self._results = list(results)
         self._snapshots = list(snapshots)
-        self.update(self._render())
+        self.update(Text(self._render()))
 
     def _render(self) -> str:
         lines = ["  Demo Summary", "  ════════════════════════"]

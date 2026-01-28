@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from rich.text import Text
 from textual.widgets import Static
 
 
@@ -17,8 +18,8 @@ class NarrationBar(Static):
     def set_text(self, text: str) -> None:
         """Update the narration text immediately."""
         self._full_text = text
-        self.update(f"  {text}")
+        self.update(Text(f"  {text}"))
 
     def clear(self) -> None:
         self._full_text = ""
-        self.update("")
+        self.update(Text(""))

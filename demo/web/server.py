@@ -25,6 +25,14 @@ app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 _orchestrator: DemoOrchestrator | None = None
 _clients: set[WebSocket] = set()
 _event_queue: asyncio.Queue[dict[str, Any]] = asyncio.Queue()
+_broadcaster_task: asyncio.Task[None] | None = None
+
+
+@app.on_event("startup")
+async def startup_event() -> None:
+    """Start the event broadcaster background task."""
+    global _broadcaster_task
+    _broadcaster_task = asyncio.create_task(_event_broadcaster())
 
 
 @app.get("/")

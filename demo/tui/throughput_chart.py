@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from rich.text import Text
 from textual.widgets import Static
 
 _GOPS_TARGET = 1000.0  # 1 Gops/s reference line
@@ -18,11 +19,11 @@ class ThroughputChart(Static):
         self._snapshots: list[dict[str, Any]] = []
 
     def on_mount(self) -> None:
-        self.update(self._render())
+        self.update(Text(self._render()))
 
     def update_data(self, snapshots: list[dict[str, Any]]) -> None:
         self._snapshots = list(snapshots)
-        self.update(self._render())
+        self.update(Text(self._render()))
 
     def _render(self) -> str:
         lines = [

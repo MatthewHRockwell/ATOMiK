@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from rich.text import Text
 from textual.widgets import Static
 
 from demo.config import NODE_CONFIGS
@@ -29,11 +30,11 @@ class NodePanel(Static):
             self._default_domain = "—"
 
     def on_mount(self) -> None:
-        self.update(self._render_content())
+        self.update(Text(self._render_content()))
 
     def update_from_snapshot(self, snap: dict[str, Any]) -> None:
         self._snap = snap
-        self.update(self._render_content())
+        self.update(Text(self._render_content()))
 
     def _render_content(self) -> str:
         if not self._snap:

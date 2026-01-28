@@ -6,77 +6,193 @@
     <title>ATOMiK 3-Node Demo Dashboard</title>
     <link rel="stylesheet" href="/static/style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3"></script>
 </head>
 <body>
     <header>
-        <h1>ATOMiK &mdash; Delta-State Computing in Silicon</h1>
-        <div class="subtitle">
-            3-Node VC Demo Dashboard
-            <span id="mode-badge" class="status-badge badge-sim">SIM</span>
+        <div class="header-content">
+            <h1>ATOMiK</h1>
+            <span class="subtitle">Delta-State Computing in Silicon</span>
+            <span id="connection-status" class="status-indicator disconnected">Disconnected</span>
         </div>
     </header>
 
-    <div class="controls">
-        <button onclick="runAct(1)">Act 1: Algebra</button>
-        <button onclick="runAct(2)">Act 2: Undo</button>
-        <button onclick="runAct(3)">Act 3: Scaling</button>
-        <button onclick="runAct(4)">Act 4: Domains</button>
-        <button onclick="runAct(5)">Act 5: Merge</button>
-        <button class="primary" onclick="runAll()">Run All</button>
-    </div>
-
-    <div class="node-row" id="node-cards">
-        <!-- Node 1 -->
-        <div class="node-card" id="card-0">
-            <h2>Node 1 <span class="status-badge badge-sim" id="badge-0">SIM</span></h2>
-            <div class="field"><span class="label">Domain</span><span class="value" id="domain-0">Finance</span></div>
-            <div class="field"><span class="label">N_BANKS</span><span class="value" id="banks-0">4</span></div>
-            <div class="field"><span class="label">Freq</span><span class="value" id="freq-0">81.0 MHz</span></div>
-            <div class="field"><span class="label">Throughput</span><span class="value" id="tp-0">324 Mops/s</span></div>
-            <div class="state-hex" id="state-0">0x0000000000000000</div>
-            <div class="field"><span class="label">Acc Zero</span><span class="value" id="acc-0">—</span></div>
-            <div class="field"><span class="label">Deltas</span><span class="value" id="deltas-0">0</span></div>
-        </div>
-        <!-- Node 2 -->
-        <div class="node-card" id="card-1">
-            <h2>Node 2 <span class="status-badge badge-sim" id="badge-1">SIM</span></h2>
-            <div class="field"><span class="label">Domain</span><span class="value" id="domain-1">Sensor</span></div>
-            <div class="field"><span class="label">N_BANKS</span><span class="value" id="banks-1">8</span></div>
-            <div class="field"><span class="label">Freq</span><span class="value" id="freq-1">67.5 MHz</span></div>
-            <div class="field"><span class="label">Throughput</span><span class="value" id="tp-1">540 Mops/s</span></div>
-            <div class="state-hex" id="state-1">0x0000000000000000</div>
-            <div class="field"><span class="label">Acc Zero</span><span class="value" id="acc-1">—</span></div>
-            <div class="field"><span class="label">Deltas</span><span class="value" id="deltas-1">0</span></div>
-        </div>
-        <!-- Node 3 -->
-        <div class="node-card" id="card-2">
-            <h2>Node 3 <span class="status-badge badge-sim" id="badge-2">SIM</span></h2>
-            <div class="field"><span class="label">Domain</span><span class="value" id="domain-2">Peak</span></div>
-            <div class="field"><span class="label">N_BANKS</span><span class="value" id="banks-2">16</span></div>
-            <div class="field"><span class="label">Freq</span><span class="value" id="freq-2">67.5 MHz</span></div>
-            <div class="field"><span class="label">Throughput</span><span class="value" id="tp-2">1,070 Mops/s</span></div>
-            <div class="state-hex" id="state-2">0x0000000000000000</div>
-            <div class="field"><span class="label">Acc Zero</span><span class="value" id="acc-2">—</span></div>
-            <div class="field"><span class="label">Deltas</span><span class="value" id="deltas-2">0</span></div>
-        </div>
-    </div>
-
-    <div class="bottom-row">
-        <div class="panel">
-            <h3>Act Results</h3>
-            <div id="act-results">
-                <p style="color: var(--subtext0); font-size: 0.85rem;">No acts run yet.</p>
+    <main>
+        <!-- Top Row: Controls + Summary -->
+        <section class="top-section">
+            <div class="controls-panel">
+                <h3>Demo Controls</h3>
+                <div class="button-grid">
+                    <button id="btn-act1" class="act-btn" data-act="1">Act 1: Algebra</button>
+                    <button id="btn-act2" class="act-btn" data-act="2">Act 2: Undo</button>
+                    <button id="btn-act3" class="act-btn" data-act="3">Act 3: Scaling</button>
+                    <button id="btn-act4" class="act-btn" data-act="4">Act 4: Domains</button>
+                    <button id="btn-act5" class="act-btn" data-act="5">Act 5: Merge</button>
+                    <button id="btn-run-all" class="primary-btn">Run All Acts</button>
+                </div>
             </div>
-        </div>
-        <div class="panel">
-            <h3>Throughput Scaling</h3>
-            <canvas id="throughput-chart" height="140"></canvas>
-        </div>
-    </div>
+            <div class="summary-panel">
+                <h3>System Summary</h3>
+                <div class="summary-grid">
+                    <div class="metric">
+                        <span class="metric-value" id="total-throughput">0</span>
+                        <span class="metric-label">Aggregate Mops/s</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-value" id="total-nodes">0</span>
+                        <span class="metric-label">Active Nodes</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-value" id="hw-count">0</span>
+                        <span class="metric-label">Hardware</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-value" id="sim-count">0</span>
+                        <span class="metric-label">Simulated</span>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-    <div class="narration" id="narration">
-        Ready. Press a button to run an act, or click "Run All" for the full sequence.
-    </div>
+        <!-- Middle Row: Node Cards -->
+        <section class="nodes-section">
+            <div class="node-card" id="node-0">
+                <div class="node-header">
+                    <span class="node-name">Node 1</span>
+                    <span class="node-badge sim" id="badge-0">SIM</span>
+                </div>
+                <div class="node-domain" id="domain-0">Finance</div>
+                <div class="node-metrics">
+                    <div class="node-metric">
+                        <span class="label">Banks</span>
+                        <span class="value" id="banks-0">4</span>
+                    </div>
+                    <div class="node-metric">
+                        <span class="label">Frequency</span>
+                        <span class="value" id="freq-0">81.0 MHz</span>
+                    </div>
+                    <div class="node-metric">
+                        <span class="label">Throughput</span>
+                        <span class="value highlight" id="tp-0">324 Mops/s</span>
+                    </div>
+                </div>
+                <div class="state-display">
+                    <div class="state-label">Current State</div>
+                    <div class="state-hex" id="state-0">0x0000000000000000</div>
+                </div>
+                <div class="node-stats">
+                    <div class="stat">
+                        <span class="label">Accumulator</span>
+                        <span class="value" id="acc-0">ZERO</span>
+                    </div>
+                    <div class="stat">
+                        <span class="label">Deltas</span>
+                        <span class="value" id="deltas-0">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="node-card" id="node-1">
+                <div class="node-header">
+                    <span class="node-name">Node 2</span>
+                    <span class="node-badge sim" id="badge-1">SIM</span>
+                </div>
+                <div class="node-domain" id="domain-1">Sensor</div>
+                <div class="node-metrics">
+                    <div class="node-metric">
+                        <span class="label">Banks</span>
+                        <span class="value" id="banks-1">8</span>
+                    </div>
+                    <div class="node-metric">
+                        <span class="label">Frequency</span>
+                        <span class="value" id="freq-1">67.5 MHz</span>
+                    </div>
+                    <div class="node-metric">
+                        <span class="label">Throughput</span>
+                        <span class="value highlight" id="tp-1">540 Mops/s</span>
+                    </div>
+                </div>
+                <div class="state-display">
+                    <div class="state-label">Current State</div>
+                    <div class="state-hex" id="state-1">0x0000000000000000</div>
+                </div>
+                <div class="node-stats">
+                    <div class="stat">
+                        <span class="label">Accumulator</span>
+                        <span class="value" id="acc-1">ZERO</span>
+                    </div>
+                    <div class="stat">
+                        <span class="label">Deltas</span>
+                        <span class="value" id="deltas-1">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="node-card" id="node-2">
+                <div class="node-header">
+                    <span class="node-name">Node 3</span>
+                    <span class="node-badge sim" id="badge-2">SIM</span>
+                </div>
+                <div class="node-domain" id="domain-2">Peak</div>
+                <div class="node-metrics">
+                    <div class="node-metric">
+                        <span class="label">Banks</span>
+                        <span class="value" id="banks-2">16</span>
+                    </div>
+                    <div class="node-metric">
+                        <span class="label">Frequency</span>
+                        <span class="value" id="freq-2">67.5 MHz</span>
+                    </div>
+                    <div class="node-metric">
+                        <span class="label">Throughput</span>
+                        <span class="value highlight" id="tp-2">1,070 Mops/s</span>
+                    </div>
+                </div>
+                <div class="state-display">
+                    <div class="state-label">Current State</div>
+                    <div class="state-hex" id="state-2">0x0000000000000000</div>
+                </div>
+                <div class="node-stats">
+                    <div class="stat">
+                        <span class="label">Accumulator</span>
+                        <span class="value" id="acc-2">ZERO</span>
+                    </div>
+                    <div class="stat">
+                        <span class="label">Deltas</span>
+                        <span class="value" id="deltas-2">0</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Bottom Row: Charts + Results -->
+        <section class="bottom-section">
+            <div class="chart-panel">
+                <h3>Throughput Scaling (Mops/s)</h3>
+                <div class="chart-container">
+                    <canvas id="throughput-chart"></canvas>
+                </div>
+                <div class="chart-legend">
+                    <span class="legend-item"><span class="dot node1"></span>N=4 Finance</span>
+                    <span class="legend-item"><span class="dot node2"></span>N=8 Sensor</span>
+                    <span class="legend-item"><span class="dot node3"></span>N=16 Peak</span>
+                    <span class="legend-item"><span class="dot target"></span>1 Gops/s Target</span>
+                </div>
+            </div>
+            <div class="results-panel">
+                <h3>Act Results</h3>
+                <div id="act-results" class="results-list">
+                    <div class="no-results">No acts run yet. Click a button to start.</div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div id="narration" class="narration">
+            Connecting to demo server...
+        </div>
+    </footer>
 
     <script src="/static/dashboard.js"></script>
 </body>
