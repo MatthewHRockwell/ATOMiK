@@ -2,7 +2,7 @@
 
 **Version:** 2.0
 **Date:** January 27, 2026
-**Status:** HARDWARE VALIDATED (3 configs programmed to Tang Nano 9K, 30/30 tests passed)
+**Status:** HARDWARE VALIDATED (6 configs programmed to Tang Nano 9K, 60/60 tests passed)
 **Target:** Gowin GW1NR-9C (Tang Nano 9K), 8640 LUT4, 6693 FF, 4320 CLS
 **Tool:** Gowin EDA V1.9.11.03 Education
 **Programmer:** openFPGALoader via JTAG (FT2232)
@@ -20,7 +20,7 @@ Phase 6 validates that N parallel XOR accumulator banks achieve linear throughpu
 - **Zero ALUs in parallel accumulator**: `syn_keep`/`syn_preserve` attributes eliminated all 66 carry-chain ALUs from XOR paths; merge tree and state reconstruction are pure-LUT
 - **Per-bank cost**: ~65 LUT + 64 FF (linear, predictable scaling)
 - **Timing closure: 13/20** configurations pass (up from 11/20 before optimization)
-- **Hardware validated**: 3 configurations programmed to Tang Nano 9K, 10/10 UART tests passed each
+- **Hardware validated**: 6 configurations programmed to Tang Nano 9K, 60/60 UART tests passed
 
 ---
 
@@ -325,15 +325,27 @@ Formula: `Fout = 27 MHz * (FBDIV_SEL+1) / (IDIV_SEL+1)`, `FVCO = Fout * ODIV_SEL
 
 ## 7. Hardware Validation (On-Device)
 
-Three timing-met configurations were programmed to the Tang Nano 9K via JTAG (openFPGALoader) and validated via UART (115200 baud, COM6).
+Six timing-met configurations were programmed to the Tang Nano 9K via JTAG (openFPGALoader) and validated via UART (115200 baud, COM6).
 
 ### 7.1 Configurations Tested
+
+**v1.0 (pre-optimization):**
 
 | Config | Bitstream | Throughput | UART Tests | Result |
 |--------|-----------|:----------:|:----------:|:------:|
 | N=1 @ 108 MHz | `project_N1_F108p0.fs` | 108.0 Mops/s | 10/10 | PASS |
 | N=4 @ 67.5 MHz | `project_N4_F67p5.fs` | 270.0 Mops/s | 10/10 | PASS |
 | N=8 @ 54 MHz | `project_N8_F54p0.fs` | 432.0 Mops/s | 10/10 | PASS |
+
+**v2.0 (with `syn_keep`/`syn_preserve` — higher frequencies):**
+
+| Config | Bitstream | Throughput | UART Tests | Result |
+|--------|-----------|:----------:|:----------:|:------:|
+| N=2 @ 94.5 MHz | `project_N2_F94p5.fs` | 189.0 Mops/s | 10/10 | PASS |
+| N=4 @ 81.0 MHz | `project_N4_F81p0.fs` | 324.0 Mops/s | 10/10 | PASS |
+| N=8 @ 67.5 MHz | `project_N8_F67p5.fs` | **540.0 Mops/s** | 10/10 | PASS |
+
+**Total: 60/60 UART tests passed across 6 configurations.**
 
 ### 7.2 Test Protocol
 
@@ -381,7 +393,7 @@ All Lean4-proven algebraic properties confirmed on hardware:
 Phase 6 demonstrates that ATOMiK's XOR-based delta algebra enables linear spatial parallelism on FPGA hardware, validated end-to-end from formal proof to silicon:
 
 1. **8x throughput scaling validated** at 67.5 MHz (540 Mops/s with 8 banks, timing-met)
-2. **Hardware validated on Tang Nano 9K**: 3 configurations programmed, 30/30 UART tests passed
+2. **Hardware validated on Tang Nano 9K**: 6 configurations programmed, 60/60 UART tests passed
 3. **Zero ALUs in parallel accumulator** — `syn_keep`/`syn_preserve` attributes eliminated all carry-chain ALUs from XOR paths; merge tree and state reconstruction are pure-LUT
 4. **Per-bank cost is predictable** (~65 LUT + 64 FF), enabling capacity planning on any FPGA target
 5. **Algebraic properties (proven in Lean4) confirmed on hardware**: commutativity, self-inverse, state reconstruction all verified via UART
@@ -397,6 +409,6 @@ Lean4 formal proofs (Phase 1)
     -> RTL simulation (iverilog, 31 tests)
       -> FPGA synthesis (Gowin EDA, 20 configurations, 13/20 timing-met)
         -> Synthesis optimization (syn_keep/syn_preserve, 66 ALUs eliminated)
-          -> Hardware validation (Tang Nano 9K, 30 UART tests)
+          -> Hardware validation (Tang Nano 9K, 60/60 UART tests, 6 configs)
             -> 540 Mops/s validated throughput (N=8 @ 67.5 MHz)
 ```
