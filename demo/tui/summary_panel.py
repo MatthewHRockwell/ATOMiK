@@ -19,7 +19,7 @@ class SummaryPanel(Static):
         self._snapshots: list[dict[str, Any]] = []
 
     def on_mount(self) -> None:
-        self.update(Text(self._render()))
+        self.update(Text(self._build_content()))
 
     def update_results(
         self,
@@ -28,9 +28,9 @@ class SummaryPanel(Static):
     ) -> None:
         self._results = list(results)
         self._snapshots = list(snapshots)
-        self.update(Text(self._render()))
+        self.update(Text(self._build_content()))
 
-    def _render(self) -> str:
+    def _build_content(self) -> str:
         lines = ["  Demo Summary", "  ════════════════════════"]
 
         # Node overview

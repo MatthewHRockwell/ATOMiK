@@ -30,13 +30,13 @@ class NodePanel(Static):
             self._default_domain = "—"
 
     def on_mount(self) -> None:
-        self.update(Text(self._render_content()))
+        self.update(Text(self._build_content()))
 
     def update_from_snapshot(self, snap: dict[str, Any]) -> None:
         self._snap = snap
-        self.update(Text(self._render_content()))
+        self.update(Text(self._build_content()))
 
-    def _render_content(self) -> str:
+    def _build_content(self) -> str:
         if not self._snap:
             return (
                 f"  {self._default_name}\n"
