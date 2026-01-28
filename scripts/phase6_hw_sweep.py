@@ -36,7 +36,7 @@ ODIV_OPTIONS = [2, 4, 8, 16, 32, 48, 64, 80, 96, 112, 128]
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 GW_SH = Path(r"C:\Gowin\Gowin_V1.9.11.03_Education_x64\IDE\bin\gw_sh.exe")
 
-BANK_CONFIGS = [1, 2, 4, 8]
+BANK_CONFIGS = [1, 2, 4, 8, 16]
 
 # Target frequencies (MHz) — achievable from 27 MHz crystal
 FREQ_TARGETS = [

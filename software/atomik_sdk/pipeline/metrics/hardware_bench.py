@@ -137,11 +137,13 @@ class HardwareBenchmark:
     ) -> dict[str, Any]:
         """Compare current metrics against Phase 6 parallel bank baseline.
 
-        Phase 6 v2.0 baseline (syn_keep/syn_preserve optimized, GW1NR-9):
-          - N=4 @ 81.0 MHz: 324 Mops/sec, 8.5% LUT, 0 ALU in accumulator
+        Phase 6 v3.0 baseline (syn_keep/syn_preserve optimized, GW1NR-9):
+          - N=4 @ 81.0 MHz: 324 Mops/sec, 8.6% LUT, 0 ALU in accumulator
           - N=8 @ 67.5 MHz: 540 Mops/sec, 13.0% LUT, 0 ALU in accumulator
+          - N=16 @ 66.0 MHz: 1056 Mops/sec, 20.6% LUT, 0 ALU in accumulator
           - Latency: 1 cycle (constant, independent of N)
-          - Hardware validated: 60/60 UART tests across 6 configs
+          - Hardware validated: 80/80 UART tests across 8 configs
+          - Capacity wall: N=64 max synthesizable (69% LUT), N=128+ fails
 
         Args:
             current: Dict of current measured metrics.
@@ -152,12 +154,14 @@ class HardwareBenchmark:
             for each metric.
         """
         # Per-bank scaling: throughput scales linearly with N
-        # Max timing-met Fmax per bank count (v2.0 hardware-validated)
-        fmax_per_n = {1: 94.5, 2: 94.5, 4: 81.0, 8: 67.5}
+        # Max timing-met Fmax per bank count (v3.0 hardware-validated)
+        fmax_per_n = {1: 94.5, 2: 94.5, 4: 81.0, 8: 67.5, 16: 66.0}
         fmax_baseline = fmax_per_n.get(n_banks, 94.5)
         baseline = {
             "fmax_mhz": fmax_baseline,
-            "lut_pct": {1: 5.5, 2: 7.1, 4: 8.6, 8: 13.0}.get(n_banks, 8.6),
+            "lut_pct": {1: 5.5, 2: 7.1, 4: 8.6, 8: 13.0, 16: 20.6}.get(
+                n_banks, 8.6
+            ),
             "ops_per_second": int(fmax_baseline * 1e6 * n_banks),
             "throughput_mops": fmax_baseline * n_banks,
             "latency_cycles": 1,

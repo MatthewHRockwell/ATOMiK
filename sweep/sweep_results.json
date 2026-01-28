@@ -48,6 +48,18 @@
     "throughput_mops": 432.0
   },
   {
+    "freq_mhz": 54.0,
+    "n_banks": 16,
+    "actual_fmax_mhz": 63.7,
+    "logic_levels": 7,
+    "luts": 1779,
+    "alus": 40,
+    "ffs": 1501,
+    "cls": 1127,
+    "timing_met": true,
+    "throughput_mops": 864.0
+  },
+  {
     "freq_mhz": 67.5,
     "n_banks": 1,
     "actual_fmax_mhz": 101.717,
@@ -94,6 +106,18 @@
     "cls": 767,
     "timing_met": true,
     "throughput_mops": 540.0
+  },
+  {
+    "freq_mhz": 67.5,
+    "n_banks": 16,
+    "actual_fmax_mhz": 66.844,
+    "logic_levels": 7,
+    "luts": 1776,
+    "alus": 40,
+    "ffs": 1501,
+    "cls": 1116,
+    "timing_met": false,
+    "throughput_mops": 1069.504
   },
   {
     "freq_mhz": 81.0,
@@ -144,6 +168,18 @@
     "throughput_mops": 565.08
   },
   {
+    "freq_mhz": 81.0,
+    "n_banks": 16,
+    "actual_fmax_mhz": 62.075,
+    "logic_levels": 7,
+    "luts": 1781,
+    "alus": 40,
+    "ffs": 1501,
+    "cls": 1165,
+    "timing_met": false,
+    "throughput_mops": 993.2
+  },
+  {
     "freq_mhz": 94.5,
     "n_banks": 1,
     "actual_fmax_mhz": 95.957,
@@ -192,6 +228,18 @@
     "throughput_mops": 569.264
   },
   {
+    "freq_mhz": 94.5,
+    "n_banks": 16,
+    "actual_fmax_mhz": 62.488,
+    "logic_levels": 7,
+    "luts": 1779,
+    "alus": 40,
+    "ffs": 1501,
+    "cls": 1159,
+    "timing_met": false,
+    "throughput_mops": 999.808
+  },
+  {
     "freq_mhz": 108.0,
     "n_banks": 1,
     "actual_fmax_mhz": 106.682,
@@ -238,5 +286,17 @@
     "cls": 779,
     "timing_met": false,
     "throughput_mops": 583.224
+  },
+  {
+    "freq_mhz": 108.0,
+    "n_banks": 16,
+    "actual_fmax_mhz": 63.311,
+    "logic_levels": 7,
+    "luts": 1782,
+    "alus": 40,
+    "ffs": 1501,
+    "cls": 1165,
+    "timing_met": false,
+    "throughput_mops": 1012.976
   }
 ]

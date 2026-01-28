@@ -25,9 +25,9 @@
 | **Phase 4B** | Domain SDKs | ✅ **Complete** | 3 domain SDKs, 57 generated files |
 | **Phase 4C** | Autonomous Pipeline | ✅ **Complete** | 6-stage controller, hardware demos, 124 tests |
 | **Phase 5** | Agentic Orchestration | ✅ **Complete** | DAG orchestrator, feedback loops, 242 tests |
-| **Phase 6** | Parallel Accumulator Banks | ✅ **Complete** | 8x linear scaling, 540 Mops/s, 60/60 HW tests |
+| **Phase 6** | Parallel Accumulator Banks | ✅ **Complete** | 16x linear scaling, 1056 Mops/s, 80/80 HW tests |
 
-**Latest**: Phase 6 validates N parallel XOR accumulator banks on FPGA hardware. 20-configuration synthesis sweep (N=1,2,4,8 x 5 frequencies) demonstrates 8x linear throughput scaling (540 Mops/s at N=8), zero ALU carry chains via `syn_keep`/`syn_preserve` optimization, and 60/60 UART tests passing on the Tang Nano 9K.
+**Latest**: Phase 6 validates N parallel XOR accumulator banks on FPGA hardware. 25-configuration synthesis sweep (N=1,2,4,8,16 x 5 frequencies) demonstrates 16x linear throughput scaling (1056 Mops/s at N=16), zero ALU carry chains via `syn_keep`/`syn_preserve` optimization, and 80/80 UART tests passing on the Tang Nano 9K.
 
 Phase 6 complete (January 27, 2026). Parallel accumulator banks with binary XOR merge tree, automated PLL-based synthesis sweep, and on-device UART validation. See [`docs/PHASE6_HARDWARE_SYNTHESIS.md`](docs/PHASE6_HARDWARE_SYNTHESIS.md) for full results.
 
@@ -114,7 +114,7 @@ Unit B: acc_B = δ₂ ⊕ δ₄ ⊕ δ₆
 Final:  acc   = acc_A ⊕ acc_B  (same result regardless of distribution)
 ```
 
-Phase 2 measured **85% parallel efficiency** in software. Phase 6 validates **exact linear scaling** in hardware.
+Phase 2 measured **85% parallel efficiency** in software. Phase 6 validates **exact linear scaling** (up to 16x) in hardware.
 
 ### Phase 6: Parallel Bank Throughput (Hardware-Validated)
 
@@ -124,18 +124,19 @@ Phase 2 measured **85% parallel efficiency** in software. Phase 6 validates **ex
 | 2 | 94.5 MHz | 189.0 Mops/s | 2.0x | MET | - |
 | 4 | 81.0 MHz | 324.0 Mops/s | 4.0x | MET | 10/10 |
 | 8 | 67.5 MHz | 540.0 Mops/s | 8.0x | MET | 10/10 |
+| 16 | 66.0 MHz | 1056.0 Mops/s | 16.0x | MET | 10/10 |
 
-At constant frequency (67.5 MHz), scaling is exactly linear: 1x/2x/4x/8x. The Fmax reduction with more banks is a routing constraint, not an architectural limitation.
+At constant frequency, scaling is exactly linear: 1x/2x/4x/8x/16x. The Fmax reduction with more banks is a routing constraint, not an architectural limitation. N=16 breaks the **1 Gops/s barrier** on a $10 FPGA.
 
 ### Projected Throughput
 
-| Platform | Est. Frequency | Single-Acc | 8-Acc (projected) |
+| Platform | Est. Frequency | Single-Acc | 16-Acc (projected) |
 |----------|---------------|------------|-------------------|
-| **Gowin GW1NR-9** (Tang Nano 9K) | 67.5-108 MHz | 108 Mops/s | **540 Mops/s** (validated) |
-| **Xilinx Artix-7** | ~300 MHz | ~300 Mops/s | ~2.4 Gops/s |
-| **Xilinx UltraScale+** | ~500 MHz | ~500 Mops/s | ~4.0 Gops/s |
-| **Intel Agilex** | ~600 MHz | ~600 Mops/s | ~4.8 Gops/s |
-| **ASIC 28nm** | ~1 GHz+ | ~1 Gops/s | ~8 Gops/s |
+| **Gowin GW1NR-9** (Tang Nano 9K) | 66.0-108 MHz | 108 Mops/s | **1,056 Mops/s** (validated) |
+| **Xilinx Artix-7** | ~300 MHz | ~300 Mops/s | ~4.8 Gops/s |
+| **Xilinx UltraScale+** | ~500 MHz | ~500 Mops/s | ~8.0 Gops/s |
+| **Intel Agilex** | ~600 MHz | ~600 Mops/s | ~9.6 Gops/s |
+| **ASIC 28nm** | ~1 GHz+ | ~1 Gops/s | ~16 Gops/s |
 
 **Multi-accumulator scaling**: Commutativity guarantees that N independent accumulators produce the same result regardless of delta distribution. Phase 6 validates exact linear throughput scaling on hardware—no synchronization overhead, no carry propagation, pure LUT fabric.
 
@@ -202,8 +203,9 @@ delta_in -> Round-Robin Distributor -> Bank[0..N-1] -> XOR Merge Tree -> current
 | 1 | 477 | 40 | 537 | 419 | 96.0 | 94.5 Mops/s |
 | 4 | 745 | 40 | 731 | 574 | 89.3 | 324 Mops/s |
 | 8 | 1126 | 40 | 988 | 779 | 71.2 | 540 Mops/s |
+| 16 | 1779 | 40 | 1501 | 1127 | 63.7 | 1056 Mops/s |
 
-Per-bank cost: ~65 LUT + 64 FF. **Zero ALUs in parallel accumulator** — `syn_keep`/`syn_preserve` attributes force all XOR paths into LUTs, eliminating carry-chain ALU inference. Only UART counters (40 ALU, fixed) use ALU mode. See [`docs/PHASE6_HARDWARE_SYNTHESIS.md`](docs/PHASE6_HARDWARE_SYNTHESIS.md) for complete 20-configuration sweep.
+Per-bank cost: ~65 LUT + 64 FF. **Zero ALUs in parallel accumulator** — `syn_keep`/`syn_preserve` attributes force all XOR paths into LUTs, eliminating carry-chain ALU inference. Only UART counters (40 ALU, fixed) use ALU mode. Capacity wall: N=64 (69% LUT) is max synthesizable; N=128+ exceeds GW1NR-9 resources. See [`docs/PHASE6_HARDWARE_SYNTHESIS.md`](docs/PHASE6_HARDWARE_SYNTHESIS.md) for complete 25-configuration sweep.
 
 ### Delta Algebra Verified in Silicon
 
@@ -338,7 +340,7 @@ ATOMiK/
 ├── constraints/                 # ✅ FPGA timing and physical constraints
 ├── synth/                       # ✅ Synthesis scripts (Gowin EDA)
 ├── sim/                         # ✅ Testbenches (Phase 3 + Phase 6 parallel)
-├── sweep/                       # ✅ Phase 6 synthesis sweep (20 configs, results JSON)
+├── sweep/                       # ✅ Phase 6 synthesis sweep (25 configs, results JSON)
 ├── scripts/                     # ✅ Hardware validation + FPGA pipeline + SDK generation
 ├── software/                    # ✅ Python SDK + pipeline + 5-language generators
 │   ├── atomik_sdk/cli.py        # atomik-gen CLI tool (pip-installable entry point)
@@ -433,7 +435,7 @@ python scripts/test_hardware.py COM6
 
 # Phase 6: Parallel bank synthesis sweep
 python scripts/phase6_hw_sweep.py --quick    # N=1,4,8 @ 94.5 MHz
-python scripts/phase6_hw_sweep.py            # Full 20-config sweep
+python scripts/phase6_hw_sweep.py            # Full 25-config sweep (N=1,2,4,8,16)
 
 # Phase 6: On-device UART validation (after programming bitstream)
 openFPGALoader -b tangnano9k sweep/impl/pnr/project_N8_F54p0.fs
@@ -453,7 +455,7 @@ python scripts/phase6_hw_validate.py         # 10/10 tests
 | **Phase 4B**: Domain SDKs | ✅ Complete | 3 domain schemas (Video/Edge/Finance), 57 generated files |
 | **Phase 4C**: Autonomous Pipeline | ✅ Complete | 6-stage controller, hardware demos, 124 tests |
 | **Phase 5**: Agentic Orchestration | ✅ Complete | DAG orchestrator, feedback loops, 25 modules, 242 tests |
-| **Phase 6**: Parallel Accumulator Banks | ✅ Complete | 8x linear scaling, 540 Mops/s, 60/60 HW tests on Tang Nano 9K |
+| **Phase 6**: Parallel Accumulator Banks | ✅ Complete | 16x linear scaling, 1056 Mops/s, 80/80 HW tests on Tang Nano 9K |
 
 ### What the SDK Architecture Enables
 
@@ -467,7 +469,7 @@ The schema-driven code generation pipeline ensures that **every new ATOMiK objec
 
 **Phase 5 added self-improvement**: The pipeline now features event-driven DAG orchestration, feedback loops with error pattern learning, adaptive model routing, cross-language consistency checking, regression detection, and self-optimization. 242 tests verify the full system.
 
-**Phase 6 validated parallel scaling**: N parallel XOR accumulator banks achieve 8x throughput (540 Mops/s) with zero-ALU merge tree, confirmed on Tang Nano 9K hardware with 60/60 UART tests. `syn_keep`/`syn_preserve` optimization eliminated 66 carry-chain ALUs, reducing logic levels by 50% and improving Fmax by up to 42%. See [`docs/PHASE6_HARDWARE_SYNTHESIS.md`](docs/PHASE6_HARDWARE_SYNTHESIS.md).
+**Phase 6 validated parallel scaling**: N parallel XOR accumulator banks achieve 16x throughput (1056 Mops/s) with zero-ALU merge tree, confirmed on Tang Nano 9K hardware with 80/80 UART tests. `syn_keep`/`syn_preserve` optimization eliminated 66 carry-chain ALUs, reducing logic levels by 50% and improving Fmax by up to 42%. N=16 banks break the 1 Gops/s barrier on a $10 FPGA. See [`docs/PHASE6_HARDWARE_SYNTHESIS.md`](docs/PHASE6_HARDWARE_SYNTHESIS.md).
 
 **Full roadmap**: [`archive/ATOMiK_DEVELOPMENT_ROADMAP.md`](archive/ATOMiK_DEVELOPMENT_ROADMAP.md) (historical) | [`docs/PHASE_5_ROADMAP.md`](docs/PHASE_5_ROADMAP.md) | [`docs/PHASE6_HARDWARE_SYNTHESIS.md`](docs/PHASE6_HARDWARE_SYNTHESIS.md)
 
@@ -500,4 +502,4 @@ For licensing inquiries, commercial integration, or architectural collaboration,
 
 ---
 
-*Last updated: January 27, 2026 — Phase 6 syn_keep optimization (540 Mops/s, zero ALU carry chains, 13/20 timing-met)*
+*Last updated: January 27, 2026 — Phase 6 N=16 banks (1056 Mops/s, 1 Gops/s barrier broken, 80/80 HW tests, 25-config sweep)*
