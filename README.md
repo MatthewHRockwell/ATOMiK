@@ -244,10 +244,10 @@ Phase 5 wraps the SDK generation pipeline in a self-improving agentic system:
 A pip-installable command-line tool for schema validation and multi-language code generation. Install with `pip install -e ./software`.
 
 <p align="center">
-  <img src="docs/diagrams/cli_terminal.svg" alt="atomik-gen CLI tool commands and output" width="700"/>
+  <img src="docs/diagrams/cli_terminal.svg" alt="atomik-gen CLI tool commands and output" width="720"/>
 </p>
 
-Options: `--output-dir`, `--languages`, `--report`, `--verbose`. See [API Reference](docs/SDK_API_REFERENCE.md#cli-tool-reference) for full details.
+Commands: `generate`, `validate`, `info`, `batch`, `list`, `pipeline`, `metrics`, `demo`. Options: `--output-dir`, `--languages`, `--report`, `--verbose`. See [API Reference](docs/SDK_API_REFERENCE.md#cli-tool-reference) for full details.
 
 ### VS Code Extension
 

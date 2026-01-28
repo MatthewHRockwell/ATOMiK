@@ -4,6 +4,9 @@ import { execFile } from "child_process";
 const OUTPUT_CHANNEL_NAME = "ATOMiK";
 let outputChannel: vscode.OutputChannel;
 
+/** Cached invocation method resolved on first call. */
+let cached: { cmd: string; prefix: string[] } | undefined;
+
 function getOutputChannel(): vscode.OutputChannel {
   if (!outputChannel) {
     outputChannel = vscode.window.createOutputChannel(OUTPUT_CHANNEL_NAME);
@@ -11,12 +14,47 @@ function getOutputChannel(): vscode.OutputChannel {
   return outputChannel;
 }
 
-function runAtomikGen(
+/** Probe a single command; resolves true if the binary exists. */
+function probe(cmd: string, args: string[]): Promise<boolean> {
+  return new Promise((resolve) => {
+    execFile(cmd, args, (error) => {
+      resolve(!(error && (error as NodeJS.ErrnoException).code === "ENOENT"));
+    });
+  });
+}
+
+/** Discover a working invocation for atomik-gen (once, then cached). */
+async function resolveCmd(): Promise<{ cmd: string; prefix: string[] }> {
+  if (cached) {
+    return cached;
+  }
+
+  const candidates: { cmd: string; prefix: string[] }[] = [
+    { cmd: "atomik-gen", prefix: [] },
+    { cmd: "python", prefix: ["-m", "atomik_sdk.cli"] },
+    { cmd: "python3", prefix: ["-m", "atomik_sdk.cli"] },
+  ];
+
+  for (const c of candidates) {
+    if (await probe(c.cmd, [...c.prefix, "--version"])) {
+      cached = c;
+      return c;
+    }
+  }
+
+  throw new Error(
+    "atomik-gen CLI not found. Install with: pip install -e ./software"
+  );
+}
+
+async function runAtomikGen(
   args: string[],
   cwd?: string
 ): Promise<{ stdout: string; stderr: string }> {
+  const { cmd, prefix } = await resolveCmd();
+
   return new Promise((resolve, reject) => {
-    execFile("atomik-gen", args, { cwd }, (error, stdout, stderr) => {
+    execFile(cmd, [...prefix, ...args], { cwd }, (error, stdout, stderr) => {
       if (error && !stdout && !stderr) {
         reject(
           new Error(

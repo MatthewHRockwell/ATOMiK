@@ -1,15 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="700" height="430" viewBox="0 0 700 430" font-family="Monaco, Consolas, 'Courier New', monospace">
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="560" viewBox="0 0 720 560" font-family="Monaco, Consolas, 'Courier New', monospace">
+
+  <style>
+    .f { opacity: 0; animation: fadeIn 0.1s forwards; }
+    .cursor { opacity: 0; animation: cursorBlink 1s 7.5s infinite; }
+    @keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
+    @keyframes cursorBlink { 0%, 49% { opacity: 0.7; } 50%, 100% { opacity: 0; } }
+  </style>
 
   <!-- Shadow -->
-  <rect x="24" y="16" width="660" height="400" rx="10" fill="#b0b8c4" opacity="0.25"/>
+  <rect x="24" y="16" width="680" height="530" rx="10" fill="#b0b8c4" opacity="0.25"/>
 
   <!-- Terminal body -->
-  <rect x="20" y="10" width="660" height="400" rx="10" fill="#1e1e2e"/>
+  <rect x="20" y="10" width="680" height="530" rx="10" fill="#1e1e2e"/>
 
   <!-- Title bar -->
-  <rect x="20" y="10" width="660" height="36" rx="10" fill="#313244"/>
-  <rect x="20" y="36" width="660" height="10" fill="#313244"/>
+  <rect x="20" y="10" width="680" height="36" rx="10" fill="#313244"/>
+  <rect x="20" y="36" width="680" height="10" fill="#313244"/>
 
   <!-- Traffic lights -->
   <circle cx="44" cy="28" r="6.5" fill="#ff5f57"/>
@@ -17,72 +24,125 @@
   <circle cx="88" cy="28" r="6.5" fill="#28c840"/>
 
   <!-- Title text -->
-  <text x="350" y="33" text-anchor="middle" font-size="12" fill="#a0a0a0" font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif">atomik-gen -- ATOMiK Schema Tools</text>
+  <text x="370" y="33" text-anchor="middle" font-size="12" fill="#a0a0a0" font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif">atomik-gen &#8212; ATOMiK Schema Tools</text>
 
-  <!-- === PROMPT === -->
-  <text x="42" y="72" font-size="13" fill="#a6e3a1">$</text>
-  <text x="57" y="72" font-size="13" fill="#cdd6f4">atomik-gen</text>
-  <text x="142" y="72" font-size="13" fill="#89b4fa">--help</text>
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!-- SEQUENCE 1: atomik-gen help                          -->
+  <!-- ═══════════════════════════════════════════════════ -->
 
-  <!-- === USAGE === -->
-  <text x="42" y="102" font-size="13" fill="#cdd6f4">Usage:</text>
-  <text x="95" y="102" font-size="13" fill="#6c7086">atomik-gen &lt;command&gt; [options]</text>
+  <!-- Prompt -->
+  <text x="42" y="70" font-size="13" fill="#a6e3a1" class="f" style="animation-delay:0.3s">$</text>
 
-  <!-- === COMMANDS HEADER === -->
-  <text x="42" y="136" font-size="13" fill="#cdd6f4">Commands:</text>
+  <!-- Typed: atomik-gen  (character-by-character, 60ms stagger) -->
+  <text x="57.0" y="70" font-size="13" fill="#cdd6f4" class="f" style="animation-delay:0.50s">a</text>
+  <text x="64.8" y="70" font-size="13" fill="#cdd6f4" class="f" style="animation-delay:0.56s">t</text>
+  <text x="72.6" y="70" font-size="13" fill="#cdd6f4" class="f" style="animation-delay:0.62s">o</text>
+  <text x="80.4" y="70" font-size="13" fill="#cdd6f4" class="f" style="animation-delay:0.68s">m</text>
+  <text x="88.2" y="70" font-size="13" fill="#cdd6f4" class="f" style="animation-delay:0.74s">i</text>
+  <text x="96.0" y="70" font-size="13" fill="#cdd6f4" class="f" style="animation-delay:0.80s">k</text>
+  <text x="103.8" y="70" font-size="13" fill="#cdd6f4" class="f" style="animation-delay:0.86s">-</text>
+  <text x="111.6" y="70" font-size="13" fill="#cdd6f4" class="f" style="animation-delay:0.92s">g</text>
+  <text x="119.4" y="70" font-size="13" fill="#cdd6f4" class="f" style="animation-delay:0.98s">e</text>
+  <text x="127.2" y="70" font-size="13" fill="#cdd6f4" class="f" style="animation-delay:1.04s">n</text>
+
+  <!-- Typed: flag help (character-by-character, flag color) -->
+  <text x="142.8" y="70" font-size="13" fill="#89b4fa" class="f" style="animation-delay:1.16s">-</text>
+  <text x="150.6" y="70" font-size="13" fill="#89b4fa" class="f" style="animation-delay:1.22s">-</text>
+  <text x="158.4" y="70" font-size="13" fill="#89b4fa" class="f" style="animation-delay:1.28s">h</text>
+  <text x="166.2" y="70" font-size="13" fill="#89b4fa" class="f" style="animation-delay:1.34s">e</text>
+  <text x="174.0" y="70" font-size="13" fill="#89b4fa" class="f" style="animation-delay:1.40s">l</text>
+  <text x="181.8" y="70" font-size="13" fill="#89b4fa" class="f" style="animation-delay:1.46s">p</text>
+
+  <!-- ── Help output (line-by-line, 150ms stagger) ── -->
+
+  <!-- Usage -->
+  <text x="42" y="100" font-size="13" fill="#cdd6f4" class="f" style="animation-delay:2.0s">Usage:</text>
+  <text x="95" y="100" font-size="13" fill="#6c7086" class="f" style="animation-delay:2.0s">atomik-gen &lt;command&gt; [options]</text>
+
+  <!-- Commands header -->
+  <text x="42" y="130" font-size="13" fill="#cdd6f4" class="f" style="animation-delay:2.3s">Commands:</text>
 
   <!-- generate -->
-  <text x="62" y="158" font-size="13" fill="#f9e2af">generate</text>
-  <text x="130" y="158" font-size="13" fill="#6c7086">&lt;schema&gt;</text>
-  <text x="310" y="158" font-size="13" fill="#a6adc8">Generate SDK code from a schema</text>
+  <text x="62" y="150" font-size="13" fill="#f9e2af" class="f" style="animation-delay:2.5s">generate</text>
+  <text x="140" y="150" font-size="13" fill="#6c7086" class="f" style="animation-delay:2.5s">&lt;schema&gt;</text>
+  <text x="310" y="150" font-size="13" fill="#a6adc8" class="f" style="animation-delay:2.5s">Generate SDK code from a schema</text>
 
   <!-- validate -->
-  <text x="62" y="178" font-size="13" fill="#f9e2af">validate</text>
-  <text x="130" y="178" font-size="13" fill="#6c7086">&lt;schema&gt;</text>
-  <text x="310" y="178" font-size="13" fill="#a6adc8">Validate a schema (no generation)</text>
+  <text x="62" y="170" font-size="13" fill="#f9e2af" class="f" style="animation-delay:2.65s">validate</text>
+  <text x="140" y="170" font-size="13" fill="#6c7086" class="f" style="animation-delay:2.65s">&lt;schema&gt;</text>
+  <text x="310" y="170" font-size="13" fill="#a6adc8" class="f" style="animation-delay:2.65s">Validate a schema (no generation)</text>
 
   <!-- info -->
-  <text x="62" y="198" font-size="13" fill="#f9e2af">info</text>
-  <text x="130" y="198" font-size="13" fill="#6c7086">&lt;schema&gt;</text>
-  <text x="310" y="198" font-size="13" fill="#a6adc8">Show schema summary</text>
+  <text x="62" y="190" font-size="13" fill="#f9e2af" class="f" style="animation-delay:2.8s">info</text>
+  <text x="140" y="190" font-size="13" fill="#6c7086" class="f" style="animation-delay:2.8s">&lt;schema&gt;</text>
+  <text x="310" y="190" font-size="13" fill="#a6adc8" class="f" style="animation-delay:2.8s">Show schema summary</text>
 
   <!-- batch -->
-  <text x="62" y="218" font-size="13" fill="#f9e2af">batch</text>
-  <text x="130" y="218" font-size="13" fill="#6c7086">&lt;directory&gt;</text>
-  <text x="310" y="218" font-size="13" fill="#a6adc8">Batch generate from a directory</text>
+  <text x="62" y="210" font-size="13" fill="#f9e2af" class="f" style="animation-delay:2.95s">batch</text>
+  <text x="140" y="210" font-size="13" fill="#6c7086" class="f" style="animation-delay:2.95s">&lt;directory&gt;</text>
+  <text x="310" y="210" font-size="13" fill="#a6adc8" class="f" style="animation-delay:2.95s">Batch generate from a directory of schemas</text>
 
   <!-- list -->
-  <text x="62" y="238" font-size="13" fill="#f9e2af">list</text>
-  <text x="310" y="238" font-size="13" fill="#a6adc8">List available target languages</text>
+  <text x="62" y="230" font-size="13" fill="#f9e2af" class="f" style="animation-delay:3.1s">list</text>
+  <text x="310" y="230" font-size="13" fill="#a6adc8" class="f" style="animation-delay:3.1s">List available target languages</text>
 
-  <!-- === OPTIONS HEADER === -->
-  <text x="42" y="272" font-size="13" fill="#cdd6f4">Options:</text>
+  <!-- pipeline -->
+  <text x="62" y="250" font-size="13" fill="#f9e2af" class="f" style="animation-delay:3.25s">pipeline</text>
+  <text x="310" y="250" font-size="13" fill="#a6adc8" class="f" style="animation-delay:3.25s">Autonomous pipeline execution</text>
 
-  <!-- output-dir option -->
-  <text x="62" y="294" font-size="13" fill="#89b4fa">--output-dir</text>
-  <text x="164" y="294" font-size="13" fill="#6c7086">DIR</text>
-  <text x="310" y="294" font-size="13" fill="#a6adc8">Output directory (default: generated)</text>
+  <!-- metrics -->
+  <text x="62" y="270" font-size="13" fill="#f9e2af" class="f" style="animation-delay:3.4s">metrics</text>
+  <text x="310" y="270" font-size="13" fill="#a6adc8" class="f" style="animation-delay:3.4s">Performance metrics</text>
 
-  <!-- languages option -->
-  <text x="62" y="314" font-size="13" fill="#89b4fa">--languages</text>
-  <text x="156" y="314" font-size="13" fill="#6c7086">LANG [...]</text>
-  <text x="310" y="314" font-size="13" fill="#a6adc8">Target languages (default: all 5)</text>
+  <!-- demo -->
+  <text x="62" y="290" font-size="13" fill="#f9e2af" class="f" style="animation-delay:3.55s">demo</text>
+  <text x="310" y="290" font-size="13" fill="#a6adc8" class="f" style="animation-delay:3.55s">Run domain hardware demonstrator</text>
 
-  <!-- report option -->
-  <text x="62" y="334" font-size="13" fill="#89b4fa">--report</text>
-  <text x="130" y="334" font-size="13" fill="#6c7086">FILE</text>
-  <text x="310" y="334" font-size="13" fill="#a6adc8">Write JSON report to file</text>
+  <!-- Options header -->
+  <text x="42" y="320" font-size="13" fill="#cdd6f4" class="f" style="animation-delay:3.85s">Options:</text>
 
-  <!-- verbose option -->
-  <text x="62" y="354" font-size="13" fill="#89b4fa">-v, --verbose</text>
-  <text x="310" y="354" font-size="13" fill="#a6adc8">Verbose output</text>
+  <!-- output-dir -->
+  <text x="62" y="340" font-size="13" fill="#89b4fa" class="f" style="animation-delay:4.0s">--output-dir</text>
+  <text x="164" y="340" font-size="13" fill="#6c7086" class="f" style="animation-delay:4.0s">DIR</text>
+  <text x="310" y="340" font-size="13" fill="#a6adc8" class="f" style="animation-delay:4.0s">Output directory (default: generated)</text>
 
-  <!-- version option -->
-  <text x="62" y="374" font-size="13" fill="#89b4fa">--version</text>
-  <text x="310" y="374" font-size="13" fill="#a6adc8">Show version and exit</text>
+  <!-- languages -->
+  <text x="62" y="360" font-size="13" fill="#89b4fa" class="f" style="animation-delay:4.15s">--languages</text>
+  <text x="156" y="360" font-size="13" fill="#6c7086" class="f" style="animation-delay:4.15s">LANG [...]</text>
+  <text x="310" y="360" font-size="13" fill="#a6adc8" class="f" style="animation-delay:4.15s">Target languages (default: all 5)</text>
 
-  <!-- === CURSOR === -->
-  <text x="42" y="400" font-size="13" fill="#a6e3a1">$</text>
-  <rect x="55" y="390" width="8" height="14" rx="1" fill="#a6e3a1" opacity="0.7"/>
+  <!-- report -->
+  <text x="62" y="380" font-size="13" fill="#89b4fa" class="f" style="animation-delay:4.3s">--report</text>
+  <text x="130" y="380" font-size="13" fill="#6c7086" class="f" style="animation-delay:4.3s">FILE</text>
+  <text x="310" y="380" font-size="13" fill="#a6adc8" class="f" style="animation-delay:4.3s">Write JSON report to file</text>
+
+  <!-- verbose -->
+  <text x="62" y="400" font-size="13" fill="#89b4fa" class="f" style="animation-delay:4.45s">-v, --verbose</text>
+  <text x="310" y="400" font-size="13" fill="#a6adc8" class="f" style="animation-delay:4.45s">Verbose output</text>
+
+  <!-- version -->
+  <text x="62" y="420" font-size="13" fill="#89b4fa" class="f" style="animation-delay:4.6s">--version</text>
+  <text x="310" y="420" font-size="13" fill="#a6adc8" class="f" style="animation-delay:4.6s">Show version and exit</text>
+
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!-- SEQUENCE 2: $ atomik-gen validate ...               -->
+  <!-- ═══════════════════════════════════════════════════ -->
+
+  <!-- Prompt -->
+  <text x="42" y="460" font-size="13" fill="#a6e3a1" class="f" style="animation-delay:5.5s">$</text>
+
+  <!-- Command (word-by-word typing) -->
+  <text x="57" y="460" font-size="13" fill="#cdd6f4" class="f" style="animation-delay:5.7s">atomik-gen</text>
+  <text x="143" y="460" font-size="13" fill="#f9e2af" class="f" style="animation-delay:5.9s">validate</text>
+  <text x="213" y="460" font-size="13" fill="#6c7086" class="f" style="animation-delay:6.1s">sdk/schemas/examples/matrix-ops.json</text>
+
+  <!-- Output: VALID (green) -->
+  <text x="42" y="490" font-size="13" fill="#a6e3a1" class="f" style="animation-delay:6.6s">matrix-ops.json: VALID</text>
+
+  <!-- Final prompt -->
+  <text x="42" y="520" font-size="13" fill="#a6e3a1" class="f" style="animation-delay:7.2s">$</text>
+
+  <!-- Blinking cursor -->
+  <rect x="55" y="510" width="8" height="14" rx="1" fill="#a6e3a1" class="cursor"/>
 
 </svg>
