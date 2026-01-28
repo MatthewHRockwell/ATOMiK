@@ -32,26 +32,35 @@ class Act4DomainApps(ActBase):
         finance = nodes[0]
         portfolio_state = 0xA000_0000_0000_0000  # initial portfolio hash
         finance.load(portfolio_state)
+        details.append(f"  Initial state S0 = 0x{portfolio_state:016X}")
+        details.append("")
 
-        # Simulate 5 price tick deltas
+        # Simulate 5 price tick deltas, showing state after each
         ticks = [_RNG.getrandbits(64) for _ in range(5)]
+        state_after_4 = None
         for i, tick in enumerate(ticks):
             finance.accumulate(tick)
-            details.append(f"  Tick {i + 1}: delta 0x{tick:016X}")
+            current_state = finance.read()
+            details.append(f"  Tick {i + 1}: delta 0x{tick:016X} -> state 0x{current_state:016X}")
+            if i == 3:  # Save state after tick 4 for undo verification
+                state_after_4 = current_state
 
-        after_ticks = finance.read()
-        details.append(f"  State after 5 ticks: 0x{after_ticks:016X}")
+        details.append("")
+        state_after_5 = finance.read()
+        details.append(f"  State after 5 ticks: 0x{state_after_5:016X}")
+        details.append(f"  State after 4 ticks: 0x{state_after_4:016X}  <-- undo target")
+        details.append("")
 
-        # Undo last tick (self-inverse)
+        # Undo last tick (self-inverse): apply tick 5 again
+        details.append(f"  Undo: re-apply tick 5 (0x{ticks[-1]:016X})")
         finance.accumulate(ticks[-1])
         after_undo = finance.read()
 
         # Verify: should equal state after first 4 ticks
-        expected_after_undo = portfolio_state
-        for t in ticks[:-1]:
-            expected_after_undo ^= t
-        ok = after_undo == expected_after_undo
-        details.append(f"  After undo last tick: 0x{after_undo:016X} [{'PASS' if ok else 'FAIL'}]")
+        ok = after_undo == state_after_4
+        details.append(f"  State after undo:    0x{after_undo:016X}")
+        details.append(f"  Expected (after 4):  0x{state_after_4:016X}")
+        details.append(f"  Match: {after_undo:016X} == {state_after_4:016X} ? [{'PASS' if ok else 'FAIL'}]")
         all_passed &= ok
 
         # ── Sensor: multi-stream fusion + alerts (Node 2) ─────────────
@@ -60,25 +69,33 @@ class Act4DomainApps(ActBase):
         sensor = nodes[1]
         baseline = 0x0000_0000_0000_0000
         sensor.load(baseline)
+        details.append(f"  Initial state = 0x{baseline:016X}")
+        details.append("")
 
-        # 3 sensor streams contributing deltas
-        streams = {
-            "IMU-accel": [_RNG.getrandbits(64) for _ in range(3)],
-            "IMU-gyro":  [_RNG.getrandbits(64) for _ in range(3)],
-            "GPS":       [_RNG.getrandbits(64) for _ in range(2)],
-        }
+        # 3 sensor streams contributing deltas - show each fusion step
+        streams = [
+            ("IMU-accel", [_RNG.getrandbits(64) for _ in range(3)]),
+            ("IMU-gyro", [_RNG.getrandbits(64) for _ in range(3)]),
+            ("GPS", [_RNG.getrandbits(64) for _ in range(2)]),
+        ]
 
         expected = baseline
-        for stream_name, stream_deltas in streams.items():
-            for d in stream_deltas:
+        for stream_name, stream_deltas in streams:
+            details.append(f"  Stream: {stream_name}")
+            for j, d in enumerate(stream_deltas):
                 sensor.accumulate(d)
                 expected ^= d
-            details.append(f"  {stream_name}: {len(stream_deltas)} deltas fused")
+                current = sensor.read()
+                details.append(f"    [{j + 1}] delta 0x{d:016X} -> fused 0x{current:016X}")
+            details.append("")
 
         fused = sensor.read()
         ok = fused == expected
-        details.append(f"  Fused state: 0x{fused:016X} [{'PASS' if ok else 'FAIL'}]")
+        details.append(f"  Final fused state:   0x{fused:016X}")
+        details.append(f"  Expected (XOR all):  0x{expected:016X}")
+        details.append(f"  Match: [{'PASS' if ok else 'FAIL'}]")
         all_passed &= ok
+        details.append("")
 
         # Alert detection: check specific bits as "alert flags"
         alert_bits = (fused >> 56) & 0xFF  # top byte
