@@ -24,7 +24,7 @@
   <circle cx="88" cy="28" r="6.5" fill="#28c840"/>
 
   <!-- Title text -->
-  <text x="370" y="33" text-anchor="middle" font-size="12" fill="#a0a0a0" font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif">atomik-gen &#8212; ATOMiK Schema Tools</text>
+  <text x="370" y="33" text-anchor="middle" font-size="12" fill="#a0a0a0" font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif">ATOMiK (C) 2026</text>
 
   <!-- ═══════════════════════════════════════════════════ -->
   <!-- SEQUENCE 1: atomik-gen help                          -->
