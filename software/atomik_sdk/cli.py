@@ -712,6 +712,11 @@ def main() -> int:
     args = parser.parse_args()
 
     if args.command is None:
+        if sys.stdin.isatty():
+            from atomik_sdk.terminal import main as terminal_main
+
+            terminal_main()
+            return EXIT_SUCCESS
         parser.print_help()
         return EXIT_SUCCESS
 
