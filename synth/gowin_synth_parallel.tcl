@@ -55,6 +55,13 @@ set_option -use_mspi_as_gpio 1
 set_option -timing_driven 1
 set_option -print_all_synthesis_warning 1
 
+# ALU extraction control:
+# Gowin maps wide XOR to carry-chain ALU mode even when carry propagation
+# is unnecessary.  RTL syn_keep attributes on merge tree and state
+# reconstruction wires prevent this for the XOR paths.
+# Uncomment below to globally disable ALU inference (affects counters too):
+# set_option -use_alu 0
+
 # -----------------------------------------------------------------------------
 # Run Synthesis
 # -----------------------------------------------------------------------------

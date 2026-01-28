@@ -519,6 +519,9 @@ def generate_tcl(project_filename: str, config_tag: str) -> str:
         set_option -use_mspi_as_gpio 1
         set_option -timing_driven 1
         set_option -print_all_synthesis_warning 1
+        # RTL syn_keep attributes prevent ALU inference on XOR paths.
+        # Uncomment to globally disable ALU inference:
+        # set_option -use_alu 0
 
         puts "=== Synthesizing: {config_tag} ==="
         run syn

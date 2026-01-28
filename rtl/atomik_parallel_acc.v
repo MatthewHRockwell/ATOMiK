@@ -74,7 +74,8 @@ module atomik_parallel_acc #(
     // =========================================================================
 
     // Initial state register (shared across all banks)
-    reg [DELTA_WIDTH-1:0] initial_state;
+    // syn_preserve prevents Gowin from merging this register into ALU chains
+    reg [DELTA_WIDTH-1:0] initial_state /* synthesis syn_preserve=1 */;
 
     // Round-robin bank selector
     reg [BANK_SEL_W-1:0] bank_sel;
@@ -188,14 +189,22 @@ module atomik_parallel_acc #(
         end
     endgenerate
 
-    wire [DELTA_WIDTH-1:0] merged_acc_comb = merge_node[2*N_BANKS - 2];
+    // Merge tree output — syn_keep prevents Gowin from absorbing this net
+    // into a carry-chain ALU.  XOR has no carry propagation, so ALU mode
+    // wastes the physical carry chain and adds unnecessary routing delay.
+    wire [DELTA_WIDTH-1:0] merged_acc_comb /* synthesis syn_keep=1 */;
+    assign merged_acc_comb = merge_node[2*N_BANKS - 2];
 
     // =========================================================================
     // Output Assignments
     // =========================================================================
 
     // State reconstruction: initial_state XOR merged accumulator
-    assign current_state      = initial_state ^ merged_acc_comb;
+    // syn_keep on the reconstruction wire forces LUT-based implementation,
+    // preventing Gowin from mapping this 64-bit XOR to ALU carry-chain mode.
+    wire [DELTA_WIDTH-1:0] state_recon /* synthesis syn_keep=1 */;
+    assign state_recon        = initial_state ^ merged_acc_comb;
+    assign current_state      = state_recon;
 
     // Merged accumulator output
     assign merged_accumulator = merged_acc_comb;
