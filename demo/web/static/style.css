@@ -164,6 +164,12 @@ section h3 {
     background: var(--blue);
     color: var(--crust);
     border-color: var(--blue);
+    animation: pulse 1s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
 }
 
 .primary-btn {
@@ -201,6 +207,12 @@ section h3 {
     font-weight: 700;
     color: var(--blue);
     font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    transition: all 0.3s ease;
+}
+
+.metric-value.updating {
+    color: var(--green);
+    transform: scale(1.05);
 }
 
 .metric-label {
@@ -224,7 +236,11 @@ section h3 {
     border-radius: 8px;
     padding: 1rem;
     border: 1px solid var(--surface1);
-    transition: border-color 0.2s ease;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.node-card.active {
+    box-shadow: 0 0 20px rgba(137, 180, 250, 0.3);
 }
 
 .node-card:nth-child(1) { border-top: 3px solid var(--node1-color); }
@@ -293,10 +309,15 @@ section h3 {
     font-weight: 600;
     color: var(--text);
     margin-top: 0.15rem;
+    transition: color 0.2s ease;
 }
 
 .node-metric .value.highlight {
     color: var(--green);
+}
+
+.node-metric .value.changing {
+    color: var(--yellow);
 }
 
 .state-display {
@@ -318,6 +339,11 @@ section h3 {
     font-size: 0.85rem;
     color: var(--mauve);
     word-break: break-all;
+    transition: color 0.2s ease;
+}
+
+.state-hex.changing {
+    color: var(--yellow);
 }
 
 .node-stats {
@@ -338,14 +364,19 @@ section h3 {
 .stat .value {
     font-size: 0.8rem;
     font-weight: 600;
+    transition: color 0.2s ease;
+}
+
+.stat .value.changing {
+    color: var(--yellow);
 }
 
 /* Bottom Section: Chart + Results */
 .bottom-section {
     display: flex;
     gap: 1rem;
-    flex: 1;
-    min-height: 0;
+    flex: 0 0 auto;
+    height: 280px;
 }
 
 .chart-panel {
@@ -355,16 +386,22 @@ section h3 {
     padding: 1rem;
     display: flex;
     flex-direction: column;
+    height: 100%;
+    overflow: hidden;
 }
 
 .chart-container {
     flex: 1;
     position: relative;
-    min-height: 180px;
-    max-height: 250px;
+    height: 200px;
+    min-height: 200px;
+    max-height: 200px;
 }
 
 .chart-container canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100% !important;
     height: 100% !important;
 }
@@ -403,6 +440,7 @@ section h3 {
     padding: 1rem;
     display: flex;
     flex-direction: column;
+    height: 100%;
     overflow: hidden;
 }
 
@@ -424,6 +462,18 @@ section h3 {
     margin-bottom: 0.5rem;
     background: var(--mantle);
     border-left: 3px solid var(--surface2);
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
 }
 
 .result-item.pass {

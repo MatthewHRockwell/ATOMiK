@@ -3,7 +3,9 @@
 let ws = null;
 let throughputChart = null;
 let reconnectAttempts = 0;
+let refreshInterval = null;
 const MAX_RECONNECT_ATTEMPTS = 10;
+const REFRESH_INTERVAL_MS = 200;  // Poll for updates during simulation
 
 // Catppuccin Mocha colors
 const COLORS = {
@@ -17,6 +19,9 @@ const COLORS = {
     surface1: '#45475a',
     mantle: '#181825',
 };
+
+// Track previous values for change detection
+let previousSnapshots = [];
 
 // ═══════════════════════════════════════════════════════════════════════
 // WebSocket Connection
@@ -53,6 +58,7 @@ function connect() {
     ws.onclose = (evt) => {
         console.log('WebSocket closed:', evt.code, evt.reason);
         setConnectionStatus(false);
+        stopRefreshPolling();
         scheduleReconnect();
     };
 
@@ -93,6 +99,24 @@ function setConnectionStatus(connected) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════
+// Real-time Refresh Polling
+// ═══════════════════════════════════════════════════════════════════════
+
+function startRefreshPolling() {
+    if (refreshInterval) return;
+    refreshInterval = setInterval(() => {
+        send({ action: 'refresh' });
+    }, REFRESH_INTERVAL_MS);
+}
+
+function stopRefreshPolling() {
+    if (refreshInterval) {
+        clearInterval(refreshInterval);
+        refreshInterval = null;
+    }
+}
+
+// ═══════════════════════════════════════════════════════════════════════
 // Message Handling
 // ═══════════════════════════════════════════════════════════════════════
 
@@ -113,43 +137,79 @@ function handleMessage(msg) {
         case 'act_start':
             setNarration(`Running Act ${msg.number}: ${msg.title}...`);
             setButtonRunning(msg.number, true);
+            startRefreshPolling();
             break;
 
         case 'act_complete':
             addActResult(msg.number, msg.title, msg.passed, msg.summary);
             setNarration(`Act ${msg.number}: ${msg.title} — ${msg.passed ? 'PASS' : 'FAIL'}`);
             setButtonRunning(msg.number, false);
+            stopRefreshPolling();
             send({ action: 'refresh' });
             break;
 
         case 'demo_start':
             clearActResults();
             setNarration('Running all 5 acts...');
+            startRefreshPolling();
             break;
 
         case 'demo_complete':
             setNarration(`Demo complete: ${msg.passed}/${msg.total} acts passed.`);
             document.querySelectorAll('.act-btn').forEach(btn => btn.classList.remove('running'));
+            stopRefreshPolling();
             send({ action: 'refresh' });
             break;
     }
 }
 
 // ═══════════════════════════════════════════════════════════════════════
-// UI Updates
+// UI Updates with Change Detection
 // ═══════════════════════════════════════════════════════════════════════
 
 function updateNodes(snapshots) {
     snapshots.forEach((s, i) => {
+        const prev = previousSnapshots[i] || {};
         const el = (id) => document.getElementById(`${id}-${i}`);
+        const card = document.getElementById(`node-${i}`);
 
-        if (el('domain')) el('domain').textContent = s.domain;
-        if (el('banks')) el('banks').textContent = s.n_banks;
-        if (el('freq')) el('freq').textContent = `${s.freq_mhz.toFixed(1)} MHz`;
-        if (el('tp')) el('tp').textContent = `${s.throughput_mops.toLocaleString()} Mops/s`;
-        if (el('state')) el('state').textContent = s.state_hex;
-        if (el('acc')) el('acc').textContent = s.accumulator_zero ? 'ZERO' : 'NON-ZERO';
-        if (el('deltas')) el('deltas').textContent = s.delta_count;
+        // Highlight card if actively processing
+        if (card) {
+            if (s.delta_count !== prev.delta_count) {
+                card.classList.add('active');
+                setTimeout(() => card.classList.remove('active'), 500);
+            }
+        }
+
+        // Update values with change highlighting
+        updateValueWithChange(el('domain'), s.domain, prev.domain);
+        updateValueWithChange(el('banks'), s.n_banks, prev.n_banks);
+        updateValueWithChange(el('freq'), `${s.freq_mhz.toFixed(1)} MHz`, prev.freq_mhz ? `${prev.freq_mhz.toFixed(1)} MHz` : null);
+        updateValueWithChange(el('tp'), `${s.throughput_mops.toLocaleString()} Mops/s`, prev.throughput_mops ? `${prev.throughput_mops.toLocaleString()} Mops/s` : null);
+
+        // State hex with change animation
+        const stateEl = el('state');
+        if (stateEl) {
+            const oldValue = stateEl.textContent;
+            stateEl.textContent = s.state_hex;
+            if (oldValue !== s.state_hex && oldValue !== '0x0000000000000000') {
+                stateEl.classList.add('changing');
+                setTimeout(() => stateEl.classList.remove('changing'), 300);
+            }
+        }
+
+        updateValueWithChange(el('acc'), s.accumulator_zero ? 'ZERO' : 'NON-ZERO', prev.accumulator_zero !== undefined ? (prev.accumulator_zero ? 'ZERO' : 'NON-ZERO') : null);
+
+        // Delta count with change animation
+        const deltasEl = el('deltas');
+        if (deltasEl) {
+            const oldCount = parseInt(deltasEl.textContent) || 0;
+            deltasEl.textContent = s.delta_count;
+            if (s.delta_count !== oldCount) {
+                deltasEl.classList.add('changing');
+                setTimeout(() => deltasEl.classList.remove('changing'), 300);
+            }
+        }
 
         const badge = el('badge');
         if (badge) {
@@ -158,18 +218,44 @@ function updateNodes(snapshots) {
         }
     });
 
+    previousSnapshots = JSON.parse(JSON.stringify(snapshots));
     updateChart(snapshots);
+}
+
+function updateValueWithChange(element, newValue, oldValue) {
+    if (!element) return;
+    const newStr = String(newValue);
+    const oldStr = String(oldValue);
+    if (element.textContent !== newStr) {
+        element.textContent = newStr;
+        if (oldValue !== null && oldStr !== newStr) {
+            element.classList.add('changing');
+            setTimeout(() => element.classList.remove('changing'), 300);
+        }
+    }
 }
 
 function updateSummary(state, snapshots) {
     const totalTp = snapshots.reduce((sum, s) => sum + (s.throughput_mops || 0), 0);
     const hwCount = state.hw_count ?? snapshots.filter(s => s.is_hardware).length;
     const simCount = state.sim_count ?? snapshots.filter(s => !s.is_hardware).length;
+    const totalDeltas = snapshots.reduce((sum, s) => sum + (s.delta_count || 0), 0);
 
-    document.getElementById('total-throughput').textContent = totalTp.toLocaleString();
-    document.getElementById('total-nodes').textContent = snapshots.length;
-    document.getElementById('hw-count').textContent = hwCount;
-    document.getElementById('sim-count').textContent = simCount;
+    updateMetricWithAnimation('total-throughput', totalTp.toLocaleString());
+    updateMetricWithAnimation('total-nodes', snapshots.length);
+    updateMetricWithAnimation('hw-count', hwCount);
+    updateMetricWithAnimation('sim-count', simCount);
+}
+
+function updateMetricWithAnimation(id, value) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const newStr = String(value);
+    if (el.textContent !== newStr) {
+        el.textContent = newStr;
+        el.classList.add('updating');
+        setTimeout(() => el.classList.remove('updating'), 300);
+    }
 }
 
 function setNarration(text) {
@@ -215,7 +301,7 @@ function clearActResults() {
 }
 
 // ═══════════════════════════════════════════════════════════════════════
-// Chart.js — Vertical bars side by side, fixed height, rescaling axis
+// Chart.js — Horizontal bars (side by side), fixed height, rescaling axis
 // ═══════════════════════════════════════════════════════════════════════
 
 function initChart() {
@@ -232,15 +318,20 @@ function initChart() {
                 borderColor: [COLORS.node1, COLORS.node2, COLORS.node3],
                 borderWidth: 1,
                 borderRadius: 4,
-                barPercentage: 0.7,
-                categoryPercentage: 0.8,
+                barThickness: 30,
             }]
         },
         options: {
+            indexAxis: 'y',  // Horizontal bars
             responsive: true,
             maintainAspectRatio: false,
             animation: {
-                duration: 300
+                duration: 200
+            },
+            layout: {
+                padding: {
+                    right: 60
+                }
             },
             plugins: {
                 legend: {
@@ -254,7 +345,7 @@ function initChart() {
                     borderWidth: 1,
                     callbacks: {
                         label: function(context) {
-                            const value = context.parsed.y;
+                            const value = context.parsed.x;
                             if (value >= 1000) {
                                 return `${(value / 1000).toFixed(2)} Gops/s`;
                             }
@@ -267,8 +358,8 @@ function initChart() {
                     annotations: {
                         targetLine: {
                             type: 'line',
-                            yMin: 1000,
-                            yMax: 1000,
+                            xMin: 1000,
+                            xMax: 1000,
                             borderColor: COLORS.red,
                             borderWidth: 2,
                             borderDash: [6, 4],
@@ -285,7 +376,7 @@ function initChart() {
                 }
             },
             scales: {
-                x: {
+                y: {
                     grid: {
                         display: false
                     },
@@ -294,9 +385,9 @@ function initChart() {
                         font: { size: 11 }
                     }
                 },
-                y: {
+                x: {
                     beginAtZero: true,
-                    suggestedMax: 1200,  // Initial max, will auto-scale if needed
+                    max: 1200,  // Fixed max for consistent scale
                     grid: {
                         color: COLORS.surface1,
                         lineWidth: 1
@@ -304,9 +395,10 @@ function initChart() {
                     ticks: {
                         color: COLORS.subtext0,
                         font: { size: 11 },
+                        stepSize: 200,
                         callback: function(value) {
                             if (value >= 1000) {
-                                return (value / 1000).toFixed(1) + ' G';
+                                return (value / 1000).toFixed(1) + 'G';
                             }
                             return value;
                         }
@@ -330,10 +422,14 @@ function updateChart(snapshots) {
     throughputChart.data.labels = snapshots.map(s => `N=${s.n_banks} ${s.domain}`);
     throughputChart.data.datasets[0].data = snapshots.map(s => s.throughput_mops);
 
-    // Auto-scale Y axis: always show at least up to 1200, but expand if needed
+    // Keep fixed max at 1200 for consistent scale (1 Gops/s line always visible)
+    // Only expand if a value exceeds 1200
     const maxValue = Math.max(...snapshots.map(s => s.throughput_mops));
-    const suggestedMax = Math.max(1200, Math.ceil(maxValue * 1.15 / 100) * 100);
-    throughputChart.options.scales.y.suggestedMax = suggestedMax;
+    if (maxValue > 1200) {
+        throughputChart.options.scales.x.max = Math.ceil(maxValue * 1.1 / 100) * 100;
+    } else {
+        throughputChart.options.scales.x.max = 1200;
+    }
 
     throughputChart.update('none');  // No animation for data updates
 }

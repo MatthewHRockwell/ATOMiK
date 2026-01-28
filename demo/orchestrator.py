@@ -180,7 +180,8 @@ class DemoOrchestrator:
         """Create 3 simulated nodes."""
         log.info("Setting up 3 simulated nodes")
         for cfg in NODE_CONFIGS:
-            backend = ATOMiKSimulator()
+            # Small latency makes real-time updates visible in dashboard
+            backend = ATOMiKSimulator(latency=0.005)
             self.nodes.append(NodeController(cfg, backend, on_event=self._on_event))
 
     def _setup_all_hardware(self) -> None:
@@ -206,7 +207,7 @@ class DemoOrchestrator:
                 except Exception as e:
                     log.warning("Board %d setup failed (%s), falling back to sim", i, e)
             # Fall back to simulator
-            backend = ATOMiKSimulator()
+            backend = ATOMiKSimulator(latency=0.005)
             self.nodes.append(NodeController(cfg, backend, on_event=self._on_event))
             log.info("%s -> simulated", cfg.name)
 
