@@ -45,6 +45,108 @@ el.replaceWith(d);
 <section>
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
+<dt id="atomik_sdk.tests.test_verilog_generation.test_parallel_bank_generation"><code class="name flex">
+<span>def <span class="ident">test_parallel_bank_generation</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_parallel_bank_generation():
+    &#34;&#34;&#34;Test Verilog RTL generation with N_BANKS=4 parallel accumulator banks.&#34;&#34;&#34;
+    print(&#34;=&#34; * 70)
+    print(&#34;Testing Parallel Bank Verilog Generation (N_BANKS=4)&#34;)
+    print(&#34;=&#34; * 70)
+    print()
+
+    from generator.namespace_mapper import NamespaceMapping
+
+    # Build a schema with N_BANKS=4 in hardware.rtl_params
+    schema = {
+        &#34;catalogue&#34;: {
+            &#34;vertical&#34;: &#34;Test&#34;,
+            &#34;field&#34;: &#34;Parallel&#34;,
+            &#34;object&#34;: &#34;BankTest&#34;,
+        },
+        &#34;schema&#34;: {
+            &#34;delta_fields&#34;: {
+                &#34;value&#34;: {&#34;width&#34;: 64, &#34;type&#34;: &#34;xor&#34;},
+            },
+            &#34;operations&#34;: {},
+        },
+        &#34;hardware&#34;: {
+            &#34;target_device&#34;: &#34;GW1NR-9&#34;,
+            &#34;rtl_params&#34;: {
+                &#34;DATA_WIDTH&#34;: 64,
+                &#34;N_BANKS&#34;: 4,
+            },
+        },
+    }
+
+    namespace = NamespaceMapping(
+        vertical=&#34;Test&#34;,
+        field=&#34;Parallel&#34;,
+        object=&#34;BankTest&#34;,
+        python_module_path=&#34;atomik.Test.Parallel&#34;,
+        python_import_statement=&#34;from atomik.Test.Parallel import BankTest&#34;,
+        rust_path=&#34;atomik::test::parallel&#34;,
+        rust_use_statement=&#34;use atomik::test::parallel::BankTest;&#34;,
+        c_include_path=&#34;atomik/test/parallel/bank_test.h&#34;,
+        c_include_statement=&#39;#include &#34;atomik/test/parallel/bank_test.h&#34;&#39;,
+        javascript_package=&#34;@atomik/test-parallel&#34;,
+        javascript_require_statement=&#34;const { BankTest } = require(&#39;@atomik/test-parallel&#39;);&#34;,
+        verilog_module_name=&#34;atomik_test_parallel_bank_test&#34;,
+    )
+
+    gen = VerilogGenerator()
+    result = gen.generate(schema, namespace)
+
+    assert result.success, f&#34;Generation failed: {result.errors}&#34;
+    print(f&#34;  [PASS] Generated {len(result.files)} file(s)&#34;)
+
+    # Find the RTL module file
+    rtl_files = [f for f in result.files if f.language == &#34;verilog&#34; and &#34;tb_&#34; not in f.relative_path]
+    assert len(rtl_files) &gt;= 1, &#34;No RTL file generated&#34;
+
+    rtl_content = rtl_files[0].content
+
+    # Verify parallel accumulator instantiation
+    assert &#34;atomik_parallel_acc&#34; in rtl_content, \
+        &#34;Generated Verilog should contain atomik_parallel_acc instantiation&#34;
+    print(&#34;  [PASS] Contains atomik_parallel_acc instantiation&#34;)
+
+    assert &#34;N_BANKS&#34; in rtl_content, \
+        &#34;Generated Verilog should contain N_BANKS parameter&#34;
+    print(&#34;  [PASS] Contains N_BANKS parameter&#34;)
+
+    assert &#34;delta_parallel_in&#34; in rtl_content, \
+        &#34;Generated Verilog should contain delta_parallel_in port&#34;
+    print(&#34;  [PASS] Contains delta_parallel_in port&#34;)
+
+    assert &#34;delta_parallel_valid&#34; in rtl_content, \
+        &#34;Generated Verilog should contain delta_parallel_valid port&#34;
+    print(&#34;  [PASS] Contains delta_parallel_valid port&#34;)
+
+    assert &#34;parallel_mode&#34; in rtl_content, \
+        &#34;Generated Verilog should contain parallel_mode port&#34;
+    print(&#34;  [PASS] Contains parallel_mode port&#34;)
+
+    # Verify testbench has parallel tests
+    tb_files = [f for f in result.files if &#34;tb_&#34; in f.relative_path]
+    assert len(tb_files) &gt;= 1, &#34;No testbench file generated&#34;
+
+    tb_content = tb_files[0].content
+    assert &#34;Parallel&#34; in tb_content or &#34;parallel&#34; in tb_content, \
+        &#34;Testbench should contain parallel mode tests&#34;
+    print(&#34;  [PASS] Testbench contains parallel mode tests&#34;)
+
+    print()
+    print(&#34;  [PASS] Parallel bank generation test complete&#34;)
+    print(&#34;=&#34; * 70)</code></pre>
+</details>
+<div class="desc"><p>Test Verilog RTL generation with N_BANKS=4 parallel accumulator banks.</p></div>
+</dd>
 <dt id="atomik_sdk.tests.test_verilog_generation.test_verilog_generation"><code class="name flex">
 <span>def <span class="ident">test_verilog_generation</span></span>(<span>)</span>
 </code></dt>
@@ -214,6 +316,7 @@ el.replaceWith(d);
 </li>
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
+<li><code><a title="atomik_sdk.tests.test_verilog_generation.test_parallel_bank_generation" href="#atomik_sdk.tests.test_verilog_generation.test_parallel_bank_generation">test_parallel_bank_generation</a></code></li>
 <li><code><a title="atomik_sdk.tests.test_verilog_generation.test_verilog_generation" href="#atomik_sdk.tests.test_verilog_generation.test_verilog_generation">test_verilog_generation</a></code></li>
 </ul>
 </li>

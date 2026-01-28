@@ -44,6 +44,13 @@ The `atomik-gen` CLI tool is the primary interface for schema validation and cod
 | `atomik-gen info <schema>` | Show schema summary (namespace, fields, operations) |
 | `atomik-gen batch <directory>` | Batch generate from a directory of schemas |
 | `atomik-gen list` | List available target languages |
+| `atomik-gen pipeline run <target>` | Execute full autonomous pipeline |
+| `atomik-gen pipeline diff <target>` | Show what would change (dry run) |
+| `atomik-gen pipeline status` | Show pipeline state from checkpoint |
+| `atomik-gen metrics show` | Show metrics for last run |
+| `atomik-gen metrics compare` | Compare metrics across schemas |
+| `atomik-gen metrics export --output FILE` | Export metrics to CSV |
+| `atomik-gen demo <domain>` | Run domain hardware demonstrator (video, sensor, finance) |
 | `atomik-gen --version` | Show version |
 
 ### Options (generate/batch)
@@ -53,6 +60,31 @@ The `atomik-gen` CLI tool is the primary interface for schema validation and cod
 | `--output-dir DIR` | Output directory | `generated` |
 | `--languages LANG [LANG ...]` | Target languages | all 5 |
 | `--report FILE` | Write JSON report | none |
+| `-v`, `--verbose` | Verbose output | off |
+
+### Options (pipeline run)
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| `--output-dir DIR` | Output directory | `generated` |
+| `--languages LANG [...]` | Target languages | all 5 |
+| `--report FILE` | Write pipeline report | none |
+| `--checkpoint DIR` | Checkpoint directory | `.atomik` |
+| `--metrics-csv FILE` | Metrics CSV path | `.atomik/metrics.csv` |
+| `--com-port PORT` | Serial port for hardware validation | none |
+| `--token-budget N` | Maximum tokens for this run | unlimited |
+| `--sim-only` | RTL simulation only (no FPGA) | off |
+| `--skip-synthesis` | Skip synthesis stage | off |
+| `--batch` | Process directory of schemas | off |
+| `-v`, `--verbose` | Verbose output | off |
+
+### Options (demo)
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| `--com-port PORT` | Serial port for FPGA | none |
+| `--sim-only` | Simulation only | off |
+| `--report FILE` | Write demo report | none |
 | `-v`, `--verbose` | Verbose output | off |
 
 ### Exit Codes
@@ -78,6 +110,21 @@ atomik-gen batch sdk/schemas/domains/ --output-dir generated_sdks --report repor
 
 # Show schema metadata
 atomik-gen info sdk/schemas/domains/finance-price-tick.json
+
+# Run autonomous pipeline on a schema
+atomik-gen pipeline run sdk/schemas/examples/matrix-ops.json --sim-only
+
+# Dry-run: show what the pipeline would change
+atomik-gen pipeline diff sdk/schemas/examples/matrix-ops.json
+
+# Show metrics from last pipeline run
+atomik-gen metrics show
+
+# Export metrics to CSV
+atomik-gen metrics export --output metrics.csv
+
+# Run the video domain hardware demonstrator (simulation)
+atomik-gen demo video --sim-only
 ```
 
 ---
