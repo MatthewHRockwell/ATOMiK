@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ATOMiK 3-Node Demo Dashboard</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+</head>
+<body>
+    <header>
+        <h1>ATOMiK &mdash; Delta-State Computing in Silicon</h1>
+        <div class="subtitle">
+            3-Node VC Demo Dashboard
+            <span id="mode-badge" class="status-badge badge-sim">SIM</span>
+        </div>
+    </header>
+
+    <div class="controls">
+        <button onclick="runAct(1)">Act 1: Algebra</button>
+        <button onclick="runAct(2)">Act 2: Undo</button>
+        <button onclick="runAct(3)">Act 3: Scaling</button>
+        <button onclick="runAct(4)">Act 4: Domains</button>
+        <button onclick="runAct(5)">Act 5: Merge</button>
+        <button class="primary" onclick="runAll()">Run All</button>
+    </div>
+
+    <div class="node-row" id="node-cards">
+        <!-- Node 1 -->
+        <div class="node-card" id="card-0">
+            <h2>Node 1 <span class="status-badge badge-sim" id="badge-0">SIM</span></h2>
+            <div class="field"><span class="label">Domain</span><span class="value" id="domain-0">Finance</span></div>
+            <div class="field"><span class="label">N_BANKS</span><span class="value" id="banks-0">4</span></div>
+            <div class="field"><span class="label">Freq</span><span class="value" id="freq-0">81.0 MHz</span></div>
+            <div class="field"><span class="label">Throughput</span><span class="value" id="tp-0">324 Mops/s</span></div>
+            <div class="state-hex" id="state-0">0x0000000000000000</div>
+            <div class="field"><span class="label">Acc Zero</span><span class="value" id="acc-0">—</span></div>
+            <div class="field"><span class="label">Deltas</span><span class="value" id="deltas-0">0</span></div>
+        </div>
+        <!-- Node 2 -->
+        <div class="node-card" id="card-1">
+            <h2>Node 2 <span class="status-badge badge-sim" id="badge-1">SIM</span></h2>
+            <div class="field"><span class="label">Domain</span><span class="value" id="domain-1">Sensor</span></div>
+            <div class="field"><span class="label">N_BANKS</span><span class="value" id="banks-1">8</span></div>
+            <div class="field"><span class="label">Freq</span><span class="value" id="freq-1">67.5 MHz</span></div>
+            <div class="field"><span class="label">Throughput</span><span class="value" id="tp-1">540 Mops/s</span></div>
+            <div class="state-hex" id="state-1">0x0000000000000000</div>
+            <div class="field"><span class="label">Acc Zero</span><span class="value" id="acc-1">—</span></div>
+            <div class="field"><span class="label">Deltas</span><span class="value" id="deltas-1">0</span></div>
+        </div>
+        <!-- Node 3 -->
+        <div class="node-card" id="card-2">
+            <h2>Node 3 <span class="status-badge badge-sim" id="badge-2">SIM</span></h2>
+            <div class="field"><span class="label">Domain</span><span class="value" id="domain-2">Peak</span></div>
+            <div class="field"><span class="label">N_BANKS</span><span class="value" id="banks-2">16</span></div>
+            <div class="field"><span class="label">Freq</span><span class="value" id="freq-2">67.5 MHz</span></div>
+            <div class="field"><span class="label">Throughput</span><span class="value" id="tp-2">1,070 Mops/s</span></div>
+            <div class="state-hex" id="state-2">0x0000000000000000</div>
+            <div class="field"><span class="label">Acc Zero</span><span class="value" id="acc-2">—</span></div>
+            <div class="field"><span class="label">Deltas</span><span class="value" id="deltas-2">0</span></div>
+        </div>
+    </div>
+
+    <div class="bottom-row">
+        <div class="panel">
+            <h3>Act Results</h3>
+            <div id="act-results">
+                <p style="color: var(--subtext0); font-size: 0.85rem;">No acts run yet.</p>
+            </div>
+        </div>
+        <div class="panel">
+            <h3>Throughput Scaling</h3>
+            <canvas id="throughput-chart" height="140"></canvas>
+        </div>
+    </div>
+
+    <div class="narration" id="narration">
+        Ready. Press a button to run an act, or click "Run All" for the full sequence.
+    </div>
+
+    <script src="/static/dashboard.js"></script>
+</body>
+</html>

@@ -1,0 +1,54 @@
+{
+  "device": "Gowin GW1NR-9 (Tang Nano 9K)",
+  "device_cost_usd": 10,
+  "data_width_bits": 64,
+  "operation_latency_ns": 10.6,
+  "operation_latency_cycles": 1,
+  "lean4_proofs": 92,
+  "pipeline_tests": 242,
+  "hardware_tests": 80,
+  "memory_reduction_percent": "95-100",
+  "nodes": [
+    {
+      "name": "Node 1 — Finance",
+      "n_banks": 4,
+      "freq_mhz": 81.0,
+      "actual_fmax_mhz": 81.143,
+      "throughput_mops": 324.0,
+      "luts": 738,
+      "ffs": 731,
+      "alus": 40,
+      "timing_met": true
+    },
+    {
+      "name": "Node 2 — Sensor",
+      "n_banks": 8,
+      "freq_mhz": 67.5,
+      "actual_fmax_mhz": 67.872,
+      "throughput_mops": 540.0,
+      "luts": 1125,
+      "ffs": 988,
+      "alus": 40,
+      "timing_met": true
+    },
+    {
+      "name": "Node 3 — Peak",
+      "n_banks": 16,
+      "freq_mhz": 67.5,
+      "actual_fmax_mhz": 66.844,
+      "throughput_mops": 1069.5,
+      "luts": 1776,
+      "ffs": 1501,
+      "alus": 40,
+      "timing_met": false,
+      "note": "Hardware validated at 66 MHz — 1056 Mops/s measured"
+    }
+  ],
+  "scaling": {
+    "1_bank": 94.5,
+    "4_banks": 324.0,
+    "8_banks": 540.0,
+    "16_banks": 1069.5,
+    "scaling_factor": "Linear (N × freq)"
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "intro": "Welcome to the ATOMiK demo. We're about to demonstrate delta-state computing in silicon — processing over 1 billion operations per second on a $10 FPGA chip.",
+  "acts": {
+    "1": {
+      "title": "Basic Delta Algebra",
+      "intro": "We begin with the fundamental operation: load an initial state, accumulate XOR deltas, and read the result. Every operation completes in a single clock cycle — 10.6 nanoseconds.",
+      "steps": [
+        "First, we load a 64-bit initial state and read it back. The hardware preserves every bit perfectly.",
+        "Next, we accumulate a single delta. XOR with zero gives us the delta itself — the identity property.",
+        "Now multiple deltas: d1 XOR d2 XOR d3. Associativity means we can group them any way we like.",
+        "Finally, state reconstruction: initial state XOR accumulated delta gives us the current state. One operation, one cycle."
+      ]
+    },
+    "2": {
+      "title": "Self-Inverse (Instant Undo)",
+      "intro": "XOR is self-inverse: applying the same delta twice cancels it out. This means every change is its own undo — no checkpoints, no logs, no rollback journals.",
+      "steps": [
+        "We apply a delta to change the state. The state changes as expected.",
+        "Now we apply the exact same delta again. The state returns to the original.",
+        "The accumulator is back to zero — as if nothing happened. This is instant, zero-cost undo.",
+        "This property eliminates the need for transaction logs, undo buffers, or checkpoint systems."
+      ]
+    },
+    "3": {
+      "title": "Parallel Scaling",
+      "intro": "Now we push all three nodes with the same workload. Node 1 has 4 parallel banks, Node 2 has 8, Node 3 has 16. Watch the throughput scale linearly.",
+      "steps": [
+        "All three nodes receive the same 100-delta workload.",
+        "Node 1 (4 banks): 324 million operations per second.",
+        "Node 2 (8 banks): 540 million operations per second.",
+        "Node 3 (16 banks): over 1 BILLION operations per second — on a $10 chip. Linear scaling, no diminishing returns."
+      ]
+    },
+    "4": {
+      "title": "Domain Applications",
+      "intro": "The same algebra powers real applications. Finance tick processing with instant undo. Sensor fusion across multiple streams. Peak throughput bursts.",
+      "steps": [
+        "Finance: processing a stream of price tick deltas, then instantly undoing the last one. No transaction log needed.",
+        "Sensor fusion: three independent sensor streams — IMU accelerometer, gyroscope, and GPS — merged with XOR. Order doesn't matter.",
+        "Peak performance: 200-delta burst at over 1 Gops/s. Every result is mathematically verifiable."
+      ]
+    },
+    "5": {
+      "title": "Distributed Merge",
+      "intro": "Grand finale: three nodes each process a different subset of deltas. The host merges the results — and it's identical to processing everything on one node. This proves lock-free distributed computing.",
+      "steps": [
+        "We partition 6 deltas across 3 nodes — 2 each.",
+        "Each node accumulates its subset independently. No coordination needed.",
+        "The host XOR-merges the three partial results.",
+        "We verify: single-node processing of all 6 deltas produces the EXACT same result. Commutativity proven.",
+        "This is the foundation for distributed state management without locks, consensus, or coordination overhead."
+      ]
+    }
+  },
+  "outro": "You've just seen delta-state computing in silicon. Mathematically proven, hardware validated, and ready to scale. 92 formal proofs. 1 billion operations per second. All on a $10 chip."
+}

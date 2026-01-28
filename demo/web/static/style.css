@@ -1,0 +1,224 @@
+/* ATOMiK Demo Dashboard — Catppuccin Mocha Theme */
+
+:root {
+    --base: #1e1e2e;
+    --mantle: #181825;
+    --crust: #11111b;
+    --surface0: #313244;
+    --surface1: #45475a;
+    --surface2: #585b70;
+    --overlay0: #6c7086;
+    --text: #cdd6f4;
+    --subtext0: #a6adc8;
+    --green: #a6e3a1;
+    --yellow: #f9e2af;
+    --blue: #89b4fa;
+    --red: #f38ba8;
+    --mauve: #cba6f7;
+    --peach: #fab387;
+    --teal: #94e2d5;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+    background: var(--base);
+    color: var(--text);
+    min-height: 100vh;
+}
+
+header {
+    background: var(--surface0);
+    padding: 1rem 2rem;
+    text-align: center;
+    border-bottom: 2px solid var(--surface1);
+}
+
+header h1 {
+    font-size: 1.4rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+}
+
+header .subtitle {
+    color: var(--subtext0);
+    font-size: 0.85rem;
+    margin-top: 0.3rem;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    margin-left: 0.5rem;
+}
+.badge-hw { background: var(--green); color: var(--crust); }
+.badge-sim { background: var(--blue); color: var(--crust); }
+
+/* Node cards */
+.node-row {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem 2rem;
+}
+
+.node-card {
+    flex: 1;
+    background: var(--surface0);
+    border: 1px solid var(--surface1);
+    border-radius: 8px;
+    padding: 1rem;
+}
+
+.node-card h2 {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.node-card .field {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.2rem 0;
+    font-size: 0.85rem;
+}
+
+.node-card .field .label {
+    color: var(--subtext0);
+}
+
+.node-card .field .value {
+    font-weight: 600;
+}
+
+.state-hex {
+    font-family: monospace;
+    color: var(--mauve);
+    font-size: 0.9rem;
+    padding: 0.4rem 0;
+    text-align: center;
+    background: var(--mantle);
+    border-radius: 4px;
+    margin: 0.5rem 0;
+}
+
+/* Bottom section */
+.bottom-row {
+    display: flex;
+    gap: 1rem;
+    padding: 0 2rem 1rem;
+}
+
+.panel {
+    flex: 1;
+    background: var(--surface0);
+    border: 1px solid var(--surface1);
+    border-radius: 8px;
+    padding: 1rem;
+}
+
+.panel h3 {
+    font-size: 0.95rem;
+    margin-bottom: 0.5rem;
+    color: var(--blue);
+}
+
+/* Throughput bars */
+.bar-row {
+    display: flex;
+    align-items: center;
+    margin: 0.4rem 0;
+    font-size: 0.8rem;
+}
+
+.bar-label {
+    width: 80px;
+    color: var(--subtext0);
+}
+
+.bar-track {
+    flex: 1;
+    height: 18px;
+    background: var(--mantle);
+    border-radius: 3px;
+    overflow: hidden;
+    margin: 0 0.5rem;
+    position: relative;
+}
+
+.bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.5s ease;
+}
+
+.bar-fill.node-0 { background: var(--yellow); }
+.bar-fill.node-1 { background: var(--blue); }
+.bar-fill.node-2 { background: var(--green); }
+
+.bar-value {
+    width: 100px;
+    text-align: right;
+    font-weight: 600;
+}
+
+.gops-line {
+    border-left: 2px dashed var(--red);
+    position: absolute;
+    top: 0;
+    bottom: 0;
+}
+
+/* Narration */
+.narration {
+    background: var(--mantle);
+    padding: 0.8rem 2rem;
+    color: var(--subtext0);
+    font-size: 0.85rem;
+    border-top: 1px solid var(--surface1);
+    min-height: 2.5rem;
+}
+
+/* Controls */
+.controls {
+    display: flex;
+    gap: 0.5rem;
+    padding: 0.5rem 2rem;
+    justify-content: center;
+}
+
+.controls button {
+    background: var(--surface1);
+    color: var(--text);
+    border: 1px solid var(--surface2);
+    padding: 0.4rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.8rem;
+}
+
+.controls button:hover {
+    background: var(--surface2);
+}
+
+.controls button.primary {
+    background: var(--blue);
+    color: var(--crust);
+    border-color: var(--blue);
+}
+
+/* Act results */
+.act-result {
+    padding: 0.3rem 0;
+    font-size: 0.82rem;
+}
+
+.act-result .pass { color: var(--green); }
+.act-result .fail { color: var(--red); }

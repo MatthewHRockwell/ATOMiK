@@ -50,8 +50,16 @@ dev = [
     "sphinx>=6.0.0",
     "sphinx-rtd-theme>=1.0.0",
 ]
+demo = [
+    "pyserial>=3.5",
+    "rich>=13.0.0",
+    "textual>=0.40.0",
+    "fastapi>=0.100.0",
+    "uvicorn[standard]>=0.22.0",
+    "websockets>=11.0",
+]
 all = [
-    "atomik-sdk[video,dev]",
+    "atomik-sdk[video,dev,demo]",
 ]
 
 [project.scripts]

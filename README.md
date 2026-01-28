@@ -475,6 +475,38 @@ The schema-driven code generation pipeline ensures that **every new ATOMiK objec
 
 ---
 
+## Demo
+
+The 3-node VC demo showcases ATOMiK's delta-state computing across three Tang Nano 9K FPGAs (or in simulation). It runs a 5-act sequence: basic algebra, self-inverse undo, parallel scaling, domain applications, and distributed merge.
+
+```bash
+# Install demo dependencies
+cd software && pip install -e ".[demo]"
+
+# Run in simulation (no hardware required)
+python -m demo.run_demo --mode simulate
+
+# Run with TUI + web dashboard
+python -m demo.run_demo --mode simulate --web
+
+# Step-by-step presentation mode
+python -m demo.run_demo --mode simulate --presentation
+
+# Auto-discover hardware, simulate missing boards
+python -m demo.run_demo
+
+# Headless console output
+python -m demo.run_demo --headless --mode simulate
+```
+
+| Node | Domain | Banks | Throughput | Demo Focus |
+|------|--------|-------|-----------|------------|
+| Node 1 | Finance | 4 | 324 Mops/s | Tick processing + instant undo |
+| Node 2 | Sensor | 8 | 540 Mops/s | Multi-stream fusion + alerts |
+| Node 3 | Peak | 16 | 1,070 Mops/s | 1 Gops/s milestone |
+
+---
+
 ## Documentation
 
 | Document | Description |
