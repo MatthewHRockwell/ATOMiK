@@ -7,12 +7,16 @@ Usage:
     python -m demo.run_demo --presentation           # step-by-step narration
     python -m demo.run_demo --act 3                  # run single act
     python -m demo.run_demo --headless               # no TUI, console output
+    python -m demo.run_demo --window                 # launch TUI in new window
 """
 
 from __future__ import annotations
 
 import argparse
 import logging
+import shutil
+import subprocess
+import sys
 import threading
 
 from demo.orchestrator import DemoMode, DemoOrchestrator
@@ -35,6 +39,8 @@ def _parse_args() -> argparse.Namespace:
     p.add_argument("--headless", action="store_true", help="Console output only (no TUI)")
     p.add_argument("--web-only", action="store_true", help="Web dashboard only (no TUI)")
     p.add_argument("--port", type=int, default=8000, help="Web dashboard port")
+    p.add_argument("--window", action="store_true", help="Launch TUI in a new terminal window")
+    p.add_argument("--_in_window", action="store_true", help=argparse.SUPPRESS)  # Internal flag
     return p.parse_args()
 
 
@@ -92,6 +98,33 @@ def _start_web_server(mode: DemoMode, port: int) -> None:
     print(f"Web dashboard: http://127.0.0.1:{port}")
 
 
+def _launch_in_new_window(args: argparse.Namespace) -> None:
+    """Launch the TUI in a new terminal window."""
+    # Build command to run in new window
+    cmd_args = [sys.executable, "-m", "demo.run_demo", "--_in_window"]
+    cmd_args.extend(["--mode", args.mode])
+    if args.presentation:
+        cmd_args.append("--presentation")
+
+    # Try Windows Terminal first (wt.exe), fall back to cmd
+    wt_path = shutil.which("wt")
+    if wt_path:
+        # Windows Terminal with custom title and styling
+        subprocess.Popen([
+            wt_path,
+            "--title", "ATOMiK Demo",
+            "--size", "120,35",
+            "--",
+            *cmd_args,
+        ])
+    else:
+        # Fall back to cmd.exe
+        subprocess.Popen(
+            ["cmd", "/c", "start", "ATOMiK Demo", *cmd_args],
+            shell=True,
+        )
+
+
 def main() -> None:
     args = _parse_args()
     logging.basicConfig(
@@ -100,6 +133,12 @@ def main() -> None:
     )
 
     mode = DemoMode(args.mode)
+
+    # Launch in new window (non-blocking, then exit)
+    if args.window and not args._in_window:
+        _launch_in_new_window(args)
+        print("Launched TUI in new window.")
+        return
 
     # Web-only mode
     if args.web_only:
