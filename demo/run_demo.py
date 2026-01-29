@@ -109,12 +109,10 @@ def _launch_in_new_window(args: argparse.Namespace) -> None:
     # Try Windows Terminal first (wt.exe), fall back to cmd
     wt_path = shutil.which("wt")
     if wt_path:
-        # Windows Terminal with custom title and styling
+        # Windows Terminal with custom title
         subprocess.Popen([
             wt_path,
             "--title", "ATOMiK Demo",
-            "--size", "120,35",
-            "--",
             *cmd_args,
         ])
     else:

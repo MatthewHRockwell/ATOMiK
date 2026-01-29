@@ -92,6 +92,76 @@ header h1 {
     color: var(--crust);
 }
 
+/* Device Status Section */
+.device-status {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.15rem;
+}
+
+.device-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.device-label {
+    font-size: 0.7rem;
+    color: var(--overlay0);
+    text-transform: uppercase;
+}
+
+.device-name {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.device-subinfo {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.7rem;
+}
+
+.device-mode {
+    color: var(--subtext0);
+}
+
+.device-mode.hw-run {
+    color: var(--green);
+    font-weight: 600;
+}
+
+.device-mode.sim-run {
+    color: var(--blue);
+}
+
+.device-mode.idle {
+    color: var(--overlay0);
+}
+
+.device-subinfo .separator {
+    color: var(--surface2);
+}
+
+.logical-node-count {
+    color: var(--subtext0);
+}
+
+.proof-badge {
+    background: linear-gradient(135deg, var(--mauve) 0%, var(--lavender) 100%);
+    color: var(--crust);
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    cursor: help;
+    margin-left: auto;
+    margin-right: 1rem;
+}
+
 /* Main Layout */
 main {
     flex: 1;
@@ -113,6 +183,147 @@ section h3 {
     text-transform: uppercase;
     letter-spacing: 0.05em;
     margin-bottom: 0.75rem;
+}
+
+/* Hero Metrics Section */
+.hero-metrics {
+    display: flex;
+    gap: 1rem;
+    flex-shrink: 0;
+    background: linear-gradient(135deg, var(--surface0) 0%, var(--mantle) 100%);
+    border-radius: 8px;
+    padding: 0.75rem 1.5rem;
+    border: 1px solid var(--surface1);
+}
+
+.hero-metric {
+    flex: 1;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.hero-value {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--green);
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    line-height: 1;
+    transition: all 0.3s ease;
+}
+
+.hero-value.updating {
+    color: var(--yellow);
+    transform: scale(1.05);
+}
+
+.hero-unit {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--subtext0);
+    margin-left: 0.15rem;
+}
+
+.hero-label {
+    font-size: 0.7rem;
+    color: var(--overlay0);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: 0.25rem;
+}
+
+/* Comparison Section: ATOMiK vs Traditional */
+.comparison-section {
+    display: flex;
+    gap: 0.75rem;
+    flex-shrink: 0;
+}
+
+.comparison-card {
+    flex: 1;
+    background: var(--surface0);
+    border-radius: 6px;
+    padding: 0.6rem 0.8rem;
+    border: 1px solid var(--surface1);
+}
+
+.comparison-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.comparison-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--subtext0);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.comparison-badge {
+    font-size: 0.6rem;
+    font-weight: 700;
+    padding: 0.15rem 0.4rem;
+    border-radius: 3px;
+    text-transform: uppercase;
+}
+
+.comparison-badge.win {
+    background: var(--green);
+    color: var(--crust);
+}
+
+.comparison-values {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.atomik-value, .traditional-value {
+    flex: 1;
+    text-align: center;
+}
+
+.atomik-value .value {
+    display: block;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--green);
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+.atomik-value .label {
+    display: block;
+    font-size: 0.6rem;
+    color: var(--subtext0);
+    margin-top: 0.1rem;
+}
+
+.traditional-value .value {
+    display: block;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--overlay0);
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    text-decoration: line-through;
+    text-decoration-color: var(--red);
+}
+
+.traditional-value .label {
+    display: block;
+    font-size: 0.6rem;
+    color: var(--overlay0);
+    margin-top: 0.1rem;
+}
+
+.vs-divider {
+    font-size: 0.7rem;
+    color: var(--overlay0);
+    font-weight: 600;
 }
 
 /* Top Section: Controls + Summary */
@@ -184,6 +395,107 @@ section h3 {
     border-color: var(--lavender);
 }
 
+.controls-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--surface1);
+}
+
+/* Hardware Toggle Switch */
+.hardware-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    user-select: none;
+}
+
+.hardware-toggle input {
+    display: none;
+}
+
+.toggle-slider {
+    position: relative;
+    width: 36px;
+    height: 20px;
+    background: var(--surface2);
+    border-radius: 10px;
+    transition: background 0.2s ease;
+}
+
+.toggle-slider::before {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 16px;
+    height: 16px;
+    background: var(--overlay0);
+    border-radius: 50%;
+    transition: all 0.2s ease;
+}
+
+.hardware-toggle input:checked + .toggle-slider {
+    background: var(--green);
+}
+
+.hardware-toggle input:checked + .toggle-slider::before {
+    left: 18px;
+    background: var(--crust);
+}
+
+.hardware-toggle input:disabled + .toggle-slider {
+    opacity: 0.5;
+}
+
+.toggle-text {
+    font-size: 0.75rem;
+    color: var(--subtext0);
+    font-weight: 500;
+}
+
+.hardware-toggle.active .toggle-text {
+    color: var(--green);
+}
+
+.hardware-toggle.unavailable .toggle-text {
+    color: var(--overlay0);
+}
+
+/* Download Report Button */
+.download-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.4rem 0.75rem;
+    background: var(--surface1);
+    border: 1px solid var(--surface2);
+    border-radius: 5px;
+    color: var(--subtext0);
+    font-size: 0.75rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    font-family: inherit;
+}
+
+.download-btn:hover {
+    background: var(--surface2);
+    color: var(--text);
+    border-color: var(--overlay0);
+}
+
+.download-btn:active {
+    transform: scale(0.98);
+}
+
+.download-btn .download-icon {
+    font-size: 0.85rem;
+}
+
 .summary-panel {
     background: var(--surface0);
     border-radius: 8px;
@@ -195,6 +507,16 @@ section h3 {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 1rem;
+}
+
+.summary-note {
+    margin-top: 0.75rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--surface1);
+    font-size: 0.65rem;
+    color: var(--overlay0);
+    font-style: italic;
+    text-align: center;
 }
 
 .metric {
@@ -279,7 +601,14 @@ section h3 {
 .node-domain {
     color: var(--subtext0);
     font-size: 0.8rem;
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.25rem;
+}
+
+.node-tagline {
+    color: var(--overlay0);
+    font-size: 0.7rem;
+    font-style: italic;
+    margin-bottom: 0.5rem;
 }
 
 .node-metrics {
@@ -391,11 +720,11 @@ section h3 {
 }
 
 .chart-container {
-    flex: 1;
+    flex: 0 0 auto;  /* No flex growth - respect fixed height */
     position: relative;
-    height: 200px;
-    min-height: 200px;
-    max-height: 200px;
+    height: 180px;
+    min-height: 180px;
+    max-height: 180px;
 }
 
 .chart-container canvas {

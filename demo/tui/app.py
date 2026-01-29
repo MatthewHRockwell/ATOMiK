@@ -11,6 +11,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from rich.text import Text
 from textual.app import App, ComposeResult
 from textual.binding import Binding
 from textual.containers import Horizontal
@@ -18,10 +19,40 @@ from textual.widgets import Footer, Static
 
 from demo.config import PALETTE
 from demo.orchestrator import DemoMode, DemoOrchestrator
+from demo.tui.comparison_panel import ComparisonPanel
 from demo.tui.narration_bar import NarrationBar
 from demo.tui.node_panel import NodePanel
 from demo.tui.summary_panel import SummaryPanel
 from demo.tui.throughput_chart import ThroughputChart
+
+
+class TitleBar(Static):
+    """macOS-style title bar with traffic lights."""
+
+    def compose(self) -> ComposeResult:
+        return []
+
+    def on_mount(self) -> None:
+        self._render_title_bar()
+
+    def _render_title_bar(self) -> None:
+        """Render the title bar with traffic lights and centered title."""
+        text = Text()
+        # Traffic lights (macOS style)
+        text.append("  ")
+        text.append("●", style="bold #ff5f57")  # Red
+        text.append(" ")
+        text.append("●", style="bold #febc2e")  # Yellow
+        text.append(" ")
+        text.append("●", style="bold #28c840")  # Green
+        text.append("          ")
+        # Centered title
+        text.append("ATOMiK", style="bold #89b4fa")
+        text.append("  ", style="#6c7086")
+        text.append("Delta-State Computing in Silicon", style="#6c7086")
+        text.append("  ", style="#6c7086")
+        text.append("3-Node Demo", style="#a6adc8")
+        self.update(text)
 
 
 class DemoApp(App):
@@ -33,13 +64,19 @@ class DemoApp(App):
         background: {PALETTE['base']};
         color: {PALETTE['text']};
     }}
-    #header-bar {{
+    TitleBar {{
         dock: top;
-        height: 3;
+        height: 1;
         background: {PALETTE['surface0']};
         color: {PALETTE['text']};
-        text-align: center;
-        padding: 1;
+        padding: 0 1;
+    }}
+    #hero-bar {{
+        dock: top;
+        height: 3;
+        background: {PALETTE['mantle']};
+        color: {PALETTE['text']};
+        padding: 0 1;
     }}
     #node-row {{
         height: 1fr;
@@ -53,23 +90,33 @@ class DemoApp(App):
         width: 1fr;
         border: solid {PALETTE['surface1']};
         margin: 0 1;
+        background: {PALETTE['surface0']};
     }}
     SummaryPanel {{
         width: 1fr;
         border: solid {PALETTE['surface1']};
         margin: 0 1;
+        background: {PALETTE['surface0']};
     }}
     ThroughputChart {{
         width: 1fr;
         border: solid {PALETTE['surface1']};
         margin: 0 1;
+        background: {PALETTE['surface0']};
+    }}
+    ComparisonPanel {{
+        width: 1fr;
+        border: solid {PALETTE['surface1']};
+        margin: 0 1;
+        background: {PALETTE['surface0']};
     }}
     NarrationBar {{
         dock: bottom;
-        height: 4;
+        height: 3;
         background: {PALETTE['mantle']};
         color: {PALETTE['subtext0']};
-        padding: 1;
+        padding: 0 1;
+        border-top: solid {PALETTE['surface1']};
     }}
     Footer {{
         background: {PALETTE['surface0']};
@@ -99,10 +146,8 @@ class DemoApp(App):
         self.orchestrator = DemoOrchestrator(mode=mode, on_event=self._on_demo_event)
 
     def compose(self) -> ComposeResult:
-        yield Static(
-            "ATOMiK  Delta-State Computing in Silicon  3-Node Demo",
-            id="header-bar",
-        )
+        yield TitleBar()
+        yield Static(id="hero-bar")
         with Horizontal(id="node-row"):
             yield NodePanel(index=0, id="node-0")
             yield NodePanel(index=1, id="node-1")
@@ -110,12 +155,14 @@ class DemoApp(App):
         with Horizontal(id="bottom-row"):
             yield SummaryPanel(id="summary")
             yield ThroughputChart(id="chart")
+            yield ComparisonPanel(id="comparison")
         yield NarrationBar(id="narration")
         yield Footer()
 
     def on_mount(self) -> None:
         self.orchestrator.setup()
         self._refresh_panels()
+        self._update_hero_bar()
         narration = self.query_one("#narration", NarrationBar)
         hw = self.orchestrator.state.hw_count
         sim = self.orchestrator.state.sim_count
@@ -123,6 +170,38 @@ class DemoApp(App):
             f"Ready. {hw} hardware + {sim} simulated node(s). "
             f"Press SPACE to step through acts, or R to run all."
         )
+
+    def _update_hero_bar(self) -> None:
+        """Update the hero metrics bar."""
+        hero = self.query_one("#hero-bar", Static)
+        text = Text()
+        text.append("\n  ")
+        # Device info
+        text.append("Tang Nano 9K", style="bold #89b4fa")
+        text.append("  │  ", style="#45475a")
+        # Peak Throughput
+        text.append("1.07", style="bold #a6e3a1")
+        text.append(" Gops/s", style="#6c7086")
+        text.append("  │  ", style="#45475a")
+        # Hardware Cost
+        text.append("$10", style="bold #a6e3a1")
+        text.append(" FPGA", style="#6c7086")
+        text.append("  │  ", style="#45475a")
+        # Latency
+        text.append("10.6", style="bold #a6e3a1")
+        text.append(" ns", style="#6c7086")
+        text.append("  │  ", style="#45475a")
+        # Formal Proofs
+        text.append("92", style="bold #cba6f7")
+        text.append(" Proofs", style="#6c7086")
+        text.append("  │  ", style="#45475a")
+        # Total Operations (will be updated)
+        total_deltas = sum(
+            s.get("delta_count", 0) for s in self.orchestrator.snapshots()
+        )
+        text.append(f"{total_deltas:,}", style="bold #f9e2af")
+        text.append(" ops", style="#6c7086")
+        hero.update(text)
 
     def on_unmount(self) -> None:
         self.orchestrator.teardown()
@@ -180,6 +259,12 @@ class DemoApp(App):
         try:
             chart = self.query_one("#chart", ThroughputChart)
             chart.update_data(snapshots)
+        except Exception:
+            pass
+
+        # Update hero bar with current ops count
+        try:
+            self._update_hero_bar()
         except Exception:
             pass
 

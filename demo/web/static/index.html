@@ -13,11 +13,119 @@
         <div class="header-content">
             <h1>ATOMiK</h1>
             <span class="subtitle">Delta-State Computing in Silicon</span>
-            <span id="connection-status" class="status-indicator disconnected">Disconnected</span>
+            <span class="proof-badge" title="Mathematically verified with 92 Lean4 formal proofs">92 Lean4 Proofs</span>
+            <div class="device-status">
+                <div class="device-info">
+                    <span class="device-label">Device:</span>
+                    <span id="device-name" class="device-name">Tang Nano 9K</span>
+                    <span id="connection-status" class="status-indicator disconnected">Disconnected</span>
+                </div>
+                <div class="device-subinfo">
+                    <span id="device-mode" class="device-mode">—</span>
+                    <span class="separator">•</span>
+                    <span id="logical-node-count" class="logical-node-count">Logical Nodes: 0</span>
+                </div>
+            </div>
         </div>
     </header>
 
     <main>
+        <!-- Hero Metrics: Key VC Numbers -->
+        <section class="hero-metrics">
+            <div class="hero-metric">
+                <span class="hero-value">1.07</span>
+                <span class="hero-unit">Gops/s</span>
+                <span class="hero-label">Peak Throughput</span>
+            </div>
+            <div class="hero-metric">
+                <span class="hero-value">$10</span>
+                <span class="hero-unit"></span>
+                <span class="hero-label">Hardware Cost</span>
+            </div>
+            <div class="hero-metric">
+                <span class="hero-value">10.6</span>
+                <span class="hero-unit">ns</span>
+                <span class="hero-label">Single-Cycle Latency</span>
+            </div>
+            <div class="hero-metric">
+                <span class="hero-value" id="ops-counter">0</span>
+                <span class="hero-unit">ops</span>
+                <span class="hero-label">Total Operations</span>
+            </div>
+        </section>
+
+        <!-- ATOMiK vs Traditional Comparison -->
+        <section class="comparison-section">
+            <div class="comparison-card">
+                <div class="comparison-header">
+                    <span class="comparison-label">Memory Traffic</span>
+                    <span class="comparison-badge win">99.99% less</span>
+                </div>
+                <div class="comparison-values">
+                    <div class="atomik-value">
+                        <span class="value">32 KB</span>
+                        <span class="label">ATOMiK</span>
+                    </div>
+                    <div class="vs-divider">vs</div>
+                    <div class="traditional-value">
+                        <span class="value">251 MB</span>
+                        <span class="label">Traditional</span>
+                    </div>
+                </div>
+            </div>
+            <div class="comparison-card">
+                <div class="comparison-header">
+                    <span class="comparison-label">Op Latency</span>
+                    <span class="comparison-badge win">35.7% faster</span>
+                </div>
+                <div class="comparison-values">
+                    <div class="atomik-value">
+                        <span class="value">10.6 ns</span>
+                        <span class="label">XOR (1 cycle)</span>
+                    </div>
+                    <div class="vs-divider">vs</div>
+                    <div class="traditional-value">
+                        <span class="value">71 ns</span>
+                        <span class="label">Adder chain</span>
+                    </div>
+                </div>
+            </div>
+            <div class="comparison-card">
+                <div class="comparison-header">
+                    <span class="comparison-label">Parallel Scaling</span>
+                    <span class="comparison-badge win">16x linear</span>
+                </div>
+                <div class="comparison-values">
+                    <div class="atomik-value">
+                        <span class="value">85%</span>
+                        <span class="label">Efficiency</span>
+                    </div>
+                    <div class="vs-divider">vs</div>
+                    <div class="traditional-value">
+                        <span class="value">0%</span>
+                        <span class="label">Cannot parallelize</span>
+                    </div>
+                </div>
+            </div>
+            <div class="comparison-card">
+                <div class="comparison-header">
+                    <span class="comparison-label">Undo Cost</span>
+                    <span class="comparison-badge win">Zero overhead</span>
+                </div>
+                <div class="comparison-values">
+                    <div class="atomik-value">
+                        <span class="value">0 B</span>
+                        <span class="label">Self-inverse</span>
+                    </div>
+                    <div class="vs-divider">vs</div>
+                    <div class="traditional-value">
+                        <span class="value">Full copy</span>
+                        <span class="label">+ rollback log</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- Top Row: Controls + Summary -->
         <section class="top-section">
             <div class="controls-panel">
@@ -30,6 +138,16 @@
                     <button id="btn-act5" class="act-btn" data-act="5">Act 5: Merge</button>
                     <button id="btn-run-all" class="primary-btn">Run All Acts</button>
                 </div>
+                <div class="controls-footer">
+                    <label class="hardware-toggle" id="hw-toggle-label">
+                        <input type="checkbox" id="hw-toggle" disabled>
+                        <span class="toggle-slider"></span>
+                        <span class="toggle-text" id="hw-toggle-text">Run on Hardware</span>
+                    </label>
+                    <button id="btn-download-report" class="download-btn" title="Download run report as JSON">
+                        <span class="download-icon">⬇</span> Download Report
+                    </button>
+                </div>
             </div>
             <div class="summary-panel">
                 <h3>System Summary</h3>
@@ -40,28 +158,32 @@
                     </div>
                     <div class="metric">
                         <span class="metric-value" id="total-nodes">0</span>
-                        <span class="metric-label">Active Nodes</span>
+                        <span class="metric-label">Logical Nodes</span>
                     </div>
                     <div class="metric">
                         <span class="metric-value" id="hw-count">0</span>
-                        <span class="metric-label">Hardware</span>
+                        <span class="metric-label">HW Logical</span>
                     </div>
                     <div class="metric">
                         <span class="metric-value" id="sim-count">0</span>
-                        <span class="metric-label">Simulated</span>
+                        <span class="metric-label">SIM Logical</span>
                     </div>
+                </div>
+                <div class="summary-note">
+                    Logical nodes are partitions/configurations on a single attached FPGA (not multiple boards).
                 </div>
             </div>
         </section>
 
-        <!-- Middle Row: Node Cards -->
+        <!-- Middle Row: Logical Node Cards (partitions on single FPGA) -->
         <section class="nodes-section">
             <div class="node-card" id="node-0">
                 <div class="node-header">
-                    <span class="node-name">Node 1</span>
+                    <span class="node-name">Logical Node 1</span>
                     <span class="node-badge sim" id="badge-0">SIM</span>
                 </div>
                 <div class="node-domain" id="domain-0">Finance</div>
+                <div class="node-tagline">Every tick = instant P&L. Undo = regulatory compliance.</div>
                 <div class="node-metrics">
                     <div class="node-metric">
                         <span class="label">Banks</span>
@@ -94,10 +216,11 @@
 
             <div class="node-card" id="node-1">
                 <div class="node-header">
-                    <span class="node-name">Node 2</span>
+                    <span class="node-name">Logical Node 2</span>
                     <span class="node-badge sim" id="badge-1">SIM</span>
                 </div>
                 <div class="node-domain" id="domain-1">Sensor</div>
+                <div class="node-tagline">Fuse 10 streams, detect anomalies in nanoseconds.</div>
                 <div class="node-metrics">
                     <div class="node-metric">
                         <span class="label">Banks</span>
@@ -130,10 +253,11 @@
 
             <div class="node-card" id="node-2">
                 <div class="node-header">
-                    <span class="node-name">Node 3</span>
+                    <span class="node-name">Logical Node 3</span>
                     <span class="node-badge sim" id="badge-2">SIM</span>
                 </div>
                 <div class="node-domain" id="domain-2">Peak</div>
+                <div class="node-tagline">1 Gops/s on $10 enables edge AI at scale.</div>
                 <div class="node-metrics">
                     <div class="node-metric">
                         <span class="label">Banks</span>

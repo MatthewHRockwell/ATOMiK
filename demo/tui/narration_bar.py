@@ -18,7 +18,11 @@ class NarrationBar(Static):
     def set_text(self, text: str) -> None:
         """Update the narration text immediately."""
         self._full_text = text
-        self.update(Text(f"  {text}"))
+        styled = Text()
+        styled.append("\n  ")
+        styled.append("▶ ", style="bold #a6e3a1")
+        styled.append(text, style="#a6adc8")
+        self.update(styled)
 
     def clear(self) -> None:
         self._full_text = ""
