@@ -37,6 +37,12 @@ class PipelineConfig:
     use_orchestrator: bool = False
     max_workers: int = 1
     fail_on_regression: bool = False
+    # Source-mode fields
+    source_mode: bool = False
+    source_path: str | None = None
+    source_language: str = "auto"
+    existing_schema_path: str | None = None
+    inference_overrides: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -89,6 +95,19 @@ class Pipeline:
         "metrics",
     ]
 
+    # Stage ordering for source-mode (extract → infer → migrate_check → ...)
+    SOURCE_STAGE_ORDER = [
+        "extract",
+        "infer",
+        "migrate_check",
+        "validate",
+        "diff",
+        "generate",
+        "verify",
+        "hardware",
+        "metrics",
+    ]
+
     def __init__(self, config: PipelineConfig | None = None):
         self.config = config or PipelineConfig()
         self._stages: dict[str, BaseStage] = {}
@@ -108,7 +127,7 @@ class Pipeline:
         Execute the full pipeline on a single schema.
 
         Args:
-            schema_path: Path to schema JSON file.
+            schema_path: Path to schema JSON file, or source file in source mode.
 
         Returns:
             PipelineResult with per-stage results and aggregate metrics.
@@ -117,17 +136,24 @@ class Pipeline:
         result = PipelineResult(schema=schema_path.name, success=True)
         start = time.perf_counter()
 
-        # Load schema
-        try:
-            with open(schema_path, encoding="utf-8") as f:
-                schema = json.load(f)
-        except (FileNotFoundError, json.JSONDecodeError) as e:
-            result.success = False
-            result.errors.append(f"Schema load failed: {e}")
-            return result
-
-        if self.config.verbose:
-            print(f"Pipeline: processing {schema_path.name}")
+        # Source mode: schema starts empty, populated by infer stage
+        if self.config.source_mode:
+            schema: dict[str, Any] = {}
+            stage_order = self.SOURCE_STAGE_ORDER
+            if self.config.verbose:
+                print(f"Pipeline: source mode — {schema_path.name}")
+        else:
+            # Load schema from JSON
+            try:
+                with open(schema_path, encoding="utf-8") as f:
+                    schema = json.load(f)
+            except (FileNotFoundError, json.JSONDecodeError) as e:
+                result.success = False
+                result.errors.append(f"Schema load failed: {e}")
+                return result
+            stage_order = self.STAGE_ORDER
+            if self.config.verbose:
+                print(f"Pipeline: processing {schema_path.name}")
 
         if self.config.dry_run:
             return self._dry_run(schema, str(schema_path), result)
@@ -136,9 +162,9 @@ class Pipeline:
         if self.config.use_orchestrator:
             return self._run_orchestrated(schema, str(schema_path), result, start)
 
-        # Execute stages in order (Phase 4C sequential mode)
+        # Execute stages in order
         previous_manifest = None
-        for stage_name in self.STAGE_ORDER:
+        for stage_name in stage_order:
             stage = self._stages.get(stage_name)
             if stage is None:
                 continue
@@ -269,12 +295,17 @@ class Pipeline:
         """Execute pipeline via the event-driven orchestrator."""
         from .orchestrator import Orchestrator
 
+        stage_order = (
+            self.SOURCE_STAGE_ORDER if self.config.source_mode
+            else self.STAGE_ORDER
+        )
+
         orch = Orchestrator(max_workers=self.config.max_workers)
 
         # Build default linear dependencies if none declared
         if not self._stage_deps:
             prev = None
-            for name in self.STAGE_ORDER:
+            for name in stage_order:
                 if name in self._stages:
                     deps = [prev] if prev else []
                     self._stage_deps[name] = deps
@@ -287,7 +318,7 @@ class Pipeline:
         manifests = orch.execute(schema, schema_path, self.config)
 
         # Convert orchestrator output to PipelineResult
-        for stage_name in self.STAGE_ORDER:
+        for stage_name in stage_order:
             if stage_name in manifests:
                 result.stages.append(manifests[stage_name])
 

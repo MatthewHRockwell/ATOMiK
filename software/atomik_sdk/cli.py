@@ -587,6 +587,66 @@ def cmd_demo(args: argparse.Namespace) -> int:
     return EXIT_SUCCESS
 
 
+def cmd_from_source(args: argparse.Namespace) -> int:
+    """Generate SDK from existing source code (zero LLM tokens)."""
+    source_path = Path(args.source)
+    if not source_path.exists():
+        print(f"Error: {source_path} not found", file=sys.stderr)
+        return EXIT_FILE_ERROR
+
+    from atomik_sdk.pipeline.controller import Pipeline, PipelineConfig
+    from atomik_sdk.pipeline.stages.diff import DiffStage
+    from atomik_sdk.pipeline.stages.extract import ExtractStage
+    from atomik_sdk.pipeline.stages.generate import GenerateStage
+    from atomik_sdk.pipeline.stages.hardware import HardwareStage
+    from atomik_sdk.pipeline.stages.infer import InferStage
+    from atomik_sdk.pipeline.stages.metrics import MetricsStage
+    from atomik_sdk.pipeline.stages.migrate_check import MigrateCheckStage
+    from atomik_sdk.pipeline.stages.validate import ValidateStage
+    from atomik_sdk.pipeline.stages.verify import VerifyStage
+
+    config = PipelineConfig(
+        source_mode=True,
+        source_path=str(source_path),
+        output_dir=args.output_dir,
+        languages=args.languages,
+        verbose=args.verbose,
+        report_path=args.report,
+        existing_schema_path=getattr(args, "existing_schema", None),
+        fail_on_regression=getattr(args, "strict", False),
+        inference_overrides={
+            "vertical": args.vertical,
+            "version": args.version,
+        },
+    )
+
+    pipeline = Pipeline(config)
+    pipeline.register_stage(ExtractStage())
+    pipeline.register_stage(InferStage())
+    pipeline.register_stage(MigrateCheckStage())
+    pipeline.register_stage(ValidateStage())
+    pipeline.register_stage(DiffStage())
+    pipeline.register_stage(GenerateStage())
+    pipeline.register_stage(VerifyStage())
+    pipeline.register_stage(HardwareStage())
+    pipeline.register_stage(MetricsStage())
+
+    result = pipeline.run(source_path)
+
+    if result.success:
+        print(f"\nPipeline SUCCESS [{result.validation_level}]")
+        print(f"  Files: {result.files_generated}, "
+              f"Lines: {result.lines_generated}, "
+              f"Tokens: {result.total_tokens}, "
+              f"Time: {result.total_time_ms:.0f}ms")
+    else:
+        print("\nPipeline FAILED", file=sys.stderr)
+        for err in result.errors:
+            print(f"  - {err}", file=sys.stderr)
+
+    return EXIT_SUCCESS if result.success else EXIT_GENERATION_FAILURE
+
+
 def _write_report(path: str, data: dict) -> None:
     """Write a JSON report file."""
     report_path = Path(path)
@@ -703,6 +763,20 @@ def build_parser() -> argparse.ArgumentParser:
     demo.add_argument("--report", help="Write demo report to file")
     demo.add_argument("-v", "--verbose", action="store_true")
 
+    # -----------------------------------------------------------------------
+    # from-source subcommand
+    # -----------------------------------------------------------------------
+    fs = sub.add_parser("from-source", help="Generate SDK from existing source code")
+    fs.add_argument("source", help="Source file path (.py, .rs, .c, .js, .v)")
+    fs.add_argument("--vertical", help="Override inferred vertical category")
+    fs.add_argument("--version", default="1.0.0", help="Schema version")
+    fs.add_argument("--existing-schema", help="Existing schema for migration diff")
+    fs.add_argument("--strict", action="store_true", help="Fail on migration warnings")
+    fs.add_argument("--output-dir", default="generated")
+    fs.add_argument("--languages", nargs="+", choices=list(GENERATORS.keys()))
+    fs.add_argument("--report", help="Write JSON report")
+    fs.add_argument("-v", "--verbose", action="store_true")
+
     return parser
 
 
@@ -752,6 +826,7 @@ def main() -> int:
         "batch": cmd_batch,
         "list": cmd_list,
         "demo": cmd_demo,
+        "from-source": cmd_from_source,
     }
 
     try:
