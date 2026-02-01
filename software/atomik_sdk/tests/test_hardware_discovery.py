@@ -166,6 +166,21 @@ class TestDetectBoard:
 # ---------------------------------------------------------------------------
 
 class TestDetectComPort:
+    @staticmethod
+    def _fake_serial_modules(ports):
+        """Build connected mock hierarchy for serial.tools.list_ports."""
+        fake_list_ports = mock.MagicMock()
+        fake_list_ports.comports.return_value = ports
+        fake_tools = mock.MagicMock()
+        fake_tools.list_ports = fake_list_ports
+        fake_serial = mock.MagicMock()
+        fake_serial.tools = fake_tools
+        return {
+            "serial": fake_serial,
+            "serial.tools": fake_tools,
+            "serial.tools.list_ports": fake_list_ports,
+        }
+
     def test_ftdi_vid_pid(self):
         """Port with FTDI VID:PID 0403:6010 is detected."""
         port = mock.MagicMock()
@@ -174,7 +189,7 @@ class TestDetectComPort:
         port.device = "COM6"
         port.description = "USB Serial Port"
 
-        with mock.patch("serial.tools.list_ports.comports", return_value=[port]):
+        with mock.patch.dict("sys.modules", self._fake_serial_modules([port])):
             assert detect_com_port() == "COM6"
 
     def test_keyword_fallback(self):
@@ -185,20 +200,14 @@ class TestDetectComPort:
         port.device = "/dev/ttyUSB0"
         port.description = "FT2232 Channel B"
 
-        with mock.patch("serial.tools.list_ports.comports", return_value=[port]):
+        with mock.patch.dict("sys.modules", self._fake_serial_modules([port])):
             assert detect_com_port() == "/dev/ttyUSB0"
 
     def test_no_pyserial(self):
         """If pyserial is not installed, returns None."""
-        import importlib  # noqa: E402
-
-        with mock.patch.dict("sys.modules", {"serial": None, "serial.tools": None, "serial.tools.list_ports": None}):
-            import hardware_discovery as hd  # noqa: E402
-
-            try:
-                importlib.reload(hd)
-            except Exception:
-                pass
-            # Direct call should handle ImportError gracefully
-            result = hd.detect_com_port()
-            assert result is None
+        with mock.patch.dict("sys.modules", {
+            "serial": None,
+            "serial.tools": None,
+            "serial.tools.list_ports": None,
+        }):
+            assert detect_com_port() is None
