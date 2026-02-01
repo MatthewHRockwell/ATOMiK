@@ -1,0 +1,1070 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
+<title>atomik_sdk.tests.test_schema_inferrer API documentation</title>
+<meta name="description" content="Tests for the deterministic schema inference engine.">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>atomik_sdk.tests.test_schema_inferrer</code></h1>
+</header>
+<section id="section-intro">
+<p>Tests for the deterministic schema inference engine.</p>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="atomik_sdk.tests.test_schema_inferrer.TestDeltaTypeClassification"><code class="flex name class">
+<span>class <span class="ident">TestDeltaTypeClassification</span></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class TestDeltaTypeClassification:
+    def test_bitmask_from_flags(self):
+        assert classify_delta_type(&#34;alert_flags&#34;, &#34;int&#34;) == &#34;bitmask_delta&#34;
+
+    def test_bitmask_from_mask(self):
+        assert classify_delta_type(&#34;status_mask&#34;, &#34;uint64&#34;) == &#34;bitmask_delta&#34;
+
+    def test_bitmask_from_status(self):
+        assert classify_delta_type(&#34;device_status&#34;, &#34;u32&#34;) == &#34;bitmask_delta&#34;
+
+    def test_stream_from_frame(self):
+        assert classify_delta_type(&#34;frame_delta&#34;, &#34;bytes&#34;) == &#34;delta_stream&#34;
+
+    def test_stream_from_buffer(self):
+        assert classify_delta_type(&#34;data_buffer&#34;, &#34;Vec&#34;) == &#34;delta_stream&#34;
+
+    def test_stream_from_stream(self):
+        assert classify_delta_type(&#34;video_stream&#34;, &#34;bytes&#34;) == &#34;delta_stream&#34;
+
+    def test_parameter_default(self):
+        assert classify_delta_type(&#34;price_delta&#34;, &#34;float&#34;) == &#34;parameter_delta&#34;
+
+    def test_parameter_generic(self):
+        assert classify_delta_type(&#34;temperature&#34;, &#34;f64&#34;) == &#34;parameter_delta&#34;</code></pre>
+</details>
+<div class="desc"></div>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.tests.test_schema_inferrer.TestDeltaTypeClassification.test_bitmask_from_flags"><code class="name flex">
+<span>def <span class="ident">test_bitmask_from_flags</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_bitmask_from_flags(self):
+    assert classify_delta_type(&#34;alert_flags&#34;, &#34;int&#34;) == &#34;bitmask_delta&#34;</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.tests.test_schema_inferrer.TestDeltaTypeClassification.test_bitmask_from_mask"><code class="name flex">
+<span>def <span class="ident">test_bitmask_from_mask</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_bitmask_from_mask(self):
+    assert classify_delta_type(&#34;status_mask&#34;, &#34;uint64&#34;) == &#34;bitmask_delta&#34;</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.tests.test_schema_inferrer.TestDeltaTypeClassification.test_bitmask_from_status"><code class="name flex">
+<span>def <span class="ident">test_bitmask_from_status</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_bitmask_from_status(self):
+    assert classify_delta_type(&#34;device_status&#34;, &#34;u32&#34;) == &#34;bitmask_delta&#34;</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.tests.test_schema_inferrer.TestDeltaTypeClassification.test_parameter_default"><code class="name flex">
+<span>def <span class="ident">test_parameter_default</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_parameter_default(self):
+    assert classify_delta_type(&#34;price_delta&#34;, &#34;float&#34;) == &#34;parameter_delta&#34;</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.tests.test_schema_inferrer.TestDeltaTypeClassification.test_parameter_generic"><code class="name flex">
+<span>def <span class="ident">test_parameter_generic</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_parameter_generic(self):
+    assert classify_delta_type(&#34;temperature&#34;, &#34;f64&#34;) == &#34;parameter_delta&#34;</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.tests.test_schema_inferrer.TestDeltaTypeClassification.test_stream_from_buffer"><code class="name flex">
+<span>def <span class="ident">test_stream_from_buffer</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_stream_from_buffer(self):
+    assert classify_delta_type(&#34;data_buffer&#34;, &#34;Vec&#34;) == &#34;delta_stream&#34;</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.tests.test_schema_inferrer.TestDeltaTypeClassification.test_stream_from_frame"><code class="name flex">
+<span>def <span class="ident">test_stream_from_frame</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_stream_from_frame(self):
+    assert classify_delta_type(&#34;frame_delta&#34;, &#34;bytes&#34;) == &#34;delta_stream&#34;</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.tests.test_schema_inferrer.TestDeltaTypeClassification.test_stream_from_stream"><code class="name flex">
+<span>def <span class="ident">test_stream_from_stream</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_stream_from_stream(self):
+    assert classify_delta_type(&#34;video_stream&#34;, &#34;bytes&#34;) == &#34;delta_stream&#34;</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.tests.test_schema_inferrer.TestFieldExclusion"><code class="flex name class">
+<span>class <span class="ident">TestFieldExclusion</span></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class TestFieldExclusion:
+    def test_name_excluded(self):
+        assert not is_delta_candidate(&#34;name&#34;)
+
+    def test_logger_excluded(self):
+        assert not is_delta_candidate(&#34;logger&#34;)
+
+    def test_config_excluded(self):
+        assert not is_delta_candidate(&#34;config&#34;)
+
+    def test_id_excluded(self):
+        assert not is_delta_candidate(&#34;id&#34;)
+
+    def test_delta_field_included(self):
+        assert is_delta_candidate(&#34;price_delta&#34;)
+
+    def test_motion_included(self):
+        assert is_delta_candidate(&#34;motion_vector&#34;)
+
+    def test_underscore_stripped(self):
+        assert not is_delta_candidate(&#34;_name_&#34;)</code></pre>
+</details>
+<div class="desc"></div>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.tests.test_schema_inferrer.TestFieldExclusion.test_config_excluded"><code class="name flex">
+<span>def <span class="ident">test_config_excluded</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_config_excluded(self):
+    assert not is_delta_candidate(&#34;config&#34;)</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.tests.test_schema_inferrer.TestFieldExclusion.test_delta_field_included"><code class="name flex">
+<span>def <span class="ident">test_delta_field_included</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_delta_field_included(self):
+    assert is_delta_candidate(&#34;price_delta&#34;)</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.tests.test_schema_inferrer.TestFieldExclusion.test_id_excluded"><code class="name flex">
+<span>def <span class="ident">test_id_excluded</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_id_excluded(self):
+    assert not is_delta_candidate(&#34;id&#34;)</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.tests.test_schema_inferrer.TestFieldExclusion.test_logger_excluded"><code class="name flex">
+<span>def <span class="ident">test_logger_excluded</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_logger_excluded(self):
+    assert not is_delta_candidate(&#34;logger&#34;)</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.tests.test_schema_inferrer.TestFieldExclusion.test_motion_included"><code class="name flex">
+<span>def <span class="ident">test_motion_included</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_motion_included(self):
+    assert is_delta_candidate(&#34;motion_vector&#34;)</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.tests.test_schema_inferrer.TestFieldExclusion.test_name_excluded"><code class="name flex">
+<span>def <span class="ident">test_name_excluded</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_name_excluded(self):
+    assert not is_delta_candidate(&#34;name&#34;)</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.tests.test_schema_inferrer.TestFieldExclusion.test_underscore_stripped"><code class="name flex">
+<span>def <span class="ident">test_underscore_stripped</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_underscore_stripped(self):
+    assert not is_delta_candidate(&#34;_name_&#34;)</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.tests.test_schema_inferrer.TestSchemaInferrer"><code class="flex name class">
+<span>class <span class="ident">TestSchemaInferrer</span></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class TestSchemaInferrer:
+    def _make_iface(self, **kwargs) -&gt; LanguageInterface:
+        &#34;&#34;&#34;Helper to build a LanguageInterface with defaults.&#34;&#34;&#34;
+        defaults = dict(
+            language=&#34;python&#34;,
+            file_path=&#34;/src/trading/engine.py&#34;,
+            struct_name=&#34;TradingEngine&#34;,
+            fields=[
+                InterfaceField(name=&#34;price_delta&#34;, type_name=&#34;float&#34;, bit_width=64),
+                InterfaceField(name=&#34;volume_delta&#34;, type_name=&#34;int&#34;, bit_width=64),
+                InterfaceField(name=&#34;trade_flags&#34;, type_name=&#34;int&#34;, bit_width=32),
+            ],
+            operations=[
+                InterfaceOperation(name=&#34;accumulate&#34;, return_type=&#34;None&#34;),
+                InterfaceOperation(name=&#34;get_state&#34;, return_type=&#34;dict&#34;),
+                InterfaceOperation(name=&#34;rollback&#34;, return_type=&#34;None&#34;),
+            ],
+            constants={&#34;HISTORY_DEPTH&#34;: 512},
+        )
+        defaults.update(kwargs)
+        return LanguageInterface(**defaults)
+
+    def test_infer_produces_valid_schema(self):
+        iface = self._make_iface()
+        inferrer = SchemaInferrer()
+        schema = inferrer.infer(iface)
+
+        assert &#34;catalogue&#34; in schema
+        assert &#34;schema&#34; in schema
+        assert &#34;delta_fields&#34; in schema[&#34;schema&#34;]
+        assert &#34;operations&#34; in schema[&#34;schema&#34;]
+        assert &#34;constraints&#34; in schema[&#34;schema&#34;]
+
+    def test_catalogue_inference(self):
+        iface = self._make_iface()
+        inferrer = SchemaInferrer()
+        schema = inferrer.infer(iface)
+
+        cat = schema[&#34;catalogue&#34;]
+        assert cat[&#34;object&#34;] == &#34;TradingEngine&#34;
+        assert cat[&#34;vertical&#34;] == &#34;Finance&#34;
+        assert cat[&#34;version&#34;] == &#34;1.0.0&#34;
+
+    def test_vertical_override(self):
+        iface = self._make_iface()
+        inferrer = SchemaInferrer()
+        hints = InferenceHints(vertical=&#34;Edge&#34;)
+        schema = inferrer.infer(iface, hints)
+
+        assert schema[&#34;catalogue&#34;][&#34;vertical&#34;] == &#34;Edge&#34;
+
+    def test_delta_fields_inferred(self):
+        iface = self._make_iface()
+        inferrer = SchemaInferrer()
+        schema = inferrer.infer(iface)
+
+        fields = schema[&#34;schema&#34;][&#34;delta_fields&#34;]
+        assert &#34;price_delta&#34; in fields
+        assert &#34;volume_delta&#34; in fields
+        assert &#34;trade_flags&#34; in fields
+        assert fields[&#34;trade_flags&#34;][&#34;type&#34;] == &#34;bitmask_delta&#34;
+        assert fields[&#34;price_delta&#34;][&#34;type&#34;] == &#34;parameter_delta&#34;
+
+    def test_excluded_fields_not_in_delta(self):
+        iface = self._make_iface(fields=[
+            InterfaceField(name=&#34;price_delta&#34;, type_name=&#34;float&#34;, bit_width=64),
+            InterfaceField(name=&#34;name&#34;, type_name=&#34;str&#34;, bit_width=0),
+            InterfaceField(name=&#34;logger&#34;, type_name=&#34;Logger&#34;, bit_width=0),
+        ])
+        inferrer = SchemaInferrer()
+        schema = inferrer.infer(iface)
+
+        fields = schema[&#34;schema&#34;][&#34;delta_fields&#34;]
+        assert &#34;price_delta&#34; in fields
+        assert &#34;name&#34; not in fields
+        assert &#34;logger&#34; not in fields
+
+    def test_operations_inference(self):
+        iface = self._make_iface()
+        inferrer = SchemaInferrer()
+        schema = inferrer.infer(iface)
+
+        ops = schema[&#34;schema&#34;][&#34;operations&#34;]
+        assert ops[&#34;accumulate&#34;][&#34;enabled&#34;] is True
+        assert &#34;reconstruct&#34; in ops  # from get_state
+        assert ops[&#34;reconstruct&#34;][&#34;enabled&#34;] is True
+        assert &#34;rollback&#34; in ops
+        assert ops[&#34;rollback&#34;][&#34;enabled&#34;] is True
+        assert ops[&#34;rollback&#34;][&#34;history_depth&#34;] == 512  # from constants
+
+    def test_operations_minimal(self):
+        &#34;&#34;&#34;Only accumulate when no matching method names.&#34;&#34;&#34;
+        iface = self._make_iface(operations=[
+            InterfaceOperation(name=&#34;compute&#34;, return_type=&#34;int&#34;),
+        ], constants={})
+        inferrer = SchemaInferrer()
+        schema = inferrer.infer(iface)
+
+        ops = schema[&#34;schema&#34;][&#34;operations&#34;]
+        assert &#34;accumulate&#34; in ops
+        assert &#34;reconstruct&#34; not in ops
+        assert &#34;rollback&#34; not in ops
+
+    def test_constraints_defaults(self):
+        iface = self._make_iface()
+        inferrer = SchemaInferrer()
+        schema = inferrer.infer(iface)
+
+        constraints = schema[&#34;schema&#34;][&#34;constraints&#34;]
+        assert constraints[&#34;target_frequency_mhz&#34;] == 94.5
+        assert constraints[&#34;max_memory_mb&#34;] == 64
+
+    def test_wide_stream_encoding(self):
+        &#34;&#34;&#34;Wide delta_stream fields should get spatiotemporal encoding.&#34;&#34;&#34;
+        iface = self._make_iface(fields=[
+            InterfaceField(name=&#34;frame_buffer&#34;, type_name=&#34;bytes&#34;, bit_width=128),
+        ])
+        inferrer = SchemaInferrer()
+        schema = inferrer.infer(iface)
+
+        field = schema[&#34;schema&#34;][&#34;delta_fields&#34;][&#34;frame_buffer&#34;]
+        assert field[&#34;type&#34;] == &#34;delta_stream&#34;
+        assert field[&#34;encoding&#34;] == &#34;spatiotemporal_4x4x4&#34;
+        assert field[&#34;compression&#34;] == &#34;xor&#34;
+
+    def test_version_override(self):
+        iface = self._make_iface()
+        inferrer = SchemaInferrer()
+        hints = InferenceHints(version=&#34;2.5.0&#34;)
+        schema = inferrer.infer(iface, hints)
+
+        assert schema[&#34;catalogue&#34;][&#34;version&#34;] == &#34;2.5.0&#34;</code></pre>
+</details>
+<div class="desc"></div>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.tests.test_schema_inferrer.TestSchemaInferrer.test_catalogue_inference"><code class="name flex">
+<span>def <span class="ident">test_catalogue_inference</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_catalogue_inference(self):
+    iface = self._make_iface()
+    inferrer = SchemaInferrer()
+    schema = inferrer.infer(iface)
+
+    cat = schema[&#34;catalogue&#34;]
+    assert cat[&#34;object&#34;] == &#34;TradingEngine&#34;
+    assert cat[&#34;vertical&#34;] == &#34;Finance&#34;
+    assert cat[&#34;version&#34;] == &#34;1.0.0&#34;</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.tests.test_schema_inferrer.TestSchemaInferrer.test_constraints_defaults"><code class="name flex">
+<span>def <span class="ident">test_constraints_defaults</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_constraints_defaults(self):
+    iface = self._make_iface()
+    inferrer = SchemaInferrer()
+    schema = inferrer.infer(iface)
+
+    constraints = schema[&#34;schema&#34;][&#34;constraints&#34;]
+    assert constraints[&#34;target_frequency_mhz&#34;] == 94.5
+    assert constraints[&#34;max_memory_mb&#34;] == 64</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.tests.test_schema_inferrer.TestSchemaInferrer.test_delta_fields_inferred"><code class="name flex">
+<span>def <span class="ident">test_delta_fields_inferred</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_delta_fields_inferred(self):
+    iface = self._make_iface()
+    inferrer = SchemaInferrer()
+    schema = inferrer.infer(iface)
+
+    fields = schema[&#34;schema&#34;][&#34;delta_fields&#34;]
+    assert &#34;price_delta&#34; in fields
+    assert &#34;volume_delta&#34; in fields
+    assert &#34;trade_flags&#34; in fields
+    assert fields[&#34;trade_flags&#34;][&#34;type&#34;] == &#34;bitmask_delta&#34;
+    assert fields[&#34;price_delta&#34;][&#34;type&#34;] == &#34;parameter_delta&#34;</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.tests.test_schema_inferrer.TestSchemaInferrer.test_excluded_fields_not_in_delta"><code class="name flex">
+<span>def <span class="ident">test_excluded_fields_not_in_delta</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_excluded_fields_not_in_delta(self):
+    iface = self._make_iface(fields=[
+        InterfaceField(name=&#34;price_delta&#34;, type_name=&#34;float&#34;, bit_width=64),
+        InterfaceField(name=&#34;name&#34;, type_name=&#34;str&#34;, bit_width=0),
+        InterfaceField(name=&#34;logger&#34;, type_name=&#34;Logger&#34;, bit_width=0),
+    ])
+    inferrer = SchemaInferrer()
+    schema = inferrer.infer(iface)
+
+    fields = schema[&#34;schema&#34;][&#34;delta_fields&#34;]
+    assert &#34;price_delta&#34; in fields
+    assert &#34;name&#34; not in fields
+    assert &#34;logger&#34; not in fields</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.tests.test_schema_inferrer.TestSchemaInferrer.test_infer_produces_valid_schema"><code class="name flex">
+<span>def <span class="ident">test_infer_produces_valid_schema</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_infer_produces_valid_schema(self):
+    iface = self._make_iface()
+    inferrer = SchemaInferrer()
+    schema = inferrer.infer(iface)
+
+    assert &#34;catalogue&#34; in schema
+    assert &#34;schema&#34; in schema
+    assert &#34;delta_fields&#34; in schema[&#34;schema&#34;]
+    assert &#34;operations&#34; in schema[&#34;schema&#34;]
+    assert &#34;constraints&#34; in schema[&#34;schema&#34;]</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.tests.test_schema_inferrer.TestSchemaInferrer.test_operations_inference"><code class="name flex">
+<span>def <span class="ident">test_operations_inference</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_operations_inference(self):
+    iface = self._make_iface()
+    inferrer = SchemaInferrer()
+    schema = inferrer.infer(iface)
+
+    ops = schema[&#34;schema&#34;][&#34;operations&#34;]
+    assert ops[&#34;accumulate&#34;][&#34;enabled&#34;] is True
+    assert &#34;reconstruct&#34; in ops  # from get_state
+    assert ops[&#34;reconstruct&#34;][&#34;enabled&#34;] is True
+    assert &#34;rollback&#34; in ops
+    assert ops[&#34;rollback&#34;][&#34;enabled&#34;] is True
+    assert ops[&#34;rollback&#34;][&#34;history_depth&#34;] == 512  # from constants</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.tests.test_schema_inferrer.TestSchemaInferrer.test_operations_minimal"><code class="name flex">
+<span>def <span class="ident">test_operations_minimal</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_operations_minimal(self):
+    &#34;&#34;&#34;Only accumulate when no matching method names.&#34;&#34;&#34;
+    iface = self._make_iface(operations=[
+        InterfaceOperation(name=&#34;compute&#34;, return_type=&#34;int&#34;),
+    ], constants={})
+    inferrer = SchemaInferrer()
+    schema = inferrer.infer(iface)
+
+    ops = schema[&#34;schema&#34;][&#34;operations&#34;]
+    assert &#34;accumulate&#34; in ops
+    assert &#34;reconstruct&#34; not in ops
+    assert &#34;rollback&#34; not in ops</code></pre>
+</details>
+<div class="desc"><p>Only accumulate when no matching method names.</p></div>
+</dd>
+<dt id="atomik_sdk.tests.test_schema_inferrer.TestSchemaInferrer.test_version_override"><code class="name flex">
+<span>def <span class="ident">test_version_override</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_version_override(self):
+    iface = self._make_iface()
+    inferrer = SchemaInferrer()
+    hints = InferenceHints(version=&#34;2.5.0&#34;)
+    schema = inferrer.infer(iface, hints)
+
+    assert schema[&#34;catalogue&#34;][&#34;version&#34;] == &#34;2.5.0&#34;</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.tests.test_schema_inferrer.TestSchemaInferrer.test_vertical_override"><code class="name flex">
+<span>def <span class="ident">test_vertical_override</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_vertical_override(self):
+    iface = self._make_iface()
+    inferrer = SchemaInferrer()
+    hints = InferenceHints(vertical=&#34;Edge&#34;)
+    schema = inferrer.infer(iface, hints)
+
+    assert schema[&#34;catalogue&#34;][&#34;vertical&#34;] == &#34;Edge&#34;</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.tests.test_schema_inferrer.TestSchemaInferrer.test_wide_stream_encoding"><code class="name flex">
+<span>def <span class="ident">test_wide_stream_encoding</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_wide_stream_encoding(self):
+    &#34;&#34;&#34;Wide delta_stream fields should get spatiotemporal encoding.&#34;&#34;&#34;
+    iface = self._make_iface(fields=[
+        InterfaceField(name=&#34;frame_buffer&#34;, type_name=&#34;bytes&#34;, bit_width=128),
+    ])
+    inferrer = SchemaInferrer()
+    schema = inferrer.infer(iface)
+
+    field = schema[&#34;schema&#34;][&#34;delta_fields&#34;][&#34;frame_buffer&#34;]
+    assert field[&#34;type&#34;] == &#34;delta_stream&#34;
+    assert field[&#34;encoding&#34;] == &#34;spatiotemporal_4x4x4&#34;
+    assert field[&#34;compression&#34;] == &#34;xor&#34;</code></pre>
+</details>
+<div class="desc"><p>Wide delta_stream fields should get spatiotemporal encoding.</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.tests.test_schema_inferrer.TestVerticalClassification"><code class="flex name class">
+<span>class <span class="ident">TestVerticalClassification</span></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class TestVerticalClassification:
+    def test_video_keywords(self):
+        assert classify_vertical(&#34;FrameDecoder&#34;, [&#34;pixel_data&#34;, &#34;motion_vector&#34;]) == &#34;Video&#34;
+
+    def test_finance_keywords(self):
+        assert classify_vertical(&#34;PriceTick&#34;, [&#34;price_delta&#34;, &#34;volume&#34;]) == &#34;Finance&#34;
+
+    def test_edge_keywords(self):
+        assert classify_vertical(&#34;IMUFusion&#34;, [&#34;accel_x&#34;, &#34;gyro_z&#34;]) == &#34;Edge&#34;
+
+    def test_audio_keywords(self):
+        assert classify_vertical(&#34;AudioMixer&#34;, [&#34;sample_rate&#34;, &#34;pcm_data&#34;]) == &#34;Audio&#34;
+
+    def test_network_keywords(self):
+        assert classify_vertical(&#34;PacketRouter&#34;, [&#34;latency&#34;, &#34;throughput&#34;]) == &#34;Network&#34;
+
+    def test_robotics_keywords(self):
+        assert classify_vertical(&#34;JointController&#34;, [&#34;servo_angle&#34;, &#34;trajectory&#34;]) == &#34;Robotics&#34;
+
+    def test_medical_keywords(self):
+        assert classify_vertical(&#34;ECGMonitor&#34;, [&#34;heart_rate&#34;, &#34;pulse&#34;]) == &#34;Medical&#34;
+
+    def test_fallback_compute(self):
+        assert classify_vertical(&#34;FooBar&#34;, [&#34;x&#34;, &#34;y&#34;, &#34;z&#34;]) == &#34;Compute&#34;</code></pre>
+</details>
+<div class="desc"></div>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.tests.test_schema_inferrer.TestVerticalClassification.test_audio_keywords"><code class="name flex">
+<span>def <span class="ident">test_audio_keywords</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_audio_keywords(self):
+    assert classify_vertical(&#34;AudioMixer&#34;, [&#34;sample_rate&#34;, &#34;pcm_data&#34;]) == &#34;Audio&#34;</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.tests.test_schema_inferrer.TestVerticalClassification.test_edge_keywords"><code class="name flex">
+<span>def <span class="ident">test_edge_keywords</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_edge_keywords(self):
+    assert classify_vertical(&#34;IMUFusion&#34;, [&#34;accel_x&#34;, &#34;gyro_z&#34;]) == &#34;Edge&#34;</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.tests.test_schema_inferrer.TestVerticalClassification.test_fallback_compute"><code class="name flex">
+<span>def <span class="ident">test_fallback_compute</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_fallback_compute(self):
+    assert classify_vertical(&#34;FooBar&#34;, [&#34;x&#34;, &#34;y&#34;, &#34;z&#34;]) == &#34;Compute&#34;</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.tests.test_schema_inferrer.TestVerticalClassification.test_finance_keywords"><code class="name flex">
+<span>def <span class="ident">test_finance_keywords</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_finance_keywords(self):
+    assert classify_vertical(&#34;PriceTick&#34;, [&#34;price_delta&#34;, &#34;volume&#34;]) == &#34;Finance&#34;</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.tests.test_schema_inferrer.TestVerticalClassification.test_medical_keywords"><code class="name flex">
+<span>def <span class="ident">test_medical_keywords</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_medical_keywords(self):
+    assert classify_vertical(&#34;ECGMonitor&#34;, [&#34;heart_rate&#34;, &#34;pulse&#34;]) == &#34;Medical&#34;</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.tests.test_schema_inferrer.TestVerticalClassification.test_network_keywords"><code class="name flex">
+<span>def <span class="ident">test_network_keywords</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_network_keywords(self):
+    assert classify_vertical(&#34;PacketRouter&#34;, [&#34;latency&#34;, &#34;throughput&#34;]) == &#34;Network&#34;</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.tests.test_schema_inferrer.TestVerticalClassification.test_robotics_keywords"><code class="name flex">
+<span>def <span class="ident">test_robotics_keywords</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_robotics_keywords(self):
+    assert classify_vertical(&#34;JointController&#34;, [&#34;servo_angle&#34;, &#34;trajectory&#34;]) == &#34;Robotics&#34;</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.tests.test_schema_inferrer.TestVerticalClassification.test_video_keywords"><code class="name flex">
+<span>def <span class="ident">test_video_keywords</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_video_keywords(self):
+    assert classify_vertical(&#34;FrameDecoder&#34;, [&#34;pixel_data&#34;, &#34;motion_vector&#34;]) == &#34;Video&#34;</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.tests.test_schema_inferrer.TestWidthSnapping"><code class="flex name class">
+<span>class <span class="ident">TestWidthSnapping</span></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class TestWidthSnapping:
+    def test_zero_default(self):
+        assert snap_width(0) == 64
+
+    def test_negative_default(self):
+        assert snap_width(-1) == 64
+
+    def test_exact_8(self):
+        assert snap_width(8) == 8
+
+    def test_exact_64(self):
+        assert snap_width(64) == 64
+
+    def test_exact_128(self):
+        assert snap_width(128) == 128
+
+    def test_snap_1_to_8(self):
+        assert snap_width(1) == 8
+
+    def test_snap_33_to_32(self):
+        assert snap_width(33) == 32
+
+    def test_snap_48_to_32_or_64(self):
+        # 48 is equidistant from 32 and 64; snaps to first found (32)
+        result = snap_width(48)
+        assert result in (32, 64)
+
+    def test_snap_300_to_256(self):
+        assert snap_width(300) == 256</code></pre>
+</details>
+<div class="desc"></div>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.tests.test_schema_inferrer.TestWidthSnapping.test_exact_128"><code class="name flex">
+<span>def <span class="ident">test_exact_128</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_exact_128(self):
+    assert snap_width(128) == 128</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.tests.test_schema_inferrer.TestWidthSnapping.test_exact_64"><code class="name flex">
+<span>def <span class="ident">test_exact_64</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_exact_64(self):
+    assert snap_width(64) == 64</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.tests.test_schema_inferrer.TestWidthSnapping.test_exact_8"><code class="name flex">
+<span>def <span class="ident">test_exact_8</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_exact_8(self):
+    assert snap_width(8) == 8</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.tests.test_schema_inferrer.TestWidthSnapping.test_negative_default"><code class="name flex">
+<span>def <span class="ident">test_negative_default</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_negative_default(self):
+    assert snap_width(-1) == 64</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.tests.test_schema_inferrer.TestWidthSnapping.test_snap_1_to_8"><code class="name flex">
+<span>def <span class="ident">test_snap_1_to_8</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_snap_1_to_8(self):
+    assert snap_width(1) == 8</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.tests.test_schema_inferrer.TestWidthSnapping.test_snap_300_to_256"><code class="name flex">
+<span>def <span class="ident">test_snap_300_to_256</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_snap_300_to_256(self):
+    assert snap_width(300) == 256</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.tests.test_schema_inferrer.TestWidthSnapping.test_snap_33_to_32"><code class="name flex">
+<span>def <span class="ident">test_snap_33_to_32</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_snap_33_to_32(self):
+    assert snap_width(33) == 32</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.tests.test_schema_inferrer.TestWidthSnapping.test_snap_48_to_32_or_64"><code class="name flex">
+<span>def <span class="ident">test_snap_48_to_32_or_64</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_snap_48_to_32_or_64(self):
+    # 48 is equidistant from 32 and 64; snaps to first found (32)
+    result = snap_width(48)
+    assert result in (32, 64)</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.tests.test_schema_inferrer.TestWidthSnapping.test_zero_default"><code class="name flex">
+<span>def <span class="ident">test_zero_default</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_zero_default(self):
+    assert snap_width(0) == 64</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="atomik_sdk.tests" href="index.html">atomik_sdk.tests</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="atomik_sdk.tests.test_schema_inferrer.TestDeltaTypeClassification" href="#atomik_sdk.tests.test_schema_inferrer.TestDeltaTypeClassification">TestDeltaTypeClassification</a></code></h4>
+<ul class="">
+<li><code><a title="atomik_sdk.tests.test_schema_inferrer.TestDeltaTypeClassification.test_bitmask_from_flags" href="#atomik_sdk.tests.test_schema_inferrer.TestDeltaTypeClassification.test_bitmask_from_flags">test_bitmask_from_flags</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_schema_inferrer.TestDeltaTypeClassification.test_bitmask_from_mask" href="#atomik_sdk.tests.test_schema_inferrer.TestDeltaTypeClassification.test_bitmask_from_mask">test_bitmask_from_mask</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_schema_inferrer.TestDeltaTypeClassification.test_bitmask_from_status" href="#atomik_sdk.tests.test_schema_inferrer.TestDeltaTypeClassification.test_bitmask_from_status">test_bitmask_from_status</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_schema_inferrer.TestDeltaTypeClassification.test_parameter_default" href="#atomik_sdk.tests.test_schema_inferrer.TestDeltaTypeClassification.test_parameter_default">test_parameter_default</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_schema_inferrer.TestDeltaTypeClassification.test_parameter_generic" href="#atomik_sdk.tests.test_schema_inferrer.TestDeltaTypeClassification.test_parameter_generic">test_parameter_generic</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_schema_inferrer.TestDeltaTypeClassification.test_stream_from_buffer" href="#atomik_sdk.tests.test_schema_inferrer.TestDeltaTypeClassification.test_stream_from_buffer">test_stream_from_buffer</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_schema_inferrer.TestDeltaTypeClassification.test_stream_from_frame" href="#atomik_sdk.tests.test_schema_inferrer.TestDeltaTypeClassification.test_stream_from_frame">test_stream_from_frame</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_schema_inferrer.TestDeltaTypeClassification.test_stream_from_stream" href="#atomik_sdk.tests.test_schema_inferrer.TestDeltaTypeClassification.test_stream_from_stream">test_stream_from_stream</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.tests.test_schema_inferrer.TestFieldExclusion" href="#atomik_sdk.tests.test_schema_inferrer.TestFieldExclusion">TestFieldExclusion</a></code></h4>
+<ul class="">
+<li><code><a title="atomik_sdk.tests.test_schema_inferrer.TestFieldExclusion.test_config_excluded" href="#atomik_sdk.tests.test_schema_inferrer.TestFieldExclusion.test_config_excluded">test_config_excluded</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_schema_inferrer.TestFieldExclusion.test_delta_field_included" href="#atomik_sdk.tests.test_schema_inferrer.TestFieldExclusion.test_delta_field_included">test_delta_field_included</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_schema_inferrer.TestFieldExclusion.test_id_excluded" href="#atomik_sdk.tests.test_schema_inferrer.TestFieldExclusion.test_id_excluded">test_id_excluded</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_schema_inferrer.TestFieldExclusion.test_logger_excluded" href="#atomik_sdk.tests.test_schema_inferrer.TestFieldExclusion.test_logger_excluded">test_logger_excluded</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_schema_inferrer.TestFieldExclusion.test_motion_included" href="#atomik_sdk.tests.test_schema_inferrer.TestFieldExclusion.test_motion_included">test_motion_included</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_schema_inferrer.TestFieldExclusion.test_name_excluded" href="#atomik_sdk.tests.test_schema_inferrer.TestFieldExclusion.test_name_excluded">test_name_excluded</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_schema_inferrer.TestFieldExclusion.test_underscore_stripped" href="#atomik_sdk.tests.test_schema_inferrer.TestFieldExclusion.test_underscore_stripped">test_underscore_stripped</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.tests.test_schema_inferrer.TestSchemaInferrer" href="#atomik_sdk.tests.test_schema_inferrer.TestSchemaInferrer">TestSchemaInferrer</a></code></h4>
+<ul class="">
+<li><code><a title="atomik_sdk.tests.test_schema_inferrer.TestSchemaInferrer.test_catalogue_inference" href="#atomik_sdk.tests.test_schema_inferrer.TestSchemaInferrer.test_catalogue_inference">test_catalogue_inference</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_schema_inferrer.TestSchemaInferrer.test_constraints_defaults" href="#atomik_sdk.tests.test_schema_inferrer.TestSchemaInferrer.test_constraints_defaults">test_constraints_defaults</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_schema_inferrer.TestSchemaInferrer.test_delta_fields_inferred" href="#atomik_sdk.tests.test_schema_inferrer.TestSchemaInferrer.test_delta_fields_inferred">test_delta_fields_inferred</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_schema_inferrer.TestSchemaInferrer.test_excluded_fields_not_in_delta" href="#atomik_sdk.tests.test_schema_inferrer.TestSchemaInferrer.test_excluded_fields_not_in_delta">test_excluded_fields_not_in_delta</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_schema_inferrer.TestSchemaInferrer.test_infer_produces_valid_schema" href="#atomik_sdk.tests.test_schema_inferrer.TestSchemaInferrer.test_infer_produces_valid_schema">test_infer_produces_valid_schema</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_schema_inferrer.TestSchemaInferrer.test_operations_inference" href="#atomik_sdk.tests.test_schema_inferrer.TestSchemaInferrer.test_operations_inference">test_operations_inference</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_schema_inferrer.TestSchemaInferrer.test_operations_minimal" href="#atomik_sdk.tests.test_schema_inferrer.TestSchemaInferrer.test_operations_minimal">test_operations_minimal</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_schema_inferrer.TestSchemaInferrer.test_version_override" href="#atomik_sdk.tests.test_schema_inferrer.TestSchemaInferrer.test_version_override">test_version_override</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_schema_inferrer.TestSchemaInferrer.test_vertical_override" href="#atomik_sdk.tests.test_schema_inferrer.TestSchemaInferrer.test_vertical_override">test_vertical_override</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_schema_inferrer.TestSchemaInferrer.test_wide_stream_encoding" href="#atomik_sdk.tests.test_schema_inferrer.TestSchemaInferrer.test_wide_stream_encoding">test_wide_stream_encoding</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.tests.test_schema_inferrer.TestVerticalClassification" href="#atomik_sdk.tests.test_schema_inferrer.TestVerticalClassification">TestVerticalClassification</a></code></h4>
+<ul class="">
+<li><code><a title="atomik_sdk.tests.test_schema_inferrer.TestVerticalClassification.test_audio_keywords" href="#atomik_sdk.tests.test_schema_inferrer.TestVerticalClassification.test_audio_keywords">test_audio_keywords</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_schema_inferrer.TestVerticalClassification.test_edge_keywords" href="#atomik_sdk.tests.test_schema_inferrer.TestVerticalClassification.test_edge_keywords">test_edge_keywords</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_schema_inferrer.TestVerticalClassification.test_fallback_compute" href="#atomik_sdk.tests.test_schema_inferrer.TestVerticalClassification.test_fallback_compute">test_fallback_compute</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_schema_inferrer.TestVerticalClassification.test_finance_keywords" href="#atomik_sdk.tests.test_schema_inferrer.TestVerticalClassification.test_finance_keywords">test_finance_keywords</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_schema_inferrer.TestVerticalClassification.test_medical_keywords" href="#atomik_sdk.tests.test_schema_inferrer.TestVerticalClassification.test_medical_keywords">test_medical_keywords</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_schema_inferrer.TestVerticalClassification.test_network_keywords" href="#atomik_sdk.tests.test_schema_inferrer.TestVerticalClassification.test_network_keywords">test_network_keywords</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_schema_inferrer.TestVerticalClassification.test_robotics_keywords" href="#atomik_sdk.tests.test_schema_inferrer.TestVerticalClassification.test_robotics_keywords">test_robotics_keywords</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_schema_inferrer.TestVerticalClassification.test_video_keywords" href="#atomik_sdk.tests.test_schema_inferrer.TestVerticalClassification.test_video_keywords">test_video_keywords</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.tests.test_schema_inferrer.TestWidthSnapping" href="#atomik_sdk.tests.test_schema_inferrer.TestWidthSnapping">TestWidthSnapping</a></code></h4>
+<ul class="">
+<li><code><a title="atomik_sdk.tests.test_schema_inferrer.TestWidthSnapping.test_exact_128" href="#atomik_sdk.tests.test_schema_inferrer.TestWidthSnapping.test_exact_128">test_exact_128</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_schema_inferrer.TestWidthSnapping.test_exact_64" href="#atomik_sdk.tests.test_schema_inferrer.TestWidthSnapping.test_exact_64">test_exact_64</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_schema_inferrer.TestWidthSnapping.test_exact_8" href="#atomik_sdk.tests.test_schema_inferrer.TestWidthSnapping.test_exact_8">test_exact_8</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_schema_inferrer.TestWidthSnapping.test_negative_default" href="#atomik_sdk.tests.test_schema_inferrer.TestWidthSnapping.test_negative_default">test_negative_default</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_schema_inferrer.TestWidthSnapping.test_snap_1_to_8" href="#atomik_sdk.tests.test_schema_inferrer.TestWidthSnapping.test_snap_1_to_8">test_snap_1_to_8</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_schema_inferrer.TestWidthSnapping.test_snap_300_to_256" href="#atomik_sdk.tests.test_schema_inferrer.TestWidthSnapping.test_snap_300_to_256">test_snap_300_to_256</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_schema_inferrer.TestWidthSnapping.test_snap_33_to_32" href="#atomik_sdk.tests.test_schema_inferrer.TestWidthSnapping.test_snap_33_to_32">test_snap_33_to_32</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_schema_inferrer.TestWidthSnapping.test_snap_48_to_32_or_64" href="#atomik_sdk.tests.test_schema_inferrer.TestWidthSnapping.test_snap_48_to_32_or_64">test_snap_48_to_32_or_64</a></code></li>
+<li><code><a title="atomik_sdk.tests.test_schema_inferrer.TestWidthSnapping.test_zero_default" href="#atomik_sdk.tests.test_schema_inferrer.TestWidthSnapping.test_zero_default">test_zero_default</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+</body>
+</html>

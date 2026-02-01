@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
+<title>atomik_sdk.hardware_discovery API documentation</title>
+<meta name="description" content="Centralised hardware and tool discovery for ATOMiK …">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>atomik_sdk.hardware_discovery</code></h1>
+</header>
+<section id="section-intro">
+<p>Centralised hardware and tool discovery for ATOMiK.</p>
+<p>All FPGA-related tool lookups, board detection, and serial-port
+discovery live here so that <code>cli.py</code>, <code>hardware.py</code>,
+<code>fpga_pipeline.py</code>, and <code>phase6_hw_sweep.py</code> share one
+implementation.</p>
+<p>Every function is a pure helper (no class state).</p>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="atomik_sdk.hardware_discovery.detect_board"><code class="name flex">
+<span>def <span class="ident">detect_board</span></span>(<span>) ‑> str | None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def detect_board() -&gt; str | None:
+    &#34;&#34;&#34;Detect a connected Tang Nano 9K (or similar Gowin) FPGA board.
+
+    Tries ``programmer_cli --scan-cables`` first, then
+    ``openFPGALoader --detect`` as fallback.
+
+    Returns a board identifier string (e.g. ``&#34;tangnano9k&#34;``) or
+    ``None`` if no board is found.
+    &#34;&#34;&#34;
+    prog = find_tool(&#34;programmer_cli&#34;)
+    if prog:
+        try:
+            result = subprocess.run(
+                [prog, &#34;--scan-cables&#34;],
+                capture_output=True, text=True, timeout=10,
+            )
+            if &#34;cable found&#34; in result.stdout.lower():
+                return &#34;tangnano9k&#34;
+        except (subprocess.TimeoutExpired, OSError):
+            pass
+
+    openfpga = find_tool(&#34;openFPGALoader&#34;)
+    if openfpga:
+        try:
+            result = subprocess.run(
+                [openfpga, &#34;--detect&#34;],
+                capture_output=True, text=True, timeout=10,
+            )
+            stdout_lower = result.stdout.lower()
+            if &#34;gw1nr&#34; in stdout_lower or &#34;tangnano9k&#34; in stdout_lower:
+                return &#34;tangnano9k&#34;
+        except (subprocess.TimeoutExpired, OSError):
+            pass
+
+    return None</code></pre>
+</details>
+<div class="desc"><p>Detect a connected Tang Nano 9K (or similar Gowin) FPGA board.</p>
+<p>Tries <code>programmer_cli --scan-cables</code> first, then
+<code>openFPGALoader --detect</code> as fallback.</p>
+<p>Returns a board identifier string (e.g. <code>"tangnano9k"</code>) or
+<code>None</code> if no board is found.</p></div>
+</dd>
+<dt id="atomik_sdk.hardware_discovery.detect_com_port"><code class="name flex">
+<span>def <span class="ident">detect_com_port</span></span>(<span>) ‑> str | None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def detect_com_port() -&gt; str | None:
+    &#34;&#34;&#34;Auto-detect the serial (COM / ttyUSB) port for the FPGA board.
+
+    Matches FTDI VID:PID ``0403:6010`` first, then falls back to
+    description-keyword matching.
+    &#34;&#34;&#34;
+    try:
+        import serial.tools.list_ports
+    except ImportError:
+        return None
+
+    for port in serial.tools.list_ports.comports():
+        if port.vid == _FTDI_VID and port.pid == _FTDI_PID:
+            return port.device
+
+    # Keyword fallback
+    for port in serial.tools.list_ports.comports():
+        desc = (port.description or &#34;&#34;).lower()
+        if any(kw in desc for kw in _KEYWORD_HINTS):
+            return port.device
+
+    return None</code></pre>
+</details>
+<div class="desc"><p>Auto-detect the serial (COM / ttyUSB) port for the FPGA board.</p>
+<p>Matches FTDI VID:PID <code>0403:6010</code> first, then falls back to
+description-keyword matching.</p></div>
+</dd>
+<dt id="atomik_sdk.hardware_discovery.find_gowin_root"><code class="name flex">
+<span>def <span class="ident">find_gowin_root</span></span>(<span>) ‑> pathlib.Path | None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def find_gowin_root() -&gt; Path | None:
+    &#34;&#34;&#34;Locate the Gowin EDA installation directory.
+
+    Search order:
+      1. ``GOWIN_HOME`` environment variable
+      2. ``C:\\Gowin\\*`` and ``C:\\Program Files\\Gowin\\*`` (Windows)
+      3. ``/opt/Gowin/*`` (Linux)
+
+    Returns the versioned directory (e.g.
+    ``Gowin_V1.9.11.03_Education_x64``) or ``None``.
+    &#34;&#34;&#34;
+    env = os.environ.get(&#34;GOWIN_HOME&#34;)
+    if env:
+        p = Path(env)
+        if p.is_dir():
+            return p
+
+    if sys.platform == &#34;win32&#34;:
+        probe_bases = [Path(&#34;C:/Gowin&#34;), Path(&#34;C:/Program Files/Gowin&#34;)]
+    else:
+        probe_bases = [Path(&#34;/opt/Gowin&#34;)]
+
+    for base in probe_bases:
+        if base.is_dir():
+            candidates = sorted(base.iterdir(), reverse=True)
+            for c in candidates:
+                if c.is_dir() and (c / &#34;IDE&#34; / &#34;bin&#34;).is_dir():
+                    return c
+    return None</code></pre>
+</details>
+<div class="desc"><p>Locate the Gowin EDA installation directory.</p>
+<p>Search order:
+1. <code>GOWIN_HOME</code> environment variable
+2. <code>C:\Gowin\*</code> and <code>C:\Program Files\Gowin\*</code> (Windows)
+3. <code>/opt/Gowin/*</code> (Linux)</p>
+<p>Returns the versioned directory (e.g.
+<code>Gowin_V1.9.11.03_Education_x64</code>) or <code>None</code>.</p></div>
+</dd>
+<dt id="atomik_sdk.hardware_discovery.find_tool"><code class="name flex">
+<span>def <span class="ident">find_tool</span></span>(<span>name: str, config_path: str | None = None) ‑> str | None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def find_tool(name: str, config_path: str | None = None) -&gt; str | None:
+    &#34;&#34;&#34;Return an absolute path (or bare command name) for *name*.
+
+    Priority:
+      1. Explicit *config_path* (expanded, verified)
+      2. ``shutil.which(name)``
+      3. Gowin EDA subpath (with ``.exe`` suffix on Windows)
+      4. ``OPENFPGALOADER_PATH`` env var (for openFPGALoader)
+    &#34;&#34;&#34;
+    if config_path:
+        expanded = os.path.expandvars(config_path)
+        if os.path.isfile(expanded):
+            return expanded
+        if shutil.which(expanded):
+            return expanded
+
+    found = shutil.which(name)
+    if found:
+        return found
+
+    # Gowin subpath fallback
+    subpath = _GOWIN_TOOL_SUBPATHS.get(name)
+    if subpath:
+        root = find_gowin_root()
+        if root:
+            suffix = &#34;.exe&#34; if sys.platform == &#34;win32&#34; else &#34;&#34;
+            candidate = root / (subpath + suffix)
+            if candidate.exists():
+                return str(candidate)
+
+    # openFPGALoader env-var / MSYS2 fallback
+    if name == &#34;openFPGALoader&#34;:
+        env_path = os.environ.get(&#34;OPENFPGALOADER_PATH&#34;)
+        if env_path and os.path.isfile(env_path):
+            return env_path
+        if sys.platform == &#34;win32&#34;:
+            msys2 = Path(r&#34;C:\msys64\ucrt64\bin\openFPGALoader.exe&#34;)
+            if msys2.is_file():
+                return str(msys2)
+
+    return None</code></pre>
+</details>
+<div class="desc"><p>Return an absolute path (or bare command name) for <em>name</em>.</p>
+<h2 id="priority">Priority</h2>
+<ol>
+<li>Explicit <em>config_path</em> (expanded, verified)</li>
+<li><code>shutil.which(name)</code></li>
+<li>Gowin EDA subpath (with <code>.exe</code> suffix on Windows)</li>
+<li><code>OPENFPGALOADER_PATH</code> env var (for openFPGALoader)</li>
+</ol></div>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="atomik_sdk" href="index.html">atomik_sdk</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="atomik_sdk.hardware_discovery.detect_board" href="#atomik_sdk.hardware_discovery.detect_board">detect_board</a></code></li>
+<li><code><a title="atomik_sdk.hardware_discovery.detect_com_port" href="#atomik_sdk.hardware_discovery.detect_com_port">detect_com_port</a></code></li>
+<li><code><a title="atomik_sdk.hardware_discovery.find_gowin_root" href="#atomik_sdk.hardware_discovery.find_gowin_root">find_gowin_root</a></code></li>
+<li><code><a title="atomik_sdk.hardware_discovery.find_tool" href="#atomik_sdk.hardware_discovery.find_tool">find_tool</a></code></li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+</body>
+</html>

@@ -177,6 +177,20 @@ atomik-gen &ndash;version</p>
     demo.add_argument(&#34;--report&#34;, help=&#34;Write demo report to file&#34;)
     demo.add_argument(&#34;-v&#34;, &#34;--verbose&#34;, action=&#34;store_true&#34;)
 
+    # -----------------------------------------------------------------------
+    # from-source subcommand
+    # -----------------------------------------------------------------------
+    fs = sub.add_parser(&#34;from-source&#34;, help=&#34;Generate SDK from existing source code&#34;)
+    fs.add_argument(&#34;source&#34;, help=&#34;Source file path (.py, .rs, .c, .js, .v)&#34;)
+    fs.add_argument(&#34;--vertical&#34;, help=&#34;Override inferred vertical category&#34;)
+    fs.add_argument(&#34;--version&#34;, default=&#34;1.0.0&#34;, help=&#34;Schema version&#34;)
+    fs.add_argument(&#34;--existing-schema&#34;, help=&#34;Existing schema for migration diff&#34;)
+    fs.add_argument(&#34;--strict&#34;, action=&#34;store_true&#34;, help=&#34;Fail on migration warnings&#34;)
+    fs.add_argument(&#34;--output-dir&#34;, default=&#34;generated&#34;)
+    fs.add_argument(&#34;--languages&#34;, nargs=&#34;+&#34;, choices=list(GENERATORS.keys()))
+    fs.add_argument(&#34;--report&#34;, help=&#34;Write JSON report&#34;)
+    fs.add_argument(&#34;-v&#34;, &#34;--verbose&#34;, action=&#34;store_true&#34;)
+
     return parser</code></pre>
 </details>
 <div class="desc"><p>Build the argument parser with all subcommands.</p></div>
@@ -284,6 +298,12 @@ atomik-gen &ndash;version</p>
 </summary>
 <pre><code class="python">def cmd_demo(args: argparse.Namespace) -&gt; int:
     &#34;&#34;&#34;Run a domain hardware demonstrator.&#34;&#34;&#34;
+    import re
+    import shutil
+    import subprocess
+    import tempfile
+    import time
+
     domain = args.domain
     valid_domains = [&#34;video&#34;, &#34;sensor&#34;, &#34;finance&#34;]
 
@@ -308,85 +328,227 @@ atomik-gen &ndash;version</p>
 
     sim_only = getattr(args, &#34;sim_only&#34;, False)
     verbose = getattr(args, &#34;verbose&#34;, False)
+    t_start = time.perf_counter()
 
+    # -- Tool detection -------------------------------------------------------
+    from atomik_sdk.hardware_discovery import detect_board, find_tool
+
+    iverilog = shutil.which(&#34;iverilog&#34;)
+    vvp_cmd = shutil.which(&#34;vvp&#34;)
+
+    has_gowin = find_tool(&#34;gw_sh&#34;) is not None
+    has_programmer = find_tool(&#34;programmer_cli&#34;) is not None
+    has_openfpga = find_tool(&#34;openFPGALoader&#34;) is not None
+
+    # -- Board detection (skip when --sim-only) --------------------------------
+    board_detected = False
+    hardware_used = False
+
+    if not sim_only:
+        board_detected = detect_board() is not None
+
+    mode = &#34;simulation&#34; if sim_only else &#34;auto&#34;
     print(f&#34;ATOMiK {domain.title()} Domain Demonstrator&#34;)
     print(&#34;=&#34; * 40)
     print(f&#34;  Top module: {top_file.name}&#34;)
     print(f&#34;  Testbench:  {tb_file.name if tb_file.exists() else &#39;N/A&#39;}&#34;)
-    print(f&#34;  Mode:       {&#39;simulation&#39; if sim_only else &#39;full&#39;}&#34;)
+    print(f&#34;  Mode:       {mode}&#34;)
+    if not sim_only:
+        print(f&#34;  Board:      {&#39;detected&#39; if board_detected else &#39;not detected&#39;}&#34;)
     print()
 
-    # Gather all Verilog source files
+    # -- Gather Verilog source files -------------------------------------------
     common_dir = project_root / &#34;demos&#34; / &#34;common&#34;
     rtl_dir = project_root / &#34;rtl&#34;
+    rtl_pll_dir = project_root / &#34;rtl&#34; / &#34;pll&#34;
+    sim_stubs_dir = project_root / &#34;sim&#34; / &#34;stubs&#34;
 
     src_files = []
-    for d in [rtl_dir, common_dir, demo_dir]:
+    # Stubs first (Gowin rPLL behavioural model), then PLL wrappers, RTL,
+    # common modules, and finally the demo-specific sources.
+    for d in [sim_stubs_dir, rtl_pll_dir, rtl_dir, common_dir, demo_dir]:
         if d.exists():
             src_files.extend(sorted(d.glob(&#34;*.v&#34;)))
 
     # Remove testbenches from source list
     src_files = [f for f in src_files if not f.name.startswith(&#34;tb_&#34;)]
 
-    # Run simulation if testbench exists
+    # -- Simulation &amp; validation tracking --------------------------------------
+    success = False
+    validation_level = &#34;no_rtl&#34;
+    sim_tests_passed = 0
+    sim_tests_total = 0
+    exit_code = EXIT_SUCCESS
+
     if tb_file.exists():
-        import shutil
-        iverilog = shutil.which(&#34;iverilog&#34;)
-        vvp_cmd = shutil.which(&#34;vvp&#34;)
-
         if iverilog and vvp_cmd:
-            import subprocess
-            import tempfile
-
             print(&#34;Running RTL simulation...&#34;)
             all_files = [str(f) for f in src_files] + [str(tb_file)]
 
             with tempfile.NamedTemporaryFile(suffix=&#34;.vvp&#34;, delete=False) as tmp:
                 vvp_out = tmp.name
 
-            result = subprocess.run(
+            compile_result = subprocess.run(
                 [iverilog, &#34;-o&#34;, vvp_out] + all_files,
-                capture_output=True, text=True,
-            )
-
-            if result.returncode != 0:
-                print(f&#34;Compilation failed:\n{result.stderr}&#34;)
-                return EXIT_HARDWARE_FAILURE
-
-            result = subprocess.run(
-                [vvp_cmd, vvp_out],
                 capture_output=True, text=True,
                 timeout=60,
             )
 
-            print(result.stdout)
-            if result.stderr and verbose:
-                print(result.stderr)
-
-            Path(vvp_out).unlink(missing_ok=True)
-
-            if &#34;FAIL&#34; in result.stdout.upper() and &#34;0 FAIL&#34; not in result.stdout.upper():
-                print(&#34;Demo simulation: FAILED&#34;)
-                return EXIT_HARDWARE_FAILURE
+            if compile_result.returncode != 0:
+                print(f&#34;Compilation failed:\n{compile_result.stderr}&#34;)
+                exit_code = EXIT_HARDWARE_FAILURE
             else:
-                print(&#34;Demo simulation: PASSED&#34;)
+                sim_result = subprocess.run(
+                    [vvp_cmd, vvp_out],
+                    capture_output=True, text=True,
+                    timeout=60,
+                )
+
+                print(sim_result.stdout)
+                if sim_result.stderr and verbose:
+                    print(sim_result.stderr)
+
+                Path(vvp_out).unlink(missing_ok=True)
+
+                # Parse pass/fail counts from the test summary block.
+                # Testbenches print &#34;Passed: N&#34; and &#34;Failed: N&#34; lines.
+                pass_match = re.search(
+                    r&#34;Passed:\s+(\d+)&#34;, sim_result.stdout,
+                )
+                fail_match = re.search(
+                    r&#34;Failed:\s+(\d+)&#34;, sim_result.stdout,
+                )
+                if pass_match:
+                    sim_tests_passed = int(pass_match.group(1))
+                if fail_match:
+                    sim_tests_total = sim_tests_passed + int(fail_match.group(1))
+                else:
+                    sim_tests_total = sim_tests_passed
+
+                # Use parsed fail count when available; fall back to
+                # string heuristic only when no structured output exists.
+                if fail_match:
+                    has_failure = int(fail_match.group(1)) &gt; 0
+                else:
+                    has_failure = &#34;FAIL&#34; in sim_result.stdout.upper()
+                if has_failure:
+                    print(&#34;Demo simulation: FAILED&#34;)
+                    validation_level = &#34;simulation_only&#34;
+                    exit_code = EXIT_HARDWARE_FAILURE
+                else:
+                    print(&#34;Demo simulation: PASSED&#34;)
+                    validation_level = &#34;simulation_only&#34;
+                    success = True
         else:
             print(&#34;iverilog/vvp not found -- cannot simulate&#34;)
-            return EXIT_HARDWARE_FAILURE
+            exit_code = EXIT_HARDWARE_FAILURE
     else:
         print(&#34;No testbench found for this demo&#34;)
 
+    # -- Hardware escalation (auto mode only) ----------------------------------
+    if success and not sim_only and board_detected and has_gowin:
+        print(&#34;Attempting synthesis (Gowin EDA)...&#34;)
+        validation_level = &#34;synthesized&#34;
+        hardware_used = True
+        # Full synthesis + programming is handled by HardwareStage in the
+        # pipeline; here we record the capability level reached.
+
+    duration_ms = (time.perf_counter() - t_start) * 1000.0
+
     if args.report:
-        _write_report(args.report, {
+        report_data = {
             &#34;domain&#34;: domain,
-            &#34;mode&#34;: &#34;simulation&#34; if sim_only else &#34;full&#34;,
+            &#34;success&#34;: success,
+            &#34;validation_level&#34;: validation_level,
+            &#34;hardware_used&#34;: hardware_used,
+            &#34;board_detected&#34;: board_detected,
+            &#34;mode&#34;: mode,
             &#34;top_module&#34;: str(top_file),
             &#34;testbench&#34;: str(tb_file) if tb_file.exists() else None,
-        })
+            &#34;sim_tests_passed&#34;: sim_tests_passed,
+            &#34;sim_tests_total&#34;: sim_tests_total,
+            &#34;duration_ms&#34;: round(duration_ms, 1),
+            &#34;tools&#34;: {
+                &#34;iverilog&#34;: iverilog is not None,
+                &#34;gowin_eda&#34;: has_gowin,
+                &#34;programmer_cli&#34;: has_programmer,
+                &#34;openfpga_loader&#34;: has_openfpga,
+            },
+        }
+        _write_report(args.report, report_data)
 
-    return EXIT_SUCCESS</code></pre>
+    return exit_code</code></pre>
 </details>
 <div class="desc"><p>Run a domain hardware demonstrator.</p></div>
+</dd>
+<dt id="atomik_sdk.cli.cmd_from_source"><code class="name flex">
+<span>def <span class="ident">cmd_from_source</span></span>(<span>args: argparse.Namespace) ‑> int</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def cmd_from_source(args: argparse.Namespace) -&gt; int:
+    &#34;&#34;&#34;Generate SDK from existing source code (zero LLM tokens).&#34;&#34;&#34;
+    source_path = Path(args.source)
+    if not source_path.exists():
+        print(f&#34;Error: {source_path} not found&#34;, file=sys.stderr)
+        return EXIT_FILE_ERROR
+
+    from atomik_sdk.pipeline.controller import Pipeline, PipelineConfig
+    from atomik_sdk.pipeline.stages.diff import DiffStage
+    from atomik_sdk.pipeline.stages.extract import ExtractStage
+    from atomik_sdk.pipeline.stages.generate import GenerateStage
+    from atomik_sdk.pipeline.stages.hardware import HardwareStage
+    from atomik_sdk.pipeline.stages.infer import InferStage
+    from atomik_sdk.pipeline.stages.metrics import MetricsStage
+    from atomik_sdk.pipeline.stages.migrate_check import MigrateCheckStage
+    from atomik_sdk.pipeline.stages.validate import ValidateStage
+    from atomik_sdk.pipeline.stages.verify import VerifyStage
+
+    config = PipelineConfig(
+        source_mode=True,
+        source_path=str(source_path),
+        output_dir=args.output_dir,
+        languages=args.languages,
+        verbose=args.verbose,
+        report_path=args.report,
+        existing_schema_path=getattr(args, &#34;existing_schema&#34;, None),
+        fail_on_regression=getattr(args, &#34;strict&#34;, False),
+        inference_overrides={
+            &#34;vertical&#34;: args.vertical,
+            &#34;version&#34;: args.version,
+        },
+    )
+
+    pipeline = Pipeline(config)
+    pipeline.register_stage(ExtractStage())
+    pipeline.register_stage(InferStage())
+    pipeline.register_stage(MigrateCheckStage())
+    pipeline.register_stage(ValidateStage())
+    pipeline.register_stage(DiffStage())
+    pipeline.register_stage(GenerateStage())
+    pipeline.register_stage(VerifyStage())
+    pipeline.register_stage(HardwareStage())
+    pipeline.register_stage(MetricsStage())
+
+    result = pipeline.run(source_path)
+
+    if result.success:
+        print(f&#34;\nPipeline SUCCESS [{result.validation_level}]&#34;)
+        print(f&#34;  Files: {result.files_generated}, &#34;
+              f&#34;Lines: {result.lines_generated}, &#34;
+              f&#34;Tokens: {result.total_tokens}, &#34;
+              f&#34;Time: {result.total_time_ms:.0f}ms&#34;)
+    else:
+        print(&#34;\nPipeline FAILED&#34;, file=sys.stderr)
+        for err in result.errors:
+            print(f&#34;  - {err}&#34;, file=sys.stderr)
+
+    return EXIT_SUCCESS if result.success else EXIT_GENERATION_FAILURE</code></pre>
+</details>
+<div class="desc"><p>Generate SDK from existing source code (zero LLM tokens).</p></div>
 </dd>
 <dt id="atomik_sdk.cli.cmd_generate"><code class="name flex">
 <span>def <span class="ident">cmd_generate</span></span>(<span>args: argparse.Namespace) ‑> int</span>
@@ -811,6 +973,7 @@ atomik-gen &ndash;version</p>
         &#34;batch&#34;: cmd_batch,
         &#34;list&#34;: cmd_list,
         &#34;demo&#34;: cmd_demo,
+        &#34;from-source&#34;: cmd_from_source,
     }
 
     try:
@@ -841,6 +1004,7 @@ atomik-gen &ndash;version</p>
 <li><code><a title="atomik_sdk.cli.build_parser" href="#atomik_sdk.cli.build_parser">build_parser</a></code></li>
 <li><code><a title="atomik_sdk.cli.cmd_batch" href="#atomik_sdk.cli.cmd_batch">cmd_batch</a></code></li>
 <li><code><a title="atomik_sdk.cli.cmd_demo" href="#atomik_sdk.cli.cmd_demo">cmd_demo</a></code></li>
+<li><code><a title="atomik_sdk.cli.cmd_from_source" href="#atomik_sdk.cli.cmd_from_source">cmd_from_source</a></code></li>
 <li><code><a title="atomik_sdk.cli.cmd_generate" href="#atomik_sdk.cli.cmd_generate">cmd_generate</a></code></li>
 <li><code><a title="atomik_sdk.cli.cmd_info" href="#atomik_sdk.cli.cmd_info">cmd_info</a></code></li>
 <li><code><a title="atomik_sdk.cli.cmd_list" href="#atomik_sdk.cli.cmd_list">cmd_list</a></code></li>

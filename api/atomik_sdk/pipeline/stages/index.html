@@ -48,6 +48,10 @@ a manifest for the next stage.</p>
 <dd>
 <div class="desc"><p>Differential Change Detection Stage …</p></div>
 </dd>
+<dt><code class="name"><a title="atomik_sdk.pipeline.stages.extract" href="extract.html">atomik_sdk.pipeline.stages.extract</a></code></dt>
+<dd>
+<div class="desc"><p>Source Code Extraction Stage …</p></div>
+</dd>
 <dt><code class="name"><a title="atomik_sdk.pipeline.stages.generate" href="generate.html">atomik_sdk.pipeline.stages.generate</a></code></dt>
 <dd>
 <div class="desc"><p>Selective Code Generation Stage …</p></div>
@@ -56,9 +60,17 @@ a manifest for the next stage.</p>
 <dd>
 <div class="desc"><p>Hardware-in-the-Loop Pipeline Stage (Mandatory) …</p></div>
 </dd>
+<dt><code class="name"><a title="atomik_sdk.pipeline.stages.infer" href="infer.html">atomik_sdk.pipeline.stages.infer</a></code></dt>
+<dd>
+<div class="desc"><p>Schema Inference Stage …</p></div>
+</dd>
 <dt><code class="name"><a title="atomik_sdk.pipeline.stages.metrics" href="metrics.html">atomik_sdk.pipeline.stages.metrics</a></code></dt>
 <dd>
 <div class="desc"><p>Metrics Collection Stage …</p></div>
+</dd>
+<dt><code class="name"><a title="atomik_sdk.pipeline.stages.migrate_check" href="migrate_check.html">atomik_sdk.pipeline.stages.migrate_check</a></code></dt>
+<dd>
+<div class="desc"><p>Migration Safety Check Stage …</p></div>
 </dd>
 <dt><code class="name"><a title="atomik_sdk.pipeline.stages.validate" href="validate.html">atomik_sdk.pipeline.stages.validate</a></code></dt>
 <dd>
@@ -127,9 +139,12 @@ a manifest for the next stage.</p>
 <h3>Subclasses</h3>
 <ul class="hlist">
 <li><a title="atomik_sdk.pipeline.stages.diff.DiffStage" href="diff.html#atomik_sdk.pipeline.stages.diff.DiffStage">DiffStage</a></li>
+<li><a title="atomik_sdk.pipeline.stages.extract.ExtractStage" href="extract.html#atomik_sdk.pipeline.stages.extract.ExtractStage">ExtractStage</a></li>
 <li><a title="atomik_sdk.pipeline.stages.generate.GenerateStage" href="generate.html#atomik_sdk.pipeline.stages.generate.GenerateStage">GenerateStage</a></li>
 <li><a title="atomik_sdk.pipeline.stages.hardware.HardwareStage" href="hardware.html#atomik_sdk.pipeline.stages.hardware.HardwareStage">HardwareStage</a></li>
+<li><a title="atomik_sdk.pipeline.stages.infer.InferStage" href="infer.html#atomik_sdk.pipeline.stages.infer.InferStage">InferStage</a></li>
 <li><a title="atomik_sdk.pipeline.stages.metrics.MetricsStage" href="metrics.html#atomik_sdk.pipeline.stages.metrics.MetricsStage">MetricsStage</a></li>
+<li><a title="atomik_sdk.pipeline.stages.migrate_check.MigrateCheckStage" href="migrate_check.html#atomik_sdk.pipeline.stages.migrate_check.MigrateCheckStage">MigrateCheckStage</a></li>
 <li><a title="atomik_sdk.pipeline.stages.validate.ValidateStage" href="validate.html#atomik_sdk.pipeline.stages.validate.ValidateStage">ValidateStage</a></li>
 <li><a title="atomik_sdk.pipeline.stages.verify.VerifyStage" href="verify.html#atomik_sdk.pipeline.stages.verify.VerifyStage">VerifyStage</a></li>
 </ul>
@@ -452,9 +467,12 @@ def success(self) -&gt; bool:
 <li><h3><a href="#header-submodules">Sub-modules</a></h3>
 <ul>
 <li><code><a title="atomik_sdk.pipeline.stages.diff" href="diff.html">atomik_sdk.pipeline.stages.diff</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.stages.extract" href="extract.html">atomik_sdk.pipeline.stages.extract</a></code></li>
 <li><code><a title="atomik_sdk.pipeline.stages.generate" href="generate.html">atomik_sdk.pipeline.stages.generate</a></code></li>
 <li><code><a title="atomik_sdk.pipeline.stages.hardware" href="hardware.html">atomik_sdk.pipeline.stages.hardware</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.stages.infer" href="infer.html">atomik_sdk.pipeline.stages.infer</a></code></li>
 <li><code><a title="atomik_sdk.pipeline.stages.metrics" href="metrics.html">atomik_sdk.pipeline.stages.metrics</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.stages.migrate_check" href="migrate_check.html">atomik_sdk.pipeline.stages.migrate_check</a></code></li>
 <li><code><a title="atomik_sdk.pipeline.stages.validate" href="validate.html">atomik_sdk.pipeline.stages.validate</a></code></li>
 <li><code><a title="atomik_sdk.pipeline.stages.verify" href="verify.html">atomik_sdk.pipeline.stages.verify</a></code></li>
 </ul>

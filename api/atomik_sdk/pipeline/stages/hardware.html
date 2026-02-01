@@ -218,28 +218,24 @@ when the respective tools and hardware are detected.</p>
 
     def _has_gowin_eda(self) -&gt; bool:
         &#34;&#34;&#34;Check if Gowin EDA synthesis tools are available.&#34;&#34;&#34;
-        # Check common Gowin tool names
-        return shutil.which(&#34;gw_sh&#34;) is not None
+        from atomik_sdk.hardware_discovery import find_tool
+
+        return find_tool(&#34;gw_sh&#34;) is not None
 
     def _has_fpga_tools(self) -&gt; bool:
-        &#34;&#34;&#34;Check if openFPGALoader is available.&#34;&#34;&#34;
-        return shutil.which(&#34;openFPGALoader&#34;) is not None
+        &#34;&#34;&#34;Check if board-programming tools are available.&#34;&#34;&#34;
+        from atomik_sdk.hardware_discovery import find_tool
+
+        return (
+            find_tool(&#34;programmer_cli&#34;) is not None
+            or find_tool(&#34;openFPGALoader&#34;) is not None
+        )
 
     def _detect_board(self) -&gt; str | None:
         &#34;&#34;&#34;Detect connected Tang Nano 9K board.&#34;&#34;&#34;
-        openfpga = shutil.which(&#34;openFPGALoader&#34;)
-        if not openfpga:
-            return None
-        try:
-            result = subprocess.run(
-                [openfpga, &#34;--detect&#34;],
-                capture_output=True, text=True, timeout=10,
-            )
-            if &#34;GW1NR&#34; in result.stdout or &#34;tangnano9k&#34; in result.stdout.lower():
-                return &#34;tangnano9k&#34;
-        except (subprocess.TimeoutExpired, OSError):
-            pass
-        return None
+        from atomik_sdk.hardware_discovery import detect_board
+
+        return detect_board()
 
     def _program_fpga(self, manifest: StageManifest, config: Any) -&gt; bool:
         &#34;&#34;&#34;Program the FPGA with the bitstream.&#34;&#34;&#34;
@@ -265,14 +261,9 @@ when the respective tools and hardware are detected.</p>
 
     def _detect_com_port(self) -&gt; str | None:
         &#34;&#34;&#34;Auto-detect COM port for UART communication.&#34;&#34;&#34;
-        try:
-            import serial.tools.list_ports
-            for port in serial.tools.list_ports.comports():
-                if &#34;USB&#34; in port.description.upper() or &#34;SERIAL&#34; in port.description.upper():
-                    return port.device
-        except ImportError:
-            pass
-        return None
+        from atomik_sdk.hardware_discovery import detect_com_port
+
+        return detect_com_port()
 
     def _on_device_validation(
         self, com_port: str, manifest: StageManifest

@@ -87,6 +87,10 @@ and cross-run learning.</p>
 <dd>
 <div class="desc"><p>Feedback Loop Engine …</p></div>
 </dd>
+<dt><code class="name"><a title="atomik_sdk.pipeline.inference" href="inference/index.html">atomik_sdk.pipeline.inference</a></code></dt>
+<dd>
+<div class="desc"><p>Schema inference engine for source-code-driven SDK generation.</p></div>
+</dd>
 <dt><code class="name"><a title="atomik_sdk.pipeline.knowledge" href="knowledge/index.html">atomik_sdk.pipeline.knowledge</a></code></dt>
 <dd>
 <div class="desc"><p>Error pattern knowledge base with fuzzy matching and learning.</p></div>
@@ -2207,6 +2211,19 @@ for parallel specialist dispatch.</p>
         &#34;metrics&#34;,
     ]
 
+    # Stage ordering for source-mode (extract → infer → migrate_check → ...)
+    SOURCE_STAGE_ORDER = [
+        &#34;extract&#34;,
+        &#34;infer&#34;,
+        &#34;migrate_check&#34;,
+        &#34;validate&#34;,
+        &#34;diff&#34;,
+        &#34;generate&#34;,
+        &#34;verify&#34;,
+        &#34;hardware&#34;,
+        &#34;metrics&#34;,
+    ]
+
     def __init__(self, config: PipelineConfig | None = None):
         self.config = config or PipelineConfig()
         self._stages: dict[str, BaseStage] = {}
@@ -2226,7 +2243,7 @@ for parallel specialist dispatch.</p>
         Execute the full pipeline on a single schema.
 
         Args:
-            schema_path: Path to schema JSON file.
+            schema_path: Path to schema JSON file, or source file in source mode.
 
         Returns:
             PipelineResult with per-stage results and aggregate metrics.
@@ -2235,17 +2252,24 @@ for parallel specialist dispatch.</p>
         result = PipelineResult(schema=schema_path.name, success=True)
         start = time.perf_counter()
 
-        # Load schema
-        try:
-            with open(schema_path, encoding=&#34;utf-8&#34;) as f:
-                schema = json.load(f)
-        except (FileNotFoundError, json.JSONDecodeError) as e:
-            result.success = False
-            result.errors.append(f&#34;Schema load failed: {e}&#34;)
-            return result
-
-        if self.config.verbose:
-            print(f&#34;Pipeline: processing {schema_path.name}&#34;)
+        # Source mode: schema starts empty, populated by infer stage
+        if self.config.source_mode:
+            schema: dict[str, Any] = {}
+            stage_order = self.SOURCE_STAGE_ORDER
+            if self.config.verbose:
+                print(f&#34;Pipeline: source mode — {schema_path.name}&#34;)
+        else:
+            # Load schema from JSON
+            try:
+                with open(schema_path, encoding=&#34;utf-8&#34;) as f:
+                    schema = json.load(f)
+            except (FileNotFoundError, json.JSONDecodeError) as e:
+                result.success = False
+                result.errors.append(f&#34;Schema load failed: {e}&#34;)
+                return result
+            stage_order = self.STAGE_ORDER
+            if self.config.verbose:
+                print(f&#34;Pipeline: processing {schema_path.name}&#34;)
 
         if self.config.dry_run:
             return self._dry_run(schema, str(schema_path), result)
@@ -2254,9 +2278,9 @@ for parallel specialist dispatch.</p>
         if self.config.use_orchestrator:
             return self._run_orchestrated(schema, str(schema_path), result, start)
 
-        # Execute stages in order (Phase 4C sequential mode)
+        # Execute stages in order
         previous_manifest = None
-        for stage_name in self.STAGE_ORDER:
+        for stage_name in stage_order:
             stage = self._stages.get(stage_name)
             if stage is None:
                 continue
@@ -2387,12 +2411,17 @@ for parallel specialist dispatch.</p>
         &#34;&#34;&#34;Execute pipeline via the event-driven orchestrator.&#34;&#34;&#34;
         from .orchestrator import Orchestrator
 
+        stage_order = (
+            self.SOURCE_STAGE_ORDER if self.config.source_mode
+            else self.STAGE_ORDER
+        )
+
         orch = Orchestrator(max_workers=self.config.max_workers)
 
         # Build default linear dependencies if none declared
         if not self._stage_deps:
             prev = None
-            for name in self.STAGE_ORDER:
+            for name in stage_order:
                 if name in self._stages:
                     deps = [prev] if prev else []
                     self._stage_deps[name] = deps
@@ -2405,7 +2434,7 @@ for parallel specialist dispatch.</p>
         manifests = orch.execute(schema, schema_path, self.config)
 
         # Convert orchestrator output to PipelineResult
-        for stage_name in self.STAGE_ORDER:
+        for stage_name in stage_order:
             if stage_name in manifests:
                 result.stages.append(manifests[stage_name])
 
@@ -2460,6 +2489,10 @@ manages token budgets, and produces structured reports.</p>
 </code></pre></div>
 <h3>Class variables</h3>
 <dl>
+<dt id="atomik_sdk.pipeline.Pipeline.SOURCE_STAGE_ORDER"><code class="name">var <span class="ident">SOURCE_STAGE_ORDER</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
 <dt id="atomik_sdk.pipeline.Pipeline.STAGE_ORDER"><code class="name">var <span class="ident">STAGE_ORDER</span></code></dt>
 <dd>
 <div class="desc"></div>
@@ -2519,7 +2552,7 @@ manages token budgets, and produces structured reports.</p>
     Execute the full pipeline on a single schema.
 
     Args:
-        schema_path: Path to schema JSON file.
+        schema_path: Path to schema JSON file, or source file in source mode.
 
     Returns:
         PipelineResult with per-stage results and aggregate metrics.
@@ -2528,17 +2561,24 @@ manages token budgets, and produces structured reports.</p>
     result = PipelineResult(schema=schema_path.name, success=True)
     start = time.perf_counter()
 
-    # Load schema
-    try:
-        with open(schema_path, encoding=&#34;utf-8&#34;) as f:
-            schema = json.load(f)
-    except (FileNotFoundError, json.JSONDecodeError) as e:
-        result.success = False
-        result.errors.append(f&#34;Schema load failed: {e}&#34;)
-        return result
-
-    if self.config.verbose:
-        print(f&#34;Pipeline: processing {schema_path.name}&#34;)
+    # Source mode: schema starts empty, populated by infer stage
+    if self.config.source_mode:
+        schema: dict[str, Any] = {}
+        stage_order = self.SOURCE_STAGE_ORDER
+        if self.config.verbose:
+            print(f&#34;Pipeline: source mode — {schema_path.name}&#34;)
+    else:
+        # Load schema from JSON
+        try:
+            with open(schema_path, encoding=&#34;utf-8&#34;) as f:
+                schema = json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError) as e:
+            result.success = False
+            result.errors.append(f&#34;Schema load failed: {e}&#34;)
+            return result
+        stage_order = self.STAGE_ORDER
+        if self.config.verbose:
+            print(f&#34;Pipeline: processing {schema_path.name}&#34;)
 
     if self.config.dry_run:
         return self._dry_run(schema, str(schema_path), result)
@@ -2547,9 +2587,9 @@ manages token budgets, and produces structured reports.</p>
     if self.config.use_orchestrator:
         return self._run_orchestrated(schema, str(schema_path), result, start)
 
-    # Execute stages in order (Phase 4C sequential mode)
+    # Execute stages in order
     previous_manifest = None
-    for stage_name in self.STAGE_ORDER:
+    for stage_name in stage_order:
         stage = self._stages.get(stage_name)
         if stage is None:
             continue
@@ -2621,7 +2661,7 @@ manages token budgets, and produces structured reports.</p>
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>schema_path</code></strong></dt>
-<dd>Path to schema JSON file.</dd>
+<dd>Path to schema JSON file, or source file in source mode.</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <p>PipelineResult with per-stage results and aggregate metrics.</p></div>
@@ -2673,7 +2713,7 @@ manages token budgets, and produces structured reports.</p>
 </dd>
 <dt id="atomik_sdk.pipeline.PipelineConfig"><code class="flex name class">
 <span>class <span class="ident">PipelineConfig</span></span>
-<span>(</span><span>output_dir: str = 'generated',<br>languages: list[str] | None = None,<br>verbose: bool = False,<br>report_path: str | None = None,<br>checkpoint_dir: str = '.atomik',<br>metrics_csv: str = '.atomik/metrics.csv',<br>com_port: str | None = None,<br>token_budget: int | None = None,<br>sim_only: bool = False,<br>skip_synthesis: bool = False,<br>dry_run: bool = False,<br>use_orchestrator: bool = False,<br>max_workers: int = 1,<br>fail_on_regression: bool = False)</span>
+<span>(</span><span>output_dir: str = 'generated',<br>languages: list[str] | None = None,<br>verbose: bool = False,<br>report_path: str | None = None,<br>checkpoint_dir: str = '.atomik',<br>metrics_csv: str = '.atomik/metrics.csv',<br>com_port: str | None = None,<br>token_budget: int | None = None,<br>sim_only: bool = False,<br>skip_synthesis: bool = False,<br>dry_run: bool = False,<br>use_orchestrator: bool = False,<br>max_workers: int = 1,<br>fail_on_regression: bool = False,<br>source_mode: bool = False,<br>source_path: str | None = None,<br>source_language: str = 'auto',<br>existing_schema_path: str | None = None,<br>inference_overrides: dict[str, Any] = &lt;factory&gt;)</span>
 </code></dt>
 <dd>
 <details class="source">
@@ -2696,7 +2736,13 @@ class PipelineConfig:
     dry_run: bool = False
     use_orchestrator: bool = False
     max_workers: int = 1
-    fail_on_regression: bool = False</code></pre>
+    fail_on_regression: bool = False
+    # Source-mode fields
+    source_mode: bool = False
+    source_path: str | None = None
+    source_language: str = &#34;auto&#34;
+    existing_schema_path: str | None = None
+    inference_overrides: dict[str, Any] = field(default_factory=dict)</code></pre>
 </details>
 <div class="desc"><p>Configuration for a pipeline run.</p></div>
 <h3>Instance variables</h3>
@@ -2713,7 +2759,15 @@ class PipelineConfig:
 <dd>
 <div class="desc"></div>
 </dd>
+<dt id="atomik_sdk.pipeline.PipelineConfig.existing_schema_path"><code class="name">var <span class="ident">existing_schema_path</span> : str | None</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
 <dt id="atomik_sdk.pipeline.PipelineConfig.fail_on_regression"><code class="name">var <span class="ident">fail_on_regression</span> : bool</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.PipelineConfig.inference_overrides"><code class="name">var <span class="ident">inference_overrides</span> : dict[str, typing.Any]</code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
@@ -2742,6 +2796,18 @@ class PipelineConfig:
 <div class="desc"></div>
 </dd>
 <dt id="atomik_sdk.pipeline.PipelineConfig.skip_synthesis"><code class="name">var <span class="ident">skip_synthesis</span> : bool</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.PipelineConfig.source_language"><code class="name">var <span class="ident">source_language</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.PipelineConfig.source_mode"><code class="name">var <span class="ident">source_mode</span> : bool</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.PipelineConfig.source_path"><code class="name">var <span class="ident">source_path</span> : str | None</code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
@@ -3649,6 +3715,7 @@ are not yet running or complete.</p>
 <li><code><a title="atomik_sdk.pipeline.diagnosis" href="diagnosis.html">atomik_sdk.pipeline.diagnosis</a></code></li>
 <li><code><a title="atomik_sdk.pipeline.event_bus" href="event_bus.html">atomik_sdk.pipeline.event_bus</a></code></li>
 <li><code><a title="atomik_sdk.pipeline.feedback" href="feedback.html">atomik_sdk.pipeline.feedback</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.inference" href="inference/index.html">atomik_sdk.pipeline.inference</a></code></li>
 <li><code><a title="atomik_sdk.pipeline.knowledge" href="knowledge/index.html">atomik_sdk.pipeline.knowledge</a></code></li>
 <li><code><a title="atomik_sdk.pipeline.metrics" href="metrics/index.html">atomik_sdk.pipeline.metrics</a></code></li>
 <li><code><a title="atomik_sdk.pipeline.optimization" href="optimization/index.html">atomik_sdk.pipeline.optimization</a></code></li>
@@ -3769,7 +3836,8 @@ are not yet running or complete.</p>
 </li>
 <li>
 <h4><code><a title="atomik_sdk.pipeline.Pipeline" href="#atomik_sdk.pipeline.Pipeline">Pipeline</a></code></h4>
-<ul class="">
+<ul class="two-column">
+<li><code><a title="atomik_sdk.pipeline.Pipeline.SOURCE_STAGE_ORDER" href="#atomik_sdk.pipeline.Pipeline.SOURCE_STAGE_ORDER">SOURCE_STAGE_ORDER</a></code></li>
 <li><code><a title="atomik_sdk.pipeline.Pipeline.STAGE_ORDER" href="#atomik_sdk.pipeline.Pipeline.STAGE_ORDER">STAGE_ORDER</a></code></li>
 <li><code><a title="atomik_sdk.pipeline.Pipeline.get_status" href="#atomik_sdk.pipeline.Pipeline.get_status">get_status</a></code></li>
 <li><code><a title="atomik_sdk.pipeline.Pipeline.register_stage" href="#atomik_sdk.pipeline.Pipeline.register_stage">register_stage</a></code></li>
@@ -3779,11 +3847,13 @@ are not yet running or complete.</p>
 </li>
 <li>
 <h4><code><a title="atomik_sdk.pipeline.PipelineConfig" href="#atomik_sdk.pipeline.PipelineConfig">PipelineConfig</a></code></h4>
-<ul class="two-column">
+<ul class="">
 <li><code><a title="atomik_sdk.pipeline.PipelineConfig.checkpoint_dir" href="#atomik_sdk.pipeline.PipelineConfig.checkpoint_dir">checkpoint_dir</a></code></li>
 <li><code><a title="atomik_sdk.pipeline.PipelineConfig.com_port" href="#atomik_sdk.pipeline.PipelineConfig.com_port">com_port</a></code></li>
 <li><code><a title="atomik_sdk.pipeline.PipelineConfig.dry_run" href="#atomik_sdk.pipeline.PipelineConfig.dry_run">dry_run</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.PipelineConfig.existing_schema_path" href="#atomik_sdk.pipeline.PipelineConfig.existing_schema_path">existing_schema_path</a></code></li>
 <li><code><a title="atomik_sdk.pipeline.PipelineConfig.fail_on_regression" href="#atomik_sdk.pipeline.PipelineConfig.fail_on_regression">fail_on_regression</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.PipelineConfig.inference_overrides" href="#atomik_sdk.pipeline.PipelineConfig.inference_overrides">inference_overrides</a></code></li>
 <li><code><a title="atomik_sdk.pipeline.PipelineConfig.languages" href="#atomik_sdk.pipeline.PipelineConfig.languages">languages</a></code></li>
 <li><code><a title="atomik_sdk.pipeline.PipelineConfig.max_workers" href="#atomik_sdk.pipeline.PipelineConfig.max_workers">max_workers</a></code></li>
 <li><code><a title="atomik_sdk.pipeline.PipelineConfig.metrics_csv" href="#atomik_sdk.pipeline.PipelineConfig.metrics_csv">metrics_csv</a></code></li>
@@ -3791,6 +3861,9 @@ are not yet running or complete.</p>
 <li><code><a title="atomik_sdk.pipeline.PipelineConfig.report_path" href="#atomik_sdk.pipeline.PipelineConfig.report_path">report_path</a></code></li>
 <li><code><a title="atomik_sdk.pipeline.PipelineConfig.sim_only" href="#atomik_sdk.pipeline.PipelineConfig.sim_only">sim_only</a></code></li>
 <li><code><a title="atomik_sdk.pipeline.PipelineConfig.skip_synthesis" href="#atomik_sdk.pipeline.PipelineConfig.skip_synthesis">skip_synthesis</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.PipelineConfig.source_language" href="#atomik_sdk.pipeline.PipelineConfig.source_language">source_language</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.PipelineConfig.source_mode" href="#atomik_sdk.pipeline.PipelineConfig.source_mode">source_mode</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.PipelineConfig.source_path" href="#atomik_sdk.pipeline.PipelineConfig.source_path">source_path</a></code></li>
 <li><code><a title="atomik_sdk.pipeline.PipelineConfig.token_budget" href="#atomik_sdk.pipeline.PipelineConfig.token_budget">token_budget</a></code></li>
 <li><code><a title="atomik_sdk.pipeline.PipelineConfig.use_orchestrator" href="#atomik_sdk.pipeline.PipelineConfig.use_orchestrator">use_orchestrator</a></code></li>
 <li><code><a title="atomik_sdk.pipeline.PipelineConfig.verbose" href="#atomik_sdk.pipeline.PipelineConfig.verbose">verbose</a></code></li>

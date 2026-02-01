@@ -1,0 +1,367 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
+<title>atomik_sdk.pipeline.inference.schema_inferrer API documentation</title>
+<meta name="description" content="Core inference engine: LanguageInterface → ATOMiK schema dict …">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>atomik_sdk.pipeline.inference.schema_inferrer</code></h1>
+</header>
+<section id="section-intro">
+<p>Core inference engine: LanguageInterface → ATOMiK schema dict.</p>
+<p>All inference is deterministic Python — zero LLM tokens consumed.</p>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="atomik_sdk.pipeline.inference.schema_inferrer.InferenceHints"><code class="flex name class">
+<span>class <span class="ident">InferenceHints</span></span>
+<span>(</span><span>vertical: str | None = None,<br>version: str = '1.0.0',<br>target_frequency_mhz: float = 94.5,<br>max_memory_mb: int = 64,<br>extra: dict[str, Any] = &lt;factory&gt;)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass
+class InferenceHints:
+    &#34;&#34;&#34;Optional overrides for schema inference.&#34;&#34;&#34;
+    vertical: str | None = None
+    version: str = &#34;1.0.0&#34;
+    target_frequency_mhz: float = 94.5
+    max_memory_mb: int = 64
+    extra: dict[str, Any] = field(default_factory=dict)</code></pre>
+</details>
+<div class="desc"><p>Optional overrides for schema inference.</p></div>
+<h3>Instance variables</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.inference.schema_inferrer.InferenceHints.extra"><code class="name">var <span class="ident">extra</span> : dict[str, typing.Any]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.inference.schema_inferrer.InferenceHints.max_memory_mb"><code class="name">var <span class="ident">max_memory_mb</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.inference.schema_inferrer.InferenceHints.target_frequency_mhz"><code class="name">var <span class="ident">target_frequency_mhz</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.inference.schema_inferrer.InferenceHints.version"><code class="name">var <span class="ident">version</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="atomik_sdk.pipeline.inference.schema_inferrer.InferenceHints.vertical"><code class="name">var <span class="ident">vertical</span> : str | None</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+<dt id="atomik_sdk.pipeline.inference.schema_inferrer.SchemaInferrer"><code class="flex name class">
+<span>class <span class="ident">SchemaInferrer</span></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class SchemaInferrer:
+    &#34;&#34;&#34;
+    Convert a LanguageInterface into a valid ATOMiK schema dict.
+
+    The algorithm is entirely deterministic and rule-based:
+    1. Catalogue from struct name, module path, and keyword heuristics.
+    2. Delta fields from interface fields (type classification, width snapping).
+    3. Operations from method name pattern matching.
+    4. Constraints from sensible defaults (overridable via hints).
+    &#34;&#34;&#34;
+
+    def infer(
+        self,
+        iface: LanguageInterface,
+        hints: InferenceHints | None = None,
+    ) -&gt; dict[str, Any]:
+        &#34;&#34;&#34;
+        Produce a valid ATOMiK schema dict from an extracted interface.
+
+        Returns:
+            Schema dict with &#34;catalogue&#34; and &#34;schema&#34; sections,
+            ready for the downstream validate stage.
+        &#34;&#34;&#34;
+        hints = hints or InferenceHints()
+
+        catalogue = self._infer_catalogue(iface, hints)
+        delta_fields = self._infer_delta_fields(iface)
+        operations = self._infer_operations(iface)
+        constraints = self._infer_constraints(hints)
+
+        return {
+            &#34;catalogue&#34;: catalogue,
+            &#34;schema&#34;: {
+                &#34;delta_fields&#34;: delta_fields,
+                &#34;operations&#34;: operations,
+                &#34;constraints&#34;: constraints,
+            },
+        }
+
+    def _infer_catalogue(
+        self,
+        iface: LanguageInterface,
+        hints: InferenceHints,
+    ) -&gt; dict[str, Any]:
+        &#34;&#34;&#34;Infer the catalogue section from interface metadata.&#34;&#34;&#34;
+        # Object name from struct/class name (already PascalCase from extractor)
+        object_name = iface.struct_name or &#34;UnknownObject&#34;
+
+        # Field from module path or directory
+        field_name = self._derive_field(iface.file_path)
+
+        # Vertical from keyword heuristics (overridable)
+        if hints.vertical:
+            vertical = hints.vertical
+        else:
+            field_names = [f.name for f in iface.fields]
+            vertical = classify_vertical(object_name, field_names)
+
+        return {
+            &#34;vertical&#34;: vertical,
+            &#34;field&#34;: field_name,
+            &#34;object&#34;: object_name,
+            &#34;version&#34;: hints.version,
+        }
+
+    def _derive_field(self, file_path: str) -&gt; str:
+        &#34;&#34;&#34;Derive the &#39;field&#39; catalogue entry from file path.&#34;&#34;&#34;
+        if not file_path:
+            return &#34;General&#34;
+
+        from pathlib import PurePosixPath, PureWindowsPath
+
+        # Handle both path separators
+        try:
+            path = PureWindowsPath(file_path)
+        except Exception:
+            path = PurePosixPath(file_path)
+
+        # Use parent directory name, title-cased
+        parent = path.parent.name
+        if parent and parent not in (&#34;.&#34;, &#34;src&#34;, &#34;lib&#34;, &#34;generated&#34;):
+            return parent.replace(&#34;_&#34;, &#34; &#34;).replace(&#34;-&#34;, &#34; &#34;).title().replace(&#34; &#34;, &#34;&#34;)
+
+        # Fall back to stem
+        stem = path.stem
+        return stem.replace(&#34;_&#34;, &#34; &#34;).title().replace(&#34; &#34;, &#34;&#34;)
+
+    def _infer_delta_fields(
+        self, iface: LanguageInterface
+    ) -&gt; dict[str, Any]:
+        &#34;&#34;&#34;Infer delta_fields from interface fields.&#34;&#34;&#34;
+        delta_fields: dict[str, Any] = {}
+
+        for f in iface.fields:
+            if not is_delta_candidate(f.name):
+                continue
+
+            width = snap_width(f.bit_width)
+            delta_type = classify_delta_type(f.name, f.type_name)
+
+            # Encoding: spatiotemporal for wide stream fields
+            if width &gt;= 128 and delta_type == &#34;delta_stream&#34;:
+                encoding = &#34;spatiotemporal_4x4x4&#34;
+            else:
+                encoding = &#34;raw&#34;
+
+            # Compression: xor for streams, none otherwise
+            compression = &#34;xor&#34; if delta_type == &#34;delta_stream&#34; else &#34;none&#34;
+
+            delta_fields[f.name] = {
+                &#34;type&#34;: delta_type,
+                &#34;width&#34;: width,
+                &#34;encoding&#34;: encoding,
+                &#34;compression&#34;: compression,
+                &#34;default_value&#34;: 0,
+            }
+
+        return delta_fields
+
+    def _infer_operations(self, iface: LanguageInterface) -&gt; dict[str, Any]:
+        &#34;&#34;&#34;Infer operations from interface method names.&#34;&#34;&#34;
+        op_names = {op.name.lower() for op in iface.operations}
+
+        # Accumulate is always enabled (core ATOMiK requirement)
+        operations: dict[str, Any] = {
+            &#34;accumulate&#34;: {
+                &#34;enabled&#34;: True,
+                &#34;latency_cycles&#34;: 1,
+            },
+        }
+
+        # Reconstruct if any method matches keywords
+        has_reconstruct = any(
+            kw in name
+            for name in op_names
+            for kw in RECONSTRUCT_KEYWORDS
+        )
+        if has_reconstruct:
+            operations[&#34;reconstruct&#34;] = {
+                &#34;enabled&#34;: True,
+                &#34;latency_cycles&#34;: 1,
+            }
+
+        # Rollback if any method matches keywords
+        has_rollback = any(
+            kw in name
+            for name in op_names
+            for kw in ROLLBACK_KEYWORDS
+        )
+        if has_rollback:
+            # Try to find history depth from constants
+            depth = 256  # default
+            for key, val in iface.constants.items():
+                key_lower = key.lower()
+                if (&#34;history&#34; in key_lower or &#34;depth&#34; in key_lower
+                        or &#34;rollback&#34; in key_lower):
+                    if isinstance(val, int) and val &gt; 0:
+                        depth = val
+                        break
+
+            operations[&#34;rollback&#34;] = {
+                &#34;enabled&#34;: True,
+                &#34;history_depth&#34;: depth,
+            }
+
+        return operations
+
+    def _infer_constraints(self, hints: InferenceHints) -&gt; dict[str, Any]:
+        &#34;&#34;&#34;Build constraints section from hints/defaults.&#34;&#34;&#34;
+        return {
+            &#34;target_frequency_mhz&#34;: hints.target_frequency_mhz,
+            &#34;max_memory_mb&#34;: hints.max_memory_mb,
+        }</code></pre>
+</details>
+<div class="desc"><p>Convert a LanguageInterface into a valid ATOMiK schema dict.</p>
+<p>The algorithm is entirely deterministic and rule-based:
+1. Catalogue from struct name, module path, and keyword heuristics.
+2. Delta fields from interface fields (type classification, width snapping).
+3. Operations from method name pattern matching.
+4. Constraints from sensible defaults (overridable via hints).</p></div>
+<h3>Methods</h3>
+<dl>
+<dt id="atomik_sdk.pipeline.inference.schema_inferrer.SchemaInferrer.infer"><code class="name flex">
+<span>def <span class="ident">infer</span></span>(<span>self,<br>iface: LanguageInterface,<br>hints: <a title="atomik_sdk.pipeline.inference.schema_inferrer.InferenceHints" href="#atomik_sdk.pipeline.inference.schema_inferrer.InferenceHints">InferenceHints</a> | None = None) ‑> dict[str, typing.Any]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def infer(
+    self,
+    iface: LanguageInterface,
+    hints: InferenceHints | None = None,
+) -&gt; dict[str, Any]:
+    &#34;&#34;&#34;
+    Produce a valid ATOMiK schema dict from an extracted interface.
+
+    Returns:
+        Schema dict with &#34;catalogue&#34; and &#34;schema&#34; sections,
+        ready for the downstream validate stage.
+    &#34;&#34;&#34;
+    hints = hints or InferenceHints()
+
+    catalogue = self._infer_catalogue(iface, hints)
+    delta_fields = self._infer_delta_fields(iface)
+    operations = self._infer_operations(iface)
+    constraints = self._infer_constraints(hints)
+
+    return {
+        &#34;catalogue&#34;: catalogue,
+        &#34;schema&#34;: {
+            &#34;delta_fields&#34;: delta_fields,
+            &#34;operations&#34;: operations,
+            &#34;constraints&#34;: constraints,
+        },
+    }</code></pre>
+</details>
+<div class="desc"><p>Produce a valid ATOMiK schema dict from an extracted interface.</p>
+<h2 id="returns">Returns</h2>
+<p>Schema dict with "catalogue" and "schema" sections,
+ready for the downstream validate stage.</p></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="atomik_sdk.pipeline.inference" href="index.html">atomik_sdk.pipeline.inference</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="atomik_sdk.pipeline.inference.schema_inferrer.InferenceHints" href="#atomik_sdk.pipeline.inference.schema_inferrer.InferenceHints">InferenceHints</a></code></h4>
+<ul class="">
+<li><code><a title="atomik_sdk.pipeline.inference.schema_inferrer.InferenceHints.extra" href="#atomik_sdk.pipeline.inference.schema_inferrer.InferenceHints.extra">extra</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.inference.schema_inferrer.InferenceHints.max_memory_mb" href="#atomik_sdk.pipeline.inference.schema_inferrer.InferenceHints.max_memory_mb">max_memory_mb</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.inference.schema_inferrer.InferenceHints.target_frequency_mhz" href="#atomik_sdk.pipeline.inference.schema_inferrer.InferenceHints.target_frequency_mhz">target_frequency_mhz</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.inference.schema_inferrer.InferenceHints.version" href="#atomik_sdk.pipeline.inference.schema_inferrer.InferenceHints.version">version</a></code></li>
+<li><code><a title="atomik_sdk.pipeline.inference.schema_inferrer.InferenceHints.vertical" href="#atomik_sdk.pipeline.inference.schema_inferrer.InferenceHints.vertical">vertical</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="atomik_sdk.pipeline.inference.schema_inferrer.SchemaInferrer" href="#atomik_sdk.pipeline.inference.schema_inferrer.SchemaInferrer">SchemaInferrer</a></code></h4>
+<ul class="">
+<li><code><a title="atomik_sdk.pipeline.inference.schema_inferrer.SchemaInferrer.infer" href="#atomik_sdk.pipeline.inference.schema_inferrer.SchemaInferrer.infer">infer</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+</body>
+</html>
