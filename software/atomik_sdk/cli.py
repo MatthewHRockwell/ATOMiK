@@ -483,33 +483,6 @@ def cmd_metrics_export(args: argparse.Namespace) -> int:
 # ---------------------------------------------------------------------------
 
 
-def _find_gowin_root() -> Path | None:
-    """Locate the Gowin EDA installation directory.
-
-    Checks the ``GOWIN_HOME`` environment variable first, then probes
-    common Windows install paths (``C:\\Gowin\\*``).  Returns the
-    versioned directory (e.g. ``Gowin_V1.9.11.03_Education_x64``) or
-    ``None`` if nothing is found.
-    """
-    import os
-
-    env = os.environ.get("GOWIN_HOME")
-    if env:
-        p = Path(env)
-        if p.is_dir():
-            return p
-
-    # Probe standard install locations
-    for base in [Path("C:/Gowin"), Path("C:/Program Files/Gowin")]:
-        if base.is_dir():
-            # Pick the newest versioned subdirectory
-            candidates = sorted(base.iterdir(), reverse=True)
-            for c in candidates:
-                if c.is_dir() and (c / "IDE" / "bin").is_dir():
-                    return c
-    return None
-
-
 def cmd_demo(args: argparse.Namespace) -> int:
     """Run a domain hardware demonstrator."""
     import re
@@ -545,55 +518,21 @@ def cmd_demo(args: argparse.Namespace) -> int:
     t_start = time.perf_counter()
 
     # -- Tool detection -------------------------------------------------------
+    from atomik_sdk.hardware_discovery import detect_board, find_tool
+
     iverilog = shutil.which("iverilog")
     vvp_cmd = shutil.which("vvp")
 
-    # Locate Gowin EDA — check PATH first, then known install directories
-    gowin_root = _find_gowin_root()
-    gw_sh = shutil.which("gw_sh")
-    programmer_cli = shutil.which("programmer_cli")
-    if gowin_root and not gw_sh:
-        candidate = gowin_root / "IDE" / "bin" / "gw_sh.exe"
-        if candidate.exists():
-            gw_sh = str(candidate)
-    if gowin_root and not programmer_cli:
-        candidate = gowin_root / "Programmer" / "bin" / "programmer_cli.exe"
-        if candidate.exists():
-            programmer_cli = str(candidate)
-
-    has_gowin = gw_sh is not None
-    has_programmer = programmer_cli is not None
-    has_openfpga = shutil.which("openFPGALoader") is not None
+    has_gowin = find_tool("gw_sh") is not None
+    has_programmer = find_tool("programmer_cli") is not None
+    has_openfpga = find_tool("openFPGALoader") is not None
 
     # -- Board detection (skip when --sim-only) --------------------------------
     board_detected = False
     hardware_used = False
 
     if not sim_only:
-        # Prefer Gowin programmer_cli (always ships with Gowin EDA)
-        if has_programmer:
-            try:
-                detect_result = subprocess.run(
-                    [programmer_cli, "--scan-cables"],
-                    capture_output=True, text=True, timeout=10,
-                )
-                if "cable found" in detect_result.stdout.lower():
-                    board_detected = True
-            except (subprocess.TimeoutExpired, OSError):
-                pass
-
-        # Fallback to openFPGALoader if installed
-        if not board_detected and has_openfpga:
-            try:
-                detect_result = subprocess.run(
-                    ["openFPGALoader", "--detect"],
-                    capture_output=True, text=True, timeout=10,
-                )
-                stdout_lower = detect_result.stdout.lower()
-                if "gw1nr" in stdout_lower or "tangnano9k" in stdout_lower:
-                    board_detected = True
-            except (subprocess.TimeoutExpired, OSError):
-                pass
+        board_detected = detect_board() is not None
 
     mode = "simulation" if sim_only else "auto"
     print(f"ATOMiK {domain.title()} Domain Demonstrator")
@@ -639,6 +578,7 @@ def cmd_demo(args: argparse.Namespace) -> int:
             compile_result = subprocess.run(
                 [iverilog, "-o", vvp_out] + all_files,
                 capture_output=True, text=True,
+                timeout=60,
             )
 
             if compile_result.returncode != 0:
@@ -672,10 +612,12 @@ def cmd_demo(args: argparse.Namespace) -> int:
                 else:
                     sim_tests_total = sim_tests_passed
 
-                has_failure = (
-                    "FAIL" in sim_result.stdout.upper()
-                    and "0 FAIL" not in sim_result.stdout.upper()
-                )
+                # Use parsed fail count when available; fall back to
+                # string heuristic only when no structured output exists.
+                if fail_match:
+                    has_failure = int(fail_match.group(1)) > 0
+                else:
+                    has_failure = "FAIL" in sim_result.stdout.upper()
                 if has_failure:
                     print("Demo simulation: FAILED")
                     validation_level = "simulation_only"

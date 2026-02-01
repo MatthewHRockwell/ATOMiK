@@ -20,20 +20,41 @@ pip install -e ".[dev]"
 
 ## CLI Tool: `atomik-gen`
 
-After installation, the `atomik-gen` command is available for schema validation and multi-language SDK generation:
+After installation, the `atomik-gen` command is available:
 
+### Schema & Code Generation
 ```bash
 atomik-gen generate <schema> [--output-dir DIR] [--languages LANG ...]
 atomik-gen validate <schema>
 atomik-gen info <schema>
 atomik-gen batch <directory> [--output-dir DIR] [--report FILE]
 atomik-gen list
-atomik-gen --version
 ```
 
-Example:
+### From-Source Pipeline
+```bash
+atomik-gen from-source <source-file> [--output-dir DIR] [--languages LANG ...]
+```
+Infer an ATOMiK schema directly from existing source code, then generate SDKs.
+
+### Hardware Demo
+```bash
+atomik-gen demo <domain> [--sim-only] [--com-port PORT] [--report FILE] [-v]
+```
+Run domain demos (e.g. `video`) through simulation and optional FPGA hardware validation. Produces a JSON report with validation level, timing, and tool information.
+
+### Pipeline (Advanced)
+```bash
+atomik-gen pipeline <source-file> [--output-dir DIR] [--stages STAGE ...]
+atomik-gen pipeline-status <run-id>
+```
+Run the full bidirectional pipeline: extract → infer → validate → diff → generate → verify → hardware → metrics.
+
+### Examples
 ```bash
 atomik-gen generate sdk/schemas/examples/terminal-io.json --languages python rust
+atomik-gen from-source my_app.py --languages python rust c
+atomik-gen demo video --sim-only --report demo_report.json
 atomik-gen batch sdk/schemas/domains/ --report report.json
 ```
 
@@ -68,8 +89,21 @@ The SDK provides three API levels:
 - `GenomeCompiler` - Configuration compilation
 - `BitstreamGenerator` - Verilog synthesis
 
+## Hardware Discovery
+
+The `atomik_sdk.hardware_discovery` module centralises all FPGA tool and board detection:
+
+- `find_gowin_root()` — Locate Gowin EDA installation (env, Windows, Linux probe paths)
+- `find_tool(name)` — Find tools like `gw_sh`, `programmer_cli`, `openFPGALoader`
+- `detect_board()` — Detect connected Tang Nano 9K via programmer_cli or openFPGALoader
+- `detect_com_port()` — Auto-detect UART port via pyserial VID:PID matching
+
+Cross-platform (Windows + Linux). Used by the CLI, pipeline hardware stage, and build scripts.
+
 ## Testing
 
 ```bash
 pytest tests/ -v --cov=atomik_sdk
 ```
+
+314 tests covering generators, pipeline stages, CLI commands, and hardware discovery.

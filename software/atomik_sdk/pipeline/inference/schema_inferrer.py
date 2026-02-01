@@ -10,7 +10,6 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from ..verification.interfaces import LanguageInterface
-
 from .heuristics import (
     RECONSTRUCT_KEYWORDS,
     ROLLBACK_KEYWORDS,

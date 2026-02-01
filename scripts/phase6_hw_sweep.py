@@ -20,6 +20,7 @@ import argparse
 import json
 import re
 import subprocess
+import sys
 import textwrap
 from dataclasses import dataclass
 from pathlib import Path
@@ -34,7 +35,9 @@ VCO_MAX = 1200.0
 ODIV_OPTIONS = [2, 4, 8, 16, 32, 48, 64, 80, 96, 112, 128]
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-GW_SH = Path(r"C:\Gowin\Gowin_V1.9.11.03_Education_x64\IDE\bin\gw_sh.exe")
+
+sys.path.insert(0, str(PROJECT_ROOT / "software"))
+from atomik_sdk.hardware_discovery import find_tool as _find_tool
 
 BANK_CONFIGS = [1, 2, 4, 8, 16]
 
@@ -687,9 +690,9 @@ def run_sweep(
         return results
 
     # --- Step 3: Run synthesis ---
-    if not GW_SH.exists():
-        print(f"ERROR: gw_sh not found at {GW_SH}")
-        print("Set GW_SH path in script or install Gowin EDA.")
+    gw_sh_path = _find_tool("gw_sh")
+    if not gw_sh_path:
+        print("ERROR: gw_sh not found (install Gowin EDA or set GOWIN_HOME)")
         return results
 
     print("--- Running Synthesis ---")
@@ -699,7 +702,7 @@ def run_sweep(
 
         try:
             proc = subprocess.run(
-                [str(GW_SH), str(tcl_path)],
+                [gw_sh_path, str(tcl_path)],
                 cwd=str(PROJECT_ROOT),
                 capture_output=True,
                 text=True,

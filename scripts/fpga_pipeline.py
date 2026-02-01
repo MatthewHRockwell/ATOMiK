@@ -61,7 +61,8 @@ DEFAULTS = {
     "usb_vid_pid": ["0403:6010"],
 }
 
-OPENFPGALOADER_FALLBACK = r"C:\msys64\ucrt64\bin\openFPGALoader.exe"
+sys.path.insert(0, str(PROJECT_ROOT / "software"))
+from atomik_sdk.hardware_discovery import find_tool as _hd_find_tool
 
 
 # ===================================================================
@@ -73,25 +74,9 @@ def _find_tool(name: str, config_path: str | None = None) -> str | None:
 
     Priority:
       1. Explicit path from config / CLI
-      2. Found on PATH via shutil.which
-      3. Platform-specific fallback (openFPGALoader only)
+      2. Shared hardware_discovery lookup (PATH + Gowin + fallbacks)
     """
-    if config_path:
-        expanded = os.path.expandvars(config_path)
-        if os.path.isfile(expanded):
-            return expanded
-        if shutil.which(expanded):
-            return expanded
-
-    found = shutil.which(name)
-    if found:
-        return found
-
-    # Fallback for openFPGALoader on MSYS2/Windows
-    if name == "openFPGALoader" and os.path.isfile(OPENFPGALOADER_FALLBACK):
-        return OPENFPGALOADER_FALLBACK
-
-    return None
+    return _hd_find_tool(name, config_path=config_path)
 
 
 def _load_config(config_path: str | None) -> dict:

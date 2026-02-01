@@ -74,6 +74,7 @@ module tb_video_demo;
     integer                 pass_count;
     integer                 fail_count;
     integer                 i;
+    reg                     perf_done_captured;
 
     reg [DATA_WIDTH-1:0]    initial_frame;
     reg [DATA_WIDTH-1:0]    deltas [0:NUM_DELTAS-1];
@@ -304,11 +305,15 @@ module tb_video_demo;
             do_accumulate(deltas[i]);
         end
 
-        // Stop performance counter
+        // Stop performance counter and capture the done pulse
         @(posedge clk);
         perf_stop = 1'b1;
         @(posedge clk);
+        perf_done_captured = perf_done;
         perf_stop = 1'b0;
+
+        // Allow one cycle for accumulator_zero flag to propagate
+        @(posedge clk);
 
         // Verify accumulator is non-zero after non-cancelling deltas
         check(accumulator_zero === 1'b0,
@@ -344,7 +349,7 @@ module tb_video_demo;
         // =================================================================
         $display("--- Test 4: Verify performance counter recorded operations ---");
 
-        check(perf_done === 1'b1,
+        check(perf_done_captured === 1'b1,
               "PERF: done flag asserted after stop");
         check(perf_running === 1'b0,
               "PERF: counter stopped");

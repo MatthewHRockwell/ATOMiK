@@ -24,14 +24,14 @@
 | **Phase 4A** | SDK Code Generation | ✅ **Complete** | Python/Rust/C/JS/Verilog generators |
 | **Phase 4B** | Domain SDKs | ✅ **Complete** | 3 domain SDKs, 57 generated files |
 | **Phase 4C** | Autonomous Pipeline | ✅ **Complete** | 6-stage controller, hardware demos, 124 tests |
-| **Phase 5** | Agentic Orchestration | ✅ **Complete** | DAG orchestrator, feedback loops, 242 tests |
+| **Phase 5** | Agentic Orchestration | ✅ **Complete** | DAG orchestrator, feedback loops, 314 tests |
 | **Phase 6** | Parallel Accumulator Banks | ✅ **Complete** | 16x linear scaling, 1056 Mops/s, 80/80 HW tests |
 
-**Latest**: Phase 6 validates N parallel XOR accumulator banks on FPGA hardware. 25-configuration synthesis sweep (N=1,2,4,8,16 x 5 frequencies) demonstrates 16x linear throughput scaling (1056 Mops/s at N=16), zero ALU carry chains via `syn_keep`/`syn_preserve` optimization, and 80/80 UART tests passing on the Tang Nano 9K.
+**Latest**: Platform robustness hardening (January 31, 2026). Centralised hardware discovery module, cross-platform tool/board detection, subprocess timeouts, RTL testbench timing fixes, 314 SDK tests passing. See commit history for details.
 
-Phase 6 complete (January 27, 2026). Parallel accumulator banks with binary XOR merge tree, automated PLL-based synthesis sweep, and on-device UART validation. See [`docs/PHASE6_HARDWARE_SYNTHESIS.md`](docs/PHASE6_HARDWARE_SYNTHESIS.md) for full results.
+Phase 6 complete (January 27, 2026). Parallel accumulator banks with binary XOR merge tree, automated PLL-based synthesis sweep, and on-device UART validation. 25-configuration synthesis sweep (N=1,2,4,8,16 x 5 frequencies) demonstrates 16x linear throughput scaling (1056 Mops/s at N=16). See [`docs/PHASE6_HARDWARE_SYNTHESIS.md`](docs/PHASE6_HARDWARE_SYNTHESIS.md).
 
-Phase 5 complete (January 27, 2026). Agentic pipeline with feedback loops, cross-language consistency checking, regression detection, intelligent context management, and self-tuning. See [`docs/PHASE_5_ROADMAP.md`](docs/PHASE_5_ROADMAP.md) for architecture details.
+Phase 5 complete (January 27, 2026). Agentic pipeline with feedback loops, cross-language consistency checking, regression detection, intelligent context management, and self-tuning. See [`docs/PHASE_5_ROADMAP.md`](docs/PHASE_5_ROADMAP.md).
 
 Phase 4C complete (January 26, 2026). Autonomous 6-stage pipeline controller with hardware demos. See commit `a22095d` for details.
 
@@ -356,7 +356,8 @@ ATOMiK/
 │   │   ├── analysis/            # Metrics, regression detection, field diff
 │   │   ├── context/             # Manifest, cache, intelligent context
 │   │   └── optimization/        # Self-tuning + bottleneck analysis
-│   └── atomik_sdk/tests/        # Test suite (242 tests)
+│   ├── atomik_sdk/hardware_discovery.py  # Centralised tool/board/port detection
+│   └── atomik_sdk/tests/        # Test suite (314 tests)
 ├── vscode-extension/            # ✅ VS Code extension (schema intellisense + commands)
 │   └── atomik-vscode/           # Extension source (TypeScript, snippets, schema)
 ├── sdk/schemas/                 # ✅ Schema definitions
@@ -454,7 +455,7 @@ python scripts/phase6_hw_validate.py         # 10/10 tests
 | **Phase 4A**: SDK Code Generation | ✅ Complete | 5-language generators, 100% test coverage |
 | **Phase 4B**: Domain SDKs | ✅ Complete | 3 domain schemas (Video/Edge/Finance), 57 generated files |
 | **Phase 4C**: Autonomous Pipeline | ✅ Complete | 6-stage controller, hardware demos, 124 tests |
-| **Phase 5**: Agentic Orchestration | ✅ Complete | DAG orchestrator, feedback loops, 25 modules, 242 tests |
+| **Phase 5**: Agentic Orchestration | ✅ Complete | DAG orchestrator, feedback loops, 25 modules, 314 tests |
 | **Phase 6**: Parallel Accumulator Banks | ✅ Complete | 16x linear scaling, 1056 Mops/s, 80/80 HW tests on Tang Nano 9K |
 
 ### What the SDK Architecture Enables
@@ -467,7 +468,7 @@ The schema-driven code generation pipeline ensures that **every new ATOMiK objec
 
 **Phase 4B validated this at scale**: Three domain SDKs (Video H.264 Delta, Edge Sensor IMU Fusion, Financial Price Tick) generated 57 files across all 5 languages from 3 JSON schemas, with all algebraic properties verified in generated test suites.
 
-**Phase 5 added self-improvement**: The pipeline now features event-driven DAG orchestration, feedback loops with error pattern learning, adaptive model routing, cross-language consistency checking, regression detection, and self-optimization. 242 tests verify the full system.
+**Phase 5 added self-improvement**: The pipeline now features event-driven DAG orchestration, feedback loops with error pattern learning, adaptive model routing, cross-language consistency checking, regression detection, and self-optimization. 314 tests verify the full system including CLI demo coverage and hardware discovery.
 
 **Phase 6 validated parallel scaling**: N parallel XOR accumulator banks achieve 16x throughput (1056 Mops/s) with zero-ALU merge tree, confirmed on Tang Nano 9K hardware with 80/80 UART tests. `syn_keep`/`syn_preserve` optimization eliminated 66 carry-chain ALUs, reducing logic levels by 50% and improving Fmax by up to 42%. N=16 banks break the 1 Gops/s barrier on a $10 FPGA. See [`docs/PHASE6_HARDWARE_SYNTHESIS.md`](docs/PHASE6_HARDWARE_SYNTHESIS.md).
 
@@ -534,4 +535,4 @@ For licensing inquiries, commercial integration, or architectural collaboration,
 
 ---
 
-*Last updated: January 27, 2026 — Phase 6 N=16 banks (1056 Mops/s, 1 Gops/s barrier broken, 80/80 HW tests, 25-config sweep)*
+*Last updated: January 31, 2026 — Robustness hardening (314 tests, centralised hardware discovery, cross-platform tool detection, testbench timing fixes)*

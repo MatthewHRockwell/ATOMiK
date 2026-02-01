@@ -176,79 +176,26 @@ class HardwareStage(BaseStage):
 
         return tests_passed == tests_total
 
-    def _find_gowin_root(self) -> Path | None:
-        """Locate the Gowin EDA installation directory."""
-        import os
-
-        env = os.environ.get("GOWIN_HOME")
-        if env:
-            p = Path(env)
-            if p.is_dir():
-                return p
-        for base in [Path("C:/Gowin"), Path("C:/Program Files/Gowin")]:
-            if base.is_dir():
-                candidates = sorted(base.iterdir(), reverse=True)
-                for c in candidates:
-                    if c.is_dir() and (c / "IDE" / "bin").is_dir():
-                        return c
-        return None
-
     def _has_gowin_eda(self) -> bool:
         """Check if Gowin EDA synthesis tools are available."""
-        if shutil.which("gw_sh") is not None:
-            return True
-        root = self._find_gowin_root()
-        if root:
-            return (root / "IDE" / "bin" / "gw_sh.exe").exists()
-        return False
+        from atomik_sdk.hardware_discovery import find_tool
 
-    def _find_programmer_cli(self) -> str | None:
-        """Return path to Gowin programmer_cli, or None."""
-        found = shutil.which("programmer_cli")
-        if found:
-            return found
-        root = self._find_gowin_root()
-        if root:
-            candidate = root / "Programmer" / "bin" / "programmer_cli.exe"
-            if candidate.exists():
-                return str(candidate)
-        return None
+        return find_tool("gw_sh") is not None
 
     def _has_fpga_tools(self) -> bool:
         """Check if board-programming tools are available."""
+        from atomik_sdk.hardware_discovery import find_tool
+
         return (
-            self._find_programmer_cli() is not None
-            or shutil.which("openFPGALoader") is not None
+            find_tool("programmer_cli") is not None
+            or find_tool("openFPGALoader") is not None
         )
 
     def _detect_board(self) -> str | None:
         """Detect connected Tang Nano 9K board."""
-        # Prefer Gowin programmer_cli (ships with Gowin EDA)
-        prog = self._find_programmer_cli()
-        if prog:
-            try:
-                result = subprocess.run(
-                    [prog, "--scan-cables"],
-                    capture_output=True, text=True, timeout=10,
-                )
-                if "cable found" in result.stdout.lower():
-                    return "tangnano9k"
-            except (subprocess.TimeoutExpired, OSError):
-                pass
+        from atomik_sdk.hardware_discovery import detect_board
 
-        # Fallback: openFPGALoader
-        openfpga = shutil.which("openFPGALoader")
-        if openfpga:
-            try:
-                result = subprocess.run(
-                    [openfpga, "--detect"],
-                    capture_output=True, text=True, timeout=10,
-                )
-                if "GW1NR" in result.stdout or "tangnano9k" in result.stdout.lower():
-                    return "tangnano9k"
-            except (subprocess.TimeoutExpired, OSError):
-                pass
-        return None
+        return detect_board()
 
     def _program_fpga(self, manifest: StageManifest, config: Any) -> bool:
         """Program the FPGA with the bitstream."""
@@ -274,14 +221,9 @@ class HardwareStage(BaseStage):
 
     def _detect_com_port(self) -> str | None:
         """Auto-detect COM port for UART communication."""
-        try:
-            import serial.tools.list_ports
-            for port in serial.tools.list_ports.comports():
-                if "USB" in port.description.upper() or "SERIAL" in port.description.upper():
-                    return port.device
-        except ImportError:
-            pass
-        return None
+        from atomik_sdk.hardware_discovery import detect_com_port
+
+        return detect_com_port()
 
     def _on_device_validation(
         self, com_port: str, manifest: StageManifest

@@ -1,6 +1,6 @@
 # ATOMiK Development Status Manifest
 # Auto-updated by CI/CD pipeline
-# Last manual update: January 25, 2026
+# Last manual update: January 31, 2026
 
 phases:
   phase_1:
@@ -285,14 +285,14 @@ overall:
   total_budget: "$500"
   budget_consumed: "$225"
   budget_remaining: "$275"
-  phases_complete: 4
-  phases_total: 4
+  phases_complete: 6
+  phases_total: 6
   critical_path_status: "complete"
-  current_phase: "Phase 4 - SDK Development"
-  phase_4_status: "COMPLETE"
-  next_milestone: "Phase 5 (optional) - Ecosystem Development"
+  current_phase: "Robustness Hardening"
+  phase_6_status: "COMPLETE"
+  next_milestone: "3-Board Demo for VC presentation"
   human_approval_required: false
-  last_ci_run: 2026-01-26T23:00:00Z
+  last_ci_run: 2026-01-31T00:00:00Z
 
   phase_1_2_3_summary:
     total_theorems_proven: 92
@@ -301,6 +301,28 @@ overall:
     hardware_tests_passing: 10
     key_validation: "Mathematical foundations proven, performance validated, hardware verified"
     silicon_verification: "All delta algebra properties confirmed in FPGA"
+
+  phase_5_6_summary:
+    sdk_tests_passing: 314
+    hardware_tests_passing: 80
+    parallel_banks_validated: 16
+    peak_throughput_mops: 1056
+    languages_supported: 5
+    domain_demos: 3
+    formal_proofs: 92
+
+  hardening_summary:
+    date: "2026-01-31"
+    changes:
+      - "Centralised hardware_discovery.py module (find_gowin_root, find_tool, detect_board, detect_com_port)"
+      - "Cross-platform support (Windows + Linux probe paths)"
+      - "Eliminated 4 copies of duplicated tool-discovery logic"
+      - "Added subprocess timeouts to all compilation calls"
+      - "Fixed RTL testbench timing (accumulator_zero propagation, perf_done capture)"
+      - "Fixed simulation pass/fail detection (has_failure logic bug)"
+      - "Added 20 new tests (test_cli_demo.py, test_hardware_discovery.py)"
+      - "Total SDK tests: 314 (up from 294)"
+      - "ruff check: zero violations"
 
   phase_4_context:
     primary_agent: "Claude Sonnet 4.5"
