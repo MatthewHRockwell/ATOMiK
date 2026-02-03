@@ -5,7 +5,7 @@ This directory contains synthesis scripts and build infrastructure for Phase 3 h
 ## Structure
 
 ```
-synth/
+hardware/synth/
 ├── gowin_synth.tcl       # Gowin EDA TCL synthesis script
 ├── run_synthesis.sh      # Synthesis runner (Linux/macOS)
 ├── run_synthesis.ps1     # Synthesis runner (Windows PowerShell)
@@ -42,20 +42,20 @@ export PATH=$PATH:/path/to/gowin/IDE/bin
 
 ```powershell
 # Command-line synthesis
-.\synth\run_synthesis.ps1
+.\hardware\synth\run_synthesis.ps1
 
 # Open GUI
-.\synth\run_synthesis.ps1 -GUI
+.\hardware\synth\run_synthesis.ps1 -GUI
 ```
 
 ### Linux/macOS
 
 ```bash
 # Command-line synthesis
-./synth/run_synthesis.sh
+./hardware/synth/run_synthesis.sh
 
 # Open GUI
-./synth/run_synthesis.sh --gui
+./hardware/synth/run_synthesis.sh --gui
 ```
 
 ### Manual (Gowin EDA GUI)
@@ -109,16 +109,16 @@ After successful synthesis:
 ## RTL Modules
 
 ### Core v2 (Delta Architecture)
-- `rtl/atomik_delta_acc.v` - Delta accumulator (XOR composition)
-- `rtl/atomik_state_rec.v` - State reconstructor (combinational)
-- `rtl/atomik_core_v2.v` - Top-level integration
+- `hardware/rtl/atomik_delta_acc.v` - Delta accumulator (XOR composition)
+- `hardware/rtl/atomik_state_rec.v` - State reconstructor (combinational)
+- `hardware/rtl/atomik_core_v2.v` - Top-level integration
 
 ### Support Modules
-- `rtl/pll/atomik_pll_94p5m.v` - PLL configuration (94.5 MHz)
-- `rtl/atomik_top.v` - Top-level with IO
-- `rtl/atomik_bios.v` - Boot/configuration
-- `rtl/atomik_uart_rx.v` - UART receiver
-- `rtl/atomik_uart_tx.v` - UART transmitter
+- `hardware/rtl/pll/atomik_pll_94p5m.v` - PLL configuration (94.5 MHz)
+- `hardware/rtl/atomik_top.v` - Top-level with IO
+- `hardware/rtl/atomik_bios.v` - Boot/configuration
+- `hardware/rtl/atomik_uart_rx.v` - UART receiver
+- `hardware/rtl/atomik_uart_tx.v` - UART transmitter
 
 ## Programming the FPGA
 
@@ -153,9 +153,9 @@ openFPGALoader -b tangnano9k -f impl/pnr/ATOMiK.fs
 ### Timing violations
 - Check `impl/pnr/ATOMiK_tr.html` for failing paths
 - Reduce target frequency in `gowin_synth.tcl`
-- Review `constraints/timing_constraints.sdc`
+- Review `hardware/constraints/timing_constraints.sdc`
 
 ### Synthesis errors
-- Verify all RTL files are syntax-correct: `.\scripts\test_phase3_rtl.ps1`
+- Verify all RTL files are syntax-correct: `.\hardware\scripts\test_phase3_rtl.ps1`
 - Check for missing module definitions
 - Review Gowin EDA console output

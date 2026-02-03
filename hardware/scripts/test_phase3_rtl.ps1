@@ -7,7 +7,7 @@ $ErrorActionPreference = "Continue"
 
 # Navigate to project root
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-Set-Location "$ScriptDir\.."
+Set-Location "$ScriptDir\..\.."
 
 Write-Host "=============================================="  -ForegroundColor Cyan
 Write-Host "  ATOMiK Phase 3 RTL Test Suite"               -ForegroundColor Cyan
@@ -56,10 +56,10 @@ function Parse-TestOutput {
 Write-Host "[1/3] Testing atomik_delta_acc..." -ForegroundColor Yellow
 
 $compileArgs = @(
-    "-o", "sim/tb_delta_acc.vvp",
+    "-o", "hardware/sim/tb_delta_acc.vvp",
     "-DSIMULATION",
-    "rtl/atomik_delta_acc.v",
-    "sim/tb_delta_acc.v"
+    "hardware/rtl/atomik_delta_acc.v",
+    "hardware/sim/tb_delta_acc.v"
 )
 
 & iverilog @compileArgs 2>&1 | Out-Null
@@ -67,7 +67,7 @@ if ($LASTEXITCODE -ne 0) {
     Write-Host "      COMPILE FAILED" -ForegroundColor Red
     $totalFailed++
 } else {
-    $output = & vvp sim/tb_delta_acc.vvp 2>&1
+    $output = & vvp hardware/sim/tb_delta_acc.vvp 2>&1
     $result = Parse-TestOutput $output
     
     $totalTests += $result.Tests
@@ -81,7 +81,7 @@ if ($LASTEXITCODE -ne 0) {
         $output | Select-String "FAIL" | ForEach-Object { Write-Host "      $_" -ForegroundColor Red }
     }
 }
-Remove-Item "sim/tb_delta_acc.vvp" -ErrorAction SilentlyContinue
+Remove-Item "hardware/sim/tb_delta_acc.vvp" -ErrorAction SilentlyContinue
 
 # -----------------------------------------------------------------------------
 # Test 2: State Reconstructor (atomik_state_rec)
@@ -89,9 +89,9 @@ Remove-Item "sim/tb_delta_acc.vvp" -ErrorAction SilentlyContinue
 Write-Host "[2/3] Testing atomik_state_rec..." -ForegroundColor Yellow
 
 $compileArgs = @(
-    "-o", "sim/tb_state_rec.vvp",
-    "rtl/atomik_state_rec.v",
-    "sim/tb_state_rec.v"
+    "-o", "hardware/sim/tb_state_rec.vvp",
+    "hardware/rtl/atomik_state_rec.v",
+    "hardware/sim/tb_state_rec.v"
 )
 
 & iverilog @compileArgs 2>&1 | Out-Null
@@ -99,7 +99,7 @@ if ($LASTEXITCODE -ne 0) {
     Write-Host "      COMPILE FAILED" -ForegroundColor Red
     $totalFailed++
 } else {
-    $output = & vvp sim/tb_state_rec.vvp 2>&1
+    $output = & vvp hardware/sim/tb_state_rec.vvp 2>&1
     $result = Parse-TestOutput $output
     
     $totalTests += $result.Tests
@@ -113,7 +113,7 @@ if ($LASTEXITCODE -ne 0) {
         $output | Select-String "FAIL" | ForEach-Object { Write-Host "      $_" -ForegroundColor Red }
     }
 }
-Remove-Item "sim/tb_state_rec.vvp" -ErrorAction SilentlyContinue
+Remove-Item "hardware/sim/tb_state_rec.vvp" -ErrorAction SilentlyContinue
 
 # -----------------------------------------------------------------------------
 # Test 3: Core v2 Integration (atomik_core_v2)
@@ -121,12 +121,12 @@ Remove-Item "sim/tb_state_rec.vvp" -ErrorAction SilentlyContinue
 Write-Host "[3/3] Testing atomik_core_v2..." -ForegroundColor Yellow
 
 $compileArgs = @(
-    "-o", "sim/tb_core_v2.vvp",
+    "-o", "hardware/sim/tb_core_v2.vvp",
     "-DSIMULATION",
-    "rtl/atomik_delta_acc.v",
-    "rtl/atomik_state_rec.v",
-    "rtl/atomik_core_v2.v",
-    "sim/tb_core_v2.v"
+    "hardware/rtl/atomik_delta_acc.v",
+    "hardware/rtl/atomik_state_rec.v",
+    "hardware/rtl/atomik_core_v2.v",
+    "hardware/sim/tb_core_v2.v"
 )
 
 & iverilog @compileArgs 2>&1 | Out-Null
@@ -134,7 +134,7 @@ if ($LASTEXITCODE -ne 0) {
     Write-Host "      COMPILE FAILED" -ForegroundColor Red
     $totalFailed++
 } else {
-    $output = & vvp sim/tb_core_v2.vvp 2>&1
+    $output = & vvp hardware/sim/tb_core_v2.vvp 2>&1
     $result = Parse-TestOutput $output
     
     $totalTests += $result.Tests
@@ -148,7 +148,7 @@ if ($LASTEXITCODE -ne 0) {
         $output | Select-String "FAIL" | ForEach-Object { Write-Host "      $_" -ForegroundColor Red }
     }
 }
-Remove-Item "sim/tb_core_v2.vvp" -ErrorAction SilentlyContinue
+Remove-Item "hardware/sim/tb_core_v2.vvp" -ErrorAction SilentlyContinue
 
 # -----------------------------------------------------------------------------
 # Summary

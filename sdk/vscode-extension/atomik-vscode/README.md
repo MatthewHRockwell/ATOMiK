@@ -51,7 +51,7 @@ python -m atomik_sdk.cli list
 ## Development
 
 ```bash
-cd vscode-extension/atomik-vscode
+cd sdk/vscode-extension/atomik-vscode
 npm install
 npm run compile
 ```

@@ -39,7 +39,7 @@ from pathlib import Path
 # ---------------------------------------------------------------------------
 # Resolve project root (scripts/ is one level below root)
 # ---------------------------------------------------------------------------
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
+PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 
 # ---------------------------------------------------------------------------
 # Default configuration
@@ -52,11 +52,11 @@ DEFAULTS = {
     "bitstream": "impl/pnr/ATOMiK.fs",
     "uart_baudrate": 115200,
     "rtl_files": [
-        "rtl/atomik_delta_acc.v",
-        "rtl/atomik_state_rec.v",
-        "rtl/atomik_core_v2.v",
+        "hardware/rtl/atomik_delta_acc.v",
+        "hardware/rtl/atomik_state_rec.v",
+        "hardware/rtl/atomik_core_v2.v",
     ],
-    "testbench": "sim/tb_core_v2.v",
+    "testbench": "hardware/sim/tb_core_v2.v",
     "post_program_delay_s": 3.0,
     "usb_vid_pid": ["0403:6010"],
 }
@@ -86,7 +86,7 @@ def _load_config(config_path: str | None) -> dict:
     if config_path:
         path = Path(config_path)
     else:
-        default_cfg = PROJECT_ROOT / "scripts" / "fpga_config.json"
+        default_cfg = PROJECT_ROOT / "hardware" / "scripts" / "fpga_config.json"
         if default_cfg.exists():
             path = default_cfg
     if path and path.exists():
@@ -598,7 +598,7 @@ def step_simulate(cfg: dict, result: PipelineResult) -> bool:
             result.record("rtl_simulation", False, msg)
             return False
 
-    sim_output = str(PROJECT_ROOT / "sim" / "pipeline_sim.vvp")
+    sim_output = str(PROJECT_ROOT / "hardware" / "sim" / "pipeline_sim.vvp")
     compile_cmd = [iverilog, "-o", sim_output] + rtl_files + [testbench]
 
     print(f"  Compiling: iverilog -> {Path(sim_output).name}")
@@ -871,7 +871,7 @@ def step_validate(cfg: dict, result: PipelineResult, port: str) -> bool:
 
     # Import the existing test_hardware module
     try:
-        sys.path.insert(0, str(PROJECT_ROOT / "scripts"))
+        sys.path.insert(0, str(PROJECT_ROOT / "hardware" / "scripts"))
         from test_hardware import run_tests
     except ImportError as e:
         msg = f"Cannot import test_hardware: {e}"

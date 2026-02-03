@@ -19,7 +19,7 @@ param(
 $ErrorActionPreference = "Stop"
 
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-$ProjectRoot = Split-Path -Parent $ScriptDir
+$ProjectRoot = Split-Path -Parent (Split-Path -Parent $ScriptDir)
 
 Write-Host "=============================================="  -ForegroundColor Cyan
 Write-Host " ATOMiK Synthesis Runner"                       -ForegroundColor Cyan

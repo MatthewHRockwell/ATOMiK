@@ -5,7 +5,7 @@ This directory contains testbenches and verification infrastructure for Phase 3.
 ## Structure
 
 ```
-sim/
+hardware/sim/
 ├── tb_delta_acc.v      # Delta accumulator testbench (T3.2)
 ├── tb_state_rec.v      # State reconstructor testbench (T3.3)
 ├── tb_atomik_core.v    # Integrated core testbench (T3.5)
@@ -48,6 +48,6 @@ FEDCBA9876543210  // Delta 2
 ## Verification Against Python Reference
 
 The reference_model.py generates test vectors that match the behavior of:
-- experiments/benchmarks/atomik/delta_engine.py
+- hardware/experiments/benchmarks/atomik/delta_engine.py
 
 This ensures hardware matches the validated software implementation.

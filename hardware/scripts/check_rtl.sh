@@ -8,7 +8,7 @@ set -e
 
 # Navigate to project root (handle both Windows and Unix paths)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-cd "$SCRIPT_DIR/.."
+cd "$SCRIPT_DIR/../.."
 
 echo "=========================================="
 echo "ATOMiK RTL Compilation Check"
@@ -16,10 +16,10 @@ echo "=========================================="
 
 # Define RTL files
 RTL_FILES=(
-    "rtl/atomik_top.v"
-    "rtl/atomik_core.v"
-    "rtl/pll/atomik_pll_94p5m.v"
-    "rtl/uart_genome_loader.v"
+    "hardware/rtl/atomik_top.v"
+    "hardware/rtl/atomik_core.v"
+    "hardware/rtl/pll/atomik_pll_94p5m.v"
+    "hardware/rtl/uart_genome_loader.v"
 )
 
 # Check all files exist
@@ -36,10 +36,10 @@ done
 echo ""
 echo "[2/4] Running Icarus Verilog compilation..."
 if command -v iverilog &> /dev/null; then
-    mkdir -p sim
-    iverilog -o sim/test_compile.vvp "${RTL_FILES[@]}"
+    mkdir -p hardware/sim
+    iverilog -o hardware/sim/test_compile.vvp "${RTL_FILES[@]}"
     echo "  ✓ Icarus Verilog: PASSED"
-    rm -f sim/test_compile.vvp
+    rm -f hardware/sim/test_compile.vvp
 else
     echo "  ⚠ iverilog not found, skipping"
 fi

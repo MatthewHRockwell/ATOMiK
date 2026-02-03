@@ -485,7 +485,7 @@ atomik-gen --version
 
 **Exit codes**: 0 = success, 1 = validation failure, 2 = generation failure, 3 = file/config error.
 
-The CLI wraps `GeneratorEngine` and all 5 language generators directly. A companion [VS Code extension](../../vscode-extension/atomik-vscode/README.md) provides schema intellisense and command palette integration with `atomik-gen`.
+The CLI wraps `GeneratorEngine` and all 5 language generators directly. A companion [VS Code extension](../../sdk/vscode-extension/atomik-vscode/README.md) provides schema intellisense and command palette integration with `atomik-gen`.
 
 ---
 

@@ -58,7 +58,7 @@ atomik-gen demo video --sim-only --report demo_report.json
 atomik-gen batch sdk/schemas/domains/ --report report.json
 ```
 
-A companion [VS Code extension](../vscode-extension/atomik-vscode/README.md) provides schema intellisense, snippets, and command palette integration with `atomik-gen`.
+A companion [VS Code extension](../sdk/vscode-extension/atomik-vscode/README.md) provides schema intellisense, snippets, and command palette integration with `atomik-gen`.
 
 ## Quick Start
 

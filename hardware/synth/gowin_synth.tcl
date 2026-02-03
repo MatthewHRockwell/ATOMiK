@@ -1,17 +1,15 @@
 # =============================================================================
-# ATOMiK Phase 6: Parallel Banks Synthesis Script (TCL)
+# ATOMiK Gowin EDA Synthesis Script (TCL)
 #
 # Target: GW1NR-LV9QN88PC6/I5 (Tang Nano 9K)
 # Tool:   Gowin EDA V1.9.11.03 Education
 #
 # Usage:
-#   gw_sh gowin_synth_parallel.tcl
+#   Option 1: Open in Gowin EDA GUI and run
+#   Option 2: gw_sh gowin_synth.tcl
 #
-# This synthesizes atomik_top_parallel with N_BANKS=4 parallel XOR
-# accumulator banks and XOR merge tree.
-#
-# Version: 6.0
-# Date:    January 27, 2026
+# Version: 2.5 (Fixed file list to match existing RTL)
+# Date:    January 25, 2026
 # =============================================================================
 
 # -----------------------------------------------------------------------------
@@ -19,26 +17,29 @@
 # -----------------------------------------------------------------------------
 set PROJECT_NAME "ATOMiK"
 
+# Get script directory for relative paths
 set SCRIPT_DIR [file dirname [info script]]
-set PROJECT_ROOT [file normalize "$SCRIPT_DIR/.."]
-set PROJECT_FILE "$PROJECT_ROOT/ATOMiK_parallel.gprj"
+set PROJECT_ROOT [file normalize "$SCRIPT_DIR/../.."]
+set PROJECT_FILE "$PROJECT_ROOT/hardware/ATOMiK.gprj"
 
 # -----------------------------------------------------------------------------
 # Open Project
 # -----------------------------------------------------------------------------
 puts "=============================================="
-puts " ATOMiK Phase 6: Parallel Banks Synthesis"
+puts " ATOMiK Synthesis - Gowin EDA"
 puts "=============================================="
 puts ""
 puts "Project Root: $PROJECT_ROOT"
 puts "Project File: $PROJECT_FILE"
 puts ""
 
+# Check if project file exists
 if {![file exists $PROJECT_FILE]} {
     puts "ERROR: Project file not found: $PROJECT_FILE"
     exit 1
 }
 
+# Open existing project
 puts "Opening project..."
 open_project $PROJECT_FILE
 
@@ -48,19 +49,12 @@ open_project $PROJECT_FILE
 puts ""
 puts "Configuring synthesis options..."
 
-set_option -top_module atomik_top_parallel
+set_option -top_module atomik_top
 set_option -verilog_std v2001
 set_option -use_sspi_as_gpio 1
 set_option -use_mspi_as_gpio 1
 set_option -timing_driven 1
 set_option -print_all_synthesis_warning 1
-
-# ALU extraction control:
-# Gowin maps wide XOR to carry-chain ALU mode even when carry propagation
-# is unnecessary.  RTL syn_keep attributes on merge tree and state
-# reconstruction wires prevent this for the XOR paths.
-# Uncomment below to globally disable ALU inference (affects counters too):
-# set_option -use_alu 0
 
 # -----------------------------------------------------------------------------
 # Run Synthesis
@@ -93,13 +87,13 @@ set IMPL_DIR "$PROJECT_ROOT/impl"
 
 puts ""
 puts "=============================================="
-puts " Phase 6 Parallel Banks - Synthesis Complete"
+puts " Synthesis Complete"
 puts "=============================================="
 puts ""
 puts "Output files:"
 puts "  Bitstream: $IMPL_DIR/pnr/$PROJECT_NAME.fs"
-puts "  Reports:   $IMPL_DIR/pnr/${PROJECT_NAME}.rpt.txt (resource)"
-puts "             $IMPL_DIR/pnr/${PROJECT_NAME}.tr.html  (timing)"
+puts "  Reports:   $IMPL_DIR/pnr/${PROJECT_NAME}_tr.html (timing)"
+puts "             $IMPL_DIR/pnr/${PROJECT_NAME}_pr.html (P&R)"
 puts ""
 puts "To program the FPGA:"
 puts "  openFPGALoader -b tangnano9k $IMPL_DIR/pnr/$PROJECT_NAME.fs"

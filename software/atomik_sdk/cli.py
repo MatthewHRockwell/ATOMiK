@@ -546,9 +546,9 @@ def cmd_demo(args: argparse.Namespace) -> int:
 
     # -- Gather Verilog source files -------------------------------------------
     common_dir = project_root / "demos" / "hardware" / "common"
-    rtl_dir = project_root / "rtl"
-    rtl_pll_dir = project_root / "rtl" / "pll"
-    sim_stubs_dir = project_root / "sim" / "stubs"
+    rtl_dir = project_root / "hardware" / "rtl"
+    rtl_pll_dir = project_root / "hardware" / "rtl" / "pll"
+    sim_stubs_dir = project_root / "hardware" / "sim" / "stubs"
 
     src_files = []
     # Stubs first (Gowin rPLL behavioural model), then PLL wrappers, RTL,

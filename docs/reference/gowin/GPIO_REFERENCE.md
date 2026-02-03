@@ -342,7 +342,7 @@ TBUF tbuf_inst (
 
 | File | Description |
 |------|-------------|
-| `constraints/atomik_constraints.cst` | Project physical constraints |
+| `hardware/constraints/atomik_constraints.cst` | Project physical constraints |
 | [TANG_NANO_9K_PINOUT.md](TANG_NANO_9K_PINOUT.md) | Board-specific pin mapping |
 | [TIMING_REFERENCE.md](TIMING_REFERENCE.md) | SDC timing constraints |
 

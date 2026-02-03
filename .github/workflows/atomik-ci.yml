@@ -76,8 +76,8 @@ jobs:
           pip install numpy scipy matplotlib
       - name: Execute benchmark suite
         run: |
-          if [ -d "experiments/benchmarks" ]; then
-            python experiments/benchmarks/run_all.py --output math/benchmarks/results/benchmark_results.json || echo "Benchmark script not found"
+          if [ -d "hardware/experiments/benchmarks" ]; then
+            python hardware/experiments/benchmarks/run_all.py --output math/benchmarks/results/benchmark_results.json || echo "Benchmark script not found"
           fi
       - name: Upload benchmark results
         uses: actions/upload-artifact@v4
@@ -98,10 +98,10 @@ jobs:
           sudo apt-get install -y verilator iverilog
       - name: Verilog lint and simulation
         run: |
-          if [ -d "rtl" ]; then
-            verilator --lint-only rtl/*.v 2>/dev/null || echo "Lint warnings detected"
-            if [ -d "rtl/testbench" ]; then
-              iverilog -o sim rtl/*.v rtl/testbench/*.v && vvp sim || echo "No testbenches found"
+          if [ -d "hardware/rtl" ]; then
+            verilator --lint-only hardware/rtl/*.v 2>/dev/null || echo "Lint warnings detected"
+            if [ -d "hardware/rtl/testbench" ]; then
+              iverilog -o sim hardware/rtl/*.v hardware/rtl/testbench/*.v && vvp sim || echo "No testbenches found"
             fi
           fi
 
@@ -143,7 +143,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Run FPGA pipeline
-        run: python scripts/fpga_pipeline.py --report hw_results.json
+        run: python hardware/scripts/fpga_pipeline.py --report hw_results.json
       - name: Upload hardware results
         uses: actions/upload-artifact@v4
         with:

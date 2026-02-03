@@ -64,22 +64,22 @@ phases:
       T2.8_statistical_analysis: complete
       T2.9_comparison_report: complete
     artifacts:
-      - experiments/benchmarks/design.md
-      - experiments/benchmarks/baseline/state_manager.py
-      - experiments/benchmarks/baseline/workloads.py
-      - experiments/benchmarks/baseline/test_baseline.py
-      - experiments/benchmarks/atomik/delta_engine.py
-      - experiments/benchmarks/atomik/workloads.py
-      - experiments/benchmarks/atomik/test_atomik.py
-      - experiments/benchmarks/metrics.py
-      - experiments/benchmarks/runner.py
-      - experiments/data/memory/memory_benchmarks.csv
-      - experiments/data/overhead/overhead_benchmarks.csv
-      - experiments/data/scalability/scalability_benchmarks.csv
-      - experiments/analysis/analyze.py
-      - experiments/analysis/statistics.md
-      - experiments/analysis/generate_plots.py
-      - experiments/analysis/plots/README.md
+      - hardware/experiments/benchmarks/design.md
+      - hardware/experiments/benchmarks/baseline/state_manager.py
+      - hardware/experiments/benchmarks/baseline/workloads.py
+      - hardware/experiments/benchmarks/baseline/test_baseline.py
+      - hardware/experiments/benchmarks/atomik/delta_engine.py
+      - hardware/experiments/benchmarks/atomik/workloads.py
+      - hardware/experiments/benchmarks/atomik/test_atomik.py
+      - hardware/experiments/benchmarks/metrics.py
+      - hardware/experiments/benchmarks/runner.py
+      - hardware/experiments/data/memory/memory_benchmarks.csv
+      - hardware/experiments/data/overhead/overhead_benchmarks.csv
+      - hardware/experiments/data/scalability/scalability_benchmarks.csv
+      - hardware/experiments/analysis/analyze.py
+      - hardware/experiments/analysis/statistics.md
+      - hardware/experiments/analysis/generate_plots.py
+      - hardware/experiments/analysis/plots/README.md
       - math/benchmarks/results/PERFORMANCE_COMPARISON.md
       - archive/PHASE_2_COMPLETION_REPORT.md
     metrics:
@@ -120,19 +120,19 @@ phases:
       T3.9_hardware_validation: complete
     artifacts:
       - specs/rtl_architecture.md
-      - rtl/atomik_delta_acc.v
-      - rtl/atomik_state_rec.v
-      - rtl/atomik_core_v2.v
-      - rtl/atomik_top.v
-      - sim/tb_delta_acc.v
-      - sim/tb_state_rec.v
-      - sim/tb_core_v2.v
-      - constraints/atomik_constraints.cst
-      - constraints/timing_constraints.sdc
-      - synth/gowin_synth.tcl
-      - synth/run_synthesis.ps1
-      - synth/README.md
-      - scripts/test_hardware.py
+      - hardware/rtl/atomik_delta_acc.v
+      - hardware/rtl/atomik_state_rec.v
+      - hardware/rtl/atomik_core_v2.v
+      - hardware/rtl/atomik_top.v
+      - hardware/sim/tb_delta_acc.v
+      - hardware/sim/tb_state_rec.v
+      - hardware/sim/tb_core_v2.v
+      - hardware/constraints/atomik_constraints.cst
+      - hardware/constraints/timing_constraints.sdc
+      - hardware/synth/gowin_synth.tcl
+      - hardware/synth/run_synthesis.ps1
+      - hardware/synth/README.md
+      - hardware/scripts/test_hardware.py
       - impl/pnr/ATOMiK.fs
       - math/benchmarks/results/RESOURCE_UTILIZATION.md
       - archive/PHASE_3_COMPLETION_REPORT.md

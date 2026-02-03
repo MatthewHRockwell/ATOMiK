@@ -628,7 +628,7 @@ Duty Cycle: 50% ±5%
 #### PLL Configuration (Current Production)
 
 ```verilog
-// From rtl/pll/atomik_pll_94p5m.v (ACTIVE)
+// From hardware/rtl/pll/atomik_pll_94p5m.v (ACTIVE)
 FCLKIN    = 27 MHz
 IDIV_SEL  = 1       // Divide input by 2
 FBDIV_SEL = 6       // Multiply by 7
@@ -769,7 +769,7 @@ Test 4 - Associativity (delta_assoc):
 
 #### TV2: Equivalence with Python Reference
 
-**Purpose**: Bit-exact match with `experiments/benchmarks/atomik/delta_engine.py`.
+**Purpose**: Bit-exact match with `hardware/experiments/benchmarks/atomik/delta_engine.py`.
 
 ```python
 # Generate test vectors
@@ -810,10 +810,10 @@ RTL Test:
 
 ### 7.2 Test Vector File Format
 
-Test vectors are stored in `sim/vectors/` with the following format:
+Test vectors are stored in `hardware/sim/vectors/` with the following format:
 
 ```
-# sim/vectors/tv_properties.txt
+# hardware/sim/vectors/tv_properties.txt
 # Format: OP, DATA_IN, EXPECTED_STATE, EXPECTED_ACCUM, EXPECTED_ZERO
 # OP: L=LOAD, A=ACCUMULATE, R=READ, N=NOP
 # Use '-' for don't-care values
@@ -842,39 +842,39 @@ R, -, 0x3333333333333333, -, -
 
 ```bash
 # Test atomik_delta_acc
-iverilog -o sim/tb_delta_acc.vvp \
-    sim/stubs/gowin_rpll_stub.v \
-    rtl/atomik_delta_acc.v \
-    sim/tb_delta_acc.v
-vvp sim/tb_delta_acc.vvp
+iverilog -o hardware/sim/tb_delta_acc.vvp \
+    hardware/sim/stubs/gowin_rpll_stub.v \
+    hardware/rtl/atomik_delta_acc.v \
+    hardware/sim/tb_delta_acc.v
+vvp hardware/sim/tb_delta_acc.vvp
 # EXPECT: All assertions pass, $finish with success
 
 # Test atomik_state_rec
-iverilog -o sim/tb_state_rec.vvp \
-    rtl/atomik_state_rec.v \
-    sim/tb_state_rec.v
-vvp sim/tb_state_rec.vvp
+iverilog -o hardware/sim/tb_state_rec.vvp \
+    hardware/rtl/atomik_state_rec.v \
+    hardware/sim/tb_state_rec.v
+vvp hardware/sim/tb_state_rec.vvp
 
 # Test atomik_core_v2
-iverilog -o sim/tb_core_v2.vvp \
-    rtl/atomik_delta_acc.v \
-    rtl/atomik_state_rec.v \
-    rtl/atomik_core_v2.v \
-    sim/tb_core_v2.v
-vvp sim/tb_core_v2.vvp
+iverilog -o hardware/sim/tb_core_v2.vvp \
+    hardware/rtl/atomik_delta_acc.v \
+    hardware/rtl/atomik_state_rec.v \
+    hardware/rtl/atomik_core_v2.v \
+    hardware/sim/tb_core_v2.v
+vvp hardware/sim/tb_core_v2.vvp
 ```
 
 #### 7.3.2 Waveform Analysis
 
 ```bash
 # Generate VCD for waveform viewing
-iverilog -o sim/tb_core_v2.vvp -DVCD_OUTPUT \
-    rtl/atomik_delta_acc.v \
-    rtl/atomik_state_rec.v \
-    rtl/atomik_core_v2.v \
-    sim/tb_core_v2.v
-vvp sim/tb_core_v2.vvp
-gtkwave sim/atomik_core_v2.vcd
+iverilog -o hardware/sim/tb_core_v2.vvp -DVCD_OUTPUT \
+    hardware/rtl/atomik_delta_acc.v \
+    hardware/rtl/atomik_state_rec.v \
+    hardware/rtl/atomik_core_v2.v \
+    hardware/sim/tb_core_v2.v
+vvp hardware/sim/tb_core_v2.vvp
+gtkwave hardware/sim/atomik_core_v2.vcd
 ```
 
 **Key Signals to Monitor**:
@@ -914,7 +914,7 @@ Code Coverage (Verilog):
 ### 7.6 Test Deliverables
 
 ```
-sim/
+hardware/sim/
 ├── stubs/
 │   └── gowin_rpll_stub.v         # PLL simulation model
 ├── tb_delta_acc.v                # Unit test: Delta accumulator
@@ -997,7 +997,7 @@ This maintains compatibility with existing FPGA builds while enabling delta arch
 
 ### 8.3 Pin Assignment (Tang Nano 9K)
 
-Existing pin assignments from `constraints/atomik_constraints.cst`:
+Existing pin assignments from `hardware/constraints/atomik_constraints.cst`:
 
 ```
 IO_LOC "sys_clk" 52;      // 27 MHz crystal input
@@ -1019,10 +1019,10 @@ IO_LOC "led[5]" 16;
 ### 8.4 Build Script Integration
 
 ```tcl
-# synth/gowin_synth.tcl (add core v2 to project)
-add_file -type verilog "rtl/atomik_delta_acc.v"
-add_file -type verilog "rtl/atomik_state_rec.v"
-add_file -type verilog "rtl/atomik_core_v2.v"
+# hardware/synth/gowin_synth.tcl (add core v2 to project)
+add_file -type verilog "hardware/rtl/atomik_delta_acc.v"
+add_file -type verilog "hardware/rtl/atomik_state_rec.v"
+add_file -type verilog "hardware/rtl/atomik_core_v2.v"
 
 # Synthesis options
 set_option -use_dsp 0              # No DSP blocks needed (XOR is LUT-based)
@@ -1064,12 +1064,12 @@ ATOMiK Core v2 implements delta-state computation in hardware with:
 | Task | Description | Depends On | Deliverable |
 |------|-------------|------------|-------------|
 | **T3.1** | RTL architecture spec | Phase 2 complete | `specs/rtl_architecture.md` ✓ |
-| **T3.2** | Implement atomik_delta_acc.v | T3.1 | `rtl/atomik_delta_acc.v` |
-| **T3.3** | Implement atomik_state_rec.v | T3.1 | `rtl/atomik_state_rec.v` |
-| **T3.4** | Implement atomik_core_v2.v | T3.2, T3.3 | `rtl/atomik_core_v2.v` |
-| **T3.5** | Write testbenches, simulate | T3.4 | `sim/tb_*.v`, passing tests |
-| **T3.6** | Timing constraints | T3.5 | `constraints/atomik_timing.sdc` |
-| **T3.7** | FPGA synthesis scripts | T3.6 | `synth/gowin_synth.tcl` |
+| **T3.2** | Implement atomik_delta_acc.v | T3.1 | `hardware/rtl/atomik_delta_acc.v` |
+| **T3.3** | Implement atomik_state_rec.v | T3.1 | `hardware/rtl/atomik_state_rec.v` |
+| **T3.4** | Implement atomik_core_v2.v | T3.2, T3.3 | `hardware/rtl/atomik_core_v2.v` |
+| **T3.5** | Write testbenches, simulate | T3.4 | `hardware/sim/tb_*.v`, passing tests |
+| **T3.6** | Timing constraints | T3.5 | `hardware/constraints/atomik_timing.sdc` |
+| **T3.7** | FPGA synthesis scripts | T3.6 | `hardware/synth/gowin_synth.tcl` |
 | **T3.8** | Resource utilization analysis | T3.7 | `math/benchmarks/results/RESOURCE_UTILIZATION.md` |
 | **T3.9** | Hardware validation report | T3.8 | `archive/PHASE_3_COMPLETION_REPORT.md` |
 
@@ -1202,14 +1202,14 @@ Critical Path 2: State Reconstruction
 
 | Deliverable | Location | Status |
 |-------------|----------|--------|
-| Delta accumulator | `rtl/atomik_delta_acc.v` | ✅ |
-| State reconstructor | `rtl/atomik_state_rec.v` | ✅ |
-| Core v2 integration | `rtl/atomik_core_v2.v` | ✅ |
-| Top-level with UART | `rtl/atomik_top.v` | ✅ |
-| Physical constraints | `constraints/atomik_constraints.cst` | ✅ |
-| Timing constraints | `constraints/timing_constraints.sdc` | ✅ |
-| Synthesis scripts | `synth/gowin_synth.tcl` | ✅ |
-| Hardware test script | `scripts/test_hardware.py` | ✅ |
+| Delta accumulator | `hardware/rtl/atomik_delta_acc.v` | ✅ |
+| State reconstructor | `hardware/rtl/atomik_state_rec.v` | ✅ |
+| Core v2 integration | `hardware/rtl/atomik_core_v2.v` | ✅ |
+| Top-level with UART | `hardware/rtl/atomik_top.v` | ✅ |
+| Physical constraints | `hardware/constraints/atomik_constraints.cst` | ✅ |
+| Timing constraints | `hardware/constraints/timing_constraints.sdc` | ✅ |
+| Synthesis scripts | `hardware/synth/gowin_synth.tcl` | ✅ |
+| Hardware test script | `hardware/scripts/test_hardware.py` | ✅ |
 | FPGA bitstream | `impl/pnr/ATOMiK.fs` | ✅ |
 | Resource report | `math/benchmarks/results/RESOURCE_UTILIZATION.md` | ✅ |
 | Completion report | `archive/PHASE_3_COMPLETION_REPORT.md` | ✅ |

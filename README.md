@@ -51,7 +51,7 @@ python -m software.demos.state_sync_benchmark
 ## For Engineers
 
 - **Formal Proofs**: [`math/proofs/`](math/proofs/) — 92 Lean4 theorems including Turing completeness
-- **RTL Source**: [`rtl/`](rtl/) — Verilog implementation validated on Tang Nano 9K
+- **RTL Source**: [`hardware/rtl/`](hardware/rtl/) — Verilog implementation validated on Tang Nano 9K
 - **SDK**: `pip install -e ./software` — schema-driven code generation for Python/Rust/C/JS/Verilog
 - **Phase 6 Synthesis**: [`docs/PHASE6_HARDWARE_SYNTHESIS.md`](docs/PHASE6_HARDWARE_SYNTHESIS.md) — 25-config sweep
 - **API Reference**: [`docs/SDK_API_REFERENCE.md`](docs/SDK_API_REFERENCE.md)
@@ -252,10 +252,15 @@ python -m demos.run_demo                           # Auto-discover hardware
 
 ```text
 ATOMiK/
+├── hardware/                 # FPGA/ASIC hardware design
+│   ├── rtl/                  # Verilog RTL source
+│   ├── sim/                  # Testbenches (single-core + parallel)
+│   ├── sweep/                # Phase 6 synthesis sweep (25 configs)
+│   ├── synth/                # Synthesis output and reports
+│   ├── scripts/              # Hardware validation scripts
+│   ├── constraints/          # Timing and pin constraints
+│   └── experiments/          # Hardware experiments
 ├── math/proofs/              # Lean4 formal proofs (92 theorems)
-├── rtl/                      # Verilog RTL source
-├── sim/                      # Testbenches (single-core + parallel)
-├── sweep/                    # Phase 6 synthesis sweep (25 configs)
 ├── software/                 # Python SDK + pipeline + generators
 │   ├── atomik_sdk/           # SDK package (pip install -e ./software)
 │   └── demos/                # State sync benchmarks
@@ -268,9 +273,10 @@ ATOMiK/
 ├── papers/                   # Research publications
 ├── docs/                     # SDK documentation and guides
 ├── specs/                    # Formal model and RTL specs
-├── sdk/schemas/              # JSON schema definitions
-├── scripts/                  # Hardware validation scripts
-├── vscode-extension/         # VS Code schema tools
+├── sdk/                     # SDK: schemas, generated output, VS Code extension
+│   ├── schemas/             # JSON schema definitions
+│   ├── generated/           # Generated SDK output
+│   └── vscode-extension/    # VS Code extension
 └── archive/                  # Historical phase reports
 ```
 

@@ -18,7 +18,7 @@ import sys
 from pathlib import Path
 
 # Add SDK to path
-project_root = Path(__file__).parent.parent
+project_root = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(project_root / "software" / "atomik_sdk"))
 
 from generator.core import GeneratorConfig, GeneratorEngine
@@ -109,7 +109,7 @@ def main():
     )
     parser.add_argument(
         "--output-dir",
-        default="generated_sdks",
+        default="sdk/generated",
         help="Output directory for generated code",
     )
     parser.add_argument(

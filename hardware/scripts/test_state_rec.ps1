@@ -6,7 +6,7 @@ $ErrorActionPreference = "Stop"
 
 # Navigate to project root
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-Set-Location "$ScriptDir\.."
+Set-Location "$ScriptDir\..\.."
 
 Write-Host "==========================================" -ForegroundColor Cyan
 Write-Host "ATOMiK State Reconstructor Test" -ForegroundColor Cyan
@@ -22,9 +22,9 @@ if (-not $iverilog) {
 # Compile
 Write-Host "`n[1/2] Compiling..." -ForegroundColor Yellow
 $compileArgs = @(
-    "-o", "sim/tb_state_rec.vvp",
-    "rtl/atomik_state_rec.v",
-    "sim/tb_state_rec.v"
+    "-o", "hardware/sim/tb_state_rec.vvp",
+    "hardware/rtl/atomik_state_rec.v",
+    "hardware/sim/tb_state_rec.v"
 )
 
 & iverilog @compileArgs
@@ -36,14 +36,14 @@ Write-Host "  Compilation successful" -ForegroundColor Green
 
 # Run simulation
 Write-Host "`n[2/2] Running simulation..." -ForegroundColor Yellow
-& vvp sim/tb_state_rec.vvp
+& vvp hardware/sim/tb_state_rec.vvp
 
 if ($LASTEXITCODE -ne 0) {
     Write-Host "`nSimulation returned non-zero exit code" -ForegroundColor Yellow
 }
 
 # Cleanup
-Remove-Item "sim/tb_state_rec.vvp" -ErrorAction SilentlyContinue
+Remove-Item "hardware/sim/tb_state_rec.vvp" -ErrorAction SilentlyContinue
 
 Write-Host "`n==========================================" -ForegroundColor Cyan
 Write-Host "Test complete" -ForegroundColor Cyan

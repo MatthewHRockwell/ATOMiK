@@ -34,7 +34,7 @@ VCO_MIN = 400.0
 VCO_MAX = 1200.0
 ODIV_OPTIONS = [2, 4, 8, 16, 32, 48, 64, 80, 96, 112, 128]
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
+PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 
 sys.path.insert(0, str(PROJECT_ROOT / "software"))
 from atomik_sdk.hardware_discovery import find_tool as _find_tool
@@ -616,7 +616,7 @@ def run_sweep(
 ) -> list[SynthResult]:
     """Run full synthesis sweep across frequency × N_BANKS configurations."""
 
-    sweep_dir = PROJECT_ROOT / "sweep"
+    sweep_dir = PROJECT_ROOT / "hardware" / "sweep"
     sweep_dir.mkdir(exist_ok=True)
     (sweep_dir / "pll").mkdir(exist_ok=True)
     (sweep_dir / "top").mkdir(exist_ok=True)
@@ -774,7 +774,7 @@ def run_sweep(
               f"{r.throughput_mops:>8.1f}M")
 
     # Save results JSON
-    results_path = PROJECT_ROOT / "sweep" / "sweep_results.json"
+    results_path = PROJECT_ROOT / "hardware" / "sweep" / "sweep_results.json"
     results_data = [
         {
             "freq_mhz": r.freq_mhz,

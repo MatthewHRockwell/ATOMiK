@@ -44,9 +44,9 @@
       "math/benchmarks/results/PERFORMANCE_COMPARISON.md"
     ],
     "phase_3": [
-      "rtl/",
-      "sim/",
-      "synth/"
+      "hardware/rtl/",
+      "hardware/sim/",
+      "hardware/synth/"
     ],
     "phase_4": [
       "sdk/python/",

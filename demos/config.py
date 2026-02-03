@@ -11,8 +11,8 @@ from pathlib import Path
 # ---------------------------------------------------------------------------
 REPO_ROOT = Path(__file__).resolve().parent.parent
 BITSTREAM_DIR = REPO_ROOT / "demos" / "bitstreams"
-SWEEP_BITSTREAM_DIR = REPO_ROOT / "sweep" / "impl" / "pnr"
-SWEEP_RESULTS_PATH = REPO_ROOT / "sweep" / "sweep_results.json"
+SWEEP_BITSTREAM_DIR = REPO_ROOT / "hardware" / "sweep" / "impl" / "pnr"
+SWEEP_RESULTS_PATH = REPO_ROOT / "hardware" / "sweep" / "sweep_results.json"
 
 # openFPGALoader – resolve from PATH or a known install location
 _OPENFPGA_HINTS = [

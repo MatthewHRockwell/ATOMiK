@@ -448,8 +448,8 @@ slack (MET)                            +2.198
 
 | File | Description |
 |------|-------------|
-| `constraints/atomik_timing.sdc` | Project timing constraints |
-| `constraints/atomik_constraints.cst` | Physical constraints |
+| `hardware/constraints/atomik_timing.sdc` | Project timing constraints |
+| `hardware/constraints/atomik_constraints.cst` | Physical constraints |
 | [GPIO_REFERENCE.md](GPIO_REFERENCE.md) | I/O configuration |
 | [CLOCK_REFERENCE.md](CLOCK_REFERENCE.md) | PLL configuration |
 

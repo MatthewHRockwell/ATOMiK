@@ -7,7 +7,7 @@ $ErrorActionPreference = "Stop"
 
 # Navigate to project root
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-Set-Location "$ScriptDir\.."
+Set-Location "$ScriptDir\..\.."
 
 Write-Host "==========================================" -ForegroundColor Cyan
 Write-Host "ATOMiK RTL Compilation Check" -ForegroundColor Cyan
@@ -15,11 +15,11 @@ Write-Host "==========================================" -ForegroundColor Cyan
 
 # Define RTL files (order matters - stubs first, then dependencies, then top)
 $RTL_FILES = @(
-    "sim/stubs/gowin_rpll_stub.v",   # Gowin primitive simulation stub
-    "rtl/pll/atomik_pll_94p5m.v",    # PLL wrapper
-    "rtl/uart_genome_loader.v",      # UART loader
-    "rtl/atomik_core.v",             # Core logic
-    "rtl/atomik_top.v"               # Top module
+    "hardware/sim/stubs/gowin_rpll_stub.v",   # Gowin primitive simulation stub
+    "hardware/rtl/pll/atomik_pll_94p5m.v",    # PLL wrapper
+    "hardware/rtl/uart_genome_loader.v",      # UART loader
+    "hardware/rtl/atomik_core.v",             # Core logic
+    "hardware/rtl/atomik_top.v"               # Top module
 )
 
 # Check all files exist
@@ -38,17 +38,17 @@ Write-Host "`n[2/3] Running Icarus Verilog compilation..." -ForegroundColor Yell
 $iverilog = Get-Command iverilog -ErrorAction SilentlyContinue
 if ($iverilog) {
     # Create sim directory if needed
-    if (!(Test-Path "sim")) {
-        New-Item -ItemType Directory -Path "sim" | Out-Null
+    if (!(Test-Path "hardware/sim")) {
+        New-Item -ItemType Directory -Path "hardware/sim" | Out-Null
     }
-    
+
     # Run compilation
-    $compileArgs = @("-o", "sim/test_compile.vvp") + $RTL_FILES
+    $compileArgs = @("-o", "hardware/sim/test_compile.vvp") + $RTL_FILES
     & iverilog @compileArgs
     
     if ($LASTEXITCODE -eq 0) {
         Write-Host "  PASSED: Icarus Verilog compilation successful" -ForegroundColor Green
-        Remove-Item "sim/test_compile.vvp" -ErrorAction SilentlyContinue
+        Remove-Item "hardware/sim/test_compile.vvp" -ErrorAction SilentlyContinue
     } else {
         Write-Host "  FAILED: Icarus Verilog compilation errors" -ForegroundColor Red
         exit 1

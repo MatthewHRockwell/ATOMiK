@@ -64,16 +64,16 @@ Output: 94.5 MHz (SYS_CLK_HZ parameter)
 
 | Module | Location | Output | Status |
 |--------|----------|--------|--------|
-| `atomik_pll_94p5m` | `rtl/pll/atomik_pll_94p5m.v` | 94.5 MHz | **Active** |
-| `atomik_pll_81m` | `rtl/pll/atomik_pll_81m.v` | 81.0 MHz | Available |
-| `Gowin_rPLL` | `rtl/pll/gowin_rpll/gowin_rpll.v` | Dynamic | Available (has idsel input) |
+| `atomik_pll_94p5m` | `hardware/rtl/pll/atomik_pll_94p5m.v` | 94.5 MHz | **Active** |
+| `atomik_pll_81m` | `hardware/rtl/pll/atomik_pll_81m.v` | 81.0 MHz | Available |
+| `Gowin_rPLL` | `hardware/rtl/pll/gowin_rpll/gowin_rpll.v` | Dynamic | Available (has idsel input) |
 
 ### Constraints Files
 
 | File | Purpose |
 |------|---------|
-| `constraints/atomik_constraints.cst` | Physical pin assignments |
-| `constraints/atomik_timing.sdc` | Timing constraints |
+| `hardware/constraints/atomik_constraints.cst` | Physical pin assignments |
+| `hardware/constraints/atomik_timing.sdc` | Timing constraints |
 
 ---
 
@@ -100,8 +100,8 @@ Output: 94.5 MHz (SYS_CLK_HZ parameter)
 | Document | Location |
 |----------|----------|
 | RTL Architecture Spec | `specs/rtl_architecture.md` |
-| PLL Module README | `rtl/pll/README.md` |
-| Synthesis Scripts | `synth/README.md` |
+| PLL Module README | `hardware/rtl/pll/README.md` |
+| Synthesis Scripts | `hardware/synth/README.md` |
 | Phase 3 Execution Guide | `agents/phase3/PHASE_3_EXECUTION_GUIDE.md` |
 
 ---

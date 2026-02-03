@@ -51,9 +51,9 @@
 
 | Data | Location |
 |------|----------|
-| Benchmark code | `experiments/benchmarks/` |
-| Raw measurements (360) | `experiments/data/` |
-| Statistical analysis | `experiments/analysis/` |
+| Benchmark code | `hardware/experiments/benchmarks/` |
+| Raw measurements (360) | `hardware/experiments/data/` |
+| Statistical analysis | `hardware/experiments/analysis/` |
 | Comparison report | `math/benchmarks/results/PERFORMANCE_COMPARISON.md` |
 | Hardware validation | `archive/PHASE_3_COMPLETION_REPORT.md` |
 | RTL source | `rtl/atomik_*.v` |

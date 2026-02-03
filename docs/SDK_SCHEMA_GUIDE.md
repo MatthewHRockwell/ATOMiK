@@ -532,7 +532,7 @@ atomik-gen validate sdk/schemas/examples/terminal-io.json
 atomik-gen info sdk/schemas/domains/finance-price-tick.json
 ```
 
-**VS Code**: Files matching `*.atomik.json` or in `**/schemas/**/*.json` are automatically validated with real-time error squiggles when the [ATOMiK VS Code extension](../vscode-extension/atomik-vscode/README.md) is installed.
+**VS Code**: Files matching `*.atomik.json` or in `**/schemas/**/*.json` are automatically validated with real-time error squiggles when the [ATOMiK VS Code extension](../sdk/vscode-extension/atomik-vscode/README.md) is installed.
 
 **Python Example**:
 ```python

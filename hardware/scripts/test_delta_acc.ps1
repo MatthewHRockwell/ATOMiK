@@ -6,7 +6,7 @@ $ErrorActionPreference = "Stop"
 
 # Navigate to project root
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-Set-Location "$ScriptDir\.."
+Set-Location "$ScriptDir\..\.."
 
 Write-Host "==========================================" -ForegroundColor Cyan
 Write-Host "ATOMiK Delta Accumulator Test" -ForegroundColor Cyan
@@ -22,10 +22,10 @@ if (-not $iverilog) {
 # Compile
 Write-Host "`n[1/2] Compiling..." -ForegroundColor Yellow
 $compileArgs = @(
-    "-o", "sim/tb_delta_acc.vvp",
+    "-o", "hardware/sim/tb_delta_acc.vvp",
     "-DSIMULATION",
-    "rtl/atomik_delta_acc.v",
-    "sim/tb_delta_acc.v"
+    "hardware/rtl/atomik_delta_acc.v",
+    "hardware/sim/tb_delta_acc.v"
 )
 
 & iverilog @compileArgs
@@ -37,14 +37,14 @@ Write-Host "  Compilation successful" -ForegroundColor Green
 
 # Run simulation
 Write-Host "`n[2/2] Running simulation..." -ForegroundColor Yellow
-& vvp sim/tb_delta_acc.vvp
+& vvp hardware/sim/tb_delta_acc.vvp
 
 if ($LASTEXITCODE -ne 0) {
     Write-Host "`nSimulation returned non-zero exit code" -ForegroundColor Yellow
 }
 
 # Cleanup
-Remove-Item "sim/tb_delta_acc.vvp" -ErrorAction SilentlyContinue
+Remove-Item "hardware/sim/tb_delta_acc.vvp" -ErrorAction SilentlyContinue
 
 Write-Host "`n==========================================" -ForegroundColor Cyan
 Write-Host "Test complete" -ForegroundColor Cyan

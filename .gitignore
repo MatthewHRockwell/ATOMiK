@@ -38,20 +38,21 @@ sim_cmp
 
 # Gowin EDA Build Artifacts
 # 'impl' and 'temp' contain intermediate synthesis files
-impl/
+hardware/impl/
 temp/
+archive/
 
 # Gowin Project Files & Settings
 *.gprj
 *.gprj.user
 
 # Gowin Synthesis Sweep Generated Files
-sweep/pll/
-sweep/results/
-sweep/sdc/
-sweep/tcl/
-sweep/top/
-sweep/project_*/
+hardware/sweep/pll/
+hardware/sweep/results/
+hardware/sweep/sdc/
+hardware/sweep/tcl/
+hardware/sweep/top/
+hardware/sweep/project_*/
 
 # Bitstreams (The compiled binary for the board)
 # Generally, you don't commit these to source control,

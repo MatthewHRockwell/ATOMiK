@@ -6,7 +6,7 @@ $ErrorActionPreference = "Stop"
 
 # Navigate to project root
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-Set-Location "$ScriptDir\.."
+Set-Location "$ScriptDir\..\.."
 
 Write-Host "==========================================" -ForegroundColor Cyan
 Write-Host "ATOMiK Core v2 Integration Test" -ForegroundColor Cyan
@@ -22,12 +22,12 @@ if (-not $iverilog) {
 # Compile
 Write-Host "`n[1/2] Compiling..." -ForegroundColor Yellow
 $compileArgs = @(
-    "-o", "sim/tb_core_v2.vvp",
+    "-o", "hardware/sim/tb_core_v2.vvp",
     "-DSIMULATION",
-    "rtl/atomik_delta_acc.v",
-    "rtl/atomik_state_rec.v",
-    "rtl/atomik_core_v2.v",
-    "sim/tb_core_v2.v"
+    "hardware/rtl/atomik_delta_acc.v",
+    "hardware/rtl/atomik_state_rec.v",
+    "hardware/rtl/atomik_core_v2.v",
+    "hardware/sim/tb_core_v2.v"
 )
 
 & iverilog @compileArgs
@@ -39,14 +39,14 @@ Write-Host "  Compilation successful" -ForegroundColor Green
 
 # Run simulation
 Write-Host "`n[2/2] Running simulation..." -ForegroundColor Yellow
-& vvp sim/tb_core_v2.vvp
+& vvp hardware/sim/tb_core_v2.vvp
 
 if ($LASTEXITCODE -ne 0) {
     Write-Host "`nSimulation returned non-zero exit code" -ForegroundColor Yellow
 }
 
 # Cleanup
-Remove-Item "sim/tb_core_v2.vvp" -ErrorAction SilentlyContinue
+Remove-Item "hardware/sim/tb_core_v2.vvp" -ErrorAction SilentlyContinue
 
 Write-Host "`n==========================================" -ForegroundColor Cyan
 Write-Host "Test complete" -ForegroundColor Cyan
