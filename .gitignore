@@ -82,3 +82,7 @@ business/funding_strategy/output/
 *.egg-info/
 *.zip
 .pytest_cache/
+
+#Instructions to myself
+FUNDING_PROMPTS.md
+FUNDING_CONTEXT.md
