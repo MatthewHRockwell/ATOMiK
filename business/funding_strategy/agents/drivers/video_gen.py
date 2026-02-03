@@ -22,7 +22,8 @@ AI_DISCLOSURE = (
 class VideoGenerator:
     """Generate founder presentation videos via HeyGen REST API.
 
-    Requires a HeyGen Pro plan ($99/mo for 100 credits).
+    Free tier: 3 videos/month, 1 custom avatar, up to 3 minutes.
+    Pro plan ($99/mo) available for higher volume.
     """
 
     def __init__(self, api_key: str) -> None:

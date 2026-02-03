@@ -47,6 +47,6 @@ browser:
   slow_mo: 500            # ms delay between actions for visibility
 
 video:
-  heygen_api_key: ""      # HeyGen API key (Pro plan: $99/mo)
+  heygen_api_key: ""      # HeyGen API key (free tier: 3 videos/mo)
   avatar_id: ""           # HeyGen avatar ID after creation
   founder_photo: ""       # Path to founder photo for avatar

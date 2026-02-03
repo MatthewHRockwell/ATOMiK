@@ -5,7 +5,7 @@
 - Entity: Rockwell Industries, LLC
 - Incorporation: completed
 - SAM.gov: not started
-- Programs: 0/17 submitted, 17/17 actionable, 0/17 blocked
+- Programs: 0/18 submitted, 18/18 actionable, 0/18 blocked
 
 ## Key Files
 
@@ -19,7 +19,8 @@
 
 - Demo: state sync benchmarks, NOT LLM training
 - AI video: requires disclosure on every video
-- Entity: LLC now, C-Corp conversion pending
+- Entity: LLC now, C-Corp conversion deferred until finances allow
+- HeyGen: free tier (3 videos/mo, 1 avatar, 3 min max), API key configured
 
 ## Dropped Items
 

@@ -14,7 +14,7 @@ from .grants import ChipsAct, DoeSbir, DodSbir, NasaSbir, NsfSbir
 from .incorporation import Incorporation
 from .outreach import DefenseOutreach, VCOutreach
 from .sam_gov import SamGov
-from .zero_cost import CDL, ICorp, NvidiaInception
+from .zero_cost import CDL, ICorp, IntelPartnerAlliance, NvidiaInception
 
 ALL_PROGRAMS: list[type[BaseApplication]] = [
     # Phase 0 — Entity Formation
@@ -24,6 +24,7 @@ ALL_PROGRAMS: list[type[BaseApplication]] = [
     NvidiaInception,
     CDL,
     ICorp,
+    IntelPartnerAlliance,
     # Phase 2 — Grants
     NsfSbir,
     DodSbir,

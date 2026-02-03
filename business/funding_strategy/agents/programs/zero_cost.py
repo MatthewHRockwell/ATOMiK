@@ -1,4 +1,4 @@
-"""Zero-cost program agents — NVIDIA Inception, CDL, I-Corps."""
+"""Zero-cost program agents — NVIDIA Inception, CDL, I-Corps, Intel Partner Alliance."""
 
 from __future__ import annotations
 
@@ -225,4 +225,86 @@ class ICorp(BaseApplication):
         )
         if browser:
             await browser.wait_for_human("Press Enter when done.")
+        return True
+
+
+class IntelPartnerAlliance(BaseApplication):
+    """Intel Partner Alliance — free partner programme for FPGA IP providers."""
+
+    name = "intel_partner_alliance"
+    display_name = "Intel Partner Alliance"
+    tier = 2
+    phase = 1
+    submission_method = SubmissionMethod.BROWSER
+    url = "https://www.intel.com/content/www/us/en/partner-alliance/overview.html"
+    pitch_angle = (
+        "Delta-state computing IP for Intel Agilex FPGAs. "
+        "Projected 9.6 Gops/s on Agilex with 16 parallel banks — "
+        "validated architecture on Gowin, ready to port to Intel."
+    )
+
+    def check_prerequisites(self, config: FundingConfig) -> tuple[bool, list[str]]:
+        missing: list[str] = []
+        if not config.company.website:
+            missing.append("website")
+        if not config.founder.email:
+            missing.append("founder email")
+        return (len(missing) == 0, missing)
+
+    def generate_content(self, config: FundingConfig, engine: ContentEngine) -> ApplicationContent:
+        return ApplicationContent(
+            program_id=self.name,
+            program_name=self.display_name,
+            fields={
+                "Company Name": config.company.name,
+                "Company Description": engine.get_company_description(500),
+                "Industry": "Semiconductor IP / FPGA Design",
+                "Team Size": str(config.company.employee_count),
+                "Website": config.company.website,
+                "Contact Email": config.founder.email,
+                "Partner Type": "IP Provider / Design Ecosystem",
+                "Intel Products Used": (
+                    "Targeting Intel Agilex FPGAs for delta-state "
+                    "computing IP cores. Architecture validated on Gowin "
+                    "GW1NR-9 at 1 Gops/s, projected ~9.6 Gops/s on Agilex."
+                ),
+                "Value Proposition": engine.get_pitch_for_program(self.name),
+            },
+            notes=(
+                "Intel Partner Alliance: navigate to the 'Join Now' portal, "
+                "create account with company email, complete enrollment form. "
+                "Applications reviewed within 3 business days. "
+                "Request access to Quartus Prime tools and Agilex evaluation boards."
+            ),
+        )
+
+    async def submit(
+        self,
+        content: ApplicationContent,
+        config: FundingConfig,
+        browser: BrowserDriver | None,
+        emailer: EmailSender | None,
+    ) -> bool:
+        if browser is None:
+            print("[intel_partner_alliance] No browser driver — cannot submit.")
+            return False
+
+        await browser.goto(self.url)
+        await browser.wait_for_human(
+            "Navigate to the Intel Partner Alliance 'Join Now' page, then press Enter."
+        )
+
+        for field_name, value in content.fields.items():
+            try:
+                selector = f'input[name*="{field_name.lower().replace(" ", "")}"], textarea[name*="{field_name.lower().replace(" ", "")}"]'
+                await browser.fill_field(selector, value)
+            except Exception:
+                pass
+
+        await browser.wait_for_human(
+            "Review the form, complete any remaining fields, then press Enter to submit."
+        )
+        await browser.screenshot(
+            f"business/funding_strategy/output/{self.name}/submission_screenshot.png"
+        )
         return True
