@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ATOMiK — Engineer Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .nav { display: flex; gap: 1rem; padding: 1rem 2rem; background: var(--surface0); border-bottom: 1px solid var(--surface1); }
+        .nav a { color: var(--subtext0); text-decoration: none; padding: 0.5rem 1rem; border-radius: 6px; }
+        .nav a:hover, .nav a.active { color: var(--text); background: var(--surface1); }
+        .page-content { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+        .section { margin: 2rem 0; }
+        .section h2 { color: var(--text); border-bottom: 1px solid var(--surface1); padding-bottom: 0.5rem; }
+        table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+        th, td { padding: 0.6rem 1rem; text-align: left; border-bottom: 1px solid var(--surface1); }
+        th { color: var(--subtext0); font-weight: 600; }
+        .code-block { background: var(--mantle); border-radius: 8px; padding: 1rem; font-family: monospace; overflow-x: auto; margin: 1rem 0; font-size: 0.9rem; }
+        .proof-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 0.75rem; margin: 1rem 0; }
+        .proof-card { background: var(--surface0); border-radius: 8px; padding: 1rem; display: flex; justify-content: space-between; align-items: center; }
+        .proof-card .category { color: var(--text); }
+        .proof-card .count { color: var(--blue); font-weight: 700; font-size: 1.2rem; }
+        .synth-bar { display: flex; align-items: center; gap: 0.5rem; margin: 0.3rem 0; }
+        .synth-bar .bar { height: 24px; background: var(--green); border-radius: 4px; transition: width 0.3s; }
+        .synth-bar .label { width: 80px; text-align: right; font-size: 0.85rem; color: var(--subtext0); }
+        .synth-bar .value { font-size: 0.85rem; color: var(--text); min-width: 100px; }
+        .arch-diagram { text-align: center; margin: 1rem 0; }
+        .arch-diagram pre { display: inline-block; text-align: left; background: var(--mantle); padding: 1.5rem; border-radius: 8px; font-size: 0.85rem; }
+    </style>
+</head>
+<body>
+    <nav class="nav">
+        <a href="index.html">Home</a>
+        <a href="investor.html">Investors</a>
+        <a href="engineer.html" class="active">Engineers</a>
+        <a href="demos.html">Demos</a>
+        <a href="video.html">Videos</a>
+    </nav>
+
+    <div class="page-content">
+        <h1>ATOMiK — Engineer Dashboard</h1>
+        <p style="color: var(--subtext0);">Technical deep-dive into the delta-state architecture</p>
+
+        <div class="section">
+            <h2>Architecture</h2>
+            <div class="arch-diagram">
+<pre>
+delta_in ──> Round-Robin Distributor ──> Bank[0..N-1] ──> XOR Merge Tree ──> current_state
+                                         (N x atomik_delta_acc)   (log2(N) depth)
+
+  Each bank:
+    LOAD:       initial_state &lt;- data_in
+    ACCUMULATE: accumulator &lt;- accumulator XOR data_in     (single cycle, no carry)
+    READ:       data_out &lt;- initial_state XOR accumulator   (combinational)
+</pre>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Formal Proofs (92 Theorems)</h2>
+            <div class="proof-grid" id="proofGrid">
+                <div class="proof-card"><span class="category">Core algebra</span><span class="count">12</span></div>
+                <div class="proof-card"><span class="category">Commutativity & associativity</span><span class="count">8</span></div>
+                <div class="proof-card"><span class="category">Self-inverse</span><span class="count">6</span></div>
+                <div class="proof-card"><span class="category">Parallel merge</span><span class="count">10</span></div>
+                <div class="proof-card"><span class="category">State reconstruction</span><span class="count">8</span></div>
+                <div class="proof-card"><span class="category">Turing completeness</span><span class="count">15</span></div>
+                <div class="proof-card"><span class="category">Hardware correspondence</span><span class="count">12</span></div>
+                <div class="proof-card"><span class="category">Edge cases</span><span class="count">21</span></div>
+            </div>
+            <div class="code-block">
+cd math/proofs && lake build    # Verify all 92 theorems, 0 sorry statements
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Hardware Test Results (80/80)</h2>
+            <table>
+                <tr><th>Configuration</th><th>Banks</th><th>Frequency</th><th>Tests</th><th>Result</th></tr>
+                <tr><td>Single Core</td><td>1</td><td>94.5 MHz</td><td>10/10</td><td style="color: var(--green);">PASS</td></tr>
+                <tr><td>Quad Bank</td><td>4</td><td>81.0 MHz</td><td>10/10</td><td style="color: var(--green);">PASS</td></tr>
+                <tr><td>Octa Bank</td><td>8</td><td>67.5 MHz</td><td>10/10</td><td style="color: var(--green);">PASS</td></tr>
+                <tr><td>Full Parallel</td><td>16</td><td>66.0 MHz</td><td>10/10</td><td style="color: var(--green);">PASS</td></tr>
+                <tr><td>Phase 6 Sweep</td><td>1-16</td><td>54-108 MHz</td><td>40/40</td><td style="color: var(--green);">PASS</td></tr>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>Synthesis Sweep (25 Configurations)</h2>
+            <div id="synthBars">
+                <div class="synth-bar"><span class="label">N=1</span><div class="bar" style="width: 9%; background: var(--green);"></div><span class="value">94.5 Mops/s (477 LUT)</span></div>
+                <div class="synth-bar"><span class="label">N=2</span><div class="bar" style="width: 18%; background: var(--green);"></div><span class="value">189 Mops/s (600 LUT)</span></div>
+                <div class="synth-bar"><span class="label">N=4</span><div class="bar" style="width: 31%; background: var(--blue);"></div><span class="value">324 Mops/s (745 LUT)</span></div>
+                <div class="synth-bar"><span class="label">N=8</span><div class="bar" style="width: 51%; background: var(--blue);"></div><span class="value">540 Mops/s (1126 LUT)</span></div>
+                <div class="synth-bar"><span class="label">N=16</span><div class="bar" style="width: 100%; background: var(--red);"></div><span class="value">1056 Mops/s (1779 LUT)</span></div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>SDK Code Generation</h2>
+            <table>
+                <tr><th>Target</th><th>Output</th><th>Use Case</th></tr>
+                <tr><td>Python</td><td>Class + tests</td><td>Prototyping, data science</td></tr>
+                <tr><td>Rust</td><td>Struct + impl</td><td>Systems programming</td></tr>
+                <tr><td>C</td><td>Header + impl</td><td>Embedded, bare-metal</td></tr>
+                <tr><td>JavaScript</td><td>ES module</td><td>Web, Node.js</td></tr>
+                <tr><td>Verilog</td><td>RTL + testbench</td><td>FPGA, ASIC</td></tr>
+            </table>
+            <div class="code-block">
+pip install -e ./software
+atomik-gen generate sdk/schemas/examples/terminal-io.json --output-dir generated
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Benchmark Results</h2>
+            <div id="benchResults">
+                <p style="color: var(--subtext0);">Run benchmarks: <code>python -m software.demos.state_sync_benchmark</code></p>
+            </div>
+        </div>
+    </div>
+
+    <script src="engineer.js"></script>
+</body>
+</html>
