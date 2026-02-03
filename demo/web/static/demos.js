@@ -1,0 +1,80 @@
+// Demo launcher — run scenarios and display results
+const scenarioNames = {
+    sensor_fusion: 'Sensor Fusion (N=16 streams)',
+    rollback: 'Rollback (10K deltas)',
+    distributed_sync: 'Distributed Sync (N nodes)',
+    memory_traffic: 'Memory Traffic',
+};
+
+async function runScenario(name) {
+    const btn = event.target;
+    const resultsDiv = document.getElementById('result-' + name);
+    if (!resultsDiv) return;
+
+    btn.disabled = true;
+    btn.textContent = 'Running...';
+    resultsDiv.classList.add('visible');
+    resultsDiv.innerHTML = '<em>Running benchmark...</em>';
+
+    try {
+        // Try to fetch from API (dynamic mode)
+        const resp = await fetch('/api/benchmark');
+        if (!resp.ok) throw new Error('API unavailable');
+        const data = await resp.json();
+
+        if (data.error) {
+            resultsDiv.innerHTML = '<em>No results cached. Run from terminal first.</em>';
+            btn.disabled = false;
+            btn.textContent = 'Run Scenario';
+            return;
+        }
+
+        // Find matching scenario
+        const displayName = scenarioNames[name] || name;
+        const scenario = (data.scenarios || []).find(s => s.name === displayName);
+
+        if (!scenario) {
+            resultsDiv.innerHTML = '<em>Scenario not found in results.</em>';
+        } else {
+            resultsDiv.innerHTML = formatResult(scenario);
+        }
+    } catch (e) {
+        resultsDiv.innerHTML = '<em>Running in static mode. Use terminal to run benchmarks.</em>';
+    }
+
+    btn.disabled = false;
+    btn.textContent = 'Run Scenario';
+}
+
+function formatResult(s) {
+    let html = '<table style="width:100%; font-size:0.85rem;">';
+
+    if (s.atomik_ops_sec) {
+        html += row('ATOMiK ops/s', Math.round(s.atomik_ops_sec).toLocaleString());
+        html += row('Conventional ops/s', Math.round(s.conventional_ops_sec).toLocaleString());
+        html += row('Speedup', (s.speedup || 1).toFixed(2) + 'x');
+    }
+    if (s.atomik_undo_ops !== undefined) {
+        html += row('ATOMiK undo ops', s.atomik_undo_ops);
+        html += row('Conventional undo ops', s.conventional_undo_ops);
+        html += row('ATOMiK latency', s.atomik_latency_us.toFixed(2) + ' us');
+        html += row('Conventional latency', s.conventional_latency_us.toFixed(2) + ' us');
+    }
+    if (s.atomik_messages !== undefined) {
+        html += row('ATOMiK messages', s.atomik_messages);
+        html += row('Conventional messages', s.conventional_messages);
+        html += row('Both correct?', s.atomik_correct && s.conventional_correct ? 'Yes' : 'No');
+    }
+    if (s.reduction_pct !== undefined) {
+        html += row('ATOMiK bytes', s.atomik_bytes_written.toLocaleString());
+        html += row('Conventional bytes', s.conventional_bytes_written.toLocaleString());
+        html += row('Reduction', s.reduction_pct.toFixed(1) + '%');
+    }
+
+    html += '</table>';
+    return html;
+}
+
+function row(label, value) {
+    return `<tr><td style="color:var(--subtext0)">${label}</td><td style="color:var(--text);font-weight:600">${value}</td></tr>`;
+}

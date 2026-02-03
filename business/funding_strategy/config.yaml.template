@@ -1,0 +1,52 @@
+company:
+  name: "ATOMiK"
+  legal_name: ""          # Your company legal name
+  ein: ""                 # Your EIN
+  uei: ""                 # Fill after SAM.gov registration
+  address: ""             # Your business address
+  website: "https://github.com/mopore/ATOMiK"
+  founding_date: ""       # YYYY-MM-DD
+  employee_count: 1
+  us_owned_pct: 100
+
+founder:
+  name: ""                # Your full name
+  email: ""               # Your email
+  title: "Founder & CEO"
+  bio: ""                 # Short professional bio
+  phone: ""               # Your phone number
+
+incorporation:
+  completed: false
+  state: ""               # State of incorporation
+  type: ""                # LLC, C-Corp, etc.
+  date: ""                # YYYY-MM-DD
+
+sam_gov:
+  registered: false
+  uei: ""
+
+materials:
+  one_pager: "business/one_pager/atomik_one_pager.md"
+  pitch_deck_md: "business/pitch_deck/investor_deck_full.md"
+  pitch_deck_pptx: "business/pitch_deck/ATOMiK_Investor_Deck.pptx"
+  playbook: "business/funding_strategy/funding_playbook.md"
+  demo_video: ""          # Fill when recorded
+  pitch_video: ""         # Fill when recorded
+
+email:
+  smtp_host: "smtp.gmail.com"
+  smtp_port: 587
+  smtp_user: ""           # Your Gmail address
+  smtp_password: ""       # Generate app password at myaccount.google.com/apppasswords
+  from_name: ""           # Your name
+  from_email: ""          # Your email
+
+browser:
+  headless: false         # Show browser for CAPTCHA handling
+  slow_mo: 500            # ms delay between actions for visibility
+
+video:
+  heygen_api_key: ""      # HeyGen API key (Pro plan: $99/mo)
+  avatar_id: ""           # HeyGen avatar ID after creation
+  founder_photo: ""       # Path to founder photo for avatar

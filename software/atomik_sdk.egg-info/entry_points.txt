@@ -1,2 +1,0 @@
-[console_scripts]
-atomik-gen = atomik_sdk.cli:main

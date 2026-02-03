@@ -40,6 +40,59 @@ async def index() -> FileResponse:
     return FileResponse(STATIC_DIR / "index.html")
 
 
+@app.get("/investor")
+async def investor_page() -> FileResponse:
+    return FileResponse(STATIC_DIR / "investor.html")
+
+
+@app.get("/engineer")
+async def engineer_page() -> FileResponse:
+    return FileResponse(STATIC_DIR / "engineer.html")
+
+
+@app.get("/demos")
+async def demos_page() -> FileResponse:
+    return FileResponse(STATIC_DIR / "demos.html")
+
+
+@app.get("/video")
+async def video_page() -> FileResponse:
+    return FileResponse(STATIC_DIR / "video.html")
+
+
+@app.get("/api/metrics")
+async def api_metrics() -> dict:
+    """Return key project metrics for dashboard pages."""
+    return {
+        "throughput_gops": 1.056,
+        "hardware_tests": "80/80",
+        "formal_proofs": 92,
+        "sdk_tests": 314,
+        "sdk_languages": 5,
+        "device_cost": 10,
+        "dev_cost": 225,
+        "lut_utilization": 7,
+        "clock_mhz": 94.5,
+        "latency_ns": 10.6,
+        "parallel_banks": 16,
+        "tam_b": 614,
+        "sam_b": 12,
+        "som_m": 80,
+    }
+
+
+@app.get("/api/benchmark")
+async def api_benchmark() -> dict:
+    """Return cached benchmark results if available."""
+    import json as _json
+    results_path = Path(__file__).parent.parent.parent / (
+        "software/demos/state_sync_benchmark/results/results.json"
+    )
+    if results_path.exists():
+        return _json.loads(results_path.read_text(encoding="utf-8"))
+    return {"error": "No benchmark results. Run: python -m software.demos.state_sync_benchmark"}
+
+
 @app.websocket("/ws")
 async def websocket_endpoint(ws: WebSocket) -> None:
     await ws.accept()

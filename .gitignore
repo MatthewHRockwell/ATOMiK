@@ -72,3 +72,13 @@ sweep/project_*/
 # --- Editor/Tool Local Settings ---
 .claude/settings.local.json
 
+# --- Sensitive Configuration (contains credentials) ---
+business/funding_strategy/config.yaml
+business/funding_strategy/status.json
+business/funding_strategy/debug_log.json
+business/funding_strategy/output/
+
+# --- Build Artifacts ---
+*.egg-info/
+*.zip
+.pytest_cache/

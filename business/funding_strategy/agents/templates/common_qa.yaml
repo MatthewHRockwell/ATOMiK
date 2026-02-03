@@ -1,0 +1,77 @@
+what_does_your_company_do:
+  short: "Hardware-accelerated delta-state computing in silicon"
+  long: >-
+    ATOMiK is a formally verified hardware architecture for delta-state
+    computing. Rather than the traditional Load-Modify-Store cycle, ATOMiK
+    accumulates state changes via single-cycle XOR operations, achieving 1
+    billion operations per second on a $10 FPGA. The architecture is backed
+    by 92 Lean4 formal proofs and a 5-language SDK.
+
+how_far_along:
+  answer: >-
+    Working FPGA prototype achieving 1,056 Mops/s (16 parallel banks) on a
+    Tang Nano 9K. 92 formal proofs in Lean4 with zero sorry statements.
+    314 passing tests across 5 SDK languages (Python, Rust, C, JavaScript,
+    Verilog). 80/80 hardware tests passing. All 6 development phases
+    complete. Patent pending. $225 total development cost.
+
+why_now:
+  answer: >-
+    CHIPS Act investment in domestic semiconductor R&D, growing demand for
+    energy-efficient compute at the edge ($61B -> $232B by 2030), AI
+    inference crisis (90% of lifetime cycles are inference, $300B+
+    hyperscaler capex), and post-Moore economics making novel architectures
+    competitive against brute-force scaling below 3nm.
+
+what_is_the_technical_approach:
+  answer: >-
+    XOR-based delta accumulation: State = S0 XOR d1 XOR d2 ... XOR dn.
+    This yields commutativity (lock-free parallelism), self-inverse (instant
+    undo), and single-cycle latency (no carry propagation). N parallel
+    accumulator banks with binary merge tree achieve linear throughput
+    scaling. Implemented in Verilog, synthesised on Tang Nano 9K FPGA.
+
+what_is_the_market:
+  answer: >-
+    TAM: ~$85B (FPGA $10-14B + edge computing $61B + AI accelerators
+    $10.2B). SAM: ~$8B. SOM (Year 5): ~$80M. Beachhead markets:
+    high-frequency trading (single-cycle tick processing), IoT sensor
+    fusion (lock-free multi-stream merge), streaming transforms (95%
+    memory reduction for frame delta pipelines).
+
+what_is_the_business_model:
+  answer: >-
+    ARM-style IP licensing at 90%+ gross margin. Four revenue streams:
+    (1) RTL IP licensing to chip designers, (2) vertical hardware modules
+    for specific markets, (3) SDK platform subscription, (4) professional
+    services for custom integration.
+
+how_is_this_different:
+  answer: >-
+    ATOMiK is the only hardware architecture with machine-verified
+    algebraic properties. 92 Lean4 proofs create an irreproducible moat —
+    competitors would need years of mathematical work to replicate. Working
+    silicon on $10 FPGA (not simulation), patent pending, and a full-stack
+    implementation from math proofs to 5-language SDK.
+
+what_do_you_need:
+  answer: >-
+    Seed capital to fund ASIC feasibility study, larger FPGA port (64+
+    banks), vertical SDK modules for beachhead markets, and first pilot
+    customer deployments. Delaware C-Corp incorporation is the immediate
+    next step.
+
+team_background:
+  answer: >-
+    Solo technical founder who built the entire ATOMiK stack — from 92
+    Lean4 formal proofs to FPGA synthesis to a 5-language SDK — for $225
+    total development cost. Demonstrates exceptional technical range and
+    capital efficiency.
+
+what_are_the_risks:
+  answer: >-
+    Key risks: (1) ASIC tape-out cost and timeline, mitigated by starting
+    with FPGA IP licensing; (2) market adoption timing, mitigated by
+    multiple beachhead verticals; (3) solo founder, mitigated by
+    AI-augmented development and hiring plan; (4) SBIR reauthorisation
+    lapse, mitigated by pursuing multiple funding paths simultaneously.
