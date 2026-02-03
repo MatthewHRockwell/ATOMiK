@@ -133,6 +133,13 @@ The merge tree adds only log2(N) levels of combinational logic. Zero ALU carry c
 
 # Architecture: Parallel XOR Merge Tree
 
+<p align="center">
+  <img src="parallel_merge_tree.svg" alt="ATOMiK Parallel XOR Merge Tree Architecture" width="900"/>
+</p>
+
+<details>
+<summary>ASCII diagram (click to expand)</summary>
+
 ```
          ┌─────────┐
 Input -->│ Round-   │--> Bank 0: [XOR Acc] ──┐
@@ -143,6 +150,7 @@ Input -->│ Round-   │--> Bank 0: [XOR Acc] ──┐
          │          │--> Bank N: [XOR Acc] ──┘
          └─────────┘
 ```
+</details>
 
 **Key innovations:**
 - Round-robin distribution: even bank utilization

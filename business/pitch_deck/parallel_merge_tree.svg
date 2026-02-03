@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 560" font-family="'Inter', 'Segoe UI', sans-serif">
+  <defs>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="card" x="-3%" y="-3%" width="106%" height="112%">
+      <feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.35"/>
+    </filter>
+    <linearGradient id="mergeL" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#89b4fa"/>
+      <stop offset="100%" stop-color="#cba6f7"/>
+    </linearGradient>
+    <linearGradient id="bankFill" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#2a2a3e"/>
+      <stop offset="100%" stop-color="#232336"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1100" height="560" fill="#1e1e2e" rx="12"/>
+
+  <!-- ==================== INPUT ==================== -->
+
+  <text x="48" y="260" text-anchor="middle" font-size="14" font-weight="600" fill="#a6e3a1">Delta</text>
+  <text x="48" y="280" text-anchor="middle" font-size="14" font-weight="600" fill="#a6e3a1">Stream</text>
+
+  <!-- Solid green line from text to round robin -->
+  <line x1="76" y1="268" x2="164" y2="268" stroke="#a6e3a1" stroke-width="3" stroke-linecap="round"/>
+  <polygon points="160,260 174,268 160,276" fill="#a6e3a1"/>
+
+  <!-- ==================== DISTRIBUTOR ==================== -->
+
+  <rect x="180" y="170" width="105" height="198" rx="12" fill="url(#bankFill)" stroke="#45475a" stroke-width="1.5" filter="url(#card)"/>
+  <text x="232" y="258" text-anchor="middle" font-size="13" font-weight="600" fill="#94e2d5">Round</text>
+  <text x="232" y="276" text-anchor="middle" font-size="13" font-weight="600" fill="#94e2d5">Robin</text>
+
+  <!-- Fan-out lines -->
+  <line x1="285" y1="220" x2="345" y2="138" stroke="#45475a" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="285" y1="250" x2="345" y2="228" stroke="#45475a" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="285" y1="285" x2="345" y2="318" stroke="#45475a" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="285" y1="315" x2="345" y2="408" stroke="#45475a" stroke-width="1.5" stroke-linecap="round"/>
+
+  <!-- ==================== ACCUMULATOR BANKS ==================== -->
+
+  <!-- Bank 0 -->
+  <rect x="350" y="100" width="170" height="70" rx="10" fill="url(#bankFill)" stroke="#89b4fa" stroke-width="1.5" filter="url(#card)"/>
+  <text x="395" y="141" text-anchor="middle" font-size="22" font-weight="700" fill="#89b4fa" opacity="0.5">XOR</text>
+  <text x="475" y="134" text-anchor="middle" font-size="13" font-weight="600" fill="#cdd6f4">Bank 0</text>
+  <text x="475" y="154" text-anchor="middle" font-size="10" fill="#585b70">Accumulator</text>
+
+  <!-- Bank 1 -->
+  <rect x="350" y="190" width="170" height="70" rx="10" fill="url(#bankFill)" stroke="#89b4fa" stroke-width="1.5" filter="url(#card)"/>
+  <text x="395" y="231" text-anchor="middle" font-size="22" font-weight="700" fill="#89b4fa" opacity="0.5">XOR</text>
+  <text x="475" y="224" text-anchor="middle" font-size="13" font-weight="600" fill="#cdd6f4">Bank 1</text>
+  <text x="475" y="244" text-anchor="middle" font-size="10" fill="#585b70">Accumulator</text>
+
+  <!-- Bank 2 -->
+  <rect x="350" y="280" width="170" height="70" rx="10" fill="url(#bankFill)" stroke="#89b4fa" stroke-width="1.5" filter="url(#card)"/>
+  <text x="395" y="321" text-anchor="middle" font-size="22" font-weight="700" fill="#89b4fa" opacity="0.5">XOR</text>
+  <text x="475" y="314" text-anchor="middle" font-size="13" font-weight="600" fill="#cdd6f4">Bank 2</text>
+  <text x="475" y="334" text-anchor="middle" font-size="10" fill="#585b70">Accumulator</text>
+
+  <!-- Bank 3 -->
+  <rect x="350" y="370" width="170" height="70" rx="10" fill="url(#bankFill)" stroke="#89b4fa" stroke-width="1.5" filter="url(#card)"/>
+  <text x="395" y="411" text-anchor="middle" font-size="22" font-weight="700" fill="#89b4fa" opacity="0.5">XOR</text>
+  <text x="475" y="404" text-anchor="middle" font-size="13" font-weight="600" fill="#cdd6f4">Bank 3</text>
+  <text x="475" y="424" text-anchor="middle" font-size="10" fill="#585b70">Accumulator</text>
+
+  <!-- Ellipsis indicating N banks -->
+  <text x="435" y="460" text-anchor="middle" font-size="11" fill="#585b70" font-style="italic">scales to N banks</text>
+
+  <!-- ==================== MERGE TREE ==================== -->
+
+  <!-- Level 1 lines -->
+  <line x1="520" y1="135" x2="606" y2="175" stroke="url(#mergeL)" stroke-width="2" stroke-linecap="round"/>
+  <line x1="520" y1="225" x2="606" y2="185" stroke="url(#mergeL)" stroke-width="2" stroke-linecap="round"/>
+  <line x1="520" y1="315" x2="606" y2="355" stroke="url(#mergeL)" stroke-width="2" stroke-linecap="round"/>
+  <line x1="520" y1="405" x2="606" y2="365" stroke="url(#mergeL)" stroke-width="2" stroke-linecap="round"/>
+
+  <!-- Level 1 XOR nodes (r=24 to match root) -->
+  <circle cx="630" cy="180" r="24" fill="#232336" stroke="#cba6f7" stroke-width="2" filter="url(#glow)"/>
+  <text x="630" y="186" text-anchor="middle" font-size="15" font-weight="700" fill="#cba6f7">XOR</text>
+
+  <circle cx="630" cy="360" r="24" fill="#232336" stroke="#cba6f7" stroke-width="2" filter="url(#glow)"/>
+  <text x="630" y="366" text-anchor="middle" font-size="15" font-weight="700" fill="#cba6f7">XOR</text>
+
+  <!-- Level 2 lines -->
+  <line x1="654" y1="180" x2="744" y2="268" stroke="url(#mergeL)" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="654" y1="360" x2="744" y2="272" stroke="url(#mergeL)" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- Level 2 root node (r=24) -->
+  <circle cx="768" cy="270" r="24" fill="#232336" stroke="#f9e2af" stroke-width="2.5" filter="url(#glow)"/>
+  <text x="768" y="276" text-anchor="middle" font-size="15" font-weight="700" fill="#f9e2af">XOR</text>
+
+  <!-- Depth annotation — positioned below merge tree, clear of lines -->
+  <text x="700" y="430" text-anchor="middle" font-size="11" fill="#585b70" font-style="italic">
+    <tspan font-style="italic">O</tspan><tspan>(log</tspan><tspan font-size="8" baseline-shift="sub">2</tspan><tspan> N) depth</tspan>
+  </text>
+
+  <!-- ==================== OUTPUT ==================== -->
+
+  <!-- Solid red line from final XOR to Current State -->
+  <line x1="792" y1="270" x2="874" y2="270" stroke="#f38ba8" stroke-width="3" stroke-linecap="round"/>
+  <polygon points="870,262 884,270 870,278" fill="#f38ba8"/>
+
+  <!-- Output box -->
+  <rect x="890" y="230" width="170" height="80" rx="12" fill="url(#bankFill)" stroke="#f38ba8" stroke-width="2" filter="url(#card)"/>
+  <text x="975" y="265" text-anchor="middle" font-size="15" font-weight="700" fill="#f38ba8">Current State</text>
+  <text x="975" y="288" text-anchor="middle" font-size="11" fill="#6c7086">Reconstructed on demand</text>
+
+  <!-- ==================== BOTTOM METRICS BAR ==================== -->
+
+  <rect x="170" y="490" width="760" height="50" rx="10" fill="#232336" stroke="#313244" stroke-width="1"/>
+
+  <!-- Metric 1 -->
+  <text x="295" y="515" text-anchor="middle" font-size="20" font-weight="700" fill="#a6e3a1">1 Gops/s</text>
+  <text x="295" y="532" text-anchor="middle" font-size="10" fill="#585b70">on a $10 FPGA</text>
+
+  <!-- Divider -->
+  <line x1="423" y1="500" x2="423" y2="535" stroke="#313244" stroke-width="1"/>
+
+  <!-- Metric 2 -->
+  <text x="550" y="515" text-anchor="middle" font-size="20" font-weight="700" fill="#89b4fa">16x</text>
+  <text x="550" y="532" text-anchor="middle" font-size="10" fill="#585b70">linear scaling</text>
+
+  <!-- Divider -->
+  <line x1="677" y1="500" x2="677" y2="535" stroke="#313244" stroke-width="1"/>
+
+  <!-- Metric 3 -->
+  <text x="805" y="515" text-anchor="middle" font-size="20" font-weight="700" fill="#f9e2af">1 cycle</text>
+  <text x="805" y="532" text-anchor="middle" font-size="10" fill="#585b70">per operation</text>
+
+</svg>

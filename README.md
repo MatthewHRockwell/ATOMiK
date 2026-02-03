@@ -193,10 +193,9 @@ N=16 breaks the **1 Gops/s barrier** on a $10 FPGA. Scaling is exactly linear at
 
 ### Parallel Accumulator Banks (Phase 6)
 
-```
-delta_in -> Round-Robin Distributor -> Bank[0..N-1] -> XOR Merge Tree -> current_state
-                                       (N x atomik_delta_acc)   (log2(N) depth)
-```
+<p align="center">
+  <img src="business/pitch_deck/parallel_merge_tree.svg" alt="ATOMiK Parallel XOR Merge Tree Architecture" width="800"/>
+</p>
 
 | N_BANKS | LUT | ALU | FF | Fmax (MHz) | Throughput |
 |--------:|----:|----:|---:|-----------:|-----------:|
