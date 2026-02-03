@@ -56,7 +56,7 @@
 | Statistical analysis | `hardware/experiments/analysis/` |
 | Comparison report | `math/benchmarks/results/PERFORMANCE_COMPARISON.md` |
 | Hardware validation | `archive/PHASE_3_COMPLETION_REPORT.md` |
-| RTL source | `rtl/atomik_*.v` |
+| RTL source | `hardware/rtl/atomik_*.v` |
 | Logic diagram | `docs/diagrams/atomik_core_v2_logic.svg` |
 
 ---

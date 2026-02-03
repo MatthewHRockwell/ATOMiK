@@ -463,7 +463,7 @@ Mandatory pipeline stage that validates all generated Verilog through RTL simula
 
 **Deliverables:**
 - `software/atomik_sdk/pipeline/stages/hardware.py` -- Hardware stage wrapper
-- Integration with `scripts/fpga_pipeline.py` subprocess execution
+- Integration with `hardware/scripts/fpga_pipeline.py` subprocess execution
 - Hardware validation manifest format (JSON) with embedded metrics
 - `demos/common/perf_counter.v` -- Cycle-accurate performance counter RTL module
 - `demos/common/throughput_monitor.v` -- Operations/second measurement RTL module

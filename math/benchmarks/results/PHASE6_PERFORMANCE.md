@@ -394,12 +394,12 @@ Phase 6 confirms the central MVP claim:
 1. **Phase 1 Proofs**: `math/proofs/ATOMiK/*.lean` (92 theorems, 0 sorry)
 2. **Phase 2 Performance**: `math/benchmarks/results/PERFORMANCE_COMPARISON.md`
 3. **Phase 3 Resources**: `math/benchmarks/results/RESOURCE_UTILIZATION.md`
-4. **Phase 6 RTL**: `rtl/atomik_parallel_acc.v`
-5. **Phase 6 Testbench**: `sim/tb_parallel_acc.v` (20 tests)
-6. **Phase 6 Comparison**: `sim/tb_parallel_vs_adder.v` (11 tests)
-7. **Phase 6 Benchmarks**: `experiments/benchmarks/phase6_merge_bench.py`
-8. **Phase 6 Raw Data**: `experiments/data/parallel/phase6_parallel_bench.csv`
-9. **Statistical Framework**: `experiments/benchmarks/metrics.py`
+4. **Phase 6 RTL**: `hardware/rtl/atomik_parallel_acc.v`
+5. **Phase 6 Testbench**: `hardware/sim/tb_parallel_acc.v` (20 tests)
+6. **Phase 6 Comparison**: `hardware/sim/tb_parallel_vs_adder.v` (11 tests)
+7. **Phase 6 Benchmarks**: `hardware/experiments/benchmarks/phase6_merge_bench.py`
+8. **Phase 6 Raw Data**: `hardware/experiments/data/parallel/phase6_parallel_bench.csv`
+9. **Statistical Framework**: `hardware/experiments/benchmarks/metrics.py`
 
 ---
 

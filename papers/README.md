@@ -114,7 +114,7 @@ Once published, papers should be cited as:
 
 ## Notes
 
-- All papers reference the same codebase: `math/proofs/` for Lean4, `rtl/` for Verilog
+- All papers reference the same codebase: `math/proofs/` for Lean4, `hardware/rtl/` for Verilog
 - Maintain consistency in notation across papers
 - Paper 2 and 3 should cite Paper 1 for theoretical foundation
 - Repository URL should be included once public

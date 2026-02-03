@@ -516,9 +516,9 @@ atomik_core_v2
 ### 8.3 Availability
 
 - **Proofs**: `math/proofs/ATOMiK/*.lean` (92 theorems)
-- **Benchmarks**: `experiments/benchmarks/` (Python)
-- **RTL**: `rtl/atomik_*.v` (Verilog)
-- **Data**: `experiments/data/` (360 measurements)
+- **Benchmarks**: `hardware/experiments/benchmarks/` (Python)
+- **RTL**: `hardware/rtl/atomik_*.v` (Verilog)
+- **Data**: `hardware/experiments/data/` (360 measurements)
 - **Repository**: [GitHub URL to be added]
 
 ---

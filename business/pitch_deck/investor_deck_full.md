@@ -1563,9 +1563,9 @@ feasibility study, 500+ developer community.
 |----------|------------------|-------------|
 | Lean4 proof source | `math/proofs/ATOMiK/*.lean` | 92 theorems, 8 files, 0 sorry |
 | Proof verification report | `math/validation/PROOF_VERIFICATION_REPORT.md` | Independent verification |
-| RTL source (Verilog) | `rtl/atomik_*.v` | Delta accumulator, state reconstructor, core, top |
-| Parallel accumulator RTL | `rtl/atomik_parallel_acc.v` | N-bank parallel scaling |
-| Testbench source | `sim/tb_*.v` | 31 Verilog simulation tests |
+| RTL source (Verilog) | `hardware/rtl/atomik_*.v` | Delta accumulator, state reconstructor, core, top |
+| Parallel accumulator RTL | `hardware/rtl/atomik_parallel_acc.v` | N-bank parallel scaling |
+| Testbench source | `hardware/sim/tb_*.v` | 31 Verilog simulation tests |
 | FPGA synthesis report | `math/benchmarks/results/RESOURCE_UTILIZATION.md` | Gowin STA, resource data |
 | Performance benchmarks | `math/benchmarks/results/PHASE6_PERFORMANCE.md` | Parallel scaling analysis |
 | SCORE comparison | `math/benchmarks/results/PERFORMANCE_COMPARISON.md` | Memory, overhead, scalability |
