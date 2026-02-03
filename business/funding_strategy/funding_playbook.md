@@ -100,7 +100,7 @@ Delaware C-Corp is required for:
 **ATOMiK's SBIR strengths:**
 - 92 formal proofs = strong "preliminary data" section
 - Working FPGA hardware = de-risked feasibility
-- 314 tests across 5 languages = engineering maturity
+- 353 tests across 5 languages = engineering maturity
 - $225 total development spend = extreme capital efficiency narrative
 - Defense applications (sensor fusion, secure state management) = DoD relevance
 - Patent pending = IP defensibility
@@ -192,7 +192,7 @@ Delaware C-Corp is required for:
 | Requirements | Application at ycombinator.com. Video demo. |
 | Timeline | Batches: Winter (January start) and Summer (June start) |
 
-**ATOMiK pitch angle:** Hardware that works, math that's proven, software that ships. 92 formal proofs, 1 Gops/s on a $10 chip, 314 passing tests, $225 total spend. The IP licensing business model scales without manufacturing risk.
+**ATOMiK pitch angle:** Hardware that works, math that's proven, software that ships. 92 formal proofs, 1 Gops/s on a $10 chip, 353 passing tests, $225 total spend. The IP licensing business model scales without manufacturing risk.
 
 ### 13. Techstars
 
@@ -355,7 +355,7 @@ IQT and defense VCs don't have standard application processes. Best paths:
 | Silicon Catalyst | FPGA-proven IP block ready for ASIC integration — seeking EDA access and fab partner introductions |
 | Alchemist | B2B IP licensing play — hardware blocks for chip designers with 5-language SDK for customer integration |
 | HAX | Working hardware, not a slide deck — $225 → 1 Gops/s on $10 FPGA, ready for hardware-to-market pipeline |
-| YC | Most capital-efficient hardware startup — 92 proofs, 314 tests, working silicon, $225 total spend |
+| YC | Most capital-efficient hardware startup — 92 proofs, 353 tests, working silicon, $225 total spend |
 | In-Q-Tel | Assured hardware for intelligence community — formally verified, self-inverse (instant rollback), commutative (lock-free merge) |
 | VCs | IP licensing in $600B+ semiconductor market — irreproducible formal verification moat, working silicon, patent pending |
 

@@ -106,4 +106,4 @@ Cross-platform (Windows + Linux). Used by the CLI, pipeline hardware stage, and 
 pytest tests/ -v --cov=atomik_sdk
 ```
 
-314 tests covering generators, pipeline stages, CLI commands, and hardware discovery.
+353 tests covering generators, pipeline stages, CLI commands, and hardware discovery.

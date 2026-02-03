@@ -25,7 +25,7 @@ magnitude improvement at near-zero integration cost.
 
 ## Traction (15s)
 
-Six development phases complete. Five-language SDK with 314 tests.
+Six development phases complete. Five-language SDK with 353 tests.
 Two research papers in draft. Working three-node hardware demo.
 All built by one founder for two hundred and twenty-five dollars.
 

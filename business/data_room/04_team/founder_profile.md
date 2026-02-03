@@ -16,7 +16,7 @@ Software and hardware engineer who built the complete ATOMiK stack — from 92 L
 |-------------|----------|
 | 92 formal proofs | Lean4 verification, 0 sorry statements |
 | Working FPGA hardware | Tang Nano 9K, 80/80 tests, 1 Gops/s |
-| 5-language SDK | Python/Rust/C/JS/Verilog, 314 tests |
+| 5-language SDK | Python/Rust/C/JS/Verilog, 353 tests |
 | 2 research papers | Formal verification + benchmarks |
 | $225 total cost | 3x $10 FPGAs + cables |
 

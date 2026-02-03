@@ -1,7 +1,7 @@
 # ATOMiK Architecture
 
 ![CI](https://github.com/MatthewHRockwell/ATOMiK/actions/workflows/atomik-ci.yml/badge.svg)
-![Tests](https://img.shields.io/badge/tests-314_passing-brightgreen)
+![Tests](https://img.shields.io/badge/tests-353_passing-brightgreen)
 ![Proofs](https://img.shields.io/badge/formal_proofs-92_verified-blue)
 ![Hardware](https://img.shields.io/badge/hardware_tests-80%2F80-brightgreen)
 ![SDK](https://img.shields.io/badge/SDK-5_languages-orange)
@@ -44,7 +44,7 @@ python -m software.demos.state_sync_benchmark
 - **Live Demo**: `python -m demo.run_demo --mode simulate --web` (runs at `localhost:8000`)
 - **Benchmark Evidence**: `python -m software.demos.state_sync_benchmark`
 
-**Key metrics**: $225 total development cost | 92 formal proofs | 80/80 hardware tests | 1 Gops/s on $10 FPGA | 5-language SDK | 314 tests passing
+**Key metrics**: $225 total development cost | 92 formal proofs | 80/80 hardware tests | 1 Gops/s on $10 FPGA | 5-language SDK | 353 tests passing
 
 ---
 
@@ -77,7 +77,7 @@ python -m software.demos.state_sync_benchmark
 | **Phase 4A** | SDK Code Generation | Complete | Python/Rust/C/JS/Verilog generators |
 | **Phase 4B** | Domain SDKs | Complete | 3 domain SDKs, 57 generated files |
 | **Phase 4C** | Autonomous Pipeline | Complete | 6-stage controller, hardware demos, 124 tests |
-| **Phase 5** | Agentic Orchestration | Complete | DAG orchestrator, feedback loops, 314 tests |
+| **Phase 5** | Agentic Orchestration | Complete | DAG orchestrator, feedback loops, 353 tests |
 | **Phase 6** | Parallel Accumulator Banks | Complete | 16x linear scaling, 1056 Mops/s, 80/80 HW tests |
 
 ---

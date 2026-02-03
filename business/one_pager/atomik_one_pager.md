@@ -17,7 +17,7 @@ ATOMiK is a hardware-accelerated delta-state computing architecture that replace
 | Hardware tests | **80/80** passing on Tang Nano 9K |
 | LUT utilization | **7%** (single bank) / 20% (16 banks) |
 | SDK languages | **5** (Python, Rust, C, JavaScript, Verilog) |
-| SDK tests | **314** passing |
+| SDK tests | **353** passing |
 | Device cost | **$10** (Tang Nano 9K FPGA) |
 
 ## How It Works
@@ -72,7 +72,7 @@ N parallel XOR accumulator banks with a binary merge tree achieve linear through
 | Mathematical Formalization (92 proofs) | Complete |
 | Hardware Synthesis (Tang Nano 9K) | Complete |
 | SDK Code Generation (5 languages) | Complete |
-| Agentic Pipeline (25 modules, 314 tests) | Complete |
+| Agentic Pipeline (25 modules, 353 tests) | Complete |
 | Parallel Scaling (16x, 1 Gops/s) | Complete |
 | 3-Node VC Demo | Complete |
 

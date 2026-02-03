@@ -19,7 +19,7 @@
 
 - 92 formally verified theorems (Lean4)
 - Working FPGA implementation (94.5 MHz, 80/80 tests)
-- 5-language SDK with 314 tests
+- 5-language SDK with 353 tests
 - 25-configuration synthesis sweep
 - 3-node live demo system
 - 2 research papers (draft)
