@@ -8,8 +8,8 @@ from __future__ import annotations
 import random
 import time
 
-from demo.acts.base import ActBase, ActResult
-from demo.node import NodeController
+from demos.acts.base import ActBase, ActResult
+from demos.node import NodeController
 
 # Fixed seed for reproducible demo
 _RNG = random.Random(42)

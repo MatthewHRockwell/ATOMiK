@@ -10,7 +10,7 @@ from dataclasses import dataclass
 
 from serial.tools import list_ports
 
-from demo.config import FTDI_VID, FTDI_PID
+from demos.config import FTDI_VID, FTDI_PID
 
 log = logging.getLogger(__name__)
 

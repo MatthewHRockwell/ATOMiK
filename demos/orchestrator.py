@@ -14,14 +14,14 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any, Callable
 
-from demo.acts import ALL_ACTS
-from demo.acts.base import ActBase, ActResult
-from demo.bitstream_manager import locate_bitstream, openfpgaloader_available, program_board
-from demo.config import NODE_CONFIGS, NodeConfig, UART_BAUDRATE, UART_TIMEOUT
-from demo.discovery import discover_boards, DiscoveredBoard
-from demo.hardware_interface import ATOMiKHardware
-from demo.node import NodeController
-from demo.simulator import ATOMiKSimulator
+from demos.acts import ALL_ACTS
+from demos.acts.base import ActBase, ActResult
+from demos.bitstream_manager import locate_bitstream, openfpgaloader_available, program_board
+from demos.config import NODE_CONFIGS, NodeConfig, UART_BAUDRATE, UART_TIMEOUT
+from demos.discovery import discover_boards, DiscoveredBoard
+from demos.hardware_interface import ATOMiKHardware
+from demos.node import NodeController
+from demos.simulator import ATOMiKSimulator
 
 log = logging.getLogger(__name__)
 

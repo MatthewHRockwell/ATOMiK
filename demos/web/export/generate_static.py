@@ -12,7 +12,7 @@ import shutil
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent.parent.parent
-WEB_DIR = ROOT / "demo" / "web"
+WEB_DIR = ROOT / "demos" / "web"
 STATIC_DIR = WEB_DIR / "static"
 OUTPUT_DIR = ROOT / "docs" / "site"
 RESULTS_PATH = ROOT / "software" / "demos" / "state_sync_benchmark" / "results" / "results.json"

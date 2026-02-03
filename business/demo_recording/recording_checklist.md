@@ -4,17 +4,17 @@
 
 ### Hardware
 - [ ] 3x Tang Nano 9K boards connected via USB
-- [ ] Verify all boards detected: `python -m demo.run_demo --headless --mode hardware`
+- [ ] Verify all boards detected: `python -m demos.run_demo --headless --mode hardware`
 - [ ] Bitstreams programmed: N4@81MHz, N8@67.5MHz, N16@67.5MHz
 - [ ] Power LEDs visible on all boards
 - [ ] USB hub if needed (3 USB ports)
 
 ### Software
 - [ ] Python environment activated with demo dependencies
-- [ ] `python -m demo.run_demo --mode simulate --headless` passes all 5 acts
-- [ ] TUI renders correctly: `python -m demo.run_demo --mode simulate`
-- [ ] Web dashboard loads: `python -m demo.run_demo --mode simulate --web-only`
-- [ ] Presentation mode works: `python -m demo.run_demo --mode simulate --presentation`
+- [ ] `python -m demos.run_demo --mode simulate --headless` passes all 5 acts
+- [ ] TUI renders correctly: `python -m demos.run_demo --mode simulate`
+- [ ] Web dashboard loads: `python -m demos.run_demo --mode simulate --web-only`
+- [ ] Presentation mode works: `python -m demos.run_demo --mode simulate --presentation`
 
 ### Recording Software
 - [ ] OBS Studio installed and configured

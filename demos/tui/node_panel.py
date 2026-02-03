@@ -11,7 +11,7 @@ from typing import Any
 from rich.text import Text
 from textual.widgets import Static
 
-from demo.config import NODE_CONFIGS
+from demos.config import NODE_CONFIGS
 
 # Node accent colors (Catppuccin Mocha)
 NODE_COLORS = ["#f9e2af", "#89b4fa", "#a6e3a1"]  # yellow, blue, green

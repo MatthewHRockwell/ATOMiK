@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from demo.node import NodeController
+    from demos.node import NodeController
 
 
 @dataclass

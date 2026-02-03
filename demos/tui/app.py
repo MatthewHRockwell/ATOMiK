@@ -17,13 +17,13 @@ from textual.binding import Binding
 from textual.containers import Horizontal
 from textual.widgets import Footer, Static
 
-from demo.config import PALETTE
-from demo.orchestrator import DemoMode, DemoOrchestrator
-from demo.tui.comparison_panel import ComparisonPanel
-from demo.tui.narration_bar import NarrationBar
-from demo.tui.node_panel import NodePanel
-from demo.tui.summary_panel import SummaryPanel
-from demo.tui.throughput_chart import ThroughputChart
+from demos.config import PALETTE
+from demos.orchestrator import DemoMode, DemoOrchestrator
+from demos.tui.comparison_panel import ComparisonPanel
+from demos.tui.narration_bar import NarrationBar
+from demos.tui.node_panel import NodePanel
+from demos.tui.summary_panel import SummaryPanel
+from demos.tui.throughput_chart import ThroughputChart
 
 
 class TitleBar(Static):

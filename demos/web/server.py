@@ -12,7 +12,7 @@ from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
-from demo.orchestrator import DemoMode, DemoOrchestrator
+from demos.orchestrator import DemoMode, DemoOrchestrator
 
 log = logging.getLogger(__name__)
 

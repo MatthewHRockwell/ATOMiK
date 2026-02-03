@@ -10,7 +10,7 @@ import shutil
 import subprocess
 from pathlib import Path
 
-from demo.config import BITSTREAM_DIR, SWEEP_BITSTREAM_DIR, OPENFPGALOADER
+from demos.config import BITSTREAM_DIR, SWEEP_BITSTREAM_DIR, OPENFPGALOADER
 
 log = logging.getLogger(__name__)
 

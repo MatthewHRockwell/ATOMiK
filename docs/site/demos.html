@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ATOMiK — Interactive Demos</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .nav { display: flex; gap: 1rem; padding: 1rem 2rem; background: var(--surface0); border-bottom: 1px solid var(--surface1); }
+        .nav a { color: var(--subtext0); text-decoration: none; padding: 0.5rem 1rem; border-radius: 6px; }
+        .nav a:hover, .nav a.active { color: var(--text); background: var(--surface1); }
+        .page-content { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+        .demo-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; margin: 1.5rem 0; }
+        .demo-card { background: var(--surface0); border-radius: 12px; padding: 1.5rem; border-top: 3px solid var(--blue); }
+        .demo-card h3 { color: var(--text); margin: 0 0 0.5rem; }
+        .demo-card p { color: var(--subtext0); font-size: 0.9rem; margin: 0.5rem 0; }
+        .demo-card .metrics { display: flex; gap: 1rem; margin: 1rem 0; flex-wrap: wrap; }
+        .demo-card .metric { background: var(--surface1); border-radius: 6px; padding: 0.4rem 0.8rem; font-size: 0.8rem; }
+        .run-btn { background: var(--green); color: var(--base); border: none; padding: 0.6rem 1.2rem; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.9rem; }
+        .run-btn:hover { opacity: 0.9; }
+        .run-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .results-area { background: var(--mantle); border-radius: 8px; padding: 1rem; margin-top: 1rem; display: none; font-size: 0.85rem; }
+        .results-area.visible { display: block; }
+        .section { margin: 2rem 0; }
+        .section h2 { color: var(--text); border-bottom: 1px solid var(--surface1); padding-bottom: 0.5rem; }
+        .code-block { background: var(--mantle); border-radius: 8px; padding: 1rem; font-family: monospace; font-size: 0.9rem; margin: 1rem 0; }
+    </style>
+</head>
+<body>
+    <nav class="nav">
+        <a href="index.html">Home</a>
+        <a href="investor.html">Investors</a>
+        <a href="engineer.html">Engineers</a>
+        <a href="demos.html" class="active">Demos</a>
+        <a href="video.html">Videos</a>
+    </nav>
+
+    <div class="page-content">
+        <h1>Interactive Demos</h1>
+        <p style="color: var(--subtext0);">Run ATOMiK benchmark scenarios and see results in real time</p>
+
+        <div class="demo-grid">
+            <div class="demo-card" style="border-color: var(--yellow);">
+                <h3>Sensor Fusion Merge</h3>
+                <p>Merge 16 independent sensor streams. ATOMiK uses lock-free XOR accumulation; conventional uses mutex-protected full-state copy.</p>
+                <div class="metrics">
+                    <span class="metric">N=16 streams</span>
+                    <span class="metric">100K updates</span>
+                </div>
+                <button class="run-btn" onclick="runScenario('sensor_fusion')">Run Scenario</button>
+                <div class="results-area" id="result-sensor_fusion"></div>
+            </div>
+
+            <div class="demo-card" style="border-color: var(--green);">
+                <h3>Instant Rollback</h3>
+                <p>Accumulate 10K deltas then undo. ATOMiK uses self-inverse (1 op); conventional replays from checkpoint.</p>
+                <div class="metrics">
+                    <span class="metric">10K deltas</span>
+                    <span class="metric">Self-inverse undo</span>
+                </div>
+                <button class="run-btn" onclick="runScenario('rollback')">Run Scenario</button>
+                <div class="results-area" id="result-rollback"></div>
+            </div>
+
+            <div class="demo-card" style="border-color: var(--blue);">
+                <h3>Distributed State Sync</h3>
+                <p>8 nodes sync to a single state. ATOMiK merges are order-independent; conventional requires ordered replay.</p>
+                <div class="metrics">
+                    <span class="metric">8 nodes</span>
+                    <span class="metric">10K updates</span>
+                </div>
+                <button class="run-btn" onclick="runScenario('distributed_sync')">Run Scenario</button>
+                <div class="results-area" id="result-distributed_sync"></div>
+            </div>
+
+            <div class="demo-card" style="border-color: var(--red);">
+                <h3>Memory Traffic</h3>
+                <p>Compare total bytes written. ATOMiK writes sparse deltas; conventional writes full state every time.</p>
+                <div class="metrics">
+                    <span class="metric">100K updates</span>
+                    <span class="metric">95% sparse</span>
+                </div>
+                <button class="run-btn" onclick="runScenario('memory_traffic')">Run Scenario</button>
+                <div class="results-area" id="result-memory_traffic"></div>
+            </div>
+
+            <div class="demo-card" style="border-color: var(--mauve); grid-column: 1 / -1;">
+                <h3>Full 5-Act VC Demo</h3>
+                <p>Run the complete 3-node demonstration: basic algebra, self-inverse undo, parallel scaling, domain applications, and distributed merge.</p>
+                <div class="metrics">
+                    <span class="metric">3 nodes</span>
+                    <span class="metric">5 acts</span>
+                    <span class="metric">Finance + Sensor + Peak</span>
+                </div>
+                <a href="index.html" class="run-btn" style="text-decoration: none; display: inline-block;">Open Live Dashboard</a>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Run from Terminal</h2>
+            <div class="code-block">
+# State sync benchmarks (4 scenarios)
+python -m software.demos.state_sync_benchmark
+
+# Full 3-node VC demo with web dashboard
+python -m demos.run_demo --mode simulate --web
+
+# Headless mode
+python -m demos.run_demo --headless --mode simulate
+            </div>
+        </div>
+    </div>
+
+    <script src="demos.js"></script>
+</body>
+</html>

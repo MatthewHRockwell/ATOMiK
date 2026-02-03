@@ -129,7 +129,7 @@ jobs:
         run: |
           pip install rich
           python -m software.demos.state_sync_benchmark || true
-          python demo/web/export/generate_static.py || true
+          python demos/web/export/generate_static.py || true
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:

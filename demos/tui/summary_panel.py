@@ -7,7 +7,7 @@ from typing import Any
 from rich.text import Text
 from textual.widgets import Static
 
-from demo.acts.base import ActResult
+from demos.acts.base import ActResult
 
 
 class SummaryPanel(Static):

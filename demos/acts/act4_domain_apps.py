@@ -7,8 +7,8 @@ from __future__ import annotations
 
 import random
 
-from demo.acts.base import ActBase, ActResult
-from demo.node import NodeController
+from demos.acts.base import ActBase, ActResult
+from demos.node import NodeController
 
 _RNG = random.Random(0xF1A4CE)
 

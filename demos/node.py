@@ -9,8 +9,8 @@ import time
 from dataclasses import dataclass
 from typing import Any, Callable
 
-from demo.config import NodeConfig
-from demo.hardware_interface import NodeInterface
+from demos.config import NodeConfig
+from demos.hardware_interface import NodeInterface
 
 # Type alias for event callbacks: (event_name, payload_dict)
 EventCallback = Callable[[str, dict[str, Any]], None]

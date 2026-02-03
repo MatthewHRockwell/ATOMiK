@@ -5,8 +5,8 @@ Demonstrates instant undo: delta XOR delta = 0, so any change is its own undo.
 
 from __future__ import annotations
 
-from demo.acts.base import ActBase, ActResult
-from demo.node import NodeController
+from demos.acts.base import ActBase, ActResult
+from demos.node import NodeController
 
 
 class Act2SelfInverse(ActBase):

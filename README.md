@@ -28,7 +28,7 @@ cd math/proofs && lake build       # 92 theorems, 0 sorry
 
 # Install SDK and run demo
 cd ../../software && pip install -e ".[demo]"
-python -m demo.run_demo --mode simulate --web
+python -m demos.run_demo --mode simulate --web
 
 # Run state-sync benchmarks
 python -m software.demos.state_sync_benchmark
@@ -41,7 +41,7 @@ python -m software.demos.state_sync_benchmark
 - **One-Pager**: [`business/one_pager/atomik_one_pager.md`](business/one_pager/atomik_one_pager.md)
 - **Data Room**: [`business/data_room/`](business/data_room/)
 - **Pitch Deck**: [`business/pitch_deck/`](business/pitch_deck/)
-- **Live Demo**: `python -m demo.run_demo --mode simulate --web` (runs at `localhost:8000`)
+- **Live Demo**: `python -m demos.run_demo --mode simulate --web` (runs at `localhost:8000`)
 - **Benchmark Evidence**: `python -m software.demos.state_sync_benchmark`
 
 **Key metrics**: $225 total development cost | 92 formal proofs | 80/80 hardware tests | 1 Gops/s on $10 FPGA | 5-language SDK | 353 tests passing
@@ -235,9 +235,9 @@ DAG orchestration with feedback loops, adaptive model routing, cross-language co
 The 3-node VC demo showcases ATOMiK across three Tang Nano 9K FPGAs (or in simulation):
 
 ```bash
-python -m demo.run_demo --mode simulate --web    # Web dashboard at localhost:8000
-python -m demo.run_demo --mode simulate           # TUI only
-python -m demo.run_demo                           # Auto-discover hardware
+python -m demos.run_demo --mode simulate --web    # Web dashboard at localhost:8000
+python -m demos.run_demo --mode simulate           # TUI only
+python -m demos.run_demo                           # Auto-discover hardware
 ```
 
 | Node | Domain | Banks | Throughput | Demo Focus |
@@ -259,8 +259,7 @@ ATOMiK/
 ├── software/                 # Python SDK + pipeline + generators
 │   ├── atomik_sdk/           # SDK package (pip install -e ./software)
 │   └── demos/                # State sync benchmarks
-├── demo/                     # 3-node VC demo (TUI + web)
-├── demos/                    # Domain hardware demos (finance/sensor/video)
+├── demos/                    # 3-node VC demo (TUI + web) + domain hardware demos
 ├── business/                 # Investor materials + funding automation
 │   ├── one_pager/            # Executive summary
 │   ├── pitch_deck/           # Investor deck

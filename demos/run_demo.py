@@ -1,13 +1,13 @@
 """ATOMiK 3-Node Demo — CLI entry point.
 
 Usage:
-    python -m demo.run_demo                          # auto-discover, TUI
-    python -m demo.run_demo --mode simulate          # all simulated
-    python -m demo.run_demo --mode simulate --web    # TUI + web dashboard
-    python -m demo.run_demo --presentation           # step-by-step narration
-    python -m demo.run_demo --act 3                  # run single act
-    python -m demo.run_demo --headless               # no TUI, console output
-    python -m demo.run_demo --window                 # launch TUI in new window
+    python -m demos.run_demo                          # auto-discover, TUI
+    python -m demos.run_demo --mode simulate          # all simulated
+    python -m demos.run_demo --mode simulate --web    # TUI + web dashboard
+    python -m demos.run_demo --presentation           # step-by-step narration
+    python -m demos.run_demo --act 3                  # run single act
+    python -m demos.run_demo --headless               # no TUI, console output
+    python -m demos.run_demo --window                 # launch TUI in new window
 """
 
 from __future__ import annotations
@@ -19,7 +19,7 @@ import subprocess
 import sys
 import threading
 
-from demo.orchestrator import DemoMode, DemoOrchestrator
+from demos.orchestrator import DemoMode, DemoOrchestrator
 
 
 def _parse_args() -> argparse.Namespace:
@@ -88,7 +88,7 @@ def _run_headless(mode: DemoMode, act_number: int | None) -> None:
 
 def _start_web_server(mode: DemoMode, port: int) -> None:
     """Start web dashboard in a background thread."""
-    from demo.web.server import run_web_server
+    from demos.web.server import run_web_server
     thread = threading.Thread(
         target=run_web_server,
         kwargs={"mode": mode, "port": port},
@@ -101,7 +101,7 @@ def _start_web_server(mode: DemoMode, port: int) -> None:
 def _launch_in_new_window(args: argparse.Namespace) -> None:
     """Launch the TUI in a new terminal window."""
     # Build command to run in new window
-    cmd_args = [sys.executable, "-m", "demo.run_demo", "--_in_window"]
+    cmd_args = [sys.executable, "-m", "demos.run_demo", "--_in_window"]
     cmd_args.extend(["--mode", args.mode])
     if args.presentation:
         cmd_args.append("--presentation")
@@ -140,7 +140,7 @@ def main() -> None:
 
     # Web-only mode
     if args.web_only:
-        from demo.web.server import run_web_server
+        from demos.web.server import run_web_server
         run_web_server(mode=mode, port=args.port)
         return
 
@@ -155,7 +155,7 @@ def main() -> None:
     if args.web:
         _start_web_server(mode, args.port)
 
-    from demo.tui.app import DemoApp
+    from demos.tui.app import DemoApp
     app = DemoApp(mode=mode, presentation=args.presentation)
     app.run()
 

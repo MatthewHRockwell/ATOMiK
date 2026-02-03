@@ -500,7 +500,7 @@ def cmd_demo(args: argparse.Namespace) -> int:
         return EXIT_FILE_ERROR
 
     project_root = Path(__file__).resolve().parent.parent.parent
-    demo_dir = project_root / "demos" / domain
+    demo_dir = project_root / "demos" / "hardware" / domain
 
     if not demo_dir.exists():
         print(f"Error: demo directory not found: {demo_dir}", file=sys.stderr)
@@ -545,7 +545,7 @@ def cmd_demo(args: argparse.Namespace) -> int:
     print()
 
     # -- Gather Verilog source files -------------------------------------------
-    common_dir = project_root / "demos" / "common"
+    common_dir = project_root / "demos" / "hardware" / "common"
     rtl_dir = project_root / "rtl"
     rtl_pll_dir = project_root / "rtl" / "pll"
     sim_stubs_dir = project_root / "sim" / "stubs"
