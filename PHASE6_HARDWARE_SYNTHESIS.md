@@ -319,29 +319,29 @@ Synthesis was attempted for N=32, 64, 128, and 256 banks at the lowest target fr
 
 ## 6. Automated Sweep Infrastructure
 
-### 6.1 Tool: `scripts/phase6_hw_sweep.py`
+### 6.1 Tool: `hardware/scripts/phase6_hw_sweep.py`
 
 Fully automated synthesis sweep framework:
 - **PLL solver**: Finds rPLL parameters (IDIV_SEL, FBDIV_SEL, ODIV_SEL) for any target frequency
 - **File generation**: PLL Verilog, top wrappers, SDC constraints, Gowin project files, TCL scripts
 - **Synthesis runner**: Invokes `gw_sh.exe` for each configuration
 - **Report parser**: Extracts LUT/ALU/FF/CLS from PnR reports, Fmax from timing HTML
-- **Output**: Console summary table + `sweep/sweep_results.json`
+- **Output**: Console summary table + `hardware/sweep/sweep_results.json`
 
 ### 6.2 Usage
 
 ```bash
 # Full sweep (all frequencies x all banks)
-python scripts/phase6_hw_sweep.py
+python hardware/scripts/phase6_hw_sweep.py
 
 # Quick check (94.5 MHz only)
-python scripts/phase6_hw_sweep.py --quick
+python hardware/scripts/phase6_hw_sweep.py --quick
 
 # Specific configuration
-python scripts/phase6_hw_sweep.py --freq 67.5 --banks 4
+python hardware/scripts/phase6_hw_sweep.py --freq 67.5 --banks 4
 
 # Generate files only (no synthesis)
-python scripts/phase6_hw_sweep.py --gen-only
+python hardware/scripts/phase6_hw_sweep.py --gen-only
 ```
 
 ### 6.3 PLL Configurations Used
@@ -391,7 +391,7 @@ Eight timing-met configurations were programmed to the Tang Nano 9K via JTAG (op
 
 ### 7.2 Test Protocol
 
-Each configuration runs 10 UART tests via `scripts/phase6_hw_validate.py`:
+Each configuration runs 10 UART tests via `hardware/scripts/phase6_hw_validate.py`:
 
 1. **Load zeros + readback**: Verify clean reset state
 2. **Single delta accumulation**: Load 0xDEADBEEFCAFEBABE, verify state
@@ -418,13 +418,13 @@ All Lean4-proven algebraic properties confirmed on hardware:
 
 | File | Description |
 |------|-------------|
-| `rtl/atomik_parallel_acc.v` | N-bank parallel XOR accumulator with binary merge tree |
-| `rtl/atomik_top_parallel.v` | Synthesis top-level with UART protocol |
-| `sim/tb_parallel_acc.v` | Correctness + throughput testbench (20 tests) |
-| `sim/tb_parallel_vs_adder.v` | XOR vs adder comparison testbench |
-| `scripts/phase6_hw_sweep.py` | Automated synthesis sweep framework |
-| `scripts/phase6_hw_validate.py` | UART hardware validation (10 tests) |
-| `sweep/sweep_results.json` | Machine-readable sweep results |
+| `hardware/rtl/atomik_parallel_acc.v` | N-bank parallel XOR accumulator with binary merge tree |
+| `hardware/rtl/atomik_top_parallel.v` | Synthesis top-level with UART protocol |
+| `hardware/sim/tb_parallel_acc.v` | Correctness + throughput testbench (20 tests) |
+| `hardware/sim/tb_parallel_vs_adder.v` | XOR vs adder comparison testbench |
+| `hardware/scripts/phase6_hw_sweep.py` | Automated synthesis sweep framework |
+| `hardware/scripts/phase6_hw_validate.py` | UART hardware validation (10 tests) |
+| `hardware/sweep/sweep_results.json` | Machine-readable sweep results |
 | `docs/diagrams/phase6_parallel_banks.svg` | Architecture diagram |
 | `docs/diagrams/phase6_throughput_scaling.svg` | Throughput bar chart |
 

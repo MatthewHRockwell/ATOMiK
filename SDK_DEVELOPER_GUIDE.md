@@ -136,7 +136,7 @@ Installed via `pip install -e ./software` (entry point defined in `pyproject.tom
 
 ### VS Code Extension
 
-The [VS Code extension](../vscode-extension/atomik-vscode/README.md) provides:
+The [VS Code extension](../sdk/vscode-extension/atomik-vscode/README.md) provides:
 - JSON Schema intellisense for `*.atomik.json` and `**/schemas/**/*.json` files
 - Schema snippets (`atomik-schema`, `atomik-field`, `atomik-hardware`)
 - Command palette integration invoking `atomik-gen` CLI commands
@@ -646,7 +646,7 @@ pytest tests/ atomik_sdk/tests/ -v
 
 5. (Optional) Build the VS Code extension:
 ```bash
-cd ../vscode-extension/atomik-vscode
+cd ../sdk/vscode-extension/atomik-vscode
 npm install && npm run compile
 ```
 
@@ -711,7 +711,7 @@ npm install && npm run compile
 - [ATOMiK Schema Specification](../specs/atomik_schema_v1.json)
 - [SDK User Manual](./user/SDK_USER_MANUAL.md)
 - [Schema Guide](./SDK_SCHEMA_GUIDE.md)
-- [VS Code Extension](../vscode-extension/atomik-vscode/README.md)
+- [VS Code Extension](../sdk/vscode-extension/atomik-vscode/README.md)
 - [Phase 3 Hardware Report](../archive/PHASE_3_COMPLETION_REPORT.md)
 - [Mathematical Foundations](../specs/formal_model.md)
 

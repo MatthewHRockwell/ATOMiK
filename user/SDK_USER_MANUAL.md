@@ -62,12 +62,12 @@ This installs both the Python SDK and the `atomik-gen` command-line tool for sch
 
 **VS Code Extension** (optional):
 ```bash
-cd vscode-extension/atomik-vscode
+cd sdk/vscode-extension/atomik-vscode
 npm install && npm run compile
 code --install-extension .
 ```
 
-Provides schema intellisense, snippets, and command palette integration. See [extension README](../../vscode-extension/atomik-vscode/README.md).
+Provides schema intellisense, snippets, and command palette integration. See [extension README](../../sdk/vscode-extension/atomik-vscode/README.md).
 
 **Generated SDKs** (Rust, C, JavaScript, Verilog):
 ```bash

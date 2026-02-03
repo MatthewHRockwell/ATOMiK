@@ -1000,7 +1000,7 @@ Stage N+1 consumes:
   "duration_ms": 12500,
   "artifacts": [
     {
-      "path": "generated_sdks/rtl/video/streaming/atomik_video_streaming_h264_delta.v",
+      "path": "sdk/generated/rtl/video/streaming/atomik_video_streaming_h264_delta.v",
       "language": "verilog",
       "sha256": "abc123...",
       "action": "validated"

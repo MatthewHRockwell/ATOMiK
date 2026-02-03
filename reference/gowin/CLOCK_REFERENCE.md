@@ -49,7 +49,7 @@ From DS117-2.9.3E Table 4-21:
 
 ### atomik_pll_94p5m (Current - Used by atomik_top.v)
 
-**Location**: `rtl/pll/atomik_pll_94p5m.v`
+**Location**: `hardware/rtl/pll/atomik_pll_94p5m.v`
 
 | Parameter | Value | Calculation |
 |-----------|-------|-------------|
@@ -62,7 +62,7 @@ From DS117-2.9.3E Table 4-21:
 
 ### atomik_pll_81m (Alternative)
 
-**Location**: `rtl/pll/atomik_pll_81m.v`
+**Location**: `hardware/rtl/pll/atomik_pll_81m.v`
 
 | Parameter | Value | Calculation |
 |-----------|-------|-------------|
@@ -75,7 +75,7 @@ From DS117-2.9.3E Table 4-21:
 
 ### Gowin_rPLL (Dynamic Frequency)
 
-**Location**: `rtl/pll/gowin_rpll/gowin_rpll.v`
+**Location**: `hardware/rtl/pll/gowin_rpll/gowin_rpll.v`
 
 | Parameter | Value | Notes |
 |-----------|-------|-------|
@@ -236,12 +236,12 @@ defparam rpll_inst.DEVICE = "GW1NR-9C";     // Target device
 
 | File | Description |
 |------|-------------|
-| `rtl/pll/atomik_pll_94p5m.v` | Current production PLL (94.5 MHz) |
-| `rtl/pll/atomik_pll_81m.v` | Alternative PLL (81 MHz) |
-| `rtl/pll/gowin_rpll/gowin_rpll.v` | Dynamic PLL with idsel input |
-| `rtl/pll/gowin_rpll/gowin_rpll_tmp.v` | Instantiation template |
-| `rtl/pll/gowin_rpll/gowin_rpll.ipc` | IP Core configuration |
-| `rtl/pll/README.md` | PLL module documentation |
+| `hardware/rtl/pll/atomik_pll_94p5m.v` | Current production PLL (94.5 MHz) |
+| `hardware/rtl/pll/atomik_pll_81m.v` | Alternative PLL (81 MHz) |
+| `hardware/rtl/pll/gowin_rpll/gowin_rpll.v` | Dynamic PLL with idsel input |
+| `hardware/rtl/pll/gowin_rpll/gowin_rpll_tmp.v` | Instantiation template |
+| `hardware/rtl/pll/gowin_rpll/gowin_rpll.ipc` | IP Core configuration |
+| `hardware/rtl/pll/README.md` | PLL module documentation |
 
 ---
 

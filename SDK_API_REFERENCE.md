@@ -106,7 +106,7 @@ atomik-gen generate sdk/schemas/examples/terminal-io.json --languages python rus
 atomik-gen validate sdk/schemas/domains/video-h264-delta.json
 
 # Batch process all domain schemas with report
-atomik-gen batch sdk/schemas/domains/ --output-dir generated_sdks --report report.json
+atomik-gen batch sdk/schemas/domains/ --output-dir sdk/generated --report report.json
 
 # Show schema metadata
 atomik-gen info sdk/schemas/domains/finance-price-tick.json
