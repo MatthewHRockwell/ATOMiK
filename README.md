@@ -1,6 +1,6 @@
 # ATOMiK Architecture
 
-![CI](https://github.com/mopore/ATOMiK/actions/workflows/atomik-ci.yml/badge.svg)
+![CI](https://github.com/MatthewHRockwell/ATOMiK/actions/workflows/atomik-ci.yml/badge.svg)
 ![Tests](https://img.shields.io/badge/tests-314_passing-brightgreen)
 ![Proofs](https://img.shields.io/badge/formal_proofs-92_verified-blue)
 ![Hardware](https://img.shields.io/badge/hardware_tests-80%2F80-brightgreen)
@@ -23,7 +23,7 @@
 
 ```bash
 # Clone and verify proofs
-git clone https://github.com/mopore/ATOMiK.git && cd ATOMiK
+git clone https://github.com/MatthewHRockwell/ATOMiK.git && cd ATOMiK
 cd math/proofs && lake build       # 92 theorems, 0 sorry
 
 # Install SDK and run demo

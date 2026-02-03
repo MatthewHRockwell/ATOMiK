@@ -32,4 +32,4 @@ Location: Santa Rosa, CA 95404, United States
 Email: matthew.h.rockwell@gmail.com
 ORCID: 0009-0006-6082-5583
 
-Repository: https://github.com/mattrockwell/ATOMiK
+Repository: https://github.com/MatthewHRockwell/ATOMiK

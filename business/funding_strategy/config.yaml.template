@@ -4,7 +4,7 @@ company:
   ein: ""                 # Your EIN
   uei: ""                 # Fill after SAM.gov registration
   address: ""             # Your business address
-  website: "https://github.com/mopore/ATOMiK"
+  website: "https://github.com/MatthewHRockwell/ATOMiK"
   founding_date: ""       # YYYY-MM-DD
   employee_count: 1
   us_owned_pct: 100

@@ -267,7 +267,7 @@ JSON Schema --> ATOMiK Generator --> Python + Rust + C + JavaScript + Verilog
 
 *Patent Pending — Architecture and Execution Model*
 
-Repository: github.com/mopore/ATOMiK
+Repository: github.com/MatthewHRockwell/ATOMiK
 
 ---
 
