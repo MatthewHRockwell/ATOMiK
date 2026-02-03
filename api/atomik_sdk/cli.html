@@ -313,7 +313,7 @@ atomik-gen &ndash;version</p>
         return EXIT_FILE_ERROR
 
     project_root = Path(__file__).resolve().parent.parent.parent
-    demo_dir = project_root / &#34;demos&#34; / domain
+    demo_dir = project_root / &#34;demos&#34; / &#34;hardware&#34; / domain
 
     if not demo_dir.exists():
         print(f&#34;Error: demo directory not found: {demo_dir}&#34;, file=sys.stderr)
@@ -358,7 +358,7 @@ atomik-gen &ndash;version</p>
     print()
 
     # -- Gather Verilog source files -------------------------------------------
-    common_dir = project_root / &#34;demos&#34; / &#34;common&#34;
+    common_dir = project_root / &#34;demos&#34; / &#34;hardware&#34; / &#34;common&#34;
     rtl_dir = project_root / &#34;rtl&#34;
     rtl_pll_dir = project_root / &#34;rtl&#34; / &#34;pll&#34;
     sim_stubs_dir = project_root / &#34;sim&#34; / &#34;stubs&#34;
