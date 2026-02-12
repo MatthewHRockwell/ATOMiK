@@ -1,0 +1,31 @@
+GowinSynthesis start
+Running parser ...
+Analyzing Verilog file 'C:\Users\matth\OneDrive\Personal\Projects\ATOMiK\sweep\pll\atomik_pll_54p0m.v'
+Analyzing Verilog file 'C:\Users\matth\OneDrive\Personal\Projects\ATOMiK\rtl\atomik_delta_acc.v'
+Analyzing Verilog file 'C:\Users\matth\OneDrive\Personal\Projects\ATOMiK\rtl\atomik_state_rec.v'
+Analyzing Verilog file 'C:\Users\matth\OneDrive\Personal\Projects\ATOMiK\rtl\atomik_parallel_acc.v'
+Analyzing Verilog file 'C:\Users\matth\OneDrive\Personal\Projects\ATOMiK\sweep\top\top_N4_F54p0.v'
+Compiling module 'atomik_top_sweep'("C:\Users\matth\OneDrive\Personal\Projects\ATOMiK\sweep\top\top_N4_F54p0.v":7)
+Compiling module 'atomik_pll_54p0m'("C:\Users\matth\OneDrive\Personal\Projects\ATOMiK\sweep\pll\atomik_pll_54p0m.v":10)
+Compiling module 'atomik_parallel_acc'("C:\Users\matth\OneDrive\Personal\Projects\ATOMiK\rtl\atomik_parallel_acc.v":36)
+Compiling module 'atomik_delta_acc'("C:\Users\matth\OneDrive\Personal\Projects\ATOMiK\rtl\atomik_delta_acc.v":31)
+NOTE  (EX0101) : Current top module is "atomik_top_sweep"
+[5%] Running netlist conversion ...
+Running device independent optimization ...
+[10%] Optimizing Phase 0 completed
+[15%] Optimizing Phase 1 completed
+[25%] Optimizing Phase 2 completed
+Running inference ...
+[30%] Inferring Phase 0 completed
+[40%] Inferring Phase 1 completed
+[50%] Inferring Phase 2 completed
+[55%] Inferring Phase 3 completed
+Running technical mapping ...
+[60%] Tech-Mapping Phase 0 completed
+[65%] Tech-Mapping Phase 1 completed
+[75%] Tech-Mapping Phase 2 completed
+[80%] Tech-Mapping Phase 3 completed
+[90%] Tech-Mapping Phase 4 completed
+[95%] Generate netlist file "C:\Users\matth\OneDrive\Personal\Projects\ATOMiK\sweep\impl\gwsynthesis\project_N4_F54p0.vg" completed
+[100%] Generate report file "C:\Users\matth\OneDrive\Personal\Projects\ATOMiK\sweep\impl\gwsynthesis\project_N4_F54p0_syn.rpt.html" completed
+GowinSynthesis finish

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.27 (MiKTeX 25.4) (preloaded format=pdflatex 2025.6.4)  24 JAN 2026 18:05
+This is pdfTeX, Version 3.141592653-2.6-1.40.27 (MiKTeX 25.4) (preloaded format=pdflatex 2025.6.4)  30 JAN 2026 14:51
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1044,12 +1044,12 @@ LaTeX Font Info:    Trying to load font information for U+stmry on input line 1
 
 [2]
 LaTeX Font Info:    Font shape `T1/cmtt/bx/n' in size <10> not available
-(Font)              Font shape `T1/cmtt/m/n' tried instead on input line 177.
+(Font)              Font shape `T1/cmtt/m/n' tried instead on input line 180.
 
 
 [3]
 LaTeX Font Info:    Font shape `T1/cmtt/bx/it' in size <10> not available
-(Font)              Font shape `T1/cmtt/m/it' tried instead on input line 260.
+(Font)              Font shape `T1/cmtt/m/it' tried instead on input line 263.
 
 
 [4]
@@ -1059,7 +1059,7 @@ LaTeX Font Info:    Font shape `T1/cmtt/bx/it' in size <10> not available
 [6]
 
 [7]
-Overfull \hbox (0.58969pt too wide) in paragraph at lines 552--553
+Overfull \hbox (0.58969pt too wide) in paragraph at lines 555--556
 []\T1/cmr/bx/n/10.95 Definition 4.2 \T1/cmr/m/n/10.95 (Par-al-lel Op-er-a-tor)\
 T1/cmr/bx/n/10.95 . []\T1/cmr/m/n/10.95 The \T1/cmr/m/it/10.95 par-al-lel com-p
 o-si-tion \T1/cmr/m/n/10.95 op-er-a-tor com-bines in-de-pen-dent deltas: 
@@ -1074,7 +1074,7 @@ o-si-tion \T1/cmr/m/n/10.95 op-er-a-tor com-bines in-de-pen-dent deltas:
 [10]
 
 [11]
-Overfull \hbox (4.08522pt too wide) in paragraph at lines 841--842
+Overfull \hbox (4.08522pt too wide) in paragraph at lines 844--845
 []\T1/cmr/bx/n/10.95 Theorem 6.4 \T1/cmr/m/n/10.95 (Tur-ing Com-plete-ness)\T1/
 cmr/bx/n/10.95 . []\T1/cmr/m/it/10.95 For any counter ma-chine pro-gram $\OML/c
 mm/m/it/10.95 P$\T1/cmr/m/it/10.95 , there ex-ists an ATOMiK
@@ -1092,9 +1092,11 @@ LaTeX Warning: `h' float specifier changed to `ht'.
 
 [14]
 
-[15] (Delta_State_Algebra.bbl)
+[15] (Delta_State_Algebra.bbl
 
-[16] (Delta_State_Algebra.aux)
+[16])
+
+[17] (Delta_State_Algebra.aux)
  ***********
 LaTeX2e <2024-11-01> patch level 2
 L3 programming layer <2025-04-29>
@@ -1103,24 +1105,24 @@ Package rerunfilecheck Info: File `Delta_State_Algebra.out' has not changed.
 (rerunfilecheck)             Checksum: DB0606E9F55952E26BBAA0CFF7C91814;5265.
  ) 
 Here is how much of TeX's memory you used:
- 31551 strings out of 469923
- 617214 string characters out of 5469171
- 1174959 words of memory out of 5000000
+ 31554 strings out of 469923
+ 617243 string characters out of 5469171
+ 1168959 words of memory out of 5000000
  57578 multiletter control sequences out of 15000+600000
  653543 words of font info for 111 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 84i,8n,87p,791b,1321s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 84i,8n,87p,791b,2101s stack positions out of 10000i,1000n,20000p,200000b,200000s
  <C:\Users\matth\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecit
 1000.pk> <C:\Users\matth\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi60
 0\ecbi1095.pk> <C:\Users\matth\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec
 /dpi600\ecrm0800.pk> <C:\Users\matth\AppData\Local\MiKTeX\fonts/pk/ljfour/jknap
 pen/ec/dpi600\tcrm1095.pk> <C:\Users\matth\AppData\Local\MiKTeX\fonts/pk/ljfour
 /jknappen/ec/dpi600\ectt1095.pk> <C:\Users\matth\AppData\Local\MiKTeX\fonts/pk/
-ljfour/jknappen/ec/dpi600\ecbx1095.pk> <C:\Users\matth\AppData\Local\MiKTeX\fon
-ts/pk/ljfour/jknappen/ec/dpi600\ecbx1200.pk> <C:\Users\matth\AppData\Local\MiKT
-eX\fonts/pk/ljfour/jknappen/ec/dpi600\ecti1095.pk> <C:\Users\matth\AppData\Loca
+ljfour/jknappen/ec/dpi600\ecbx1200.pk> <C:\Users\matth\AppData\Local\MiKTeX\fon
+ts/pk/ljfour/jknappen/ec/dpi600\ecti1095.pk> <C:\Users\matth\AppData\Local\MiKT
+eX\fonts/pk/ljfour/jknappen/ec/dpi600\ecbx1440.pk> <C:\Users\matth\AppData\Loca
 l\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecrm1095.pk> <C:\Users\matth\AppDat
-a\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecbx1440.pk> <C:\Users\matth\
+a\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecbx1095.pk> <C:\Users\matth\
 AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ectt1000.pk> <C:\Users\
 matth\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecti1000.pk> <C:\
 Users\matth\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecrm1000.pk
@@ -1142,9 +1144,9 @@ fonts/cm/cmsy8.pfb><C:/Users/matth/AppData/Local/Programs/MiKTeX/fonts/type1/pu
 blic/amsfonts/cm/cmti10.pfb><C:/Users/matth/AppData/Local/Programs/MiKTeX/fonts
 /type1/public/amsfonts/symbols/msam10.pfb><C:/Users/matth/AppData/Local/Program
 s/MiKTeX/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on Delta_State_Algebra.pdf (16 pages, 444778 bytes).
+Output written on Delta_State_Algebra.pdf (17 pages, 446640 bytes).
 PDF statistics:
- 1342 PDF objects out of 1440 (max. 8388607)
- 276 named destinations out of 1000 (max. 500000)
+ 1350 PDF objects out of 1440 (max. 8388607)
+ 279 named destinations out of 1000 (max. 500000)
  285 words of extra memory for PDF output out of 10000 (max. 10000000)
 

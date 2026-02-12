@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Module name="atomik_top_sweep" Register="409" Alu="38" Lut="328" T_Register="1501(409)" T_Alu="38(38)" T_Lut="1781(328)">
+ <SubModule name="u_pll"/>
+ <SubModule name="u_par" Register="68" Lut="411" T_Register="1092(68)" T_Lut="1453(411)">
+  <SubModule name="banks[0].u_bank" Register="64" Lut="66" T_Register="64(64)" T_Lut="66(66)"/>
+  <SubModule name="banks[1].u_bank" Register="64" Lut="65" T_Register="64(64)" T_Lut="65(65)"/>
+  <SubModule name="banks[2].u_bank" Register="64" Lut="65" T_Register="64(64)" T_Lut="65(65)"/>
+  <SubModule name="banks[3].u_bank" Register="64" Lut="65" T_Register="64(64)" T_Lut="65(65)"/>
+  <SubModule name="banks[4].u_bank" Register="64" Lut="65" T_Register="64(64)" T_Lut="65(65)"/>
+  <SubModule name="banks[5].u_bank" Register="64" Lut="65" T_Register="64(64)" T_Lut="65(65)"/>
+  <SubModule name="banks[6].u_bank" Register="64" Lut="65" T_Register="64(64)" T_Lut="65(65)"/>
+  <SubModule name="banks[7].u_bank" Register="64" Lut="65" T_Register="64(64)" T_Lut="65(65)"/>
+  <SubModule name="banks[8].u_bank" Register="64" Lut="66" T_Register="64(64)" T_Lut="66(66)"/>
+  <SubModule name="banks[9].u_bank" Register="64" Lut="65" T_Register="64(64)" T_Lut="65(65)"/>
+  <SubModule name="banks[10].u_bank" Register="64" Lut="65" T_Register="64(64)" T_Lut="65(65)"/>
+  <SubModule name="banks[11].u_bank" Register="64" Lut="65" T_Register="64(64)" T_Lut="65(65)"/>
+  <SubModule name="banks[12].u_bank" Register="64" Lut="65" T_Register="64(64)" T_Lut="65(65)"/>
+  <SubModule name="banks[13].u_bank" Register="64" Lut="65" T_Register="64(64)" T_Lut="65(65)"/>
+  <SubModule name="banks[14].u_bank" Register="64" Lut="65" T_Register="64(64)" T_Lut="65(65)"/>
+  <SubModule name="banks[15].u_bank" Register="64" Lut="65" T_Register="64(64)" T_Lut="65(65)"/>
+ </SubModule>
+</Module>

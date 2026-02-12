@@ -109,6 +109,9 @@ We formally verify 92 theorems in the Lean4 proof assistant, establishing: (1) t
 These results provide a rigorous mathematical foundation for \emph{ATOMiK}, a hardware-native architecture that achieves bounded, deterministic latency by eliminating cache hierarchies, speculative execution, and coherency protocols. The formal verification establishes that the architectural optimizations preserve computational semantics while enabling order-of-magnitude improvements in memory efficiency and latency determinism. To our knowledge, this represents the first formally verified foundation for transient state computation.
 \end{abstract}
 
+\medskip
+\noindent\textbf{Keywords:} formal verification \(\cdot\) delta-state algebra \(\cdot\) transient state computation \(\cdot\) XOR accumulation \(\cdot\) Abelian group \(\cdot\) Lean4 proof assistant \(\cdot\) hardware architecture \(\cdot\) Turing completeness
+
 % ============================================================================
 % 1. INTRODUCTION
 % ============================================================================
@@ -1028,6 +1031,13 @@ The proofs and source code are available at: \texttt{https://github.com/MatthewH
 The author thanks the Santa Rosa Junior College STEM department faculty for their passion and approach to teaching that established strong foundations and a love for STEM, which made this work possible.
 
 The formal proofs were developed using Lean4 \cite{moura2021lean4}. All source code and proofs are available at: \texttt{https://github.com/MatthewHRockwell/ATOMiK}.
+
+% ============================================================================
+% DECLARATIONS
+% ============================================================================
+\section*{Declarations}
+
+\paragraph{Funding} Not applicable. This research received no external funding.
 
 % ============================================================================
 % REFERENCES

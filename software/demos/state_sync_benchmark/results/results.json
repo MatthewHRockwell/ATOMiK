@@ -1,0 +1,45 @@
+{
+  "timestamp": "2026-02-03T03:44:40.682314+00:00",
+  "scenarios": [
+    {
+      "name": "Sensor Fusion (N=16 streams)",
+      "atomik_ops_sec": 2856800.042993339,
+      "conventional_ops_sec": 2673725.300841617,
+      "atomik_bytes": 800000,
+      "conventional_bytes": 1600000,
+      "speedup": 1.0684717843280664,
+      "n_streams": 16,
+      "n_updates": 100000
+    },
+    {
+      "name": "Rollback (10K deltas)",
+      "atomik_undo_ops": 1,
+      "conventional_undo_ops": 100,
+      "atomik_latency_us": 3.6999990697950125,
+      "conventional_latency_us": 63.99999256245792,
+      "n_deltas": 10000,
+      "rollback_steps": 1
+    },
+    {
+      "name": "Distributed Sync (N nodes)",
+      "atomik_messages": 8,
+      "conventional_messages": 10000,
+      "atomik_correct": true,
+      "conventional_correct": true,
+      "atomik_time_us": 3041.4999928325415,
+      "conventional_time_us": 2675411.3000060897,
+      "n_nodes": 8,
+      "n_updates": 10000
+    },
+    {
+      "name": "Memory Traffic",
+      "atomik_bytes_written": 135284,
+      "conventional_bytes_written": 800000,
+      "atomik_parallel_bytes": 135284,
+      "reduction_pct": 83.08949999999999,
+      "n_updates": 100000,
+      "state_width": 64,
+      "sparsity": 0.95
+    }
+  ]
+}

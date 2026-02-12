@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Module name="atomik_top_sweep" Register="409" Alu="38" Lut="330" T_Register="537(409)" T_Alu="38(38)" T_Lut="479(330)">
+ <SubModule name="u_pll"/>
+ <SubModule name="u_par" Register="64" Lut="85" T_Register="128(64)" T_Lut="149(85)">
+  <SubModule name="banks[0].u_bank" Register="64" Lut="64" T_Register="64(64)" T_Lut="64(64)"/>
+ </SubModule>
+</Module>

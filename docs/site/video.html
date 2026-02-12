@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ATOMiK — Video Gallery</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .nav { display: flex; gap: 1rem; padding: 1rem 2rem; background: var(--surface0); border-bottom: 1px solid var(--surface1); }
+        .nav a { color: var(--subtext0); text-decoration: none; padding: 0.5rem 1rem; border-radius: 6px; }
+        .nav a:hover, .nav a.active { color: var(--text); background: var(--surface1); }
+        .page-content { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+        .video-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 1.5rem; margin: 1.5rem 0; }
+        .video-card { background: var(--surface0); border-radius: 12px; overflow: hidden; }
+        .video-placeholder { background: var(--mantle); aspect-ratio: 16/9; display: flex; align-items: center; justify-content: center; color: var(--subtext0); font-size: 1.1rem; flex-direction: column; gap: 0.5rem; }
+        .video-placeholder .icon { font-size: 3rem; opacity: 0.3; }
+        .video-info { padding: 1.5rem; }
+        .video-info h3 { color: var(--text); margin: 0 0 0.5rem; }
+        .video-info p { color: var(--subtext0); font-size: 0.9rem; margin: 0; }
+        .video-info .duration { color: var(--blue); font-size: 0.85rem; margin-top: 0.5rem; }
+        .section { margin: 2rem 0; }
+        .section h2 { color: var(--text); border-bottom: 1px solid var(--surface1); padding-bottom: 0.5rem; }
+        .note { background: var(--surface0); border-radius: 8px; padding: 1rem; border-left: 3px solid var(--yellow); margin: 1rem 0; }
+    </style>
+</head>
+<body>
+    <nav class="nav">
+        <a href="index.html">Home</a>
+        <a href="investor.html">Investors</a>
+        <a href="engineer.html">Engineers</a>
+        <a href="demos.html">Demos</a>
+        <a href="video.html" class="active">Videos</a>
+    </nav>
+
+    <div class="page-content">
+        <h1>Video Gallery</h1>
+        <p style="color: var(--subtext0);">Presentation videos featuring ATOMiK demos and pitches</p>
+
+        <div class="note">
+            Videos are generated using AI avatar technology (HeyGen). All content is reviewed and approved by the founder personally. Each video includes a mandatory AI disclosure statement.
+        </div>
+
+        <div class="video-grid">
+            <div class="video-card">
+                <div class="video-placeholder">
+                    <span class="icon">&#9654;</span>
+                    <span>Demo Video — Coming Soon</span>
+                </div>
+                <div class="video-info">
+                    <h3>Product Demo</h3>
+                    <p>2-3 minute walkthrough of ATOMiK's architecture, live hardware demo, and benchmark results.</p>
+                    <div class="duration">Duration: ~2:30</div>
+                </div>
+            </div>
+
+            <div class="video-card">
+                <div class="video-placeholder">
+                    <span class="icon">&#9654;</span>
+                    <span>Pitch Video — Coming Soon</span>
+                </div>
+                <div class="video-info">
+                    <h3>Investor Pitch</h3>
+                    <p>1-2 minute pitch covering the opportunity, traction, and ask.</p>
+                    <div class="duration">Duration: ~1:30</div>
+                </div>
+            </div>
+
+            <div class="video-card">
+                <div class="video-placeholder">
+                    <span class="icon">&#9654;</span>
+                    <span>Accelerator Intro — Coming Soon</span>
+                </div>
+                <div class="video-info">
+                    <h3>Accelerator Introduction</h3>
+                    <p>30-second introduction for accelerator applications.</p>
+                    <div class="duration">Duration: ~0:30</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Video Scripts</h2>
+            <p style="color: var(--subtext0);">Script templates are available in the repository:</p>
+            <ul style="color: var(--text); line-height: 2;">
+                <li><code>business/funding_strategy/agents/templates/demo_video_script.md</code></li>
+                <li><code>business/funding_strategy/agents/templates/pitch_video_script.md</code></li>
+                <li><code>business/funding_strategy/agents/templates/accelerator_intro_script.md</code></li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>AI Disclosure</h2>
+            <p style="color: var(--subtext0);">All videos include the following disclosure:</p>
+            <blockquote style="color: var(--text); border-left: 3px solid var(--blue); padding-left: 1rem; margin: 1rem 0; font-style: italic;">
+                "This presentation was created using AI avatar technology. All content has been reviewed and approved by me personally."
+            </blockquote>
+        </div>
+    </div>
+</body>
+</html>

@@ -62,8 +62,8 @@ python -m software.demos.state_sync_benchmark
 
 | Paper | Topic | Status |
 |-------|-------|--------|
-| [Delta State Algebra](papers/paper1-formal-verification/) | Formal verification of ATOMiK's algebraic foundations | Draft |
-| [ATOMiK Benchmarks](papers/paper2-benchmarks/) | Performance benchmarks and SCORE comparison | Draft |
+| [Delta State Algebra](https://doi.org/10.5281/zenodo.18364796) |  Formally Verified Foundation for Transient State Computation | Preprint |
+| [ATOMiK](https://doi.org/10.5281/zenodo.18372213) | mpirical Validation of Delta-State Computation with Hardware Verification | Preprint |
 
 ---
 
@@ -74,9 +74,7 @@ python -m software.demos.state_sync_benchmark
 | **Phase 1** | Mathematical Formalization | Complete | 92 theorems verified in Lean4 |
 | **Phase 2** | SCORE Comparison | Complete | 95-100% memory reduction validated |
 | **Phase 3** | Hardware Synthesis | Complete | 10/10 hardware tests, 7% LUT @ 94.5 MHz |
-| **Phase 4A** | SDK Code Generation | Complete | Python/Rust/C/JS/Verilog generators |
-| **Phase 4B** | Domain SDKs | Complete | 3 domain SDKs, 57 generated files |
-| **Phase 4C** | Autonomous Pipeline | Complete | 6-stage controller, hardware demos, 124 tests |
+| **Phase 4** | Autonomous SDK Generation Pipeline | Complete | 6-stage controller, hardware demos, 124 tests |
 | **Phase 5** | Agentic Orchestration | Complete | DAG orchestrator, feedback loops, 353 tests |
 | **Phase 6** | Parallel Accumulator Banks | Complete | 16x linear scaling, 1056 Mops/s, 80/80 HW tests |
 

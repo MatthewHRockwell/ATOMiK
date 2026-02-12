@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.27 (MiKTeX 25.4) (preloaded format=pdflatex 2025.6.4)  25 JAN 2026 20:30
+This is pdfTeX, Version 3.141592653-2.6-1.40.27 (MiKTeX 25.4) (preloaded format=pdflatex 2025.6.4)  11 FEB 2026 18:05
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1145,8 +1145,8 @@ ed.
 (rerunfilecheck)             Checksum: 4365BBF8FB33F3247FF67B0D8827970C;6046.
  ) 
 Here is how much of TeX's memory you used:
- 31105 strings out of 469923
- 617208 string characters out of 5469171
+ 31107 strings out of 469923
+ 617230 string characters out of 5469171
  1182444 words of memory out of 5000000
  57261 multiletter control sequences out of 15000+600000
  655398 words of font info for 106 fonts, out of 8000000 for 9000
@@ -1189,9 +1189,9 @@ eX/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Users/matth/AppData/Local/Prog
 rams/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy7.pfb><C:/Users/matth/AppData/Lo
 cal/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy8.pfb><C:/Users/matth/Ap
 pData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/symbols/msam10.pfb>
-Output written on Paper_2_ATOMiK_Benchmarks.pdf (17 pages, 544898 bytes).
+Output written on Paper_2_ATOMiK_Benchmarks.pdf (17 pages, 545497 bytes).
 PDF statistics:
- 1579 PDF objects out of 1728 (max. 8388607)
- 155 named destinations out of 1000 (max. 500000)
+ 1582 PDF objects out of 1728 (max. 8388607)
+ 157 named destinations out of 1000 (max. 500000)
  310 words of extra memory for PDF output out of 10000 (max. 10000000)
 
