@@ -38,7 +38,7 @@ module atomik_state_rec #(
     input  wire [STATE_WIDTH-1:0]   delta_accumulator,  // Accumulated deltas
     
     // Output Interface
-    output wire [STATE_WIDTH-1:0]   current_state       // Reconstructed state
+    output wire [STATE_WIDTH-1:0]   current_state /* synthesis syn_keep=1 */  // Reconstructed state
 );
 
     // =========================================================================

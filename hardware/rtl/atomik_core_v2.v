@@ -85,7 +85,7 @@ module atomik_core_v2 #(
     wire [DATA_WIDTH-1:0] delta_accumulator;
     
     // Signals for state reconstruction
-    wire [DATA_WIDTH-1:0] current_state;
+    wire [DATA_WIDTH-1:0] current_state /* synthesis syn_keep=1 */;
     
     // Control signals derived from operation code
     wire load_en;

@@ -57,12 +57,12 @@ module atomik_delta_acc #(
     
     // Initial state register: S₀ from which all deltas are applied
     // Updated only on LOAD operation
-    reg [DELTA_WIDTH-1:0] initial_state;
-    
+    reg [DELTA_WIDTH-1:0] initial_state /* synthesis syn_preserve=1 */;
+
     // Delta accumulator: Running XOR composition of all deltas
     // δ_acc = δ₁ ⊕ δ₂ ⊕ ... ⊕ δₙ
     // Updated on each ACCUMULATE operation
-    reg [DELTA_WIDTH-1:0] delta_accumulator;
+    reg [DELTA_WIDTH-1:0] delta_accumulator /* synthesis syn_preserve=1 */;
 
     // =========================================================================
     // Main Sequential Logic
