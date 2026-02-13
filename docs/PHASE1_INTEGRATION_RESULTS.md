@@ -131,3 +131,59 @@ The ATOMiK hardware itself completes each operation in 1 clock cycle (39.7 ns). 
 4. **XOR cancellation verified**: Test T8/T9 confirm the fundamental ATOMiK property — applying a delta twice returns to the original state, proving the algebraic identity `a ⊕ d ⊕ d = a`.
 
 5. **Multi-delta composition verified**: Test T10 confirms that deltas compose correctly via XOR, proving `0 ⊕ 0x11111111 ⊕ 0x22222222 ⊕ 0x44444444 = 0x77777777`.
+
+---
+
+## Optimization Opportunities
+
+Phase 2 runtime development revealed several areas where performance could be improved in future phases:
+
+- **Word-level memory operations**: The `sw_memcpy` and `sw_memset` baselines use byte-level loops (15,471 and 11,572 cycles for 256B). Switching to 32-bit word-level copies would cut iteration count by 4x and should be the default for aligned buffers. The ATOMiK-tracked variants already operate at word granularity.
+
+- **SPI flash XIP latency dominance**: The 224-cycle round-trip for a single accumulate+read is overwhelmingly instruction fetch overhead — the ATOMiK hardware completes in 1 cycle. Moving hot-path code from XIP flash into SRAM (copy-on-boot or `__attribute__((section(".data")))`) could dramatically reduce cycle counts for benchmarks and real workloads.
+
+- **Multi-bank hardware**: The current single-bank design requires serializing all fingerprint operations through bank 0. Adding 4 banks (estimated +500 LUT, pushing CLS to ~86%) would enable parallel tracking of independent memory regions — e.g., fingerprinting a framebuffer on bank 0 while tracking heap integrity on bank 1.
+
+- **Burst-mode accumulation**: Currently each word requires a separate MMIO store to `ATOMIK_ACCUM`. A DMA-style burst interface (write base address + length, let hardware scan memory directly) would eliminate the per-word CPU overhead entirely. This is architecturally significant but requires RTL changes.
+
+- **Change detection without re-fingerprinting**: `atomik_region_changed()` currently recomputes the full fingerprint (scanning all N words) and compares to saved. A truly O(1) check would require the hardware to maintain a persistent shadow fingerprint — essentially a content-addressable dirty bit. This is a future hardware design consideration.
+
+- **GCC `-fno-builtin` workaround**: Required because GCC -O3 recognizes memset/memcpy loop patterns and replaces them with recursive calls. An alternative is `__attribute__((optimize("O1")))` on just the memset/memcpy functions to preserve -O3 everywhere else, or implementing them in inline assembly.
+
+- **UART bandwidth**: mini_printf outputs character-by-character with no buffering. For future demos with heavier output (benchmark tables, continuous telemetry), a ring buffer with interrupt-driven TX would free CPU cycles.
+
+---
+
+## Summary and Assessment
+
+### What We've Established
+
+Through Phase 1 integration and Phase 2 runtime development, the ATOMiK delta accumulator has moved from a standalone RTL module to a fully functional memory-mapped peripheral on a real RISC-V SoC, with a firmware runtime that exercises every aspect of its design.
+
+**The hardware works.** 21 tests pass on real silicon — 11 low-level accumulator tests and 10 integration tests covering fingerprinting, tracked memory operations, change detection, checkpoint/rollback, and heap integrity verification. The XOR-algebraic foundation (idempotency, commutativity, self-inverse cancellation) is verified on hardware, not just in simulation.
+
+**The resource cost is negligible.** ATOMiK adds 221 LUTs (2.6%) and 132 flip-flops (2.0%) to the PicoRV32 SoC. It uses zero block RAM. Timing margin is preserved at 1.23x. This is a peripheral that pays for itself in capability without meaningfully constraining what else can fit on the FPGA.
+
+**The value proposition is honest.** ATOMiK does not make memcpy faster — the CPU still moves every word. What it provides is metadata for free: a running XOR fingerprint that enables 5.1x faster change detection (13K vs 67K cycles for 256B), constant-time integrity verification (335 cycles regardless of heap size), and checkpoint/rollback with cryptographic-quality state verification. The 12-16% overhead on tracked operations is the cost of feeding one additional MMIO write per word to the accumulator.
+
+### Challenges Encountered
+
+- **Gowin EDA on Linux** requires a non-obvious `LD_PRELOAD` workaround for the Qt platform plugin. This is brittle and could break with toolchain updates. The synthesis flow works reliably once configured, but first-time setup is a pain point.
+
+- **SPI flash XIP performance** is the dominant bottleneck. Every instruction fetch goes through the SPI flash controller, meaning a 1-cycle hardware operation takes 224 cycles end-to-end. This isn't an ATOMiK problem — it affects everything — but it masks the true hardware performance in benchmarks.
+
+- **GCC pattern recognition** caused an infinite recursion bug when it optimized our `memset` implementation into a call to itself. This is a known issue in bare-metal development but cost debugging time. The `-fno-builtin` fix is simple but must be remembered.
+
+- **8KB SRAM constraint**: With 3,680 bytes used (45%) for stack, heap, and data, there's only ~4.5KB remaining. Larger demos (framebuffers, network buffers) will need to work within this or require hardware with more SRAM.
+
+### Potential Obstacles Ahead
+
+- **CLS utilization at 71%** is the tightest resource. Adding multi-bank ATOMiK (4 banks) would push to ~86%. Adding USB HID, a display controller, or other peripherals will compete for the same resources. The GW1NR-9 is small — Phase 3+ features may require careful resource budgeting or accepting that some configurations won't all fit simultaneously.
+
+- **XOR fingerprints are not cryptographically secure.** They detect accidental corruption and random bit errors, but an adversary who knows the scheme can craft collisions trivially (any permutation of XOR'd values produces the same fingerprint). For the security narrative ("try to exploit it"), this limitation needs to be acknowledged or addressed with a more robust hash.
+
+- **Single-bank serialization** means the accumulator is a shared resource. If future firmware needs to track multiple independent regions simultaneously (e.g., framebuffer dirty-checking AND heap integrity AND network packet dedup), they must time-share bank 0 with explicit save/restore of accumulator state. Multi-bank hardware is the real fix.
+
+- **No operating system yet.** Everything runs bare-metal with cooperative single-tasking. The roadmap envisions an OS shell (Phase 4), but interrupt handling, context switching, and multi-process ATOMiK state management are unsolved design problems.
+
+- **Firmware size scaling**: Phase 2 firmware is 16KB of 8MB flash — plenty of headroom. But adding a display driver, file system, USB stack, and shell will grow this substantially. The XIP performance penalty scales with code size as cache pressure increases.
