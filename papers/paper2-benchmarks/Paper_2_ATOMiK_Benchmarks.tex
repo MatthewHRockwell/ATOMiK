@@ -95,7 +95,7 @@
 \begin{abstract}
 Delta-state algebra was recently formalized and verified in the Lean4 proof assistant, establishing the theoretical foundations for computation based on composable state differences rather than persistent state. While 92 theorems proved the mathematical properties of this approach---including closure, commutativity, and Turing completeness---the practical performance implications remained empirical questions.
 
-We present a comprehensive validation of delta-state computation through two methodologies: (1)~software benchmarks comparing \atomik{} against traditional state-centric architectures across 360 measurements spanning 9 workloads, and (2)~FPGA hardware implementation validating single-cycle operation and algebraic properties in silicon. Results demonstrate 95--100\% memory traffic reduction across all workloads, with write-heavy operations achieving 22--55\% execution time improvements. Critically, hardware implementation eliminates software-observed reconstruction overhead, achieving uniform single-cycle latency (10.6~ns @ 94.5~MHz) for all operations---LOAD, ACCUMULATE, and READ. The commutative property enables 85\% parallel efficiency, impossible in traditional architectures. All algebraic properties from the formal proofs are validated in silicon (10/10 hardware tests passing on Gowin GW1NR-9 FPGA).
+We present a comprehensive validation of delta-state computation through two methodologies: (1)~software benchmarks comparing \atomik{} against traditional state-centric architectures across 360 measurements spanning 9 workloads, and (2)~FPGA hardware implementation validating single-cycle operation and algebraic properties in silicon. Results demonstrate 95--100\% memory traffic reduction across all workloads, with write-heavy operations achieving 22--55\% execution time improvements. Critically, hardware implementation eliminates software-observed reconstruction overhead, achieving uniform single-cycle latency (10.6~ns @ 94.5~MHz) for all operations---LOAD, ACCUMULATE, and READ. The commutative property enables 85\% parallel efficiency, impossible in traditional architectures. All algebraic properties from the formal proofs are validated in silicon (10/10 hardware tests passing on Gowin GW1NR-9 FPGA). Production deployment as a PicoRV32 SoC accelerator (February 2026) demonstrates zero timing violations, clean clock domain crossing, and 5/5 integration test suites passing on deployed hardware with persistent flash.
 
 To our knowledge, this represents the first delta-state architecture to demonstrate theory-to-silicon validation with uniform read/write performance, establishing that the software-observed read penalty is an implementation artifact, not a fundamental limitation.
 \end{abstract}
@@ -664,6 +664,58 @@ Hardware (FPGA) & $O(1)$ = 1 cycle & Running accumulator \\
 
 \paragraph{Explanation.} Software stores delta history and reconstructs by iterating through it. Hardware maintains a running accumulator register, updated on each delta input. State reconstruction is then a single combinational XOR---always $O(1)$, regardless of how many deltas have been accumulated.
 
+\subsection{Production Deployment Validation}
+
+Following initial hardware validation, \atomik{} was deployed as a production System-on-Chip (SoC) accelerator on the Tang Nano 9K FPGA (February 2026). The production deployment integrates a single-bank \atomik{} core with a PicoRV32 RISC-V CPU in a dual-clock architecture, providing real-world validation beyond isolated core testing.
+
+\paragraph{Production Architecture.} \Cref{tab:production} shows the production SoC configuration.
+
+\begin{table}[!htbp]
+\centering
+\caption{Production SoC deployment configuration. Clean timing closure with zero TNS validates dual-clock architecture.}
+\label{tab:production}
+\begin{tabular}{@{}lrr@{}}
+\toprule
+\textbf{Component} & \textbf{Frequency} & \textbf{$F_{\max}$ (Margin)} \\
+\midrule
+\atomik{} core & 81 MHz & 100.2 MHz (+23.6\%) \\
+CPU bus & 25.2 MHz & 30.6 MHz (+21.4\%) \\
+HDMI pixel & 25.2 MHz & 34.0 MHz (+35\%) \\
+\midrule
+\multicolumn{3}{l}{\textbf{Total Negative Slack: 0.000 ns}} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Resources.} Production SoC utilizes 3,838 LUTs (44\%), 3,103 CLBs (72\%), and both available PLLs. The \atomik{} core overhead is 230 LUTs (2.7\%) atop the baseline PicoRV32 system.
+
+\paragraph{Clock Domain Crossing.} A toggle-handshake CDC bridge safely crosses between the 25.2~MHz bus domain and the 81~MHz \atomik{} core domain, adding approximately 3 bus cycles of latency per memory-mapped I/O access.
+
+\paragraph{Integration Testing.} \Cref{tab:integration} shows production validation results.
+
+\begin{table}[!htbp]
+\centering
+\caption{Production integration test suites. All tests passing on deployed hardware with persistent SPI flash.}
+\label{tab:integration}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Suite} & \textbf{Tests} & \textbf{Result} \\
+\midrule
+Hardware operations & 11/11 & \checkmark \\
+Runtime API & 10/10 & \checkmark \\
+Checkpoint/rollback & Full sequence & \checkmark \\
+Memory operations & All benchmarks & \checkmark \\
+Heap integrity & All allocations & \checkmark \\
+\midrule
+\textbf{Total} & \textbf{5/5 suites} & \checkmark \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Deployment Status.} The production bitstream and firmware reside in persistent SPI flash, booting on power-up. The system executes a comprehensive test suite accessible via UART, validating all delta algebra properties, runtime API operations, and application-level workloads (checkpoint/rollback, tracked memory operations, heap integrity verification).
+
+\paragraph{Significance.} Production deployment demonstrates \atomik{} transition from proof-of-concept to production-ready accelerator. Zero timing violations, clean CDC operation, and comprehensive test suite passage on deployed hardware confirm the architecture's viability for real-world integration.
+
 % ============================================================================
 % 6. ANALYSIS AND DISCUSSION
 % ============================================================================
@@ -761,9 +813,13 @@ We presented comprehensive empirical validation of delta-state algebra through s
     \item \textbf{Key insight}: Hardware eliminates software reconstruction overhead entirely. The ``read penalty'' is an implementation artifact, not a fundamental limitation.
 
     \item \textbf{Silicon verification}: All algebraic properties from Lean4 proofs verified in hardware (10/10 tests passing).
+
+    \item \textbf{Production deployment}: SoC integration with PicoRV32 RISC-V achieves zero timing violations (0~TNS), clean dual-clock operation (81~MHz \atomik{}, 25.2~MHz CPU), and 5/5 integration test suites passing on deployed hardware with persistent flash (February 2026).
 \end{enumerate}
 
-\paragraph{Future Work.} ASIC implementation, wider data paths (128/256-bit), multi-channel architectures, real-world workloads (video processing, databases), and SDK development (Python, Rust, JavaScript).
+\paragraph{Significance.} This work demonstrates delta-state computation's transition from mathematical formalization to production-ready hardware. The combination of formal verification (92 Lean4 theorems), comprehensive benchmarking (360 measurements), hardware validation (10/10 tests), and production deployment (5/5 integration suites) establishes \atomik{} as a validated architecture for memory-efficient state management in silicon.
+
+\paragraph{Future Work.} ASIC implementation, wider data paths (128/256-bit), multi-bank parallel scaling (4--16 banks), real-world application integration (HFT, video processing, databases), and expanded SDK ecosystem.
 
 
 % ============================================================================
