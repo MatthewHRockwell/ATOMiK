@@ -10,12 +10,15 @@ ATOMiK is a hardware-accelerated delta-state computing architecture that replace
 
 | Metric | Value |
 |--------|-------|
-| Throughput | **1,056 Mops/s** (16 parallel banks) |
-| Operation latency | **10.6 ns** (single cycle) |
+| **Deployment Status** | ✅ **PRODUCTION** — Tang Nano 9K SoC |
+| Throughput (production) | **81 Mops/s** @ 81 MHz (single-bank) |
+| Throughput (validated) | **1,056 Mops/s** (16 parallel banks) |
+| Operation latency | **12.3 ns** (single cycle @ 81 MHz) |
 | Memory reduction | **95-100%** (sparse deltas vs. dense state) |
 | Formal proofs | **92** (Lean4 verified) |
-| Hardware tests | **80/80** passing on Tang Nano 9K |
-| LUT utilization | **7%** (single bank) / 20% (16 banks) |
+| Hardware tests | **80/80** passing (sweep) + 5/5 (integration) |
+| Timing closure | **0 TNS**, +23% margin @ 81 MHz |
+| LUT utilization | **44%** (production SoC) / 20% (standalone 16-bank) |
 | SDK languages | **5** (Python, Rust, C, JavaScript, Verilog) |
 | SDK tests | **353** passing |
 | Device cost | **$10** (Tang Nano 9K FPGA) |
@@ -69,12 +72,15 @@ N parallel XOR accumulator banks with a binary merge tree achieve linear through
 
 | Phase | Status |
 |-------|--------|
-| Mathematical Formalization (92 proofs) | Complete |
-| Hardware Synthesis (Tang Nano 9K) | Complete |
-| SDK Code Generation (5 languages) | Complete |
-| Agentic Pipeline (25 modules, 353 tests) | Complete |
-| Parallel Scaling (16x, 1 Gops/s) | Complete |
-| 3-Node VC Demo | Complete |
+| Mathematical Formalization (92 proofs) | ✅ Complete |
+| Hardware Synthesis (Tang Nano 9K) | ✅ Complete |
+| SDK Code Generation (5 languages) | ✅ Complete |
+| Agentic Pipeline (25 modules, 353 tests) | ✅ Complete |
+| Parallel Scaling (16x, 1 Gops/s) | ✅ Complete |
+| **Production SoC Deployment** | ✅ **DEPLOYED** |
+| 3-Node VC Demo | ✅ Complete |
+
+**Production Milestone** (Feb 2026): ATOMiK deployed as PicoRV32 SoC accelerator on Tang Nano 9K. Single-bank @ 81 MHz with dual-clock CDC, clean timing closure (0 TNS), persistent flash deployment. All 5 integration test suites passing on hardware.
 
 ## Contact
 

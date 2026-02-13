@@ -710,42 +710,53 @@ checkmark. Counter: "92/92 proven, 0 sorry." Lean4 logo.
 
 ---
 
-## Slide 8 — Hardware Results
+## Slide 8 — Production Deployment ✅
 
-# Tang Nano 9K: $10 FPGA, Real Silicon
+# Tang Nano 9K: $10 FPGA, Production SoC
 
-### Device Specifications
+### ✅ **DEPLOYED** — February 2026
 
 | Parameter | Value |
 |-----------|-------|
+| **Deployment Status** | ✅ **Production** — Persistent SPI flash |
 | Device | Gowin GW1NR-LV9QN88PC6/I5 |
 | Board | Sipeed Tang Nano 9K |
 | Retail price | ~$10 |
+| Architecture | PicoRV32 RISC-V CPU + ATOMiK accelerator |
 | Total LUTs | 8,640 |
 | Total FFs | 6,693 |
-| Tool | Gowin EDA V1.9.11.03 |
+| Tool | Gowin EDA V1.9.12.01 |
 
-### Synthesis Results (Single Bank, N=1)
+### Production SoC Resources
+
+| Resource | Used | Available | Utilization |
+|----------|:----:|:---------:|:-----------:|
+| Logic (LUT) | 3,838 | 8,640 | **44%** |
+| ALU | 707 | — | (CPU/peripherals only) |
+| CLS (slices) | 3,103 | 4,320 | **72%** |
+| PLL | 2 | 2 | **100%** (HDMI + ATOMiK) |
+| BSRAM | 12 | 26 | 47% |
+
+### Timing Closure (Production)
+
+| Clock Domain | Target | Achieved Fmax | Margin | TNS |
+|--------------|:------:|:------------:|:------:|:---:|
+| ATOMiK core | 81.0 MHz | **100.2 MHz** | **+23.6%** | **0** |
+| CPU bus | 25.2 MHz | **30.6 MHz** | **+21.4%** | **0** |
+| HDMI pixel | 25.2 MHz | 34.0 MHz | +35% | 0 |
+
+- **Total Negative Slack**: 0.000 ns on all domains ✅
+- **Accumulate latency**: **1 cycle** (12.3 ns @ 81 MHz)
+- **Reconstruct latency**: **0 cycles** (combinational)
+- **CDC bridge**: Toggle-handshake (25.2 MHz ↔ 81 MHz)
+
+### Standalone Core (for comparison)
 
 | Resource | Used | Available | Utilization |
 |----------|:----:|:---------:|:-----------:|
 | Logic (LUT/ALU) | 579 | 8,640 | **7%** |
 | Registers (FF) | 537 | 6,693 | **9%** |
-| PLL | 1 | 2 | 50% |
-| BSRAM | 0 | 26 | 0% |
-
-### Timing Closure
-
-| Clock | Constraint | Achieved Fmax | Slack |
-|-------|:----------:|:------------:|:-----:|
-| sys_clk | 27.0 MHz | 174.5 MHz | +547% margin |
-| atomik_clk | 94.5 MHz | 94.9 MHz | +0.049 ns |
-
-- Paths analyzed: 1,521
-- Setup violations: **0**
-- Hold violations: **0**
-- Accumulate latency: **1 cycle** (10.6 ns)
-- Reconstruct latency: **0 cycles** (combinational)
+| Fmax | 94.5 MHz | 95.0 MHz | +0.5% |
 
 ### Power
 
@@ -755,17 +766,28 @@ checkmark. Counter: "92/92 proven, 0 sorry." Lean4 logo.
 | Dynamic power | ~10-15 mW |
 | **Total** | **~15-20 mW** |
 
-### Hardware Validation
+### Production Validation ✅
 
-- **80/80 UART tests passing** on physical FPGA
-- All delta algebra properties confirmed in silicon
-- Self-inverse, commutativity, associativity verified via UART command protocol
+**Hardware Tests:**
+- **80/80** parallel bank sweep tests (N=1,2,4,8,16) ✅
+- **5/5** integration test suites on production SoC ✅
+  - `[X]` ATOMiK hardware: 11/11 PASS
+  - `[P]` Phase 2 runtime: 10/10 PASS
+  - `[K]` Checkpoint/rollback: PASS
+  - `[M]` Memory benchmarks: PASS
+  - `[H]` Heap integrity: PASS
 
-> **Speaker Notes**: This is real silicon, not simulation. The bitstream is
-> programmed onto a $10 FPGA and validated over UART. The critical path is in
-> the UART command parser, not the delta accumulator — meaning the core has
-> substantial timing headroom. At 7% LUT utilization, 93% of the device is
-> available for application logic or additional banks.
+**Deployment:**
+- ✅ Persistent SPI flash (bitstream + firmware)
+- ✅ Clean timing closure (0 TNS, dual-clock CDC)
+- ✅ All delta algebra properties confirmed in silicon
+- ✅ Production firmware: 16.4 KB (RV32I, -O3)
+
+> **Speaker Notes**: This is not a demo or proof-of-concept. This is a
+> production-deployed SoC running on real silicon with persistent flash. The
+> system boots on power-up, runs a comprehensive test suite, and passes all
+> validation. Zero timing violations. Clean CDC between bus and core domains.
+> Open-source hardware at github.com/MatthewHRockwell/TangNano-9K-example.
 
 `[VISUAL]` Photo/render of Tang Nano 9K board. Resource utilization bar chart
 (7% filled, 93% empty). Timing diagram showing 1-cycle accumulate and 0-cycle

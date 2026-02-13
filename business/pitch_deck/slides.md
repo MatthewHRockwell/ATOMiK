@@ -94,40 +94,42 @@ These aren't aspirational — they are **machine-verified mathematical proofs**.
 
 ---
 
-# Hardware Results: Single-Cycle Operations
+# Production Deployment: Real Silicon ✅
 
-Implemented on **Gowin GW1NR-9** (Tang Nano 9K — $10 FPGA):
+**Deployed on Tang Nano 9K** (Feb 2026) — $10 FPGA, PicoRV32 SoC accelerator:
 
 | Metric | Result |
 |--------|--------|
-| Operation latency | **10.6 ns** (single clock cycle) |
-| Clock frequency | 94.5 MHz (Fmax: 95.0 MHz) |
-| LUT utilization | **7%** (579 / 8,640 LUTs) |
-| FF utilization | 9% (537 / 6,693 FFs) |
-| ALU carry chains | **0** (pure XOR, no arithmetic) |
-| Hardware tests | **80/80 passing** |
-| Data width | 64-bit |
+| **Status** | ✅ **PRODUCTION** — Persistent flash |
+| Operation latency | **12.3 ns** (single clock @ 81 MHz) |
+| ATOMiK clock | 81 MHz (Fmax: **100.2 MHz**, +23% margin) |
+| CPU clock | 25.2 MHz (Fmax: 30.6 MHz, +21% margin) |
+| Timing closure | **0 TNS** (all domains) |
+| LUT utilization (SoC) | **44%** (3,838 / 8,640 LUTs) |
+| Integration tests | **5/5 passing** on hardware |
+| Standalone core | **7%** LUT (579 / 8,640) @ 94.5 MHz |
 
-*Every LOAD, ACCUMULATE, and READ completes in exactly 1 clock cycle.*
+*Every operation completes in exactly 1 clock cycle. Zero timing violations. Production-ready.*
 
 ---
 
-# Parallel Scaling: 1 Gops/s on $10
+# Parallel Scaling: Validated to 1 Gops/s
 
-N parallel XOR accumulator banks with binary merge tree:
+N parallel XOR accumulator banks with binary merge tree (hardware-validated):
 
-| Banks | Frequency | Throughput | Scaling | LUTs |
-|------:|----------:|-----------:|--------:|-----:|
-| 1 | 94.5 MHz | 94.5 Mops/s | 1.0x | 477 |
-| 4 | 81.0 MHz | 324 Mops/s | **4.0x** | 738 |
-| 8 | 67.5 MHz | 540 Mops/s | **8.0x** | 1,125 |
-| 16 | 66.0 MHz | **1,056 Mops/s** | **16.0x** | 1,776 |
+| Banks | Frequency | Throughput | Scaling | LUTs | Status |
+|------:|----------:|-----------:|--------:|-----:|--------|
+| 1 | 81 MHz | 81 Mops/s | 1.0x | 477 | ✅ **Production** |
+| 1 | 94.5 MHz | 94.5 Mops/s | 1.0x | 477 | ✅ Standalone |
+| 4 | 81.0 MHz | 324 Mops/s | **4.0x** | 738 | ✅ Validated |
+| 8 | 67.5 MHz | 540 Mops/s | **8.0x** | 1,125 | ✅ Validated |
+| 16 | 66.0 MHz | **1,056 Mops/s** | **16.0x** | 1,776 | ✅ Validated |
 
-**Linear scaling** — no diminishing returns. Throughput = N x Freq.
+**Linear scaling** — no diminishing returns. Throughput = N × Freq.
 
-The merge tree adds only log2(N) levels of combinational logic. Zero ALU carry chains means the XOR merge has no arithmetic bottleneck.
+The merge tree adds only log₂(N) levels of combinational logic. Zero ALU carry chains means the XOR merge has no arithmetic bottleneck.
 
-*N=16 banks break the **1 Gops/s barrier** using only 20% of a $10 FPGA.*
+*Production deployment uses N=1 @ 81 MHz. Architecture validated to N=16 (1 Gops/s) using only 20% of the same $10 FPGA.*
 
 ---
 
@@ -261,11 +263,13 @@ JSON Schema --> ATOMiK Generator --> Python + Rust + C + JavaScript + Verilog
 - Team expansion: FPGA engineers, application engineers, sales
 
 ### Milestones Achieved
-- 92 formal mathematical proofs
-- 1 Gops/s hardware validation
-- 5-language SDK with 242 tests
-- 25-module agentic pipeline
-- Patent application filed
+- ✅ 92 formal mathematical proofs (Lean4 verified)
+- ✅ **Production deployment** — Tang Nano 9K SoC (Feb 2026)
+- ✅ 1 Gops/s hardware validation (N=16 parallel banks)
+- ✅ 5-language SDK with 353 tests passing
+- ✅ 25-module agentic pipeline
+- ✅ Patent application filed
+- ✅ 0 TNS timing closure with +23% margin
 
 ---
 
