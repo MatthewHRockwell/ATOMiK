@@ -4,6 +4,7 @@
 ![Tests](https://img.shields.io/badge/tests-353_passing-brightgreen)
 ![Proofs](https://img.shields.io/badge/formal_proofs-92_verified-blue)
 ![Hardware](https://img.shields.io/badge/hardware_tests-80%2F80-brightgreen)
+![Production](https://img.shields.io/badge/production-deployed-brightgreen)
 ![SDK](https://img.shields.io/badge/SDK-5_languages-orange)
 ![Throughput](https://img.shields.io/badge/throughput-1_Gops%2Fs-red)
 ![Cost](https://img.shields.io/badge/dev_cost-%24225-yellow)
@@ -16,6 +17,26 @@
 > The underlying architecture, execution model, and methods are **Patent Pending**.
 > Source code is licensed under **Apache License 2.0** for evaluation, testing, and benchmarking.
 > Commercial use, hardware integration, or derivative architectural implementations require a separate license.
+
+---
+
+## 🎯 Production Hardware
+
+**ATOMiK is deployed on Tang Nano 9K ($10 FPGA) as a RISC-V SoC accelerator:**
+
+- ✅ **PicoRV32 + ATOMiK**: Dual-clock architecture (25.2 MHz CPU, 81 MHz accelerator)
+- ✅ **Clean timing closure**: Zero TNS, +23% margin on ATOMiK, +21% margin on CPU
+- ✅ **Persistent flash**: Bitstream and firmware in SPI flash, boots on power-up
+- ✅ **Full validation**: All 5 test suites passing (hardware delta ops, runtime API, checkpoints, memory ops, heap integrity)
+- ✅ **Open source hardware**: Complete SoC source at [`TangNano-9K-example/picotiny`](https://github.com/MatthewHRockwell/TangNano-9K-example/tree/main/picotiny)
+
+**Get the hardware:**
+```bash
+git clone https://github.com/MatthewHRockwell/TangNano-9K-example.git
+cd TangNano-9K-example/picotiny
+# Synthesis: cd project && gowin_sh synth.tcl
+# Flash: openFPGALoader -b tangnano9k -f picotiny.fs
+```
 
 ---
 
@@ -77,6 +98,7 @@ python -m software.demos.state_sync_benchmark
 | **Phase 4** | Autonomous SDK Generation Pipeline | Complete | 6-stage controller, hardware demos, 124 tests |
 | **Phase 5** | Agentic Orchestration | Complete | DAG orchestrator, feedback loops, 353 tests |
 | **Phase 6** | Parallel Accumulator Banks | Complete | 16x linear scaling, 1056 Mops/s, 80/80 HW tests |
+| **Production** | PicoRV32 SoC Integration | **Deployed** | Tang Nano 9K @ 81 MHz, 0 TNS, persistent flash |
 
 ---
 
@@ -152,9 +174,24 @@ N=16 breaks the **1 Gops/s barrier** on a $10 FPGA. Scaling is exactly linear at
 
 ## Hardware Implementation
 
+### Production Deployment (Tang Nano 9K SoC)
+
 | Metric | Result |
 |--------|--------|
-| **Target Device** | Gowin GW1NR-9 (Tang Nano 9K) |
+| **Target Device** | Gowin GW1NR-9 (Tang Nano 9K, $10 FPGA) |
+| **Architecture** | PicoRV32 RISC-V CPU + ATOMiK accelerator |
+| **ATOMiK Configuration** | Single-bank @ 81 MHz with dual-clock CDC |
+| **CPU Clock** | 25.2 MHz (PicoRV32 via SPI XIP) |
+| **Timing Closure** | ATOMiK: 100.2 MHz (+23.6% margin), CPU: 30.6 MHz (+21.4% margin) |
+| **Total Negative Slack** | 0.000 ns (all domains) |
+| **Logic Utilization** | 44% (3,838/8,640 LUTs), 707 ALU, 72% CLS |
+| **Flash Deployment** | Persistent SPI flash (bitstream + firmware) |
+| **Validation** | 5/5 test suites passing ([X] [P] [K] [M] [H]) |
+
+### Standalone Core Performance
+
+| Metric | Result |
+|--------|--------|
 | **Clock Frequency** | 94.5 MHz (Fmax: 94.9 MHz) |
 | **Logic Utilization** | 7% (579/8640 LUTs) |
 | **Register Utilization** | 9% (537/6693 FFs) |

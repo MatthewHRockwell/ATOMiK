@@ -1,0 +1,428 @@
+# ATOMiK Production Deployment — Tang Nano 9K SoC
+
+**Date:** February 13, 2026
+**Board:** Tang Nano 9K (GW1NR-LV9QN88PC6/I5)
+**Toolchain:** Gowin EDA V1.9.12.01
+**Architecture:** PicoRV32 RISC-V CPU + ATOMiK Delta-State Accelerator
+**Status:** ✅ **DEPLOYED** — Persistent flash, zero TNS, all tests passing
+
+---
+
+## Executive Summary
+
+ATOMiK is deployed as a production SoC accelerator on the Tang Nano 9K ($10 FPGA). The system combines a PicoRV32 RISC-V CPU running at 25.2 MHz with a single-bank ATOMiK delta-state accumulator running at 81 MHz in an independent clock domain. Clock domain crossing is handled via a toggle-handshake CDC bridge. Both bitstream and firmware are in persistent SPI flash.
+
+**Key Achievements:**
+- ✅ Clean timing closure: 0 TNS on all clock domains
+- ✅ ATOMiK @ 100.2 MHz (+23.6% margin above 81 MHz target)
+- ✅ CPU @ 30.6 MHz (+21.4% margin above 25.2 MHz target)
+- ✅ All 5 test suites passing on hardware
+- ✅ Persistent deployment ready for field use
+
+---
+
+## Architecture
+
+### Clock Domains
+
+| Domain | Clock Source | Frequency | Fmax | Margin | TNS |
+|--------|-------------|-----------|------|--------|-----|
+| **ATOMiK Core** | Dedicated PLL | 81.0 MHz | 100.2 MHz | +23.6% | 0.000 |
+| **CPU + Bus** | HDMI PLL ÷ 5 | 25.2 MHz | 30.6 MHz | +21.4% | 0.000 |
+| **HDMI Pixel** | HDMI PLL ÷ 5 | 25.2 MHz | — | — | — |
+| **HDMI Serial** | HDMI PLL | 126.0 MHz | — | — | — |
+
+### Block Diagram
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    Tang Nano 9K SoC                          │
+│                                                               │
+│  ┌─────────────────┐            ┌────────────────────────┐   │
+│  │  PicoRV32 CPU   │            │   ATOMiK Accelerator   │   │
+│  │  @ 25.2 MHz     │            │   @ 81 MHz             │   │
+│  │                 │            │                        │   │
+│  │  RV32I ISA      │◄──CDC──────┤  Single-Bank (N=1)     │   │
+│  │  SPI XIP        │  Bridge    │  32-bit Delta Width    │   │
+│  │                 │            │                        │   │
+│  └────┬────────────┘            └────────────────────────┘   │
+│       │                                                       │
+│       ├─ SRAM (8KB)                                           │
+│       ├─ SPI Flash (XIP + Persistent Storage)                │
+│       ├─ UART (115200 baud)                                  │
+│       ├─ GPIO (7 pins)                                       │
+│       └─ HDMI Output                                         │
+│                                                               │
+│  PLLs: HDMI PLL (126 MHz) + ATOMiK PLL (81 MHz)              │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Memory Map
+
+| Address Range | Device | Access |
+|--------------|--------|--------|
+| `0x0000_0000 - 0x3FFF_FFFF` | SPI Flash XIP | R (instruction fetch) |
+| `0x4000_0000 - 0x4000_1FFF` | SRAM 8KB | RW |
+| `0x8000_0000 - 0x8000_1FFF` | Boot ROM | R |
+| `0x8100_0000 - 0x8100_001F` | SPI Flash Config | RW |
+| `0x8200_0000 - 0x8200_0007` | GPIO | RW |
+| `0x8300_0000 - 0x8300_0007` | UART | RW |
+| `0xC000_0000 - 0xC000_001F` | **ATOMiK** | RW |
+
+### ATOMiK Register Map
+
+| Offset | Name | Access | Description |
+|--------|------|--------|-------------|
+| `0x00` | LOAD | W | Load initial state, clear accumulator |
+| `0x04` | ACCUM | W | Accumulate delta via XOR |
+| `0x08` | STATE | R | Read reconstructed state (initial ⊕ accumulator) |
+| `0x0C` | STATUS | R | Bit 0: accumulator_zero flag |
+| `0x10` | CONFIG | W | Bit 0: soft reset |
+| `0x14` | INIT | R | Read initial_state (debug) |
+| `0x18` | DELTA | R | Read accumulator (debug) |
+
+---
+
+## Resource Utilization
+
+### Full SoC (PicoRV32 + ATOMiK + HDMI + Peripherals)
+
+| Resource | Used | Available | Utilization |
+|----------|------|-----------|-------------|
+| **LUT** | 3,838 | 8,640 | **44%** |
+| **ALU** | 707 | — | — |
+| **FF** | — | 6,693 | — |
+| **CLS** | 3,103 | 4,320 | **72%** |
+| **BSRAM** | 12 | 26 | **47%** |
+| **rPLL** | 2 | 2 | **100%** |
+
+### ATOMiK Contribution (Single-Bank @ 81 MHz)
+
+| Resource | Baseline | With ATOMiK | Delta |
+|----------|----------|-------------|-------|
+| **LUT** | 3,608 | 3,838 | +230 (2.7%) |
+| **FF** | 1,930 | — | ~+150 |
+
+---
+
+## Validation
+
+### Hardware Test Results
+
+All test suites pass on production hardware:
+
+| Test Suite | Tests | Result | Performance |
+|-----------|-------|--------|-------------|
+| **[X] ATOMiK Hardware** | 11/11 | ✅ PASS | 224 cycles |
+| **[P] Phase 2 Full** | 10/10 | ✅ PASS | Runtime API validated |
+| **[K] Checkpoint/Rollback** | — | ✅ PASS | 518-1342 cycles |
+| **[M] Memory Benchmark** | — | ✅ PASS | 12-17k cycles |
+| **[H] Heap Integrity** | — | ✅ PASS | 335 cycles |
+
+### Test Suite Details
+
+#### [X] ATOMiK Hardware Test (11/11 PASS)
+- T1: Soft reset
+- T2: Load 0xDEADBEEF
+- T3: Accumulator zero flag
+- T4: State equals initial
+- T5: Accumulate 0xFF
+- T6: Accumulator non-zero flag
+- T7: State XOR verification
+- T8: XOR cancellation (delta ⊕ delta = 0)
+- T9: Accumulator zero again
+- T10: Multi-delta sequence
+- T11: Performance measurement (224 cycles)
+
+#### [P] Phase 2 Full Test (10/10 PASS)
+- P1: API initialization
+- P2: Fingerprint computation
+- P3: Tracked memcpy
+- P4: Unchanged region detection
+- P5: Changed region detection
+- P6: Verified memset
+- P7: Checkpoint creation
+- P8: Heap allocation
+- P9: Heap integrity check
+- P10: printf verification
+
+---
+
+## Clock Domain Crossing (CDC)
+
+### Toggle-Handshake Protocol
+
+The CDC bridge uses a toggle-handshake protocol to safely cross between the 25.2 MHz bus domain and the 81 MHz ATOMiK core domain:
+
+**Forward Path (Bus → Core):**
+1. Bus domain latches request data (addr, wdata, wstrb)
+2. Bus domain toggles `req_toggle` signal
+3. Core domain syncs via 2FF synchronizer
+4. Core domain detects edge, executes operation
+5. Core domain toggles `ack_toggle`
+
+**Return Path (Core → Bus):**
+1. Bus domain syncs `ack_toggle` via 2FF synchronizer
+2. Bus domain detects edge, drives `mem_ready`
+3. Response data (rdata) latched and stable
+
+**Latency:** ~3 bus cycles per MMIO access (~120 ns @ 25.2 MHz)
+
+**Safety:** Data is latched before toggle, sampled after 2FF sync. Standard CDC best practices.
+
+---
+
+## Build Instructions
+
+### Prerequisites
+
+```bash
+# Gowin EDA V1.9.12.01
+export GOWIN_HOME=/opt/gowin/IDE
+export LD_PRELOAD=/lib/x86_64-linux-gnu/libstdc++.so.6
+export LD_LIBRARY_PATH=$GOWIN_HOME/lib:/lib/x86_64-linux-gnu
+
+# RISC-V toolchain
+sudo apt install gcc-riscv64-unknown-elf
+
+# openFPGALoader
+sudo apt install openfpgaloader
+```
+
+### Synthesis
+
+```bash
+git clone https://github.com/MatthewHRockwell/TangNano-9K-example.git
+cd TangNano-9K-example/picotiny/project
+$GOWIN_HOME/bin/gw_sh synth.tcl
+```
+
+**Output:** `impl/pnr/picotiny.fs` (bitstream)
+
+### Flash Bitstream to Persistent Storage
+
+```bash
+openFPGALoader -b tangnano9k -f impl/pnr/picotiny.fs
+```
+
+### Build and Flash Firmware
+
+```bash
+# Build ATOMiK firmware
+cd /path/to/ATOMiK/hardware/picorv32/firmware
+make clean && make
+
+# Reset board and flash firmware
+# Method 1: Physical reset button, then immediately:
+python3 /path/to/TangNano-9K-example/picotiny/sw/pico-programmer.py \
+    build/atomik-fw.v /dev/ttyUSB1
+
+# Method 2: JTAG reload (acts as reset), then flash:
+openFPGALoader -b tangnano9k /path/to/picotiny.fs
+# Then immediately:
+python3 /path/to/TangNano-9K-example/picotiny/sw/pico-programmer.py \
+    build/atomik-fw.v /dev/ttyUSB1
+```
+
+### Serial Console
+
+```bash
+# 115200 baud, 8N1
+screen /dev/ttyUSB1 115200
+# or
+picocom -b 115200 /dev/ttyUSB1
+```
+
+**Firmware Menu:**
+- `[X]` — ATOMiK hardware test (11/11)
+- `[P]` — Phase 2 full test (10/10)
+- `[K]` — Checkpoint/rollback demo
+- `[M]` — Memory benchmark
+- `[H]` — Heap integrity demo
+- `[F]` — Flash mode
+- `[I]` — Read SPI flash ID
+- `[S]`/`[D]`/`[C]` — SPI mode (single/dual/dual+CRM)
+- `[B]` — Simplistic benchmark
+- `[1-6]` — Toggle LEDs
+
+---
+
+## Design Decisions
+
+### Why Single-Bank (N=1) Instead of Multi-Bank?
+
+The production deployment uses **N_BANKS=1** (single accumulator) running at 81 MHz for these reasons:
+
+1. **Clean Timing Closure**: N=4 at 81 MHz had a -0.454 ns TNS violation. N=1 achieves 100.2 MHz Fmax with 23.6% margin.
+2. **Resource Efficiency**: Single-bank uses 230 LUT overhead vs. ~400 LUT for N=4.
+3. **Sufficient Throughput**: 81 Mops/s meets current requirements. The architecture scales to 1,056 Mops/s (N=16 @ 66 MHz) when needed.
+4. **Simplified CDC**: Single accumulator = simpler bus wrapper, fewer cross-domain paths.
+
+**Scaling Path:** The `atomik_parallel_acc` module supports N=1,2,4,8,16 via parameter. To scale, change `N_BANKS` in `atomik_bus_wrapper.v` and re-synthesize.
+
+### Why Independent ATOMiK Clock Domain?
+
+The ATOMiK core runs at 81 MHz on a dedicated PLL, not at the CPU's 25.2 MHz:
+
+1. **Higher Throughput**: 81 MHz vs 25.2 MHz = 3.2× more operations per second.
+2. **Architectural Separation**: ATOMiK timing is independent of CPU/peripheral timing.
+3. **Future Scaling**: Higher frequencies (up to 100+ MHz) possible without impacting CPU.
+
+**Tradeoff:** Requires CDC bridge (+~50 LUT, +3 cycle latency). Worth it for 3.2× throughput gain.
+
+### Why Toggle-Handshake CDC Instead of FIFO?
+
+Toggle-handshake is simpler and sufficient for this use case:
+
+- **Latency:** ~3 bus cycles (120 ns) — acceptable for MMIO
+- **Resources:** ~50 LUT vs 200+ LUT for async FIFO
+- **Correctness:** Standard 2FF synchronizer, proven safe
+- **Self-Throttling:** Bus automatically waits for core via `mem_ready` handshake
+
+---
+
+## Known Limitations
+
+1. **Both PLLs Used**: HDMI PLL (126 MHz) + ATOMiK PLL (81 MHz) = 2/2 PLLs on GW1NR-9. No PLL headroom for additional clock domains.
+
+2. **UART Baud Rate**: Fixed at 115200 baud (CLK_FREQ/UART_BAUD-2 divider in firmware). Higher rates require firmware recompile.
+
+3. **SPI Flash Speed**: XIP runs in single-SPI mode. QSPI supported by hardware but not enabled (requires flash controller config). Instruction fetch bandwidth currently ~6.3 MB/s, could be 25.2 MB/s with QSPI.
+
+4. **SRAM Size**: Only 8KB on-chip SRAM. Heap limited to ~2KB after firmware .data/.bss sections. Large datasets require external memory or SPI flash buffering.
+
+5. **No DMA**: All ATOMiK operations are CPU-initiated MMIO. Future: DMA engine could stream deltas at line rate.
+
+---
+
+## Future Enhancements
+
+### Near-Term (Requires Firmware Only)
+
+- [ ] QSPI flash mode (4× instruction fetch bandwidth)
+- [ ] Batch delta operations (write N deltas without per-delta overhead)
+- [ ] Interrupt-driven accumulator (notify CPU on threshold)
+
+### Medium-Term (Requires RTL Changes)
+
+- [ ] Multi-bank scaling (N=4 or N=8) with per-bank addressing
+- [ ] DMA engine for zero-copy delta streaming
+- [ ] AXI bus interface (replace PicoRV32 valid/ready)
+- [ ] External DRAM controller (expand to MB/GB datasets)
+
+### Long-Term (New Platform)
+
+- [ ] Port to Artix-7 (300 MHz, 16-bank = 4.8 Gops/s)
+- [ ] Port to UltraScale+ (500 MHz, 16-bank = 8 Gops/s)
+- [ ] ASIC tape-out (28nm target, 1 GHz = 16 Gops/s)
+
+---
+
+## Reproducibility
+
+### Hardware Synthesis
+
+```bash
+# Clone repo
+git clone https://github.com/MatthewHRockwell/TangNano-9K-example.git
+cd TangNano-9K-example/picotiny
+
+# Verify commit
+git log --oneline -1
+# Expected: 38819d4 Switch ATOMiK to single-bank (N_BANKS=1) for clean timing at 81 MHz
+
+# Synthesize
+cd project
+$GOWIN_HOME/bin/gw_sh synth.tcl
+
+# Verify timing
+grep "Actual Fmax" impl/pnr/picotiny.tr
+# Expected: ATOMiK @ 100.167 MHz, CPU @ 30.591 MHz
+
+grep "setup.*0.000.*0$" impl/pnr/picotiny.tr | wc -l
+# Expected: >10 (zero TNS on all domains)
+```
+
+### Firmware Build
+
+```bash
+# Clone ATOMiK repo
+git clone https://github.com/MatthewHRockwell/ATOMiK.git
+cd ATOMiK/hardware/picorv32/firmware
+
+# Verify commit
+git log --oneline -1
+# Expected: d08d866 ATOMiK dual-clock 4-bank parallel bus wrapper with CDC bridge
+
+# Build
+make clean && make
+
+# Verify output
+ls -lh build/atomik-fw.v
+# Expected: ~16KB Verilog firmware image
+```
+
+### Hardware Test
+
+```bash
+# Flash bitstream + firmware
+openFPGALoader -b tangnano9k -f /path/to/picotiny.fs
+# Wait 100ms, then:
+python3 /path/to/pico-programmer.py /path/to/atomik-fw.v /dev/ttyUSB1
+
+# Connect serial
+screen /dev/ttyUSB1 115200
+
+# Run tests (type each letter):
+X   # ATOMiK hardware test → expect 11/11 PASS
+P   # Phase 2 full test → expect 10/10 PASS
+K   # Checkpoint/rollback → expect PASS
+M   # Memory benchmark → expect PASS
+H   # Heap integrity → expect PASS
+```
+
+---
+
+## Performance Metrics
+
+### ATOMiK Core Operations (@ 81 MHz)
+
+| Operation | Cycles | Latency | Throughput |
+|-----------|--------|---------|------------|
+| LOAD (initial_state) | 1 | 12.3 ns | 81 Mops/s |
+| ACCUM (delta XOR) | 1 | 12.3 ns | 81 Mops/s |
+| STATE (reconstruct) | 1 | 12.3 ns | 81 Mops/s |
+
+### End-to-End (CPU → ATOMiK via CDC)
+
+| Operation | CPU Cycles | Latency @ 25.2 MHz | Notes |
+|-----------|-----------|-------------------|-------|
+| MMIO Write (LOAD/ACCUM) | ~6 | ~238 ns | Includes bus arbitration + CDC |
+| MMIO Read (STATE/STATUS) | ~8 | ~317 ns | Includes CDC + response |
+
+### Application-Level Benchmarks
+
+| Workload | Cycles | Time @ 25.2 MHz | Notes |
+|----------|--------|-----------------|-------|
+| **Checkpoint (4 fields)** | 518 | 20.6 μs | 4× LOAD + fingerprint |
+| **Detect Change (4 fields)** | 1,342 | 53.3 μs | 5× deltas + read |
+| **Rollback** | 419 | 16.6 μs | 4× LOAD to restore |
+| **memcpy 256B (tracked)** | 17,357 | 689 μs | ATOMiK-aware copy |
+| **memset 256B (verified)** | 13,389 | 531 μs | ATOMiK-aware set |
+| **Change detection (256B)** | 13,194 | 524 μs | 5× faster than memcmp |
+
+---
+
+## Conclusion
+
+ATOMiK is successfully deployed as a production SoC accelerator on the Tang Nano 9K. The system achieves clean timing closure with healthy margins (+23% on ATOMiK, +21% on CPU), passes all functional tests on hardware, and is ready for field deployment via persistent SPI flash.
+
+The single-bank @ 81 MHz configuration provides 81 Mops/s throughput with minimal resource overhead (2.7% LUT). The architecture is proven to scale linearly to 1,056 Mops/s (16 banks @ 66 MHz) when higher throughput is required.
+
+**Next Steps:** Real-world application integration, multi-bank scaling experiments, ASIC feasibility study.
+
+---
+
+**Repository:** [MatthewHRockwell/TangNano-9K-example](https://github.com/MatthewHRockwell/TangNano-9K-example/tree/main/picotiny)
+**Commit:** `38819d4` (bitstream) / `d08d866` (firmware)
+**License:** Apache 2.0 (subject to patent notice)
