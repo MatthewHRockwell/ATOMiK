@@ -3,7 +3,7 @@
 **Document Version:** 1.1
 **Date:** February 12, 2026
 **Author:** Matt Rockwell + Claude (Planning Partner)
-**Status:** ACTIVE — Phase 0 In Progress (see `PHASE0_LINUX_MIGRATION.md`)
+**Status:** ACTIVE — Phase 1 In Progress (Phase 0 COMPLETE, Section 2.1 COMPLETE, Section 2.2 COMPLETE)
 
 ---
 
@@ -78,35 +78,40 @@ cd TangNano-9K-example/picotiny
 
 #### 2.1.2 Tasks
 
-- [ ] **Task 1.1.1:** Open the picotiny project in Gowin EDA
+- [x] **Task 1.1.1:** Open the picotiny project in Gowin EDA
   - File: `TangNano-9K-example/picotiny/project/picotiny.gprj`
   - Enable "Use MSPI as regular IO" in Project → Configuration → Place&Route → Dual-Purpose Pin
   - Run Clean & Rerun All
   - **Requirement:** Synthesis and P&R complete without errors
   - **Reminder:** The Gowin Programmer may need to use "embFlash Erase, Program" (NOT "Verify") for Tang Nano 9K
+  - **Result:** Synthesized via `gw_sh` (TCL scripting) — zero errors, P&R completed in 7s
 
-- [ ] **Task 1.1.2:** Flash the PicoRV32 bitstream to the FPGA
+- [x] **Task 1.1.2:** Flash the PicoRV32 bitstream to the FPGA
   ```bash
   openFPGALoader -b tangnano9k -f picotiny.fs
   ```
+  - **Result:** Flashed to persistent storage, CRC check passed
 
-- [ ] **Task 1.1.3:** Program the firmware via UART
+- [x] **Task 1.1.3:** Program the firmware via UART
   ```bash
   cd TangNano-9K-example/picotiny
-  python sw/pico-programmer.py example-fw-flash.v /dev/ttyUSBx
+  python sw/pico-programmer.py example-fw-flash.v /dev/ttyUSB1
   ```
   - Press S1 button when prompted "Waiting for reset"
   - Find correct serial port with `ls /dev/ttyUSB*`
+  - **Result:** 11,761 bytes, 3 sectors, 46 pages — flashing completed
 
-- [ ] **Task 1.1.4:** Verify UART output
+- [x] **Task 1.1.4:** Verify UART output
   ```bash
   picocom /dev/ttyUSB1 -b 115200
   ```
+  - **Result:** PicoSoC boot menu confirmed — LED toggle, SPI flash, benchmark commands functional
 
-- [ ] **Task 1.1.5:** Document resource utilization
+- [x] **Task 1.1.5:** Document resource utilization
   - Record: LUT usage, FF usage, BRAM usage, Fmax
   - Compare against ATOMiK standalone utilization (7% LUT single-core)
   - Document in `docs/PHASE1_PICORV32_BRINGUP.md`
+  - **Result:** 4,357 LUT (51%), 1,930 FF (29%), 12 BSRAM (47%), Fmax 33.7 MHz. Combined with ATOMiK 4-bank leaves 41% LUT headroom.
 
 #### 2.1.3 PicoRV32 Resource Budget (Reference)
 
@@ -123,57 +128,43 @@ ATOMiK 4-bank: ~745 LUTs
 
 ### 2.2 Integrate ATOMiK Core with PicoRV32
 
-- [ ] **Task 1.2.1:** Design the memory map
-  - ATOMiK delta accumulator as memory-mapped peripheral on PicoRV32's bus
-  - Address ranges:
-    - `0x0000_0000 - 0x0000_FFFF` — Instruction memory (BRAM)
-    - `0x0001_0000 - 0x0001_FFFF` — Data memory (BRAM)
-    - `0x0002_0000 - 0x0002_00FF` — UART
-    - `0x0003_0000 - 0x0003_00FF` — SPI
-    - `0x0004_0000 - 0x0004_00FF` — **ATOMiK Delta Accumulator** ← NEW
+- [x] **Task 1.2.1:** Design the memory map
+  - ATOMiK at `0xC000_0000` (S3 Wishbone slot of picotiny's 1:4 mux)
+  - 7 registers: LOAD, ACCUM, STATE, STATUS, CONFIG, INIT, DELTA
+  - Documented in `hardware/picorv32/memory_map.md`
 
-- [ ] **Task 1.2.2:** Create ATOMiK bus interface wrapper
-  - Wrap `atomik_core_v2.v` with AHB-Lite or Wishbone slave interface
-  - Registers:
-    - `0x00` — LOAD initial state (write)
-    - `0x04` — ACCUMULATE delta (write)
-    - `0x08` — READ current state (read)
-    - `0x0C` — STATUS (read: ready, busy, bank count)
-    - `0x10` — CONFIG (write: select bank, reset)
+- [x] **Task 1.2.2:** Create ATOMiK bus interface wrapper
+  - `hardware/picorv32/atomik_bus_wrapper.v` — wraps `atomik_core_v2` (DATA_WIDTH=32)
+  - PicoRV32 valid/ready protocol, 1-cycle ready latency
+  - Soft reset via CONFIG register bit 0
 
-- [ ] **Task 1.2.3:** Integrate into picotiny SoC
-  - Add ATOMiK peripheral to the bus fabric
-  - Synthesize the combined design
-  - **Requirement:** Synthesis succeeds, timing closure met, resource utilization documented
+- [x] **Task 1.2.3:** Integrate into picotiny SoC
+  - Replaced `assign wbp_ready = 1'b1;` stub with `atomik_bus_wrapper` instance
+  - Synthesis: 4,578 logic (53%), 2,062 FF (31%), 12 BSRAM (47%)
+  - ATOMiK overhead: +221 LUT, +132 FF (2.6% of total)
+  - Timing: Fmax 31.032 MHz vs 25.2 MHz constraint — **PASS** (1.23x margin)
+  - Bitstream flashed, CRC check passed
 
-- [ ] **Task 1.2.4:** Write bare-metal C test program
-  ```c
-  #define ATOMIK_BASE 0x00040000
-  #define ATOMIK_LOAD    (*(volatile uint32_t*)(ATOMIK_BASE + 0x00))
-  #define ATOMIK_ACCUM   (*(volatile uint32_t*)(ATOMIK_BASE + 0x04))
-  #define ATOMIK_READ    (*(volatile uint32_t*)(ATOMIK_BASE + 0x08))
+- [x] **Task 1.2.4:** Write bare-metal C test program
+  - 11-test suite: reset, load, accumulate, XOR verify, cancellation, multi-delta, perf
+  - Added `[X] ATOMiK delta test` menu option to PicoSoC firmware
+  - Firmware built: 16,492 bytes (RV32I, -O3)
 
-  void test_atomik() {
-      ATOMIK_LOAD = 0xDEADBEEF;     // Set initial state
-      ATOMIK_ACCUM = 0x000000FF;     // Apply delta
-      uint32_t result = ATOMIK_READ;  // Read: should be 0xDEADBE10
-      // Print over UART...
-  }
-  ```
-
-- [ ] **Task 1.2.5:** Performance baseline
-  - Measure: cycles for ATOMiK operations vs equivalent software operations
-  - Measure: combined Fmax, total LUT/FF usage
-  - Document results in `docs/PHASE1_INTEGRATION_RESULTS.md`
+- [x] **Task 1.2.5:** Performance baseline — **11/11 tests PASS on hardware**
+  - All ATOMiK operations verified on real Tang Nano 9K hardware
+  - XOR cancellation (idempotency) confirmed: `a ⊕ d ⊕ d = a`
+  - Multi-delta composition confirmed: `0 ⊕ 0x11.. ⊕ 0x22.. ⊕ 0x44.. = 0x77..`
+  - Performance: 224 cycles (8.9 µs @ 25.2 MHz) for load+accumulate+read round-trip
+  - Full results in `docs/PHASE1_INTEGRATION_RESULTS.md`
 
 ### 2.3 Phase 1 Validation Gate
 
-- [ ] PicoRV32 boots and runs bare-metal C code on Tang Nano 9K
-- [ ] ATOMiK delta accumulator is accessible as a memory-mapped peripheral
-- [ ] UART communication works bidirectionally
-- [ ] Combined resource utilization is documented and leaves headroom
-- [ ] Timing closure is met
-- [ ] At least one C test program demonstrates delta accumulation via PicoRV32
+- [x] PicoRV32 boots and runs bare-metal C code on Tang Nano 9K
+- [x] ATOMiK delta accumulator is accessible as a memory-mapped peripheral (0xC0000000)
+- [x] UART communication works bidirectionally (115200 baud, picocom verified)
+- [x] Combined resource utilization is documented and leaves headroom (53% LUT, 56% remaining)
+- [x] Timing closure is met (Fmax 31.0 MHz > 25.2 MHz constraint)
+- [x] At least one C test program demonstrates delta accumulation via PicoRV32 (11/11 PASS)
 
 ---
 
