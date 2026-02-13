@@ -1,10 +1,12 @@
 # Phase 2 — ATOMiK Runtime & Delta-State Memory: Results
 
-**Date:** February 12, 2026
+**Date:** February 12-13, 2026
 **Platform:** Tang Nano 9K (GW1NR-9) + PicoRV32 @ 25.2 MHz
-**Firmware:** 16,308 bytes (RV32I, -O3, -fno-builtin)
+**Firmware:** 16,400 bytes (RV32I, -O3, -fno-builtin)
 **SRAM:** 3,680 / 8,192 bytes used (44.9%)
-**Hardware:** Unchanged from Phase 1 (firmware-only changes)
+**Hardware Configuration:** Single-bank ATOMiK @ 81 MHz with dual-clock CDC
+
+**Production Status:** ✅ **DEPLOYED** — Persistent SPI flash, 0 TNS, all tests passing
 
 ---
 
@@ -176,9 +178,28 @@ After data write: PASS
 
 ---
 
+## Production Deployment Update (February 13, 2026)
+
+**Final Configuration:** Single-bank ATOMiK @ 81 MHz with dual-clock CDC bridge.
+
+| Metric | Result |
+|--------|--------|
+| **ATOMiK Clock** | 81 MHz (100.2 MHz Fmax, +23.6% margin) |
+| **CPU Clock** | 25.2 MHz (30.6 MHz Fmax, +21.4% margin) |
+| **Timing Closure** | 0 TNS on all domains ✅ |
+| **Resources** | 3,838 LUT (44%), 707 ALU, 3,103 CLS (72%) |
+| **Flash** | Bitstream + firmware in persistent SPI flash |
+| **Validation** | 5/5 test suites passing ([X] [P] [K] [M] [H]) |
+
+**Architecture:** The ATOMiK core runs in an independent 81 MHz clock domain, crossing to the 25.2 MHz CPU bus via a toggle-handshake CDC bridge. This provides 3.2× higher accumulator throughput (81 vs 25.2 Mops/s) with ~3 bus cycle latency overhead for MMIO access. Clean timing closure with zero TNS validates the dual-clock design.
+
+**Repository:** Complete SoC source at [TangNano-9K-example/picotiny](https://github.com/MatthewHRockwell/TangNano-9K-example/tree/main/picotiny) (commit `38819d4`). See [`PRODUCTION_DEPLOYMENT.md`](PRODUCTION_DEPLOYMENT.md) for full technical details.
+
+---
+
 ## Context: Phase 2 Within the ATOMiK Architecture
 
-Phase 2 exercises the **lowest-tier ATOMiK core** (single-bank, 32-bit, on PicoRV32 at 25.2 MHz via SPI XIP). This is the entry point of a validated architecture that scales to 1,056 Mops/s with 16 parallel banks on the same $10 FPGA (Phase 6, hardware-validated 80/80 UART tests).
+Phase 2 exercises ATOMiK in production deployment: single-bank @ 81 MHz with dual-clock CDC on PicoRV32 @ 25.2 MHz via SPI XIP. This is the entry point of a validated architecture that scales to 1,056 Mops/s with 16 parallel banks on the same $10 FPGA (Phase 6, hardware-validated 80/80 UART tests).
 
 **What Phase 2 demonstrates on this minimal configuration:**
 - 5.1x faster change detection than byte-level comparison — and this ratio holds at any buffer size
@@ -197,3 +218,5 @@ ATOMiK's security derives from the architecture itself, not from traditional cry
 
 **Phase 2 overhead in context:**
 The 12-16% tracked operation overhead measured here reflects the cost of CPU-mediated MMIO writes to a single-bank accumulator over SPI XIP flash. With QSPI (4:1 bandwidth, already supported by the Tang Nano 9K hardware) and code execution from SRAM, this overhead would decrease substantially. The multi-bank architecture eliminates the single-accumulator bottleneck entirely — parallel banks accept deltas simultaneously with no serialization.
+
+**Production deployment note:** The final production configuration uses a single-bank accumulator at 81 MHz (vs original 25.2 MHz). This provides 3.2× higher throughput on the ATOMiK core itself, though the CPU-side MMIO latency remains similar (~6-8 cycles) due to CDC bridge overhead. The architecture is validated to scale linearly to N=16 banks when higher throughput is required.
