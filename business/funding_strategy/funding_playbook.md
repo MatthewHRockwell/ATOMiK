@@ -59,7 +59,7 @@ Delaware C-Corp is required for:
 | Relevance | **MEDIUM** — Energy-efficient computing topics. ATOMiK's 95–100% memory traffic reduction and ~20mW power consumption map to energy efficiency narratives. |
 | Status | FY2026 topics at science.osti.gov/sbir |
 
-**ATOMiK pitch angle:** Delta-state accumulation eliminates 95–100% of memory bus traffic compared to full-state copy architectures. At ~20mW on a $10 FPGA, ATOMiK demonstrates a path to orders-of-magnitude energy reduction in state-heavy workloads (sensor fusion, database replication, digital twins).
+**ATOMiK pitch angle:** Delta-state accumulation eliminates 95–100% of memory bus traffic compared to full-state copy architectures. At ~20mW on a $13.50 FPGA, ATOMiK demonstrates a path to orders-of-magnitude energy reduction in state-heavy workloads (sensor fusion, database replication, digital twins).
 
 ### 4. CHIPS Act R&D BAA
 
@@ -171,7 +171,7 @@ Delaware C-Corp is required for:
 | Relevance | **HIGH** — B2B enterprise focus matches IP licensing model. Hardware welcome. Deep tech track specifically for foundational technology. SF + Chicago hubs. |
 | Timeline | Next class began Jan 2026. Apply for next cohort at alchemistaccelerator.com |
 
-**ATOMiK pitch angle:** B2B IP licensing play — delta-state hardware blocks for chip designers and system integrators. Proven architecture (1 Gops/s on $10 FPGA), 5-language SDK for customer integration, patent pending.
+**ATOMiK pitch angle:** B2B IP licensing play — delta-state hardware blocks for chip designers and system integrators. Proven architecture (1 Gops/s on $13.50 FPGA), 5-language SDK for customer integration, patent pending.
 
 ### 11. HAX (SOSV)
 
@@ -181,7 +181,7 @@ Delaware C-Corp is required for:
 | Relevance | **HIGH** — Premier hardware accelerator. 348+ portfolio companies, $2.5B raised, $8.6B cumulative value. Prototyping resources and supply chain support. |
 | Timeline | Rolling applications at hax.co |
 
-**ATOMiK pitch angle:** Working hardware on $10 FPGA — not a slide deck, not a simulation. 1 Gops/s throughput, 92 formal proofs, $225 total development cost. Ready for HAX's hardware-to-market pipeline.
+**ATOMiK pitch angle:** Working hardware on $13.50 FPGA — not a slide deck, not a simulation. 1 Gops/s throughput, 92 formal proofs, $225 total development cost. Ready for HAX's hardware-to-market pipeline.
 
 ### 12. Y Combinator
 
@@ -192,7 +192,7 @@ Delaware C-Corp is required for:
 | Requirements | Application at ycombinator.com. Video demo. |
 | Timeline | Batches: Winter (January start) and Summer (June start) |
 
-**ATOMiK pitch angle:** Hardware that works, math that's proven, software that ships. 92 formal proofs, 1 Gops/s on a $10 chip, 353 passing tests, $225 total spend. The IP licensing business model scales without manufacturing risk.
+**ATOMiK pitch angle:** Hardware that works, math that's proven, software that ships. 92 formal proofs, 1 Gops/s on a $13.50 chip, 353 passing tests, $225 total spend. The IP licensing business model scales without manufacturing risk.
 
 ### 13. Techstars
 
@@ -212,7 +212,7 @@ Delaware C-Corp is required for:
 - For Silicon Catalyst specifically: IC/chip design details, technology node, TAM/SAM/SOM
 
 **ATOMiK's accelerator strengths:**
-- Working silicon on $10 FPGA (most applicants have no hardware)
+- Working silicon on $13.50 FPGA (most applicants have no hardware)
 - 92 formal proofs (unmatched in semiconductor startups)
 - $225 total development cost (extreme capital efficiency story)
 - 5-language SDK (commercial surface area)
@@ -347,14 +347,14 @@ IQT and defense VCs don't have standard application processes. Best paths:
 |----------|-----------------|
 | NSF SBIR | Novel semiconductor architecture with 92 formal proofs — advancing the state of the art in verified hardware design |
 | DoD SBIR | High-assurance hardware for edge computing in contested environments — formally verified state management for sensor fusion |
-| DOE SBIR | Energy-efficient computing primitive — 95–100% memory traffic reduction, ~20mW power on $10 FPGA |
+| DOE SBIR | Energy-efficient computing primitive — 95–100% memory traffic reduction, ~20mW power on $13.50 FPGA |
 | CHIPS Act | American semiconductor IP — area-efficient (7% LUT) formally verified compute block for next-gen chip designs |
 | NASA SBIR | Radiation-tolerant state management with flight-system-grade formal verification (92 Lean4 proofs) |
 | NVIDIA Inception | State management accelerator for AI inference pipelines — reducing memory bandwidth in model serving |
 | CDL | Science-based venture — new computing primitive grounded in delta-state algebra, not incremental improvement |
 | Silicon Catalyst | FPGA-proven IP block ready for ASIC integration — seeking EDA access and fab partner introductions |
 | Alchemist | B2B IP licensing play — hardware blocks for chip designers with 5-language SDK for customer integration |
-| HAX | Working hardware, not a slide deck — $225 → 1 Gops/s on $10 FPGA, ready for hardware-to-market pipeline |
+| HAX | Working hardware, not a slide deck — $225 → 1 Gops/s on $13.50 FPGA, ready for hardware-to-market pipeline |
 | YC | Most capital-efficient hardware startup — 92 proofs, 353 tests, working silicon, $225 total spend |
 | In-Q-Tel | Assured hardware for intelligence community — formally verified, self-inverse (instant rollback), commutative (lock-free merge) |
 | VCs | IP licensing in $600B+ semiconductor market — irreproducible formal verification moat, working silicon, patent pending |

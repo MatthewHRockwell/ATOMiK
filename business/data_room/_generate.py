@@ -138,7 +138,7 @@ less than the cost of a single engineering hour at market rates.
 This was enabled by:
 1. AI-augmented development (Claude for code generation and verification)
 2. Open-source toolchains (Lean4, Gowin EDA, Python ecosystem)
-3. Low-cost FPGA hardware ($10/board)
+3. Low-cost FPGA hardware ($13.50/board)
 4. Solo founder with full-stack capability (math → hardware → software)
 """
     (DATA_ROOM / "01_financial" / "development_cost.md").write_text(
@@ -403,7 +403,7 @@ def generate_founder_profile(config: dict) -> None:
 | Working FPGA hardware | Tang Nano 9K, 80/80 tests, 1 Gops/s |
 | 5-language SDK | Python/Rust/C/JS/Verilog, 314 tests |
 | 2 research papers | Formal verification + benchmarks |
-| $225 total cost | 3x $10 FPGAs + cables |
+| $225 total cost | 3x $13.50 FPGAs + cables |
 
 ### AI-Augmented Development
 

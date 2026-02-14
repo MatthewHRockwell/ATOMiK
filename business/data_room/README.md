@@ -1,6 +1,6 @@
 # ATOMiK — Investor Data Room
 
-This data room contains due diligence materials for ATOMiK, a delta-state computing architecture achieving 1 billion operations/second on a $10 FPGA.
+This data room contains due diligence materials for ATOMiK, a delta-state computing architecture achieving 1 billion operations/second on a $13.50 FPGA.
 
 ## Contents
 

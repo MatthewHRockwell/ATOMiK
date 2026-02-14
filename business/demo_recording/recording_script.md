@@ -16,7 +16,7 @@
 
 **Visual**: Dashboard starting up, 3 node cards appearing.
 
-**Voiceover**: "What if you could process 1 billion state updates per second on a $10 chip? Not in simulation — on real hardware, with mathematical proofs guaranteeing correctness. This is ATOMiK."
+**Voiceover**: "What if you could process 1 billion state updates per second on a $13.50 chip? Not in simulation — on real hardware, with mathematical proofs guaranteeing correctness. This is ATOMiK."
 
 ### 0:20–0:50 — Problem + Solution
 
@@ -28,7 +28,7 @@
 
 **Visual**: TUI dashboard running Act 3 (Parallel Scaling).
 
-**Voiceover**: "Three FPGA nodes, each with a different number of parallel banks. Same workload. Watch the throughput scale linearly. 4 banks: 324 million operations per second. 8 banks: 540 million. 16 banks: over 1 billion. On a $10 chip. Linear scaling, no diminishing returns."
+**Voiceover**: "Three FPGA nodes, each with a different number of parallel banks. Same workload. Watch the throughput scale linearly. 4 banks: 324 million operations per second. 8 banks: 540 million. 16 banks: over 1 billion. On a $13.50 chip. Linear scaling, no diminishing returns."
 
 ### 1:30–2:10 — Live Demo: Distributed Merge
 
@@ -40,7 +40,7 @@
 
 **Visual**: Slides showing 92 proofs, SDK pipeline, architecture diagram.
 
-**Voiceover**: "92 mathematical proofs formally verified in Lean4. A schema-driven SDK generating code in 5 languages with 242 automated tests. 80 hardware tests passing. This isn't a prototype — it's a complete, validated computing architecture."
+**Voiceover**: "92 mathematical proofs formally verified in Lean4. A schema-driven SDK generating code in 5 languages with 353 automated tests. 80 hardware tests passing. This isn't a prototype — it's a complete, validated computing architecture."
 
 ### 2:40–3:00 — Call to Action
 
@@ -54,7 +54,7 @@
 
 ### 0:00–0:30 — Hook
 
-Same as highlight reel opening. Establish the "1 billion ops on $10" hook.
+Same as highlight reel opening. Establish the "1 billion ops on $13.50" hook.
 
 ### 0:30–2:00 — Problem/Solution (Slides 2-4)
 
@@ -84,7 +84,7 @@ Same as highlight reel opening. Establish the "1 billion ops on $10" hook.
 
 **Visual**: TUI running Act 3, throughput chart filling in.
 
-**Voiceover**: "Now the scaling demo. Same workload on all three nodes. 4 parallel banks: 324 million ops. 8 banks: 540 million. 16 banks: breaks 1 billion operations per second. Linear scaling — throughput equals N times frequency. And this is on a $10 FPGA using only 20% of its logic."
+**Voiceover**: "Now the scaling demo. Same workload on all three nodes. 4 parallel banks: 324 million ops. 8 banks: 540 million. 16 banks: breaks 1 billion operations per second. Linear scaling — throughput equals N times frequency. And this is on a $13.50 FPGA using only 20% of its logic."
 
 ### 6:30–7:30 — Live Demo: Act 4 (Domain Applications)
 
@@ -102,7 +102,7 @@ Same as highlight reel opening. Establish the "1 billion ops on $10" hook.
 
 **Visual**: Architecture diagram, SDK pipeline, market applications.
 
-**Voiceover**: "The architecture: N parallel XOR banks with a binary merge tree. Zero carry chains. The SDK: one JSON schema generates implementations in Python, Rust, C, JavaScript, and Verilog — 19 files per schema, 242 tests. Applications span finance, IoT, video, databases, digital twins, and gaming."
+**Voiceover**: "The architecture: N parallel XOR banks with a binary merge tree. Zero carry chains. The SDK: one JSON schema generates implementations in Python, Rust, C, JavaScript, and Verilog — 19 files per schema, 353 tests. Applications span finance, IoT, video, databases, digital twins, and gaming."
 
 ### 9:15–10:00 — Business + CTA (Slides 12-15)
 

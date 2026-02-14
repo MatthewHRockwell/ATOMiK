@@ -23,7 +23,7 @@ This sounds simple, but doing it reliably at extreme speed in hardware is the br
 ## Why Does It Matter?
 
 ### Speed
-ATOMiK processes over **1 billion operations per second** on a chip that costs $10. For comparison, many enterprise systems struggle to process millions of operations per second on servers costing thousands of dollars.
+ATOMiK processes over **1 billion operations per second** on a chip that costs $13.50. For comparison, many enterprise systems struggle to process millions of operations per second on servers costing thousands of dollars.
 
 ### Memory Savings
 Traditional systems keep full copies of data in memory. ATOMiK reduces memory usage by **95-100%** because it stores only the small changes, not the full data. Less memory means lower hardware costs, lower power consumption, and the ability to run on smaller, cheaper devices.
@@ -32,7 +32,7 @@ Traditional systems keep full copies of data in memory. ATOMiK reduces memory us
 Every claim about ATOMiK's behavior is backed by **92 mathematical proofs** — not tests, not simulations, but formal proofs verified by a computer. This is the same level of rigor used to verify airplane autopilot software and nuclear reactor controls. If the math says it works, it works. Period.
 
 ### Cost
-The prototype runs on a **$10 chip** (a Tang Nano 9K FPGA). Competing approaches require hardware costing hundreds to thousands of dollars to achieve similar performance. This cost advantage opens markets that were previously too expensive to serve.
+The prototype runs on a **$13.50 chip** (a Tang Nano 9K FPGA). Competing approaches require hardware costing hundreds to thousands of dollars to achieve similar performance. This cost advantage opens markets that were previously too expensive to serve.
 
 ---
 
@@ -51,18 +51,18 @@ Today, there are a few ways companies handle data that changes frequently:
 
 ---
 
-## The $10 Breakthrough
+## The $13.50 Breakthrough
 
-The prototype chip ATOMiK runs on — the Tang Nano 9K — costs **$10**. Here's what that means:
+The prototype chip ATOMiK runs on — the Tang Nano 9K — costs **$13.50**. Here's what that means:
 
-- A single $10 chip with 16 parallel processing banks achieves **1,056 million operations per second**
+- A single $13.50 chip with 16 parallel processing banks achieves **1,056 million operations per second**
 - The chip uses only **20% of its capacity** at this level — there's room to grow
 - Each operation completes in **10.6 nanoseconds** (billionths of a second)
 - The architecture scales linearly: double the banks, double the speed
 
-**Why this matters for the business:** Low hardware cost means ATOMiK can target markets where traditional hardware-accelerated solutions are too expensive. An IoT sensor, a factory robot, or a medical device can afford a $10 chip. It cannot afford a $10,000 server.
+**Why this matters for the business:** Low hardware cost means ATOMiK can target markets where traditional hardware-accelerated solutions are too expensive. An IoT sensor, a factory robot, or a medical device can afford a $13.50 chip. It cannot afford a $10,000 server.
 
-**Scaling up:** The same architecture runs on larger, more powerful chips (from companies like AMD/Xilinx or Intel/Altera). On those chips, performance scales proportionally — 32 banks, 64 banks, and beyond. The $10 chip proves the concept; larger chips deliver enterprise-grade throughput.
+**Scaling up:** The same architecture runs on larger, more powerful chips (from companies like AMD/Xilinx or Intel/Altera). On those chips, performance scales proportionally — 32 banks, 64 banks, and beyond. The $13.50 chip proves the concept; larger chips deliver enterprise-grade throughput.
 
 ---
 
@@ -129,7 +129,7 @@ Custom integration work for enterprises that need ATOMiK adapted to their specif
 - **Patent pending** — Legal protection for the architecture
 - **92 formal proofs** — Years of mathematical work that competitors would need to replicate
 - **Full-stack solution** — From math proofs to working silicon to software tools
-- **$10 proof point** — Working hardware, not just theory
+- **$13.50 proof point** — Working hardware, not just theory
 
 ---
 
@@ -139,7 +139,7 @@ Custom integration work for enterprises that need ATOMiK adapted to their specif
 |----------|--------|
 | What is it? | A chip architecture that processes data changes instead of data copies |
 | How fast? | 1 billion+ operations per second |
-| How cheap? | $10 prototype chip |
+| How cheap? | $13.50 prototype chip |
 | Is it proven? | 92 mathematical proofs + working hardware |
 | Who buys it? | Any industry where data changes fast and accuracy matters |
 | How does it make money? | IP licensing, software subscriptions, professional services |

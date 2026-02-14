@@ -129,7 +129,7 @@ This prints results directly to the terminal as plain text.
 ### Act 3: Parallel Scaling
 **What it shows:** Performance scales linearly as you add parallel processing banks (4x, 8x, 16x).
 
-**In business terms:** Double the hardware resources, double the throughput — no diminishing returns. This is the foundation of ATOMiK's scalability story. The $10 chip with 16 banks already breaks 1 billion operations per second.
+**In business terms:** Double the hardware resources, double the throughput — no diminishing returns. This is the foundation of ATOMiK's scalability story. The $13.50 chip with 16 banks already breaks 1 billion operations per second.
 
 ### Act 4: Domain Applications
 **What it shows:** Delta-state operations applied to real-world scenarios — trading, IoT, video processing.

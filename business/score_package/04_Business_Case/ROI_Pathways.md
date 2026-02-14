@@ -55,7 +55,7 @@ Professional services also serve as a sales channel: each engagement creates dee
 
 | Component | Cost | Notes |
 |-----------|------|-------|
-| Tang Nano 9K FPGA (prototype) | $10 | Current development platform |
+| Tang Nano 9K FPGA (prototype) | $13.50 | Current development platform |
 | Xilinx/AMD mid-range FPGA | $50-500 | Enterprise deployment target |
 | ASIC fabrication (per unit at volume) | $2-5 | At 100K+ unit volumes |
 | ATOMiK IP royalty (per unit) | $0.50-5.00 | 1-5% of chip price |
@@ -78,7 +78,7 @@ ATOMiK's value proposition centers on measurable savings for customers:
 | Savings Category | Mechanism | Magnitude |
 |-----------------|-----------|-----------|
 | **Memory reduction** | 95-100% less memory needed for state management | $X per server per year in RAM costs |
-| **Hardware cost** | $10 chip vs. $1,000+ specialized hardware | 100x cost reduction for edge deployments |
+| **Hardware cost** | $13.50 chip vs. $1,000+ specialized hardware | 100x cost reduction for edge deployments |
 | **Bandwidth** | Delta transmission vs. full-state replication | 95% bandwidth reduction |
 | **Engineering time** | SDK code generation vs. manual porting | Weeks per project |
 | **Verification cost** | 92 proofs vs. custom test suites | Months of verification effort |
@@ -177,7 +177,7 @@ At blended 85% gross margins, breakeven requires approximately $1.1-$2.0M in ann
 | Factor | Strength | Explanation |
 |--------|----------|-------------|
 | **Performance gain** | Very Strong | 1,000x+ improvement over software approaches; immediate, measurable |
-| **Cost reduction** | Strong | $10 hardware vs. $1,000+ alternatives; 95% memory/bandwidth savings |
+| **Cost reduction** | Strong | $13.50 hardware vs. $1,000+ alternatives; 95% memory/bandwidth savings |
 | **Risk reduction** | Strong | 92 formal proofs vs. testing-only approaches; especially valuable in regulated industries |
 | **SDK integration ease** | Moderate | Code generation in 5 languages reduces integration effort |
 | **Open-source on-ramp** | Moderate | Free SDK tier eliminates procurement friction for evaluation |

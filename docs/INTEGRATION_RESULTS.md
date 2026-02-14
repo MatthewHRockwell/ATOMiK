@@ -1,4 +1,4 @@
-# Phase 1 — ATOMiK + PicoRV32 Integration Results
+# ATOMiK + PicoRV32 Integration Results
 
 **Date:** February 12, 2026
 **Board:** Tang Nano 9K (GW1NR-LV9QN88PC6/I5)

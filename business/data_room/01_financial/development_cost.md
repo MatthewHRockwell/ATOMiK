@@ -34,5 +34,5 @@ less than the cost of a single engineering hour at market rates.
 This was enabled by:
 1. AI-augmented development (Claude for code generation and verification)
 2. Open-source toolchains (Lean4, Gowin EDA, Python ecosystem)
-3. Low-cost FPGA hardware ($10/board)
+3. Low-cost FPGA hardware ($13.50/board)
 4. Solo founder with full-stack capability (math → hardware → software)

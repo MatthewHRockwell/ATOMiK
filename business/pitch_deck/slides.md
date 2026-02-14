@@ -22,7 +22,7 @@ style: |
 
 ## Delta-State Computing in Silicon
 
-**1 billion operations/second on a $10 chip**
+**1 billion operations/second on a $13.50 chip**
 
 *Mathematically proven. Hardware validated. Patent pending.*
 
@@ -96,7 +96,7 @@ These aren't aspirational — they are **machine-verified mathematical proofs**.
 
 # Production Deployment: Real Silicon ✅
 
-**Deployed on Tang Nano 9K** (Feb 2026) — $10 FPGA, PicoRV32 SoC accelerator:
+**Deployed on Tang Nano 9K** (Feb 2026) — $13.50 FPGA, PicoRV32 SoC accelerator:
 
 | Metric | Result |
 |--------|--------|
@@ -129,7 +129,7 @@ N parallel XOR accumulator banks with binary merge tree (hardware-validated):
 
 The merge tree adds only log₂(N) levels of combinational logic. Zero ALU carry chains means the XOR merge has no arithmetic bottleneck.
 
-*Production deployment uses N=1 @ 81 MHz. Architecture validated to N=16 (1 Gops/s) using only 20% of the same $10 FPGA.*
+*Production deployment uses N=1 @ 81 MHz. Architecture validated to N=16 (1 Gops/s) using only 20% of the same $13.50 FPGA.*
 
 ---
 
@@ -189,7 +189,7 @@ JSON Schema --> ATOMiK Generator --> Python + Rust + C + JavaScript + Verilog
 ```
 
 - **19 files generated per schema** across 5 languages
-- **242 tests** verify algebraic properties in every implementation
+- **353 tests** verify algebraic properties in every implementation
 - **Agentic pipeline**: DAG orchestration, feedback loops, self-optimization
 - **25 modules**: including error KB, regression gate, cross-language consistency
 

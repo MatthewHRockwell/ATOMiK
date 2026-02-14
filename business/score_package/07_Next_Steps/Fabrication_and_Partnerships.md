@@ -1,6 +1,6 @@
 # Fabrication Roadmap & Partnership Framework
 
-*From $10 prototype to production silicon — ATOMiK's hardware path forward.*
+*From $13.50 prototype to production silicon — ATOMiK's hardware path forward.*
 
 ---
 
@@ -11,7 +11,7 @@ ATOMiK's delta-state computing architecture is validated on the **Gowin GW1NR-9*
 | Parameter | Current Value |
 |-----------|--------------|
 | Device | Gowin GW1NR-9 (Tang Nano 9K) |
-| Cost | $10 retail |
+| Cost | $13.50 retail |
 | LUTs used | 7% (1 bank) / 20% (16 banks) |
 | Throughput | 1,056 Mops/s (16 parallel banks) |
 | Latency | 10.6 ns per operation (single cycle) |
@@ -48,7 +48,7 @@ ATOMiK's delta-state computing architecture is validated on the **Gowin GW1NR-9*
 
 | Configuration | Banks | Est. Throughput | Target Device |
 |--------------|-------|----------------|---------------|
-| Current prototype | 16 | 1,056 Mops/s | Gowin GW1NR-9 ($10) |
+| Current prototype | 16 | 1,056 Mops/s | Gowin GW1NR-9 ($13.50) |
 | Mid-range FPGA | 64 | 4,000+ Mops/s | Xilinx Artix-7 ($50-100) |
 | High-end FPGA | 256 | 16,000+ Mops/s | Xilinx Alveo U50 ($2,000) |
 | Top-tier FPGA | 1,024 | 60,000+ Mops/s | Intel Stratix 10 ($5,000+) |
@@ -65,7 +65,7 @@ An ASIC (Application-Specific Integrated Circuit) is a custom chip designed for 
 
 | Factor | FPGA | ASIC |
 |--------|------|------|
-| Per-unit cost | $10-$5,000 | $2-$20 (at volume) |
+| Per-unit cost | $13.50-$5,000 | $2-$20 (at volume) |
 | NRE (non-recurring engineering) | Near zero | $2-$10M |
 | Time to market | Weeks | 12-18 months |
 | Performance | Good (limited by FPGA fabric) | Best (custom logic) |

@@ -36,11 +36,11 @@ Each industry section follows the same format:
 
 **The Problem:** Billions of sensors generate continuous data streams. Edge devices have limited power and memory budgets. Current approaches either send raw data to the cloud (expensive bandwidth) or process locally on hardware that's too costly for mass deployment.
 
-**How ATOMiK Solves It:** A $10 ATOMiK chip at the edge processes sensor deltas locally, sending only meaningful changes upstream. 95-100% memory reduction means the chip runs on tiny power budgets. Commutative merging means sensors don't need to coordinate — their updates combine correctly regardless of arrival order.
+**How ATOMiK Solves It:** A $13.50 ATOMiK chip at the edge processes sensor deltas locally, sending only meaningful changes upstream. 95-100% memory reduction means the chip runs on tiny power budgets. Commutative merging means sensors don't need to coordinate — their updates combine correctly regardless of arrival order.
 
 **Example Use Case:** A smart agriculture deployment uses 10,000 soil moisture sensors across farmland. Each sensor's ATOMiK chip processes readings locally, forwarding only significant changes to a central hub. The hub merges all streams in parallel without synchronization. Total edge hardware cost: $100,000 (vs. $1M+ with traditional processing).
 
-**Key Metric:** 95-100% memory reduction at the edge, enabling $10-per-node deployment at scale.
+**Key Metric:** 95-100% memory reduction at the edge, enabling $13.50-per-node deployment at scale.
 
 ---
 
@@ -106,7 +106,7 @@ Each industry section follows the same format:
 
 **The Problem:** Self-driving cars have dozens of sensors (cameras, LiDAR, radar, ultrasonic) that produce data simultaneously. This data must be fused into a single coherent world model in real time. Current sensor fusion systems are complex, power-hungry, and prone to timing issues when sensor data arrives out of order.
 
-**How ATOMiK Solves It:** Each sensor produces deltas (changes to the perceived environment). ATOMiK fuses these deltas in parallel, and the commutative property guarantees correct results regardless of sensor timing. The $10 hardware cost enables redundant processing units for safety-critical applications.
+**How ATOMiK Solves It:** Each sensor produces deltas (changes to the perceived environment). ATOMiK fuses these deltas in parallel, and the commutative property guarantees correct results regardless of sensor timing. The $13.50 hardware cost enables redundant processing units for safety-critical applications.
 
 **Example Use Case:** An autonomous shuttle processes data from 8 LiDAR units, 12 cameras, and 4 radar sensors. Each sensor's output is encoded as a delta to the world model. ATOMiK merges all 24 sensor streams in parallel, producing a consistent environment model every 10.6 nanoseconds. Out-of-order sensor data doesn't cause inconsistencies.
 
@@ -134,11 +134,11 @@ Each industry section follows the same format:
 
 **The Problem:** Patient monitors generate continuous vital sign data that must be processed reliably with zero data loss. Current systems use expensive, certified hardware. Formal verification requirements (FDA, IEC 62304) make software qualification costly and slow.
 
-**How ATOMiK Solves It:** The 92 formal proofs provide a mathematical guarantee of correctness — a strong foundation for regulatory submissions. The $10 hardware cost enables deployment in resource-constrained settings (rural clinics, field hospitals). Self-inverse operations mean any data point can be validated by re-applying and checking for null delta.
+**How ATOMiK Solves It:** The 92 formal proofs provide a mathematical guarantee of correctness — a strong foundation for regulatory submissions. The $13.50 hardware cost enables deployment in resource-constrained settings (rural clinics, field hospitals). Self-inverse operations mean any data point can be validated by re-applying and checking for null delta.
 
 **Example Use Case:** A remote patient monitoring system uses ATOMiK chips in bedside monitors. Each vital sign reading (heart rate, blood pressure, oxygen) generates a delta. The chip processes all channels in parallel, flags anomalies in real time, and transmits only significant changes to the nursing station. The formal proofs support the FDA 510(k) submission by demonstrating mathematical correctness.
 
-**Key Metric:** Mathematically proven data integrity on $10 hardware — enabling regulatory compliance at low cost.
+**Key Metric:** Mathematically proven data integrity on $13.50 hardware — enabling regulatory compliance at low cost.
 
 ---
 
@@ -162,7 +162,7 @@ Each industry section follows the same format:
 
 **The Problem:** Factory robots and automated production lines generate and consume continuous state updates — position, force, temperature, production counts. Coordinating multiple robots requires consistent shared state with minimal latency. Current approaches use industrial Ethernet with cycle times measured in milliseconds.
 
-**How ATOMiK Solves It:** Robot state updates are deltas processed in single clock cycles (10.6 ns — over 1,000x faster than typical industrial bus cycles). Multiple robots' state deltas merge in parallel without locking. The low hardware cost ($10) enables per-robot processing rather than centralized control.
+**How ATOMiK Solves It:** Robot state updates are deltas processed in single clock cycles (10.6 ns — over 1,000x faster than typical industrial bus cycles). Multiple robots' state deltas merge in parallel without locking. The low hardware cost ($13.50) enables per-robot processing rather than centralized control.
 
 **Example Use Case:** An automotive assembly line has 50 robots performing welding, painting, and assembly. Each robot's ATOMiK chip processes its own state deltas and merges peer robot states to coordinate handoffs. The commutative property means robots don't need to negotiate update order — they converge to consistent shared state automatically.
 
@@ -245,7 +245,7 @@ Each industry section follows the same format:
 | # | Industry | Market Size | Primary Value Proposition |
 |---|----------|-------------|--------------------------|
 | 1 | High-Frequency Trading | $12B | Single-cycle tick processing |
-| 2 | IoT / Sensor Networks | $650B | $10 edge processing |
+| 2 | IoT / Sensor Networks | $650B | $13.50 edge processing |
 | 3 | Video Processing | $85B | 95% memory reduction |
 | 4 | Database Infrastructure | $100B | O(1) state reconstruction |
 | 5 | Digital Twins | $48B | Lock-free parallel merge |

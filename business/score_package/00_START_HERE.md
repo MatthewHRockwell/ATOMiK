@@ -6,7 +6,7 @@
 
 ## What Is ATOMiK?
 
-ATOMiK is a new computing architecture that processes data changes instead of entire data copies. It runs on a $10 chip, performs over 1 billion operations per second, and is backed by 92 mathematical proofs that guarantee correctness.
+ATOMiK is a new computing architecture that processes data changes instead of entire data copies. It runs on a $13.50 chip, performs over 1 billion operations per second, and is backed by 92 mathematical proofs that guarantee correctness.
 
 **In plain English:** Instead of saving the entire spreadsheet every time you change one cell, ATOMiK saves only the change — and it does this in hardware, at extreme speed, with mathematical certainty that nothing is lost.
 
@@ -35,10 +35,10 @@ This package contains everything you need to evaluate ATOMiK as a business oppor
 
 - **What:** Hardware-accelerated delta-state computing architecture
 - **Speed:** 1,056 million operations per second (16 parallel banks)
-- **Cost:** Runs on a $10 FPGA chip (Tang Nano 9K)
+- **Cost:** Runs on a $13.50 FPGA chip (Tang Nano 9K)
 - **Proof:** 92 machine-verified mathematical proofs (Lean4)
 - **SDK:** Software tools in 5 languages (Python, Rust, C, JavaScript, Verilog)
-- **Tests:** 242 passing software tests, 80/80 passing hardware tests
+- **Tests:** 353 passing software tests, 80/80 passing hardware tests
 - **Status:** Working prototype — 6 development phases complete
 - **IP:** Patent pending
 

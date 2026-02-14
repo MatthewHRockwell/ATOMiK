@@ -10,7 +10,7 @@
 ![Cost](https://img.shields.io/badge/dev_cost-%24225-yellow)
 ![License](https://img.shields.io/badge/license-Apache_2.0-blue)
 
-**Delta-State Computation in Silicon — 1 Billion Operations/Second on a $10 Chip**
+**Delta-State Computation in Silicon — 1 Billion Operations/Second on a $13.50 Chip**
 
 > **IP & PATENT NOTICE**
 >
@@ -22,7 +22,7 @@
 
 ## 🎯 Production Hardware
 
-**ATOMiK is deployed on Tang Nano 9K ($10 FPGA) as a RISC-V SoC accelerator:**
+**ATOMiK is deployed on Tang Nano 9K as a RISC-V SoC accelerator:**
 
 - ✅ **PicoRV32 + ATOMiK**: Dual-clock architecture (25.2 MHz CPU, 81 MHz accelerator)
 - ✅ **Clean timing closure**: Zero TNS, +23% margin on ATOMiK, +21% margin on CPU
@@ -65,7 +65,7 @@ python -m software.demos.state_sync_benchmark
 - **Live Demo**: `python -m demos.run_demo --mode simulate --web` (runs at `localhost:8000`)
 - **Benchmark Evidence**: `python -m software.demos.state_sync_benchmark`
 
-**Key metrics**: $225 total development cost | 92 formal proofs | 80/80 hardware tests | 1 Gops/s on $10 FPGA | 5-language SDK | 353 tests passing
+**Key metrics**: $225 total development cost | 92 formal proofs | 80/80 hardware tests | 1 Gops/s | 5-language SDK | 353 tests passing
 
 ---
 
@@ -74,7 +74,7 @@ python -m software.demos.state_sync_benchmark
 - **Formal Proofs**: [`math/proofs/`](math/proofs/) — 92 Lean4 theorems including Turing completeness
 - **RTL Source**: [`hardware/rtl/`](hardware/rtl/) — Verilog implementation validated on Tang Nano 9K
 - **SDK**: `pip install -e ./software` — schema-driven code generation for Python/Rust/C/JS/Verilog
-- **Phase 6 Synthesis**: [`docs/PHASE6_HARDWARE_SYNTHESIS.md`](docs/PHASE6_HARDWARE_SYNTHESIS.md) — 25-config sweep
+- **Hardware Synthesis**: [`docs/HARDWARE_SYNTHESIS.md`](docs/HARDWARE_SYNTHESIS.md) — 25-config sweep
 - **API Reference**: [`docs/SDK_API_REFERENCE.md`](docs/SDK_API_REFERENCE.md)
 
 ---
@@ -90,15 +90,15 @@ python -m software.demos.state_sync_benchmark
 
 ## Development Status
 
-| Phase | Description | Status | Milestone |
-|-------|-------------|--------|-----------|
-| **Phase 1** | Mathematical Formalization | Complete | 92 theorems verified in Lean4 |
-| **Phase 2** | SCORE Comparison | Complete | 95-100% memory reduction validated |
-| **Phase 3** | Hardware Synthesis | Complete | 10/10 hardware tests, 7% LUT @ 94.5 MHz |
-| **Phase 4** | Autonomous SDK Generation Pipeline | Complete | 6-stage controller, hardware demos, 124 tests |
-| **Phase 5** | Agentic Orchestration | Complete | DAG orchestrator, feedback loops, 353 tests |
-| **Phase 6** | Parallel Accumulator Banks | Complete | 16x linear scaling, 1056 Mops/s, 80/80 HW tests |
-| **Production** | PicoRV32 SoC Integration | **Deployed** | Tang Nano 9K @ 81 MHz, 0 TNS, persistent flash |
+| Milestone | Description | Status |
+|-----------|-------------|--------|
+| **Mathematical Formalization** | 92 theorems verified in Lean4 | Complete |
+| **SCORE Comparison** | 95-100% memory reduction validated | Complete |
+| **Hardware Synthesis** | 10/10 hardware tests, 7% LUT @ 94.5 MHz | Complete |
+| **SDK Generation Pipeline** | 6-stage controller, hardware demos, 5-language output | Complete |
+| **Agentic Orchestration** | DAG orchestrator, feedback loops, 353 tests | Complete |
+| **Parallel Accumulator Banks** | 16x linear scaling, 1,056 Mops/s, 80/80 HW tests | Complete |
+| **Production SoC Deployment** | Tang Nano 9K @ 81 MHz, 0 TNS, persistent flash | **Deployed** |
 
 ---
 
@@ -148,7 +148,7 @@ ATOMiK's delta operations form an **Abelian group**, formally verified in Lean4:
 | **ACCUMULATE** | 1 | 10.6 ns |
 | **READ** | 1 | 10.6 ns |
 
-### Phase 6: Parallel Bank Throughput (Hardware-Validated)
+### Parallel Bank Throughput (Hardware-Validated)
 
 | Banks | Frequency | Throughput | Scaling | Timing | HW Tests |
 |------:|----------:|-----------:|--------:|:------:|:--------:|
@@ -158,7 +158,7 @@ ATOMiK's delta operations form an **Abelian group**, formally verified in Lean4:
 | 8 | 67.5 MHz | 540.0 Mops/s | 8.0x | MET | 10/10 |
 | 16 | 66.0 MHz | 1056.0 Mops/s | 16.0x | MET | 10/10 |
 
-N=16 breaks the **1 Gops/s barrier** on a $10 FPGA. Scaling is exactly linear at constant frequency.
+N=16 breaks the **1 Gops/s barrier** on the Tang Nano 9K. Scaling is exactly linear at constant frequency.
 
 ### Projected Throughput
 
@@ -178,7 +178,7 @@ N=16 breaks the **1 Gops/s barrier** on a $10 FPGA. Scaling is exactly linear at
 
 | Metric | Result |
 |--------|--------|
-| **Target Device** | Gowin GW1NR-9 (Tang Nano 9K, $10 FPGA) |
+| **Target Device** | Gowin GW1NR-9 (Tang Nano 9K) |
 | **Architecture** | PicoRV32 RISC-V CPU + ATOMiK accelerator |
 | **ATOMiK Configuration** | Single-bank @ 81 MHz with dual-clock CDC |
 | **CPU Clock** | 25.2 MHz (PicoRV32 via SPI XIP) |
@@ -226,7 +226,7 @@ N=16 breaks the **1 Gops/s barrier** on a $10 FPGA. Scaling is exactly linear at
 ```
 </details>
 
-### Parallel Accumulator Banks (Phase 6)
+### Parallel Accumulator Banks
 
 <p align="center">
   <img src="business/pitch_deck/parallel_merge_tree.svg" alt="ATOMiK Parallel XOR Merge Tree Architecture" width="800"/>
@@ -255,13 +255,13 @@ N=16 breaks the **1 Gops/s barrier** on a $10 FPGA. Scaling is exactly linear at
 | **JavaScript** | ES module class | Web applications, browser-side |
 | **Verilog** | RTL module + testbench | FPGA synthesis, ASIC design |
 
-### Agentic Pipeline (Phase 5)
+### Agentic Pipeline
 
 <p align="center">
-  <img src="docs/diagrams/phase5_pipeline.svg" alt="Phase 5 Pipeline" width="860"/>
+  <img src="docs/diagrams/phase5_pipeline.svg" alt="Agentic Pipeline" width="860"/>
 </p>
 
-DAG orchestration with feedback loops, adaptive model routing, cross-language consistency checking, regression detection, and self-optimization. See [`docs/PHASE_5_ROADMAP.md`](docs/PHASE_5_ROADMAP.md).
+DAG orchestration with feedback loops, adaptive model routing, cross-language consistency checking, regression detection, and self-optimization. See [`docs/SDK_ORCHESTRATION.md`](docs/SDK_ORCHESTRATION.md).
 
 ---
 
@@ -290,7 +290,7 @@ ATOMiK/
 ├── hardware/                 # FPGA/ASIC hardware design
 │   ├── rtl/                  # Verilog RTL source
 │   ├── sim/                  # Testbenches (single-core + parallel)
-│   ├── sweep/                # Phase 6 synthesis sweep (25 configs)
+│   ├── sweep/                # Parallel bank synthesis sweep (25 configs)
 │   ├── synth/                # Synthesis output and reports
 │   ├── scripts/              # Hardware validation scripts
 │   ├── constraints/          # Timing and pin constraints
@@ -325,8 +325,8 @@ ATOMiK/
 | [SDK API Reference](docs/SDK_API_REFERENCE.md) | Complete API documentation (5 languages) |
 | [Formal Model](specs/formal_model.md) | Delta-state algebra mathematical specification |
 | [RTL Architecture](specs/rtl_architecture.md) | Hardware design specification and timing |
-| [Phase 6 Synthesis](docs/PHASE6_HARDWARE_SYNTHESIS.md) | Parallel bank synthesis sweep and HW validation |
-| [Phase 5 Roadmap](docs/PHASE_5_ROADMAP.md) | Agentic orchestration architecture |
+| [Hardware Synthesis](docs/HARDWARE_SYNTHESIS.md) | Parallel bank synthesis sweep and HW validation |
+| [SDK Orchestration](docs/SDK_ORCHESTRATION.md) | Agentic orchestration architecture |
 
 ---
 

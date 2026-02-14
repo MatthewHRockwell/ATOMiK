@@ -1,25 +1,25 @@
-# ATOMiK v2 — Complete Roadmap & Execution Plan
+# ATOMiK — Roadmap & Execution Plan
 
-**Document Version:** 1.1
-**Date:** February 12, 2026
+**Document Version:** 2.0
+**Date:** February 14, 2026
 **Author:** Matt Rockwell + Claude (Planning Partner)
-**Status:** ACTIVE — Phase 2 COMPLETE (Phase 0 COMPLETE, Phase 1 COMPLETE, Phase 2 COMPLETE)
+**Status:** ACTIVE — Production SoC deployed, optimization phase next
 
 ---
 
 ## Table of Contents
 
 1. [Vision Summary](#1-vision-summary)
-2. [Phase 1 — PicoRV32 + ATOMiK Integration](#2-phase-1--picorv32--atomik-integration)
-3. [Phase 2 — ATOMiK Runtime & Delta-State Memory](#3-phase-2--atomik-runtime--delta-state-memory)
-4. [Phase 3 — Core Generator & Synthesis Pipeline](#4-phase-3--core-generator--synthesis-pipeline)
-5. [Phase 4 — OS Shell & User Interface](#5-phase-4--os-shell--user-interface)
-6. [Phase 5 — Library Replacement Pipeline (Automated)](#6-phase-5--library-replacement-pipeline-automated)
-7. [Phase 6 — Multi-Node Scaling Demo](#7-phase-6--multi-node-scaling-demo)
-8. [Phase 7 — ATOMiK IDE & Comparative Visualization](#8-phase-7--atomik-ide--comparative-visualization)
-9. [Phase 8 — Executive Automation Pipelines](#9-phase-8--executive-automation-pipelines)
-10. [Phase 9 — Post-Demo Expansion](#10-phase-9--post-demo-expansion)
-11. [Repository Structure (v2)](#11-repository-structure-v2)
+2. [PicoRV32 + ATOMiK Integration](#2-picorv32--atomik-integration) ✅
+3. [Runtime & Delta-State Memory](#3-runtime--delta-state-memory) ✅
+4. [Core Generator & Synthesis Pipeline](#4-core-generator--synthesis-pipeline) ✅
+5. [OS Shell & User Interface](#5-os-shell--user-interface)
+6. [Library Replacement Pipeline](#6-library-replacement-pipeline)
+7. [Multi-Node Scaling Demo](#7-multi-node-scaling-demo) ✅
+8. [IDE & Comparative Visualization](#8-ide--comparative-visualization)
+9. [Executive Automation Pipelines](#9-executive-automation-pipelines)
+10. [Post-Demo Expansion](#10-post-demo-expansion)
+11. [Repository Structure](#11-repository-structure)
 12. [Business Strategy Notes](#12-business-strategy-notes)
 13. [Reference Links & Resources](#13-reference-links--resources)
 
@@ -60,7 +60,7 @@ Three Tang Nano 9K boards scaling linearly, proving the architecture extends bey
 
 ---
 
-## 2. Phase 1 — PicoRV32 + ATOMiK Integration
+## 2. PicoRV32 + ATOMiK Integration
 
 **Goal:** Get PicoRV32 running on the Tang Nano 9K alongside the ATOMiK delta accumulator core. Prove they can coexist on the same FPGA with acceptable resource utilization. Achieve "hello world" over UART.
 
@@ -168,7 +168,7 @@ ATOMiK 4-bank: ~745 LUTs
 
 ---
 
-## 3. Phase 2 — ATOMiK Runtime & Delta-State Memory
+## 3. Runtime & Delta-State Memory
 
 **Goal:** Build the bridge between PicoRV32's standard C execution and ATOMiK's delta-state operations. Implement a minimal runtime that replaces key memory operations with delta-state equivalents.
 
@@ -217,7 +217,7 @@ ATOMiK 4-bank: ~745 LUTs
 
 ---
 
-## 4. Phase 3 — Core Generator & Synthesis Pipeline
+## 4. Core Generator & Synthesis Pipeline
 
 **Goal:** Build the automated pipeline: design parameters → Verilog generation → synthesis → place & route → program FPGA, all from the command line.
 
@@ -276,7 +276,7 @@ ATOMiK 4-bank: ~745 LUTs
 
 ---
 
-## 5. Phase 4 — OS Shell & User Interface
+## 5. OS Shell & User Interface
 
 **Goal:** Build a minimal interactive environment — keyboard input, display output, command interpretation. The user can type commands, see output, and interact with the system.
 
@@ -341,7 +341,7 @@ ATOMiK 4-bank: ~745 LUTs
 
 ---
 
-## 6. Phase 5 — Library Replacement Pipeline (Automated)
+## 6. Library Replacement Pipeline
 
 **Goal:** Systematically replace standard C library functions with delta-state implementations using automated testing and comparison.
 
@@ -400,7 +400,7 @@ ATOMiK 4-bank: ~745 LUTs
 
 ---
 
-## 7. Phase 6 — Multi-Node Scaling Demo
+## 7. Multi-Node Scaling Demo
 
 **Goal:** Connect three Tang Nano 9K boards and demonstrate linear scaling across hardware nodes.
 
@@ -441,7 +441,7 @@ ATOMiK 4-bank: ~745 LUTs
 
 ---
 
-## 8. Phase 7 — ATOMiK IDE & Comparative Visualization
+## 8. IDE & Comparative Visualization
 
 **Goal:** Build an ATOMiK-specific development environment showing parameter changes and their effects on performance, with side-by-side comparison against Von Neumann architectures.
 
@@ -463,7 +463,7 @@ ATOMiK 4-bank: ~745 LUTs
 
 ---
 
-## 9. Phase 8 — Executive Automation Pipelines
+## 9. Executive Automation Pipelines
 
 **Goal:** Automate business development, outreach, social media, and demo generation — freeing Matt to focus on technology.
 
@@ -495,7 +495,7 @@ ATOMiK 4-bank: ~745 LUTs
 
 ---
 
-## 10. Phase 9 — Post-Demo Expansion
+## 10. Post-Demo Expansion
 
 **Goal:** Advanced features and optimizations building on the working demo.
 
@@ -527,7 +527,7 @@ ATOMiK 4-bank: ~745 LUTs
 
 ---
 
-## 11. Repository Structure (v2)
+## 11. Repository Structure
 
 ```
 ATOMiK/

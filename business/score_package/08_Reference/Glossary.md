@@ -54,7 +54,7 @@ A mathematical statement that has been proven true. Each of ATOMiK's 92 theorems
 ## Hardware Terms
 
 **FPGA (Field-Programmable Gate Array)**
-A programmable computer chip — like a blank circuit board you can configure. Unlike a regular processor that runs software instructions, an FPGA is physically wired to perform specific operations. This makes it much faster for specialized tasks. ATOMiK uses a $10 FPGA as its prototype platform.
+A programmable computer chip — like a blank circuit board you can configure. Unlike a regular processor that runs software instructions, an FPGA is physically wired to perform specific operations. This makes it much faster for specialized tasks. ATOMiK uses a $13.50 FPGA as its prototype platform.
 
 **ASIC (Application-Specific Integrated Circuit)**
 A custom chip designed for one specific purpose. Faster and cheaper per unit than an FPGA, but costs millions of dollars to design and manufacture. ASICs make sense when you need to produce hundreds of thousands or millions of identical chips.
@@ -66,10 +66,10 @@ The "source code" for a chip. Just as software is written in programming languag
 A programming language for designing computer chips. ATOMiK's hardware is written in Verilog. It describes the physical circuits, logic gates, and connections that make up the chip.
 
 **LUT (Look-Up Table)**
-The basic building block inside an FPGA. Think of it as a small, fast memory that implements a logic function. ATOMiK's 16-bank design uses only 20% of the available LUTs on the $10 chip — meaning there's significant room to grow.
+The basic building block inside an FPGA. Think of it as a small, fast memory that implements a logic function. ATOMiK's 16-bank design uses only 20% of the available LUTs on the $13.50 chip — meaning there's significant room to grow.
 
 **Tang Nano 9K**
-The specific $10 FPGA development board that ATOMiK runs on. Made by Sipeed using a Gowin GW1NR-9 FPGA chip. It's small (about the size of a USB stick), cheap, and powerful enough to demonstrate 1 billion operations per second.
+The specific $13.50 FPGA development board that ATOMiK runs on. Made by Sipeed using a Gowin GW1NR-9 FPGA chip. It's small (about the size of a USB stick), cheap, and powerful enough to demonstrate 1 billion operations per second.
 
 **Clock Cycle**
 One "tick" of the chip's internal clock. Everything inside a digital chip happens in sync with its clock. ATOMiK completes one full operation per clock cycle — about 10.6 nanoseconds (billionths of a second) on the current chip.
@@ -103,7 +103,7 @@ A blueprint that describes the structure of data. In ATOMiK's SDK, a schema defi
 A set of rules that allows different software programs to communicate with each other. ATOMiK's SDK provides APIs that let applications use delta-state operations without knowing the underlying hardware details.
 
 **CI/CD (Continuous Integration / Continuous Deployment)**
-Automated systems that test and deploy software every time a change is made. ATOMiK's SDK includes 242 automated tests that run continuously to ensure everything works correctly.
+Automated systems that test and deploy software every time a change is made. ATOMiK's SDK includes 353 automated tests that run continuously to ensure everything works correctly.
 
 ---
 
@@ -163,7 +163,7 @@ A competitive advantage that's difficult for others to replicate. ATOMiK's moat 
 ## Demo-Specific Terms
 
 **Simulation Mode**
-Running the ATOMiK demo using software that mimics what the hardware does, without requiring the physical chip. All demo features work in simulation — you don't need the $10 board to see ATOMiK in action.
+Running the ATOMiK demo using software that mimics what the hardware does, without requiring the physical chip. All demo features work in simulation — you don't need the $13.50 board to see ATOMiK in action.
 
 **TUI (Text-based User Interface)**
 A graphical interface that runs inside a terminal/command prompt window, using text characters to draw boxes, charts, and tables. ATOMiK's TUI provides a rich demo experience without needing a web browser.

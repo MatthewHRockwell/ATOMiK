@@ -1,6 +1,6 @@
 # ATOMiK — Delta-State Computing in Silicon
 
-**1 Billion Operations/Second on a $10 Chip**
+**1 Billion Operations/Second on a $13.50 Chip**
 
 ATOMiK is a hardware-accelerated delta-state computing architecture that replaces traditional full-state updates with XOR-based delta accumulation. Every operation completes in a single clock cycle (10.6 ns), scales linearly with parallel banks, and is backed by 92 machine-verified mathematical proofs.
 
@@ -21,7 +21,7 @@ ATOMiK is a hardware-accelerated delta-state computing architecture that replace
 | LUT utilization | **44%** (production SoC) / 20% (standalone 16-bank) |
 | SDK languages | **5** (Python, Rust, C, JavaScript, Verilog) |
 | SDK tests | **353** passing |
-| Device cost | **$10** (Tang Nano 9K FPGA) |
+| Device cost | **$13.50** (Tang Nano 9K FPGA) |
 
 ## How It Works
 
@@ -38,7 +38,7 @@ State_current = Initial XOR delta_1 XOR delta_2 XOR ... XOR delta_n
 
 ## Architecture
 
-N parallel XOR accumulator banks with a binary merge tree achieve linear throughput scaling. 16 banks on a $10 FPGA break the 1 Gops/s barrier. The architecture extends to 32x, 64x, and beyond on larger FPGAs.
+N parallel XOR accumulator banks with a binary merge tree achieve linear throughput scaling. 16 banks on a $13.50 FPGA break the 1 Gops/s barrier. The architecture extends to 32x, 64x, and beyond on larger FPGAs.
 
 ## Market Applications
 

@@ -16,19 +16,19 @@
 
 ### Delta-State Computing in Silicon
 
-**1 Billion Operations/Second on a $10 Chip**
+**1 Billion Operations/Second on a $13.50 Chip**
 
 *Mathematically proven. Hardware validated. Patent pending.*
 
 > **Speaker Notes**: ATOMiK is a new computing primitive — a hardware-accelerated
 > delta-state algebra that replaces full-state read-modify-write with single-cycle
-> XOR delta accumulation. We achieve 1 Gops/s on a $10 FPGA with 92 formally
+> XOR delta accumulation. We achieve 1 Gops/s on a $13.50 FPGA with 92 formally
 > verified mathematical proofs. This is not an incremental improvement to an
 > existing architecture — it is a fundamentally different way to manage state in
 > silicon.
 
 `[VISUAL]` Title slide with ATOMiK logo. Central KPI: "1,056 Mops/s" in large
-text. Subtitle: "$10 device | 10.6 ns latency | 92 formal proofs". Dark
+text. Subtitle: "$13.50 device | 10.6 ns latency | 92 formal proofs". Dark
 background (#1e1e2e) with blue (#89b4fa) and green (#a6e3a1) accents matching
 Marp theme.
 
@@ -169,7 +169,7 @@ property table below.
 | **Parallel efficiency** | Measured vs theoretical | 0.85 (vs 0.0 baseline) |
 | **SDK coverage** | Tests passing | 353 across 5 languages |
 | **SDK languages** | Code generation targets | Python, Rust, C, JavaScript, Verilog |
-| **Device cost** | Tang Nano 9K FPGA | $10 |
+| **Device cost** | Tang Nano 9K FPGA | $13.50 |
 | **Total dev budget** | AI-assisted development | ~$225 in AI token costs |
 
 **Parallel scaling (Verilog-verified, deterministic):**
@@ -424,17 +424,17 @@ tagline: "Delta-State Computing in Silicon."
 **Vision**: Eliminate the memory wall by replacing full-state computation with
 delta-state algebra — in hardware.
 
-**Tagline**: 1 Billion Operations/Second on a $10 Chip.
+**Tagline**: 1 Billion Operations/Second on a $13.50 Chip.
 
 *Mathematically proven. Hardware validated. Patent pending.*
 
 > **Speaker Notes**: ATOMiK is a new computing primitive. We've built a
-> hardware-accelerated delta-state algebra that achieves 1 Gops/s on a $10 FPGA,
+> hardware-accelerated delta-state algebra that achieves 1 Gops/s on a $13.50 FPGA,
 > backed by 92 formally verified proofs and 353 passing tests across 5 languages.
 > This deck presents the full technical and commercial case.
 
 `[VISUAL]` Full-bleed title slide. ATOMiK logo centered. One-liner vision
-statement. Key metrics strip: "1,056 Mops/s | 10.6 ns | 92 proofs | $10
+statement. Key metrics strip: "1,056 Mops/s | 10.6 ns | 92 proofs | $13.50
 device." Dark theme (#1e1e2e).
 
 ---
@@ -712,7 +712,7 @@ checkmark. Counter: "92/92 proven, 0 sorry." Lean4 logo.
 
 ## Slide 8 — Production Deployment ✅
 
-# Tang Nano 9K: $10 FPGA, Production SoC
+# Tang Nano 9K: $13.50 FPGA, Production SoC
 
 ### ✅ **DEPLOYED** — February 2026
 
@@ -721,7 +721,7 @@ checkmark. Counter: "92/92 proven, 0 sorry." Lean4 logo.
 | **Deployment Status** | ✅ **Production** — Persistent SPI flash |
 | Device | Gowin GW1NR-LV9QN88PC6/I5 |
 | Board | Sipeed Tang Nano 9K |
-| Retail price | ~$10 |
+| Retail price | ~$13.50 |
 | Architecture | PicoRV32 RISC-V CPU + ATOMiK accelerator |
 | Total LUTs | 8,640 |
 | Total FFs | 6,693 |
@@ -960,7 +960,7 @@ mathematically guaranteed instant undo.
 
 **Pain point**: IoT edge devices face hard power constraints. Multi-sensor
 fusion requires lock-free merge of concurrent streams. ATOMiK's commutative
-merge on a $10 FPGA directly addresses this.
+merge on a $13.50 FPGA directly addresses this.
 
 ### 3. Streaming Data Transforms
 
@@ -1386,7 +1386,7 @@ Advisory needs as open seats.
 |------|:--------:|-----------|
 | **Technical: Timing closure at larger N** | Medium | Validated to N=16 on smallest FPGA. Larger devices have more routing resources. Pipeline registers available if needed. |
 | **Adoption: Delta-state is a new paradigm** | High | SDK abstracts the model — developers use familiar languages. Schema-driven generation means minimal learning curve. Community-first GTM. |
-| **Tooling: Gowin ecosystem is niche** | Low | Architecture is vendor-agnostic Verilog. Xilinx/Lattice ports are straightforward. Gowin was chosen for cost ($10), not lock-in. |
+| **Tooling: Gowin ecosystem is niche** | Low | Architecture is vendor-agnostic Verilog. Xilinx/Lattice ports are straightforward. Gowin was chosen for cost ($13.50), not lock-in. |
 | **Manufacturing: ASIC tape-out risk** | Medium | ASIC is Phase 3 of GTM, not Phase 1. FPGA deployment is the initial revenue path. ASIC feasibility study de-risks before commitment. |
 | **Competition: Large players could replicate** | Medium | 92 proofs + patent + ecosystem create multi-layer moat. Time-to-replicate is 6-12+ months even for well-resourced teams. First-mover advantage in IP licensing. |
 | **Bus factor: Solo founder** | Medium | All work is documented, machine-verified, and reproducible. Post-funding team expansion addresses this directly. Formal proofs are permanent — they don't depend on the author. |
@@ -1471,7 +1471,7 @@ stage. Closing: "$225 to 1 Gops/s. Imagine what funded execution looks like."
    is the optimal structure for parallel state accumulation. This is not opinion —
    it is mathematics.
 
-2. **Hardware validated**: 1,056 Mops/s on a $10 FPGA with 80/80 tests passing.
+2. **Hardware validated**: 1,056 Mops/s on a $13.50 FPGA with 80/80 tests passing.
    Real silicon, not simulation. 95-100% memory traffic reduction measured.
 
 3. **Timing is right**: The AI inference crisis, memory wall, edge constraints,
@@ -1483,7 +1483,7 @@ stage. Closing: "$225 to 1 Gops/s. Imagine what funded execution looks like."
 
 We invite investors to:
 - **Review the proofs**: Every theorem is in the repository, machine-verified
-- **Run the hardware**: The demo runs on $10 boards — we'll ship you one
+- **Run the hardware**: The demo runs on $13.50 boards — we'll ship you one
 - **Examine the data**: Every metric traces to a source file with methodology
 
 **ATOMiK — Delta-State Computing in Silicon**
@@ -1498,7 +1498,7 @@ We invite investors to:
 
 `[VISUAL]` Three-pillar layout: Math (proof icon), Hardware (chip icon), Market
 (growth chart icon). Each pillar has its key number. Center: ATOMiK logo.
-Bottom: "We'll ship you a $10 board. See it for yourself." Contact information.
+Bottom: "We'll ship you a $13.50 board. See it for yourself." Contact information.
 
 ---
 
@@ -1534,7 +1534,7 @@ proofs with zero sorry statements.
 
 | Metric | Value |
 |--------|-------|
-| Peak throughput | 1,056 Mops/s (16 banks on $10 FPGA) |
+| Peak throughput | 1,056 Mops/s (16 banks on $13.50 FPGA) |
 | Operation latency | 10.6 ns (single cycle @ 94.5 MHz) |
 | Memory traffic reduction | 95-100% (up to 30,740x) |
 | Write-heavy speedup | +22% to +58% (p < 0.001) |
