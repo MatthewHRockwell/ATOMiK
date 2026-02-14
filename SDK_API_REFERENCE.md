@@ -12,7 +12,7 @@
 5. [C SDK API](#c-sdk-api)
 6. [JavaScript SDK API](#javascript-sdk-api)
 7. [Verilog RTL Interface](#verilog-rtl-interface)
-8. [Pipeline API (Phase 5)](#pipeline-api-phase-5)
+8. [Pipeline API](#pipeline-api)
 
 ---
 
@@ -740,13 +740,13 @@ reg [$clog2(HISTORY_DEPTH)-1:0] history_head;      // History buffer head pointe
 - All operations complete in 1 clock cycle
 - ACCUMULATE latency: 1 cycle
 - RECONSTRUCT latency: 0 cycles (combinatorial) + 1 cycle register
-- Designed for 94.5 MHz operation (matches Phase 3 FPGA)
+- Designed for 94.5 MHz operation (matches validated FPGA configuration)
 - LUT utilization: ~7% on GW1NR-9
 - FF utilization: ~9% on GW1NR-9
 
 ---
 
-## Pipeline API (Phase 5)
+## Pipeline API
 
 The Pipeline API provides the autonomous generation pipeline infrastructure, including orchestration, feedback loops, adaptive routing, token efficiency, parallel execution, verification, analysis, context management, and self-optimization.
 

@@ -1,4 +1,4 @@
-# Phase 1 — PicoRV32 Standalone Bringup Results
+# PicoRV32 Standalone Bringup Results
 
 **Date:** February 12, 2026
 **Board:** Tang Nano 9K (GW1NR-LV9QN88PC6/I5)

@@ -1,8 +1,7 @@
 # ATOMiK SDK Developer Guide
 
-**Version:** 2.0.0
-**Last Updated:** January 27, 2026
-**Phase:** 5 - Agentic Orchestration
+**Version:** 2.1.0
+**Last Updated:** February 14, 2026
 
 ## Table of Contents
 
@@ -10,8 +9,8 @@
 2. [Architecture Overview](#architecture-overview)
 3. [Generator Framework](#generator-framework)
 4. [Creating Custom Generators](#creating-custom-generators)
-5. [Pipeline Framework (Phase 5)](#pipeline-framework-phase-5)
-6. [Schema Design Guidelines](#schema-design-guidelines)
+5. [Pipeline Framework](#pipeline-framework)
+6. [Schema Reference](#schema-reference)
 7. [Testing](#testing)
 8. [Contributing](#contributing)
 
@@ -26,7 +25,7 @@ The ATOMiK SDK is a multi-language code generation framework that produces delta
 - **Multi-Language Support**: Python, Rust, C, Verilog, JavaScript
 - **Schema-Driven Generation**: Single JSON schema → 5 language implementations
 - **Namespace Consistency**: Automatic mapping across languages
-- **Hardware Integration**: Verilog RTL matching Phase 3 FPGA architecture
+- **Hardware Integration**: Verilog RTL matching validated FPGA architecture
 - **Extensible Architecture**: Plugin-based generator system
 
 ---
@@ -370,11 +369,11 @@ def test_mylanguage_generation():
 
 ---
 
-## Pipeline Framework (Phase 5)
+## Pipeline Framework
 
 ### Overview
 
-Phase 5 transforms the Phase 4C linear pipeline into a self-improving agentic orchestrator. The implementation spans 16 tasks (T5.1-T5.16), introducing 25 new modules across orchestration, routing, verification, feedback, and optimization subsystems. The full test suite includes 242 total tests validating all pipeline components end-to-end.
+The pipeline framework is a self-improving agentic orchestrator built on 25 modules across orchestration, routing, verification, feedback, and optimization subsystems. The full test suite includes 353 total tests validating all pipeline components end-to-end.
 
 ### DAG Orchestrator
 
@@ -457,23 +456,58 @@ The `ConfigTuner` auto-tunes pipeline configuration parameters including worker 
 
 ---
 
-## Schema Design Guidelines
+## Schema Reference
 
-### Catalogue Metadata
+This section provides the complete reference for ATOMiK JSON schema specifications, which drive multi-language SDK generation from a single declarative source.
 
-The catalogue section defines the namespace position:
+### Core Concepts
+
+**Delta-State Computing**: Instead of storing full state, ATOMiK maintains:
+- **Initial state** (S0): The base state at time t=0
+- **Delta accumulator** (delta): XOR composition of all deltas
+- **Current state**: S = S0 XOR delta (single XOR operation)
+
+**Catalogue-Driven Namespaces**: The schema's catalogue position automatically determines import paths, file/module structure, and package naming conventions in all target languages.
+
+| Benefit | Description |
+|---------|-------------|
+| **Write Once, Deploy Everywhere** | Define delta operations once, generate code for all platforms |
+| **Type Safety** | JSON Schema validation catches errors before code generation |
+| **Discoverability** | Hierarchical catalogue structure enables ecosystem browsing |
+| **Hardware/Software Co-design** | Same schema generates both software SDK and hardware RTL |
+| **Version Management** | Semantic versioning built into schema metadata |
+
+### Schema Structure
+
+An ATOMiK schema consists of three main sections: catalogue (required), schema (required), and hardware (optional).
+
+#### Catalogue (Required)
+
+Positioning metadata that determines API namespace and module identity.
 
 ```json
 {
   "catalogue": {
-    "vertical": "Compute",     // Industry vertical (Video, Network, etc.)
-    "field": "Linear",          // Field within vertical
-    "object": "MatrixOps",      // Specific object/module name
-    "version": "1.0.0",         // Semantic versioning
-    "description": "Matrix operations using delta encoding"
+    "vertical": "System",
+    "field": "Terminal",
+    "object": "TerminalIO",
+    "version": "1.0.0",
+    "author": "ATOMiK Project",
+    "license": "MIT",
+    "description": "Control primitive for terminal I/O operations"
   }
 }
 ```
+
+| Field | Description | Example |
+|-------|-------------|---------|
+| `vertical` | Top-level market vertical | "Video", "Network", "Edge" |
+| `field` | Domain-specific field | "Stream", "P2P", "Sensor" |
+| `object` | Specific component name | "H264Delta", "DeltaExchange" |
+| `version` | Semantic version | "1.0.0", "2.1.3-beta" |
+| `author` | Author/organization | "ATOMiK Project", "Acme Corp" |
+| `license` | SPDX identifier | "MIT", "Apache-2.0" |
+| `description` | Human-readable summary | "Efficient video frame delta encoding" |
 
 **Naming Rules:**
 - All identifiers must be PascalCase
@@ -481,81 +515,434 @@ The catalogue section defines the namespace position:
 - Avoid reserved keywords across all languages
 - Length: 2-64 characters
 
-### Delta Fields
+#### Schema (Required)
 
-Define the delta state fields:
+Computational definition of delta fields, operations, and constraints.
 
 ```json
 {
   "schema": {
     "delta_fields": {
-      "matrix_delta": {
-        "type": "delta_stream",
-        "width": 256,
-        "description": "Spatiotemporal delta encoding"
+      "command_delta": {
+        "type": "parameter_delta",
+        "width": 64,
+        "encoding": "raw",
+        "compression": "none"
       }
-    }
-  }
-}
-```
-
-**Delta Types:**
-- `delta_stream`: Continuous delta stream
-- `parameter_delta`: Parameter-based deltas
-- `event_delta`: Event-driven deltas
-
-**Width Constraints:**
-- Must be power of 2
-- Range: 8 to 512 bits
-- Must match hardware DATA_WIDTH if hardware section present
-
-### Operations
-
-Configure which operations are enabled:
-
-```json
-{
-  "schema": {
+    },
     "operations": {
       "accumulate": {
-        "enabled": true
+        "enabled": true,
+        "latency_cycles": 1
       },
       "reconstruct": {
-        "enabled": true
-      },
-      "rollback": {
         "enabled": true,
-        "history_depth": 10
+        "latency_cycles": 1
       }
+    },
+    "constraints": {
+      "max_memory_mb": 1,
+      "update_latency_ms": 1
     }
   }
 }
 ```
 
-**Standard Operations:**
-- `accumulate`: XOR delta into accumulator (always enabled)
-- `reconstruct`: Compute current state (always enabled)
-- `rollback`: Undo N previous deltas (optional)
+#### Hardware (Optional)
 
-### Hardware Mapping
-
-Optional hardware configuration for Verilog generation:
+Hardware mapping for Verilog RTL generation.
 
 ```json
 {
   "hardware": {
-    "target": "FPGA",
-    "device": "GW1NR-LV9QN88PC6/I5",
-    "clock_mhz": 94.5,
-    "interface": "UART",
-    "data_width": 64
+    "target_device": "GW1NR-9",
+    "rtl_params": {
+      "DATA_WIDTH": 64,
+      "ENABLE_PARALLEL": false
+    },
+    "synthesis_options": {
+      "optimization_goal": "speed"
+    }
   }
 }
 ```
 
 **Validation:**
-- `data_width` must match maximum delta field width
+- `DATA_WIDTH` must match maximum delta field width
 - Verilog generator uses these parameters
+
+### Field Type Reference
+
+ATOMiK supports three fundamental delta field types.
+
+#### `delta_stream`
+
+**Purpose**: Continuous stream of deltas (e.g., video frames, sensor readings).
+
+**Characteristics**:
+- High-frequency updates
+- Time-series data
+- Typically compressed
+
+**Use Cases**: Video frame deltas, audio sample deltas, network packet streams, sensor data streams.
+
+```json
+{
+  "network_delta": {
+    "type": "delta_stream",
+    "width": 128,
+    "compression": "xor"
+  }
+}
+```
+
+#### `bitmask_delta`
+
+**Purpose**: Bit-level state changes (e.g., flags, status bits).
+
+**Characteristics**:
+- Sparse updates (few bits change)
+- Boolean state tracking
+- Efficient for large bitmaps
+
+**Use Cases**: Device status flags, feature enable/disable, permission bits, configuration registers.
+
+```json
+{
+  "status_flags": {
+    "type": "bitmask_delta",
+    "width": 32,
+    "encoding": "raw"
+  }
+}
+```
+
+#### `parameter_delta`
+
+**Purpose**: Configuration/parameter updates (e.g., settings, control values).
+
+**Characteristics**:
+- Infrequent updates
+- Full-width values
+- Human-readable intent
+
+**Use Cases**: Configuration changes, control commands, parameter tuning, system settings.
+
+```json
+{
+  "config_delta": {
+    "type": "parameter_delta",
+    "width": 64,
+    "default_value": 0
+  }
+}
+```
+
+### Delta Field Properties
+
+#### Width
+
+**Required**: Yes
+**Type**: Integer (enum)
+**Values**: 8, 16, 32, 64, 128, 256
+
+The bit width must be a power of 2 between 8 and 256 bits.
+
+**Choosing Width**:
+- **8-bit**: Boolean flags, byte-aligned data
+- **16-bit**: Audio samples, small counters
+- **32-bit**: Standard integers, addresses
+- **64-bit**: Timestamps, large counters, pointers
+- **128-bit**: UUID, IPv6 addresses, crypto keys
+- **256-bit**: Hash values, wide data buses
+
+**Hardware Impact**: Wider fields consume more FPGA resources (LUTs, registers).
+
+#### Encoding
+
+**Required**: No
+**Type**: String (enum)
+**Values**: `spatiotemporal_4x4x4`, `raw`, `rle`
+**Default**: `raw`
+
+| Encoding | Description | Use Case |
+|----------|-------------|----------|
+| `raw` | No encoding, direct bit representation | Default, maximum speed |
+| `spatiotemporal_4x4x4` | 4x4x4 block encoding | Video/image deltas |
+| `rle` | Run-length encoding | Sparse data, long zero runs |
+
+```json
+{
+  "video_delta": {
+    "type": "delta_stream",
+    "width": 256,
+    "encoding": "spatiotemporal_4x4x4"
+  }
+}
+```
+
+#### Compression
+
+**Required**: No
+**Type**: String (enum)
+**Values**: `xor`, `rle`, `none`
+**Default**: `none`
+
+| Compression | Description | Ratio | Speed |
+|-------------|-------------|-------|-------|
+| `none` | No compression | 1:1 | Fastest |
+| `xor` | XOR-based delta compression | 10-100:1 | Fast |
+| `rle` | Run-length encoding | 5-50:1 | Medium |
+
+**Trade-offs**:
+- `none`: Maximum speed, no size reduction
+- `xor`: Good balance, hardware-friendly (95% memory reduction validated)
+- `rle`: Best for sparse data with long runs
+
+#### Default Value
+
+**Required**: No
+**Type**: Integer (>= 0)
+**Default**: 0
+
+Initial value for the delta field at system startup.
+
+### Operations Reference
+
+#### Accumulate (Required)
+
+XOR-based delta accumulation (the core operation).
+
+**Mathematical Form**: `delta_accumulated <- delta_accumulated XOR delta_new`
+
+**Properties** (proven in Lean4):
+- **Commutative**: d1 XOR d2 = d2 XOR d1
+- **Associative**: (d1 XOR d2) XOR d3 = d1 XOR (d2 XOR d3)
+- **Self-Inverse**: d XOR d = 0
+- **Identity**: d XOR 0 = d
+
+**Hardware Performance**:
+- **Latency**: 1 clock cycle @ 94.5 MHz
+- **Throughput**: 94.5 million deltas/second
+- **Resource**: ~160 LUTs (7% of GW1NR-9)
+
+```json
+{
+  "operations": {
+    "accumulate": {
+      "enabled": true,
+      "latency_cycles": 1
+    }
+  }
+}
+```
+
+**Note**: `enabled` must always be `true` (accumulate is mandatory).
+
+#### Reconstruct
+
+State reconstruction from accumulated deltas.
+
+**Mathematical Form**: `S_current = S_initial XOR delta_accumulated`
+
+**Complexity**:
+- **Software**: O(N) if maintaining delta history, O(1) if maintaining accumulator
+- **Hardware**: O(1) - single XOR operation
+
+**Performance**:
+- **Latency**: 1 clock cycle (combinational + output register)
+
+```json
+{
+  "operations": {
+    "reconstruct": {
+      "enabled": true,
+      "latency_cycles": 1
+    }
+  }
+}
+```
+
+**Use Cases**: Reading current state, checkpointing, state export.
+
+#### Rollback (Optional)
+
+Temporal state rollback via delta reversal.
+
+**Mathematical Form**: `S_t-1 = S_t XOR delta_t` (reverse last delta)
+
+**Key Property**: Self-inverse property (d XOR d = 0) enables perfect rollback.
+
+**Requirements**:
+- If `enabled` is `true`, `history_depth` must be specified
+- History depth determines how many deltas to store
+
+```json
+{
+  "operations": {
+    "rollback": {
+      "enabled": true,
+      "history_depth": 256
+    }
+  }
+}
+```
+
+**Memory Cost**: `memory_bytes = history_depth * (delta_width / 8)` (e.g., 256 entries x 128 bits / 8 = 4 KB)
+
+**Use Cases**: Undo/redo functionality, distributed consensus (conflict resolution), time-travel debugging, checkpointing.
+
+### Constraints
+
+Constraints define resource and performance limits for the generated SDK.
+
+#### Memory Constraints
+
+**Field**: `max_memory_mb`
+**Type**: Integer (1 - 65,536 MB)
+
+**Guidance**:
+- **Edge devices**: 1-16 MB
+- **Mobile**: 16-256 MB
+- **Server**: 256+ MB
+
+#### Power Constraints
+
+**Field**: `max_power_mw`
+**Type**: Integer (1 - 100,000 mW)
+
+**Guidance**:
+- **Battery-powered**: 100-1,000 mW
+- **USB-powered**: 1,000-5,000 mW
+- **Mains-powered**: 5,000+ mW
+
+#### Latency Constraints
+
+**Field**: `update_latency_ms`
+**Type**: Integer (0 - 10,000 ms)
+
+**Guidance**:
+- **Real-time control**: 0-10 ms
+- **Interactive**: 10-100 ms
+- **Batch processing**: 100+ ms
+
+#### Target Frequency
+
+**Field**: `target_frequency_mhz`
+**Type**: Number (1.0 - 1,000.0 MHz)
+**Default**: 94.5 MHz
+
+### Schema Validation
+
+All ATOMiK schemas must validate against `specs/atomik_schema_v1.json` (JSON Schema Draft 7).
+
+**CLI Validation** (recommended):
+```bash
+# Validate a single schema
+atomik-gen validate sdk/schemas/examples/terminal-io.json
+
+# Show schema summary (namespace, fields, operations)
+atomik-gen info sdk/schemas/domains/finance-price-tick.json
+```
+
+**VS Code**: Files matching `*.atomik.json` or in `**/schemas/**/*.json` are automatically validated with real-time error squiggles when the [ATOMiK VS Code extension](../sdk/vscode-extension/atomik-vscode/README.md) is installed.
+
+**Python Example**:
+```python
+import json
+import jsonschema
+
+# Load schema specification
+with open('specs/atomik_schema_v1.json') as f:
+    schema_spec = json.load(f)
+
+# Load instance schema
+with open('sdk/schemas/examples/terminal-io.json') as f:
+    instance = json.load(f)
+
+# Validate
+try:
+    jsonschema.validate(instance=instance, schema=schema_spec)
+    print("Schema is valid")
+except jsonschema.ValidationError as e:
+    print(f"Validation error: {e.message}")
+```
+
+See [`specs/schema_validation_rules.md`](../specs/schema_validation_rules.md) for detailed error descriptions and fixes.
+
+**Validation Checklist**:
+- Schema validates against `atomik_schema_v1.json`
+- All required fields present (vertical, field, object, version, delta_fields, accumulate)
+- Delta field widths are powers of 2 (8, 16, 32, 64, 128, 256)
+- Object names are valid identifiers in all target languages
+- If rollback enabled, history_depth is specified
+- If hardware.rtl_params.DATA_WIDTH specified, matches delta field widths
+- Semantic version follows semver format
+
+### Schema Examples
+
+#### Terminal I/O (Control Primitive)
+
+**File**: [`sdk/schemas/examples/terminal-io.json`](../sdk/schemas/examples/terminal-io.json)
+**Catalogue**: System / Terminal / TerminalIO
+
+Two 64-bit delta fields (command, response) with minimal memory footprint (< 1 MB), low latency (< 1 ms), and hardware-ready GW1NR-9 target.
+
+**Use Cases**: Command-line interfaces, serial terminal emulation, remote control protocols.
+
+#### P2P Delta Exchange (Network Primitive)
+
+**File**: [`sdk/schemas/examples/p2p-delta.json`](../sdk/schemas/examples/p2p-delta.json)
+**Catalogue**: Network / P2P / DeltaExchange
+
+128-bit delta stream with XOR compression, rollback capability (256 entry history), and conflict resolution support.
+
+**Use Cases**: Distributed databases, collaborative editing, blockchain state sync, IoT mesh networks.
+
+#### Matrix Operations (Compute Primitive)
+
+**File**: [`sdk/schemas/examples/matrix-ops.json`](../sdk/schemas/examples/matrix-ops.json)
+**Catalogue**: Compute / Linear / MatrixOps
+
+256-bit wide delta field with spatiotemporal encoding (4x4x4 blocks), parallel hardware acceleration, optimized for sparse updates.
+
+**Use Cases**: Machine learning (gradient updates), scientific computing (iterative solvers), computer graphics (transformation matrices), quantum simulation (state evolution).
+
+#### Video H.264 Delta
+
+**File**: [`sdk/schemas/domains/video-h264-delta.json`](../sdk/schemas/domains/video-h264-delta.json)
+**Catalogue**: Video / Streaming / H264Delta
+
+256-bit `frame_delta` with spatiotemporal 4x4x4 encoding and XOR compression, 256-bit `motion_vector` parameter delta, rollback support (512 frame history), hardware-optimized for speed at 150 MHz target.
+
+#### Edge Sensor IMU Fusion
+
+**File**: [`sdk/schemas/domains/edge-sensor-imu.json`](../sdk/schemas/domains/edge-sensor-imu.json)
+**Catalogue**: Edge / Sensor / IMUFusion
+
+64-bit `motion_delta` stream for accelerometer/gyroscope data, 64-bit `alert_flags` bitmask delta for anomaly detection, rollback support (1024 sample history), power-optimized hardware at 100 MHz target (500 mW budget).
+
+#### Financial Price Tick
+
+**File**: [`sdk/schemas/domains/finance-price-tick.json`](../sdk/schemas/domains/finance-price-tick.json)
+**Catalogue**: Finance / Trading / PriceTick
+
+64-bit `price_delta` (parameter delta for bid/ask changes), 64-bit `volume_delta` (delta stream with XOR compression), 64-bit `trade_flags` (bitmask delta for trade status), rollback support (4096 transaction history), speed-optimized hardware at 400 MHz target (1 ms latency).
+
+### Vertical Catalog
+
+Predefined verticals and common fields:
+
+| Vertical | Common Fields | Examples |
+|----------|---------------|----------|
+| **Video** | Stream, Codec, Frame, Display | H264Delta, FrameDelta, DisplaySync |
+| **Edge** | Sensor, Actuator, Gateway, Fusion | SensorFusion, ActuatorControl |
+| **Network** | P2P, Packet, Protocol, Security | DeltaExchange, PacketAnalyzer |
+| **Finance** | Trading, Risk, Settlement | TradeUpdate, RiskDelta |
+| **Science** | Simulation, Analysis, Data | QuantumState, SimulationDelta |
+| **Compute** | Linear, Transform, Neural | MatrixOps, FFTDelta, NeuralDelta |
+| **System** | Terminal, Process, Memory | TerminalIO, ProcessState |
+| **Storage** | Block, Object, Cache | BlockDelta, CacheLine |
 
 ---
 
@@ -583,12 +970,12 @@ Cross-language consistency validation:
 python tests/test_integration.py
 ```
 
-### Phase 5 Pipeline Tests
+### Pipeline Tests
 
-Phase 5 introduces 12 new test files covering all pipeline subsystems. The full suite now includes 242 tests across generator and pipeline components:
+The pipeline has 12 test files covering all subsystems. The full suite includes 353 tests across generator and pipeline components:
 
 ```bash
-# Run the complete test suite (242 tests)
+# Run the complete test suite (353 tests)
 pytest tests/ atomik_sdk/tests/ -v
 ```
 
@@ -710,15 +1097,16 @@ npm install && npm run compile
 
 - [ATOMiK Schema Specification](../specs/atomik_schema_v1.json)
 - [SDK User Manual](./user/SDK_USER_MANUAL.md)
-- [Schema Guide](./SDK_SCHEMA_GUIDE.md)
 - [VS Code Extension](../sdk/vscode-extension/atomik-vscode/README.md)
-- [Phase 3 Hardware Report](../archive/PHASE_3_COMPLETION_REPORT.md)
+- [Hardware Report](../archive/PHASE_3_COMPLETION_REPORT.md)
 - [Mathematical Foundations](../specs/formal_model.md)
+- [Schema Validation Rules](../specs/schema_validation_rules.md)
+- [Lean4 Proofs](../math/proofs/ATOMiK/)
+- [Performance Benchmarks](../math/benchmarks/results/PERFORMANCE_COMPARISON.md)
 
 ---
 
-**Document Version:** 2.0.0
+**Document Version:** 2.1.0
 **Generator Framework Version:** 1.0.0
 **Pipeline Framework Version:** 1.0.0
-**ATOMiK Phase:** 5 - Agentic Orchestration
-**Last Updated:** January 27, 2026
+**Last Updated:** February 14, 2026

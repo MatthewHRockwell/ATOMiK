@@ -10,7 +10,7 @@
 
 ## Executive Summary
 
-ATOMiK is deployed as a production SoC accelerator on the Tang Nano 9K ($10 FPGA). The system combines a PicoRV32 RISC-V CPU running at 25.2 MHz with a single-bank ATOMiK delta-state accumulator running at 81 MHz in an independent clock domain. Clock domain crossing is handled via a toggle-handshake CDC bridge. Both bitstream and firmware are in persistent SPI flash.
+ATOMiK is deployed as a production SoC accelerator on the Tang Nano 9K. The system combines a PicoRV32 RISC-V CPU running at 25.2 MHz with a single-bank ATOMiK delta-state accumulator running at 81 MHz in an independent clock domain. Clock domain crossing is handled via a toggle-handshake CDC bridge. Both bitstream and firmware are in persistent SPI flash.
 
 **Key Achievements:**
 - ✅ Clean timing closure: 0 TNS on all clock domains
@@ -114,7 +114,7 @@ All test suites pass on production hardware:
 | Test Suite | Tests | Result | Performance |
 |-----------|-------|--------|-------------|
 | **[X] ATOMiK Hardware** | 11/11 | ✅ PASS | 224 cycles |
-| **[P] Phase 2 Full** | 10/10 | ✅ PASS | Runtime API validated |
+| **[P] Runtime Integration** | 10/10 | ✅ PASS | Runtime API validated |
 | **[K] Checkpoint/Rollback** | — | ✅ PASS | 518-1342 cycles |
 | **[M] Memory Benchmark** | — | ✅ PASS | 12-17k cycles |
 | **[H] Heap Integrity** | — | ✅ PASS | 335 cycles |
@@ -134,7 +134,7 @@ All test suites pass on production hardware:
 - T10: Multi-delta sequence
 - T11: Performance measurement (224 cycles)
 
-#### [P] Phase 2 Full Test (10/10 PASS)
+#### [P] Runtime Integration Test (10/10 PASS)
 - P1: API initialization
 - P2: Fingerprint computation
 - P3: Tracked memcpy
@@ -235,7 +235,7 @@ picocom -b 115200 /dev/ttyUSB1
 
 **Firmware Menu:**
 - `[X]` — ATOMiK hardware test (11/11)
-- `[P]` — Phase 2 full test (10/10)
+- `[P]` — Runtime integration test (10/10)
 - `[K]` — Checkpoint/rollback demo
 - `[M]` — Memory benchmark
 - `[H]` — Heap integrity demo
@@ -375,7 +375,7 @@ screen /dev/ttyUSB1 115200
 
 # Run tests (type each letter):
 X   # ATOMiK hardware test → expect 11/11 PASS
-P   # Phase 2 full test → expect 10/10 PASS
+P   # Runtime integration test → expect 10/10 PASS
 K   # Checkpoint/rollback → expect PASS
 M   # Memory benchmark → expect PASS
 H   # Heap integrity → expect PASS
@@ -410,6 +410,73 @@ H   # Heap integrity → expect PASS
 | **memcpy 256B (tracked)** | 17,357 | 689 μs | ATOMiK-aware copy |
 | **memset 256B (verified)** | 13,389 | 531 μs | ATOMiK-aware set |
 | **Change detection (256B)** | 13,194 | 524 μs | 5× faster than memcmp |
+
+---
+
+## Detailed Runtime Benchmarks
+
+### Memory Operations (256 bytes / 64 words)
+
+#### Copy Operations
+
+| Operation | Cycles | Notes |
+|---|---|---|
+| `sw_memcpy` (byte-level) | 15,471 | Standard byte-by-byte copy |
+| `atomik_memcpy_tracked` | 17,357 | Copy + XOR fingerprint in single pass |
+| **Overhead** | **+12.2%** | Cost of integrity tracking |
+
+#### Fill Operations
+
+| Operation | Cycles | Notes |
+|---|---|---|
+| `sw_memset` (byte-level) | 11,572 | Standard byte-by-byte fill |
+| `atomik_memset_verified` | 13,389 | Fill + XOR fingerprint in single pass |
+| **Overhead** | **+15.7%** | Cost of integrity tracking |
+
+#### Change Detection
+
+| Operation | Cycles | Notes |
+|---|---|---|
+| `sw_memcmp` (identical buffers) | 67,354 | Compare 256 bytes between two buffers |
+| `atomik_region_changed` (no change) | 13,194 | Recompute fingerprint, compare to saved |
+| `atomik_region_changed` (1-bit flip) | 13,191 | Detects single-bit change |
+| **Speedup** | **5.1x** | Single-buffer scan vs two-buffer comparison |
+
+#### Fingerprint
+
+| Operation | Cycles | Notes |
+|---|---|---|
+| `atomik_fingerprint` (64 words) | 12,798 | XOR-fold entire buffer via accumulator |
+
+### Benchmark Analysis
+
+The tracked memory operations (memcpy, memset) add 12-16% cycle overhead — the cost of one additional MMIO write per word to feed the ATOMiK accumulator. The CPU still moves every byte; ATOMiK does not accelerate the copy itself.
+
+**Where ATOMiK delivers genuine value is change detection.** Once a fingerprint is saved, checking whether a memory region has changed requires scanning only one buffer (13K cycles) instead of comparing two buffers byte-by-byte (67K cycles). This 5.1x speedup compounds with buffer size. The fingerprint comparison itself is always 1 cycle regardless of buffer size.
+
+For systems that need frequent dirty-checking (graphics framebuffers, sensor state, network packet deduplication), this is meaningful.
+
+### Optimization Opportunities
+
+The 12-16% tracked operation overhead measured here reflects the cost of CPU-mediated MMIO writes to a single-bank accumulator over SPI XIP flash. With QSPI (4:1 bandwidth, already supported by the Tang Nano 9K hardware) and code execution from SRAM, this overhead would decrease substantially. The multi-bank architecture eliminates the single-accumulator bottleneck entirely — parallel banks accept deltas simultaneously with no serialization.
+
+---
+
+## Firmware Source Files
+
+| File | Purpose |
+|---|---|
+| `hardware/picorv32/firmware/atomik.h` | Hardware Abstraction Layer — bank-aware inline API |
+| `hardware/picorv32/firmware/printf.h` | mini_printf header |
+| `hardware/picorv32/firmware/printf.c` | mini_printf implementation (no div, powers-of-10 table) |
+| `hardware/picorv32/firmware/atomik_mem.h` | Tracked memory operations header |
+| `hardware/picorv32/firmware/atomik_mem.c` | Tracked memory operations + memset/memcpy symbols |
+| `hardware/picorv32/firmware/atomik_alloc.h` | Bump allocator header |
+| `hardware/picorv32/firmware/atomik_alloc.c` | Bump allocator with XOR integrity tracking |
+| `hardware/picorv32/firmware/firmware.c` | Main firmware — HAL API, 5 menu commands |
+| `hardware/picorv32/firmware/Makefile` | Build system (rv32i, -O3, -fno-builtin) |
+| `hardware/picorv32/firmware/linker_flash.ld` | Linker script with 2KB heap region |
+| `hardware/picorv32/firmware/crt_flash.S` | Startup code |
 
 ---
 
