@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<Module name="atomik_top_sweep" Register="409" Alu="38" Lut="337" T_Register="602(409)" T_Alu="38(38)" T_Lut="617(337)">
- <SubModule name="u_pll"/>
- <SubModule name="u_par" Register="65" Lut="150" T_Register="193(65)" T_Lut="280(150)">
-  <SubModule name="banks[0].u_bank" Register="64" Lut="65" T_Register="64(64)" T_Lut="65(65)"/>
-  <SubModule name="banks[1].u_bank" Register="64" Lut="65" T_Register="64(64)" T_Lut="65(65)"/>
- </SubModule>
-</Module>

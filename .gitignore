@@ -23,6 +23,7 @@ __pycache__/
 .DS_Store
 # Windows
 Thumbs.db
+desktop.ini
 
 # --- Hardware / FPGA (Gowin & Verilog) ---
 # Simulation waveforms (These get huge, do not upload)
@@ -53,6 +54,7 @@ hardware/sweep/sdc/
 hardware/sweep/tcl/
 hardware/sweep/top/
 hardware/sweep/project_*/
+hardware/sweep/impl/
 
 # Bitstreams (The compiled binary for the board)
 # Generally, you don't commit these to source control,
@@ -79,11 +81,24 @@ business/funding_strategy/status.json
 business/funding_strategy/debug_log.json
 business/funding_strategy/output/
 
+# --- LaTeX Build Artifacts ---
+*.aux
+*.bbl
+*.blg
+*.synctex.gz
+papers/**/*.log
+
+# --- Legacy Windows Scripts ---
+*.ps1
+
 # --- Build Artifacts ---
 *.egg-info/
 *.zip
 .pytest_cache/
 build/
+
+# --- Verilog Netlists (synthesis output) ---
+*.vg
 
 #Instructions to myself
 FUNDING_PROMPTS.md
