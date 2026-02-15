@@ -187,3 +187,5 @@ Through Phase 1 integration and Phase 2 runtime development, the ATOMiK delta ac
 - **The accumulator is a shared resource by design.** XOR commutativity means order of accumulation is irrelevant — multiple producers can feed deltas in any order and the result is identical. This is a feature enabling lock-free parallel accumulation, not a serialization bottleneck.
 
 - **OS and firmware growth** remain open design questions for future phases. The 8MB flash provides substantial headroom (16KB of 8MB used), and the automated synthesis sweep infrastructure enables rapid evaluation of different SoC configurations.
+
+- **Automated performance benchmarking** is now available via the `[R]` firmware command and `perf_runner.py`. The suite captures 550 machine-parseable measurements per run, covering ATOMiK core ops, memory operations, burst/scaling, and CPU baselines. Results are pooled in append-only JSONL format with automatic regression detection between runs. See `hardware/scripts/perf_runner.py` and `hardware/experiments/data/hardware_perf/`.
