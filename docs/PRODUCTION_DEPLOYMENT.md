@@ -118,6 +118,7 @@ All test suites pass on production hardware:
 | **[K] Checkpoint/Rollback** | — | ✅ PASS | 518-1342 cycles |
 | **[M] Memory Benchmark** | — | ✅ PASS | 12-17k cycles |
 | **[H] Heap Integrity** | — | ✅ PASS | 335 cycles |
+| **[R] Performance Benchmark** | 550 measurements | ✅ PASS | Automated sweep |
 
 ### Test Suite Details
 
@@ -242,6 +243,7 @@ picocom -b 115200 /dev/ttyUSB1
 - `[F]` — Flash mode
 - `[I]` — Read SPI flash ID
 - `[S]`/`[D]`/`[C]` — SPI mode (single/dual/dual+CRM)
+- `[R]` — Performance benchmark suite (550 measurements, machine-parseable)
 - `[B]` — Simplistic benchmark
 - `[1-6]` — Toggle LEDs
 
@@ -473,7 +475,9 @@ The 12-16% tracked operation overhead measured here reflects the cost of CPU-med
 | `hardware/picorv32/firmware/atomik_mem.c` | Tracked memory operations + memset/memcpy symbols |
 | `hardware/picorv32/firmware/atomik_alloc.h` | Bump allocator header |
 | `hardware/picorv32/firmware/atomik_alloc.c` | Bump allocator with XOR integrity tracking |
-| `hardware/picorv32/firmware/firmware.c` | Main firmware — HAL API, 5 menu commands |
+| `hardware/picorv32/firmware/perf_bench.h` | Performance benchmark declarations |
+| `hardware/picorv32/firmware/perf_bench.c` | Automated benchmark suite (550 measurements) |
+| `hardware/picorv32/firmware/firmware.c` | Main firmware — HAL API, 6 menu commands |
 | `hardware/picorv32/firmware/Makefile` | Build system (rv32i, -O3, -fno-builtin) |
 | `hardware/picorv32/firmware/linker_flash.ld` | Linker script with 2KB heap region |
 | `hardware/picorv32/firmware/crt_flash.S` | Startup code |
@@ -487,6 +491,8 @@ ATOMiK is successfully deployed as a production SoC accelerator on the Tang Nano
 The single-bank @ 81 MHz configuration provides 81 Mops/s throughput with minimal resource overhead (2.7% LUT). The architecture is proven to scale linearly to 1,056 Mops/s (16 banks @ 66 MHz) when higher throughput is required.
 
 **Next Steps:** Real-world application integration, multi-bank scaling experiments, ASIC feasibility study.
+
+For known hardware and software issues, see [`docs/KNOWN_ISSUES.md`](KNOWN_ISSUES.md).
 
 ---
 

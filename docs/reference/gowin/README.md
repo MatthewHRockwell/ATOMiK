@@ -27,6 +27,11 @@ Quick reference for ATOMiK hardware development targeting Tang Nano 9K (GW1NR-9)
 | [GPIO_REFERENCE.md](GPIO_REFERENCE.md) | IO standards, CST syntax, bank configuration |
 | [TIMING_REFERENCE.md](TIMING_REFERENCE.md) | SDC syntax, timing closure strategies |
 | [TANG_NANO_9K_PINOUT.md](TANG_NANO_9K_PINOUT.md) | Board-specific pin assignments |
+| [RESOURCE_BUDGET_GUIDE.md](RESOURCE_BUDGET_GUIDE.md) | FPGA resource budget, peripheral planning, optimization |
+| [FIRMWARE_BUILD_GUIDE.md](FIRMWARE_BUILD_GUIDE.md) | Firmware compilation, flashing, and optimization |
+| [HDMI_DISPLAY_GUIDE.md](HDMI_DISPLAY_GUIDE.md) | HDMI display output configuration |
+| [SPI_PERIPHERAL_GUIDE.md](SPI_PERIPHERAL_GUIDE.md) | SPI peripheral integration |
+| [WISHBONE_PERIPHERAL_GUIDE.md](WISHBONE_PERIPHERAL_GUIDE.md) | Wishbone bus peripheral development |
 
 ---
 
@@ -106,4 +111,4 @@ Output: 94.5 MHz (SYS_CLK_HZ parameter)
 
 ---
 
-*Last Updated: January 25, 2026*
+*Last Updated: February 15, 2026*

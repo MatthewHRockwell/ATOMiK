@@ -5,6 +5,7 @@
 #include "atomik_mem.h"
 #include "atomik_alloc.h"
 #include "printf.h"
+#include "perf_bench.h"
 
 // a pointer to this is a null pointer, but the compiler does not
 // know that because "sram" is a linker symbol from sections.lds.
@@ -554,6 +555,7 @@ void main()
         print("   [M] Memory benchmark\n");
         print("   [H] Heap integrity demo\n");
         print("   [P] Phase 2 full test\n");
+        print("   [R] Performance benchmark suite\n");
 
         for (int rep = 10; rep > 0; rep--)
         {
@@ -599,6 +601,7 @@ void main()
             case 'M': case 'm': cmd_mem_benchmark(); break;
             case 'H': case 'h': cmd_heap_demo(); break;
             case 'P': case 'p': cmd_phase2_test(); break;
+            case 'R': case 'r': cmd_perf_suite(); break;
             default: continue;
             }
         }

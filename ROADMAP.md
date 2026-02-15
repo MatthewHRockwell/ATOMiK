@@ -27,7 +27,7 @@
 
 ## 1. Vision Summary
 
-ATOMiK v2 represents a strategic pivot from SDK-focused tooling to a full operating environment built on delta-state computation. The core thesis: a $15 FPGA board running ATOMiK should boot, execute programs, and interact with users (keyboard, mouse, monitor) in a way that is competitive with hardware costing orders of magnitude more.
+ATOMiK v2 represents a strategic pivot from SDK-focused tooling to a full operating environment built on delta-state computation. The core thesis: a $13.50 FPGA board running ATOMiK should boot, execute programs, and interact with users (keyboard, mouse, monitor) in a way that is competitive with hardware costing orders of magnitude more.
 
 ### Key Strategic Decisions
 
@@ -214,6 +214,25 @@ ATOMiK 4-bank: ~745 LUTs
 - [x] A C program using ATOMiK runtime can: initialize, allocate memory, compute, print results over UART
 - [x] All results documented in `docs/PHASE2_RUNTIME_RESULTS.md`
 - [x] 10/10 integration tests PASS on hardware, 11/11 Phase 1 tests still PASS
+
+### 3.3 Automated Performance Benchmarking
+
+- [x] **Task 2.3.1:** Create firmware performance benchmark module (`perf_bench.c`)
+  - 550 machine-parseable `##PERF` measurements per run
+  - 4 test categories: ATOMiK core ops, memory operations, burst/scaling, CPU baselines
+  - 'R' command added to firmware menu
+
+- [x] **Task 2.3.2:** Create Python capture and runner pipeline
+  - `hardware/scripts/perf_capture.py` — UART capture and `##PERF` line parser
+  - `hardware/scripts/perf_runner.py` — orchestrator with metadata, statistics, JSONL pooling
+  - Append-only data pool at `hardware/experiments/data/hardware_perf/perf_pool.jsonl`
+  - Automatic regression detection between consecutive runs
+
+- [x] **Task 2.3.3:** Validate on hardware
+  - 550 measurements captured across two consecutive runs
+  - 11/11 ATOMiK HW tests, 10/10 integration tests passing
+  - Key results: ATOMiK load=64cy, accum=70cy, read=99cy, roundtrip=285cy
+  - Change detection 76-80% faster than sw_memcmp
 
 ---
 

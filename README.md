@@ -99,6 +99,7 @@ python -m software.demos.state_sync_benchmark
 | **Agentic Orchestration** | DAG orchestrator, feedback loops, 353 tests | Complete |
 | **Parallel Accumulator Banks** | 16x linear scaling, 1,056 Mops/s, 80/80 HW tests | Complete |
 | **Production SoC Deployment** | Tang Nano 9K @ 81 MHz, 0 TNS, persistent flash | **Deployed** |
+| **Performance Benchmarking** | 550-measurement automated suite, JSONL data pooling, regression detection | Complete |
 
 ---
 
@@ -186,7 +187,7 @@ N=16 breaks the **1 Gops/s barrier** on the Tang Nano 9K. Scaling is exactly lin
 | **Total Negative Slack** | 0.000 ns (all domains) |
 | **Logic Utilization** | 44% (3,838/8,640 LUTs), 707 ALU, 72% CLS |
 | **Flash Deployment** | Persistent SPI flash (bitstream + firmware) |
-| **Validation** | 5/5 test suites passing ([X] [P] [K] [M] [H]) |
+| **Validation** | 6/6 test suites passing ([X] [P] [K] [M] [H] [R]) |
 
 ### Standalone Core Performance
 
@@ -327,6 +328,8 @@ ATOMiK/
 | [RTL Architecture](specs/rtl_architecture.md) | Hardware design specification and timing |
 | [Hardware Synthesis](docs/HARDWARE_SYNTHESIS.md) | Parallel bank synthesis sweep and HW validation |
 | [SDK Orchestration](docs/SDK_ORCHESTRATION.md) | Agentic orchestration architecture |
+| [Known Issues](docs/KNOWN_ISSUES.md) | Hardware/software issue tracker and troubleshooting |
+| [Production Deployment](docs/PRODUCTION_DEPLOYMENT.md) | Tang Nano 9K SoC deployment guide |
 
 ---
 
