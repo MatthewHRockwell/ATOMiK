@@ -10,6 +10,24 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR/../.."
 
+# Handle --v3 flag: delegate to v3 Makefile
+if [ "${1:-}" = "--v3" ]; then
+    echo "=========================================="
+    echo "ATOMiK v3 RTL Check"
+    echo "=========================================="
+    echo ""
+    echo "[1/2] Verilator lint..."
+    make -C hardware/v3 lint
+    echo ""
+    echo "[2/2] iverilog smoke tests..."
+    make -C hardware/v3 sim-iverilog
+    echo ""
+    echo "=========================================="
+    echo "v3 RTL check complete!"
+    echo "=========================================="
+    exit 0
+fi
+
 echo "=========================================="
 echo "ATOMiK RTL Compilation Check"
 echo "=========================================="

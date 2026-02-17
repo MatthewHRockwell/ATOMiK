@@ -281,6 +281,21 @@ phases:
       sdk_emulation: "SDKs should provide software emulation of hardware operations"
     last_updated: 2026-01-25T18:00:00Z
 
+v3:
+  name: "ATOMiK v3 Architecture"
+  status: in_progress
+  spec: "specs/atomik_v3.md"
+  tasks: "specs/atomik_v3_tasks.md"
+  phases:
+    phase_0: { name: "Tooling & Infrastructure", status: in_progress }
+    phase_1: { name: "Custom RV64I CPU Core", status: pending }
+    phase_2: { name: "ATOMiK v3 Datapath", status: pending }
+    phase_3: { name: "SoC Integration", status: pending }
+    phase_4: { name: "Display Pipeline", status: pending }
+    phase_5: { name: "I/O & Multi-Node", status: pending }
+    phase_6: { name: "Parallel Banks & PLL", status: pending }
+    phase_7: { name: "Benchmarking & Production", status: pending }
+
 overall:
   total_budget: "$500"
   budget_consumed: "$225"

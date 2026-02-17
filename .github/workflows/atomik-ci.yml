@@ -149,3 +149,33 @@ jobs:
         with:
           name: hardware-validation
           path: hw_results.json
+
+  v3-rtl-lint:
+    runs-on: ubuntu-latest
+    if: >-
+      contains(github.event.head_commit.message, '[v3]') ||
+      contains(github.event.head_commit.message, '[rtl]')
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Verilog tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y verilator iverilog
+      - name: Verilator lint
+        run: make -C hardware/v3 lint
+      - name: iverilog smoke tests
+        run: make -C hardware/v3 sim-iverilog
+
+  v3-compliance:
+    runs-on: ubuntu-latest
+    if: >-
+      contains(github.event.head_commit.message, '[compliance]') ||
+      contains(github.event.head_commit.message, '[v3]')
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y verilator gcc-riscv64-unknown-elf
+      - name: RISC-V compliance tests
+        run: make -C hardware/v3 compliance

@@ -28,6 +28,7 @@ desktop.ini
 # --- Hardware / FPGA (Gowin & Verilog) ---
 # Simulation waveforms (These get huge, do not upload)
 *.vcd
+*.fst
 *.lxt
 *.wlf
 
@@ -55,6 +56,7 @@ hardware/sweep/tcl/
 hardware/sweep/top/
 hardware/sweep/project_*/
 hardware/sweep/impl/
+hardware/v3/synth/impl/
 
 # Bitstreams (The compiled binary for the board)
 # Generally, you don't commit these to source control,
