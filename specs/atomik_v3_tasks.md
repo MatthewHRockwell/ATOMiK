@@ -1,0 +1,602 @@
+# ATOMiK v3 — Phased Implementation Task List
+
+**Reference**: `specs/atomik_v3.md` v3.0.1
+**Target**: GW1NR-LV9QN88PC6/I5 (Tang Nano 9K, $13.50)
+**Baseline**: v2 SoC — PicoRV32 + ATOMiK @ 81 MHz, 3,838 LUT (44%), all tests passing
+
+---
+
+## Phase 0: Tooling & Infrastructure
+
+**Goal**: Establish the verification, simulation, and build environment for v3 development before writing any RTL. Everything downstream depends on this.
+
+### 0.1 Verilator Environment Setup
+- [x] Install Verilator (≥5.x) and verify it builds on Kubuntu 24.04
+- [x] Create `hardware/v3/sim/` directory structure (Makefiles, harness templates)
+- [x] Write a minimal smoke test: compile a trivial Verilog module through Verilator, run C++ testbench, confirm waveform output (VCD/FST)
+- [x] Document build commands in a `hardware/v3/README.md`
+
+### 0.2 iverilog Module Test Harness
+- [x] Set up `hardware/v3/sim/iverilog/` for quick single-module iteration
+- [x] Port the v2 iverilog testbench pattern (`$dumpfile`/`$dumpvars`, task-based assertions) to v3 directory structure
+- [x] Verify iverilog can compile and simulate a simple parameterized module with `DW=64`
+
+### 0.3 RISC-V Compliance Suite Integration
+- [ ] Clone `riscv-software-src/riscv-tests`
+- [ ] Build the `rv64ui-p-*` subset with `riscv64-unknown-elf-gcc -march=rv64i -mabi=lp64`
+- [ ] Create a Verilator-based test runner that loads a test ELF, runs the CPU model, and checks the pass/fail signature (write to `tohost`)
+- [x] Create scaffold README documenting runner architecture and setup instructions
+- This will be a red test initially (no CPU yet) — the runner itself must be ready
+
+### 0.4 Gowin Synthesis Script
+- [x] Create `hardware/v3/synth/` with a `synth_v3.tcl` for gw_sh command-line synthesis (based on v2's pattern at `hardware/synth/gowin_synth.tcl`)
+- [x] Parameterize for v3 source files (initially empty module stubs)
+- [ ] Verify the Gowin EDA workaround (`LD_PRELOAD`, `LD_LIBRARY_PATH`, `QT_PLUGIN_PATH`) works with a dummy project targeting GW1NR-9
+- Gowin synthesis is local-only (requires licensed EDA) — not in CI. The `hardware-validate` self-hosted runner could run it in the future but is not required for Phase 0
+
+### 0.5 CI Pipeline Update
+
+The existing CI (`atomik-ci.yml`) has the following jobs:
+- `validate` — Python SDK lint (ruff) + pytest (353 tests). Runs on every push/PR. **Keep unchanged.**
+- `proof-check` — Lean4 proofs. Gated on `[proof]` commit tag. **Keep unchanged.**
+- `benchmark` — Python benchmarks. Gated on `[benchmark]` tag. **Keep unchanged.**
+- `synthesis` — Verilator lint + iverilog sim on `hardware/rtl/*.v`. Gated on `[synthesis]` tag. **Extend for v3.**
+- `hardware-validate` — Self-hosted FPGA runner. Gated on `[hardware]` tag. **Keep unchanged (v2 hardware).**
+- `deploy-docs` — GitHub Pages on main. **Keep unchanged.**
+
+Additionally: `review.yml` (PR ruff check) and `math/proofs/.github/workflows/lean_action_ci.yml` (standalone Lean4 build) remain untouched.
+
+**Changes to `atomik-ci.yml`:**
+
+1. [ ] **Rename `synthesis` job to `v2-rtl-check`** and keep existing behavior (v2 regression guard):
+   ```yaml
+   v2-rtl-check:
+     needs: validate
+     if: contains(github.event.head_commit.message, '[synthesis]') || contains(github.event.head_commit.message, '[rtl]')
+     # ... existing verilator lint + iverilog on hardware/rtl/*.v and hardware/sim/*.v
+   ```
+
+2. [x] **Add new `v3-rtl-lint` job** — runs on every push/PR when v3 files change (no commit tag required):
+   ```yaml
+   v3-rtl-lint:
+     runs-on: ubuntu-latest
+     if: >
+       github.event_name == 'workflow_dispatch' ||
+       contains(github.event.head_commit.message, '[rtl]') ||
+       contains(github.event.head_commit.message, '[v3]')
+     steps:
+       - uses: actions/checkout@v4
+       - name: Install Verilog tools
+         run: sudo apt-get update && sudo apt-get install -y verilator iverilog
+       - name: Verilator lint (v3 RTL)
+         run: |
+           if [ -d "hardware/v3/rtl" ] && ls hardware/v3/rtl/*.v 1>/dev/null 2>&1; then
+             verilator --lint-only -Wall hardware/v3/rtl/*.v
+           else
+             echo "No v3 RTL files yet — lint skipped"
+           fi
+       - name: iverilog module tests (v3)
+         run: |
+           if [ -d "hardware/v3/sim" ] && ls hardware/v3/sim/tb_*.v 1>/dev/null 2>&1; then
+             for tb in hardware/v3/sim/tb_*.v; do
+               echo "=== Running $tb ==="
+               iverilog -o sim_out hardware/v3/rtl/*.v "$tb" && vvp sim_out
+             done
+             rm -f sim_out
+           else
+             echo "No v3 testbenches yet — sim skipped"
+           fi
+   ```
+
+3. [x] **Add new `v3-compliance` job** — runs rv64ui-p-* via Verilator (gated on `[compliance]` or `[v3]` tag):
+   ```yaml
+   v3-compliance:
+     runs-on: ubuntu-latest
+     if: contains(github.event.head_commit.message, '[compliance]') || contains(github.event.head_commit.message, '[v3]')
+     steps:
+       - uses: actions/checkout@v4
+       - name: Install tools
+         run: |
+           sudo apt-get update
+           sudo apt-get install -y verilator gcc-riscv64-unknown-elf
+       - name: Build compliance tests
+         run: |
+           if [ -d "hardware/v3/sim/compliance" ]; then
+             cd hardware/v3/sim/compliance && make build
+           else
+             echo "Compliance harness not yet created — skipped"
+           fi
+       - name: Run rv64ui-p-* suite
+         run: |
+           if [ -f "hardware/v3/sim/compliance/run_compliance.sh" ]; then
+             hardware/v3/sim/compliance/run_compliance.sh
+           else
+             echo "Compliance runner not yet created — skipped"
+           fi
+   ```
+
+4. [x] **Update `check_rtl.sh`** — add v3 support alongside v2:
+   - [x] Add a `--v3` flag that lints `hardware/v3/rtl/*.v` and runs `hardware/v3/sim/tb_*.v`
+   - [x] Default (no flag) continues to lint v2 files (backward compatible)
+
+5. [x] **Update `.github/atomik-status.yml`** — add v3 phase tracking:
+   ```yaml
+   v3:
+     name: "ATOMiK v3 Architecture"
+     status: in_progress
+     phases:
+       phase_0: { name: "Tooling & Infrastructure", status: pending }
+       phase_1: { name: "Custom RV64I CPU Core", status: pending }
+       # ... etc
+   ```
+
+**Key principles:**
+- v2 CI jobs are **never broken** — existing paths remain untouched
+- v3 jobs gracefully skip when files don't exist yet (no false failures during early phases)
+- `[v3]` commit tag triggers all v3 CI jobs; `[rtl]` triggers both v2 and v3 RTL checks
+- No commit tag gating on `v3-rtl-lint` for push events — this is the fast feedback loop
+- Compliance suite is tag-gated because it's slow (full Verilator simulation of 47 tests)
+
+**Exit criteria**: `make lint` and `make sim-smoke` pass in the v3 directory. Compliance runner executes (and fails, since no CPU exists yet). Gowin synthesis of a stub module completes without errors. v2 CI jobs still pass with no changes.
+
+---
+
+## Phase 1: Custom RV64I CPU Core
+
+**Goal**: A working multi-cycle RV64I core that passes the rv64ui-p-* compliance suite. No ATOMiK integration yet — just a correct CPU.
+
+**Dependencies**: Phase 0 (tooling must be ready)
+
+### 1.1 Instruction Fetch Unit
+- [ ] SPI flash XIP interface (reuse v2's SPI controller or write a minimal one)
+- [ ] 32-bit instruction fetch → instruction register
+- [ ] PC register (64-bit) with increment logic (+4 per instruction)
+- [ ] FSM state: FETCH → present address to SPI, latch 32-bit instruction word
+
+### 1.2 Instruction Decoder
+- [ ] Full RV64I decode: R-type, I-type, S-type, B-type, U-type, J-type
+- [ ] 47 base integer instructions (LUI, AUIPC, JAL, JALR, branches, loads, stores, ALU reg/imm, 64-bit W-suffix ops)
+- [ ] Immediate extraction and sign extension (all 6 immediate formats)
+- [ ] Custom-0 opcode detection (funct3 decode for 4 ATOMiK instructions) — **decode only, no execute logic yet** — output a `custom_op` signal for Phase 2
+- [ ] FSM state: DECODE → latch decoded fields, initiate BSRAM register file read
+
+### 1.3 BSRAM Register File
+- [ ] Instantiate 1 Gowin BSRAM block in 288×64-bit true dual-port configuration
+- [ ] Port A: read RS1 (address = rs1 field from decoder)
+- [ ] Port B: read RS2 (address = rs2 field from decoder)
+- [ ] Write port: shared with Port A or B (write-back on WB stage, write enable gated by `rd != x0`)
+- [ ] Hardwire x0 to always read as zero (either via address decode or output mux)
+- [ ] Verify: write a value to x1, read it back, confirm 1-cycle latency fits within Decode stage timing
+
+### 1.4 ALU
+- [ ] 64-bit ALU supporting all RV64I operations:
+  - ADD, SUB, SLL, SLT, SLTU, XOR, SRL, SRA, OR, AND
+  - ADDW, SUBW, SLLW, SRLW, SRAW (32-bit W-variants, sign-extended to 64)
+- [ ] **No multiply/divide** (RV64I base only, same as v2's RV32I approach)
+- [ ] Use Gowin ALU carry chains for ADD/SUB (lesson from v2: do NOT replace with LUT adders)
+- [ ] XOR path should be pure LUT (no carry chains) — carry forward v2's `syn_keep`/`syn_preserve` methodology
+
+### 1.5 Branch / Jump Logic
+- [ ] Branch comparator: BEQ, BNE, BLT, BGE, BLTU, BGEU
+- [ ] JAL: PC ← PC + imm, rd ← PC + 4
+- [ ] JALR: PC ← (rs1 + imm) & ~1, rd ← PC + 4
+- [ ] Branch target: PC ← PC + imm (taken) or PC ← PC + 4 (not taken)
+- [ ] All comparisons are 64-bit
+
+### 1.6 Load/Store Unit with 64→32 Adapter
+- [ ] Supports RV64I load/store widths: LB, LH, LW, LD, LBU, LHU, LWU, SB, SH, SW, SD
+- [ ] 64→32 adapter inside load/store unit:
+  - 32-bit peripheral accesses: single bus transaction
+  - 64-bit loads (LD): two 32-bit reads (lower word, upper word), assembled in register
+  - 64-bit stores (SD): two 32-bit writes
+- [ ] Address decoder: same memory map as v2 (S0: Flash, S1: SRAM, S2: Peripherals, S3: reserved for ATOMiK in Phase 2)
+- [ ] Byte/halfword/word alignment and sign extension
+
+### 1.7 Writeback + FSM Controller
+- [ ] 5-state FSM: FETCH → DECODE → EXECUTE → MEMORY → WRITEBACK
+- [ ] ATOMiK and ALU-only instructions skip MEMORY (3-4 cycles)
+- [ ] Load/store instructions use all 5 stages (5 cycles)
+- [ ] CSR support: minimal — `rdcycle` (cycle counter) for benchmarking, `mtvec`/`mepc` if trap handling is needed
+- [ ] Write-back to BSRAM register file (Port A write enable)
+
+### 1.8 Compliance Testing
+- [ ] Run full rv64ui-p-* suite through Verilator
+- [ ] Target: **all tests pass** (47 instruction tests)
+- [ ] Capture cycle count per test for baseline performance characterization
+- [ ] Fix any decode/ALU/branch bugs identified by compliance failures
+
+### 1.9 Synthesis Feasibility Check
+- [ ] Synthesize CPU-only design (no ATOMiK, no peripherals) through Gowin EDA
+- [ ] Measure: LUT4 count, FF count, Fmax, logic levels
+- [ ] Target: ≤2,500 LUT4, Fmax ≥25 MHz (sufficient for SPI XIP)
+- [ ] If over budget: identify largest contributors (decoder? ALU? register mux?) and optimize
+
+**Exit criteria**: rv64ui-p-* compliance suite passes 47/47. Synthesis report shows ≤2,500 LUT4. Fmax ≥25 MHz.
+
+---
+
+## Phase 2: ATOMiK v3 Datapath
+
+**Goal**: Integrate the ATOMiK delta-state engine with the CPU — BSRAM state table, direct-wire accumulator, optimized CLS mapping. The 4 custom instructions execute correctly.
+
+**Dependencies**: Phase 1 (working CPU required)
+
+### 2.1 ATOMiK v3 Accumulator Module
+- [ ] Write `hardware/v3/rtl/atomik_v3_acc.v`
+- [ ] Parameterized `DW` (32 or 64)
+- [ ] Accumulator register with XOR feedback: `acc <= acc ^ delta_in` on `accum_en`
+- [ ] Clear on `load_en`: `acc <= 0`
+- [ ] Zero detection: `acc_zero = ~(|acc)`
+- [ ] Apply `syn_preserve=1` on accumulator register (carry forward v2's zero-ALU methodology)
+- **No initial_state register** — this is now in BSRAM (Section 2.2)
+
+### 2.2 BSRAM State Table
+- [ ] Instantiate 1 Gowin BSRAM block in 288×64-bit configuration (or 576×32-bit for DW=32)
+- [ ] Single read port for `initial_state` lookup
+- [ ] Write port for context initialization (CPU stores reference states via ATOMIK.LOAD)
+- [ ] Address register (`bsram_addr`) updated by ATOMIK.SWAP and ATOMIK.LOAD
+- [ ] Read latency: 1 cycle, hidden within CPU Decode stage
+
+### 2.3 State Reconstructor
+- [ ] Pure combinational: `current_state = initial_state ^ accumulator`
+- [ ] Apply `syn_keep=1` on output wire (carry forward v2 methodology)
+- [ ] Feeds directly into CPU register file write port for ATOMIK.READ
+
+### 2.4 Direct Wire Integration
+- [ ] Wire ATOMiK into the CPU's Execute stage:
+  - ATOMIK.LOAD (funct3=0x0): write `rs1[8:0]` to `bsram_addr`, assert `load_en` (clears accumulator), initiate BSRAM read
+  - ATOMIK.ACCUM (funct3=0x1): route `rs1` value to `delta_in`, assert `accum_en`
+  - ATOMIK.READ (funct3=0x2): route `current_state` to register file write data, write to `rd`
+  - ATOMIK.SWAP (funct3=0x3): write `rs1[8:0]` to `bsram_addr` (accumulator unchanged)
+- [ ] No bus, no CDC, no protocol — combinational/registered paths within the CPU module
+- [ ] ATOMiK instructions skip the Memory stage (3 cycles: FETCH→DECODE→EXECUTE)
+
+### 2.5 CLS Mapping Validation
+- [ ] Synthesize the accumulator + reconstructor through Gowin EDA
+- [ ] Verify CLS mapping in the synthesis report:
+  - Target: 1.0 CLS per datapath bit (LUT4[0] = acc XOR, LUT4[1] = recon XOR, REG[0] = acc, REG[1] = output)
+  - Verify zero ALU inference on XOR paths (check for `syn_keep`/`syn_preserve` effectiveness)
+  - Compare against v2 baseline (~1.7 CLS/bit)
+- [ ] If CLS mapping is suboptimal: adjust Verilog coding style, add constraints, or use Gowin placement directives
+
+### 2.6 Custom Instruction Verification
+- [ ] Write targeted testbenches (Verilator + iverilog) for each instruction:
+  - ATOMIK.LOAD: load reference state from BSRAM, verify accumulator clears, verify `initial_state` reads correctly
+  - ATOMIK.ACCUM: inject delta, verify `acc = acc ^ delta`, verify multi-delta composition
+  - ATOMIK.READ: verify `rd = initial_state ^ accumulator` for various state/delta combinations
+  - ATOMIK.SWAP: verify `bsram_addr` changes, accumulator persists, `current_state` reflects new reference
+  - Context switch patterns: instant switch, full switch (SWAP+LOAD), fork (READ→store→SWAP)
+- [ ] Verify XOR cancellation: `ACCUM(δ); ACCUM(δ)` → accumulator returns to previous value
+- [ ] Verify multi-delta composition matches Lean4 algebra: `δ₁ ⊕ δ₂ ⊕ δ₃ = δ₃ ⊕ δ₁ ⊕ δ₂` (commutativity)
+
+### 2.7 Combined CPU + ATOMiK Synthesis
+- [ ] Synthesize full CPU + ATOMiK datapath (no peripherals yet)
+- [ ] Measure: LUT4, FF, BSRAM, Fmax, logic levels, CLS utilization
+- [ ] Target: ≤2,700 LUT4 combined, Fmax ≥25 MHz
+- [ ] Verify BSRAM usage: 1 (register file) + 1 (state table) = 2 blocks
+
+**Exit criteria**: All 4 custom instructions pass testbench verification. CLS mapping ≤1.2 CLS/bit (ideally 1.0). Combined synthesis ≤2,700 LUT4. rv64ui-p-* still passes (no regressions).
+
+---
+
+## Phase 3: SoC Integration
+
+**Goal**: Build the complete v3 SoC — CPU + ATOMiK + peripherals + HDMI. Boots from SPI flash, outputs to HDMI, communicates over UART. Functionally equivalent to v2 SoC but with v3 architecture.
+
+**Dependencies**: Phase 2 (CPU + ATOMiK must work)
+
+### 3.1 SPI Flash XIP Controller
+- [ ] Adapt v2's SPI flash controller for 64-bit CPU (instruction fetch is still 32-bit)
+- [ ] XIP read path: CPU presents address → SPI controller fetches 32-bit word → CPU latches instruction
+- [ ] Verify boot sequence: CPU starts fetching from address 0x00000000 in SPI flash
+
+### 3.2 SRAM Integration
+- [ ] 8 KB SRAM (10 BSRAM blocks) at address 0x40000000 (same as v2)
+- [ ] 64-bit CPU accesses SRAM via 64→32 adapter (inside load/store unit)
+- [ ] Stack, heap, and data segments reside in SRAM
+
+### 3.3 UART Peripheral
+- [ ] Reuse v2's UART module (115200 baud, character-at-a-time)
+- [ ] Memory-mapped at peripheral address range (0x80000000+)
+- [ ] 32-bit register interface (unchanged from v2)
+
+### 3.4 GPIO
+- [ ] Reuse v2's GPIO module for LED control and button input
+- [ ] Memory-mapped in peripheral range
+
+### 3.5 HDMI Output
+- [ ] Reuse v2's HDMI module (640×480, 25.2 MHz pixel clock, 126 MHz TMDS serializer)
+- [ ] Connect to PLL1 (HDMI PLL: 126 MHz + 25.2 MHz CLKDIV)
+- [ ] Initially: static test pattern (same as v2 bringup) — display pipeline integration is Phase 4
+
+### 3.6 PLL Configuration
+- [ ] PLL1: HDMI (126 MHz serializer, 25.2 MHz pixel clock)
+- [ ] PLL2: ATOMiK dedicated clock (81 MHz for single-bank v3.0 bringup)
+  - Note: v3 CPU + ATOMiK share the same clock domain (direct wire), so PLL2 serves both
+  - CPU clock = ATOMiK clock = 81 MHz (or whatever Fmax allows post-synthesis)
+- [ ] If CPU Fmax < 81 MHz: reduce PLL2 frequency. v2's CPU ran at 25.2 MHz (shared with HDMI pixel clock), so any frequency ≥25 MHz is an improvement
+
+### 3.7 Reset and Clock Domain Crossing
+- [ ] Reset synchronizer (3-FF chain, same as v2 pattern)
+- [ ] CDC between PLL1 domain (HDMI) and PLL2 domain (CPU+ATOMiK) — only needed for HDMI data path
+- [ ] No CDC needed between CPU and ATOMiK (same clock domain in v3!)
+
+### 3.8 Memory Map Integration
+- [ ] Full address decoder:
+  - 0x00000000: SPI Flash XIP (instruction fetch)
+  - 0x40000000: SRAM (8 KB data/stack)
+  - 0x80000000: Peripherals (UART, GPIO, HDMI control)
+  - 0xC0000000: Reserved (ATOMiK is direct-wire, not memory-mapped, but keep for debug/status registers if needed)
+
+### 3.9 Firmware Port
+- [ ] Port v2 firmware structure to RV64I:
+  - `riscv64-unknown-elf-gcc -march=rv64i -mabi=lp64 -Os -fno-builtin`
+  - Update linker script for 64-bit addresses
+  - Update `mini_printf` for 64-bit (powers-of-10 table with repeated subtraction, no multiply)
+  - UART menu system (reuse v2's interactive test harness pattern)
+- [ ] Basic boot test: print "ATOMiK v3 SoC" over UART, blink LED
+
+### 3.10 ATOMiK Hardware Tests (Port from v2)
+- [ ] Port the v2 test suite to use v3's custom instructions:
+  - [X] 11 core delta tests (load, accumulate, read, cancellation, multi-delta, etc.)
+  - [P] Runtime integration tests (fingerprinting, tracked operations, change detection)
+  - Use inline assembly wrappers from Section 4.3 of the spec
+- [ ] All tests execute on real hardware via UART at 115200 baud
+- [ ] Target: equivalent to v2's 11/11 + 10/10 pass rate
+
+### 3.11 Full SoC Synthesis and Timing Closure
+- [ ] Synthesize complete v3 SoC through Gowin EDA
+- [ ] Timing constraints: CPU+ATOMiK clock, HDMI pixel clock, HDMI serializer clock
+- [ ] Target:
+  - ≤3,100 LUT4 (36% of GW1NR-9)
+  - 14 BSRAM (54%) — 10 SRAM + 2 Boot ROM + 1 regfile + 1 state table
+  - Zero TNS on all clock domains
+  - Fmax ≥25 MHz for CPU+ATOMiK (sufficient for SPI XIP)
+- [ ] If over budget: identify and optimize the largest contributors
+
+### 3.12 Flash Deployment
+- [ ] Generate bitstream (`.fs` file) and firmware (`.v` flash format)
+- [ ] Flash to Tang Nano 9K: `openFPGALoader -b tangnano9k -f picotiny_v3.fs`
+- [ ] Flash firmware: `pico-programmer.py fw-v3.v /dev/ttyUSB1`
+- [ ] Verify persistent boot: power cycle → firmware boots → UART menu appears → tests pass
+
+**Exit criteria**: v3 SoC boots from flash on Tang Nano 9K. UART interactive. HDMI shows test pattern. All hardware tests pass. LUT ≤3,100. Zero TNS.
+
+---
+
+## Phase 4: Display Pipeline
+
+**Goal**: Implement the change-driven display architecture — CLS3 SREG scanline delta mask, 256×64-bit delta color LUT, and scanline-based reference frame reconstruction.
+
+**Dependencies**: Phase 3 (SoC with HDMI output must work)
+
+### 4.1 Delta Color LUT (BSRAM)
+- [ ] Instantiate 1 BSRAM block in 256×64-bit configuration
+- [ ] CPU can write entries (transition deltas) via MMIO or a dedicated write path
+- [ ] Read port: addressed by 8-bit index from CLS3 SREG REG[1]
+- [ ] Pre-load common transition deltas (identity at index 0, text colors, UI theme transitions)
+- [ ] Verify: write a delta to LUT[5], read it back, confirm `pixel_out = pixel_ref ^ LUT[5]`
+
+### 4.2 CLS3 SREG — Scanline Delta Mask (REG[0])
+- [ ] Configure CLS3 REG[0] as a shift register (1-bit-per-pixel)
+- [ ] Serial input: load from ATOMiK change detection logic ("did this pixel change?")
+- [ ] Serial output: 1 bit per pixel clock, gates the color LUT lookup
+- [ ] Shift clock: pixel clock (25.2 MHz) for output, ATOMiK clock (81 MHz) for input
+- [ ] CDC: registered handshake (ATOMiK domain → pixel domain)
+
+### 4.3 CLS3 SREG — Color Delta Index (REG[1])
+- [ ] Configure CLS3 REG[1] as a shift register (8-bit index stream)
+- [ ] Serial input: populated by CPU or ATOMiK logic with LUT indices for changed pixels
+- [ ] Serial output: feeds the delta color LUT address input
+- [ ] Synchronized with REG[0]: when REG[0] shifts out a '1' (pixel changed), REG[1]'s current index is valid
+
+### 4.4 Scanline Reference Buffer
+- [ ] 1 BSRAM block configured as a scanline buffer (640 × 24-bit = 15.4 Kbit, fits in 18 Kbit)
+- [ ] Double-buffered or ping-pong: CPU/DMA loads next scanline's reference while current scanline streams out
+- [ ] Read port: addressed by pixel column counter (0–639)
+- [ ] Integration: `pixel_out = scanline_ref[col] ^ LUT[index]` when delta mask = 1, else `pixel_out = scanline_ref[col]`
+
+### 4.5 Display Pipeline Integration
+- [ ] Wire the pipeline into the HDMI scanout path:
+  1. Pixel clock increments column counter (0–639 per scanline)
+  2. CLS3 SREG REG[0] shifts out delta mask bit
+  3. If changed: REG[1] provides LUT index → delta color LUT → XOR with scanline reference
+  4. If unchanged: pass scanline reference directly to TMDS encoder
+  5. TMDS encoder → HDMI output (same as v2)
+- [ ] Verify: static display (all pixels unchanged) produces correct image with zero delta mask activity
+
+### 4.6 Firmware: Display Test Suite
+- [ ] Write display test firmware:
+  - Fill delta color LUT with known transitions
+  - Set scanline reference to a solid color
+  - Mark specific pixels as "changed" in the delta mask
+  - Verify HDMI output shows correct per-pixel updates
+- [ ] Test cases:
+  - All static (delta mask = 0 everywhere) → solid reference color
+  - Single pixel changed → one pixel shows reference XOR delta
+  - Full scanline changed → all pixels updated via LUT
+  - Multiple LUT indices → verify different transitions render correctly
+
+### 4.7 Synthesis and Resource Check
+- [ ] Synthesize SoC + display pipeline
+- [ ] Measure additional LUT/BSRAM cost of display integration
+- [ ] Target: ≤3,300 LUT4 (display adds ~200 LUT for control logic, LUT addressing, muxing)
+- [ ] BSRAM: +1 (delta color LUT) + 1 (scanline buffer) = 16/26 total (62%)
+- [ ] Verify CLS3 SREG mapping in synthesis report — confirm REGs configured as shift registers
+
+**Exit criteria**: HDMI output shows correct delta-driven pixel updates. Static pixels are zero cost (no switching activity). Delta color LUT produces correct per-pixel transitions. Timing met.
+
+---
+
+## Phase 5: I/O & Multi-Node Streaming
+
+**Goal**: High-speed inter-board delta streaming via IDES16/OSER16 LVDS. Two boards exchanging delta streams and converging to the same state.
+
+**Dependencies**: Phase 3 (basic SoC), Phase 2 (ATOMiK accumulator)
+
+### 5.1 OSER16 Transmit Module
+- [ ] Instantiate Gowin OSER16 primitive on an LVDS output pair
+- [ ] 16-bit parallel input from fabric (at 81 MHz) → serialized DDR output (162 Mbit/s)
+- [ ] CPU writes delta stream to a TX FIFO; OSER16 drains FIFO at wire speed
+- [ ] Frame format: [sync header][delta_width][delta_data][CRC-8]
+
+### 5.2 IDES16 Receive Module
+- [ ] Instantiate Gowin IDES16 primitive on an LVDS input pair
+- [ ] DDR input (162 Mbit/s) → 16-bit parallel output to fabric (at 81 MHz)
+- [ ] RX FIFO with frame detection (sync header alignment)
+- [ ] Auto-inject received deltas into ATOMiK accumulator (bypasses CPU for maximum throughput)
+
+### 5.3 Streaming Protocol
+- [ ] Define the delta stream wire protocol:
+  - Sync header (8-bit, unique pattern for frame alignment)
+  - Delta width field (2 bits: 8/16/32/64-bit deltas)
+  - Delta payload (variable length)
+  - CRC-8 for error detection (XOR-based, naturally aligned with the algebra)
+- [ ] Flow control: backpressure via a ready/valid handshake at FIFO boundary
+
+### 5.4 Multi-Node Verification
+- [ ] Two-board test:
+  - Board A: accumulate deltas locally, transmit delta stream via OSER16
+  - Board B: receive stream via IDES16, inject into local accumulator
+  - Both boards: read state via ATOMIK.READ, compare values over UART
+- [ ] Verification: both boards converge to identical state regardless of delta arrival order (commutativity proof validated on hardware)
+
+### 5.5 Bandwidth Benchmarking
+- [ ] Measure actual throughput vs. theoretical 162 Mbit/s
+- [ ] Test with different delta widths (8, 16, 32, 64-bit)
+- [ ] Compare against v2's USB serial baseline (~12 Mbit/s)
+- [ ] Target: ≥100 Mbit/s sustained (accounting for protocol overhead)
+
+**Exit criteria**: Two boards exchange delta streams at ≥100 Mbit/s. Both boards converge to identical reconstructed state. Commutativity verified on hardware.
+
+---
+
+## Phase 6: Parallel Banks & PLL Optimization
+
+**Goal**: Multi-bank ATOMiK on v3, leveraging BSRAM-backed scaling. Validate the clock/PLL strategy from Section 13 of the spec.
+
+**Dependencies**: Phase 2 (single-bank must work), Phase 4 (display pipeline for PLL experiments)
+
+### 6.1 Parameterized Multi-Bank Instantiation
+- [ ] Extend `atomik_v3_acc.v` to support N_BANKS parameter (1, 2, 4, 8, 16)
+- [ ] Binary XOR merge tree for parallel accumulation (same architecture as v2's `atomik_parallel_acc.v`)
+- [ ] All banks share the single BSRAM state table (different address ranges per bank)
+- [ ] Apply `syn_keep`/`syn_preserve` on merge tree and reconstruction paths
+
+### 6.2 Synthesis Sweep
+- [ ] Run the same 25-config sweep as v2 (N=1,2,4,8,16 × 5 frequencies)
+- [ ] Compare per-bank cost: target ~45 LUT + 32 FF (vs v2's ~65 LUT + 64 FF)
+- [ ] Verify zero ALU inference across all configurations
+- [ ] Record Fmax vs N_BANKS curve and compare to v2 data
+
+### 6.3 Clock Consolidation Experiment
+- [ ] For N≥4 configurations where ATOMiK Fmax drops below ~60 MHz:
+  - Consolidate CPU + ATOMiK onto PLL2 at the parallel Fmax
+  - Free PLL1 for display/streaming experiments
+- [ ] Measure: does sharing a clock domain between CPU and ATOMiK improve or degrade timing?
+- [ ] This validates the Section 13 clock strategy
+
+### 6.4 Display PLL Experiment
+- [ ] With PLL1 freed (CPU+ATOMiK on PLL2):
+  - Configure PLL1 for a higher pixel clock (720p: 74.25 MHz pixel, 371.25 MHz serializer)
+  - Or configure PLL1 for faster IDES16/OSER16 streaming
+- [ ] Measure: does the freed PLL enable meaningful display/streaming bandwidth improvements?
+- This is exploratory — success is data, not necessarily a production config
+
+### 6.5 N=16 Validation
+- [ ] Synthesize N=16 on v3 architecture
+- [ ] Target: ≤4,350 LUT4 (50%), timing met at ≥60 MHz
+- [ ] Run hardware tests on all 16 banks
+- [ ] Compare throughput to v2's validated 1,056 Mops/s at N=16 @ 66 MHz
+
+**Exit criteria**: Multi-bank synthesis sweep complete. Per-bank cost validated at ~45 LUT (42% reduction from v2). Clock consolidation experiment produces actionable data. N=16 timing met.
+
+---
+
+## Phase 7: Benchmarking & Production Hardening
+
+**Goal**: Comprehensive benchmarking against v2 baseline, performance characterization, production-grade deployment.
+
+**Dependencies**: Phase 3 (SoC works), Phase 6 (multi-bank data available)
+
+### 7.1 Performance Benchmarking Suite (Port from v2)
+- [ ] Port `perf_bench.c` to v3 custom instructions
+- [ ] Same 550-measurement suite: ATOMiK core ops, memory operations, burst/scaling, CPU baselines
+- [ ] `##PERF:` tagged output for machine parsing
+- [ ] Python runner (`perf_runner.py`) updated for v3
+
+### 7.2 v2 vs v3 Comparison Matrix
+- [ ] Head-to-head benchmark on the same Tang Nano 9K:
+  - ATOMiK core latency: v2 (3 cycles CDC) vs v3 (1 cycle direct wire)
+  - Round-trip: v2 (285 cycles) vs v3 (target: <100 cycles)
+  - Change detection speed
+  - Context switch latency: v2 (3-cycle MMIO) vs v3 (1-cycle SWAP)
+  - CLS utilization: v2 (~1.7/bit) vs v3 (target: 1.0/bit)
+  - LUT total: v2 (3,838) vs v3 (target: ≤3,100)
+
+### 7.3 Regression Detection
+- [ ] Append v3 results to `hardware/experiments/data/hardware_perf/perf_pool.jsonl`
+- [ ] Automated regression detection between v2 and v3 data pools
+- [ ] Flag any metric where v3 is worse than v2 (should be none)
+
+### 7.4 Documentation Update
+- [ ] Update `docs/PRODUCTION_DEPLOYMENT.md` for v3 SoC
+- [ ] Update `ROADMAP.md` to reflect v3 completion
+- [ ] Update `README.md` badges and key metrics
+- [ ] Write `docs/V3_MIGRATION_GUIDE.md`: firmware porting guide (MMIO → custom instructions)
+
+### 7.5 Persistent Flash Deployment
+- [ ] Final bitstream + firmware flash to Tang Nano 9K
+- [ ] Verify persistent boot across power cycles
+- [ ] Verify all test suites pass on production hardware
+- [ ] Tag release in git: `v3.0.0`
+
+**Exit criteria**: All benchmarks show v3 ≥ v2 on every metric. Documentation updated. Production flash deployment verified. Git tagged.
+
+---
+
+## Summary: Phase Dependencies
+
+```
+Phase 0: Tooling ─────────────────────────────────────────────┐
+    │                                                          │
+    v                                                          │
+Phase 1: RV64I CPU ──────────────────────────────────────┐     │
+    │                                                     │     │
+    v                                                     │     │
+Phase 2: ATOMiK v3 Datapath ────────────────────────┐     │     │
+    │                                                │     │     │
+    v                                                │     │     │
+Phase 3: SoC Integration ──────────────────┐        │     │     │
+    │              │                        │        │     │     │
+    v              v                        │        │     │     │
+Phase 4:       Phase 5:                     │        │     │     │
+Display        I/O Streaming                │        │     │     │
+Pipeline       (needs Phase 2+3)            │        │     │     │
+    │              │                        │        │     │     │
+    v              v                        v        v     v     v
+Phase 6: Parallel Banks & PLL ──────────────────────────────────┘
+    │                                        (needs Phase 2+4)
+    v
+Phase 7: Benchmarking & Production
+```
+
+**Critical path**: Phase 0 → 1 → 2 → 3 → 7
+**Parallel opportunities**: Phase 4 and Phase 5 can start concurrently after Phase 3
+**Phase 6** requires Phase 2 (multi-bank) and Phase 4 (display PLL experiments)
+
+---
+
+## Resource Budget Tracking
+
+| Phase | Cumulative LUT4 | BSRAM | Key Addition |
+|:-----:|:----------------:|:-----:|:-------------|
+| 1 | ~1,800 | 1 | CPU + register file |
+| 2 | ~2,000 | 2 | + ATOMiK acc + state table |
+| 3 | ~3,100 | 14 | + SRAM, Boot ROM, UART, GPIO, HDMI |
+| 4 | ~3,300 | 16 | + Delta color LUT + scanline buffer |
+| 5 | ~3,400 | 16 | + IDES16/OSER16 control logic |
+| 6 | ~4,350 (N=16) | 16 | + Parallel banks (if N=16) |
+
+**Hard limits**: 8,640 LUT4, 26 BSRAM, 2 PLL, 4,320 CLS
+**Tightest constraint**: CLS (72% in v2) — v3's 1.0 CLS/bit mapping directly addresses this
