@@ -14,6 +14,8 @@
 
 `timescale 1ns / 1ps
 
+/* verilator lint_off MULTITOP */
+
 module atomik_v3_stub #(
     parameter DW = 64  // Delta/state width (bits)
 )(

@@ -6,7 +6,7 @@
 #   sim-iverilog  - Run iverilog testbenches
 #   sim-verilator - Run Verilator C++ testbenches
 #   sim-smoke     - Run both iverilog and Verilator smoke tests
-#   compliance    - RISC-V compliance tests (placeholder)
+#   compliance    - RISC-V compliance tests
 #   synth         - Reminder for local Gowin synthesis
 #   clean         - Remove simulation artifacts
 #   all           - lint + sim-smoke (default)
@@ -19,20 +19,29 @@ IVERILOG  := $(shell command -v $(OSS_CAD)/iverilog 2>/dev/null || command -v iv
 VVP       := $(shell command -v $(OSS_CAD)/vvp 2>/dev/null || command -v vvp 2>/dev/null)
 
 # Directories
-V3_DIR    := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
-RTL_DIR   := $(V3_DIR)rtl
-SIM_IV    := $(V3_DIR)sim/iverilog
-SIM_VL    := $(V3_DIR)sim/verilator
-BUILD_DIR := $(V3_DIR)build
+V3_DIR      := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+RTL_DIR     := $(V3_DIR)rtl
+SIM_IV      := $(V3_DIR)sim/iverilog
+SIM_VL      := $(V3_DIR)sim/verilator
+SIM_COMP    := $(V3_DIR)sim/compliance
+BUILD_DIR   := $(V3_DIR)build
+COMP_BUILD  := $(BUILD_DIR)/compliance
 
-# RTL sources
-RTL_SRC := $(wildcard $(RTL_DIR)/*.v)
+# RISC-V tests directory
+RISCV_TESTS := $(HOME)/Projects/riscv-tests
+
+# RTL sources (exclude stub for CPU targets)
+RTL_ALL     := $(wildcard $(RTL_DIR)/*.v)
+RTL_CPU     := $(filter-out %atomik_v3_stub.v,$(RTL_ALL))
 
 # Testbenches
 TB_IV_SRC := $(wildcard $(SIM_IV)/tb_*.v)
 TB_VL_SRC := $(wildcard $(SIM_VL)/tb_*.cpp)
 
-.PHONY: all lint sim-iverilog sim-verilator sim-smoke compliance synth clean
+# Reset PC for riscv-tests (default entry point)
+RESET_PC ?= 0x0000000080000000
+
+.PHONY: all lint sim-iverilog sim-verilator sim-smoke compliance compliance-build synth clean
 
 all: lint sim-smoke
 
@@ -42,11 +51,11 @@ all: lint sim-smoke
 lint:
 ifeq ($(VERILATOR),)
 	@echo "SKIP: verilator not found"
-else ifeq ($(RTL_SRC),)
+else ifeq ($(RTL_ALL),)
 	@echo "SKIP: no RTL files in $(RTL_DIR)"
 else
 	@echo "=== Verilator lint ==="
-	$(VERILATOR) --lint-only -Wall $(RTL_SRC)
+	$(VERILATOR) --lint-only -Wall $(RTL_ALL)
 	@echo "PASS: lint clean"
 endif
 
@@ -64,7 +73,7 @@ else
 	for tb in $(TB_IV_SRC); do \
 		name=$$(basename $$tb .v); \
 		echo "=== iverilog: $$name ==="; \
-		$(IVERILOG) -o $(BUILD_DIR)/$$name.vvp -I$(RTL_DIR) $(RTL_SRC) $$tb && \
+		$(IVERILOG) -o $(BUILD_DIR)/$$name.vvp -I$(RTL_DIR) $(RTL_ALL) $$tb && \
 		$(VVP) $(BUILD_DIR)/$$name.vvp | tee $(BUILD_DIR)/$$name.log; \
 		if grep -q "ALL TESTS PASSED" $(BUILD_DIR)/$$name.log; then \
 			echo "RESULT: $$name PASSED"; \
@@ -90,7 +99,6 @@ else
 	@failed=0; \
 	for tb in $(TB_VL_SRC); do \
 		name=$$(basename $$tb .cpp); \
-		mod=$$(echo $$name | sed 's/^tb_//'); \
 		echo "=== Verilator: $$name ==="; \
 		$(VERILATOR) --cc --exe --build --trace-fst \
 			-DTRACE \
@@ -119,12 +127,69 @@ endif
 sim-smoke: sim-iverilog sim-verilator
 
 # -----------------------------------------------------------------------------
-# compliance: RISC-V compliance tests (placeholder)
+# compliance-build: Build the compliance runner binary
 # -----------------------------------------------------------------------------
-compliance:
+compliance-build:
+ifeq ($(VERILATOR),)
+	@echo "SKIP: verilator not found"
+else
+	@mkdir -p $(COMP_BUILD)
+	@echo "=== Building compliance runner ==="
+	$(VERILATOR) --cc --exe --build --trace-fst \
+		-DTRACE \
+		-CFLAGS "-DTRACE -I$(SIM_COMP)" \
+		-GRESET_PC=$(RESET_PC) \
+		--top-module atomik_v3_cpu \
+		--Mdir $(COMP_BUILD) \
+		-I$(RTL_DIR) \
+		$(RTL_CPU) \
+		$(SIM_COMP)/compliance_runner.cpp \
+		-o compliance_runner
+	@echo "Built: $(COMP_BUILD)/compliance_runner"
+endif
+
+# -----------------------------------------------------------------------------
+# compliance: Build and run RISC-V compliance tests
+# -----------------------------------------------------------------------------
+COMP_TESTS := $(wildcard $(RISCV_TESTS)/isa/rv64ui-p-*)
+# Filter out .dump files
+COMP_ELFS  := $(filter-out %.dump,$(COMP_TESTS))
+
+compliance: compliance-build
+ifeq ($(VERILATOR),)
+	@echo "SKIP: verilator not found"
+else ifeq ($(COMP_ELFS),)
 	@echo "=== RISC-V Compliance Tests ==="
-	@echo "SKIP: Not yet implemented (scaffold only)"
-	@echo "See hardware/v3/sim/compliance/README.md for setup instructions"
+	@echo "SKIP: No test binaries found."
+	@echo "Build riscv-tests first:"
+	@echo "  cd ~/Projects && git clone https://github.com/riscv-software-src/riscv-tests"
+	@echo "  cd riscv-tests && git submodule update --init --recursive"
+	@echo "  autoconf && ./configure --prefix=\$$PWD/install && make isa"
+else
+	@echo "=== RISC-V Compliance Tests ==="
+	@passed=0; failed=0; total=0; \
+	for elf in $(COMP_ELFS); do \
+		name=$$(basename $$elf); \
+		total=$$((total + 1)); \
+		if $(COMP_BUILD)/compliance_runner $$elf --timeout 500000 2>&1 | tee $(COMP_BUILD)/$$name.log | grep -q "^PASS"; then \
+			echo "PASS: $$name"; \
+			passed=$$((passed + 1)); \
+		else \
+			echo "FAIL: $$name"; \
+			failed=$$((failed + 1)); \
+		fi; \
+	done; \
+	echo ""; \
+	echo "=============================================="; \
+	echo "Compliance: $$passed/$$total passed"; \
+	echo "=============================================="; \
+	if [ $$failed -ne 0 ]; then \
+		echo "*** $$failed TESTS FAILED ***"; \
+		exit 1; \
+	else \
+		echo "*** ALL TESTS PASSED ***"; \
+	fi
+endif
 
 # -----------------------------------------------------------------------------
 # synth: Gowin synthesis (local only, requires licensed EDA)

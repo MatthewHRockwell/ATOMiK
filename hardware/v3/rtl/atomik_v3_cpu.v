@@ -1,0 +1,323 @@
+// =============================================================================
+// ATOMiK v3 CPU Top-Level
+//
+// Module:      atomik_v3_cpu
+// Description: RV64I multi-cycle CPU top-level.
+//              Wires: fetch, decode, regfile, ALU, branch, LSU, CSR, control.
+//              32-bit external bus (PicoRV32-compatible valid/ready protocol).
+//
+// Author: ATOMiK Project
+// Date:   February 2026
+// =============================================================================
+
+`timescale 1ns / 1ps
+
+/* verilator lint_off UNUSEDSIGNAL */
+/* verilator lint_off UNUSEDPARAM */
+
+module atomik_v3_cpu #(
+    parameter RESET_PC = 64'h0000_0000_0010_0000
+)(
+    input  wire        clk,
+    input  wire        rst_n,
+
+    // 32-bit bus interface (PicoRV32-compatible)
+    output wire        mem_valid,
+    input  wire        mem_ready,
+    output wire [31:0] mem_addr,
+    output wire [31:0] mem_wdata,
+    output wire [3:0]  mem_wstrb,
+    input  wire [31:0] mem_rdata
+);
+
+    // =========================================================================
+    // Internal wires
+    // =========================================================================
+
+    // Fetch
+    wire [63:0] pc;
+    wire [63:0] pc_next;
+    wire        pc_wen;
+    wire        fetch_start;
+    wire        fetch_done;
+    wire [31:0] instr;
+    wire        fetch_bus_valid;
+    wire [31:0] fetch_bus_addr;
+
+    // Decode
+    wire [4:0]  dec_rd, dec_rs1, dec_rs2;
+    wire [63:0] dec_imm;
+    wire [4:0]  dec_alu_op;
+    wire        dec_alu_src_b_imm;
+    wire        dec_is_word_op;
+    wire        dec_is_lui, dec_is_auipc, dec_is_jal, dec_is_jalr;
+    wire        dec_is_branch, dec_is_load, dec_is_store;
+    wire        dec_is_alu_reg, dec_is_alu_imm;
+    wire        dec_is_system, dec_is_fence, dec_is_custom0;
+    wire [2:0]  dec_mem_size, dec_funct3;
+    wire [6:0]  dec_funct7; // Connected to decoder; unused at top-level (used in Phase 2+ ATOMiK decode)
+    wire        dec_illegal;
+
+    // Register file
+    wire [63:0] rs1_data, rs2_data;
+    wire [63:0] rd_data;
+    wire        regfile_wen;
+
+    // ALU
+    wire [63:0] alu_result;
+    wire [63:0] alu_operand_a, alu_operand_b;
+
+    // Branch
+    wire        branch_taken;
+
+    // LSU
+    wire        lsu_start, lsu_done;
+    wire [63:0] lsu_rdata;
+    wire        lsu_bus_valid;
+    wire [31:0] lsu_bus_addr;
+    wire [31:0] lsu_bus_wdata;
+    wire [3:0]  lsu_bus_wstrb;
+
+    // CSR
+    wire [63:0] csr_rdata;
+    wire        csr_wen;
+    wire        trap_enter, trap_return;
+    wire [63:0] mtvec_out, mepc_out;
+    wire        instr_retire;
+
+    // Control
+    wire [1:0]  pc_src;
+    wire [2:0]  wb_src;
+    wire [2:0]  state_out;
+
+    // FSM state constants (must match atomik_v3_control.v)
+    localparam S_EXECUTE   = 3'd2;
+    localparam S_MEMORY    = 3'd3;
+
+    // =========================================================================
+    // Bus arbitration: fetch vs LSU
+    // FSM guarantees mutual exclusion — fetch only active in FETCH state,
+    // LSU only active in MEMORY state
+    // =========================================================================
+    wire lsu_has_bus = (state_out == S_MEMORY) || (state_out == S_EXECUTE && (dec_is_load || dec_is_store));
+
+    assign mem_valid = lsu_has_bus ? lsu_bus_valid : fetch_bus_valid;
+    assign mem_addr  = lsu_has_bus ? lsu_bus_addr  : fetch_bus_addr;
+    assign mem_wdata = lsu_bus_wdata;
+    assign mem_wstrb = lsu_has_bus ? lsu_bus_wstrb : 4'b0;
+
+    // =========================================================================
+    // Fetch Unit
+    // =========================================================================
+    atomik_v3_fetch #(
+        .RESET_PC(RESET_PC)
+    ) u_fetch (
+        .clk            (clk),
+        .rst_n          (rst_n),
+        .pc_next        (pc_next),
+        .pc_wen         (pc_wen),
+        .pc             (pc),
+        .fetch_start    (fetch_start),
+        .instr          (instr),
+        .fetch_done     (fetch_done),
+        .fetch_bus_valid(fetch_bus_valid),
+        .bus_ready      (mem_ready),
+        .fetch_bus_addr (fetch_bus_addr),
+        .bus_rdata      (mem_rdata)
+    );
+
+    // =========================================================================
+    // Decoder
+    // =========================================================================
+    atomik_v3_decode u_decode (
+        .instr          (instr),
+        .rd             (dec_rd),
+        .rs1            (dec_rs1),
+        .rs2            (dec_rs2),
+        .imm            (dec_imm),
+        .alu_op         (dec_alu_op),
+        .alu_src_b_imm  (dec_alu_src_b_imm),
+        .is_word_op     (dec_is_word_op),
+        .is_lui         (dec_is_lui),
+        .is_auipc       (dec_is_auipc),
+        .is_jal         (dec_is_jal),
+        .is_jalr        (dec_is_jalr),
+        .is_branch      (dec_is_branch),
+        .is_load        (dec_is_load),
+        .is_store       (dec_is_store),
+        .is_alu_reg     (dec_is_alu_reg),
+        .is_alu_imm     (dec_is_alu_imm),
+        .is_system      (dec_is_system),
+        .is_fence       (dec_is_fence),
+        .is_custom0     (dec_is_custom0),
+        .mem_size       (dec_mem_size),
+        .funct3         (dec_funct3),
+        .funct7         (dec_funct7),
+        .illegal_instr  (dec_illegal)
+    );
+
+    // =========================================================================
+    // Register File
+    // =========================================================================
+    atomik_v3_regfile u_regfile (
+        .clk      (clk),
+        .rst_n    (rst_n),
+        .rs1_addr (dec_rs1),
+        .rs1_data (rs1_data),
+        .rs2_addr (dec_rs2),
+        .rs2_data (rs2_data),
+        .rd_addr  (dec_rd),
+        .rd_data  (rd_data),
+        .rd_wen   (regfile_wen)
+    );
+
+    // =========================================================================
+    // ALU operand muxing
+    // =========================================================================
+    // Operand A: PC for AUIPC, else RS1
+    assign alu_operand_a = dec_is_auipc ? pc : rs1_data;
+
+    // Operand B: immediate if flagged, else RS2
+    assign alu_operand_b = dec_alu_src_b_imm ? dec_imm : rs2_data;
+
+    // =========================================================================
+    // ALU
+    // =========================================================================
+    atomik_v3_alu u_alu (
+        .operand_a  (alu_operand_a),
+        .operand_b  (alu_operand_b),
+        .alu_op     (dec_alu_op),
+        .is_word_op (dec_is_word_op),
+        .result     (alu_result)
+    );
+
+    // =========================================================================
+    // Branch Comparator
+    // =========================================================================
+    atomik_v3_branch u_branch (
+        .rs1_val      (rs1_data),
+        .rs2_val      (rs2_data),
+        .funct3       (dec_funct3),
+        .branch_taken (branch_taken)
+    );
+
+    // =========================================================================
+    // Load/Store Unit
+    // =========================================================================
+    atomik_v3_lsu u_lsu (
+        .clk          (clk),
+        .rst_n        (rst_n),
+        .lsu_start    (lsu_start),
+        .lsu_is_store (dec_is_store),
+        .lsu_size     (dec_mem_size),
+        .lsu_addr     (alu_result),     // Effective addr = rs1 + imm (from ALU)
+        .lsu_wdata    (rs2_data),
+        .lsu_rdata    (lsu_rdata),
+        .lsu_done     (lsu_done),
+        .bus_valid    (lsu_bus_valid),
+        .bus_ready    (mem_ready),
+        .bus_addr     (lsu_bus_addr),
+        .bus_wdata    (lsu_bus_wdata),
+        .bus_wstrb    (lsu_bus_wstrb),
+        .bus_rdata    (mem_rdata)
+    );
+
+    // =========================================================================
+    // CSR Unit
+    // =========================================================================
+    // CSR write data: for CSRRWI/CSRRSI/CSRRCI, use zero-extended zimm (rs1 field)
+    wire [63:0] csr_wdata_mux = (dec_funct3[2]) ?
+        {59'b0, dec_rs1} : rs1_data;
+
+    atomik_v3_csr u_csr (
+        .clk          (clk),
+        .rst_n        (rst_n),
+        .csr_addr     (instr[31:20]),   // CSR address from immediate field
+        .csr_wdata    (csr_wdata_mux),
+        .csr_op       (dec_funct3),
+        .csr_wen      (csr_wen),
+        .csr_rdata    (csr_rdata),
+        .trap_enter   (trap_enter),
+        .trap_pc      (pc),
+        .trap_cause   (dec_is_system && dec_funct3 == 3'b000 && instr[20] ?
+                       64'd3 :  // EBREAK = cause 3
+                       dec_illegal ? 64'd2 :  // Illegal instruction = cause 2
+                       64'd11),  // ECALL from M-mode = cause 11
+        .trap_return  (trap_return),
+        .mtvec_out    (mtvec_out),
+        .mepc_out     (mepc_out),
+        .instr_retire (instr_retire)
+    );
+
+    // =========================================================================
+    // FSM Controller
+    // =========================================================================
+    atomik_v3_control u_control (
+        .clk           (clk),
+        .rst_n         (rst_n),
+        .fetch_start   (fetch_start),
+        .fetch_done    (fetch_done),
+        .is_lui        (dec_is_lui),
+        .is_auipc      (dec_is_auipc),
+        .is_jal        (dec_is_jal),
+        .is_jalr       (dec_is_jalr),
+        .is_branch     (dec_is_branch),
+        .is_load       (dec_is_load),
+        .is_store      (dec_is_store),
+        .is_alu_reg    (dec_is_alu_reg),
+        .is_alu_imm    (dec_is_alu_imm),
+        .is_system     (dec_is_system),
+        .is_fence      (dec_is_fence),
+        .is_custom0    (dec_is_custom0),
+        .illegal_instr (dec_illegal),
+        .funct3        (dec_funct3),
+        .instr         (instr),
+        .branch_taken  (branch_taken),
+        .lsu_start     (lsu_start),
+        .lsu_done      (lsu_done),
+        .regfile_wen   (regfile_wen),
+        .pc_wen        (pc_wen),
+        .csr_wen       (csr_wen),
+        .trap_enter    (trap_enter),
+        .trap_return   (trap_return),
+        .instr_retire  (instr_retire),
+        .pc_src        (pc_src),
+        .wb_src        (wb_src),
+        .state_out     (state_out)
+    );
+
+    // =========================================================================
+    // PC next mux
+    // =========================================================================
+    wire [63:0] pc_plus_4   = pc + 64'd4;
+    wire [63:0] pc_plus_imm = pc + dec_imm;
+    wire [63:0] jalr_target = alu_result & ~64'd1;  // (rs1 + imm) & ~1
+
+    reg [63:0] pc_next_mux;
+    always @(*) begin
+        case (pc_src)
+            2'd0: pc_next_mux = pc_plus_4;
+            2'd1: pc_next_mux = pc_plus_imm;
+            2'd2: pc_next_mux = jalr_target;
+            2'd3: pc_next_mux = trap_return ? mepc_out : mtvec_out;
+            default: pc_next_mux = pc_plus_4;
+        endcase
+    end
+    assign pc_next = pc_next_mux;
+
+    // =========================================================================
+    // Writeback mux
+    // =========================================================================
+    reg [63:0] wb_data;
+    always @(*) begin
+        case (wb_src)
+            3'd0: wb_data = alu_result;
+            3'd1: wb_data = lsu_rdata;
+            3'd2: wb_data = pc_plus_4;
+            3'd3: wb_data = csr_rdata;
+            default: wb_data = 64'b0;
+        endcase
+    end
+    assign rd_data = wb_data;
+
+endmodule

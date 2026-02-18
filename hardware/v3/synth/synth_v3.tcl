@@ -18,11 +18,11 @@
 set SCRIPT_DIR [file dirname [info script]]
 set PROJECT_ROOT [file normalize "$SCRIPT_DIR/../../.."]
 set V3_RTL_DIR "$PROJECT_ROOT/hardware/v3/rtl"
-set TOP_MODULE "atomik_v3_stub"
+set IMPL_DIR "$PROJECT_ROOT/hardware/v3/synth/impl"
+set TOP_MODULE "atomik_v3_cpu"
 
 # Device: Tang Nano 9K
 set DEVICE "GW1NR-LV9QN88PC6/I5"
-set DEVICE_FAMILY "GW1NR-9"
 
 puts "=============================================="
 puts " ATOMiK v3 Synthesis - Gowin EDA"
@@ -35,30 +35,55 @@ puts "Device:       $DEVICE"
 puts ""
 
 # -----------------------------------------------------------------------------
-# Collect RTL Source Files
+# Collect RTL Source Files (exclude stub)
 # -----------------------------------------------------------------------------
-set rtl_files [glob -nocomplain "$V3_RTL_DIR/*.v"]
-if {[llength $rtl_files] == 0} {
-    puts "ERROR: No Verilog files found in $V3_RTL_DIR"
+set rtl_files [glob -nocomplain "$V3_RTL_DIR/atomik_v3_*.v"]
+set cpu_files {}
+foreach f $rtl_files {
+    if {[string match "*stub*" $f]} continue
+    lappend cpu_files $f
+}
+
+if {[llength $cpu_files] == 0} {
+    puts "ERROR: No CPU RTL files found in $V3_RTL_DIR"
     exit 1
 }
 
 puts "Source files:"
-foreach f $rtl_files {
-    puts "  $f"
+foreach f $cpu_files {
+    puts "  [file tail $f]"
 }
 puts ""
 
 # -----------------------------------------------------------------------------
-# Create In-Memory Project
+# Create Project
 # -----------------------------------------------------------------------------
-create_project -name "ATOMiK_v3" -dir "$PROJECT_ROOT/hardware/v3/synth/impl" \
-    -device $DEVICE
+file mkdir $IMPL_DIR
+set gprj_file "$IMPL_DIR/ATOMiK_v3.gprj"
 
-# Add source files
-foreach f $rtl_files {
-    add_file $f
+# Write a minimal .gprj file
+set gprj_fd [open $gprj_file w]
+puts $gprj_fd {<?xml version="1" encoding="UTF-8"?>}
+puts $gprj_fd {<!DOCTYPE gowin-fpga-project>}
+puts $gprj_fd {<Project>}
+puts $gprj_fd {    <Template>FPGA</Template>}
+puts $gprj_fd {    <Version>5</Version>}
+puts $gprj_fd {    <Device name="GW1NR-9C" pn="GW1NR-LV9QN88PC6/I5">gw1nr9c-004</Device>}
+puts $gprj_fd {    <FileList>}
+close $gprj_fd
+
+# Append source files to the project file
+set gprj_fd [open $gprj_file a]
+foreach f $cpu_files {
+    puts $gprj_fd "        <File path=\"$f\" type=\"file.verilog\" enable=\"1\"/>"
 }
+puts $gprj_fd {    </FileList>}
+puts $gprj_fd {</Project>}
+close $gprj_fd
+
+open_project $gprj_file
+
+# Files are already listed in the .gprj — do NOT call add_file (causes duplicates)
 
 # -----------------------------------------------------------------------------
 # Set Options
@@ -101,4 +126,5 @@ puts ""
 puts "=============================================="
 puts " ATOMiK v3 Synthesis Complete"
 puts "=============================================="
+puts "Results in: $IMPL_DIR"
 puts ""
