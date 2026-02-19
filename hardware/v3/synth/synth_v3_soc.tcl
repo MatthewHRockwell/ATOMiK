@@ -10,6 +10,9 @@
 # Open the project
 open_project atomik_v3_soc.gprj
 
+# Set top module explicitly
+set_option -top_module atomik_v3_soc
+
 # Enable MSPI as regular IO (required for SPI flash pins)
 set_option -use_mspi_as_gpio 1
 
