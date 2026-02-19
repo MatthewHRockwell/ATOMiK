@@ -156,8 +156,10 @@ module atomik_v3_decode (
             // JAL: rd = PC+4, PC = PC + imm_j
             // -----------------------------------------------------------------
             OP_JAL: begin
-                is_jal = 1'b1;
-                imm    = imm_j;
+                is_jal        = 1'b1;
+                imm           = imm_j;
+                alu_op        = ALU_ADD;
+                alu_src_b_imm = 1'b1;
             end
 
             // -----------------------------------------------------------------
@@ -174,8 +176,10 @@ module atomik_v3_decode (
             // Branch: BEQ, BNE, BLT, BGE, BLTU, BGEU
             // -----------------------------------------------------------------
             OP_BRANCH: begin
-                is_branch = 1'b1;
-                imm       = imm_b;
+                is_branch     = 1'b1;
+                imm           = imm_b;
+                alu_op        = ALU_ADD;
+                alu_src_b_imm = 1'b1;
             end
 
             // -----------------------------------------------------------------

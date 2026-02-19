@@ -85,6 +85,10 @@ module atomik_v3_cpu #(
     wire [63:0] mtvec_out, mepc_out;
     wire        instr_retire;
 
+    // ATOMiK
+    wire [63:0] atomik_current_state;
+    wire        atomik_acc_zero;
+
     // Control
     wire [1:0]  pc_src;
     wire [2:0]  wb_src;
@@ -100,6 +104,16 @@ module atomik_v3_cpu #(
     // LSU only active in MEMORY state
     // =========================================================================
     wire lsu_has_bus = (state_out == S_MEMORY) || (state_out == S_EXECUTE && (dec_is_load || dec_is_store));
+
+    // synthesis translate_off
+    // Bus mutual exclusion assertion: fetch and LSU must never drive bus simultaneously
+    always @(posedge clk) begin
+        if (rst_n && fetch_bus_valid && lsu_bus_valid) begin
+            $display("BUS ASSERTION FAIL: fetch_bus_valid and lsu_bus_valid both high at time %0t", $time);
+            $finish(1);
+        end
+    end
+    // synthesis translate_on
 
     assign mem_valid = lsu_has_bus ? lsu_bus_valid : fetch_bus_valid;
     assign mem_addr  = lsu_has_bus ? lsu_bus_addr  : fetch_bus_addr;
@@ -174,8 +188,8 @@ module atomik_v3_cpu #(
     // =========================================================================
     // ALU operand muxing
     // =========================================================================
-    // Operand A: PC for AUIPC, else RS1
-    assign alu_operand_a = dec_is_auipc ? pc : rs1_data;
+    // Operand A: PC for AUIPC/branch/JAL (target = PC + imm), else RS1
+    assign alu_operand_a = (dec_is_auipc || dec_is_branch || dec_is_jal) ? pc : rs1_data;
 
     // Operand B: immediate if flagged, else RS2
     assign alu_operand_b = dec_alu_src_b_imm ? dec_imm : rs2_data;
@@ -250,6 +264,32 @@ module atomik_v3_cpu #(
     );
 
     // =========================================================================
+    // ATOMiK Datapath (accumulator, state table, reconstructor)
+    // =========================================================================
+    // Custom-0 sub-type decode
+    wire atomik_load  = dec_is_custom0 && (dec_funct3 == 3'b000);
+    wire atomik_accum = dec_is_custom0 && (dec_funct3 == 3'b001);
+    wire atomik_swap  = dec_is_custom0 && (dec_funct3 == 3'b011);
+
+    // Enable signals: fire once during EXECUTE state
+    wire atomik_load_en  = (state_out == S_EXECUTE) && atomik_load;
+    wire atomik_accum_en = (state_out == S_EXECUTE) && atomik_accum;
+    wire atomik_swap_en  = (state_out == S_EXECUTE) && atomik_swap;
+
+    atomik_v3_atomik u_atomik (
+        .clk           (clk),
+        .rst_n         (rst_n),
+        .load_en       (atomik_load_en),
+        .accum_en      (atomik_accum_en),
+        .swap_en       (atomik_swap_en),
+        .addr_in       (rs1_data[7:0]),    // LOAD/SWAP address
+        .delta_in      (rs1_data),          // ACCUM delta
+        .init_data     (rs2_data),          // LOAD initial state (from rs2)
+        .current_state (atomik_current_state),
+        .acc_zero      (atomik_acc_zero)
+    );
+
+    // =========================================================================
     // FSM Controller
     // =========================================================================
     atomik_v3_control u_control (
@@ -290,14 +330,14 @@ module atomik_v3_cpu #(
     // PC next mux
     // =========================================================================
     wire [63:0] pc_plus_4   = pc + 64'd4;
-    wire [63:0] pc_plus_imm = pc + dec_imm;
-    wire [63:0] jalr_target = alu_result & ~64'd1;  // (rs1 + imm) & ~1
+    // Branch/JAL target computed by ALU (pc + imm); JALR target is (rs1 + imm) & ~1
+    wire [63:0] jalr_target = {alu_result[63:1], 1'b0};
 
     reg [63:0] pc_next_mux;
     always @(*) begin
         case (pc_src)
             2'd0: pc_next_mux = pc_plus_4;
-            2'd1: pc_next_mux = pc_plus_imm;
+            2'd1: pc_next_mux = alu_result;     // Branch/JAL: PC + imm (from ALU)
             2'd2: pc_next_mux = jalr_target;
             2'd3: pc_next_mux = trap_return ? mepc_out : mtvec_out;
             default: pc_next_mux = pc_plus_4;
@@ -315,6 +355,7 @@ module atomik_v3_cpu #(
             3'd1: wb_data = lsu_rdata;
             3'd2: wb_data = pc_plus_4;
             3'd3: wb_data = csr_rdata;
+            3'd4: wb_data = atomik_current_state;  // ATOMIK.READ
             default: wb_data = 64'b0;
         endcase
     end

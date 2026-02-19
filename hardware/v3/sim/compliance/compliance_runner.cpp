@@ -16,6 +16,10 @@
 #include "Vatomik_v3_cpu.h"
 #include "verilated.h"
 
+#if VM_COVERAGE
+#include "verilated_cov.h"
+#endif
+
 #ifdef TRACE
 #include "verilated_fst_c.h"
 #endif
@@ -38,6 +42,8 @@ int main(int argc, char **argv) {
             do_trace = true;
         } else if (strcmp(argv[i], "--timeout") == 0 && i + 1 < argc) {
             max_cycles = strtoull(argv[++i], nullptr, 0);
+        } else if (strcmp(argv[i], "--cov-file") == 0 && i + 1 < argc) {
+            i++;  // Skip value (handled at exit)
         } else if (argv[i][0] != '-' && argv[i][0] != '+') {
             elf_file = argv[i];
         }
@@ -141,6 +147,14 @@ int main(int argc, char **argv) {
 
         cycle++;
 
+        // Check for RTL assertions ($finish called)
+        if (Verilated::gotFinish()) {
+            fprintf(stderr, "ASSERTION FAILED in RTL at cycle %lu during %s\n",
+                    (unsigned long)cycle, elf_file);
+            result = 3;
+            break;
+        }
+
         // Check tohost
         if (mem.tohost_written()) {
             uint64_t tohost = mem.get_tohost_value();
@@ -171,6 +185,20 @@ int main(int argc, char **argv) {
     }
 #endif
     delete cpu;
+
+#if VM_COVERAGE
+    // Write coverage data; use --cov-file <name> if provided, else coverage.dat
+    {
+        const char *cov_file = "coverage.dat";
+        for (int i = 1; i < argc; i++) {
+            if (strcmp(argv[i], "--cov-file") == 0 && i + 1 < argc) {
+                cov_file = argv[++i];
+                break;
+            }
+        }
+        VerilatedCov::write(cov_file);
+    }
+#endif
 
     return result;
 }

@@ -14,9 +14,10 @@
 
 # Tool discovery — prefer oss-cad-suite if available, else system PATH
 OSS_CAD := $(HOME)/Tools/oss-cad-suite/bin
-VERILATOR := $(shell command -v $(OSS_CAD)/verilator 2>/dev/null || command -v verilator 2>/dev/null)
-IVERILOG  := $(shell command -v $(OSS_CAD)/iverilog 2>/dev/null || command -v iverilog 2>/dev/null)
-VVP       := $(shell command -v $(OSS_CAD)/vvp 2>/dev/null || command -v vvp 2>/dev/null)
+VERILATOR     := $(shell command -v $(OSS_CAD)/verilator 2>/dev/null || command -v verilator 2>/dev/null)
+VERILATOR_COV := $(shell command -v $(OSS_CAD)/verilator_coverage 2>/dev/null || command -v verilator_coverage 2>/dev/null)
+IVERILOG      := $(shell command -v $(OSS_CAD)/iverilog 2>/dev/null || command -v iverilog 2>/dev/null)
+VVP           := $(shell command -v $(OSS_CAD)/vvp 2>/dev/null || command -v vvp 2>/dev/null)
 
 # Directories
 V3_DIR      := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
@@ -41,7 +42,11 @@ TB_VL_SRC := $(wildcard $(SIM_VL)/tb_*.cpp)
 # Reset PC for riscv-tests (default entry point)
 RESET_PC ?= 0x0000000080000000
 
-.PHONY: all lint sim-iverilog sim-verilator sim-smoke compliance compliance-build synth clean
+COVERAGE_BUILD := $(BUILD_DIR)/coverage
+COVERAGE_DATA  := $(BUILD_DIR)/coverage_data
+COVERAGE_ANN   := $(BUILD_DIR)/coverage_annotated
+
+.PHONY: all lint sim-iverilog sim-verilator sim-smoke compliance compliance-build coverage coverage-build synth clean
 
 all: lint sim-smoke
 
@@ -189,6 +194,72 @@ else
 	else \
 		echo "*** ALL TESTS PASSED ***"; \
 	fi
+endif
+
+# -----------------------------------------------------------------------------
+# coverage-build: Build compliance runner with line coverage instrumentation
+# -----------------------------------------------------------------------------
+coverage-build:
+ifeq ($(VERILATOR),)
+	@echo "SKIP: verilator not found"
+else
+	@mkdir -p $(COVERAGE_BUILD)
+	@echo "=== Building compliance runner with coverage ==="
+	$(VERILATOR) --cc --exe --build --coverage-line \
+		-CFLAGS "-I$(SIM_COMP)" \
+		-GRESET_PC=$(RESET_PC) \
+		--top-module atomik_v3_cpu \
+		--Mdir $(COVERAGE_BUILD) \
+		-I$(RTL_DIR) \
+		$(RTL_CPU) \
+		$(SIM_COMP)/compliance_runner.cpp \
+		-o compliance_runner_cov
+	@echo "Built: $(COVERAGE_BUILD)/compliance_runner_cov"
+endif
+
+# -----------------------------------------------------------------------------
+# coverage: Run compliance tests with coverage, merge, and annotate
+# -----------------------------------------------------------------------------
+coverage: coverage-build
+ifeq ($(VERILATOR),)
+	@echo "SKIP: verilator not found"
+else ifeq ($(VERILATOR_COV),)
+	@echo "SKIP: verilator_coverage not found"
+else ifeq ($(COMP_ELFS),)
+	@echo "SKIP: No test binaries found (build riscv-tests first)"
+else
+	@mkdir -p $(COVERAGE_DATA)
+	@echo "=== Running compliance tests with coverage ==="
+	@passed=0; failed=0; total=0; \
+	for elf in $(COMP_ELFS); do \
+		name=$$(basename $$elf); \
+		total=$$((total + 1)); \
+		if $(COVERAGE_BUILD)/compliance_runner_cov $$elf --timeout 500000 \
+			--cov-file $(COVERAGE_DATA)/$$name.dat 2>&1 | \
+			grep -q "^PASS"; then \
+			passed=$$((passed + 1)); \
+		else \
+			echo "FAIL: $$name"; \
+			failed=$$((failed + 1)); \
+		fi; \
+	done; \
+	echo "Compliance: $$passed/$$total passed"
+	@echo "=== Merging coverage data ==="
+	$(VERILATOR_COV) --annotate $(COVERAGE_ANN) --annotate-all $(COVERAGE_DATA)/*.dat
+	@echo "=== Coverage report: $(COVERAGE_ANN)/ ==="
+	@echo "Key files to examine:"
+	@echo "  atomik_v3_decode.v"
+	@echo "  atomik_v3_control.v"
+	@echo ""
+	@echo "--- Coverage summary ---"
+	@for f in $(COVERAGE_ANN)/atomik_v3_decode.v $(COVERAGE_ANN)/atomik_v3_control.v; do \
+		if [ -f "$$f" ]; then \
+			name=$$(basename $$f); \
+			total=$$(grep -c '^ ' $$f 2>/dev/null || echo 0); \
+			uncov=$$(grep -c '%000000' $$f 2>/dev/null || echo 0); \
+			echo "  $$name: $$uncov uncovered lines"; \
+		fi; \
+	done
 endif
 
 # -----------------------------------------------------------------------------

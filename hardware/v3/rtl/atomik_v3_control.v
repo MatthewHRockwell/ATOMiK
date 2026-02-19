@@ -239,7 +239,16 @@ module atomik_v3_control (
                     pc_src = 2'd3;  // mepc (handled in top-level PC mux)
                 end
 
-                else if (is_fence || is_custom0) begin
+                else if (is_custom0) begin
+                    // ATOMIK.READ (funct3=010): write reconstructed state to rd
+                    if (funct3 == 3'b010) begin
+                        regfile_wen = 1'b1;
+                        wb_src = 3'd4;  // ATOMiK current_state
+                    end
+                    // LOAD, ACCUM, SWAP: no regfile write, just advance PC
+                end
+
+                else if (is_fence) begin
                     // NOP: just advance PC
                 end
 

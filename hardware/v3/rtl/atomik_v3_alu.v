@@ -6,6 +6,10 @@
 //              Supports all RV64I arithmetic/logic ops and W-variants.
 //              Pure combinational — no clock, no state.
 //
+//              Shift optimization: single shared right-shift barrel shifter.
+//              SLL is implemented as: reverse(reverse(input) >> shamt).
+//              SRA uses sign-bit fill; SRL/SLL use zero fill.
+//
 // Author: ATOMiK Project
 // Date:   February 2026
 // =============================================================================
@@ -37,9 +41,6 @@ module atomik_v3_alu (
     // Internal wires
     wire [63:0] sum;
     wire [63:0] diff;
-    wire [63:0] sll_result;
-    wire [63:0] srl_result;
-    wire [63:0] sra_result;
     wire        slt_result;
     wire        sltu_result;
 
@@ -50,18 +51,54 @@ module atomik_v3_alu (
     assign sum  = operand_a + operand_b;
     assign diff = operand_a - operand_b;
 
-    // Shifts
+    // =========================================================================
+    // Shared barrel shifter (SLL, SRL, SRA unified)
+    //
+    // Strategy: one right-shift barrel shifter with configurable fill bit.
+    // SLL is implemented via bit-reversal: reverse input, right-shift, reverse output.
+    // Bit reversal is free in hardware (routing only, no LUT cost).
+    // =========================================================================
+
+    wire is_sll = (alu_op == ALU_SLL);
+    wire is_sra = (alu_op == ALU_SRA);
+
     // For W-variants: operate on lower 32 bits only
-    wire [63:0] shift_input_a = is_word_op ? {32'b0, operand_a[31:0]} : operand_a;
+    wire [63:0] shift_base = is_word_op ? {32'b0, operand_a[31:0]} : operand_a;
 
-    assign sll_result = shift_input_a << shamt;
-
-    assign srl_result = shift_input_a >> shamt;
-
-    // Arithmetic right shift: for W-variants, sign-extend from bit 31
+    // For SRA: sign-extend from bit 31 (W-variant) or bit 63
     wire [63:0] sra_input = is_word_op ?
         {{32{operand_a[31]}}, operand_a[31:0]} : operand_a;
-    assign sra_result = $signed(sra_input) >>> shamt;
+
+    // Prepare shift input: bit-reverse for SLL, sign-extend for SRA, normal for SRL
+    wire [63:0] shift_in;
+    genvar g;
+    generate
+        for (g = 0; g < 64; g = g + 1) begin : gen_shift_in
+            assign shift_in[g] = is_sll ? shift_base[63-g] :
+                                 is_sra ? sra_input[g] :
+                                          shift_base[g];
+        end
+    endgenerate
+
+    // Fill bit: sign bit for SRA, zero for SRL/SLL
+    wire fill = is_sra & shift_in[63];
+
+    // 6-stage right-shift barrel shifter with configurable fill
+    wire [63:0] s5, s4, s3, s2, s1, s0;
+    assign s5 = shamt[5] ? {{32{fill}}, shift_in[63:32]} : shift_in;
+    assign s4 = shamt[4] ? {{16{fill}}, s5[63:16]}       : s5;
+    assign s3 = shamt[3] ? {{8{fill}},  s4[63:8]}        : s4;
+    assign s2 = shamt[2] ? {{4{fill}},  s3[63:4]}        : s3;
+    assign s1 = shamt[1] ? {{2{fill}},  s2[63:2]}        : s2;
+    assign s0 = shamt[0] ? {{1{fill}},  s1[63:1]}        : s1;
+
+    // Post-process: bit-reverse output for SLL
+    wire [63:0] shift_result;
+    generate
+        for (g = 0; g < 64; g = g + 1) begin : gen_shift_out
+            assign shift_result[g] = is_sll ? s0[63-g] : s0[g];
+        end
+    endgenerate
 
     // Comparisons (always 64-bit, even for W-variants)
     assign slt_result  = ($signed(operand_a) < $signed(operand_b)) ? 1'b1 : 1'b0;
@@ -74,12 +111,12 @@ module atomik_v3_alu (
         case (alu_op)
             ALU_ADD:    alu_raw = sum;
             ALU_SUB:    alu_raw = diff;
-            ALU_SLL:    alu_raw = sll_result;
+            ALU_SLL:    alu_raw = shift_result;
             ALU_SLT:    alu_raw = {63'b0, slt_result};
             ALU_SLTU:   alu_raw = {63'b0, sltu_result};
             ALU_XOR:    alu_raw = operand_a ^ operand_b;
-            ALU_SRL:    alu_raw = srl_result;
-            ALU_SRA:    alu_raw = sra_result;
+            ALU_SRL:    alu_raw = shift_result;
+            ALU_SRA:    alu_raw = shift_result;
             ALU_OR:     alu_raw = operand_a | operand_b;
             ALU_AND:    alu_raw = operand_a & operand_b;
             ALU_PASS_B: alu_raw = operand_b;
