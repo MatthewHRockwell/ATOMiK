@@ -10,7 +10,7 @@
 //                ATOMIK.LOAD  (funct3=000): Write initial_state to table, set addr, clear acc
 //                ATOMIK.ACCUM (funct3=001): acc ^= delta_in
 //                ATOMIK.READ  (funct3=010): output = initial_state ^ accumulator
-//                ATOMIK.SWAP  (funct3=011): set addr (acc unchanged)
+//                ATOMIK.SWAP  (funct3=011): update ref = current_state, clear acc, return old state
 //
 // BSRAM Mapping:
 //   State table: 256x64-bit via 2 SDPB blocks (256x32-bit low + 256x32-bit high)
@@ -45,11 +45,25 @@ module atomik_v3_atomik (
     // =========================================================================
     (* syn_preserve = 1 *) reg [63:0] accumulator;
 
+    // Delayed accumulator clear for SWAP: the writeback mux reads
+    // current_state one cycle after EXECUTE, so the accumulator must
+    // hold its value through WRITEBACK before clearing.
+    reg swap_pending;
+
+    always @(posedge clk) begin
+        if (!rst_n)
+            swap_pending <= 1'b0;
+        else
+            swap_pending <= swap_en;
+    end
+
     always @(posedge clk) begin
         if (!rst_n)
             accumulator <= 64'b0;
         else if (load_en)
             accumulator <= 64'b0;        // Clear on LOAD
+        else if (swap_pending)
+            accumulator <= 64'b0;        // Clear one cycle after SWAP (after writeback reads)
         else if (accum_en)
             accumulator <= accumulator ^ delta_in;  // XOR accumulate
     end
@@ -74,10 +88,12 @@ module atomik_v3_atomik (
     (* syn_ramstyle = "block_ram" *) reg [63:0] state_table [0:255];
     reg [63:0] state_read_reg;
 
-    // Write port: ATOMIK.LOAD writes initial_state
+    // Write port: ATOMIK.LOAD writes initial_state, ATOMIK.SWAP updates reference
     always @(posedge clk) begin
         if (load_en)
             state_table[addr_in] <= init_data;
+        else if (swap_en)
+            state_table[active_addr] <= state_read_reg ^ accumulator;  // New ref = current_state
     end
 
     // Read port: registered output, always reads active_addr

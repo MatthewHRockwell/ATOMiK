@@ -241,11 +241,12 @@ module atomik_v3_control (
 
                 else if (is_custom0) begin
                     // ATOMIK.READ (funct3=010): write reconstructed state to rd
-                    if (funct3 == 3'b010) begin
+                    // ATOMIK.SWAP (funct3=011): write current_state to rd, then update ref + clear acc
+                    if (funct3 == 3'b010 || funct3 == 3'b011) begin
                         regfile_wen = 1'b1;
                         wb_src = 3'd4;  // ATOMiK current_state
                     end
-                    // LOAD, ACCUM, SWAP: no regfile write, just advance PC
+                    // LOAD (000), ACCUM (001): no regfile write, just advance PC
                 end
 
                 else if (is_fence) begin

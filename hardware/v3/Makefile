@@ -7,6 +7,9 @@
 #   sim-verilator - Run Verilator C++ testbenches
 #   sim-smoke     - Run both iverilog and Verilator smoke tests
 #   compliance    - RISC-V compliance tests
+#   firmware      - Build BROM and flash firmware (RV64I)
+#   sim-soc       - Full SoC simulation (Verilator, behavioral peripherals)
+#   lint-soc      - Lint SoC top module
 #   synth         - Reminder for local Gowin synthesis
 #   clean         - Remove simulation artifacts
 #   all           - lint + sim-smoke (default)
@@ -25,8 +28,14 @@ RTL_DIR     := $(V3_DIR)rtl
 SIM_IV      := $(V3_DIR)sim/iverilog
 SIM_VL      := $(V3_DIR)sim/verilator
 SIM_COMP    := $(V3_DIR)sim/compliance
+SIM_SOC     := $(V3_DIR)sim/soc
+SOC_DIR     := $(V3_DIR)soc
+FW_BROM     := $(SOC_DIR)/firmware/fw-brom
+FW_FLASH    := $(SOC_DIR)/firmware/fw-flash
+FW_SCRIPTS  := $(SOC_DIR)/firmware/scripts
 BUILD_DIR   := $(V3_DIR)build
 COMP_BUILD  := $(BUILD_DIR)/compliance
+SOC_BUILD   := $(BUILD_DIR)/soc
 
 # RISC-V tests directory
 RISCV_TESTS := $(HOME)/Projects/riscv-tests
@@ -46,7 +55,7 @@ COVERAGE_BUILD := $(BUILD_DIR)/coverage
 COVERAGE_DATA  := $(BUILD_DIR)/coverage_data
 COVERAGE_ANN   := $(BUILD_DIR)/coverage_annotated
 
-.PHONY: all lint sim-iverilog sim-verilator sim-smoke compliance compliance-build coverage coverage-build synth clean
+.PHONY: all lint sim-iverilog sim-verilator sim-smoke compliance compliance-build coverage coverage-build firmware sim-soc lint-soc synth clean
 
 all: lint sim-smoke
 
@@ -260,6 +269,62 @@ else
 			echo "  $$name: $$uncov uncovered lines"; \
 		fi; \
 	done
+endif
+
+# -----------------------------------------------------------------------------
+# firmware: Build BROM and flash firmware (RV64I)
+# -----------------------------------------------------------------------------
+firmware:
+	@echo "=== Building Boot ROM firmware ==="
+	$(MAKE) -C $(FW_BROM)
+	@echo "=== Building Flash firmware ==="
+	$(MAKE) -C $(FW_FLASH)
+
+# -----------------------------------------------------------------------------
+# lint-soc: Verilator lint on SoC + CPU RTL
+# -----------------------------------------------------------------------------
+lint-soc:
+ifeq ($(VERILATOR),)
+	@echo "SKIP: verilator not found"
+else
+	@echo "=== Verilator lint (SoC) ==="
+	$(VERILATOR) --lint-only -Wall \
+		-I$(RTL_DIR) -I$(SOC_DIR) \
+		$(RTL_CPU) $(SOC_DIR)/atomik_v3_soc.v \
+		$(SOC_DIR)/picoperipheral.v \
+		$(SOC_DIR)/simpleuart.v \
+		$(SOC_DIR)/picomemory.v \
+		$(SOC_DIR)/spimemio_puya.v
+	@echo "PASS: SoC lint clean"
+endif
+
+# -----------------------------------------------------------------------------
+# sim-soc: Full SoC simulation (Verilator + behavioral peripherals)
+# -----------------------------------------------------------------------------
+sim-soc: firmware
+ifeq ($(VERILATOR),)
+	@echo "SKIP: verilator not found"
+else
+	@mkdir -p $(SOC_BUILD)
+	@echo "=== Preparing firmware hex files ==="
+	python3 $(FW_SCRIPTS)/v_to_hex32.py $(FW_BROM)/build/fw-brom.v $(SOC_BUILD)/fw-brom.hex32 0x80000000
+	python3 $(FW_SCRIPTS)/v_to_hex32.py $(FW_FLASH)/build/fw-flash.v $(SOC_BUILD)/fw-flash.hex32 0x00000000
+	@echo "=== Building SoC simulation ==="
+	$(VERILATOR) --cc --exe --build --trace-fst \
+		-DTRACE \
+		-CFLAGS "-DTRACE" \
+		-Wno-TIMESCALEMOD -Wno-WIDTHTRUNC -Wno-WIDTHEXPAND \
+		--top-module sim_soc_top \
+		--Mdir $(SOC_BUILD) \
+		-I$(RTL_DIR) -I$(SOC_DIR) \
+		$(RTL_CPU) \
+		$(SOC_DIR)/picoperipheral.v \
+		$(SOC_DIR)/simpleuart.v \
+		$(SIM_SOC)/sim_soc_top.v \
+		$(SIM_SOC)/soc_smoke.cpp \
+		-o soc_smoke
+	@echo "=== Running SoC simulation ==="
+	cd $(SOC_BUILD) && ./soc_smoke --timeout 25000000
 endif
 
 # -----------------------------------------------------------------------------
