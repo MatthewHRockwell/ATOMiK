@@ -1,6 +1,10 @@
 // ISP Flasher for ATOMiK v3 SoC (RV64I)
 // Identical logic to v2 — all MMIO is 32-bit (uses lw/sw via volatile uint32_t*)
 
+// Compile-time flag for hardware bringup mode
+// When enabled: bypasses ISP/flash, continuously spams UART + toggles GPIO
+#define BRINGUP_MODE 1
+
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -132,12 +136,51 @@ void test_loop() {
     }
 }
 
-#define FW_WAIT_MAXCNT  500000
+#define FW_WAIT_MAXCNT  5000000  // ~370ms timeout at 13.5 MHz (longer for ISP)
 #define CLK_FREQ        13500000  // Crystal direct ÷2 (bypassing PLL)
 #define UART_BAUD       115200
 
 int main()
 {
+#ifdef BRINGUP_MODE
+    // =========================================================================
+    // BRINGUP MODE: Minimal test to prove CPU + UART + GPIO liveness
+    // =========================================================================
+    // Goal: Isolate "is hardware alive?" from ISP/flash complexity
+
+    // Configure UART baud rate
+    UART0->CLKDIV = CLK_FREQ / UART_BAUD - 2;  // Try formula 1: clk/baud - 2
+
+    // Wait for UART to settle (15 idle bits = ~1740 cycles)
+    for (volatile int i = 0; i < 2000; i++);
+
+    // Configure GPIO[0] as output for LED heartbeat
+    GPIO0->OE = 0x01;
+    GPIO0->OUT = 0x00;
+
+    // Dual liveness indicators:
+    // 1. UART: Continuous 'T' spam (proves: CPU fetch, ROM mapping, UART TX, baud)
+    // 2. GPIO: Toggle heartbeat (proves: CPU alive independent of UART)
+
+    uint8_t led_state = 0;
+    while (1) {
+        // UART spam: 'T' character
+        UART0->DATA = 'T';
+
+        // Delay ~100k cycles at 13.5 MHz = ~7.4ms
+        // Gives ~135 Hz UART spam, ~67.5 Hz LED toggle
+        for (volatile int i = 0; i < 100000; i++);
+
+        // Toggle GPIO[0] LED
+        led_state ^= 1;
+        GPIO0->OUT = led_state;
+    }
+    // Never returns
+
+#else
+    // =========================================================================
+    // PRODUCTION MODE: ISP flasher with flash boot fallback
+    // =========================================================================
     FLASH_BUF flash_buffer;
     uint8_t instr;
     int buflen;
@@ -257,4 +300,5 @@ int main()
             break;
         }
     }
+#endif  // BRINGUP_MODE
 }
