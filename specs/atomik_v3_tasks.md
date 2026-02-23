@@ -361,12 +361,19 @@ Additionally: `review.yml` (PR ruff check) and `math/proofs/.github/workflows/le
 
 ### 3.12 Flash Deployment
 - [x] Bitstream generated (`.fs` file at `hardware/v3/synth/impl/pnr/atomik_v3_soc.fs`)
-- [ ] Flash to Tang Nano 9K: `openFPGALoader -b tangnano9k hardware/v3/synth/impl/pnr/atomik_v3_soc.fs`
+- [x] SRAM deployment working (volatile bitstream load via `openFPGALoader -b tangnano9k atomik_v3_soc.fs`)
+  - **Three critical bugs discovered and fixed during SRAM testing**:
+    1. **V3-009: Power-on reset failure** — CPU FSMs powered on in unknown state (sys_resetn tied to constant). Fixed: Added 256-cycle reset counter with initial block.
+    2. **V3-010: Bus arbiter crosstalk** — Both fetch unit and LSU received mem_ready directly, causing ready signal crosstalk when LSU had bus. Fixed: Gated mem_ready based on lsu_has_bus.
+    3. **V3-011: UART timing violation** — simpleuart sends 15 idle bits after CLKDIV write (~1740 cycles). Firmware wrote DATA before transmission ready. Fixed: Added 2000-cycle delay after UART initialization in isp_flasher.c.
+- [x] UART communication verified (115200 baud, ISP flasher messages received)
+- [ ] Flash to persistent storage: `openFPGALoader -b tangnano9k -f hardware/v3/synth/impl/pnr/atomik_v3_soc.fs`
 - [ ] Flash firmware: `pico-programmer.py fw-v3.v /dev/ttyUSB1`
 - [ ] Verify persistent boot: power cycle → firmware boots → UART menu appears → tests pass
+- [ ] HDMI output verification: verify test pattern displays on screen
 - **Requires physical FPGA access**
 
-**Exit criteria**: v3 SoC boots from flash on Tang Nano 9K. UART interactive. HDMI shows test pattern. All hardware tests pass. Zero TNS. **Status: synthesis complete, awaiting FPGA deployment.**
+**Exit criteria**: v3 SoC boots from flash on Tang Nano 9K. UART interactive. HDMI shows test pattern. All hardware tests pass. Zero TNS. **Status: SRAM deployment working with bugs fixed, flash deployment pending.**
 
 ---
 
