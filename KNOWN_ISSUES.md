@@ -357,6 +357,85 @@ The 2000-cycle delay ensures the transmitter has finished sending idle bits befo
 
 ---
 
+### V3-012: No UART Output in Bringup Mode — CPU Liveness Unknown
+
+**Severity:** Critical (blocking Phase 3C Task 4)
+**Date:** February 23, 2026
+**Status:** Open (under investigation)
+
+**Symptom:** After implementing Boot ROM bringup mode (continuous UART 'T' spam + GPIO toggle heartbeat) and successfully synthesizing/loading bitstream, there is zero UART output at any baud rate tested (9600-230400). The CPU liveness is unknown — the failure occurs before any observable UART transmission.
+
+**Build artifacts verified:**
+- ✅ Synthesis: Clean (zero timing violations, 0 TNS/WNS)
+- ✅ Bitstream: Loads successfully to Tang Nano 9K SRAM (`openFPGALoader` completes)
+- ✅ Disassembly: Correct boot sequence (crtStart @ 0x80000000 → main @ 0x80000054)
+  - UART CLKDIV set correctly: 115 = (13,500,000 / 115,200) - 2 ✓
+  - UART DATA write loop with 'T' (0x54) ✓
+  - GPIO[0] toggle heartbeat ✓
+- ✅ Boot ROM firmware: 752 bytes, built successfully
+- ✅ BSRAM IP updated: bootram_2kx8_0..3 with bringup Boot ROM
+
+**Test configuration:**
+- Clock: 27 MHz crystal → CLKDIV ÷2 → 13.5 MHz CPU clock
+- UART: 115200 baud (divider = 115)
+- Reset PC: 0x80000000 (Boot ROM base)
+- Boot ROM mapped at: 0x80000000-0x80001FFF (8 KB, BSRAM)
+
+**Diagnostic attempts:**
+- ✅ Tried multiple baud rates: 9600, 19200, 38400, 57600, 115200, 230400 (all silent)
+- ❌ Cannot verify GPIO toggle (pins 15/16 on expansion header, no on-board LED)
+- ❌ Cannot probe clock/reset signals (no scope/logic analyzer)
+- ✅ Debug signal pins defined in CST: debug_reset_n (pin 15), debug_clk_toggle (pin 16)
+
+**Possible root causes (ordered by likelihood):**
+1. **CPU not fetching instructions** — Clock not running, PLL failure, or reset stuck
+2. **Boot ROM not mapped correctly** — Bus arbiter routing, address decode error
+3. **UART peripheral not functional** — TX pin not connected, peripheral initialization issue
+4. **UART divider formula wrong** — Oversampling assumption (8x/16x vs 1x) incorrect
+5. **Power-on reset timing** — Reset release too fast, CPU FSMs in metastable state
+
+**Comparison with v2 production SoC:**
+- v2 @ 25.2 MHz (PLL-based) boots reliably and produces UART output
+- v3 @ 13.5 MHz (crystal ÷2, PLL bypassed due to earlier lock failures) — silent
+
+**Previous similar issue:**
+- V3-009: CPU powered on in unknown state (missing reset pulse) — fixed with explicit reset generator
+- V3-010: Bus arbiter crosstalk (fetch unit saw LSU ready) — fixed with gated ready signals
+- V3-011: UART timing violation (DATA written before transmitter ready) — fixed with delay after CLKDIV
+
+**Next diagnostic steps (recommended order):**
+1. **Verilator SoC testbench** — Simulate full SoC boot sequence to verify:
+   - PC jumps to 0x80000000 on reset
+   - Boot ROM reads succeed (instruction fetch from BSRAM)
+   - UART TX toggles at correct times
+   - Clock domain crossing (if any) is correct
+2. **Try alternative UART divider formulas:**
+   - Current: `CLKDIV = (clk / baud) - 2` = 115
+   - Try 8x oversample: `CLKDIV = (clk / (baud * 8)) - 2` = 12
+   - Try 16x oversample: `CLKDIV = (clk / (baud * 16)) - 2` = 5
+3. **Physical hardware debug** (if tools available):
+   - Scope probe on ser_tx (pin 17) — verify toggle vs constant HIGH
+   - Scope probe on GPIO[0] (expansion header) — verify CPU heartbeat
+   - Scope probe on clk_p — verify 13.5 MHz clock is running
+4. **Simplify bringup test further:**
+   - Remove UART entirely, toggle GPIO only (LED blink test)
+   - Hard-wire ser_tx to a counter instead of UART peripheral
+   - Create minimal CPU smoke test (execute single instruction, toggle output pin)
+
+**Bringup mode can be disabled to restore production ISP flasher:**
+```c
+// In hardware/v3/soc/firmware/fw-brom/isp_flasher.c
+#define BRINGUP_MODE 0  // Change from 1 to 0
+```
+
+**Related files:**
+- Boot ROM: `hardware/v3/soc/firmware/fw-brom/isp_flasher.c`
+- SoC top: `hardware/v3/soc/atomik_v3_soc.v`
+- Synthesis log: `hardware/v3/synth/synth_bringup.log`
+- Commit: 0f6f247 "Add Boot ROM bringup mode for hardware liveness testing"
+
+---
+
 ## Software Issues
 
 ### SW-001: `perf_runner.py` Key Parsing ValueError
