@@ -1,6 +1,6 @@
 # ATOMiK Known Issues & Error Log
 
-**Last Updated:** February 17, 2026
+**Last Updated:** February 22, 2026
 
 This document tracks hardware and software issues encountered during development, their root causes, and resolutions. It serves as a troubleshooting reference for future work.
 
@@ -218,6 +218,142 @@ openFPGALoader -b tangnano9k /path/to/TangNano-9K-example/picotiny/picotiny.fs
 **Impact:** None on RTL correctness. The BSRAM register file works correctly in the full CPU (all 53/54 compliance tests pass). Only the standalone iverilog testbench needs updating.
 
 **Fix:** Update testbench to account for BSRAM read latency: present address, wait 1 clock cycle, then check output. Deferred to Phase 3.
+
+---
+
+## v3 SoC Issues (Phase 3)
+
+### V3-009: Power-on Reset Not Applied — CPU FSMs Powered On In Unknown State
+
+**Severity:** Critical
+**Date:** February 22, 2026
+**Status:** Fixed
+
+**Symptom:** After SRAM bitstream load, CPU shows mem_valid continuously asserted (stuck HIGH). No state progression, no instruction fetch activity. Reset signal sys_resetn is HIGH but CPU never executes.
+
+**Root Cause:** In `atomik_v3_soc.v`, the sys_resetn signal was assigned to a constant:
+```verilog
+assign sys_resetn = 1'b1;  // CPU never sees reset pulse!
+```
+
+On FPGA power-up or bitstream load, flip-flops in the CPU FSM (fetch, LSU, control state) are initialized to random values. Without an explicit reset pulse, the FSM remains in an undefined state even though the reset signal is HIGH. The CPU's reset-sensitive logic never transitions to a known initial state.
+
+**Impact:** CPU completely non-functional on hardware. Verilator simulations worked because Verilator initializes all registers to zero by default (unless `--x-initial` is used).
+
+**Fix:** Added explicit power-on reset generator with initial block:
+```verilog
+// Power-on reset generator (hold reset for 256 cycles after power-on)
+reg [7:0] reset_counter;
+reg sys_resetn_reg;
+
+initial begin
+    reset_counter = 8'h00;
+    sys_resetn_reg = 1'b0;
+end
+
+always @(posedge clk_p) begin
+    if (reset_counter != 8'hFF) begin
+        reset_counter <= reset_counter + 1;
+        sys_resetn_reg <= 1'b0;  // Hold in reset
+    end else begin
+        sys_resetn_reg <= 1'b1;  // Release reset after 256 cycles
+    end
+end
+
+assign sys_resetn = sys_resetn_reg;
+```
+
+This ensures the CPU FSMs are held in reset for 256 clock cycles (~19 µs at 13.5 MHz) after bitstream load, then cleanly released to a known initial state.
+
+**Lesson:** On FPGAs, always use explicit reset generators with initial blocks or external reset signals. Never rely on constant-high reset — it doesn't initialize flip-flop state on power-up.
+
+---
+
+### V3-010: Bus Arbiter Ready Signal Crosstalk — Fetch Unit Sees LSU Responses
+
+**Severity:** Critical
+**Date:** February 22, 2026
+**Status:** Fixed
+
+**Symptom:** After fixing V3-009, CPU progressed past FETCH state but still did not boot. mem_valid toggled but no UART output. Debug showed both fetch_bus_valid and mem_ready asserted simultaneously even though CPU FSM was in EXECUTE state (where fetch should be idle).
+
+**Root Cause:** In `atomik_v3_cpu.v`, both the fetch unit and LSU were connected directly to the shared mem_ready signal without gating:
+```verilog
+// BROKEN: Both units receive mem_ready directly
+.bus_ready      (mem_ready),  // fetch unit (line 138)
+.bus_ready      (mem_ready),  // LSU (line 232)
+```
+
+When the LSU had bus ownership (during MEMORY state or load/store in EXECUTE), mem_ready asserted in response to the LSU's bus transaction. However, the fetch unit also saw this mem_ready pulse and incorrectly latched stale bus data, corrupting its instruction register. The fetch unit's state machine advanced as if it had successfully fetched an instruction, even though the bus was serving the LSU.
+
+**Impact:** CPU executed garbage instructions due to corrupted fetch data. Bus transactions appeared to complete but the CPU never made forward progress.
+
+**Fix:** Gated mem_ready based on bus ownership (which master currently owns the bus):
+```verilog
+// Gate mem_ready based on bus ownership (FIX: prevent crosstalk)
+wire lsu_has_bus = (state_out == S_MEMORY) ||
+                   (state_out == S_EXECUTE && (dec_is_load || dec_is_store));
+
+wire fetch_bus_ready = mem_ready && !lsu_has_bus;
+wire lsu_bus_ready   = mem_ready && lsu_has_bus;
+
+// In fetch unit instantiation:
+.bus_ready      (fetch_bus_ready),  // FIX: use gated ready signal
+
+// In LSU instantiation:
+.bus_ready      (lsu_bus_ready),    // FIX: use gated ready signal
+```
+
+Now each unit only sees mem_ready when it has bus ownership. The FSM state machine guarantees mutual exclusion — fetch is only active in FETCH state, LSU only in MEMORY/EXECUTE-load-store.
+
+**Lesson:** When multiple bus masters share a single bus, always gate the ready signal based on ownership. A bus arbiter must ensure only the current master sees handshake signals. Direct connection of ready to multiple masters causes crosstalk and data corruption.
+
+---
+
+### V3-011: UART Timing Violation — Data Written Before Transmitter Ready
+
+**Severity:** High
+**Date:** February 22, 2026
+**Status:** Fixed
+
+**Symptom:** After fixing V3-009 and V3-010, CPU executed firmware correctly (confirmed via FSM state debug), but UART TX remained idle (no transmission). Debug confirmed both UART CLKDIV and DATA registers were written by firmware, but the UART TX pin (ser_tx) stayed HIGH (idle state).
+
+**Root Cause:** The simpleuart module sends 15 idle bits after a CLKDIV write (lines 119-123 of simpleuart.v):
+```verilog
+if (reg_div_we) begin
+    send_pattern <= 1;
+    send_bitcnt <= 0;
+    send_divcnt <= 0;
+    send_dummy <= ~0;  // 15 bits of 1's (idle state)
+end
+```
+
+This takes approximately 1,740 cycles at 13.5 MHz (15 bits × 116 cycles/bit at 115200 baud). The DATA register write is only accepted when `send_bitcnt == 0` (line 127). If firmware writes DATA immediately after CLKDIV, the write is silently ignored because the transmitter is busy sending idle bits.
+
+The v3 firmware (isp_flasher.c) set CLKDIV and then immediately sent data:
+```c
+UART0->CLKDIV = CLK_FREQ / UART_BAUD - 2;
+// BUG: Immediately write DATA without waiting for idle bits
+UART0->DATA = 'X';  // Silently ignored!
+```
+
+**Impact:** No UART output after boot. The ISP flasher's initial diagnostic message was never transmitted. Firmware appeared to hang waiting for UART.
+
+**Fix:** Added explicit delay after CLKDIV initialization:
+```c
+UART0->CLKDIV = CLK_FREQ / UART_BAUD - 2;
+
+// CRITICAL: Wait for UART to finish sending 15 idle bits after CLKDIV write
+// This takes ~1740 cycles (15 bits * 116 cycles/bit at 115200 baud, 13.5 MHz clock)
+for (waitcnt = 0; waitcnt < 2000; waitcnt++);
+
+// Now safe to write DATA
+UART0->DATA = 'X';
+```
+
+The 2000-cycle delay ensures the transmitter has finished sending idle bits before any DATA writes occur.
+
+**Lesson:** Peripheral modules may have initialization timing requirements not exposed in the register interface. When porting firmware to a new architecture, review the peripheral RTL for state machine delays and ensure firmware timing accounts for these. UART CLKDIV changes require waiting for the transmitter to stabilize before sending data.
 
 ---
 
