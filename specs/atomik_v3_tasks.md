@@ -288,10 +288,14 @@ Additionally: `review.yml` (PR ruff check) and `math/proofs/.github/workflows/le
 
 **Dependencies**: Phase 2 (CPU + ATOMiK must work)
 
-### 3.1 SPI Flash XIP Controller
+### 3.1 SPI Flash XIP Controller ✅ **COMPLETE - Phase 3B - Feb 23, 2026**
 - [x] Adapt v2's SPI flash controller for 64-bit CPU (instruction fetch is still 32-bit)
 - [x] XIP read path: CPU presents address → SPI controller fetches 32-bit word → CPU latches instruction
-- [x] Verify boot sequence: CPU starts fetching from address 0x00000000 in SPI flash
+- [x] **Hardware validated:** CPU boots from flash at 0x00000000, executes instructions from SPI flash
+- [x] **Evidence:** Flash firmware banner printed, PC=0x168 (flash address space)
+- [x] **Method:** Direct flash boot (reset PC=0x00000000), programmed via openFPGALoader --external-flash
+
+**Note:** Phase 3B validated Flash XIP by booting CPU directly from flash (bypassing Boot ROM). Full ISP programming flow deferred to Phase 3C integration. See `docs/PHASE3B_COMPLETE.md` for validation details.
 
 ### 3.2 SRAM Integration
 - [x] 8 KB SRAM (4 BSRAM blocks) at address 0x40000000 (same as v2)
@@ -335,15 +339,17 @@ Additionally: `review.yml` (PR ruff check) and `math/proofs/.github/workflows/le
   - 0x80000000: Boot ROM 8 KB + peripherals (S2: UART, GPIO, SPI flash config)
   - 0xC0000000: Tied off (S3, ATOMiK is direct-wire via custom instructions)
 
-### 3.9 Firmware Port
-- [x] Port v2 firmware structure to RV64I:
+### 3.9 Firmware Port — **Phase 3C: IN PROGRESS**
+- [ ] Port v2 firmware structure to RV64I:
   - `riscv64-unknown-elf-gcc -march=rv64i -mabi=lp64 -Os -fno-builtin`
   - Linker scripts for 64-bit (`elf64-littleriscv`)
   - 64-bit hex print (16 digits), powers-of-10 table with repeated subtraction
   - UART menu system with ATOMiK test harness
-- [x] Boot ROM (ISP flasher): 1,344 bytes RV64I, fits in 8 KB BROM
-- [x] Flash firmware: 6,344 bytes flash, 2,064 bytes RAM
-- [x] Verilator SoC smoke test: boots from BROM, jumps to flash, 9/9 ATOMiK tests PASS
+- [ ] Boot ROM (ISP flasher): Port to RV64I, restore Boot ROM boot flow
+- [ ] Flash firmware: Port v2 UART menu + all ATOMiK tests to RV64I
+- [ ] Hardware validation: UART menu functional, all v2 tests ported and passing
+
+**Status:** Minimal XIP test firmware working (696 bytes). Full v2 firmware port in progress.
 
 ### 3.10 ATOMiK Hardware Tests (Port from v2)
 - [x] Port the v2 test suite to use v3's custom instructions:

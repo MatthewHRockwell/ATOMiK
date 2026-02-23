@@ -2,7 +2,7 @@
 
 **Last Updated:** February 23, 2026
 
-## Current Status: 🟢 **Phase 3A Complete - UART Working**
+## Current Status: 🟢 **Phase 3B Complete - Flash XIP Validated**
 
 ### Completed Milestones
 
@@ -13,6 +13,25 @@
 - **Full SoC integration** working (CPU → bus → UART)
 
 **Evidence:** Continuous "TEST\n" output from /dev/ttyUSB1
+
+#### ✅ Phase 3B: Flash XIP Validation (Feb 23, 2026)
+- **CPU boots directly from SPI flash** at address 0x00000000
+- **Instruction fetch from flash** verified via hardware test
+- **Flash firmware executing** - banner and PC confirmation
+- **Program Counter:** 0x168 (flash address space, not Boot ROM)
+
+**Evidence:**
+```
+
+
+=== ATOMiK v3 Flash XIP Test ===
+Phase 3B: SPI Flash Execute-In-Place
+Running from: 0x00000000 (SPI Flash)
+Current PC: 0x00000168
+
+Flash XIP Working! (Heartbeat below)
+FLASH-XIP-OK [00000000]
+```
 
 ### Architecture Overview
 
@@ -40,12 +59,7 @@ From synthesis report:
 
 ### Next Steps
 
-#### Phase 3B: Flash XIP Validation
-- [ ] Verify SPI flash read timing
-- [ ] Test code execution from flash
-- [ ] Validate instruction fetch pipeline
-
-#### Phase 3C: Main Firmware Development
+#### Phase 3C: Main Firmware Development 🔄 **IN PROGRESS**
 - [ ] Port v2 firmware to RV64I
   - [ ] 64-bit startup (crt_flash.S)
   - [ ] ATOMiK test wrappers (custom instructions)
@@ -103,8 +117,8 @@ From synthesis report:
 | Phase 1: CPU Core | - | Complete | ✅ |
 | Phase 2: Compliance | - | Complete | ✅ |
 | Phase 3A: UART | Feb 23 | Feb 23 | ✅ |
-| Phase 3B: Flash XIP | TBD | - | 🔄 Next |
-| Phase 3C: Firmware | TBD | - | 📋 Planned |
+| Phase 3B: Flash XIP | Feb 23 | Feb 23 | ✅ |
+| Phase 3C: Firmware | Feb 23 | - | 🔄 In Progress |
 | Phase 3D: ATOMiK | TBD | - | 📋 Planned |
 | Phase 3E: Validation | TBD | - | 📋 Planned |
 
@@ -115,18 +129,25 @@ From synthesis report:
 - [x] Boot ROM executing
 - [x] SoC integration verified
 
+**Phase 3B (Flash XIP):** ✅ ACHIEVED
+- [x] SPI flash readable
+- [x] Instruction fetch from flash
+- [x] Flash startup code executing
+- [x] Program Counter in flash address space
+
 **Phase 3 (Overall):** 🔄 IN PROGRESS
 - [x] SoC boots from SPI flash
 - [x] UART console functional
+- [ ] Full v2 firmware ported to RV64I
 - [ ] ATOMiK custom instructions validated
 - [ ] Performance meets/exceeds v2
 
 ### Recommendations
 
-1. **Proceed to Phase 3B immediately** - Flash XIP is critical path
-2. **Firmware development in parallel** - Can start porting while debugging flash
-3. **Document ATOMiK instruction encoding** - Needed for firmware wrappers
-4. **Plan FPGA availability** - Hardware validation requires physical board access
+1. **Proceed to Phase 3C immediately** - Port v2 firmware to RV64I
+2. **Restore Boot ROM boot flow** - Re-enable Boot ROM → Flash jump for production
+3. **Implement ATOMiK custom instruction wrappers** - C inline assembly for ATOMIK.LOAD/ACCUM/READ
+4. **Test all v2 features** - UART menu, ATOMiK tests (X, P, K, M, H), performance benchmarks
 
 ### Contact & Resources
 
@@ -137,4 +158,4 @@ From synthesis report:
 
 ---
 
-**Bottom Line:** Phase 3A complete. v3 SoC UART communication validated on hardware. Ready for Flash XIP testing and firmware development.
+**Bottom Line:** Phase 3A + 3B complete. v3 SoC has working UART and validated Flash XIP. Ready for Phase 3C: full v2 firmware port to RV64I.
