@@ -120,6 +120,18 @@ typedef struct {
     uint8_t data_buf[256];
 } FLASH_BUF;
 
+// Test function to verify jump mechanism
+void test_loop() {
+    while (1) {
+        uart_putchar('T');
+        uart_putchar('E');
+        uart_putchar('S');
+        uart_putchar('T');
+        uart_putchar('\n');
+        for (volatile int i = 0; i < 100000; i++);
+    }
+}
+
 #define FW_WAIT_MAXCNT  500000
 #define CLK_FREQ        13500000  // Crystal direct ÷2 (bypassing PLL)
 #define UART_BAUD       115200
@@ -152,8 +164,9 @@ int main()
     }
 
     if (waitcnt == FW_WAIT_MAXCNT) {
+        // Phase 3B: Jump to flash firmware at 0x00000000
         // Diagnostic: read first word from SPI flash XIP and print it
-        uart_putchar('X');
+        uart_putchar('J');  // 'J' = Jumping to flash
         volatile uint32_t *fp = (volatile uint32_t *)0x00000004;
         uint32_t w = *fp;
         for (int i = 7; i >= 0; i--) {
@@ -162,8 +175,19 @@ int main()
         }
         uart_putchar('!');
 
-        // Jump to SPI flash at address 0x00000000
-        __asm__ volatile ("jr zero");
+        // Jump to flash entry point (0x00000000)
+        // Use function pointer to avoid compiler optimizations
+        void (*flash_entry)(void) = (void (*)(void))0x00000000;
+        flash_entry();
+
+        // Should never reach here
+        while (1) {
+            uart_putchar('E');  // 'E' = Error (jump failed)
+            uart_putchar('R');
+            uart_putchar('R');
+            uart_putchar('\n');
+            for (volatile int i = 0; i < 100000; i++);
+        }
     }
 
     while (1) {
