@@ -26,7 +26,7 @@
 
 module atomik_v3_soc (
     input clk,
-    // input resetn,  // External reset pin doesn't work - tie HIGH internally
+    input resetn,  // External reset pin (S14 on Tang Nano 9K)
 
     output       tmds_clk_n,
     output       tmds_clk_p,
@@ -68,25 +68,12 @@ Gowin_CLKDIV u_div_2 (
 assign clk_p5 = clk_p;
 
 // Power-on reset generator (hold reset for 256 cycles after power-on)
-// Use explicit initial block instead of inline initialization
-reg [7:0] reset_counter;
-reg sys_resetn_reg;
-
-initial begin
-    reset_counter = 8'h00;
-    sys_resetn_reg = 1'b0;
-end
-
-always @(posedge clk_p) begin
-    if (reset_counter != 8'hFF) begin
-        reset_counter <= reset_counter + 1;
-        sys_resetn_reg <= 1'b0;  // Hold in reset
-    end else begin
-        sys_resetn_reg <= 1'b1;  // Release reset after 256 cycles
-    end
-end
-
-assign sys_resetn = sys_resetn_reg;
+// Reset synchronization (from picotiny v2)
+Reset_Sync u_Reset_Sync (
+    .clk       (clk_p),
+    .ext_reset (resetn),  // External reset button
+    .resetn    (sys_resetn)
+);
 
 // =========================================================================
 // CPU bus signals (32-bit valid/ready, same as PicoRV32)
@@ -100,9 +87,10 @@ wire [31:0] mem_rdata;
 
 // =========================================================================
 // ATOMiK v3 CPU (RV64I + ATOMiK custom instructions, 32-bit bus)
+// Phase 3B: Boot directly from flash (0x00000000) for XIP validation
 // =========================================================================
 atomik_v3_cpu #(
-    .RESET_PC(64'h0000_0000_8000_0000)
+    .RESET_PC(64'h0000_0000_0000_0000)
 ) u_cpu (
     .clk       (clk_p),
     .rst_n     (sys_resetn),
