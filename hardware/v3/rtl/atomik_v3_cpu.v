@@ -115,6 +115,10 @@ module atomik_v3_cpu #(
     end
     // synthesis translate_on
 
+    // Gate mem_ready based on bus ownership (FIX: prevent crosstalk)
+    wire fetch_bus_ready = mem_ready && !lsu_has_bus;
+    wire lsu_bus_ready   = mem_ready && lsu_has_bus;
+
     assign mem_valid = lsu_has_bus ? lsu_bus_valid : fetch_bus_valid;
     assign mem_addr  = lsu_has_bus ? lsu_bus_addr  : fetch_bus_addr;
     assign mem_wdata = lsu_bus_wdata;
@@ -135,7 +139,7 @@ module atomik_v3_cpu #(
         .instr          (instr),
         .fetch_done     (fetch_done),
         .fetch_bus_valid(fetch_bus_valid),
-        .bus_ready      (mem_ready),
+        .bus_ready      (fetch_bus_ready),  // FIX: use gated ready signal
         .fetch_bus_addr (fetch_bus_addr),
         .bus_rdata      (mem_rdata)
     );
@@ -229,7 +233,7 @@ module atomik_v3_cpu #(
         .lsu_rdata    (lsu_rdata),
         .lsu_done     (lsu_done),
         .bus_valid    (lsu_bus_valid),
-        .bus_ready    (mem_ready),
+        .bus_ready    (lsu_bus_ready),  // FIX: use gated ready signal
         .bus_addr     (lsu_bus_addr),
         .bus_wdata    (lsu_bus_wdata),
         .bus_wstrb    (lsu_bus_wstrb),

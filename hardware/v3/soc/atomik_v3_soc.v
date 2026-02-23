@@ -26,7 +26,7 @@
 
 module atomik_v3_soc (
     input clk,
-    input resetn,
+    // input resetn,  // External reset pin doesn't work - tie HIGH internally
 
     output       tmds_clk_n,
     output       tmds_clk_p,
@@ -40,34 +40,53 @@ module atomik_v3_soc (
 
     input  ser_rx,
     output ser_tx,
-    inout [6:0] gpio
+    inout [4:0] gpio,  // Reduced from [6:0] to free pins 15,16 for debug
+
+    // Debug outputs
+    output wire debug_reset_n,    // LED: HIGH when CPU out of reset
+    output wire debug_clk_toggle  // LED: Toggles with divided clock
 );
 
 // =========================================================================
-// Clock generation: PLL (27 MHz → 126 MHz) + CLKDIV (÷5 → 25.2 MHz)
+// Clock generation: Crystal direct (27 MHz) + CLKDIV (÷2 → 13.5 MHz)
+// PLL bypassed due to lock failure - using crystal directly
 // =========================================================================
-wire clk_p;       // 25.2 MHz CPU + pixel clock
-wire clk_p5;      // 126 MHz HDMI serializer clock
-wire pll_lock;
+wire clk_p;       // 13.5 MHz CPU + pixel clock
+wire clk_p5;      // Same as clk_p for HDMI (won't work properly, but not critical)
 wire sys_resetn;
+wire pll_lock;    // Tie-off for HDMI module (no PLL)
+assign pll_lock = 1'b0;  // Indicate PLL not locked
 
-Gowin_rPLL u_pll (
-    .clkin(clk),
-    .clkout(clk_p5),
-    .lock(pll_lock)
-);
-
-Gowin_CLKDIV u_div_5 (
+// No PLL - use crystal directly through divider
+Gowin_CLKDIV u_div_2 (
     .clkout(clk_p),
-    .hclkin(clk_p5),
-    .resetn(pll_lock)
+    .hclkin(clk),         // Crystal input directly
+    .resetn(1'b1)         // Always enabled
 );
 
-Reset_Sync u_Reset_Sync (
-    .resetn(sys_resetn),
-    .ext_reset(resetn & pll_lock),
-    .clk(clk_p)
-);
+// HDMI won't work properly without PLL, but assign clock anyway to avoid errors
+assign clk_p5 = clk_p;
+
+// Power-on reset generator (hold reset for 256 cycles after power-on)
+// Use explicit initial block instead of inline initialization
+reg [7:0] reset_counter;
+reg sys_resetn_reg;
+
+initial begin
+    reset_counter = 8'h00;
+    sys_resetn_reg = 1'b0;
+end
+
+always @(posedge clk_p) begin
+    if (reset_counter != 8'hFF) begin
+        reset_counter <= reset_counter + 1;
+        sys_resetn_reg <= 1'b0;  // Hold in reset
+    end else begin
+        sys_resetn_reg <= 1'b1;  // Release reset after 256 cycles
+    end
+end
+
+assign sys_resetn = sys_resetn_reg;
 
 // =========================================================================
 // CPU bus signals (32-bit valid/ready, same as PicoRV32)
@@ -183,6 +202,29 @@ PicoMem_Mux_1_4 u_bus_mux (
 // S3 tie-off: immediate ready, zero data
 assign wbp_ready = wbp_valid;
 assign wbp_rdata = 32'h0;
+
+// =========================================================================
+// Debug outputs - UART WRITE DETAIL TEST
+// =========================================================================
+// Check which UART registers are being written
+reg uart_clkdiv_written;  // Offset 4 (addr[2] = 1)
+reg uart_data_written;     // Offset 0 (addr[2] = 0)
+
+always @(posedge clk_p or negedge sys_resetn) begin
+    if (!sys_resetn) begin
+        uart_clkdiv_written <= 1'b0;
+        uart_data_written <= 1'b0;
+    end else if (uart_valid && uart_ready && |uart_wstrb) begin
+        if (uart_addr[2])
+            uart_clkdiv_written <= 1'b1;  // CLKDIV write
+        else
+            uart_data_written <= 1'b1;    // DATA write
+    end
+end
+
+// Pin 15: ON if BOTH CLKDIV and DATA written, OFF if only one or neither
+assign debug_reset_n = uart_clkdiv_written && uart_data_written;
+assign debug_clk_toggle = 1'b0;  // Pin 16: ignore (broken)
 
 // =========================================================================
 // Peripheral address decoder (within S2: 0x8000_0000)

@@ -121,7 +121,7 @@ typedef struct {
 } FLASH_BUF;
 
 #define FW_WAIT_MAXCNT  500000
-#define CLK_FREQ        25175000
+#define CLK_FREQ        13500000  // Crystal direct ÷2 (bypassing PLL)
 #define UART_BAUD       115200
 
 int main()
@@ -133,6 +133,17 @@ int main()
 
     UART0->CLKDIV = CLK_FREQ / UART_BAUD - 2;
 
+    // CRITICAL: Wait for UART to finish sending 15 idle bits after CLKDIV write
+    // This takes ~1740 cycles (15 bits * 116 cycles/bit at 115200 baud, 13.5 MHz clock)
+    for (waitcnt = 0; waitcnt < 2000; waitcnt++);
+
+    // Flush UART RX noise from FPGA reconfiguration glitches.
+    // Without this, pin noise during SRAM bitstream load can appear
+    // as 0x55 and prematurely enter ISP mode.
+    for (waitcnt = 0; waitcnt < 200000; waitcnt++) {
+        (void)UART0->DATA;
+    }
+
     for (waitcnt = 0; waitcnt < FW_WAIT_MAXCNT; waitcnt++) {
         if (UART0->DATA == 0x55) {
             uart_putchar(0x56);
@@ -141,8 +152,18 @@ int main()
     }
 
     if (waitcnt == FW_WAIT_MAXCNT) {
-        void (*flash_vec)(void) = (void (*)(void))(0x00000000);
-        flash_vec();
+        // Diagnostic: read first word from SPI flash XIP and print it
+        uart_putchar('X');
+        volatile uint32_t *fp = (volatile uint32_t *)0x00000004;
+        uint32_t w = *fp;
+        for (int i = 7; i >= 0; i--) {
+            uint8_t n = (w >> (4*i)) & 0xF;
+            uart_putchar(n < 10 ? '0' + n : 'a' + n - 10);
+        }
+        uart_putchar('!');
+
+        // Jump to SPI flash at address 0x00000000
+        __asm__ volatile ("jr zero");
     }
 
     while (1) {
@@ -205,9 +226,8 @@ int main()
             // ISP Flasher RST
             uart_putchar(0xF1);
 
-            // Jump to reset vector
-            void (*rst_vec)(void) = (void (*)(void))(0x80000000);
-            rst_vec();
+            // Jump to reset vector (use asm to avoid compiler UB issues)
+            __asm__ volatile ("li t0, 0x80000000; jr t0" ::: "t0");
             break;
         default:
             break;
