@@ -1,6 +1,6 @@
 PROJ_NAME = fw-flash
 
-SRCS = $(wildcard *.c) $(wildcard *.S)
+SRCS = firmware.c atomik_v3_mem.c atomik_v3_alloc.c printf_v3.c perf_bench_v3.c crt_flash.S
 
 LDSCRIPT = ./linker_flash.ld
 

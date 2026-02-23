@@ -87,10 +87,10 @@ wire [31:0] mem_rdata;
 
 // =========================================================================
 // ATOMiK v3 CPU (RV64I + ATOMiK custom instructions, 32-bit bus)
-// Phase 3B: Boot directly from flash (0x00000000) for XIP validation
+// Production boot flow: Boot ROM (0x80000000) → Flash (0x00000000)
 // =========================================================================
 atomik_v3_cpu #(
-    .RESET_PC(64'h0000_0000_0000_0000)
+    .RESET_PC(64'h0000_0000_8000_0000)
 ) u_cpu (
     .clk       (clk_p),
     .rst_n     (sys_resetn),
