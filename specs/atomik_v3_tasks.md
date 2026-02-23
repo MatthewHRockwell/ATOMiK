@@ -298,10 +298,15 @@ Additionally: `review.yml` (PR ruff check) and `math/proofs/.github/workflows/le
 - [x] 64-bit CPU accesses SRAM via 64→32 adapter (inside load/store unit)
 - [x] Stack, heap, and data segments reside in SRAM
 
-### 3.3 UART Peripheral
-- [x] Reuse v2's UART module (115200 baud, character-at-a-time)
+### 3.3 UART Peripheral ✅ **COMPLETE - Feb 23, 2026**
+- [x] ~~Reuse v2's UART module~~ **Replaced with manual_uart_tx.v**
 - [x] Memory-mapped at peripheral address range (0x83000000)
 - [x] 32-bit register interface (unchanged from v2)
+- [x] **Hardware validated on Tang Nano 9K** - transmitting "TEST\n" at 115200 baud
+- [x] **Boot ROM executing** - ISP flasher running correctly
+- [x] **Full SoC integration** - CPU → bus → UART → /dev/ttyUSB1 working
+
+**Note:** simpleuart.v worked in Verilator but failed on hardware after synthesis. Replaced with manual_uart_tx.v - a clean, hardware-proven UART TX peripheral based on uart_test.v manual bitbanging. Drop-in replacement, validated in ~2 hours. See `docs/UART_FIX_SUCCESS.md` for details.
 
 ### 3.4 GPIO
 - [x] Reuse v2's GPIO module for LED control and button input

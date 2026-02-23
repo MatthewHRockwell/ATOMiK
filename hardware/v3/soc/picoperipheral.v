@@ -6,15 +6,15 @@ module Reset_Sync (
  output resetn
 );
 
- reg [3:0] reset_cnt = 0;
- 
+ reg [3:0] reset_cnt;
+
  always @(posedge clk or negedge ext_reset) begin
      if (~ext_reset)
-         reset_cnt <= 4'b0;
+         reset_cnt <= 4'b0000;
      else
          reset_cnt <= reset_cnt + !resetn;
  end
- 
+
  assign resetn = &reset_cnt;
 
 endmodule
@@ -46,7 +46,8 @@ module PicoMem_UART (
  
  assign mem_s_ready = reg_div_sel || (reg_dat_sel && ~reg_dat_wait);
  
- simpleuart u_simpleuart (
+ // Use manual_uart_tx (drop-in replacement, hardware-proven)
+ manual_uart_tx u_manual_uart_tx (
    .clk(clk),
    .resetn(resetn),
    .ser_tx(ser_tx),
