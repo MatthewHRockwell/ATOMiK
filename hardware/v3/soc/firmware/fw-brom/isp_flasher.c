@@ -137,8 +137,8 @@ void test_loop() {
 }
 
 #define FW_WAIT_MAXCNT  5000000  // ~370ms timeout at 13.5 MHz (longer for ISP)
-#define CLK_FREQ        13500000  // Crystal direct ÷2 (bypassing PLL)
-#define UART_BAUD       115200
+#define CLK_FREQ        27000000  // Crystal frequency (actual baud will be 76800, not 115200)
+#define UART_BAUD       115200    // Targeting 115200 produces 76800 actual (see V3-016)
 
 int main()
 {
@@ -162,13 +162,12 @@ int main()
     // 1. UART: Continuous 'T' spam (proves: CPU fetch, ROM mapping, UART TX, baud)
     // 2. GPIO: Toggle heartbeat (proves: CPU alive independent of UART)
 
+    // Infinite spam loop: UART 'T' + GPIO toggle heartbeat
     uint8_t led_state = 0;
     while (1) {
-        // UART spam: 'T' character
         UART0->DATA = 'T';
 
-        // Delay ~100k cycles at 13.5 MHz = ~7.4ms
-        // Gives ~135 Hz UART spam, ~67.5 Hz LED toggle
+        // Delay ~100k cycles at 27 MHz = ~3.7ms
         for (volatile int i = 0; i < 100000; i++);
 
         // Toggle GPIO[0] LED

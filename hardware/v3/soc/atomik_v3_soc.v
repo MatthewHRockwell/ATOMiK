@@ -48,21 +48,17 @@ module atomik_v3_soc (
 );
 
 // =========================================================================
-// Clock generation: Crystal direct (27 MHz) + CLKDIV (÷2 → 13.5 MHz)
-// PLL bypassed due to lock failure - using crystal directly
+// Clock generation: Crystal direct (27 MHz) - BYPASS CLKDIV
+// Testing: Remove CLKDIV to eliminate potential instability source
 // =========================================================================
-wire clk_p;       // 13.5 MHz CPU + pixel clock
+wire clk_p;       // 27 MHz CPU + pixel clock (crystal direct)
 wire clk_p5;      // Same as clk_p for HDMI (won't work properly, but not critical)
 wire sys_resetn;
 wire pll_lock;    // Tie-off for HDMI module (no PLL)
 assign pll_lock = 1'b0;  // Indicate PLL not locked
 
-// No PLL - use crystal directly through divider
-Gowin_CLKDIV u_div_2 (
-    .clkout(clk_p),
-    .hclkin(clk),         // Crystal input directly
-    .resetn(1'b1)         // Always enabled
-);
+// BYPASS CLKDIV - use crystal directly
+assign clk_p = clk;  // Direct connection, no divider
 
 // HDMI won't work properly without PLL, but assign clock anyway to avoid errors
 assign clk_p5 = clk_p;

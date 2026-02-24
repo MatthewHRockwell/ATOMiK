@@ -120,59 +120,76 @@ module atomik_v3_lsu (
     end
 
     // =========================================================================
-    // Bus signals
+    // Bus signals (REGISTERED to prevent glitches - see KNOWN_ISSUES V3-015)
     // =========================================================================
-    always @(*) begin
-        bus_valid = 1'b0;
-        bus_addr  = 32'b0;
-        bus_wdata = 32'b0;
-        bus_wstrb = 4'b0;
-
-        case (state)
-            S_XACT1: begin
-                bus_valid = 1'b1;
-                bus_addr  = req_addr[31:0] & 32'hFFFFFFFC;  // Word-aligned
-
-                if (req_is_store) begin
-                    case (req_size)
-                        SIZE_B: begin
-                            bus_wdata = {4{req_wdata[7:0]}};
-                            bus_wstrb = 4'b0001 << byte_off;
-                        end
-                        SIZE_H: begin
-                            bus_wdata = {2{req_wdata[15:0]}};
-                            bus_wstrb = 4'b0011 << byte_off;
-                        end
-                        SIZE_W: begin
-                            bus_wdata = req_wdata[31:0];
-                            bus_wstrb = 4'b1111;
-                        end
-                        SIZE_D: begin
-                            bus_wdata = req_wdata[31:0];  // Lower word first
-                            bus_wstrb = 4'b1111;
-                        end
-                        default: begin
-                            bus_wdata = req_wdata[31:0];
-                            bus_wstrb = 4'b1111;
-                        end
-                    endcase
+    always @(posedge clk) begin
+        if (!rst_n) begin
+            bus_valid <= 1'b0;
+            bus_addr  <= 32'b0;
+            bus_wdata <= 32'b0;
+            bus_wstrb <= 4'b0;
+        end else begin
+            case (state_next)  // Use NEXT state to avoid one-cycle lag
+                S_IDLE: begin
+                    bus_valid <= 1'b0;
+                    bus_wstrb <= 4'b0;
                 end
-            end
 
-            S_XACT2: begin
-                bus_valid = 1'b1;
-                bus_addr  = (req_addr[31:0] + 32'd4) & 32'hFFFFFFFC;  // Next word
+                S_XACT1: begin
+                    bus_valid <= 1'b1;
+                    bus_addr  <= lsu_addr[31:0] & 32'hFFFFFFFC;  // Word-aligned
 
-                if (req_is_store) begin
-                    bus_wdata = req_wdata[63:32];  // Upper word
-                    bus_wstrb = 4'b1111;
+                    if (lsu_is_store) begin
+                        case (lsu_size)
+                            SIZE_B: begin
+                                bus_wdata <= {4{lsu_wdata[7:0]}};
+                                bus_wstrb <= 4'b0001 << lsu_addr[1:0];
+                            end
+                            SIZE_H: begin
+                                bus_wdata <= {2{lsu_wdata[15:0]}};
+                                bus_wstrb <= 4'b0011 << lsu_addr[1:0];
+                            end
+                            SIZE_W: begin
+                                bus_wdata <= lsu_wdata[31:0];
+                                bus_wstrb <= 4'b1111;
+                            end
+                            SIZE_D: begin
+                                bus_wdata <= lsu_wdata[31:0];  // Lower word first
+                                bus_wstrb <= 4'b1111;
+                            end
+                            default: begin
+                                bus_wdata <= lsu_wdata[31:0];
+                                bus_wstrb <= 4'b1111;
+                            end
+                        endcase
+                    end else begin
+                        bus_wstrb <= 4'b0;  // Reads: no write strobes
+                    end
                 end
-            end
 
-            default: begin
-                // IDLE and DONE: no bus activity
-            end
-        endcase
+                S_XACT2: begin
+                    bus_valid <= 1'b1;
+                    bus_addr  <= (req_addr[31:0] + 32'd4) & 32'hFFFFFFFC;  // Next word
+
+                    if (req_is_store) begin
+                        bus_wdata <= req_wdata[63:32];  // Upper word
+                        bus_wstrb <= 4'b1111;
+                    end else begin
+                        bus_wstrb <= 4'b0;  // Reads: no write strobes
+                    end
+                end
+
+                S_DONE: begin
+                    bus_valid <= 1'b0;
+                    bus_wstrb <= 4'b0;
+                end
+
+                default: begin
+                    bus_valid <= 1'b0;
+                    bus_wstrb <= 4'b0;
+                end
+            endcase
+        end
     end
 
     // =========================================================================

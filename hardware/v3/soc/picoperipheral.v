@@ -46,17 +46,17 @@ module PicoMem_UART (
  
  assign mem_s_ready = reg_div_sel || (reg_dat_sel && ~reg_dat_wait);
  
- // Use manual_uart_tx (drop-in replacement, hardware-proven)
- manual_uart_tx u_manual_uart_tx (
+ // Use simpleuart (v2 proven module - see KNOWN_ISSUES V3-014)
+ simpleuart u_uart (
    .clk(clk),
    .resetn(resetn),
    .ser_tx(ser_tx),
    .ser_rx(ser_rx),
-   .reg_div_we({4{reg_div_sel}} & mem_s_wstrb),
+   .reg_div_we(reg_div_sel ? mem_s_wstrb : 4'b0),
    .reg_div_di(mem_s_wdata),
    .reg_div_do(reg_div_do),
-   .reg_dat_we(reg_dat_sel & mem_s_wstrb[0]),
-   .reg_dat_re(reg_dat_sel & ~(|mem_s_wstrb)),
+   .reg_dat_we(reg_dat_sel ? |mem_s_wstrb : 1'b0),
+   .reg_dat_re(reg_dat_sel ? ~(|mem_s_wstrb) : 1'b0),
    .reg_dat_di(mem_s_wdata),
    .reg_dat_do(reg_dat_do),
    .reg_dat_wait(reg_dat_wait)
