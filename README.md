@@ -108,7 +108,7 @@ python -m software.demos.state_sync_benchmark
 | **Timing Closure** | 25.2 MHz CPU clock, zero TNS | ✅ Complete |
 | **CPU Hang Debug** | Root cause identified & fixed (timing violations) | ✅ Complete |
 | **Hardware Validation** | Repeated MMIO stress testing | ✅ Complete (62/62 PASS) |
-| **ISP Flasher** | Boot ROM with UART ISP protocol | 🔄 In Progress (Stage 1 done) |
+| **ISP Flasher** | Boot ROM with UART ISP protocol | 🔄 In Progress (Stage 2 done) |
 | **Flash Boot Chain** | SPI XIP execution | ⏸️ Pending |
 | **ATOMiK Hardware Tests** | 9 tests on v3 hardware | ⏸️ Pending |
 | **AUIPC Fix** | Fix PC-relative addressing bug | ⏸️ Pending |

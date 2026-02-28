@@ -389,12 +389,96 @@ int main() {
 }
 
 // --------------------------------------------------------
+// ISP STAGE 2: Complete timeout path (handshake + jump to flash)
+// --------------------------------------------------------
+
+#elif defined(ISP_STAGE2)
+
+#define FW_WAIT_MAXCNT 100000  // Reduced for debugging (~4ms at 25.2MHz)
+
+static inline uint8_t uart_getchar_blocking() {
+    int32_t rdata;
+    do {
+        rdata = (int32_t)UART0->DATA;
+    } while (rdata < 0);
+    return (uint8_t)rdata;
+}
+
+int main() {
+    volatile uint32_t waitcnt;  // Changed to uint32_t and volatile
+
+    UART0->CLKDIV = CLK_FREQ / UART_BAUD - 2;
+    delay(2000);
+
+    // Print ISP banner
+    uart_putchar('I');
+    uart_putchar('S');
+    uart_putchar('P');
+    uart_putchar('\n');
+
+    // ISP handshake loop with heartbeat
+    for (waitcnt = 0; waitcnt < FW_WAIT_MAXCNT; waitcnt++) {
+        // Compiler barrier to prevent loop optimization
+        asm volatile("" ::: "memory");
+
+        // Heartbeat dot every 16K iterations (sparse to avoid UART flood)
+        if ((waitcnt & 0x3FFF) == 0) {
+            uart_putchar('.');
+        }
+
+        int32_t rdata = (int32_t)UART0->DATA;
+        if (rdata == 0x55) {
+            uart_putchar(0x56);  // ACK
+
+            // Echo 3 bytes to confirm handshake
+            for (int i = 0; i < 3; i++) {
+                uint8_t byte = uart_getchar_blocking();
+                uart_putchar(byte);
+            }
+
+            // Stay in echo loop (no flash ops yet)
+            while (1) {
+                uint8_t cmd = uart_getchar_blocking();
+                uart_putchar(cmd);
+            }
+        }
+    }
+
+    // Timeout - print exit marker
+    uart_putchar('E');  // Exit marker (proves loop completed)
+    uart_putchar('\n');
+
+    // Jump message
+    uart_putchar('J');
+    uart_putchar('U');
+    uart_putchar('M');
+    uart_putchar('P');
+    uart_putchar('!');
+    uart_putchar('\n');
+
+    delay(100000);  // Let UART finish transmitting
+
+    // Jump to flash entry point (0x00000000)
+    void (*flash_entry)(void) = (void (*)(void))0x00000000;
+    flash_entry();
+
+    // Should never reach here - flash firmware should take over
+    while (1) {
+        uart_putchar('E');  // Error - jump failed
+        uart_putchar('R');
+        uart_putchar('R');
+        uart_putchar('\n');
+        delay(1000000);
+    }
+}
+
+// --------------------------------------------------------
 // FULL ISP MODE: (Disabled until staged bringup complete)
 // --------------------------------------------------------
 
 #else
 
-#error "Please define BISECT_STEP1-8, BRINGUP_MODE, or ISP_STAGE1"
+#error "Please define BISECT_STEP1-8, BRINGUP_MODE, ISP_STAGE1, or ISP_STAGE2"
 
 #endif
 
