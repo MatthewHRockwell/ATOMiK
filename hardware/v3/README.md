@@ -2,6 +2,26 @@
 
 Custom RV64I CPU core with integrated ATOMiK delta-state datapath, targeting the Tang Nano 9K (GW1NR-LV9QN88PC6/I5).
 
+## Current Status (Phase 3D Complete) ✅
+
+**Hardware Validation:** 62/62 tests PASS
+- ✅ BRINGUP_MODE: CPU baseline working
+- ✅ BISECT_STEP8: 10 UART reads pass
+- ✅ BISECT_STEP7: 10,000 UART reads pass (60/60 consecutive)
+- ✅ Extended stress: 50 consecutive test cycles (~3.5 min)
+- ✅ Thermal stability: Validated through 60s warmup
+- ✅ ISP handshake: 0x55→0x56 ACK + echo working
+
+**Timing:** Clean closure at 25.2 MHz (TNS = 0.000 ns, Fmax = 25.201 MHz)
+
+**Known Issues:**
+- ⚠️ Thin timing margin (+0.004%) - consider 24 MHz for production
+- ⚠️ AUIPC instruction broken (workaround: use `li` instead of `la`)
+- ⏸️ Flash boot chain not yet validated
+- ⏸️ ATOMiK hardware tests pending
+
+See `deploy/HARDWARE_VALIDATION_COMPLETE.md` for detailed test results.
+
 ## Directory Structure
 
 ```

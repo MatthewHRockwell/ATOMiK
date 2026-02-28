@@ -90,14 +90,28 @@ python -m software.demos.state_sync_benchmark
 
 ## Development Status
 
+### Production Hardware (v2)
 | Milestone | Description | Status |
 |-----------|-------------|--------|
-| **Mathematical Formalization** | 92 theorems verified in Lean4 | Complete |
-| **SCORE Comparison** | 95-100% memory reduction validated | Complete |
-| **Hardware Synthesis** | 10/10 hardware tests, 7% LUT @ 94.5 MHz | Complete |
-| **SDK Generation Pipeline** | 6-stage controller, hardware demos, 5-language output | Complete |
-| **Agentic Orchestration** | DAG orchestrator, feedback loops, 353 tests | Complete |
-| **Parallel Accumulator Banks** | 16x linear scaling, 1,056 Mops/s, 80/80 HW tests | Complete |
+| **Mathematical Formalization** | 92 theorems verified in Lean4 | ✅ Complete |
+| **SCORE Comparison** | 95-100% memory reduction validated | ✅ Complete |
+| **Hardware Synthesis** | 10/10 hardware tests, 7% LUT @ 94.5 MHz | ✅ Complete |
+| **SDK Generation Pipeline** | 6-stage controller, hardware demos, 5-language output | ✅ Complete |
+| **Agentic Orchestration** | DAG orchestrator, feedback loops, 353 tests | ✅ Complete |
+| **Parallel Accumulator Banks** | 16x linear scaling, 1,056 Mops/s, 80/80 HW tests | ✅ Complete |
+| **Production SoC Deployment** | PicoRV32 + ATOMiK @ 25.2/81 MHz, persistent flash | ✅ Complete |
+
+### Next-Generation Hardware (v3 - In Progress)
+| Milestone | Description | Status |
+|-----------|-------------|--------|
+| **RV64I CPU Core** | Custom 64-bit RISC-V with integrated ATOMiK datapath | ✅ Complete (53/54 compliance) |
+| **Timing Closure** | 25.2 MHz CPU clock, zero TNS | ✅ Complete |
+| **CPU Hang Debug** | Root cause identified & fixed (timing violations) | ✅ Complete |
+| **Hardware Validation** | Repeated MMIO stress testing | ✅ Complete (62/62 PASS) |
+| **ISP Flasher** | Boot ROM with UART ISP protocol | 🔄 In Progress (Stage 1 done) |
+| **Flash Boot Chain** | SPI XIP execution | ⏸️ Pending |
+| **ATOMiK Hardware Tests** | 9 tests on v3 hardware | ⏸️ Pending |
+| **AUIPC Fix** | Fix PC-relative addressing bug | ⏸️ Pending |
 | **Production SoC Deployment** | Tang Nano 9K @ 81 MHz, 0 TNS, persistent flash | **Deployed** |
 | **Performance Benchmarking** | 550-measurement automated suite, JSONL data pooling, regression detection | Complete |
 

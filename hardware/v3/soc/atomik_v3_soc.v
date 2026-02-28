@@ -48,26 +48,33 @@ module atomik_v3_soc (
 );
 
 // =========================================================================
-// Clock generation: Crystal direct (27 MHz) - BYPASS CLKDIV
-// Testing: Remove CLKDIV to eliminate potential instability source
+// Clock generation: PLL + CLKDIV (matches v2 architecture)
+// PLL: 27 MHz → 126 MHz (clk_p5 for HDMI 5x serializer)
+// CLKDIV: 126 MHz ÷ 5 → 25.2 MHz (clk_p for CPU + HDMI pixel clock)
 // =========================================================================
-wire clk_p;       // 27 MHz CPU + pixel clock (crystal direct)
-wire clk_p5;      // Same as clk_p for HDMI (won't work properly, but not critical)
+wire clk_p;       // 25.2 MHz CPU + pixel clock
+wire clk_p5;      // 126 MHz HDMI 5x serializer clock
 wire sys_resetn;
-wire pll_lock;    // Tie-off for HDMI module (no PLL)
-assign pll_lock = 1'b0;  // Indicate PLL not locked
+wire pll_lock;    // PLL lock indicator
 
-// BYPASS CLKDIV - use crystal directly
-assign clk_p = clk;  // Direct connection, no divider
+Gowin_rPLL u_pll (
+    .clkin  (clk),
+    .clkout (clk_p5),
+    .lock   (pll_lock)
+);
 
-// HDMI won't work properly without PLL, but assign clock anyway to avoid errors
-assign clk_p5 = clk_p;
+Gowin_CLKDIV u_div_5 (
+    .clkout (clk_p),
+    .hclkin (clk_p5),
+    .resetn (pll_lock)
+);
 
-// Power-on reset generator (hold reset for 256 cycles after power-on)
-// Reset synchronization (from picotiny v2)
+// Power-on reset generator (hold reset until PLL locks + 16 cycles)
+// Reset synchronization - gated by PLL lock
 Reset_Sync u_Reset_Sync (
     .clk       (clk_p),
-    .ext_reset (resetn),  // External reset button
+    .ext_reset (resetn),   // External reset button
+    .pll_lock  (pll_lock), // Hold reset until PLL stable
     .resetn    (sys_resetn)
 );
 

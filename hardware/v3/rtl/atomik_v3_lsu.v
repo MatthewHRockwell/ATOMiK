@@ -83,8 +83,8 @@ module atomik_v3_lsu (
         state_next = state;
         case (state)
             S_IDLE:  if (lsu_start) state_next = S_XACT1;
-            S_XACT1: if (bus_ready) state_next = req_needs_two ? S_XACT2 : S_DONE;
-            S_XACT2: if (bus_ready) state_next = S_DONE;
+            S_XACT1: if (bus_valid && bus_ready) state_next = req_needs_two ? S_XACT2 : S_DONE;
+            S_XACT2: if (bus_valid && bus_ready) state_next = S_DONE;
             S_DONE:  state_next = S_IDLE;
             default: state_next = S_IDLE;
         endcase
@@ -211,7 +211,7 @@ module atomik_v3_lsu (
     always @(posedge clk) begin
         if (!rst_n)
             last_rdata <= 32'b0;
-        else if ((state == S_XACT1 || state == S_XACT2) && bus_ready && !req_is_store)
+        else if ((state == S_XACT1 || state == S_XACT2) && bus_valid && bus_ready && !req_is_store)
             last_rdata <= bus_rdata;
     end
 

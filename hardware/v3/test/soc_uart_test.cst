@@ -1,0 +1,19 @@
+IO_LOC "clk" 52;
+IO_PORT "clk" IO_TYPE=LVCMOS33 PULL_MODE=UP;
+
+IO_LOC "uart_tx" 17;
+IO_PORT "uart_tx" IO_TYPE=LVCMOS33 DRIVE=8;
+
+# Debug outputs on GPIO pins (Bank 0, 3.3V)
+IO_LOC "gpio_debug[0]" 25;
+IO_PORT "gpio_debug[0]" IO_TYPE=LVCMOS33 DRIVE=8;
+IO_LOC "gpio_debug[1]" 26;
+IO_PORT "gpio_debug[1]" IO_TYPE=LVCMOS33 DRIVE=8;
+IO_LOC "gpio_debug[2]" 27;
+IO_PORT "gpio_debug[2]" IO_TYPE=LVCMOS33 DRIVE=8;
+IO_LOC "gpio_debug[3]" 28;
+IO_PORT "gpio_debug[3]" IO_TYPE=LVCMOS33 DRIVE=8;
+IO_LOC "gpio_debug[4]" 29;
+IO_PORT "gpio_debug[4]" IO_TYPE=LVCMOS33 DRIVE=8;
+IO_LOC "gpio_debug[5]" 30;
+IO_PORT "gpio_debug[5]" IO_TYPE=LVCMOS33 DRIVE=8;

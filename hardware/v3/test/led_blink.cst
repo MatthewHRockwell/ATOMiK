@@ -1,0 +1,13 @@
+// Clock
+IO_LOC "clk" 52;
+IO_PORT "clk" IO_TYPE=LVCMOS33 PULL_MODE=UP;
+
+// Test three pins with different blink rates
+IO_LOC "pin15" 15;
+IO_PORT "pin15" IO_TYPE=LVCMOS18 DRIVE=8;
+
+IO_LOC "pin17" 17;
+IO_PORT "pin17" IO_TYPE=LVCMOS33 DRIVE=8;
+
+IO_LOC "pin18" 18;
+IO_PORT "pin18" IO_TYPE=LVCMOS33 DRIVE=8;

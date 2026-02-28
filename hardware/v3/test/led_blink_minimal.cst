@@ -1,0 +1,4 @@
+// Minimal LED blink constraints for Tang Nano 9K
+// Using GPIO pin 15 (Bank 3, 1.8V - matching bank voltage)
+IO_LOC "led_out" 15;
+IO_PORT "led_out" IO_TYPE=LVCMOS18 PULL_MODE=UP DRIVE=8;

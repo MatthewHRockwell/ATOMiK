@@ -1,0 +1,8 @@
+IO_LOC "led_resetn" 15;
+IO_PORT "led_resetn" IO_TYPE=LVCMOS18 PULL_MODE=NONE DRIVE=8;
+
+IO_LOC "led_resetn_inv" 16;
+IO_PORT "led_resetn_inv" IO_TYPE=LVCMOS18 PULL_MODE=NONE DRIVE=8;
+
+IO_LOC "resetn" 4;
+IO_PORT "resetn" IO_TYPE=LVCMOS18 PULL_MODE=UP;

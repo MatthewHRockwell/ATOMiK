@@ -16,6 +16,9 @@ set_option -top_module atomik_v3_soc
 # Enable MSPI as regular IO (required for SPI flash pins)
 set_option -use_mspi_as_gpio 1
 
+# Enable DONE pin as regular IO (required for Tang Nano 9K to complete configuration)
+set_option -use_done_as_gpio 1
+
 # Set output base name
 set_option -output_base_name atomik_v3_soc
 

@@ -1,6 +1,6 @@
 # ATOMiK Known Issues & Error Log
 
-**Last Updated:** February 23, 2026
+**Last Updated:** February 28, 2026
 
 This document tracks hardware and software issues encountered during development, their root causes, and resolutions. It serves as a troubleshooting reference for future work.
 
@@ -773,3 +773,142 @@ These are not bugs but important lessons learned during development:
 ---
 
 *This document is updated as new issues are discovered and resolved.*
+
+---
+
+### V3-016: CPU Hang on Repeated MMIO Loads (Phase 3D)
+
+**Severity:** Critical
+**Date:** February 27-28, 2026
+**Status:** Fixed
+
+**Symptom:** CPU hangs completely when executing tight loops with repeated MMIO reads (e.g., UART polling). Simple CPU operations (function calls, stack, single loads, branches) work correctly, but repeated loads to memory-mapped peripherals cause a complete system hang with no UART output.
+
+**Bisection Results:**
+- ✅ BISECT_STEP1-5: Function calls, stack frames, single loads, long loops, function pointers - ALL PASS
+- ❌ BISECT_STEP6-8: UART polling loops (10 to 10,000 iterations) - ALL HANG
+
+**Root Cause (Multi-Factor):**
+
+1. **Timing Violations (Primary):**
+   - CPU running at 27 MHz direct from crystal
+   - Achievable Fmax: only 26.563 MHz
+   - Result: 24 setup timing violations, TNS = -7.086 ns
+   - Critical path: instruction[3] → regfile BSRAM (15 logic levels)
+   - Timing violations cause wrong data to be latched into registers on some clock cycles, creating probabilistic hangs that correlate with instruction count
+
+2. **LSU Handshake Bug (Secondary):**
+   - LSU state transitions checked `bus_ready` alone, not `bus_valid && bus_ready`
+   - Lines 86, 87, 214 in `atomik_v3_lsu.v` violated valid/ready protocol
+   - State machine could advance before bus transaction completed
+
+3. **Reset Synchronization (Tertiary):**
+   - Reset not gated on PLL lock
+   - CPU could start before clock stabilized
+   - Caused intermittent boot failures
+
+4. **UART Baud Rate (Configuration):**
+   - Firmware defined CLK_FREQ=27000000
+   - Actual CPU clock is 25.2 MHz after PLL+CLKDIV
+   - UART baud rate miscalculated → corrupted output
+
+**Fixes Applied:**
+
+1. **Clock Architecture Restored:**
+   ```
+   PLL: 27 MHz → 126 MHz
+   CLKDIV: 126 MHz ÷ 5 → 25.2 MHz
+   Result: TNS = 0.000 ns, Fmax = 25.201 MHz
+   ```
+   - Files: `soc/gowin_ip/gowin_rpll/gowin_rpll.v`, `soc/gowin_ip/gowin_clkdiv/gowin_clkdiv.v`, `soc/atomik_v3_soc.v`
+
+2. **LSU Handshake Protocol Fixed:**
+   ```verilog
+   // Before: if (bus_ready) state_next = ...
+   // After:  if (bus_valid && bus_ready) state_next = ...
+   ```
+   - File: `rtl/atomik_v3_lsu.v` lines 86, 87, 214
+
+3. **Reset Synchronization Fixed:**
+   ```verilog
+   // Added pll_lock gating to Reset_Sync
+   else if (pll_lock)
+       reset_cnt <= reset_cnt + !resetn;
+   else
+       reset_cnt <= 4'b0000;
+   ```
+   - File: `soc/picoperipheral.v`
+
+4. **UART Baud Rate Corrected:**
+   ```c
+   #define CLK_FREQ 25200000  // was 27000000
+   ```
+   - File: `soc/firmware/fw-brom/isp_flasher.c`
+
+**Validation Results:**
+- **62/62 hardware tests PASS** across thermal and stress conditions
+- **BISECT_STEP7 (10,000 UART reads):** 60/60 consecutive passes
+- **Extended stress test:** 50/50 consecutive runs (~3.5 minutes)
+- **Thermal stability:** Stable through 60s warmup + extended testing
+- **ISP handshake:** Working (0x55→0x56 ACK, echo test pass)
+
+**Analysis:**
+Timing closure at 25.2 MHz plus the LSU handshake fix eliminates the hang across repeated-load stress tests. The probabilistic nature of the hang (simple tests passed, complex tests failed) is consistent with timing violations — more cycles executed increases probability of hitting violated paths.
+
+**Lessons Learned:**
+1. **Always check timing first** when debugging hardware hangs
+2. **Timing violations mask RTL bugs** — both must be fixed
+3. **Clock bypasses for "testing" are dangerous** — restore proper clock generation
+4. **Thin margins are fragile** — +0.004% margin is barely sufficient across PVT variation
+
+**Prevention:**
+- Monitor timing reports in every synthesis run
+- Never bypass clock generation without explicit timing analysis
+- Validate handshake protocols even when timing is clean
+- Test across thermal conditions for marginal designs
+
+**Documentation:**
+- `hardware/v3/deploy/TIMING_VIOLATION_ROOT_CAUSE.md`
+- `hardware/v3/deploy/PHASE3D_TIMING_FIX_COMPLETE.md`
+- `hardware/v3/deploy/HARDWARE_VALIDATION_COMPLETE.md`
+- `hardware/v3/deploy/BUG_REPORT_BISECTION_COMPLETE.md`
+
+---
+
+### V3-017: AUIPC Instruction Broken
+
+**Severity:** High
+**Date:** February 2026
+**Status:** Open (workaround available)
+
+**Symptom:** AUIPC (Add Upper Immediate to PC) instruction generates incorrect addresses. This affects:
+- Global pointer initialization (`.option push; .option norelax; la gp, __global_pointer$`)
+- Position-independent code sequences
+- Address materialization patterns generated by compiler
+
+**Root Cause:** Not yet investigated (deferred pending Phase 3D completion)
+
+**Workaround:** Use `li` (load immediate) instead of `la` (load address) in assembly:
+```assembly
+# BROKEN:
+la sp, _stack_start  # Uses AUIPC + ADDI
+
+# WORKING:
+li sp, 0x800002F0    # Direct immediate load
+```
+
+**Impact:**
+- Requires custom CRT (C runtime) without AUIPC
+- Limits compiler code generation patterns
+- Must use `-fno-pic` and absolute addressing
+
+**Priority:** Should be fixed before production firmware development
+
+**Next Steps:**
+1. Create minimal AUIPC test case
+2. Trace execution in Verilator waveforms  
+3. Compare ALU result with expected PC+immediate
+4. Fix decode or ALU logic
+5. Add AUIPC to compliance test suite
+
+---

@@ -19,7 +19,7 @@ MABI  = lp64
 CFLAGS  = -march=$(MARCH) -mabi=$(MABI) -Os -fno-builtin
 CFLAGS += -ffunction-sections -fdata-sections
 CFLAGS += -MD -fstrict-volatile-bitfields
-CFLAGS += -DBRINGUP_MODE
+CFLAGS += -DISP_STAGE1  # ISP minimal: banner + handshake + echo (no flash ops)
 
 LDFLAGS  = -march=$(MARCH) -mabi=$(MABI) -Wl,--gc-sections
 LDFLAGS += -nostdlib -lgcc -mcmodel=medany -nostartfiles -ffreestanding

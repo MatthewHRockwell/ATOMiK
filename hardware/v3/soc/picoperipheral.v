@@ -3,6 +3,7 @@
 module Reset_Sync (
  input clk,
  input ext_reset,
+ input pll_lock,     // PLL lock - hold reset until stable
  output resetn
 );
 
@@ -11,8 +12,10 @@ module Reset_Sync (
  always @(posedge clk or negedge ext_reset) begin
      if (~ext_reset)
          reset_cnt <= 4'b0000;
-     else
+     else if (pll_lock)  // Only count when PLL is locked
          reset_cnt <= reset_cnt + !resetn;
+     else
+         reset_cnt <= 4'b0000;  // Hold in reset if PLL unlocks
  end
 
  assign resetn = &reset_cnt;

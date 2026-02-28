@@ -12,9 +12,9 @@ _stack_size = DEFINED(_stack_size) ? _stack_size : 2k;
 _heap_size = DEFINED(_heap_size) ? _heap_size : 0;
 
 SECTIONS {
-    .vector : {
+    .vector 0x00000000 : {
         . = ALIGN(4);
-        *crt_flash.o(.text);
+        KEEP(*crt_flash.o(.text .text.*));
     } > FLASH
 
     .text :

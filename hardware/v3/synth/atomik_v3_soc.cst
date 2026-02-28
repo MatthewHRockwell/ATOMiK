@@ -13,17 +13,13 @@ IO_LOC "tmds_d_p[2]" 75,74;
 IO_PORT "tmds_d_p[2]" PULL_MODE=NONE DRIVE=8;
 IO_LOC "tmds_clk_p" 69,68;
 IO_PORT "tmds_clk_p" PULL_MODE=NONE DRIVE=8;
-IO_LOC "ser_tx" 17;
+IO_LOC "ser_tx" 17;  # Tang Nano 9K USB-UART TX
 IO_PORT "ser_tx" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=8;
 IO_LOC "flash_csb" 60;
 IO_PORT "flash_csb" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=8;
 IO_LOC "flash_clk" 59;
 IO_PORT "flash_clk" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=8;
-IO_LOC "gpio[6]" 3;
-IO_PORT "gpio[6]" PULL_MODE=UP DRIVE=8;
-IO_LOC "gpio[5]" 16;
-IO_PORT "gpio[5]" PULL_MODE=UP DRIVE=8;
-IO_LOC "gpio[4]" 15;
+IO_LOC "gpio[4]" 3;
 IO_PORT "gpio[4]" PULL_MODE=UP DRIVE=8;
 IO_LOC "gpio[3]" 14;
 IO_PORT "gpio[3]" PULL_MODE=UP DRIVE=8;
@@ -37,9 +33,15 @@ IO_LOC "flash_miso" 62;
 IO_PORT "flash_miso" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=8;
 IO_LOC "flash_mosi" 61;
 IO_PORT "flash_mosi" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=8;
-IO_LOC "ser_rx" 18;
+IO_LOC "ser_rx" 18;  # Tang Nano 9K USB-UART RX
 IO_PORT "ser_rx" IO_TYPE=LVCMOS33 PULL_MODE=UP;
 IO_LOC "resetn" 4;
-IO_PORT "resetn" PULL_MODE=UP;
+IO_PORT "resetn" PULL_MODE=UP;  # Reset button (S14 on Tang Nano 9K)
 IO_LOC "clk" 52;
 IO_PORT "clk" IO_TYPE=LVCMOS33 PULL_MODE=UP;
+
+IO_LOC "debug_reset_n" 15;
+IO_PORT "debug_reset_n" IO_TYPE=LVCMOS18 PULL_MODE=NONE DRIVE=8;
+
+IO_LOC "debug_clk_toggle" 16;
+IO_PORT "debug_clk_toggle" IO_TYPE=LVCMOS18 PULL_MODE=NONE DRIVE=8;

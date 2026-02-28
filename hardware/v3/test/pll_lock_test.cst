@@ -1,0 +1,13 @@
+// PLL Lock Test Constraints
+// clk = 27 MHz crystal input (pin 52)
+// led_lock = PLL lock indicator (pin 15)
+// led_blink = Blink from PLL clock (pin 16)
+
+IO_LOC "clk" 52;
+IO_PORT "clk" IO_TYPE=LVCMOS33 PULL_MODE=UP;
+
+IO_LOC "led_lock" 15;
+IO_PORT "led_lock" IO_TYPE=LVCMOS18 PULL_MODE=UP DRIVE=8;
+
+IO_LOC "led_blink" 16;
+IO_PORT "led_blink" IO_TYPE=LVCMOS18 PULL_MODE=UP DRIVE=8;

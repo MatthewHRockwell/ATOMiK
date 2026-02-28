@@ -1,9 +1,12 @@
 // ISP Flasher for ATOMiK v3 SoC (RV64I)
 // Identical logic to v2 — all MMIO is 32-bit (uses lw/sw via volatile uint32_t*)
 
-// Compile-time flag for hardware bringup mode
-// When enabled: bypasses ISP/flash, continuously spams UART + toggles GPIO
-#define BRINGUP_MODE 1
+// BISECTION MODE: Systematically test CPU features to isolate bug
+// Controlled by Makefile defines:
+//   -DBISECT_STEP1: Function call test
+//   -DBISECT_STEP2: Stack frame test
+//   -DBISECT_STEP3: Load test
+//   -DBRINGUP_MODE: Simple loop (known working)
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -38,24 +41,198 @@ typedef struct {
 
 // --------------------------------------------------------
 
-#define QSPI_IO_CSb     0x20
-#define QSPI_IO_CLK     0x10
-#define QSPI_IO_MOSI    0x01
-#define QSPI_IO_MISO    0x02
+#define CLK_FREQ        25200000  // 25.2 MHz (PLL+CLKDIV, not direct crystal!)
+#define UART_BAUD       115200
 
-#define QSPI_OE_MOSI    0x0100
+static inline void uart_putchar(uint8_t wdata) {
+    UART0->DATA = wdata;
+}
 
-#define QSPI_EN_ENABLE  0x80
+static inline void delay(int cycles) {
+    for (volatile int i = 0; i < cycles; i++);
+}
 
-#define QSPI_FLASH_RDSR     0x05
-#define QSPI_FLASH_WREN     0x06
-#define QSPI_FLASH_SE       0x20
-#define QSPI_FLASH_PP       0x02
-#define QSPI_FLASHSR_WIP    0x01
+// --------------------------------------------------------
+// BISECTION STEP 1: Single function call
+// --------------------------------------------------------
 
-#define FLASHIO_REQWREN 0x01
+#ifdef BISECT_STEP1
 
-static inline uint8_t uart_getchar() {
+// Test: Can we call a function and return?
+// noinline forces actual JAL/JALR instead of inlining
+void __attribute__((noinline)) print_F(void) {
+    uart_putchar('F');
+}
+
+int main() {
+    // Initialize UART
+    UART0->CLKDIV = CLK_FREQ / UART_BAUD - 2;
+    delay(2000);
+
+    // Infinite loop: call function, delay, repeat
+    while (1) {
+        print_F();  // Function call test
+        delay(100000);
+    }
+}
+
+// --------------------------------------------------------
+// BISECTION STEP 2: Stack frame test
+// --------------------------------------------------------
+
+#elif defined(BISECT_STEP2)
+
+int main() {
+    // Initialize UART
+    UART0->CLKDIV = CLK_FREQ / UART_BAUD - 2;
+    delay(2000);
+
+    // Create local array to force stack frame
+    uint8_t local_array[16];
+
+    // Write pattern to array
+    for (int i = 0; i < 16; i++) {
+        local_array[i] = 'S';
+    }
+
+    // Read back and print
+    while (1) {
+        uart_putchar(local_array[0]);
+        delay(100000);
+    }
+}
+
+// --------------------------------------------------------
+// BISECTION STEP 3: Load test (polling UART status)
+// --------------------------------------------------------
+
+#elif defined(BISECT_STEP3)
+
+int main() {
+    // Initialize UART
+    UART0->CLKDIV = CLK_FREQ / UART_BAUD - 2;
+    delay(2000);
+
+    while (1) {
+        // Read UART DATA register (polling)
+        int32_t rdata = (int32_t)UART0->DATA;
+
+        // Print result-coded byte
+        if (rdata < 0) {
+            uart_putchar('N');  // Negative = no data
+        } else {
+            uart_putchar('D');  // Non-negative = data available
+        }
+        delay(100000);
+    }
+}
+
+// --------------------------------------------------------
+// BRINGUP MODE: Simple loop (known working baseline)
+// --------------------------------------------------------
+
+#elif defined(BRINGUP_MODE)
+
+int main() {
+    // Initialize UART
+    UART0->CLKDIV = CLK_FREQ / UART_BAUD - 2;
+    delay(2000);
+
+    // Configure GPIO for LED heartbeat
+    GPIO0->OE = 0x01;
+    GPIO0->OUT = 0x00;
+
+    // Simple spam loop
+    uint8_t led_state = 0;
+    while (1) {
+        UART0->DATA = 'T';
+        delay(100000);
+
+        led_state ^= 1;
+        GPIO0->OUT = led_state;
+    }
+}
+
+// --------------------------------------------------------
+// BISECTION STEP 4: Timeout loop (like ISP but simpler)
+// --------------------------------------------------------
+
+#elif defined(BISECT_STEP4)
+
+#define FW_WAIT_MAXCNT 5000000  // ~185ms at 27 MHz
+
+int main() {
+    volatile int waitcnt;
+
+    UART0->CLKDIV = CLK_FREQ / UART_BAUD - 2;
+    delay(2000);
+
+    // Timeout loop (like ISP flasher)
+    for (waitcnt = 0; waitcnt < FW_WAIT_MAXCNT; waitcnt++) {
+        // Don't actually check UART - just loop
+    }
+
+    // If we reach here, timeout expired
+    uart_putchar('J');
+    uart_putchar('U');
+    uart_putchar('M');
+    uart_putchar('P');
+    uart_putchar('!');
+
+    // Infinite loop to prevent further execution
+    while (1) {
+        delay(1000000);
+    }
+}
+
+// --------------------------------------------------------
+// BISECTION STEP 5: Jump to flash (critical test)
+// --------------------------------------------------------
+
+#elif defined(BISECT_STEP5)
+
+#define FW_WAIT_MAXCNT 5000000
+
+int main() {
+    volatile int waitcnt;
+
+    UART0->CLKDIV = CLK_FREQ / UART_BAUD - 2;
+    delay(2000);
+
+    // Timeout loop
+    for (waitcnt = 0; waitcnt < FW_WAIT_MAXCNT; waitcnt++) {
+        // Skip ISP handshake for now
+    }
+
+    // Print JUMP message
+    uart_putchar('J');
+    uart_putchar('U');
+    uart_putchar('M');
+    uart_putchar('P');
+    uart_putchar('!');
+
+    delay(100000);  // Let UART finish
+
+    // Jump to flash entry point
+    void (*flash_entry)(void) = (void (*)(void))0x00000000;
+    flash_entry();
+
+    // Should never reach here
+    while (1) {
+        uart_putchar('E');  // Error - jump failed
+        delay(100000);
+    }
+}
+
+// --------------------------------------------------------
+// BISECTION STEP 6: Minimal ISP with handshake only
+// --------------------------------------------------------
+
+#elif defined(BISECT_STEP6)
+
+#define FW_WAIT_MAXCNT 5000000
+
+static inline uint8_t uart_getchar_blocking() {
     int32_t rdata;
     do {
         rdata = (int32_t)UART0->DATA;
@@ -63,241 +240,161 @@ static inline uint8_t uart_getchar() {
     return (uint8_t)rdata;
 }
 
-static inline void uart_putchar(uint8_t wdata) {
-    UART0->DATA = wdata;
-}
-
-static inline uint8_t spi_trbyte(uint8_t txdata) {
-    uint8_t spi_io;
-    for (int i = 0; i < 8; i++) {
-        spi_io = (txdata >> 7) & QSPI_IO_MOSI;
-        QSPI0->IO = spi_io;
-        spi_io |= QSPI_IO_CLK;
-        QSPI0->IO = spi_io;
-        txdata = (txdata << 1) | ((QSPI0->IO & QSPI_IO_MISO) >> 1);
-    }
-    return txdata;
-}
-
-void spi_flashio(uint8_t *pdata, int length, int wren) {
-    // Set CS high, IO0 is output
-    QSPI0->IOW = QSPI_OE_MOSI | QSPI_IO_CSb;
-
-    // Enable Manual SPI Ctrl
-    QSPI0->EN = 0;
-
-    // Send WREN cmd when requested
-    if (wren) {
-        QSPI0->IO = 0;
-        spi_trbyte(QSPI_FLASH_WREN);
-        QSPI0->IO = QSPI_IO_CSb;
-    }
-
-    // Perform actual data RW
-    QSPI0->IO = 0;
-    while (length) {
-        *pdata = spi_trbyte(*pdata);
-        pdata++;
-        length--;
-    }
-    QSPI0->IO = QSPI_IO_CSb;
-
-    // Check WIP/BUSY bit when WREN issued
-    if (wren) {
-        uint8_t res;
-        do {
-            QSPI0->IO = 0;
-            spi_trbyte(QSPI_FLASH_RDSR);
-            res = spi_trbyte(0x00);
-            QSPI0->IO = QSPI_IO_CSb;
-        } while(res & QSPI_FLASHSR_WIP);
-    }
-
-    // Return to XIP mode
-    QSPI0->EN = QSPI_EN_ENABLE;
-}
-
-typedef struct {
-    uint8_t instr;
-    // In transmit sequence, addr[0] -> 23:16 / addr[1] -> 15:8 / addr[2] -> 7:0
-    uint8_t addr[3];
-    uint8_t data_buf[256];
-} FLASH_BUF;
-
-// Test function to verify jump mechanism
-void test_loop() {
-    while (1) {
-        uart_putchar('T');
-        uart_putchar('E');
-        uart_putchar('S');
-        uart_putchar('T');
-        uart_putchar('\n');
-        for (volatile int i = 0; i < 100000; i++);
-    }
-}
-
-#define FW_WAIT_MAXCNT  5000000  // ~370ms timeout at 13.5 MHz (longer for ISP)
-#define CLK_FREQ        27000000  // Crystal frequency (actual baud will be 76800, not 115200)
-#define UART_BAUD       115200    // Targeting 115200 produces 76800 actual (see V3-016)
-
-int main()
-{
-#ifdef BRINGUP_MODE
-    // =========================================================================
-    // BRINGUP MODE: Minimal test to prove CPU + UART + GPIO liveness
-    // =========================================================================
-    // Goal: Isolate "is hardware alive?" from ISP/flash complexity
-
-    // Configure UART baud rate
-    UART0->CLKDIV = CLK_FREQ / UART_BAUD - 2;  // Try formula 1: clk/baud - 2
-
-    // Wait for UART to settle (15 idle bits = ~1740 cycles)
-    for (volatile int i = 0; i < 2000; i++);
-
-    // Configure GPIO[0] as output for LED heartbeat
-    GPIO0->OE = 0x01;
-    GPIO0->OUT = 0x00;
-
-    // Dual liveness indicators:
-    // 1. UART: Continuous 'T' spam (proves: CPU fetch, ROM mapping, UART TX, baud)
-    // 2. GPIO: Toggle heartbeat (proves: CPU alive independent of UART)
-
-    // Infinite spam loop: UART 'T' + GPIO toggle heartbeat
-    uint8_t led_state = 0;
-    while (1) {
-        UART0->DATA = 'T';
-
-        // Delay ~100k cycles at 27 MHz = ~3.7ms
-        for (volatile int i = 0; i < 100000; i++);
-
-        // Toggle GPIO[0] LED
-        led_state ^= 1;
-        GPIO0->OUT = led_state;
-    }
-    // Never returns
-
-#else
-    // =========================================================================
-    // PRODUCTION MODE: ISP flasher with flash boot fallback
-    // =========================================================================
-    FLASH_BUF flash_buffer;
-    uint8_t instr;
-    int buflen;
-    int waitcnt;
+int main() {
+    volatile int waitcnt;
 
     UART0->CLKDIV = CLK_FREQ / UART_BAUD - 2;
+    delay(2000);
 
-    // CRITICAL: Wait for UART to finish sending 15 idle bits after CLKDIV write
-    // This takes ~1740 cycles (15 bits * 116 cycles/bit at 115200 baud, 13.5 MHz clock)
-    for (waitcnt = 0; waitcnt < 2000; waitcnt++);
-
-    // Flush UART RX noise from FPGA reconfiguration glitches.
-    // Without this, pin noise during SRAM bitstream load can appear
-    // as 0x55 and prematurely enter ISP mode.
-    for (waitcnt = 0; waitcnt < 200000; waitcnt++) {
-        (void)UART0->DATA;
-    }
-
+    // ISP handshake loop
     for (waitcnt = 0; waitcnt < FW_WAIT_MAXCNT; waitcnt++) {
-        if (UART0->DATA == 0x55) {
-            uart_putchar(0x56);
+        int32_t rdata = (int32_t)UART0->DATA;
+        if (rdata == 0x55) {
+            uart_putchar(0x56);  // ACK
             break;
         }
     }
 
-    if (waitcnt == FW_WAIT_MAXCNT) {
-        // Phase 3B: Jump to flash firmware at 0x00000000
-        // Diagnostic: read first word from SPI flash XIP and print it
-        uart_putchar('J');  // 'J' = Jumping to flash
-        volatile uint32_t *fp = (volatile uint32_t *)0x00000004;
-        uint32_t w = *fp;
-        for (int i = 7; i >= 0; i--) {
-            uint8_t n = (w >> (4*i)) & 0xF;
-            uart_putchar(n < 10 ? '0' + n : 'a' + n - 10);
-        }
-        uart_putchar('!');
+    // If ISP detected, enter simple echo loop for testing
+    if (waitcnt < FW_WAIT_MAXCNT) {
+        uart_putchar('I');  // ISP mode
+        uart_putchar('S');
+        uart_putchar('P');
 
-        // Jump to flash entry point (0x00000000)
-        // Use function pointer to avoid compiler optimizations
-        void (*flash_entry)(void) = (void (*)(void))0x00000000;
-        flash_entry();
-
-        // Should never reach here
         while (1) {
-            uart_putchar('E');  // 'E' = Error (jump failed)
-            uart_putchar('R');
-            uart_putchar('R');
-            uart_putchar('\n');
-            for (volatile int i = 0; i < 100000; i++);
+            uint8_t cmd = uart_getchar_blocking();
+            uart_putchar(cmd);  // Echo back
         }
     }
+
+    // Timeout - jump to flash
+    uart_putchar('J');
+    uart_putchar('U');
+    uart_putchar('M');
+    uart_putchar('P');
+    uart_putchar('!');
+
+    delay(100000);
+
+    void (*flash_entry)(void) = (void (*)(void))0x00000000;
+    flash_entry();
+
+    while (1);
+}
+
+// --------------------------------------------------------
+// BISECTION STEP 7: Isolate UART polling issue
+// --------------------------------------------------------
+
+#elif defined(BISECT_STEP7)
+
+int main() {
+    volatile int waitcnt;
+    volatile int32_t dummy;
+
+    UART0->CLKDIV = CLK_FREQ / UART_BAUD - 2;
+    delay(2000);
+
+    // Loop that reads UART but doesn't use the value
+    for (waitcnt = 0; waitcnt < 10000; waitcnt++) {
+        dummy = (int32_t)UART0->DATA;  // Read UART in loop
+    }
+
+    // If we get here, print success
+    uart_putchar('O');
+    uart_putchar('K');
 
     while (1) {
-        instr = uart_getchar();
+        delay(1000000);
+    }
+}
 
-        switch(instr) {
-        case 0x55:
-            // ISP Flasher ACK
-            uart_putchar(0x56);
-            break;
+// --------------------------------------------------------
+// BISECTION STEP 8: Very few UART reads to test LSU fix
+// --------------------------------------------------------
 
-        case 0x10:
-            // ISP Flasher WBUF (Write Pagebuf)
-            uart_putchar(0x11);
+#elif defined(BISECT_STEP8)
 
-            buflen = uart_getchar() + 1;
+int main() {
+    UART0->CLKDIV = CLK_FREQ / UART_BAUD - 2;
+    delay(2000);
 
-            uint8_t chksum = 0;
-            for (int i = 0; i < buflen; i++) {
-                uint8_t rdata = uart_getchar();
-                flash_buffer.data_buf[i] = rdata;
-                chksum += rdata;
+    // Just 10 reads instead of 10,000
+    for (int i = 0; i < 10; i++) {
+        volatile int32_t dummy = (int32_t)UART0->DATA;
+    }
+
+    // Print success
+    uart_putchar('O');
+    uart_putchar('K');
+    uart_putchar('!');
+
+    while (1) delay(1000000);
+}
+
+// --------------------------------------------------------
+// ISP STAGE 1: Minimal handshake (banner + echo, no flash)
+// --------------------------------------------------------
+
+#elif defined(ISP_STAGE1)
+
+#define FW_WAIT_MAXCNT 5000000
+
+static inline uint8_t uart_getchar_blocking() {
+    int32_t rdata;
+    do {
+        rdata = (int32_t)UART0->DATA;
+    } while (rdata < 0);
+    return (uint8_t)rdata;
+}
+
+int main() {
+    volatile int waitcnt;
+
+    UART0->CLKDIV = CLK_FREQ / UART_BAUD - 2;
+    delay(2000);
+
+    // Print ISP banner
+    uart_putchar('I');
+    uart_putchar('S');
+    uart_putchar('P');
+    uart_putchar('\n');
+
+    // ISP handshake loop
+    for (waitcnt = 0; waitcnt < FW_WAIT_MAXCNT; waitcnt++) {
+        int32_t rdata = (int32_t)UART0->DATA;
+        if (rdata == 0x55) {
+            uart_putchar(0x56);  // ACK
+
+            // Echo 3 bytes to confirm handshake
+            for (int i = 0; i < 3; i++) {
+                uint8_t byte = uart_getchar_blocking();
+                uart_putchar(byte);
             }
-            uart_putchar(chksum);
-            break;
 
-        case 0x30:
-            // ISP Flasher ESEC (Erase Sector)
-            uart_putchar(0x31);
-
-            flash_buffer.instr = QSPI_FLASH_SE;
-            flash_buffer.addr[0] = uart_getchar();
-            flash_buffer.addr[1] = uart_getchar();
-            flash_buffer.addr[2] = uart_getchar();
-
-            if (buflen) {
-                spi_flashio( (void *)&flash_buffer, 4, FLASHIO_REQWREN);
+            // Stay in echo loop (no flash ops yet)
+            while (1) {
+                uint8_t cmd = uart_getchar_blocking();
+                uart_putchar(cmd);
             }
-
-            uart_putchar(0x32);
-            break;
-
-        case 0x40:
-            // ISP Flasher WPAG (Write Page)
-            uart_putchar(0x41);
-
-            flash_buffer.instr = QSPI_FLASH_PP;
-            flash_buffer.addr[0] = uart_getchar();
-            flash_buffer.addr[1] = uart_getchar();
-            flash_buffer.addr[2] = uart_getchar();
-
-            if (buflen) {
-                spi_flashio( (void *)&flash_buffer, 4+buflen, FLASHIO_REQWREN);
-            }
-
-            uart_putchar(0x42);
-            break;
-
-        case 0xF0:
-            // ISP Flasher RST
-            uart_putchar(0xF1);
-
-            // Jump to reset vector (use asm to avoid compiler UB issues)
-            __asm__ volatile ("li t0, 0x80000000; jr t0" ::: "t0");
-            break;
-        default:
-            break;
         }
     }
-#endif  // BRINGUP_MODE
+
+    // Timeout - should jump to flash (Stage 2)
+    uart_putchar('T');
+    uart_putchar('O');
+    uart_putchar('\n');
+
+    while (1) delay(1000000);
 }
+
+// --------------------------------------------------------
+// FULL ISP MODE: (Disabled until staged bringup complete)
+// --------------------------------------------------------
+
+#else
+
+#error "Please define BISECT_STEP1-8, BRINGUP_MODE, or ISP_STAGE1"
+
+#endif
+

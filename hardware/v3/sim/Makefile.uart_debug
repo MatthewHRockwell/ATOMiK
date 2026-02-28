@@ -1,0 +1,41 @@
+# Makefile for uart_handshake_test Verilator simulation
+
+VERILATOR = verilator
+VERILATOR_FLAGS = -Wno-fatal --trace --cc --exe
+VERILATOR_FLAGS += --top-module uart_handshake_test
+
+# Source files
+RTL_DIR = ../test
+SRC_DIR = ../soc
+TB_SRC = uart_debug_tb.cpp
+
+VERILOG_SOURCES = \
+	$(RTL_DIR)/uart_handshake_test.v \
+	$(SRC_DIR)/simpleuart.v
+
+# Build directory
+OBJ_DIR = obj_dir
+
+# Target executable
+TARGET = $(OBJ_DIR)/Vuart_handshake_test
+
+.PHONY: all clean run waves
+
+all: $(TARGET)
+
+$(TARGET): $(VERILOG_SOURCES) $(TB_SRC)
+	$(VERILATOR) $(VERILATOR_FLAGS) $(VERILOG_SOURCES) $(TB_SRC)
+	make -C $(OBJ_DIR) -f Vuart_handshake_test.mk
+
+run: $(TARGET)
+	@echo "Running UART debug simulation..."
+	$(TARGET)
+	@echo ""
+	@echo "Waveform saved to uart_debug.vcd"
+	@echo "Open with: gtkwave uart_debug.vcd"
+
+waves: uart_debug.vcd
+	gtkwave uart_debug.vcd &
+
+clean:
+	rm -rf $(OBJ_DIR) uart_debug.vcd

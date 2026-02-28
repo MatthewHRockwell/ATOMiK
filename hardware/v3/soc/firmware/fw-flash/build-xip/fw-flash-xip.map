@@ -1,0 +1,130 @@
+
+Discarded input sections
+
+ .text          0x0000000000000000        0x0 build-xip/test_flash_xip.o
+ .data          0x0000000000000000        0x0 build-xip/test_flash_xip.o
+ .bss           0x0000000000000000        0x0 build-xip/test_flash_xip.o
+ .data          0x0000000000000000        0x0 build-xip/crt_flash.o
+ .bss           0x0000000000000000        0x0 build-xip/crt_flash.o
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+FLASH            0x0000000000000000 0x0000000000800000 xr
+RAM              0x0000000040000000 0x0000000000002000 xrw
+*default*        0x0000000000000000 0xffffffffffffffff
+
+Linker script and memory map
+
+LOAD build-xip/test_flash_xip.o
+LOAD build-xip/crt_flash.o
+LOAD /usr/lib/gcc/riscv64-unknown-elf/13.2.0/rv64i/lp64/libgcc.a
+                0x0000000000000800                _stack_size = DEFINED (_stack_size)?_stack_size:0x800
+                0x0000000000000000                _heap_size = DEFINED (_heap_size)?_heap_size:0x0
+
+.vector         0x0000000000000000       0xa0
+                0x0000000000000000                . = ALIGN (0x4)
+ *crt_flash.o(.text)
+ .text          0x0000000000000000       0xa0 build-xip/crt_flash.o
+                0x0000000000000000                crtStart
+
+.text           0x00000000000000a0      0x214
+                0x00000000000000a0                . = ALIGN (0x4)
+ *(.text)
+ *(.text*)
+ .text.print    0x00000000000000a0       0x34 build-xip/test_flash_xip.o
+                0x00000000000000a0                print
+ .text.print_hex32
+                0x00000000000000d4       0x3c build-xip/test_flash_xip.o
+                0x00000000000000d4                print_hex32
+ .text.startup.main
+                0x0000000000000110       0xd0 build-xip/test_flash_xip.o
+                0x0000000000000110                main
+ *(.rodata)
+ *(.rodata*)
+ .rodata.main.str1.8
+                0x00000000000001e0       0xd3 build-xip/test_flash_xip.o
+ *(.srodata)
+ *(.srodata*)
+ *(.eh_frame_hdr)
+ *(.eh_frame)
+                0x00000000000002b4                . = ALIGN (0x4)
+ *fill*         0x00000000000002b3        0x1 
+                0x00000000000002b4                _etext = .
+                0x00000000000002b4                _sidata = _etext
+
+.rela.dyn       0x00000000000002b8        0x0
+ .rela.text     0x00000000000002b8        0x0 build-xip/test_flash_xip.o
+
+.rodata
+ *(.rdata)
+ *(.rodata .rodata.*)
+ *(.gnu.linkonce.r.*)
+
+.ctors          0x00000000000002b4        0x4
+                0x00000000000002b8                . = ALIGN (0x8)
+ *fill*         0x00000000000002b4        0x4 
+                0x00000000000002b8                _ctors_start = .
+ *(.init_array*)
+ *(SORT_BY_NAME(.ctors.*))
+ *(.ctors)
+                0x00000000000002b8                . = ALIGN (0x8)
+                0x00000000000002b8                _ctors_end = .
+
+.data           0x0000000040000000        0x0 load address 0x00000000000002b4
+                0x0000000040000000                . = ALIGN (0x8)
+                0x0000000040000000                _sdata = .
+                0x0000000040000000                _ram_start = .
+                0x0000000040000000                . = ALIGN (0x8)
+ *(.data)
+ *(.data*)
+ *(.gnu.linkonce.d.*)
+                0x0000000040000000                . = ALIGN (0x8)
+                0x0000000040000800                PROVIDE (__global_pointer$ = (. + 0x800))
+ *(.sdata)
+ *(.sdata*)
+ *(.gnu.linkonce.s.*)
+                0x0000000040000000                . = ALIGN (0x8)
+                0x0000000040000000                _edata = .
+
+.bss            0x0000000040000000        0x0
+                0x0000000040000000                . = ALIGN (0x8)
+                0x0000000040000000                _bss_start = .
+ *(.bss)
+ *(.bss*)
+ *(.sbss)
+ *(.sbss*)
+ *(.gnu.linkonce.sb.*)
+ *(.gnu.linkonce.b.*)
+ *(COMMON)
+                0x0000000040000000                . = ALIGN (0x8)
+                0x0000000040000000                _bss_end = .
+                0x0000000040000000                _end = .
+                [!provide]                        PROVIDE (end = .)
+
+.heap           0x0000000040000000        0x0
+                0x0000000040000000                . = ALIGN (0x8)
+                [!provide]                        PROVIDE (_heap_start = .)
+                0x0000000040000000                . = (. + _heap_size)
+                0x0000000040000000                . = ALIGN (0x8)
+                [!provide]                        PROVIDE (_heap_end = .)
+
+.stack          0x0000000040000000      0x800
+                0x0000000040000000                . = ALIGN (0x10)
+                [!provide]                        PROVIDE (_stack_end = .)
+                0x0000000000000800                . = _stack_size
+ *fill*         0x0000000040000000      0x800 
+                0x0000000040000800                . = ALIGN (0x10)
+                0x0000000040000800                PROVIDE (_stack_start = .)
+OUTPUT(build-xip/fw-flash-xip.elf elf64-littleriscv)
+
+.comment        0x0000000000000000       0x22
+ .comment       0x0000000000000000       0x22 build-xip/test_flash_xip.o
+                                         0x23 (size before relaxing)
+
+.riscv.attributes
+                0x0000000000000000       0x1c
+ .riscv.attributes
+                0x0000000000000000       0x1c build-xip/test_flash_xip.o
+ .riscv.attributes
+                0x000000000000001c       0x1a build-xip/crt_flash.o

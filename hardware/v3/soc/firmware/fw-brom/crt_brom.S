@@ -14,21 +14,12 @@ crtStart:
   nop
 
 crtInit:
-  .option push
-  .option norelax
-  la gp, __global_pointer$
-  .option pop
-  la sp, _stack_start
+  # Skip gp initialization - not needed for bringup
+  # Set sp using direct load (no AUIPC)
+  # Note: ISP main() needs 384-byte stack frame. This value empirically works.
+  li sp, 0x800002F0    # Stack start (validated to work with bringup mode)
 
-bss_init:
-  la a0, _bss_start
-  la a1, _bss_end
-bss_loop:
-  beq a0,a1,bss_done
-  sd zero,0(a0)
-  add a0,a0,8
-  j bss_loop
-bss_done:
+  # Skip BSS clear - not needed for bringup
 
   call main
 infinitLoop:

@@ -1,0 +1,208 @@
+*** GOWIN Tcl Command Line Console  *** 
+QXcbIntegration: Cannot create platform OpenGL context, neither GLX nor EGL are enabled
+Open project /home/mattrock/Projects/ATOMiK/hardware/v3/synth/atomik_v3_soc.gprj finished
+GowinSynthesis start
+Running parser ...
+Analyzing Verilog file '/home/mattrock/Projects/ATOMiK/hardware/v3/rtl/atomik_v3_alu.v'
+Analyzing Verilog file '/home/mattrock/Projects/ATOMiK/hardware/v3/rtl/atomik_v3_atomik.v'
+Analyzing Verilog file '/home/mattrock/Projects/ATOMiK/hardware/v3/rtl/atomik_v3_branch.v'
+Analyzing Verilog file '/home/mattrock/Projects/ATOMiK/hardware/v3/rtl/atomik_v3_control.v'
+Analyzing Verilog file '/home/mattrock/Projects/ATOMiK/hardware/v3/rtl/atomik_v3_cpu.v'
+Analyzing Verilog file '/home/mattrock/Projects/ATOMiK/hardware/v3/rtl/atomik_v3_csr.v'
+Analyzing Verilog file '/home/mattrock/Projects/ATOMiK/hardware/v3/rtl/atomik_v3_decode.v'
+Analyzing Verilog file '/home/mattrock/Projects/ATOMiK/hardware/v3/rtl/atomik_v3_fetch.v'
+Analyzing Verilog file '/home/mattrock/Projects/ATOMiK/hardware/v3/rtl/atomik_v3_lsu.v'
+Analyzing Verilog file '/home/mattrock/Projects/ATOMiK/hardware/v3/rtl/atomik_v3_regfile.v'
+Analyzing Verilog file '/home/mattrock/Projects/ATOMiK/hardware/v3/soc/atomik_v3_soc.v'
+Analyzing Verilog file '/home/mattrock/Projects/ATOMiK/hardware/v3/soc/picoperipheral.v'
+WARN  (EX3788) : Block identifier is required on this block("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/picoperipheral.v":125)
+Analyzing Verilog file '/home/mattrock/Projects/ATOMiK/hardware/v3/soc/manual_uart_tx.v'
+Analyzing Verilog file '/home/mattrock/Projects/ATOMiK/hardware/v3/soc/spimemio_puya.v'
+Analyzing Verilog file '/home/mattrock/Projects/ATOMiK/hardware/v3/soc/picomemory.v'
+Analyzing Verilog file '/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_defines.vh'
+Analyzing Verilog file '/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_enc.v'
+Analyzing included file '/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_defines.vh'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_enc.v":21)
+Back to file '/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_enc.v'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_enc.v":21)
+Analyzing Verilog file '/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_hdmi_top.v'
+Analyzing included file '/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_defines.vh'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_hdmi_top.v":21)
+Back to file '/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_hdmi_top.v'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_hdmi_top.v":21)
+Undeclared symbol 'term_in_tready', assumed default net type 'wire'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_hdmi_top.v":105)
+Analyzing Verilog file '/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_openldi.v'
+Analyzing included file '/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_defines.vh'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_openldi.v":21)
+Back to file '/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_openldi.v'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_openldi.v":21)
+Analyzing Verilog file '/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_tcard.v'
+Analyzing included file '/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_defines.vh'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_tcard.v":21)
+Back to file '/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_tcard.v'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_tcard.v":21)
+Analyzing Verilog file '/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_term.v'
+Analyzing included file '/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_defines.vh'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_term.v":21)
+Back to file '/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_term.v'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_term.v":21)
+Analyzing Verilog file '/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_tmds.v'
+Analyzing included file '/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_defines.vh'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_tmds.v":21)
+Back to file '/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_tmds.v'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_tmds.v":21)
+Analyzing Verilog file '/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_utils.v'
+Analyzing included file '/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_defines.vh'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_utils.v":21)
+Back to file '/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_utils.v'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_utils.v":21)
+Analyzing Verilog file '/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_vdma.v'
+Analyzing included file '/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_defines.vh'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_vdma.v":21)
+Back to file '/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_vdma.v'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_vdma.v":21)
+Analyzing Verilog file '/home/mattrock/Projects/ATOMiK/hardware/v3/soc/gowin_ip/gowin_rpll/gowin_rpll.v'
+Analyzing Verilog file '/home/mattrock/Projects/ATOMiK/hardware/v3/soc/gowin_ip/gowin_clkdiv/gowin_clkdiv.v'
+Analyzing Verilog file '/home/mattrock/Projects/ATOMiK/hardware/v3/soc/gowin_ip/sram_2kx8/sram_2kx8.v'
+Analyzing Verilog file '/home/mattrock/Projects/ATOMiK/hardware/v3/soc/gowin_ip/bootram_2kx8_0/bootram_2kx8_0.v'
+Analyzing Verilog file '/home/mattrock/Projects/ATOMiK/hardware/v3/soc/gowin_ip/bootram_2kx8_1/bootram_2kx8_1.v'
+Analyzing Verilog file '/home/mattrock/Projects/ATOMiK/hardware/v3/soc/gowin_ip/bootram_2kx8_2/bootram_2kx8_2.v'
+Analyzing Verilog file '/home/mattrock/Projects/ATOMiK/hardware/v3/soc/gowin_ip/bootram_2kx8_3/bootram_2kx8_3.v'
+Compiling module 'atomik_v3_soc'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/atomik_v3_soc.v":27)
+Compiling module 'Gowin_CLKDIV'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/gowin_ip/gowin_clkdiv/gowin_clkdiv.v":9)
+Compiling module 'Reset_Sync'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/picoperipheral.v":3)
+Compiling module 'atomik_v3_cpu(RESET_PC=64'h0000_0000_8000_0000)'("/home/mattrock/Projects/ATOMiK/hardware/v3/rtl/atomik_v3_cpu.v":18)
+Compiling module 'atomik_v3_fetch(RESET_PC=64'b0000000000000000000000000000000010000000000000000000000000000000)'("/home/mattrock/Projects/ATOMiK/hardware/v3/rtl/atomik_v3_fetch.v":17)
+Compiling module 'atomik_v3_decode'("/home/mattrock/Projects/ATOMiK/hardware/v3/rtl/atomik_v3_decode.v":16)
+Compiling module 'atomik_v3_regfile'("/home/mattrock/Projects/ATOMiK/hardware/v3/rtl/atomik_v3_regfile.v":30)
+Extracting RAM for identifier 'regs_a'("/home/mattrock/Projects/ATOMiK/hardware/v3/rtl/atomik_v3_regfile.v":52)
+Extracting RAM for identifier 'regs_b'("/home/mattrock/Projects/ATOMiK/hardware/v3/rtl/atomik_v3_regfile.v":69)
+Compiling module 'atomik_v3_alu'("/home/mattrock/Projects/ATOMiK/hardware/v3/rtl/atomik_v3_alu.v":19)
+Compiling module 'atomik_v3_branch'("/home/mattrock/Projects/ATOMiK/hardware/v3/rtl/atomik_v3_branch.v":15)
+Compiling module 'atomik_v3_lsu'("/home/mattrock/Projects/ATOMiK/hardware/v3/rtl/atomik_v3_lsu.v":19)
+Compiling module 'atomik_v3_csr'("/home/mattrock/Projects/ATOMiK/hardware/v3/rtl/atomik_v3_csr.v":18)
+Compiling module 'atomik_v3_atomik'("/home/mattrock/Projects/ATOMiK/hardware/v3/rtl/atomik_v3_atomik.v":24)
+Extracting RAM for identifier 'state_table'("/home/mattrock/Projects/ATOMiK/hardware/v3/rtl/atomik_v3_atomik.v":88)
+Compiling module 'atomik_v3_control'("/home/mattrock/Projects/ATOMiK/hardware/v3/rtl/atomik_v3_control.v":17)
+Compiling module 'PicoMem_Mux_1_4'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/picoperipheral.v":192)
+Compiling module 'PicoMem_Mux_1_4(PICOS0_ADDR_BASE=32'h8000_0000,PICOS0_ADDR_MASK=32'h0F00_0000,PICOS1_ADDR_BASE=32'h8100_0000,PICOS1_ADDR_MASK=32'h0F00_0000,PICOS2_ADDR_BASE=32'h8200_0000,PICOS2_ADDR_MASK=32'h0F00_0000,PICOS3_ADDR_BASE=32'h8300_0000,PICOS3_ADDR_MASK=32'h0F00_0000)'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/picoperipheral.v":192)
+Compiling module 'PicoMem_SRAM_8KB'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/picomemory.v":122)
+Compiling module 'sram_2kx8'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/gowin_ip/sram_2kx8/sram_2kx8.v":9)
+Compiling module 'PicoMem_BOOT_SRAM_8KB'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/picomemory.v":32)
+Compiling module 'bootram_2kx8_3'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/gowin_ip/bootram_2kx8_3/bootram_2kx8_3.v":9)
+Compiling module 'bootram_2kx8_2'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/gowin_ip/bootram_2kx8_2/bootram_2kx8_2.v":9)
+Compiling module 'bootram_2kx8_1'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/gowin_ip/bootram_2kx8_1/bootram_2kx8_1.v":9)
+Compiling module 'bootram_2kx8_0'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/gowin_ip/bootram_2kx8_0/bootram_2kx8_0.v":9)
+Compiling module 'PicoMem_SPI_Flash'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/picoperipheral.v":130)
+Compiling module 'spimemio_puya'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/spimemio_puya.v":20)
+Compiling module 'spimemio_xfer'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/spimemio_puya.v":418)
+WARN  (EX3791) : Expression size 8 truncated to fit in target size 4("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/spimemio_puya.v":614)
+WARN  (EX3791) : Expression size 25 truncated to fit in target size 24("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/spimemio_puya.v":240)
+Compiling module 'PicoMem_GPIO'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/picoperipheral.v":67)
+WARN  (EX3670) : Actual bit length 5 differs from formal bit length 32 for port 'io'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/atomik_v3_soc.v":330)
+Compiling module 'PicoMem_UART'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/picoperipheral.v":22)
+Compiling module 'manual_uart_tx'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/manual_uart_tx.v":15)
+WARN  (EX3791) : Expression size 5 truncated to fit in target size 4("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/manual_uart_tx.v":106)
+Compiling module 'svo_hdmi_top'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_hdmi_top.v":23)
+WARN  (EX3791) : Expression size 5 truncated to fit in target size 4("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_hdmi_top.v":81)
+WARN  (EX3791) : Expression size 5 truncated to fit in target size 4("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_hdmi_top.v":84)
+Compiling module 'svo_tcard(SVO_MODE="640x480V")'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_tcard.v":23)
+WARN  (EX3045) : Case equality operator always evaluates to false due to comparison with 'x' or 'z'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_tcard.v":33)
+WARN  (EX3791) : Expression size 32 truncated to fit in target size 24("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_tcard.v":237)
+WARN  (EX3791) : Expression size 15 truncated to fit in target size 14("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_tcard.v":251)
+WARN  (EX3791) : Expression size 10 truncated to fit in target size 9("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_tcard.v":253)
+WARN  (EX3791) : Expression size 6 truncated to fit in target size 5("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_tcard.v":254)
+WARN  (EX3791) : Expression size 15 truncated to fit in target size 14("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_tcard.v":257)
+WARN  (EX3791) : Expression size 10 truncated to fit in target size 9("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_tcard.v":259)
+WARN  (EX3791) : Expression size 6 truncated to fit in target size 5("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_tcard.v":260)
+Compiling module 'svo_term(SVO_MODE="640x480V")'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_term.v":23)
+Extracting RAM for identifier 'mem'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_term.v":64)
+WARN  (EX3045) : Case equality operator always evaluates to false due to comparison with 'x' or 'z'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_term.v":54)
+WARN  (EX3791) : Expression size 12 truncated to fit in target size 11("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_term.v":144)
+WARN  (EX3791) : Expression size 12 truncated to fit in target size 11("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_term.v":145)
+WARN  (EX3791) : Expression size 32 truncated to fit in target size 11("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_term.v":192)
+WARN  (EX3791) : Expression size 15 truncated to fit in target size 14("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_term.v":371)
+WARN  (EX3791) : Expression size 15 truncated to fit in target size 14("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_term.v":373)
+WARN  (EX3791) : Expression size 12 truncated to fit in target size 11("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_term.v":389)
+WARN  (EX3791) : Expression size 4 truncated to fit in target size 3("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_term.v":433)
+WARN  (EX3791) : Expression size 4 truncated to fit in target size 3("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_term.v":439)
+Compiling module 'svo_overlay(SVO_MODE="640x480V")'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_utils.v":250)
+WARN  (EX3045) : Case equality operator always evaluates to false due to comparison with 'x' or 'z'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_utils.v":275)
+WARN  (EX3791) : Expression size 2 truncated to fit in target size 1("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_utils.v":303)
+Compiling module 'svo_buf(SVO_MODE="640x480V")'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_utils.v":101)
+WARN  (EX3045) : Case equality operator always evaluates to false due to comparison with 'x' or 'z'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_utils.v":121)
+Compiling module 'svo_axis_pipe(TDATA_WIDTH=24)'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_utils.v":31)
+Compiling module 'svo_buf(TUSER_WIDTH=2,SVO_MODE="640x480V")'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_utils.v":101)
+WARN  (EX3045) : Case equality operator always evaluates to false due to comparison with 'x' or 'z'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_utils.v":121)
+Compiling module 'svo_axis_pipe(TDATA_WIDTH=24,TUSER_WIDTH=2)'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_utils.v":31)
+Compiling module 'svo_enc(SVO_MODE="640x480V")'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_enc.v":23)
+Extracting RAM for identifier 'ctrl_fifo'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_enc.v":48)
+Extracting RAM for identifier 'pixel_fifo'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_enc.v":51)
+Extracting RAM for identifier 'out_fifo'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_enc.v":54)
+WARN  (EX3045) : Case equality operator always evaluates to false due to comparison with 'x' or 'z'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_enc.v":43)
+WARN  (EX3791) : Expression size 3 truncated to fit in target size 2("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_enc.v":92)
+WARN  (EX3791) : Expression size 15 truncated to fit in target size 14("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_enc.v":96)
+WARN  (EX3791) : Expression size 15 truncated to fit in target size 14("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_enc.v":98)
+WARN  (EX3791) : Expression size 4 truncated to fit in target size 3("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_enc.v":110)
+WARN  (EX3791) : Expression size 4 truncated to fit in target size 3("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_enc.v":125)
+WARN  (EX3791) : Expression size 3 truncated to fit in target size 2("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_enc.v":129)
+WARN  (EX3791) : Expression size 3 truncated to fit in target size 2("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_enc.v":130)
+WARN  (EX3791) : Expression size 3 truncated to fit in target size 2("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_enc.v":133)
+WARN  (EX3791) : Expression size 3 truncated to fit in target size 2("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_enc.v":134)
+WARN  (EX3791) : Expression size 4 truncated to fit in target size 3("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_enc.v":135)
+WARN  (EX3791) : Expression size 3 truncated to fit in target size 2("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_enc.v":155)
+WARN  (EX3791) : Expression size 3 truncated to fit in target size 2("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_enc.v":159)
+Compiling module 'svo_tmds'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_tmds.v":23)
+NOTE  (EX0101) : Current top module is "atomik_v3_soc"
+[5%] Running netlist conversion ...
+WARN  (CV0016) : Input ser_rx is unused("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/atomik_v3_soc.v":41)
+Running device independent optimization ...
+[10%] Optimizing Phase 0 completed
+[15%] Optimizing Phase 1 completed
+[25%] Optimizing Phase 2 completed
+Running inference ...
+[30%] Inferring Phase 0 completed
+[40%] Inferring Phase 1 completed
+[50%] Inferring Phase 2 completed
+[55%] Inferring Phase 3 completed
+Running technical mapping ...
+[60%] Tech-Mapping Phase 0 completed
+[65%] Tech-Mapping Phase 1 completed
+[75%] Tech-Mapping Phase 2 completed
+[80%] Tech-Mapping Phase 3 completed
+[90%] Tech-Mapping Phase 4 completed
+WARN  (NL0002) : The module "svo_enc" instantiated to "svo_enc" is swept in optimizing("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_hdmi_top.v":148)
+WARN  (NL0002) : The module "svo_overlay" instantiated to "svo_overlay" is swept in optimizing("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_hdmi_top.v":133)
+WARN  (NL0002) : The module "svo_buf" instantiated to "svo_buf_in" is swept in optimizing("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_utils.v":319)
+WARN  (NL0002) : The module "svo_axis_pipe" instantiated to "svo_axis_pipe" is swept in optimizing("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_utils.v":166)
+WARN  (NL0002) : The module "svo_buf" instantiated to "svo_buf_out" is swept in optimizing("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_utils.v":347)
+WARN  (NL0002) : The module "svo_axis_pipe" instantiated to "svo_axis_pipe" is swept in optimizing("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_utils.v":166)
+WARN  (NL0002) : The module "svo_buf" instantiated to "svo_buf_over" is swept in optimizing("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_utils.v":333)
+WARN  (NL0002) : The module "svo_axis_pipe" instantiated to "svo_axis_pipe" is swept in optimizing("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_utils.v":166)
+WARN  (NL0002) : The module "svo_tcard" instantiated to "svo_tcard" is swept in optimizing("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_hdmi_top.v":97)
+WARN  (NL0002) : The module "svo_term" instantiated to "svo_term" is swept in optimizing("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_hdmi_top.v":112)
+WARN  (NL0002) : The module "svo_tmds" instantiated to "svo_tmds_0" is swept in optimizing("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_hdmi_top.v":160)
+WARN  (NL0002) : The module "svo_tmds" instantiated to "svo_tmds_1" is swept in optimizing("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_hdmi_top.v":170)
+WARN  (NL0002) : The module "svo_tmds" instantiated to "svo_tmds_2" is swept in optimizing("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_hdmi_top.v":180)
+[95%] Generate netlist file "/home/mattrock/Projects/ATOMiK/hardware/v3/synth/impl/gwsynthesis/atomik_v3_soc.vg" completed
+[100%] Generate report file "/home/mattrock/Projects/ATOMiK/hardware/v3/synth/impl/gwsynthesis/atomik_v3_soc_syn.rpt.html" completed
+GowinSynthesis finish
+Reading netlist file: "/home/mattrock/Projects/ATOMiK/hardware/v3/synth/impl/gwsynthesis/atomik_v3_soc.vg"
+Parsing netlist file "/home/mattrock/Projects/ATOMiK/hardware/v3/synth/impl/gwsynthesis/atomik_v3_soc.vg" completed
+Processing netlist completed
+Reading constraint file: "/home/mattrock/Projects/ATOMiK/hardware/v3/synth/atomik_v3_soc.cst"
+Physical Constraint parsed completed
+Running placement......
+[10%] Placement Phase 0 completed
+[20%] Placement Phase 1 completed
+[30%] Placement Phase 2 completed
+WARN  (TA1132) :  'u_div_2/clkdiv_inst/CLKOUT.default_gen_clk' was determined to be a clock but was not created.
+[50%] Placement Phase 3 completed
+Running routing......
+[60%] Routing Phase 0 completed
+[70%] Routing Phase 1 completed
+[80%] Routing Phase 2 completed
+[90%] Routing Phase 3 completed
+Running timing analysis......
+[95%] Timing analysis completed
+Placement and routing completed
+Bitstream generation in progress......
+Bitstream generation completed
+Running power analysis......
+[100%] Power analysis completed
+Generate file "/home/mattrock/Projects/ATOMiK/hardware/v3/synth/impl/pnr/atomik_v3_soc.power.html" completed
+Generate file "/home/mattrock/Projects/ATOMiK/hardware/v3/synth/impl/pnr/atomik_v3_soc.pin.html" completed
+Generate file "/home/mattrock/Projects/ATOMiK/hardware/v3/synth/impl/pnr/atomik_v3_soc.rpt.html" completed
+Generate file "/home/mattrock/Projects/ATOMiK/hardware/v3/synth/impl/pnr/atomik_v3_soc.rpt.txt" completed
+Generate file "/home/mattrock/Projects/ATOMiK/hardware/v3/synth/impl/pnr/atomik_v3_soc.tr.html" completed
+Generate file "/home/mattrock/Projects/ATOMiK/hardware/v3/synth/impl/pnr/atomik_v3_soc.tr" completed
+Mon Feb 23 13:58:36 2026
+
+invalid command name "close_project"
+    while executing
+"close_project"
+    (file "synth_v3_soc.tcl" line 35)

@@ -1,0 +1,9 @@
+// Crystal Test Constraints
+IO_LOC "clk" 52;
+IO_PORT "clk" IO_TYPE=LVCMOS33 PULL_MODE=UP;
+
+IO_LOC "led_blink" 15;
+IO_PORT "led_blink" IO_TYPE=LVCMOS18 PULL_MODE=UP DRIVE=8;
+
+IO_LOC "led_toggle" 16;
+IO_PORT "led_toggle" IO_TYPE=LVCMOS18 PULL_MODE=UP DRIVE=8;
