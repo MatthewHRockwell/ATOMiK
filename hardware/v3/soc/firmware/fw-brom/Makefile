@@ -19,7 +19,7 @@ MABI  = lp64
 CFLAGS  = -march=$(MARCH) -mabi=$(MABI) -Os -fno-builtin
 CFLAGS += -ffunction-sections -fdata-sections
 CFLAGS += -MD -fstrict-volatile-bitfields
-CFLAGS += -DISP_STAGE2  # ISP Stage 2: timeout path + jump to flash
+CFLAGS += -DISP_STAGE3B  # Test hardware baseline
 
 LDFLAGS  = -march=$(MARCH) -mabi=$(MABI) -Wl,--gc-sections
 LDFLAGS += -nostdlib -lgcc -mcmodel=medany -nostartfiles -ffreestanding
