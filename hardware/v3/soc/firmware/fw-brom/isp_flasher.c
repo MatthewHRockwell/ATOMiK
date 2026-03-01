@@ -685,12 +685,350 @@ int main() {
 }
 
 // --------------------------------------------------------
+// ISP STAGE 3C: Add WBUF (small buffer for incremental testing)
+// --------------------------------------------------------
+
+#elif defined(ISP_STAGE3C)
+
+#define FW_WAIT_MAXCNT 5000000
+#define WBUF_SIZE 32  // Small buffer for incremental testing (vs 256 in full version)
+
+#define QSPI_IO_CSb     0x20
+#define QSPI_IO_CLK     0x10
+#define QSPI_IO_MOSI    0x01
+#define QSPI_IO_MISO    0x02
+#define QSPI_OE_MOSI    0x0100
+#define QSPI_EN_ENABLE  0x80
+#define QSPI_FLASH_RDSR     0x05
+#define QSPI_FLASH_WREN     0x06
+#define QSPI_FLASH_SE       0x20
+#define QSPI_FLASHSR_WIP    0x01
+#define FLASHIO_REQWREN 0x01
+
+static inline uint8_t spi_trbyte(uint8_t txdata) {
+    uint8_t spi_io;
+    for (int i = 0; i < 8; i++) {
+        spi_io = (txdata >> 7) & QSPI_IO_MOSI;
+        QSPI0->IO = spi_io;
+        spi_io |= QSPI_IO_CLK;
+        QSPI0->IO = spi_io;
+        txdata = (txdata << 1) | ((QSPI0->IO & QSPI_IO_MISO) >> 1);
+    }
+    return txdata;
+}
+
+void spi_flashio(uint8_t *pdata, int length, int wren) {
+    QSPI0->IOW = QSPI_OE_MOSI | QSPI_IO_CSb;
+    QSPI0->EN = 0;
+
+    if (wren) {
+        QSPI0->IO = 0;
+        spi_trbyte(QSPI_FLASH_WREN);
+        QSPI0->IO = QSPI_IO_CSb;
+    }
+
+    QSPI0->IO = 0;
+    while (length) {
+        *pdata = spi_trbyte(*pdata);
+        pdata++;
+        length--;
+    }
+    QSPI0->IO = QSPI_IO_CSb;
+
+    if (wren) {
+        uint8_t res;
+        do {
+            QSPI0->IO = 0;
+            spi_trbyte(QSPI_FLASH_RDSR);
+            res = spi_trbyte(0x00);
+            QSPI0->IO = QSPI_IO_CSb;
+        } while(res & QSPI_FLASHSR_WIP);
+    }
+
+    QSPI0->EN = QSPI_EN_ENABLE;
+}
+
+static inline uint8_t uart_getchar_blocking() {
+    int32_t rdata;
+    do {
+        rdata = (int32_t)UART0->DATA;
+    } while (rdata < 0);
+    return (uint8_t)rdata;
+}
+
+int main() {
+    uint8_t instr;
+    uint8_t flash_cmd[4];
+    uint8_t write_buf[WBUF_SIZE];  // Small write buffer
+    int buflen = 0;
+    volatile uint32_t waitcnt;
+
+    UART0->CLKDIV = CLK_FREQ / UART_BAUD - 2;
+    delay(2000);
+
+    // ISP handshake with timeout
+    for (waitcnt = 0; waitcnt < FW_WAIT_MAXCNT; waitcnt++) {
+        int32_t rdata = (int32_t)UART0->DATA;
+        if (rdata == 0x55) {
+            uart_putchar(0x56);
+            break;
+        }
+    }
+
+    // Timeout - jump to flash
+    if (waitcnt == FW_WAIT_MAXCNT) {
+        uart_putchar('J');
+        uart_putchar('U');
+        uart_putchar('M');
+        uart_putchar('P');
+        uart_putchar('!');
+        uart_putchar('\n');
+        delay(100000);
+        void (*flash_entry)(void) = (void (*)(void))0x00000000;
+        flash_entry();
+    }
+
+    // ISP command loop
+    while (1) {
+        instr = uart_getchar_blocking();
+
+        switch(instr) {
+        case 0x55:
+            // ISP handshake ACK
+            uart_putchar(0x56);
+            break;
+
+        case 0x10:
+            // ISP WBUF (Write Page Buffer)
+            // Host:  0x10 len dat0-datn
+            // Reply:      0x11           chksum
+            uart_putchar(0x11);
+
+            buflen = uart_getchar_blocking() + 1;
+
+            // Limit to buffer size
+            if (buflen > WBUF_SIZE) {
+                buflen = WBUF_SIZE;
+            }
+
+            uint8_t chksum = 0;
+            for (int i = 0; i < buflen; i++) {
+                uint8_t rdata = uart_getchar_blocking();
+                write_buf[i] = rdata;
+                chksum += rdata;
+            }
+            uart_putchar(chksum);
+            break;
+
+        case 0x30:
+            // ISP ESEC (Erase Sector)
+            uart_putchar(0x31);
+            flash_cmd[0] = QSPI_FLASH_SE;
+            flash_cmd[1] = uart_getchar_blocking();
+            flash_cmd[2] = uart_getchar_blocking();
+            flash_cmd[3] = uart_getchar_blocking();
+            spi_flashio(flash_cmd, 4, FLASHIO_REQWREN);
+            uart_putchar(0x32);
+            break;
+
+        case 0xF0:
+            // ISP RST (Reset/Jump to BROM)
+            uart_putchar(0xF1);
+            void (*rst_vec)(void) = (void (*)(void))0x80000000;
+            rst_vec();
+            break;
+
+        default:
+            // Unknown command - ignore
+            break;
+        }
+    }
+}
+
+// --------------------------------------------------------
+// ISP STAGE 3D: Add WPAG (page program) - complete flash programming
+// --------------------------------------------------------
+
+#elif defined(ISP_STAGE3D)
+
+#define FW_WAIT_MAXCNT 5000000
+#define WBUF_SIZE 32
+
+#define QSPI_IO_CSb     0x20
+#define QSPI_IO_CLK     0x10
+#define QSPI_IO_MOSI    0x01
+#define QSPI_IO_MISO    0x02
+#define QSPI_OE_MOSI    0x0100
+#define QSPI_EN_ENABLE  0x80
+#define QSPI_FLASH_RDSR     0x05
+#define QSPI_FLASH_WREN     0x06
+#define QSPI_FLASH_SE       0x20
+#define QSPI_FLASH_PP       0x02  // Page Program
+#define QSPI_FLASHSR_WIP    0x01
+#define FLASHIO_REQWREN 0x01
+
+static inline uint8_t spi_trbyte(uint8_t txdata) {
+    uint8_t spi_io;
+    for (int i = 0; i < 8; i++) {
+        spi_io = (txdata >> 7) & QSPI_IO_MOSI;
+        QSPI0->IO = spi_io;
+        spi_io |= QSPI_IO_CLK;
+        QSPI0->IO = spi_io;
+        txdata = (txdata << 1) | ((QSPI0->IO & QSPI_IO_MISO) >> 1);
+    }
+    return txdata;
+}
+
+void spi_flashio(uint8_t *pdata, int length, int wren) {
+    QSPI0->IOW = QSPI_OE_MOSI | QSPI_IO_CSb;
+    QSPI0->EN = 0;
+
+    if (wren) {
+        QSPI0->IO = 0;
+        spi_trbyte(QSPI_FLASH_WREN);
+        QSPI0->IO = QSPI_IO_CSb;
+    }
+
+    QSPI0->IO = 0;
+    while (length) {
+        *pdata = spi_trbyte(*pdata);
+        pdata++;
+        length--;
+    }
+    QSPI0->IO = QSPI_IO_CSb;
+
+    if (wren) {
+        uint8_t res;
+        do {
+            QSPI0->IO = 0;
+            spi_trbyte(QSPI_FLASH_RDSR);
+            res = spi_trbyte(0x00);
+            QSPI0->IO = QSPI_IO_CSb;
+        } while(res & QSPI_FLASHSR_WIP);
+    }
+
+    QSPI0->EN = QSPI_EN_ENABLE;
+}
+
+static inline uint8_t uart_getchar_blocking() {
+    int32_t rdata;
+    do {
+        rdata = (int32_t)UART0->DATA;
+    } while (rdata < 0);
+    return (uint8_t)rdata;
+}
+
+int main() {
+    uint8_t instr;
+    uint8_t page_buf[4 + WBUF_SIZE];  // cmd(1) + addr(3) + data(WBUF_SIZE)
+    int buflen = 0;
+    volatile uint32_t waitcnt;
+
+    UART0->CLKDIV = CLK_FREQ / UART_BAUD - 2;
+    delay(2000);
+
+    // ISP handshake with timeout
+    for (waitcnt = 0; waitcnt < FW_WAIT_MAXCNT; waitcnt++) {
+        int32_t rdata = (int32_t)UART0->DATA;
+        if (rdata == 0x55) {
+            uart_putchar(0x56);
+            break;
+        }
+    }
+
+    // Timeout - jump to flash
+    if (waitcnt == FW_WAIT_MAXCNT) {
+        uart_putchar('J');
+        uart_putchar('U');
+        uart_putchar('M');
+        uart_putchar('P');
+        uart_putchar('!');
+        uart_putchar('\n');
+        delay(100000);
+        void (*flash_entry)(void) = (void (*)(void))0x00000000;
+        flash_entry();
+    }
+
+    // ISP command loop
+    while (1) {
+        instr = uart_getchar_blocking();
+
+        switch(instr) {
+        case 0x55:
+            uart_putchar(0x56);
+            break;
+
+        case 0x10:
+            // ISP WBUF (Write Page Buffer)
+            // Host:  0x10 len dat0-datn
+            // Reply:      0x11           chksum
+            uart_putchar(0x11);
+
+            buflen = uart_getchar_blocking() + 1;
+            if (buflen > WBUF_SIZE) {
+                buflen = WBUF_SIZE;
+            }
+
+            uint8_t chksum = 0;
+            for (int i = 0; i < buflen; i++) {
+                uint8_t rdata = uart_getchar_blocking();
+                page_buf[4 + i] = rdata;  // Store after cmd+addr
+                chksum += rdata;
+            }
+            uart_putchar(chksum);
+            break;
+
+        case 0x30:
+            // ISP ESEC (Erase Sector)
+            uart_putchar(0x31);
+            page_buf[0] = QSPI_FLASH_SE;
+            page_buf[1] = uart_getchar_blocking();
+            page_buf[2] = uart_getchar_blocking();
+            page_buf[3] = uart_getchar_blocking();
+            spi_flashio(page_buf, 4, FLASHIO_REQWREN);
+            uart_putchar(0x32);
+            break;
+
+        case 0x40:
+            // ISP WPAG (Write/Program Page)
+            // Host:  0x40 addr2-0
+            // Reply:      0x41    [program] 0x42
+            uart_putchar(0x41);
+
+            page_buf[0] = QSPI_FLASH_PP;
+            page_buf[1] = uart_getchar_blocking();  // addr[2]
+            page_buf[2] = uart_getchar_blocking();  // addr[1]
+            page_buf[3] = uart_getchar_blocking();  // addr[0]
+
+            // Program page with buffered data
+            if (buflen > 0) {
+                spi_flashio(page_buf, 4 + buflen, FLASHIO_REQWREN);
+            }
+
+            uart_putchar(0x42);
+            break;
+
+        case 0xF0:
+            // ISP RST
+            uart_putchar(0xF1);
+            void (*rst_vec)(void) = (void (*)(void))0x80000000;
+            rst_vec();
+            break;
+
+        default:
+            break;
+        }
+    }
+}
+
+// --------------------------------------------------------
 // ISP STAGE 3: Full flash programming protocol
 // --------------------------------------------------------
 
 #elif defined(ISP_STAGE3)
 
 #define FW_WAIT_MAXCNT 5000000  // ~200ms at 25.2 MHz
+#define WBUF_SIZE 256  // Full page buffer (production)
 
 // SPI Flash bit definitions
 #define QSPI_IO_CSb     0x20

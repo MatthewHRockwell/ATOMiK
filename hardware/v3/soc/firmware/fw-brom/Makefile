@@ -19,7 +19,7 @@ MABI  = lp64
 CFLAGS  = -march=$(MARCH) -mabi=$(MABI) -Os -fno-builtin
 CFLAGS += -ffunction-sections -fdata-sections
 CFLAGS += -MD -fstrict-volatile-bitfields
-CFLAGS += -DISP_STAGE3B  # Parser only - proven working
+CFLAGS += -DISP_STAGE3  # Production ISP flasher (256-byte buffer)
 
 LDFLAGS  = -march=$(MARCH) -mabi=$(MABI) -Wl,--gc-sections
 LDFLAGS += -nostdlib -lgcc -mcmodel=medany -nostartfiles -ffreestanding
