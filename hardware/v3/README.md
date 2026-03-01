@@ -2,7 +2,7 @@
 
 Custom RV64I CPU core with integrated ATOMiK delta-state datapath, targeting the Tang Nano 9K (GW1NR-LV9QN88PC6/I5).
 
-## Current Status (ISP Stage 2 Complete) ✅
+## Current Status (ISP Stage 3B Complete) ✅
 
 **Hardware Validation:** 62/62 tests PASS
 - ✅ BRINGUP_MODE: CPU baseline working
@@ -11,21 +11,25 @@ Custom RV64I CPU core with integrated ATOMiK delta-state datapath, targeting the
 - ✅ Extended stress: 50 consecutive test cycles (~3.5 min)
 - ✅ Thermal stability: Validated through 60s warmup
 
-**ISP Boot ROM:** Stage 2 Complete
+**ISP Boot ROM:** Stage 3B Complete
 - ✅ ISP_STAGE1: Handshake + echo (0x55→0x56 ACK working)
 - ✅ ISP_STAGE2: Timeout path + flash jump (validated with diagnostics)
   - Output: `ISP\n.......E\nJUMP!\n`
   - Timeout loop executes correctly (heartbeat visible)
   - Flash jump successful (CPU executes from 0x00000000)
-- 🔄 ISP_STAGE3: Flash programming protocol (in progress)
+- ✅ ISP_STAGE3A: Command parser (0x10→WB, 0x30→ES, 0x40→WP, 0xF0→RS)
+- ✅ ISP_STAGE3B: ESEC implementation (0x30 → 0x31...0x32, SPI flash erase working)
+- 🔄 ISP_STAGE3C: Full flash programming (WBUF + WPAG integration next)
 
 **Timing:** Clean closure at 25.2 MHz (TNS = 0.000 ns, Fmax = 25.202 MHz)
 
+**Recent Fixes:**
+- ✅ Stack pointer bug fixed (hardcoded 0x800002F0 → linker _stack_start)
+- ✅ AUIPC works correctly with .option norelax (la sp, _stack_start)
+
 **Known Issues:**
 - ⚠️ Thin timing margin (+0.008%) - consider 24 MHz for production
-- ⚠️ AUIPC instruction broken (workaround: use `li` instead of `la`)
-- ⏸️ Full flash boot chain pending Stage 3
-- ⏸️ ATOMiK hardware tests pending
+- ⏸️ Full flash programming pending (WBUF+WPAG)
 
 See `deploy/HARDWARE_VALIDATION_COMPLETE.md` and `deploy/ISP_STAGE2_COMPLETE.md`.
 
