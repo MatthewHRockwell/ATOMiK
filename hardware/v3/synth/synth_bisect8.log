@@ -1,0 +1,71 @@
+*** GOWIN Tcl Command Line Console  *** 
+QXcbIntegration: Cannot create platform OpenGL context, neither GLX nor EGL are enabled
+Open project /home/mattrock/Projects/ATOMiK/hardware/v3/synth/atomik_v3_soc.gprj finished
+GowinSynthesis start
+Running parser ...
+Analyzing Verilog file '/home/mattrock/Projects/ATOMiK/hardware/v3/rtl/atomik_v3_alu.v'
+Analyzing Verilog file '/home/mattrock/Projects/ATOMiK/hardware/v3/rtl/atomik_v3_atomik.v'
+Analyzing Verilog file '/home/mattrock/Projects/ATOMiK/hardware/v3/rtl/atomik_v3_branch.v'
+Analyzing Verilog file '/home/mattrock/Projects/ATOMiK/hardware/v3/rtl/atomik_v3_control.v'
+Analyzing Verilog file '/home/mattrock/Projects/ATOMiK/hardware/v3/rtl/atomik_v3_cpu.v'
+Analyzing Verilog file '/home/mattrock/Projects/ATOMiK/hardware/v3/rtl/atomik_v3_csr.v'
+Analyzing Verilog file '/home/mattrock/Projects/ATOMiK/hardware/v3/rtl/atomik_v3_decode.v'
+Analyzing Verilog file '/home/mattrock/Projects/ATOMiK/hardware/v3/rtl/atomik_v3_fetch.v'
+Analyzing Verilog file '/home/mattrock/Projects/ATOMiK/hardware/v3/rtl/atomik_v3_lsu.v'
+Analyzing Verilog file '/home/mattrock/Projects/ATOMiK/hardware/v3/rtl/atomik_v3_regfile.v'
+Analyzing Verilog file '/home/mattrock/Projects/ATOMiK/hardware/v3/soc/atomik_v3_soc.v'
+Analyzing Verilog file '/home/mattrock/Projects/ATOMiK/hardware/v3/soc/picoperipheral.v'
+WARN  (EX3788) : Block identifier is required on this block("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/picoperipheral.v":128)
+Analyzing Verilog file '/home/mattrock/Projects/ATOMiK/hardware/v3/soc/simpleuart.v'
+Analyzing Verilog file '/home/mattrock/Projects/ATOMiK/hardware/v3/soc/spimemio_puya.v'
+Analyzing Verilog file '/home/mattrock/Projects/ATOMiK/hardware/v3/soc/picomemory.v'
+Analyzing Verilog file '/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_defines.vh'
+Analyzing Verilog file '/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_enc.v'
+Analyzing included file '/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_defines.vh'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_enc.v":21)
+Back to file '/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_enc.v'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_enc.v":21)
+Analyzing Verilog file '/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_hdmi_top.v'
+Analyzing included file '/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_defines.vh'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_hdmi_top.v":21)
+Back to file '/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_hdmi_top.v'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_hdmi_top.v":21)
+Undeclared symbol 'term_in_tready', assumed default net type 'wire'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_hdmi_top.v":105)
+Analyzing Verilog file '/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_openldi.v'
+Analyzing included file '/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_defines.vh'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_openldi.v":21)
+Back to file '/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_openldi.v'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_openldi.v":21)
+Analyzing Verilog file '/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_tcard.v'
+Analyzing included file '/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_defines.vh'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_tcard.v":21)
+Back to file '/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_tcard.v'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_tcard.v":21)
+Analyzing Verilog file '/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_term.v'
+Analyzing included file '/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_defines.vh'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_term.v":21)
+Back to file '/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_term.v'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_term.v":21)
+Analyzing Verilog file '/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_tmds.v'
+Analyzing included file '/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_defines.vh'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_tmds.v":21)
+Back to file '/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_tmds.v'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_tmds.v":21)
+Analyzing Verilog file '/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_utils.v'
+Analyzing included file '/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_defines.vh'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_utils.v":21)
+Back to file '/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_utils.v'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_utils.v":21)
+Analyzing Verilog file '/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_vdma.v'
+Analyzing included file '/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_defines.vh'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_vdma.v":21)
+Back to file '/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_vdma.v'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/hdmi/svo_vdma.v":21)
+Analyzing Verilog file '/home/mattrock/Projects/ATOMiK/hardware/v3/soc/gowin_ip/gowin_rpll/gowin_rpll.v'
+Analyzing Verilog file '/home/mattrock/Projects/ATOMiK/hardware/v3/soc/gowin_ip/gowin_clkdiv/gowin_clkdiv.v'
+Analyzing Verilog file '/home/mattrock/Projects/ATOMiK/hardware/v3/soc/gowin_ip/sram_2kx8/sram_2kx8.v'
+Analyzing Verilog file '/home/mattrock/Projects/ATOMiK/hardware/v3/soc/gowin_ip/bootram_2kx8_0/bootram_2kx8_0.v'
+ERROR (EX3863) : Syntax error near '2048'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/gowin_ip/bootram_2kx8_0/bootram_2kx8_0.v":42)
+ERROR (EX3928) : Module 'bootram_2kx8_0' is ignored due to previous errors("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/gowin_ip/bootram_2kx8_0/bootram_2kx8_0.v":109)
+Verilog file '/home/mattrock/Projects/ATOMiK/hardware/v3/soc/gowin_ip/bootram_2kx8_0/bootram_2kx8_0.v' ignored due to errors
+Analyzing Verilog file '/home/mattrock/Projects/ATOMiK/hardware/v3/soc/gowin_ip/bootram_2kx8_1/bootram_2kx8_1.v'
+ERROR (EX3863) : Syntax error near '2048'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/gowin_ip/bootram_2kx8_1/bootram_2kx8_1.v":42)
+ERROR (EX3928) : Module 'bootram_2kx8_1' is ignored due to previous errors("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/gowin_ip/bootram_2kx8_1/bootram_2kx8_1.v":109)
+Verilog file '/home/mattrock/Projects/ATOMiK/hardware/v3/soc/gowin_ip/bootram_2kx8_1/bootram_2kx8_1.v' ignored due to errors
+Analyzing Verilog file '/home/mattrock/Projects/ATOMiK/hardware/v3/soc/gowin_ip/bootram_2kx8_2/bootram_2kx8_2.v'
+ERROR (EX3863) : Syntax error near '2048'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/gowin_ip/bootram_2kx8_2/bootram_2kx8_2.v":42)
+ERROR (EX3928) : Module 'bootram_2kx8_2' is ignored due to previous errors("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/gowin_ip/bootram_2kx8_2/bootram_2kx8_2.v":109)
+Verilog file '/home/mattrock/Projects/ATOMiK/hardware/v3/soc/gowin_ip/bootram_2kx8_2/bootram_2kx8_2.v' ignored due to errors
+Analyzing Verilog file '/home/mattrock/Projects/ATOMiK/hardware/v3/soc/gowin_ip/bootram_2kx8_3/bootram_2kx8_3.v'
+ERROR (EX3863) : Syntax error near '2048'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/gowin_ip/bootram_2kx8_3/bootram_2kx8_3.v":42)
+ERROR (EX3928) : Module 'bootram_2kx8_3' is ignored due to previous errors("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/gowin_ip/bootram_2kx8_3/bootram_2kx8_3.v":109)
+Verilog file '/home/mattrock/Projects/ATOMiK/hardware/v3/soc/gowin_ip/bootram_2kx8_3/bootram_2kx8_3.v' ignored due to errors
+GowinSynthesis finish
+
+    while executing
+"run syn"
+    (file "synth_v3_soc.tcl" line 29)

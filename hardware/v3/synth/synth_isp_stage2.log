@@ -75,17 +75,9 @@ Compiling module 'PicoMem_SRAM_8KB'("/home/mattrock/Projects/ATOMiK/hardware/v3/
 Compiling module 'sram_2kx8'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/gowin_ip/sram_2kx8/sram_2kx8.v":9)
 Compiling module 'PicoMem_BOOT_SRAM_8KB'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/picomemory.v":32)
 Compiling module 'bootram_2kx8_3'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/gowin_ip/bootram_2kx8_3/bootram_2kx8_3.v":9)
-WARN  (EX3044) : Overwriting previous value of parameter 'sp_inst_0.INIT_RAM_3E'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/gowin_ip/bootram_2kx8_3/bootram_2kx8_3.v":106)
-WARN  (EX3044) : Overwriting previous value of parameter 'sp_inst_0.INIT_RAM_3F'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/gowin_ip/bootram_2kx8_3/bootram_2kx8_3.v":107)
 Compiling module 'bootram_2kx8_2'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/gowin_ip/bootram_2kx8_2/bootram_2kx8_2.v":9)
-WARN  (EX3044) : Overwriting previous value of parameter 'sp_inst_0.INIT_RAM_3E'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/gowin_ip/bootram_2kx8_2/bootram_2kx8_2.v":106)
-WARN  (EX3044) : Overwriting previous value of parameter 'sp_inst_0.INIT_RAM_3F'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/gowin_ip/bootram_2kx8_2/bootram_2kx8_2.v":107)
 Compiling module 'bootram_2kx8_1'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/gowin_ip/bootram_2kx8_1/bootram_2kx8_1.v":9)
-WARN  (EX3044) : Overwriting previous value of parameter 'sp_inst_0.INIT_RAM_3E'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/gowin_ip/bootram_2kx8_1/bootram_2kx8_1.v":106)
-WARN  (EX3044) : Overwriting previous value of parameter 'sp_inst_0.INIT_RAM_3F'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/gowin_ip/bootram_2kx8_1/bootram_2kx8_1.v":107)
 Compiling module 'bootram_2kx8_0'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/gowin_ip/bootram_2kx8_0/bootram_2kx8_0.v":9)
-WARN  (EX3044) : Overwriting previous value of parameter 'sp_inst_0.INIT_RAM_3E'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/gowin_ip/bootram_2kx8_0/bootram_2kx8_0.v":106)
-WARN  (EX3044) : Overwriting previous value of parameter 'sp_inst_0.INIT_RAM_3F'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/gowin_ip/bootram_2kx8_0/bootram_2kx8_0.v":107)
 Compiling module 'PicoMem_SPI_Flash'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/picoperipheral.v":133)
 Compiling module 'spimemio_puya'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/spimemio_puya.v":20)
 Compiling module 'spimemio_xfer'("/home/mattrock/Projects/ATOMiK/hardware/v3/soc/spimemio_puya.v":418)
@@ -196,7 +188,7 @@ Generate file "/home/mattrock/Projects/ATOMiK/hardware/v3/synth/impl/pnr/atomik_
 Generate file "/home/mattrock/Projects/ATOMiK/hardware/v3/synth/impl/pnr/atomik_v3_soc.rpt.txt" completed
 Generate file "/home/mattrock/Projects/ATOMiK/hardware/v3/synth/impl/pnr/atomik_v3_soc.tr.html" completed
 Generate file "/home/mattrock/Projects/ATOMiK/hardware/v3/synth/impl/pnr/atomik_v3_soc.tr" completed
-Sat Feb 28 16:20:28 2026
+Sat Feb 28 10:25:35 2026
 
 invalid command name "close_project"
     while executing
