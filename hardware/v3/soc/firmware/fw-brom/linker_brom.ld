@@ -1,9 +1,10 @@
 OUTPUT_FORMAT("elf64-littleriscv", "elf64-littleriscv", "elf64-littleriscv")
 OUTPUT_ARCH(riscv)
-ENTRY(crtStart)
+ENTRY(_start)
 
 MEMORY {
   BROM : ORIGIN = 0x80000000, LENGTH = 8k
+  SRAM : ORIGIN = 0x40000000, LENGTH = 8k
 }
 
 _stack_size = DEFINED(_stack_size) ? _stack_size : 1024;
@@ -12,6 +13,7 @@ _heap_size = DEFINED(_heap_size) ? _heap_size : 0;
 SECTIONS {
 
   .vector : {
+    KEEP(*(.vector));
     *crt_brom.o(.text);
   } > BROM
 
@@ -90,6 +92,6 @@ SECTIONS {
     . = . + _stack_size;
     . = ALIGN(16);
     PROVIDE (_stack_start = .);
-  } > BROM
+  } > SRAM
 
 }

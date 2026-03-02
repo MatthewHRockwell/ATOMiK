@@ -88,6 +88,7 @@ module atomik_v3_cpu #(
     // ATOMiK
     wire [63:0] atomik_current_state;
     wire        atomik_acc_zero;
+    reg  [63:0] atomik_result_r;     // Registered result for WRITEBACK
 
     // Control
     wire [1:0]  pc_src;
@@ -294,6 +295,20 @@ module atomik_v3_cpu #(
     );
 
     // =========================================================================
+    // ATOMiK result register
+    // Captures current_state at each clock edge so WRITEBACK (1 cycle after
+    // EXECUTE) reads the pre-EXECUTE value. Fixes Gowin BSRAM write-through:
+    // during SWAP, the state_table read port returns the NEW value on
+    // simultaneous read/write, corrupting the combinational current_state.
+    // =========================================================================
+    always @(posedge clk) begin
+        if (!rst_n)
+            atomik_result_r <= 64'b0;
+        else
+            atomik_result_r <= atomik_current_state;
+    end
+
+    // =========================================================================
     // FSM Controller
     // =========================================================================
     atomik_v3_control u_control (
@@ -359,7 +374,7 @@ module atomik_v3_cpu #(
             3'd1: wb_data = lsu_rdata;
             3'd2: wb_data = pc_plus_4;
             3'd3: wb_data = csr_rdata;
-            3'd4: wb_data = atomik_current_state;  // ATOMIK.READ
+            3'd4: wb_data = atomik_result_r;  // ATOMiK result (registered from EXECUTE)
             default: wb_data = 64'b0;
         endcase
     end
