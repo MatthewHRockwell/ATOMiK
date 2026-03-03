@@ -220,7 +220,7 @@ def main():
         print("\nTo test persistent boot:")
         print("1. Power cycle the FPGA (unplug USB)")
         print("2. Reload bitstream: openFPGALoader -b tangnano9k atomik_v3_soc.fs")
-        print("3. Wait for ISP timeout (~14s with current loop)")
+        print("3. Wait for ISP timeout (~16s at 21.6 MHz)")
         print("4. Flash firmware should execute (look for 'F!F!' on UART)")
 
     except Exception as e:

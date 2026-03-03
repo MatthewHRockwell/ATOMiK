@@ -7,8 +7,9 @@
 //   - Tie off S3 (0xC0000000) — ATOMiK MMIO slot freed
 //   - Same peripheral hierarchy, same HDMI, same memory map
 //
-// Clock: PLL1 27 MHz → 126 MHz (CLKOUT), CLKDIV ÷5 → 25.2 MHz (clk_cpu)
+// Clock: PLL1 27 MHz → 108 MHz (CLKOUT), CLKDIV ÷5 → 21.6 MHz (clk_cpu)
 // No PLL2 needed: ATOMiK runs in CPU clock domain via custom instructions
+// V3-020 fix: Lowered from 126/25.2 MHz to 108/21.6 MHz for timing closure
 //
 // Memory Map:
 //   0x00000000  SPI Flash XIP (8 MB)
@@ -48,12 +49,13 @@ module atomik_v3_soc (
 );
 
 // =========================================================================
-// Clock generation: PLL + CLKDIV (matches v2 architecture)
-// PLL: 27 MHz → 126 MHz (clk_p5 for HDMI 5x serializer)
-// CLKDIV: 126 MHz ÷ 5 → 25.2 MHz (clk_p for CPU + HDMI pixel clock)
+// Clock generation: PLL + CLKDIV
+// PLL: 27 MHz → 108 MHz (clk_p5 for HDMI 5x serializer)
+// CLKDIV: 108 MHz ÷ 5 → 21.6 MHz (clk_p for CPU + HDMI pixel clock)
+// V3-020: Reduced from 126/25.2 MHz — Fmax was 24.745 MHz (40 violations)
 // =========================================================================
-wire clk_p;       // 25.2 MHz CPU + pixel clock
-wire clk_p5;      // 126 MHz HDMI 5x serializer clock
+wire clk_p;       // 21.6 MHz CPU + pixel clock
+wire clk_p5;      // 108 MHz HDMI 5x serializer clock
 wire sys_resetn;
 wire pll_lock;    // PLL lock indicator
 

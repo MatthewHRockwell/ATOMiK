@@ -41,7 +41,7 @@ typedef struct {
 
 // --------------------------------------------------------
 
-#define CLK_FREQ        25200000  // 25.2 MHz (126 MHz / 5)
+#define CLK_FREQ        21600000  // 21.6 MHz (108 MHz / 5) — V3-020 fix
 #define UART_BAUD       115200
 
 static inline void uart_putchar(uint8_t wdata) {
@@ -392,7 +392,7 @@ int main() {
 
 #elif defined(ISP_STAGE2)
 
-#define FW_WAIT_MAXCNT 100000  // Reduced for debugging (~4ms at 25.2MHz)
+#define FW_WAIT_MAXCNT 100000  // Reduced for debugging (~5ms at 21.6MHz)
 
 static inline uint8_t uart_getchar_blocking() {
     int32_t rdata;
@@ -1020,7 +1020,7 @@ int main() {
 
 #elif defined(ISP_STAGE3)
 
-#define FW_WAIT_MAXCNT 5000000  // ~14s wall time (volatile loop, ~3 insn/iter at 25.2 MHz)
+#define FW_WAIT_MAXCNT 5000000  // ~16s wall time (volatile loop, ~3 insn/iter at 21.6 MHz)
 #define WBUF_SIZE 256  // Full page buffer (production)
 
 // SPI Flash bit definitions

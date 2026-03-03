@@ -8,7 +8,7 @@
 _start:
     # Initialize UART (same as Boot ROM)
     li t0, 0x83000000      # UART base
-    li t1, 217             # CLKDIV for 25.2 MHz / 115200 baud
+    li t1, 185             # CLKDIV for 21.6 MHz / 115200 baud (V3-020 fix)
     sw t1, 4(t0)
 
     # Wait for UART

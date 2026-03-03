@@ -34,8 +34,8 @@ _start:
     # UART base = 0x83000000
     lui t0, 0x83000
 
-    # Set CLKDIV = 217 for 115200 baud
-    li t1, 217
+    # Set CLKDIV = 185 for 115200 baud at 21.6 MHz (V3-020 fix)
+    li t1, 185
     sw t1, 4(t0)
 
     # s0 (x8) = fail flag (0 = all pass, 1 = any fail)
