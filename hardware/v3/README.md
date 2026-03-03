@@ -1,50 +1,91 @@
 # ATOMiK v3 Hardware
 
-Custom RV64I CPU core with integrated ATOMiK delta-state datapath, targeting the Tang Nano 9K (GW1NR-LV9QN88PC6/I5).
+Custom RV32I CPU core with integrated ATOMiK delta-state datapath, targeting the Tang Nano 9K (GW1NR-LV9QN88PC6/I5).
 
-## Current Status (ISP Boot ROM Complete) ✅
+## Current Status: v3.0.0-alpha
 
-**Hardware Validation:** 62/62 tests PASS
-- ✅ BRINGUP_MODE: CPU baseline working
-- ✅ BISECT_STEP8: 10 UART reads pass
-- ✅ BISECT_STEP7: 10,000 UART reads pass (60/60 consecutive)
-- ✅ Extended stress: 50 consecutive test cycles (~3.5 min)
-- ✅ Thermal stability: Validated through 60s warmup
+**Boot Chain:** BROM → ISP timeout → Flash XIP — fully validated
+- CPU running at 21.6 MHz (108 MHz PLL / 5), zero timing violations
+- Fmax 21.766 MHz, +0.77% margin, zero TNS
+- ISP flash programmer with NACK semantics and readback verify
+- Persistent flash boot validated with extended stability tests
 
-**ISP Boot ROM:** Complete & Production-Ready
-- ✅ ISP_STAGE1: Handshake + echo
-- ✅ ISP_STAGE2: Timeout path + flash jump
-- ✅ ISP_STAGE3A: Command parser
-- ✅ ISP_STAGE3B: ESEC (sector erase)
-- ✅ ISP_STAGE3C: WBUF (write buffer)
-- ✅ ISP_STAGE3D: WPAG (page program)
-- ✅ ISP_STAGE3: Full flash programmer (256-byte pages)
-  - Validated: 8B, 128B, 256B buffers
-  - All checksums correct
-  - Ready for persistent flash deployment
+**Resolved Issues:** V3-018 (GCC UB), V3-019 (ISP erase), V3-020 (timing violations)
 
-**Timing:** Clean closure at 25.2 MHz (TNS = 0.000 ns, Fmax = 25.202 MHz)
+See `docs/KNOWN_ISSUES.md` for details.
 
-**Recent Fixes:**
-- ✅ Stack pointer bug fixed (hardcoded 0x800002F0 → linker _stack_start)
-- ✅ AUIPC works correctly with .option norelax (la sp, _stack_start)
+## ISP Flash Programming
 
-**Known Issues:**
-- ⚠️ Thin timing margin (+0.008%) - consider 24 MHz for production
-- ⏸️ Full flash programming pending (WBUF+WPAG)
+The ISP (In-System Programming) protocol allows firmware to be written to SPI flash over UART without physical reset buttons.
 
-See `deploy/HARDWARE_VALIDATION_COMPLETE.md` and `deploy/ISP_STAGE2_COMPLETE.md`.
+### Prerequisites
+
+- Bitstream: `synth/atomik_v3_soc.fs`
+- Firmware: A `.v` hex file (e.g., `soc/firmware/fw-flash/test_flash_minimal.v`)
+- UART: `/dev/ttyUSB1` at 115200 baud
+
+### Programming Procedure
+
+**The UART port must be opened before loading the bitstream.** The CH552T USB-UART bridge on the Tang Nano 9K drops data if the port isn't open when the FPGA starts. The ISP handshake window opens immediately after BROM boot, so any delay from opening the port afterward can miss it.
+
+```bash
+# Automated (recommended):
+cd hardware/v3/synth
+python3 isp_flash_programmer.py ../soc/firmware/fw-flash/test_flash_minimal.v
+
+# The programmer handles the sequence automatically:
+# 1. Opens UART (before bitstream load)
+# 2. Loads bitstream via openFPGALoader (triggers CPU reset → ISP starts)
+# 3. Flushes stale UART data, then performs ISP handshake
+# 4. Programs firmware in 256-byte pages with checksums
+# 5. Reads back and verifies every byte
+```
+
+### ISP Protocol Commands
+
+| Command | Byte | Description |
+|---------|------|-------------|
+| Handshake | `0x55` | Host sends; BROM replies `0x56` |
+| WBUF | `0x10 len data...` | Write up to 256 bytes to page buffer |
+| ESEC | `0x30 addr2 addr1 addr0` | Erase 4KB sector |
+| WPAG | `0x40 addr2 addr1 addr0` | Program page from buffer |
+| RDBK | `0x50 addr2 addr1 addr0 len` | Read back flash data + checksum |
+| RST | `0xF0` | Reset to BROM |
+
+NACK responses: `0x4F` (WPAG with empty buffer), `0xFF` (unknown command).
+
+### Boot Sequence After Programming
+
+After programming, the boot chain is:
+1. BROM starts, sends ISP handshake probe on UART
+2. If no host responds within ~16s (at 21.6 MHz), BROM prints `JUMP!`
+3. CPU jumps to flash XIP at address `0x00000000`
+4. Flash firmware executes (e.g., prints `F!F!`)
+
+To observe the full boot chain after power-cycle:
+```bash
+# Load bitstream to SRAM (does not persist across power cycles)
+openFPGALoader -b tangnano9k synth/atomik_v3_soc.fs
+# Wait ~16s for ISP timeout, then firmware runs
+# Monitor: picocom /dev/ttyUSB1 -b 115200
+```
 
 ## Directory Structure
 
 ```
 hardware/v3/
-├── rtl/              Verilog source modules
+├── rtl/              Verilog source modules (CPU, decode, ALU, CSR, regfile, LSU)
 ├── sim/
 │   ├── iverilog/     Module-level testbenches (iverilog/VVP)
 │   ├── verilator/    Verilator C++ test harnesses
-│   └── compliance/   RISC-V ISA compliance test runner (scaffold)
-├── synth/            Gowin EDA synthesis scripts
+│   └── compliance/   RISC-V ISA compliance test runner
+├── soc/              SoC integration
+│   ├── atomik_v3_soc.v       Top-level SoC (CPU + BSRAM + UART + SPI flash)
+│   ├── firmware/fw-brom/     ISP boot ROM firmware (C)
+│   ├── firmware/fw-flash/    Flash test firmware (assembly)
+│   └── gowin_ip/             Gowin IP cores (PLL, BSRAM)
+├── synth/            Gowin EDA synthesis (SDC, programmer, bitstream)
+├── deploy/           Session logs and debug notes
 ├── Makefile          Unified build system
 └── README.md         This file
 ```
