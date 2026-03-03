@@ -9,9 +9,9 @@
 ## 1. Phase Summary
 
 -   **Current Phase:** Phase 3 --- SoC Integration (Tang Nano 9K)
--   **Date Updated:** 2026-02-22
--   **Status:** Partially Complete (SRAM deployment working, flash deployment pending)
--   **Exit Decision:** Conditional Go (requires flash deployment and HDMI verification)
+-   **Date Updated:** 2026-03-03
+-   **Status:** Boot Chain Complete (BROM → ISP → Flash XIP validated). Timing violations open (V3-020).
+-   **Exit Decision:** Conditional Go (requires timing fix and HDMI verification)
 
 ------------------------------------------------------------------------
 
@@ -21,15 +21,22 @@ Phase 3 integrates the v3 CPU + ATOMiK into a complete SoC with peripherals (UAR
 boots from SPI flash on Tang Nano 9K, and validates the full system on hardware.
 
 **Achieved:**
-- Full SoC synthesis (5,594 LUT, 16 BSRAM, zero TNS)
+- Full SoC synthesis (5,594 LUT, 16 BSRAM)
 - SRAM deployment working (bitstream loaded to volatile memory)
 - UART communication functional (115200 baud)
 - Three critical bugs discovered and fixed (power-on reset, bus arbiter, UART timing)
+- ISP flasher ported to RV64I and running on hardware (ISP_STAGE3)
+- Flash boot chain validated: BROM → ISP timeout (~14s) → JUMP! → XIP → F!F! repeating
+- ISP programming flow working: handshake, sector erase, page program, checksum verify
+- Critical bugs fixed: V3-018 (GCC null-pointer UB), V3-019 (ESEC gating)
+- Golden tag locked: `v3-boot-chain-golden`
 
 **Remaining:**
-- Flash deployment to persistent storage
+- Fix timing violations: 40 setup violations at 25.2 MHz, Fmax 24.745 MHz (V3-020)
+- ISP protocol robustness: NACK/error codes, readback verify command
+- Flash deployment to persistent storage (bitstream)
 - HDMI output verification
-- Full hardware test suite execution
+- Full hardware test suite execution (ATOMiK custom instructions on hardware)
 
 **Exclusions:** Display pipeline (Phase 4), multi-node streaming (Phase 5), parallel banks (Phase 6).
 
@@ -46,11 +53,14 @@ boots from SPI flash on Tang Nano 9K, and validates the full system on hardware.
 | BSRAM utilization | <80% | 62% (16/26) | PASS |
 | UART communication | 115200 baud functional | Working (ISP flasher verified) | PASS |
 | ATOMiK tests (sim) | 9/9 Verilator | 9/9 PASS | PASS |
-| ATOMiK tests (hardware) | 9/9 on real FPGA | Pending flash deployment | PENDING |
+| ATOMiK tests (hardware) | 9/9 on real FPGA | Pending (requires flash-resident test firmware) | PENDING |
 | SRAM deployment | Bitstream loads, UART works | Working after 3 critical bug fixes | PASS |
-| Flash deployment | Persistent boot from flash | Not yet tested | PENDING |
+| Flash boot chain | BROM → ISP → XIP execution | Validated: 946 clean F!F! prints, golden tag locked | PASS |
+| ISP flash programming | Program firmware via UART ISP | Working: handshake, erase, program, checksum | PASS |
+| Timing violations | Zero setup violations | 40 violations at 25.2 MHz, Fmax 24.745 MHz (V3-020) | FAIL |
+| Flash deployment (persistent) | Persistent boot from flash | Not yet tested (bitstream persistence) | PENDING |
 | HDMI output | Test pattern displays | Not yet verified | PENDING |
-| KNOWN_ISSUES.md | Updated | V3-009, V3-010, V3-011 added | PASS |
+| KNOWN_ISSUES.md | Updated | V3-009 through V3-020 added | PASS |
 | Phase Context | Updated | This document | PASS |
 
 ------------------------------------------------------------------------
