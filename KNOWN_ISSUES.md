@@ -987,21 +987,26 @@ case 0x30:  // ESEC
 
 **Severity:** High
 **Date:** March 2, 2026
-**Status:** Open
+**Status:** Resolved (clock lowered to 21.6 MHz)
 
-**Symptom:** 40 setup timing violations on clk_cpu domain. Fmax = 24.745 MHz vs 25.2 MHz target (1.8% over).
+**Symptom:** 40 setup timing violations on clk_cpu domain at 25.2 MHz. Fmax = 24.745 MHz (1.8% over).
 
-**Worst paths:** All originate from `u_cpu/u_fetch/instr_0_s0/Q` (instruction register bit 0) fanning out to regfile and LSU endpoints. Worst slack: -0.729ns. Logic depth: 14 levels.
+**Worst paths:** All originate from `u_cpu/u_fetch/instr_0_s0/Q` (instruction register bit 0) fanning out to regfile and LSU endpoints. Worst slack at 25.2 MHz: -0.729ns. Logic depth: 14 levels.
 
-**Critical path:** Fetch → Decode → Regfile write address / LSU request address. The single-cycle decode path from instruction fetch to register file and load-store unit is too long.
+**Critical path:** Fetch → Decode → Regfile write address / LSU request address. The single-cycle decode path from instruction fetch to register file and load-store unit is too long for 25.2 MHz.
 
-**Impact:** Timing violations mean no correctness guarantee across PVT (process, voltage, temperature) corners. Current hardware "works" but could fail under different conditions (higher temperature, lower voltage, different silicon lot).
+**Resolution:** Lowered PLL from 126 MHz to 108 MHz (FBDIV_SEL=3, IDIV_SEL=0, ODIV_SEL=4). CLKDIV ÷5 produces 21.6 MHz CPU clock. HDMI 5:1 ratio preserved (108 MHz serializer = 5× 21.6 MHz pixel). HDMI refresh rate ~51.4 Hz (within monitor tolerance).
 
-**Fix options (in order of preference for bringup):**
-1. **Lower CPU clock**: Change PLL/CLKDIV to produce ~24 MHz. Requires finding a PLL config that still gives 5x pixel clock for HDMI.
-2. **Pipeline the decode stage**: Add register between fetch and decode, making instruction decode a 2-stage pipeline. Fixes the path permanently but requires significant RTL changes.
-3. **Retime/restructure the decode mux**: Reduce fan-out from instruction register by breaking the decode into smaller, registered stages.
+**Timing after fix:**
+- Fmax: 21.766 MHz (target 21.6 MHz, +0.77% margin)
+- Zero TNS, zero violations
+- Worst slack: +0.354 ns (positive)
+- Logic depth: 13 levels
 
-**Current status:** Boot chain validated despite violations. Tagged `v3-boot-chain-golden` as reference point.
+**Performance impact:** ~14% reduction vs 25.2 MHz. ISP timeout increases from ~14s to ~16s. UART baud divisor changed from 217 to 185.
+
+**Future improvement:** Pipeline the decode stage (add register between fetch and decode) to restore 25.2 MHz operation. This would require FSM changes but is the long-term fix.
+
+**Validated:** Boot chain (BROM → ISP → XIP → F!F!) confirmed working at 21.6 MHz with zero corruption.
 
 ---
