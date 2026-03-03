@@ -10,6 +10,7 @@
 #
 # Expected output:
 #   1=AB 2=54 3=AB 4=DE 5P 6=5A 7=AA 8P 9P AP BP CP DP
+#   E:B=XXXX L=XXXX A=XXXX R=XXXX S=XXXX
 #   OK
 #
 # Tests:
@@ -26,6 +27,7 @@
 #   B: SRAM bus traffic doesn't corrupt ATOMiK accumulator (0xBEEF^0xFF=0xBE10) (P/F)
 #   C: SRAM boundary — store/load at last valid word 0x40001FFC (P/F)
 #   D: 64-bit round-trip: ATOMiK READ → SD to SRAM → LD back → compare (P/F)
+#   E: Cycle counter measurement: LOAD, ACCUM, READ, SWAP (prints hex deltas)
 
 .section .text
 .global _start
@@ -61,6 +63,39 @@
 .macro PRINT_CHAR ch
     li t1, \ch
     sw t1, 0(s0)
+.endm
+
+# Print register[15:0] as 4 hex digits via UART at s0
+# Uses a3, t3 as scratch.
+.macro PRINT_HEX_WORD reg
+    srli a3, \reg, 12
+    andi a3, a3, 0xF
+    li t3, 10
+    blt a3, t3, 8880f
+    addi a3, a3, ('A' - 10)
+    j 8881f
+8880: addi a3, a3, '0'
+8881: sw a3, 0(s0)
+    srli a3, \reg, 8
+    andi a3, a3, 0xF
+    blt a3, t3, 8882f
+    addi a3, a3, ('A' - 10)
+    j 8883f
+8882: addi a3, a3, '0'
+8883: sw a3, 0(s0)
+    srli a3, \reg, 4
+    andi a3, a3, 0xF
+    blt a3, t3, 8884f
+    addi a3, a3, ('A' - 10)
+    j 8885f
+8884: addi a3, a3, '0'
+8885: sw a3, 0(s0)
+    andi a3, \reg, 0xF
+    blt a3, t3, 8886f
+    addi a3, a3, ('A' - 10)
+    j 8887f
+8886: addi a3, a3, '0'
+8887: sw a3, 0(s0)
 .endm
 
 _start:
@@ -408,6 +443,69 @@ c_done:
 d_pass:
     PRINT_CHAR 'P'
 d_done:
+    PRINT_CHAR '\n'
+
+    # =========================================================================
+    # Test E: Cycle counter measurements
+    # Measures cycle cost of each ATOMiK operation using mcycle CSR.
+    # Each measurement: csrr before, operation, csrr after, delta = after - before.
+    # The delta includes the csrr overhead (~4 cycles per read).
+    # Output: E:LOAD=XXXX ACCUM=XXXX READ=XXXX SWAP=XXXX
+    # =========================================================================
+    PRINT_CHAR 'E'
+    PRINT_CHAR ':'
+
+    # --- Measure baseline (csrr overhead) ---
+    csrr s3, mcycle             # before
+    csrr s4, mcycle             # after (nothing in between)
+    sub  s5, s4, s3
+    PRINT_CHAR 'B'
+    PRINT_CHAR '='
+    PRINT_HEX_WORD s5
+    PRINT_CHAR ' '
+
+    # --- Measure LOAD ---
+    li a0, 60
+    li a1, 0x42
+    csrr s3, mcycle             # before
+    ATOMIK_LOAD(a0, a1)
+    csrr s4, mcycle             # after
+    sub  s5, s4, s3
+    PRINT_CHAR 'L'
+    PRINT_CHAR '='
+    PRINT_HEX_WORD s5
+    PRINT_CHAR ' '
+
+    # --- Measure ACCUM ---
+    li a0, 0x77
+    csrr s3, mcycle             # before
+    ATOMIK_ACCUM(a0)
+    csrr s4, mcycle             # after
+    sub  s5, s4, s3
+    PRINT_CHAR 'A'
+    PRINT_CHAR '='
+    PRINT_HEX_WORD s5
+    PRINT_CHAR ' '
+
+    # --- Measure READ ---
+    csrr s3, mcycle             # before
+    ATOMIK_READ(a2)
+    csrr s4, mcycle             # after
+    sub  s5, s4, s3
+    PRINT_CHAR 'R'
+    PRINT_CHAR '='
+    PRINT_HEX_WORD s5
+    PRINT_CHAR ' '
+
+    # --- Measure SWAP ---
+    li a0, 61
+    csrr s3, mcycle             # before
+    ATOMIK_SWAP(a2, a0)
+    csrr s4, mcycle             # after
+    sub  s5, s4, s3
+    PRINT_CHAR 'S'
+    PRINT_CHAR '='
+    PRINT_HEX_WORD s5
     PRINT_CHAR '\n'
 
     # =========================================================================

@@ -45,6 +45,10 @@ module atomik_v3_csr (
     localparam ADDR_MSCRATCH = 12'h340;
     localparam ADDR_MEPC     = 12'h341;
     localparam ADDR_MCAUSE   = 12'h342;
+    localparam ADDR_MCYCLE   = 12'hB00;
+    localparam ADDR_MINSTRET = 12'hB02;
+    localparam ADDR_CYCLE    = 12'hC00;  // User-mode shadow (read-only)
+    localparam ADDR_INSTRET  = 12'hC02;  // User-mode shadow (read-only)
 
     // CSR operation encoding (funct3)
     localparam CSR_RW  = 3'b001;  // CSRRW
@@ -67,8 +71,10 @@ module atomik_v3_csr (
     reg [63:0] mcause;
     // mtval: hardwired to zero (spec allows this)
     // mie/mip: hardwired to zero (no interrupt sources)
-    // mcycle/minstret: read-only zero for now (saves ~300 LUT from LUT-based adders)
-    // Can be re-enabled with writable counters when SoC integration needs them
+
+    // Performance counters
+    reg [63:0] mcycle;      // Free-running cycle counter
+    reg [63:0] minstret;    // Retired instruction counter
 
     // misa: RV64I, no extensions
     // MXL = 2 (64-bit), extensions bit 8 (I) set
@@ -88,7 +94,11 @@ module atomik_v3_csr (
             ADDR_MSCRATCH: csr_rdata = mscratch;
             ADDR_MEPC:     csr_rdata = mepc;
             ADDR_MCAUSE:   csr_rdata = mcause;
-            // mie, mip, mtval, mcycle, minstret, mhartid: all read as zero
+            ADDR_MCYCLE,
+            ADDR_CYCLE:    csr_rdata = mcycle;
+            ADDR_MINSTRET,
+            ADDR_INSTRET:  csr_rdata = minstret;
+            // mie, mip, mtval, mhartid: all read as zero
             default:       csr_rdata = 64'b0;
         endcase
     end
@@ -118,7 +128,13 @@ module atomik_v3_csr (
             mscratch <= 64'b0;
             mepc     <= 64'b0;
             mcause   <= 64'b0;
+            mcycle   <= 64'b0;
+            minstret <= 64'b0;
         end else begin
+            // Performance counters (always incrementing)
+            mcycle <= mcycle + 64'd1;
+            if (instr_retire)
+                minstret <= minstret + 64'd1;
             // Trap entry
             if (trap_enter) begin
                 mepc   <= trap_pc;
@@ -142,11 +158,13 @@ module atomik_v3_csr (
                         mstatus_mpie <= csr_new_val[7];
                         mstatus_mpp  <= csr_new_val[12:11];
                     end
-                    // mie, mip, mtval, mcycle, minstret: writes ignored
+                    // mie, mip, mtval: writes ignored
                     ADDR_MTVEC:    mtvec    <= csr_new_val;
                     ADDR_MSCRATCH: mscratch <= csr_new_val;
                     ADDR_MEPC:     mepc     <= csr_new_val;
                     ADDR_MCAUSE:   mcause   <= csr_new_val;
+                    ADDR_MCYCLE:   mcycle   <= csr_new_val;
+                    ADDR_MINSTRET: minstret <= csr_new_val;
                     default: ; // Read-only or unimplemented
                 endcase
             end
