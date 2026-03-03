@@ -1,9 +1,9 @@
-.section .text
+.section .vector,"ax"
 
-.global crtStart
+.global _start
 .global main
 
-crtStart:
+_start:
   j crtInit
   nop
   nop

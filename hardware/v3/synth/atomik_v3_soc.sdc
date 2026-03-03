@@ -15,8 +15,10 @@
 // 27 MHz oscillator input
 create_clock -name clk_osc -period 37.037 -waveform {0 18.518} [get_ports {clk}]
 
-// Note: Gowin tools auto-detect PLL and CLKDIV generated clocks.
-// Expected: clk_p5 = 126 MHz (period 7.937 ns)
-//           clk_p  = 25.2 MHz (period 39.683 ns)
-//
-// Target Fmax for CPU: 25.2 MHz (well within measured capability of 26.563 MHz)
+// Note: Gowin tools auto-detect PLL but NOT CLKDIV correctly.
+// Must explicitly create the CLKDIV output clock.
+// clk_p5 = 126 MHz (period 7.937 ns) — PLL output (auto-detected)
+// clk_p  = 25.2 MHz (period 39.683 ns) — CLKDIV ÷5 output
+// Using create_clock (not create_generated_clock) because get_pins may not resolve
+// in Gowin's PNR netlist after hierarchy flattening.
+create_clock -name clk_cpu -period 39.683 -waveform {0 19.841} [get_nets {clk_p}]

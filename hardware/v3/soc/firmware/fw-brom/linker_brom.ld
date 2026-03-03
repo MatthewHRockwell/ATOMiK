@@ -14,7 +14,6 @@ SECTIONS {
 
   .vector : {
     KEEP(*(.vector));
-    *crt_brom.o(.text);
   } > BROM
 
   .memory : {

@@ -193,25 +193,34 @@ def main():
     prog = ISPFlashProgrammer()
 
     try:
-        # Step 1: Load bitstream with ISP firmware
+        # Step 1: Open UART FIRST (before bitstream load)
+        # CH552T drops data if port not open; we need the ISP handshake window
+        prog.open_uart()
+
+        # Step 2: Load bitstream (triggers CPU reset → ISP firmware starts)
         prog.load_bitstream(bitstream_path)
 
-        # Step 2: Open UART and handshake
-        prog.open_uart()
+        # Step 3: Wait for FPGA boot then handshake within ISP timeout window
+        time.sleep(0.5)  # Let FPGA initialize
         prog.handshake()
 
-        # Step 3: Read firmware
+        # Step 4: Read firmware
         firmware_data = prog.read_verilog_hex(firmware_path)
 
-        # Step 4: Program to flash
+        # Step 5: Program to flash
         prog.program_firmware(firmware_data, base_addr=0x00000000)
 
-        # Step 5: Reset and test
+        # TODO: Add readback verify step — after programming, read back
+        # programmed region and compare bytes. Requires adding a READ
+        # command (0x50) to the ISP firmware protocol. This would catch
+        # silent corruption even if firmware ACKs are incorrect.
+
+        # Done
         print("=== Programming Complete ===")
         print("\nTo test persistent boot:")
         print("1. Power cycle the FPGA (unplug USB)")
         print("2. Reload bitstream: openFPGALoader -b tangnano9k atomik_v3_soc.fs")
-        print("3. Wait for ISP timeout (~200ms)")
+        print("3. Wait for ISP timeout (~14s with current loop)")
         print("4. Flash firmware should execute (look for 'F!F!' on UART)")
 
     except Exception as e:

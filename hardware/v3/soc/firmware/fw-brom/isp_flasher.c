@@ -41,7 +41,7 @@ typedef struct {
 
 // --------------------------------------------------------
 
-#define CLK_FREQ        25200000  // 25.2 MHz (PLL+CLKDIV, not direct crystal!)
+#define CLK_FREQ        25200000  // 25.2 MHz (126 MHz / 5)
 #define UART_BAUD       115200
 
 static inline void uart_putchar(uint8_t wdata) {
@@ -214,8 +214,7 @@ int main() {
     delay(100000);  // Let UART finish
 
     // Jump to flash entry point
-    void (*flash_entry)(void) = (void (*)(void))0x00000000;
-    flash_entry();
+    asm volatile("li t0, 0; jr t0" ::: "t0");
 
     // Should never reach here
     while (1) {
@@ -276,8 +275,7 @@ int main() {
 
     delay(100000);
 
-    void (*flash_entry)(void) = (void (*)(void))0x00000000;
-    flash_entry();
+    asm volatile("li t0, 0; jr t0" ::: "t0");
 
     while (1);
 }
@@ -459,8 +457,7 @@ int main() {
     delay(100000);  // Let UART finish transmitting
 
     // Jump to flash entry point (0x00000000)
-    void (*flash_entry)(void) = (void (*)(void))0x00000000;
-    flash_entry();
+    asm volatile("li t0, 0; jr t0" ::: "t0");
 
     // Should never reach here - flash firmware should take over
     while (1) {
@@ -520,8 +517,7 @@ int main() {
         uart_putchar('!');
         uart_putchar('\n');
         delay(100000);
-        void (*flash_entry)(void) = (void (*)(void))0x00000000;
-        flash_entry();
+        asm volatile("li t0, 0; jr t0" ::: "t0");
     }
 
     // Command parser (echo command IDs only, no operations)
@@ -650,8 +646,7 @@ int main() {
         uart_putchar('!');
         uart_putchar('\n');
         delay(100000);
-        void (*flash_entry)(void) = (void (*)(void))0x00000000;
-        flash_entry();
+        asm volatile("li t0, 0; jr t0" ::: "t0");
     }
 
     while (1) {
@@ -784,8 +779,7 @@ int main() {
         uart_putchar('!');
         uart_putchar('\n');
         delay(100000);
-        void (*flash_entry)(void) = (void (*)(void))0x00000000;
-        flash_entry();
+        asm volatile("li t0, 0; jr t0" ::: "t0");
     }
 
     // ISP command loop
@@ -945,8 +939,7 @@ int main() {
         uart_putchar('!');
         uart_putchar('\n');
         delay(100000);
-        void (*flash_entry)(void) = (void (*)(void))0x00000000;
-        flash_entry();
+        asm volatile("li t0, 0; jr t0" ::: "t0");
     }
 
     // ISP command loop
@@ -1027,7 +1020,7 @@ int main() {
 
 #elif defined(ISP_STAGE3)
 
-#define FW_WAIT_MAXCNT 5000000  // ~200ms at 25.2 MHz
+#define FW_WAIT_MAXCNT 5000000  // ~14s wall time (volatile loop, ~3 insn/iter at 25.2 MHz)
 #define WBUF_SIZE 256  // Full page buffer (production)
 
 // SPI Flash bit definitions
@@ -1140,10 +1133,12 @@ int main() {
         uart_putchar('!');
         uart_putchar('\n');
 
-        delay(100000);
+        delay(100000);  // Let UART finish transmitting
 
-        void (*flash_entry)(void) = (void (*)(void))0x00000000;
-        flash_entry();
+        // Jump to flash entry point (0x00000000)
+        // MUST use inline asm: GCC treats (void(*)())0 as null pointer UB
+        // and inserts ebreak / optimizes away the jump
+        asm volatile("li t0, 0; jr t0" ::: "t0");
     }
 
     // ISP command loop
@@ -1184,10 +1179,8 @@ int main() {
             flash_buffer.addr[1] = uart_getchar_blocking();
             flash_buffer.addr[2] = uart_getchar_blocking();
 
-            // Erase 4KB sector
-            if (buflen) {
-                spi_flashio((uint8_t *)&flash_buffer, 4, FLASHIO_REQWREN);
-            }
+            // Erase 4KB sector (unconditional — erase doesn't use data buffer)
+            spi_flashio((uint8_t *)&flash_buffer, 4, FLASHIO_REQWREN);
 
             uart_putchar(0x32);
             break;
