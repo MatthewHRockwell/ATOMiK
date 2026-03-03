@@ -5,10 +5,15 @@ Programs firmware to SPI flash via UART ISP protocol
 """
 
 import serial
+import struct
 import subprocess
 import time
 import sys
+import zlib
 from pathlib import Path
+
+FLASH_HDR_MAGIC = 0x4D4F5441  # "ATOM" little-endian
+FLASH_HDR_SIZE = 16
 
 class ISPFlashProgrammer:
     def __init__(self, port='/dev/ttyUSB1', baud=115200):
@@ -199,6 +204,20 @@ class ISPFlashProgrammer:
 
         print(f"\n✓ Programmed {total_bytes} bytes in {page_num} pages\n")
 
+    def generate_header(self, firmware_data):
+        """Generate 16-byte flash header with CRC32"""
+        image_len = len(firmware_data)
+        crc = zlib.crc32(firmware_data) & 0xFFFFFFFF
+        entry = 0x00000010  # Right after header
+        header = struct.pack('<IIII', FLASH_HDR_MAGIC, image_len, crc, entry)
+        print(f"Flash header:")
+        print(f"  Magic:     0x{FLASH_HDR_MAGIC:08X} ('ATOM')")
+        print(f"  Image len: {image_len} bytes (0x{image_len:X})")
+        print(f"  CRC32:     0x{crc:08X}")
+        print(f"  Entry:     0x{entry:08X}")
+        print()
+        return header
+
     def reset(self):
         """Reset to BROM"""
         print("Resetting to BROM...")
@@ -213,24 +232,47 @@ class ISPFlashProgrammer:
             self.ser.close()
 
     def read_verilog_hex(self, vfile_path):
-        """Read Verilog hex file and return binary data"""
+        """Read Verilog hex file and return binary data.
+
+        Respects @address segments: fills gaps with 0xFF and returns
+        a flat binary starting from the lowest address.
+        """
         print(f"Reading firmware: {vfile_path}")
 
-        data = bytearray()
+        segments = []
+        current_addr = 0
+        current_data = bytearray()
+
         with open(vfile_path, 'r') as f:
             for line in f:
                 line = line.strip()
                 if line.startswith('@'):
-                    # Address line - ignore for now (assume sequential)
-                    continue
+                    if current_data:
+                        segments.append((current_addr, bytes(current_data)))
+                        current_data = bytearray()
+                    current_addr = int(line[1:], 16)
                 elif line:
-                    # Hex data line
                     hex_bytes = line.split()
                     for hb in hex_bytes:
-                        data.append(int(hb, 16))
+                        current_data.append(int(hb, 16))
+        if current_data:
+            segments.append((current_addr, bytes(current_data)))
 
-        print(f"✓ Read {len(data)} bytes\n")
-        return bytes(data)
+        if not segments:
+            raise ValueError("No data found in Verilog hex file")
+
+        # Build flat binary from lowest address
+        base_addr = segments[0][0]
+        last_seg = segments[-1]
+        total_size = (last_seg[0] + len(last_seg[1])) - base_addr
+
+        data = bytearray([0xFF] * total_size)
+        for addr, seg_data in segments:
+            offset = addr - base_addr
+            data[offset:offset + len(seg_data)] = seg_data
+
+        print(f"✓ Read {len(data)} bytes (base 0x{base_addr:X}, {len(segments)} segments)\n")
+        return bytes(data), base_addr
 
 
 def main():
@@ -266,14 +308,17 @@ def main():
         prog.ser.read(1000)  # Flush any leftover data from previous boot
         prog.handshake()
 
-        # Step 4: Read firmware
-        firmware_data = prog.read_verilog_hex(firmware_path)
+        # Step 4: Read firmware and generate header
+        firmware_data, fw_base = prog.read_verilog_hex(firmware_path)
+        print(f"Firmware base address: 0x{fw_base:X}")
+        header = prog.generate_header(firmware_data)
+        full_image = header + firmware_data
 
-        # Step 5: Program to flash
-        prog.program_firmware(firmware_data, base_addr=0x00000000)
+        # Step 5: Program header + firmware to flash
+        prog.program_firmware(full_image, base_addr=0x00000000)
 
         # Step 6: Readback verify
-        prog.verify_firmware(firmware_data, base_addr=0x00000000)
+        prog.verify_firmware(full_image, base_addr=0x00000000)
 
         # Done
         print("=== Programming + Verify Complete ===")

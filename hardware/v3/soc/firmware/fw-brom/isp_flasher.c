@@ -1098,6 +1098,41 @@ typedef struct {
     uint8_t data_buf[256];
 } FLASH_BUF;
 
+// --- Flash header + CRC gate helpers ---
+
+static inline uint32_t get_u32_le(const uint8_t *p) {
+    return (uint32_t)p[0] | ((uint32_t)p[1] << 8) |
+           ((uint32_t)p[2] << 16) | ((uint32_t)p[3] << 24);
+}
+
+static uint32_t crc32_update(uint32_t crc, uint8_t byte) {
+    crc ^= byte;
+    for (int i = 0; i < 8; i++) {
+        if (crc & 1)
+            crc = (crc >> 1) ^ 0xEDB88320;
+        else
+            crc >>= 1;
+    }
+    return crc;
+}
+
+// Read N bytes from flash at 24-bit address into flash_buffer.data_buf
+static void flash_read_bytes(FLASH_BUF *buf, uint32_t addr, int len) {
+    buf->instr = 0x03;  // SPI Flash Read command
+    buf->addr[0] = (addr >> 16) & 0xFF;
+    buf->addr[1] = (addr >> 8) & 0xFF;
+    buf->addr[2] = addr & 0xFF;
+    for (int i = 0; i < len; i++)
+        buf->data_buf[i] = 0;
+    spi_flashio((uint8_t *)buf, 4 + len, 0);
+}
+
+#define FLASH_HDR_MAGIC 0x4D4F5441  // "ATOM" little-endian
+#define FLASH_HDR_SIZE  16
+#define FLASH_MAX_IMAGE 0x100000    // 1MB max
+
+// --- End CRC gate helpers ---
+
 static inline uint8_t uart_getchar_blocking() {
     int32_t rdata;
     do {
@@ -1124,22 +1159,61 @@ int main() {
         }
     }
 
-    // Timeout - jump to flash
+    // Timeout - validate flash header + CRC before jumping
     if (waitcnt == FW_WAIT_MAXCNT) {
-        uart_putchar('J');
-        uart_putchar('U');
-        uart_putchar('M');
-        uart_putchar('P');
-        uart_putchar('!');
-        uart_putchar('\n');
+        // Read 16-byte header from flash offset 0x00
+        flash_read_bytes(&flash_buffer, 0x000000, FLASH_HDR_SIZE);
 
+        uint32_t magic     = get_u32_le(&flash_buffer.data_buf[0]);
+        uint32_t image_len = get_u32_le(&flash_buffer.data_buf[4]);
+        uint32_t exp_crc   = get_u32_le(&flash_buffer.data_buf[8]);
+        uint32_t entry     = get_u32_le(&flash_buffer.data_buf[12]);
+
+        // Validate magic
+        if (magic != FLASH_HDR_MAGIC) {
+            uart_putchar('N'); uart_putchar('O'); uart_putchar('I');
+            uart_putchar('M'); uart_putchar('G'); uart_putchar('\n');
+            goto stay_in_isp;
+        }
+
+        // Sanity check image length
+        if (image_len == 0 || image_len > FLASH_MAX_IMAGE) {
+            uart_putchar('B'); uart_putchar('A'); uart_putchar('D');
+            uart_putchar('S'); uart_putchar('Z'); uart_putchar('\n');
+            goto stay_in_isp;
+        }
+
+        // Compute CRC32 over payload (flash offset 0x10, length image_len)
+        uint32_t crc = 0xFFFFFFFF;
+        uint32_t remaining = image_len;
+        uint32_t addr = FLASH_HDR_SIZE;
+        while (remaining > 0) {
+            uint32_t chunk = (remaining > 256) ? 256 : remaining;
+            flash_read_bytes(&flash_buffer, addr, (int)chunk);
+            for (uint32_t i = 0; i < chunk; i++)
+                crc = crc32_update(crc, flash_buffer.data_buf[i]);
+            addr += chunk;
+            remaining -= chunk;
+        }
+        crc ^= 0xFFFFFFFF;
+
+        if (crc != exp_crc) {
+            uart_putchar('B'); uart_putchar('A'); uart_putchar('D');
+            uart_putchar('C'); uart_putchar('R'); uart_putchar('C');
+            uart_putchar('\n');
+            goto stay_in_isp;
+        }
+
+        uart_putchar('J'); uart_putchar('U'); uart_putchar('M');
+        uart_putchar('P'); uart_putchar('!'); uart_putchar('\n');
         delay(100000);  // Let UART finish transmitting
 
-        // Jump to flash entry point (0x00000000)
-        // MUST use inline asm: GCC treats (void(*)())0 as null pointer UB
-        // and inserts ebreak / optimizes away the jump
-        asm volatile("li t0, 0; jr t0" ::: "t0");
+        // Jump to entry point from header
+        // MUST use inline asm: GCC treats low addresses as null pointer UB
+        asm volatile("mv t0, %0; jr t0" :: "r"((uint64_t)entry) : "t0");
     }
+
+    stay_in_isp:
 
     // ISP command loop
     while (1) {

@@ -4,7 +4,7 @@ ENTRY(crtStart)
 
 MEMORY
 {
-  FLASH (rx)  : ORIGIN = 0x00000000, LENGTH = 8M
+  FLASH (rx)  : ORIGIN = 0x00000010, LENGTH = 8M - 16
   RAM   (xrw) : ORIGIN = 0x40000000, LENGTH = 8k
 }
 
@@ -12,7 +12,7 @@ _stack_size = DEFINED(_stack_size) ? _stack_size : 2k;
 _heap_size = DEFINED(_heap_size) ? _heap_size : 0;
 
 SECTIONS {
-    .vector 0x00000000 : {
+    .vector 0x00000010 : {
         . = ALIGN(4);
         KEEP(*crt_flash.o(.text .text.*));
     } > FLASH
