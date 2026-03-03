@@ -72,6 +72,7 @@ module atomik_v3_cpu #(
 
     // LSU
     wire        lsu_start, lsu_done;
+    wire        lsu_misaligned;
     wire [63:0] lsu_rdata;
     wire        lsu_bus_valid;
     wire [31:0] lsu_bus_addr;
@@ -94,6 +95,7 @@ module atomik_v3_cpu #(
     wire [1:0]  pc_src;
     wire [2:0]  wb_src;
     wire [2:0]  state_out;
+    wire        misaligned_trap;
 
     // FSM state constants (must match atomik_v3_control.v)
     localparam S_EXECUTE   = 3'd2;
@@ -233,6 +235,7 @@ module atomik_v3_cpu #(
         .lsu_wdata    (rs2_data),
         .lsu_rdata    (lsu_rdata),
         .lsu_done     (lsu_done),
+        .lsu_misaligned (lsu_misaligned),
         .bus_valid    (lsu_bus_valid),
         .bus_ready    (lsu_bus_ready),  // FIX: use gated ready signal
         .bus_addr     (lsu_bus_addr),
@@ -258,7 +261,9 @@ module atomik_v3_cpu #(
         .csr_rdata    (csr_rdata),
         .trap_enter   (trap_enter),
         .trap_pc      (pc),
-        .trap_cause   (dec_is_system && dec_funct3 == 3'b000 && instr[20] ?
+        .trap_cause   (misaligned_trap ?
+                       (dec_is_store ? 64'd6 : 64'd4) :  // Store/load address misaligned
+                       dec_is_system && dec_funct3 == 3'b000 && instr[20] ?
                        64'd3 :  // EBREAK = cause 3
                        dec_illegal ? 64'd2 :  // Illegal instruction = cause 2
                        64'd11),  // ECALL from M-mode = cause 11
@@ -334,6 +339,7 @@ module atomik_v3_cpu #(
         .branch_taken  (branch_taken),
         .lsu_start     (lsu_start),
         .lsu_done      (lsu_done),
+        .lsu_misaligned(lsu_misaligned),
         .regfile_wen   (regfile_wen),
         .pc_wen        (pc_wen),
         .csr_wen       (csr_wen),
@@ -342,6 +348,7 @@ module atomik_v3_cpu #(
         .instr_retire  (instr_retire),
         .pc_src        (pc_src),
         .wb_src        (wb_src),
+        .misaligned_trap(misaligned_trap),
         .state_out     (state_out)
     );
 

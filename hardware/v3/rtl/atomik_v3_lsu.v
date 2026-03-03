@@ -28,6 +28,7 @@ module atomik_v3_lsu (
     input  wire [63:0] lsu_wdata,       // Store data (rs2 value)
     output reg  [63:0] lsu_rdata,       // Load result (aligned, sign-extended)
     output reg         lsu_done,        // Transaction complete
+    output wire        lsu_misaligned,  // Address alignment violation
 
     // 32-bit bus interface (directly driven, no arbitration here)
     output reg         bus_valid,
@@ -62,6 +63,18 @@ module atomik_v3_lsu (
     reg [63:0] req_wdata;
     reg [31:0] rdata_lo;   // First 32-bit read result (for 64-bit loads)
 
+    // Misaligned access detection (combinational, checked before transaction starts)
+    reg misaligned_check;
+    always @(*) begin
+        case (lsu_size)
+            SIZE_H, SIZE_HU: misaligned_check = lsu_addr[0];       // 2-byte: addr[0] must be 0
+            SIZE_W, SIZE_WU: misaligned_check = |lsu_addr[1:0];    // 4-byte: addr[1:0] must be 00
+            SIZE_D:          misaligned_check = |lsu_addr[2:0];    // 8-byte: addr[2:0] must be 000
+            default:         misaligned_check = 1'b0;              // Byte: no alignment required
+        endcase
+    end
+    assign lsu_misaligned = lsu_start && misaligned_check;
+
     // Need two transactions?
     wire needs_two = (lsu_size == SIZE_D);
     reg  req_needs_two;
@@ -82,7 +95,7 @@ module atomik_v3_lsu (
     always @(*) begin
         state_next = state;
         case (state)
-            S_IDLE:  if (lsu_start) state_next = S_XACT1;
+            S_IDLE:  if (lsu_start && !misaligned_check) state_next = S_XACT1;
             S_XACT1: if (bus_valid && bus_ready) state_next = req_needs_two ? S_XACT2 : S_DONE;
             S_XACT2: if (bus_valid && bus_ready) state_next = S_DONE;
             S_DONE:  state_next = S_IDLE;

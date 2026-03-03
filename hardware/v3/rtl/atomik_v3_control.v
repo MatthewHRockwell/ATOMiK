@@ -47,6 +47,7 @@ module atomik_v3_control (
     // LSU interface
     output reg         lsu_start,
     input  wire        lsu_done,
+    input  wire        lsu_misaligned, // Address alignment violation
 
     // Control outputs
     output reg         regfile_wen,    // Register file write enable
@@ -70,6 +71,9 @@ module atomik_v3_control (
     // 2 = PC + 4 (JAL/JALR link)
     // 3 = CSR read data
 
+    // Misaligned trap flag (for cause code generation)
+    output wire        misaligned_trap,
+
     // Current state (exposed for bus arbitration)
     output wire [2:0]  state_out
 );
@@ -83,6 +87,18 @@ module atomik_v3_control (
 
     reg [2:0] state, state_next;
     assign state_out = state;
+    assign misaligned_trap = was_misaligned;
+
+    // Latch misaligned status from EXECUTE for use in WRITEBACK
+    reg was_misaligned;
+    always @(posedge clk) begin
+        if (!rst_n)
+            was_misaligned <= 1'b0;
+        else if (state == S_EXECUTE)
+            was_misaligned <= lsu_misaligned;
+        else if (state == S_WRITEBACK)
+            was_misaligned <= 1'b0;
+    end
 
     // ECALL/EBREAK detection
     wire is_ecall  = is_system && (funct3 == 3'b000) && (instr[31:20] == 12'h000);
@@ -116,10 +132,10 @@ module atomik_v3_control (
             end
 
             S_EXECUTE: begin
-                if (is_load || is_store)
+                if ((is_load || is_store) && !lsu_misaligned)
                     state_next = S_MEMORY;
                 else
-                    state_next = S_WRITEBACK;
+                    state_next = S_WRITEBACK;  // Also handles misaligned → trap in WB
             end
 
             S_MEMORY: begin
@@ -191,7 +207,12 @@ module atomik_v3_control (
                 // Default: PC + 4
                 pc_src = 2'd0;
 
-                if (is_lui || is_auipc || is_alu_reg || is_alu_imm) begin
+                if (was_misaligned) begin
+                    trap_enter = 1'b1;
+                    pc_src = 2'd3;  // mtvec
+                end
+
+                else if (is_lui || is_auipc || is_alu_reg || is_alu_imm) begin
                     regfile_wen = 1'b1;
                     wb_src = 3'd0;  // ALU result
                 end

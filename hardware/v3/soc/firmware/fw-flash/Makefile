@@ -13,7 +13,7 @@ PYTHON  ?= python3
 VDUMP   ?= ../scripts/vdump8to32.py
 MEM_BASEADDR ?= 0x00000000
 
-MARCH = rv64i
+MARCH = rv64i_zicsr
 MABI  = lp64
 
 CFLAGS  = -march=$(MARCH) -mabi=$(MABI) -Os -fno-builtin
