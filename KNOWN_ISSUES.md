@@ -906,9 +906,102 @@ li sp, 0x800002F0    # Direct immediate load
 
 **Next Steps:**
 1. Create minimal AUIPC test case
-2. Trace execution in Verilator waveforms  
+2. Trace execution in Verilator waveforms
 3. Compare ALU result with expected PC+immediate
 4. Fix decode or ALU logic
 5. Add AUIPC to compliance test suite
+
+---
+
+### V3-018: GCC Null-Pointer UB at Address 0x00000000
+
+**Severity:** Critical
+**Date:** March 2, 2026
+**Status:** Fixed
+
+**Symptom:** Flash XIP reads from address 0 appear to hang the CPU. The instruction after a volatile load from address 0 is `ebreak`, and all subsequent code is removed by the compiler.
+
+**Root Cause:** GCC treats `*(volatile uint32_t*)0x00000000` as a null pointer dereference (undefined behavior). At `-Os`, it:
+1. Emits the load instruction (which actually completes successfully)
+2. Inserts `ebreak` immediately after (trap for UB)
+3. **Optimizes away all code after the load** (unreachable after UB)
+
+Similarly, `((void(*)())0)()` (function pointer call to address 0) is UB — GCC inserts `ebreak` and removes the jump entirely.
+
+**Fix:** Use inline assembly for all address-0 operations:
+```c
+// Read from address 0 (XIP flash):
+uint32_t val;
+asm volatile("lw %0, 0(%1)" : "=r"(val) : "r"((uint32_t)0x00000000));
+
+// Jump to address 0 (flash entry point):
+asm volatile("li t0, 0; jr t0" ::: "t0");
+```
+
+**Impact:** All function pointer jumps to address 0 and all volatile reads from address 0 in `isp_flasher.c` (9 instances across ISP stages) were silently broken.
+
+**Lesson:** On embedded systems where address 0 is valid memory (e.g., SPI flash XIP), never use C-level pointer dereferences or function pointer calls to address 0. GCC's null-pointer UB handling is aggressive and silent — no warnings at compile time, just `ebreak` in the disassembly.
+
+---
+
+### V3-019: ISP ESEC Command Silently Skipped — Sector Erase Gated on Buffer Length
+
+**Severity:** Critical
+**Date:** March 2, 2026
+**Status:** Fixed
+
+**Symptom:** ISP flash programming appears to succeed (host receives correct ACK bytes, checksums match), but programmed firmware doesn't execute correctly after XIP boot.
+
+**Root Cause:** In `ISP_STAGE3` of `isp_flasher.c`, the ESEC (sector erase) command was guarded by `if (buflen)`:
+```c
+case 0x30:  // ESEC
+    uart_putchar(0x31);   // ACK start
+    // ... read address ...
+    if (buflen) {         // BUG: buflen == 0 until first WBUF!
+        spi_flashio(...); // Erase never executes
+    }
+    uart_putchar(0x32);   // ACK end (sent regardless!)
+```
+
+The host ISP programmer sends erases before any buffer writes (correct for flash). But `buflen` is 0 until the first WBUF (0x10) command, so the erase is skipped. The firmware sends 0x31 and 0x32 ACKs regardless, so the host cannot detect the failure.
+
+Without erase, NOR flash page program can only clear bits (1->0) but cannot set bits (0->1). Old flash data corrupts the new firmware.
+
+**Fix:** Removed the `if (buflen)` guard — sector erase is unconditional:
+```c
+case 0x30:  // ESEC
+    uart_putchar(0x31);
+    // ... read address ...
+    spi_flashio((uint8_t *)&flash_buffer, 4, FLASHIO_REQWREN);  // Always erase
+    uart_putchar(0x32);
+```
+
+**Protocol Improvement TODO:**
+- ACK should only be sent after the operation completes successfully
+- Add NACK/error codes for failed preconditions
+- Add readback verify command (0x50) to detect silent corruption on host side
+
+---
+
+### V3-020: Setup Timing Violations at 25.2 MHz — No Correctness Guarantee
+
+**Severity:** High
+**Date:** March 2, 2026
+**Status:** Open
+
+**Symptom:** 40 setup timing violations on clk_cpu domain. Fmax = 24.745 MHz vs 25.2 MHz target (1.8% over).
+
+**Worst paths:** All originate from `u_cpu/u_fetch/instr_0_s0/Q` (instruction register bit 0) fanning out to regfile and LSU endpoints. Worst slack: -0.729ns. Logic depth: 14 levels.
+
+**Critical path:** Fetch → Decode → Regfile write address / LSU request address. The single-cycle decode path from instruction fetch to register file and load-store unit is too long.
+
+**Impact:** Timing violations mean no correctness guarantee across PVT (process, voltage, temperature) corners. Current hardware "works" but could fail under different conditions (higher temperature, lower voltage, different silicon lot).
+
+**Fix options (in order of preference for bringup):**
+1. **Lower CPU clock**: Change PLL/CLKDIV to produce ~24 MHz. Requires finding a PLL config that still gives 5x pixel clock for HDMI.
+2. **Pipeline the decode stage**: Add register between fetch and decode, making instruction decode a 2-stage pipeline. Fixes the path permanently but requires significant RTL changes.
+3. **Retime/restructure the decode mux**: Reduce fan-out from instruction register by breaking the decode into smaller, registered stages.
+
+**Current status:** Boot chain validated despite violations. Tagged `v3-boot-chain-golden` as reference point.
 
 ---
