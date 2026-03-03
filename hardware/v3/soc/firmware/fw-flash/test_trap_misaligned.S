@@ -1,11 +1,14 @@
-# Trap handler test firmware for ATOMiK v3
-# Tests illegal instruction trap: should print !02_XXXX
+# Misaligned access trap test for ATOMiK v3
+# Tests:
+#   1. Misaligned load (cause 4) — LW from odd address
+#   2. Misaligned store (cause 6) — SW to odd address
 #
 # Expected output:
-#   1         (test marker: about to trigger illegal instruction)
-#   !02_XXXX  (trap: cause 2 = illegal instruction, XXXX = address of .word 0)
+#   L         (about to do misaligned load)
+#   !04_XXXX  (load address misaligned)
 #
-# The trap handler halts after printing, so only one trap message appears.
+# Note: trap handler halts, so only one test runs per boot.
+# To test store misaligned, comment out the load test and rebuild.
 
 .section .text
 .global _start
@@ -17,44 +20,38 @@ _start:
     csrw mtvec, t0
 
     # Initialize UART
-    li t0, 0x83000000      # UART base
-    li t1, 185             # CLKDIV for 21.6 MHz / 115200 baud
+    li t0, 0x83000000
+    li t1, 185             # 21.6 MHz / 115200
     sw t1, 4(t0)
-
-    # Wait for UART
     li t2, 2000
 1:  addi t2, t2, -1
     bnez t2, 1b
 
-    # Print '1' — about to trigger illegal instruction
-    li t1, '1'
+    # Print 'L' — about to do misaligned load
+    li t1, 'L'
     sw t1, 0(t0)
     li t1, '\n'
     sw t1, 0(t0)
 
-    # === TEST: Illegal instruction ===
-    # All-zeros is not a valid RV64I instruction
-    .word 0x00000000
+    # === TEST: Misaligned LW (address 0x40000001 — odd, in SRAM) ===
+    li t0, 0x40000001
+    lw t1, 0(t0)          # Should trap with cause 4
 
     # Should never reach here
+    li t0, 0x83000000
     li t1, 'X'
     sw t1, 0(t0)
-
 2:  j 2b
 
 # ==========================================================================
-# Trap handler — identical to crt_flash.S version
-# Prints: !CC_AAAA\n  (CC=mcause low byte, AAAA=mepc low 16 bits)
+# Trap handler (same as crt_brom.S)
 # ==========================================================================
 .balign 4
 _trap_handler:
     li t0, 0x83000000
-
-    # Print '!'
     li t1, '!'
     sw t1, 0(t0)
 
-    # mcause low byte as 2 hex digits
     csrr t2, mcause
     srli t1, t2, 4
     andi t1, t1, 0xF
@@ -72,11 +69,9 @@ _trap_handler:
 5:  addi t1, t1, '0'
 6:  sw t1, 0(t0)
 
-    # Print '_'
     li t1, '_'
     sw t1, 0(t0)
 
-    # mepc low 16 bits as 4 hex digits
     csrr t2, mepc
     srli t1, t2, 12
     andi t1, t1, 0xF
@@ -110,9 +105,7 @@ _trap_handler:
 13: addi t1, t1, '0'
 14: sw t1, 0(t0)
 
-    # Print newline
     li t1, '\n'
     sw t1, 0(t0)
 
-    # Halt
 15: j 15b

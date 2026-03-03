@@ -15,6 +15,8 @@ _start:
 
 crtInit:
   # Set trap vector FIRST — before anything else can fault
+  # BROM at 0x80000000 requires AUIPC (address exceeds %hi/%lo range on RV64)
+  # AUIPC is validated working on this CPU
   .option push
   .option norelax
   la t0, _trap_handler

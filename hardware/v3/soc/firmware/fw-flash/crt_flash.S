@@ -11,11 +11,10 @@ crtStart:
 
 crtInit:
   # Set trap vector FIRST — before anything else can fault
-  .option push
-  .option norelax
-  la t0, _flash_trap_handler
+  # Use %hi/%lo to avoid AUIPC (deterministic absolute address)
+  lui  t0, %hi(_flash_trap_handler)
+  addi t0, t0, %lo(_flash_trap_handler)
   csrw mtvec, t0
-  .option pop
 
   # Diagnostic: Initialize UART first so we can print debug chars
   li t0, 0x83000000    # UART base
