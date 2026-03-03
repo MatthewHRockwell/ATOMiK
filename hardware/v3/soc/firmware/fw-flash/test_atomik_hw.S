@@ -9,7 +9,7 @@
 #   ATOMIK_SWAP  rd=old_state(a2), rs1=new_addr(a0)     → save current, switch to a0, acc=0
 #
 # Expected output:
-#   1=AB 2=54 3=AB 4=DE 5P 6=5A 7=AA 8P 9P
+#   1=AB 2=54 3=AB 4=DE 5P 6=5A 7=AA 8P 9P AP BP CP DP
 #   OK
 #
 # Tests:
@@ -22,6 +22,10 @@
 #   7: Read ctx0 after SWAP (acc should be 0 after swap)
 #   8: Multi-context: load 16 contexts, read back in permuted order (P/F)
 #   9: SWAP return value: verify rd gets pre-swap state (P/F)
+#   A: Store ATOMiK READ result to SRAM, load back, compare (P/F)
+#   B: SRAM bus traffic doesn't corrupt ATOMiK accumulator (0xBEEF^0xFF=0xBE10) (P/F)
+#   C: SRAM boundary — store/load at last valid word 0x40001FFC (P/F)
+#   D: 64-bit round-trip: ATOMiK READ → SD to SRAM → LD back → compare (P/F)
 
 .section .text
 .global _start
@@ -285,7 +289,126 @@ _start:
     addi s1, s1, 1
     j 91f
 90: PRINT_CHAR 'P'
-91: PRINT_CHAR '\n'
+91: PRINT_CHAR ' '
+
+    # =========================================================================
+    # Test A: Store ATOMiK READ result to SRAM, load back, compare
+    # LOAD ctx50=0xCAFE, READ → a2, SW to SRAM, LW back, compare
+    # Proves ATOMiK results survive store/load round-trip
+    # Expected: AP
+    # =========================================================================
+    PRINT_CHAR 'A'
+
+    li s2, 0x40000000          # SRAM base
+    li a0, 50
+    li a1, 0xCAFE
+    ATOMIK_LOAD(a0, a1)       # ctx50: init=0xCAFE, acc=0
+    ATOMIK_READ(a2)            # a2 = 0xCAFE
+
+    sw a2, 0(s2)               # store to SRAM[0]
+    lw a3, 0(s2)               # load back
+
+    beq a2, a3, a_pass
+    PRINT_CHAR 'F'
+    addi s1, s1, 1
+    j a_done
+a_pass:
+    PRINT_CHAR 'P'
+a_done:
+    PRINT_CHAR ' '
+
+    # =========================================================================
+    # Test B: SRAM bus traffic doesn't corrupt ATOMiK accumulator state
+    # Setup: LOAD ctx51=0xBEEF, ACCUM 0xFF → current = 0xBEEF ^ 0xFF = 0xBE10
+    # Then do several SRAM writes and reads (bus traffic)
+    # Then READ → should still be 0xBE10
+    # Proves bus arbitration preserves ATOMiK internal state
+    # Expected: BP
+    # =========================================================================
+    PRINT_CHAR 'B'
+
+    li a0, 51
+    li a1, 0xBEEF
+    ATOMIK_LOAD(a0, a1)       # ctx51: init=0xBEEF, acc=0
+
+    li a0, 0xFF
+    ATOMIK_ACCUM(a0)           # acc=0xFF, current = 0xBEEF ^ 0xFF = 0xBE10
+
+    # Generate bus traffic — 4 store/load cycles
+    li t4, 0x11111111
+    sw t4, 0(s2)
+    lw t5, 0(s2)
+    li t4, 0x22222222
+    sw t4, 4(s2)
+    lw t5, 4(s2)
+    li t4, 0x33333333
+    sw t4, 8(s2)
+    lw t5, 8(s2)
+    li t4, 0x44444444
+    sw t4, 12(s2)
+    lw t5, 12(s2)
+
+    # Now read ATOMiK — state should be untouched
+    ATOMIK_READ(a2)            # should be 0xBE10
+    li a3, 0xBE10
+    beq a2, a3, b_pass
+    PRINT_CHAR '='
+    PRINT_HEX_BYTE a2         # debug: print what we got (low byte)
+    addi s1, s1, 1
+    j b_done
+b_pass:
+    PRINT_CHAR 'P'
+b_done:
+    PRINT_CHAR ' '
+
+    # =========================================================================
+    # Test C: SRAM boundary — store/load at last valid word
+    # SRAM is 8KB at 0x40000000, last valid word at 0x40001FFC
+    # Note: bit-31-set values (e.g. 0xDEADBEEF) have different 64-bit repr
+    # via li (zero-ext) vs lw (sign-ext) on RV64I. Use bit-31-clear pattern.
+    # Expected: CP
+    # =========================================================================
+    PRINT_CHAR 'C'
+
+    li t4, 0x40001FFC          # last valid aligned word in 8KB SRAM
+    li t5, 0x7EADBEEF          # bit 31 clear — lw/li agree on 64-bit repr
+    sw t5, 0(t4)               # store to boundary
+    lw t6, 0(t4)               # load back
+    beq t5, t6, c_pass
+    PRINT_CHAR '='
+    PRINT_HEX_BYTE t6         # debug: print low byte of what we read back
+    addi s1, s1, 1
+    j c_done
+c_pass:
+    PRINT_CHAR 'P'
+c_done:
+    PRINT_CHAR ' '
+
+    # =========================================================================
+    # Test D: 64-bit round-trip — ATOMiK READ → SD to SRAM → LD back
+    # LOAD ctx52=0x0123456789ABCDEF, READ → a2 (full 64-bit)
+    # SD a2 to SRAM, LD back to a3, compare
+    # Exercises LSU doubleword path (2 × 32-bit bus transactions)
+    # Expected: DP
+    # =========================================================================
+    PRINT_CHAR 'D'
+
+    li a0, 52
+    li a1, 0x0123456789ABCDEF
+    ATOMIK_LOAD(a0, a1)       # ctx52: init=full 64-bit pattern
+    ATOMIK_READ(a2)            # a2 = 0x0123456789ABCDEF
+
+    sd a2, 16(s2)              # SD to SRAM[16] (doubleword aligned)
+    ld a3, 16(s2)              # LD back
+
+    beq a2, a3, d_pass
+    PRINT_CHAR 'F'
+    addi s1, s1, 1
+    j d_done
+d_pass:
+    PRINT_CHAR 'P'
+d_done:
+    PRINT_CHAR '\n'
 
     # =========================================================================
     # Final result
