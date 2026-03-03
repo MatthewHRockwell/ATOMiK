@@ -1176,8 +1176,15 @@ int main() {
             goto stay_in_isp;
         }
 
-        // Sanity check image length
-        if (image_len == 0 || image_len > FLASH_MAX_IMAGE) {
+        // Validate entry point (must be 0x10 = right after header)
+        if (entry != FLASH_HDR_SIZE) {
+            uart_putchar('B'); uart_putchar('A'); uart_putchar('D');
+            uart_putchar('E'); uart_putchar('P'); uart_putchar('\n');
+            goto stay_in_isp;
+        }
+
+        // Sanity check image length (min 4 bytes, max flash size minus header)
+        if (image_len < 4 || image_len > FLASH_MAX_IMAGE) {
             uart_putchar('B'); uart_putchar('A'); uart_putchar('D');
             uart_putchar('S'); uart_putchar('Z'); uart_putchar('\n');
             goto stay_in_isp;
