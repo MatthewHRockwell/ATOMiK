@@ -99,8 +99,69 @@ class ISPFlashProgrammer:
         time.sleep(0.4)  # Page program takes time
 
         resp = self.ser.read(10)
+        if 0x4F in resp:
+            raise RuntimeError(f"WPAG NACK: no buffer data loaded (send WBUF first)")
         if b'A' not in resp or b'B' not in resp:
             raise RuntimeError(f"WPAG failed: {resp}")
+
+    def read_flash(self, addr, length):
+        """Read flash data for verification (max 256 bytes)"""
+        if length > 256:
+            raise ValueError(f"Read too large: {length} > 256")
+
+        addr_bytes = [
+            (addr >> 16) & 0xFF,
+            (addr >> 8) & 0xFF,
+            addr & 0xFF
+        ]
+
+        self.ser.write(bytes([0x50] + addr_bytes + [length - 1]))
+        time.sleep(0.2)
+
+        # Read ACK byte
+        ack = self.ser.read(1)
+        if not ack or ack[0] != 0x51:
+            raise RuntimeError(f"RDBK ACK failed: {ack}")
+
+        # Read data + checksum
+        data = self.ser.read(length)
+        if len(data) != length:
+            raise RuntimeError(f"RDBK short read: {len(data)}/{length}")
+
+        chksum_byte = self.ser.read(1)
+        if not chksum_byte:
+            raise RuntimeError("RDBK checksum missing")
+
+        expected_chksum = sum(data) & 0xFF
+        if chksum_byte[0] != expected_chksum:
+            raise RuntimeError(
+                f"RDBK checksum: 0x{chksum_byte[0]:02x} != 0x{expected_chksum:02x}")
+
+        return bytes(data)
+
+    def verify_firmware(self, firmware_data, base_addr=0x00000000):
+        """Verify programmed data by reading back and comparing"""
+        total_bytes = len(firmware_data)
+        print(f"Verifying {total_bytes} bytes at 0x{base_addr:06x}...")
+
+        offset = 0
+        while offset < total_bytes:
+            chunk_size = min(256, total_bytes - offset)
+            read_addr = base_addr + offset
+
+            readback = self.read_flash(read_addr, chunk_size)
+            expected = firmware_data[offset:offset + chunk_size]
+
+            if readback != expected:
+                for i, (got, exp) in enumerate(zip(readback, expected)):
+                    if got != exp:
+                        raise RuntimeError(
+                            f"Verify FAIL at 0x{read_addr + i:06x}: "
+                            f"read 0x{got:02x}, expected 0x{exp:02x}")
+
+            offset += chunk_size
+
+        print(f"✓ Verified {total_bytes} bytes\n")
 
     def program_firmware(self, firmware_data, base_addr=0x00000000):
         """Program firmware to flash"""
@@ -202,6 +263,7 @@ def main():
 
         # Step 3: Wait for FPGA boot then handshake within ISP timeout window
         time.sleep(0.5)  # Let FPGA initialize
+        prog.ser.read(1000)  # Flush any leftover data from previous boot
         prog.handshake()
 
         # Step 4: Read firmware
@@ -210,13 +272,11 @@ def main():
         # Step 5: Program to flash
         prog.program_firmware(firmware_data, base_addr=0x00000000)
 
-        # TODO: Add readback verify step — after programming, read back
-        # programmed region and compare bytes. Requires adding a READ
-        # command (0x50) to the ISP firmware protocol. This would catch
-        # silent corruption even if firmware ACKs are incorrect.
+        # Step 6: Readback verify
+        prog.verify_firmware(firmware_data, base_addr=0x00000000)
 
         # Done
-        print("=== Programming Complete ===")
+        print("=== Programming + Verify Complete ===")
         print("\nTo test persistent boot:")
         print("1. Power cycle the FPGA (unplug USB)")
         print("2. Reload bitstream: openFPGALoader -b tangnano9k atomik_v3_soc.fs")

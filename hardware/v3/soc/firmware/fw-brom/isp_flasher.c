@@ -1188,21 +1188,50 @@ int main() {
         case 0x40:
             // ISP WPAG (Write/Program Page)
             // Host:  0x40 addr2-0
-            // Reply:      0x41    [program] 0x42
-            uart_putchar(0x41);
-
+            // Reply: 0x4F (NACK if no buffer) or 0x41 [program] 0x42
             flash_buffer.instr = QSPI_FLASH_PP;
             flash_buffer.addr[0] = uart_getchar_blocking();
             flash_buffer.addr[1] = uart_getchar_blocking();
             flash_buffer.addr[2] = uart_getchar_blocking();
 
-            // Program page with buffered data
-            if (buflen) {
-                spi_flashio((uint8_t *)&flash_buffer, 4 + buflen, FLASHIO_REQWREN);
+            if (buflen == 0) {
+                uart_putchar(0x4F);  // NACK: no buffer data loaded
+                break;
             }
 
+            uart_putchar(0x41);
+            spi_flashio((uint8_t *)&flash_buffer, 4 + buflen, FLASHIO_REQWREN);
             uart_putchar(0x42);
             break;
+
+        case 0x50: {
+            // ISP RDBK (Read Back Flash)
+            // Host:  0x50 addr2 addr1 addr0 len   (len = actual_length - 1)
+            // Reply: 0x51 data0..dataN chksum
+            uart_putchar(0x51);
+
+            flash_buffer.instr = 0x03;  // SPI Flash Read command
+            flash_buffer.addr[0] = uart_getchar_blocking();
+            flash_buffer.addr[1] = uart_getchar_blocking();
+            flash_buffer.addr[2] = uart_getchar_blocking();
+            int rb_len = uart_getchar_blocking() + 1;
+
+            // Clear read buffer
+            for (int i = 0; i < rb_len; i++)
+                flash_buffer.data_buf[i] = 0;
+
+            // SPI read (no WREN needed for reads)
+            spi_flashio((uint8_t *)&flash_buffer, 4 + rb_len, 0);
+
+            // Send data and checksum
+            uint8_t rb_chksum = 0;
+            for (int i = 0; i < rb_len; i++) {
+                uart_putchar(flash_buffer.data_buf[i]);
+                rb_chksum += flash_buffer.data_buf[i];
+            }
+            uart_putchar(rb_chksum);
+            break;
+        }
 
         case 0xF0:
             // ISP RST (Reset/Jump to BROM)
@@ -1216,7 +1245,8 @@ int main() {
             break;
 
         default:
-            // Unknown command - ignore
+            // Unknown command NACK
+            uart_putchar(0xFF);
             break;
         }
     }
