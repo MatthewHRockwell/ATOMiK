@@ -108,10 +108,10 @@ python -m software.demos.state_sync_benchmark
 | **Timing Closure** | 25.2 MHz CPU clock, zero TNS | ✅ Complete |
 | **CPU Hang Debug** | Root cause identified & fixed (timing violations) | ✅ Complete |
 | **Hardware Validation** | Repeated MMIO stress testing | ✅ Complete (62/62 PASS) |
-| **ISP Flasher** | Boot ROM with UART ISP protocol | 🔄 In Progress (Stage 2 done) |
-| **Flash Boot Chain** | SPI XIP execution | ⏸️ Pending |
+| **ISP Flasher** | Boot ROM with UART ISP protocol for flash programming | ✅ Complete |
+| **Flash Boot Chain** | BROM → ISP timeout → SPI XIP execution | ✅ Complete (validated, golden tag) |
 | **ATOMiK Hardware Tests** | 9 tests on v3 hardware | ⏸️ Pending |
-| **AUIPC Fix** | Fix PC-relative addressing bug | ⏸️ Pending |
+| **Timing Violation Fix** | 40 setup violations at 25.2 MHz (V3-020) | 🔄 In Progress |
 | **Production SoC Deployment** | Tang Nano 9K @ 81 MHz, 0 TNS, persistent flash | **Deployed** |
 | **Performance Benchmarking** | 550-measurement automated suite, JSONL data pooling, regression detection | Complete |
 
@@ -343,7 +343,8 @@ ATOMiK/
 | [Hardware Synthesis](docs/HARDWARE_SYNTHESIS.md) | Parallel bank synthesis sweep and HW validation |
 | [SDK Orchestration](docs/SDK_ORCHESTRATION.md) | Agentic orchestration architecture |
 | [Known Issues](docs/KNOWN_ISSUES.md) | Hardware/software issue tracker and troubleshooting |
-| [Production Deployment](docs/PRODUCTION_DEPLOYMENT.md) | Tang Nano 9K SoC deployment guide |
+| [Production Deployment](docs/PRODUCTION_DEPLOYMENT.md) | Tang Nano 9K v2 SoC deployment guide |
+| [v3 Task List](specs/atomik_v3_tasks.md) | v3 phased implementation tracker |
 
 ---
 

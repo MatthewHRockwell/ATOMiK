@@ -339,17 +339,25 @@ Additionally: `review.yml` (PR ruff check) and `math/proofs/.github/workflows/le
   - 0x80000000: Boot ROM 8 KB + peripherals (S2: UART, GPIO, SPI flash config)
   - 0xC0000000: Tied off (S3, ATOMiK is direct-wire via custom instructions)
 
-### 3.9 Firmware Port — **Phase 3C: IN PROGRESS**
-- [ ] Port v2 firmware structure to RV64I:
+### 3.9 Firmware Port — **Phase 3C: BOOT CHAIN COMPLETE**
+- [x] Port v2 firmware structure to RV64I:
   - `riscv64-unknown-elf-gcc -march=rv64i -mabi=lp64 -Os -fno-builtin`
   - Linker scripts for 64-bit (`elf64-littleriscv`)
   - 64-bit hex print (16 digits), powers-of-10 table with repeated subtraction
   - UART menu system with ATOMiK test harness
-- [ ] Boot ROM (ISP flasher): Port to RV64I, restore Boot ROM boot flow
-- [ ] Flash firmware: Port v2 UART menu + all ATOMiK tests to RV64I
-- [ ] Hardware validation: UART menu functional, all v2 tests ported and passing
+- [x] Boot ROM (ISP flasher): Ported to RV64I, ISP_STAGE3 running on hardware
+  - ISP handshake, WBUF, ESEC, WPAG all working
+  - Critical bug V3-019 fixed: ESEC was gated by `if (buflen)` — erase silently skipped
+  - Critical bug V3-018 fixed: GCC null-pointer UB at address 0 — inline asm for all jumps
+  - ~14s ISP timeout (5M volatile loop iterations at 25.2 MHz)
+- [x] Flash firmware: test_flash_minimal.S programmed and executing from XIP
+  - Full boot chain validated: BROM → ISP timeout → "JUMP!" → XIP → "F!F!" repeating
+  - 946 clean prints over 25 seconds, zero corruption
+  - Golden tag: `v3-boot-chain-golden`
+- [ ] Full v2 UART menu + ATOMiK tests: Port to RV64I for flash-resident firmware
+- [ ] Hardware validation: All v2 tests ported and passing on flash firmware
 
-**Status:** Minimal XIP test firmware working (696 bytes). Full v2 firmware port in progress.
+**Status:** Boot chain fully validated. ISP programming flow working. Full v2 firmware port pending.
 
 ### 3.10 ATOMiK Hardware Tests (Port from v2)
 - [x] Port the v2 test suite to use v3's custom instructions:
@@ -378,13 +386,20 @@ Additionally: `review.yml` (PR ruff check) and `math/proofs/.github/workflows/le
     2. **V3-010: Bus arbiter crosstalk** — Both fetch unit and LSU received mem_ready directly, causing ready signal crosstalk when LSU had bus. Fixed: Gated mem_ready based on lsu_has_bus.
     3. **V3-011: UART timing violation** — simpleuart sends 15 idle bits after CLKDIV write (~1740 cycles). Firmware wrote DATA before transmission ready. Fixed: Added 2000-cycle delay after UART initialization in isp_flasher.c.
 - [x] UART communication verified (115200 baud, ISP flasher messages received)
+- [x] Flash firmware programming via ISP: `isp_flash_programmer.py test_flash_minimal.v`
+  - ISP handshake, sector erase, page program all working
+  - V3-018 fixed: GCC null-pointer UB (inline asm for address-0 jumps)
+  - V3-019 fixed: ESEC gating bug (erase now unconditional)
+  - V3-020: 40 setup timing violations at 25.2 MHz, Fmax 24.745 MHz (open issue)
+- [x] Flash boot chain validated: BROM → ISP timeout (~14s) → "JUMP!" → XIP → "F!F!" repeating
+  - 946 clean prints over 25s, zero corruption
+  - Golden tag: `v3-boot-chain-golden`
 - [ ] Flash to persistent storage: `openFPGALoader -b tangnano9k -f hardware/v3/synth/impl/pnr/atomik_v3_soc.fs`
-- [ ] Flash firmware: `pico-programmer.py fw-v3.v /dev/ttyUSB1`
 - [ ] Verify persistent boot: power cycle → firmware boots → UART menu appears → tests pass
 - [ ] HDMI output verification: verify test pattern displays on screen
 - **Requires physical FPGA access**
 
-**Exit criteria**: v3 SoC boots from flash on Tang Nano 9K. UART interactive. HDMI shows test pattern. All hardware tests pass. Zero TNS. **Status: SRAM deployment working with bugs fixed, flash deployment pending.**
+**Exit criteria**: v3 SoC boots from flash on Tang Nano 9K. UART interactive. HDMI shows test pattern. All hardware tests pass. Zero TNS. **Status: Boot chain validated (SRAM + flash XIP). Persistent bitstream and HDMI verification pending. 40 setup timing violations (V3-020) need resolution.**
 
 ---
 

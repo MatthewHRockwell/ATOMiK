@@ -1,9 +1,9 @@
 # ATOMiK — Roadmap & Execution Plan
 
-**Document Version:** 2.0
-**Date:** February 14, 2026
+**Document Version:** 2.1
+**Date:** March 3, 2026
 **Author:** Matt Rockwell + Claude (Planning Partner)
-**Status:** ACTIVE — Production SoC deployed, optimization phase next
+**Status:** ACTIVE — v2 Production SoC deployed, v3 boot chain validated
 
 ---
 
@@ -656,5 +656,31 @@ ATOMiK/
 
 ---
 
+## 14. ATOMiK v3 Architecture Status
+
+The v3 architecture is a ground-up redesign: custom RV64I CPU with ATOMiK custom instructions wired directly into the execute stage (no bus, no CDC). Full task list at [`specs/atomik_v3_tasks.md`](specs/atomik_v3_tasks.md).
+
+### Completed
+- **Phase 0**: Tooling & infrastructure (Verilator, iverilog, compliance runner, Gowin synthesis)
+- **Phase 1**: Custom RV64I CPU core — 53/54 rv64ui-p-* compliance (only `ma_data` misaligned access fails, expected)
+- **Phase 2**: ATOMiK v3 datapath — 4 custom instructions (LOAD, ACCUM, READ, SWAP), 1.016 CLS/bit mapping, 21+11 tests passing
+- **Phase 3 (partial)**: SoC integration — 5,594 LUT, 16 BSRAM, full SoC on Tang Nano 9K
+  - SRAM deployment working, UART functional
+  - ISP flasher ported to RV64I, flash programming validated
+  - **Boot chain validated**: BROM → ISP timeout → JUMP! → XIP → F!F! (golden tag: `v3-boot-chain-golden`)
+
+### In Progress
+- **Timing violations (V3-020)**: 40 setup violations at 25.2 MHz, Fmax 24.745 MHz — needs clock reduction or decode pipeline optimization
+- **ISP protocol robustness**: NACK/error codes, readback verify (command 0x50)
+- **Full firmware port**: v2 UART menu + ATOMiK test suite on flash-resident firmware
+
+### Pending
+- Phase 4: Display pipeline (delta color LUT, CLS3 SREG scanline mask)
+- Phase 5: I/O & multi-node streaming (IDES16/OSER16 LVDS)
+- Phase 6: Parallel banks & PLL optimization
+- Phase 7: Benchmarking & production hardening
+
+---
+
 *This document is a living roadmap. Update as decisions are made and phases are completed.*
-*Last updated: February 12, 2026*
+*Last updated: March 3, 2026*
