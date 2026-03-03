@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 """
 ISP Flash Programmer for ATOMiK v3 SoC
-Programs firmware to SPI flash via UART ISP protocol
+Programs firmware to SPI flash via UART ISP protocol.
+Supports --boot-test mode for automated hardware regression.
 """
 
+import argparse
 import serial
 import struct
 import subprocess
@@ -230,6 +232,56 @@ class ISPFlashProgrammer:
         """Close UART"""
         if self.ser:
             self.ser.close()
+            self.ser = None
+
+    def boot_and_capture(self, bitstream_path, timeout_s=25):
+        """Reload bitstream and capture UART output from firmware boot.
+
+        After programming, this reloads the bitstream to trigger a fresh boot:
+        BROM starts → ISP timeout (~16s) → CRC gate validates → JUMP! → firmware runs.
+        Captures all UART output until timeout or early termination (OK/FAIL detected).
+        """
+        print("\n=== Boot Test ===\n")
+
+        # Close UART before bitstream reload
+        self.close()
+
+        # Reload bitstream (triggers fresh BROM boot)
+        self.load_bitstream(bitstream_path)
+
+        # Reopen UART and start capturing
+        print(f"Opening UART: {self.port} @ {self.baud}")
+        self.ser = serial.Serial(self.port, self.baud, timeout=0.5)
+        time.sleep(0.2)
+        self.ser.read(100)  # Flush stale data
+
+        print(f"Waiting for ISP timeout + firmware boot (up to {timeout_s}s)...")
+        captured = bytearray()
+        start = time.time()
+        while time.time() - start < timeout_s:
+            chunk = self.ser.read(256)
+            if chunk:
+                captured.extend(chunk)
+                # Early termination: firmware printed final result
+                text = captured.decode('ascii', errors='replace')
+                if '\nOK\n' in text or 'OK\r' in text:
+                    break
+                if '\nFAIL\n' in text or 'FAIL\r' in text:
+                    break
+            else:
+                # Print progress dot every ~0.5s of silence
+                elapsed = time.time() - start
+                sys.stdout.write('.')
+                sys.stdout.flush()
+
+        elapsed = time.time() - start
+        print(f"\nCapture complete ({elapsed:.1f}s, {len(captured)} bytes)\n")
+
+        # Decode and clean up
+        text = captured.decode('ascii', errors='replace')
+        # Strip non-printable except newline/CR
+        clean = ''.join(c for c in text if c == '\n' or c == '\r' or (32 <= ord(c) < 127))
+        return clean
 
     def read_verilog_hex(self, vfile_path):
         """Read Verilog hex file and return binary data.
@@ -276,13 +328,26 @@ class ISPFlashProgrammer:
 
 
 def main():
-    if len(sys.argv) < 2:
-        print("Usage: isp_flash_programmer.py <firmware.v>")
-        print("\nExample:")
-        print("  ./isp_flash_programmer.py ../soc/firmware/fw-flash/test_flash_minimal.v")
-        sys.exit(1)
+    parser = argparse.ArgumentParser(
+        description='ISP Flash Programmer for ATOMiK v3 SoC')
+    parser.add_argument('firmware', type=Path,
+                        help='Path to firmware .v file (Verilog hex)')
+    parser.add_argument('--port', default='/dev/ttyUSB1',
+                        help='UART port (default: /dev/ttyUSB1)')
+    parser.add_argument('--baud', type=int, default=115200,
+                        help='UART baud rate (default: 115200)')
+    parser.add_argument('--boot-test', action='store_true',
+                        help='After programming, reload bitstream and capture boot output')
+    parser.add_argument('--expect', type=str, default=None,
+                        help='Expected substring in boot output (requires --boot-test)')
+    parser.add_argument('--timeout', type=int, default=25,
+                        help='Boot capture timeout in seconds (default: 25)')
+    args = parser.parse_args()
 
-    firmware_path = Path(sys.argv[1])
+    if args.expect and not args.boot_test:
+        parser.error("--expect requires --boot-test")
+
+    firmware_path = args.firmware
     if not firmware_path.exists():
         print(f"ERROR: Firmware file not found: {firmware_path}")
         sys.exit(1)
@@ -293,7 +358,7 @@ def main():
         print("Run synthesis first or copy bitstream to current directory")
         sys.exit(1)
 
-    prog = ISPFlashProgrammer()
+    prog = ISPFlashProgrammer(port=args.port, baud=args.baud)
 
     try:
         # Step 1: Open UART FIRST (before bitstream load)
@@ -320,13 +385,30 @@ def main():
         # Step 6: Readback verify
         prog.verify_firmware(full_image, base_addr=0x00000000)
 
-        # Done
         print("=== Programming + Verify Complete ===")
-        print("\nTo test persistent boot:")
-        print("1. Power cycle the FPGA (unplug USB)")
-        print("2. Reload bitstream: openFPGALoader -b tangnano9k atomik_v3_soc.fs")
-        print("3. Wait for ISP timeout (~16s at 21.6 MHz)")
-        print("4. Flash firmware should execute (look for 'F!F!' on UART)")
+
+        # Step 7: Boot test (optional)
+        if args.boot_test:
+            output = prog.boot_and_capture(bitstream_path,
+                                           timeout_s=args.timeout)
+            print("=== Boot Test Output ===")
+            print(output)
+            print("========================")
+
+            if args.expect:
+                if args.expect in output:
+                    print(f"\nPASS: found expected output")
+                    sys.exit(0)
+                else:
+                    print(f"\nFAIL: expected substring not found")
+                    print(f"  Expected: {args.expect!r}")
+                    sys.exit(1)
+        else:
+            print("\nTo test persistent boot:")
+            print("1. Power cycle the FPGA (unplug USB)")
+            print("2. Reload bitstream: openFPGALoader -b tangnano9k atomik_v3_soc.fs")
+            print("3. Wait for ISP timeout (~16s at 21.6 MHz)")
+            print("4. Flash firmware should execute (look for test output on UART)")
 
     except Exception as e:
         print(f"\nERROR: {e}")
