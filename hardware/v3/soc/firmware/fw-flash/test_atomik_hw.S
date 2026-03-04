@@ -12,6 +12,7 @@
 #   1=AB 2=54 3=AB 4=DE 5P 6=5A 7=AA 8P 9P AP BP CP DP GP
 #   E:B=XXXX L=XXXX A=XXXX R=XXXX S=XXXX
 #   F:B=XXXX/XXXX N=XXXX/XXXX L=XXXX/XXXX A=XXXX/XXXX R=XXXX/XXXX S=XXXX/XXXX
+#   HP
 #   OK
 #
 # Tests:
@@ -31,6 +32,7 @@
 #   E: Cycle counter measurement from XIP: LOAD, ACCUM, READ, SWAP (prints hex deltas)
 #   F: SRAM-based cycle measurement: eliminates XIP fetch overhead, 1024-iteration loops
 #   G: SRAM wrap-around: verify 0x40002000 aliases to 0x40000000 (no trap, addr truncation)
+#   H: Delta stress: 1M ACCUM ops, verify state reconstruction (accumulator stability)
 
 .section .text
 .global _start
@@ -693,6 +695,49 @@ f_load_print:
     PRINT_HEX_WORD s5
     PRINT_CHAR '/'
     PRINT_HEX_WORD s2
+    PRINT_CHAR '\n'
+
+    # =========================================================================
+    # Test H: Delta stress accumulation — 1,000,000 ACCUM operations
+    # Verifies long-term accumulator stability and XOR self-inverse at scale.
+    #
+    # Strategy:
+    #   1. LOAD ctx80 = 0x0123456789ABCDEF (full 64-bit pattern)
+    #   2. ACCUM 0xFFFFFFFFFFFFFFFF × 1,000,000 (even count)
+    #   3. Even XOR count → acc = 0 → READ must return exact initial state
+    #   4. Verify all 64 bits match
+    #
+    # This proves:
+    #   - No bit drift after sustained operation
+    #   - All 64 accumulator bits stable
+    #   - Self-inverse property (a ⊕ a = 0) holds at scale
+    #
+    # Expected: HP
+    # =========================================================================
+    PRINT_CHAR 'H'
+
+    li   a0, 80
+    li   a1, 0x0123456789ABCDEF
+    ATOMIK_LOAD(a0, a1)            # ctx80: init = full 64-bit pattern, acc = 0
+
+    li   a0, -1                    # 0xFFFFFFFFFFFFFFFF (all bits delta)
+    li   t0, 1000000               # 1M iterations
+h_loop:
+    ATOMIK_ACCUM(a0)
+    addi t0, t0, -1
+    bnez t0, h_loop
+
+    # After 1M even-count ACCUMs of 0xFFF...F: acc = 0
+    # READ should return exact initial state
+    ATOMIK_READ(a2)
+    li   a3, 0x0123456789ABCDEF
+    beq  a2, a3, h_pass
+    PRINT_CHAR 'F'
+    addi s1, s1, 1
+    j    h_done
+h_pass:
+    PRINT_CHAR 'P'
+h_done:
     PRINT_CHAR '\n'
 
     # =========================================================================
