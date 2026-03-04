@@ -738,6 +738,26 @@ end
 
 ---
 
+### V3-021: HDMI Output Timing Not Recognized by Some Monitors
+
+**Severity:** Low
+**Date:** March 3, 2026
+**Status:** Open (cosmetic — display functions correctly)
+
+**Symptom:** Some monitors display "The current input timing is not supported by the monitor display" and suggest changing to the monitor's native timing (e.g., 3440x1440 @ 60Hz). Despite this warning, the HDMI output has been functional throughout development and testing — the test card, text overlay, and delta-driven display pipeline all render correctly.
+
+**Root Cause:** The v3 SoC runs at 21.6 MHz pixel clock (downclocked from 25.2 MHz to resolve V3-020 timing violations). This produces a non-standard refresh rate of ~51.4 Hz (vs the standard 640x480 @ 60 Hz which requires 25.175 MHz). Some monitors' EDID timing validation rejects this as unsupported, even though the TMDS encoding and signal integrity are correct.
+
+The svo_tcard module generates only active pixels (640x480 with no blanking intervals in the pixel stream); blanking is inserted by svo_enc internally. The combination of non-standard pixel clock and the SVO pipeline's timing characteristics produces a frame rate that falls outside many monitors' declared supported range.
+
+**Impact:** Cosmetic only. Display output is correct and verified on multiple monitors during testing. The warning message may overlay the display content on some monitors.
+
+**Workaround:** Use a monitor that accepts non-standard timings (most modern monitors and HDMI capture devices work fine). Alternatively, a future phase could restore 25.2 MHz pixel clock by pipelining the CPU decode stage to meet timing at the higher frequency.
+
+**Long-term fix:** Restore 25.2 MHz operation by adding a pipeline register between fetch and decode stages (breaks the critical path). This would produce standard 640x480 @ ~60 Hz timing that all monitors accept.
+
+---
+
 ## Software Issues
 
 ### SW-001: `perf_runner.py` Key Parsing ValueError
