@@ -536,7 +536,7 @@ void cmd_phase2_test()
 
 volatile int i;
 
-#define CLK_FREQ        13500000  // 13.5 MHz
+#define CLK_FREQ        21600000  // 21.6 MHz (108 MHz PLL / 5 CLKDIV)
 #define UART_BAUD       115200
 
 void main()
@@ -560,7 +560,7 @@ void main()
     print("/_/   \\_\\_| \\___/|_|  |_|_|_|\\_\\       |___/\n");
     print("\n");
     print("  RV64I + ATOMiK Custom Instructions\n");
-    print("  Tang Nano 9K @ 13.5 MHz\n");
+    print("  Tang Nano 9K @ 21.6 MHz\n");
     print("\n");
 
     // LED startup sequence

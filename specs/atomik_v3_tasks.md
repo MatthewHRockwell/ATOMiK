@@ -354,16 +354,27 @@ Additionally: `review.yml` (PR ruff check) and `math/proofs/.github/workflows/le
   - Full boot chain validated: BROM → ISP timeout → "JUMP!" → XIP → "F!F!" repeating
   - 946 clean prints over 25 seconds, zero corruption
   - Golden tag: `v3-boot-chain-golden`
-- [ ] Full v2 UART menu + ATOMiK tests: Port to RV64I for flash-resident firmware
-- [ ] Hardware validation: All v2 tests ported and passing on flash firmware
+- [x] Full v2 UART menu + ATOMiK tests: Port to RV64I for flash-resident firmware
+  - firmware.c: Full UART menu with [X] ATOMiK test (T1-T9), [P] Phase 2 test (P1-P10), [K] Checkpoint demo, [M] Memory benchmark, [H] Heap demo, [B] XOR benchmark, [R] Perf suite
+  - Fixed CLK_FREQ: 13.5 MHz → 21.6 MHz (matching actual PLL ÷ CLKDIV)
+  - Fixed heap: _heap_size 0 → 1KB (heap allocator was returning NULL)
+  - 12,368 bytes flash, 4,016 bytes RAM (49% of 8KB)
+- [x] Hardware validation: All v2 tests ported and passing on flash firmware
+  - ATOMiK test: 9/9 PASS (load, accum, read, XOR cancel, multi-delta, 64-bit, swap, post-swap, perf @ 192 cycles)
+  - Phase 2 test: 10/10 ALL PASS (fingerprint, tracked memcpy, change detection, checkpoint, heap alloc, heap integrity, printf)
+  - Checkpoint demo: Rollback verified, fingerprint comparison working
+  - Memory benchmark: ATOMiK 6.4x faster than sw_memcpy, 9.8x faster change detection
+  - Heap demo: 1024B heap, integrity check in 338 cycles
 
-**Status:** Boot chain fully validated. ISP programming flow working. Full v2 firmware port pending.
+**Status:** Full v2 firmware ported and all tests passing on hardware.
 
 ### 3.10 ATOMiK Hardware Tests (Port from v2)
 - [x] Port the v2 test suite to use v3's custom instructions:
   - [X] 9 ATOMiK tests via custom instructions (`.insn r 0x0B`): load, accum, read, XOR cancel, multi-delta, 64-bit, swap, post-swap, perf
   - Use `atomik_v3.h` inline assembly wrappers
-- [ ] All tests execute on real hardware via UART at 115200 baud — **requires FPGA deployment (Step 3.12)**
+- [x] All tests execute on real hardware via UART at 115200 baud
+  - test_atomik_hw.S: 17 tests (1-9, A-G, H) ALL PASS including 1M delta stress test
+  - firmware.c: Interactive UART menu, ATOMiK 9/9 PASS, Phase 2 10/10 ALL PASS
 - [x] Verilator SoC simulation: 9/9 PASS (equivalent to v2's test coverage)
 
 ### 3.11 Full SoC Synthesis and Timing Closure
@@ -394,12 +405,16 @@ Additionally: `review.yml` (PR ruff check) and `math/proofs/.github/workflows/le
 - [x] Flash boot chain validated: BROM → ISP timeout (~14s) → "JUMP!" → XIP → "F!F!" repeating
   - 946 clean prints over 25s, zero corruption
   - Golden tag: `v3-boot-chain-golden`
-- [ ] Flash to persistent storage: `openFPGALoader -b tangnano9k -f hardware/v3/synth/impl/pnr/atomik_v3_soc.fs`
-- [ ] Verify persistent boot: power cycle → firmware boots → UART menu appears → tests pass
-- [ ] HDMI output verification: verify test pattern displays on screen
+- [x] Flash to persistent storage: `openFPGALoader -b tangnano9k -f atomik_v3_soc.fs`
+  - CRC check: Success. Bitstream in embedded config flash.
+- [x] Verify persistent boot: JTAG reset → BROM boots → ISP timeout → firmware boots → UART menu appears → ATOMiK 9/9 PASS, Phase 2 10/10 ALL PASS
+- [x] HDMI output verification: Color test pattern + text console displayed on Dell monitor
+  - Color rectangle grid (right half) rendering correctly
+  - UART text mirrored to HDMI (left half) — banner, menu, test results all visible
+  - Full 64-bit output confirmed: `hex=0xdeadbeefcafebabe` displayed on screen
 - **Requires physical FPGA access**
 
-**Exit criteria**: v3 SoC boots from flash on Tang Nano 9K. UART interactive. HDMI shows test pattern. All hardware tests pass. Zero TNS. **Status: Boot chain validated (SRAM + flash XIP). Persistent bitstream and HDMI verification pending. 40 setup timing violations (V3-020) need resolution.**
+**Exit criteria**: v3 SoC boots from flash on Tang Nano 9K. UART interactive. HDMI shows test pattern. All hardware tests pass. Zero TNS. **Status: COMPLETE. All exit criteria met. Persistent flash boot validated. All tests passing: ATOMiK 9/9, Phase 2 10/10, test_atomik_hw 17/17. HDMI verified: color test pattern + text console on Dell monitor. V3-020 resolved by downclocking to 21.6 MHz (15% timing margin).**
 
 ---
 

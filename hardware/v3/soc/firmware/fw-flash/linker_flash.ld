@@ -9,7 +9,7 @@ MEMORY
 }
 
 _stack_size = DEFINED(_stack_size) ? _stack_size : 2k;
-_heap_size = DEFINED(_heap_size) ? _heap_size : 0;
+_heap_size = DEFINED(_heap_size) ? _heap_size : 1k;
 
 SECTIONS {
     .vector 0x00000010 : {
