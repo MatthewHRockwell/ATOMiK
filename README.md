@@ -72,7 +72,7 @@ python -m software.demos.state_sync_benchmark
 ## For Engineers
 
 - **Formal Proofs**: [`math/proofs/`](math/proofs/) — 92 Lean4 theorems including Turing completeness
-- **RTL Source**: [`hardware/rtl/`](hardware/rtl/) — Verilog implementation validated on Tang Nano 9K
+- **RTL Source**: [`hardware/rtl/`](hardware/rtl/) (v2), [`hardware/v3/`](hardware/v3/) (v3) — Verilog implementations validated on Tang Nano 9K
 - **SDK**: `pip install -e ./software` — schema-driven code generation for Python/Rust/C/JS/Verilog
 - **Hardware Synthesis**: [`docs/HARDWARE_SYNTHESIS.md`](docs/HARDWARE_SYNTHESIS.md) — 25-config sweep
 - **API Reference**: [`docs/SDK_API_REFERENCE.md`](docs/SDK_API_REFERENCE.md)
@@ -105,15 +105,15 @@ python -m software.demos.state_sync_benchmark
 | Milestone | Description | Status |
 |-----------|-------------|--------|
 | **RV64I CPU Core** | Custom 64-bit RISC-V with integrated ATOMiK datapath | ✅ Complete (53/54 compliance) |
-| **Timing Closure** | 25.2 MHz CPU clock, zero TNS | ✅ Complete |
+| **Timing Closure** | 21.6 MHz CPU clock, zero TNS | ✅ Complete |
 | **CPU Hang Debug** | Root cause identified & fixed (timing violations) | ✅ Complete |
 | **Hardware Validation** | Repeated MMIO stress testing | ✅ Complete (62/62 PASS) |
 | **ISP Flasher** | Boot ROM with UART ISP protocol for flash programming | ✅ Complete |
 | **Flash Boot Chain** | BROM → ISP timeout → SPI XIP execution | ✅ Complete (validated, golden tag) |
-| **ATOMiK Hardware Tests** | 9 tests on v3 hardware | ⏸️ Pending |
-| **Timing Violation Fix** | 40 setup violations at 25.2 MHz (V3-020) | 🔄 In Progress |
-| **Production SoC Deployment** | Tang Nano 9K @ 81 MHz, 0 TNS, persistent flash | **Deployed** |
-| **Performance Benchmarking** | 550-measurement automated suite, JSONL data pooling, regression detection | Complete |
+| **ATOMiK Hardware Tests** | 9 ATOMiK + 10 Phase 2 tests on v3 hardware | ✅ Complete (9/9 + 10/10 PASS) |
+| **Timing Violation Fix** | Resolved by downclocking to 21.6 MHz (V3-020) | ✅ Complete |
+| **Production SoC Deployment** | Tang Nano 9K @ 21.6 MHz, 0 TNS, persistent flash | ✅ **Deployed** |
+| **Delta-Driven Display** | Change-driven HDMI pipeline: `pixel_out = pixel_ref ⊕ LUT[index]` | ✅ Complete (6/6 PASS) |
 
 ---
 
@@ -202,6 +202,21 @@ N=16 breaks the **1 Gops/s barrier** on the Tang Nano 9K. Scaling is exactly lin
 | **Logic Utilization** | 44% (3,838/8,640 LUTs), 707 ALU, 72% CLS |
 | **Flash Deployment** | Persistent SPI flash (bitstream + firmware) |
 | **Validation** | 6/6 test suites passing ([X] [P] [K] [M] [H] [R]) |
+
+### v3 SoC Deployment (Tang Nano 9K)
+
+| Metric | Result |
+|--------|--------|
+| **Target Device** | Gowin GW1NR-9 (Tang Nano 9K) |
+| **Architecture** | Custom RV64I CPU + ATOMiK direct-wire (single clock domain) |
+| **CPU Clock** | 21.6 MHz (PLL 108 MHz ÷ 5) |
+| **Timing Closure** | Fmax 21.637 MHz (+0.17% margin), zero TNS |
+| **Logic Utilization** | 69% (5,966/8,640 LUTs), 88% CLS |
+| **BSRAM** | 19/26 (74%) — regfile, state table, SRAM, BROM, SPI, HDMI, display LUT + scanline |
+| **HDMI** | 640x480 with delta-driven display pipeline |
+| **Display Pipeline** | `pixel_out = pixel_ref ⊕ LUT[index]` — zero-cost unchanged pixels |
+| **Flash Deployment** | Persistent SPI flash (bitstream + firmware via ISP programmer) |
+| **Validation** | ATOMiK 9/9, Phase 2 10/10, Display 6/6 — all PASS |
 
 ### Standalone Core Performance
 
@@ -303,10 +318,15 @@ python -m demos.run_demo                           # Auto-discover hardware
 ```text
 ATOMiK/
 ├── hardware/                 # FPGA/ASIC hardware design
-│   ├── rtl/                  # Verilog RTL source
-│   ├── sim/                  # Testbenches (single-core + parallel)
+│   ├── rtl/                  # v2 Verilog RTL source
+│   ├── v3/                   # v3 SoC (RV64I + ATOMiK + HDMI + display pipeline)
+│   │   ├── rtl/              # v3 CPU and ATOMiK RTL
+│   │   ├── soc/              # SoC integration (peripherals, HDMI, firmware)
+│   │   ├── synth/            # Gowin synthesis project and bitstream
+│   │   └── sim/              # Verilator and iverilog testbenches
+│   ├── sim/                  # v2 testbenches (single-core + parallel)
 │   ├── sweep/                # Parallel bank synthesis sweep (25 configs)
-│   ├── synth/                # Synthesis output and reports
+│   ├── synth/                # v2 synthesis output and reports
 │   ├── scripts/              # Hardware validation scripts
 │   ├── constraints/          # Timing and pin constraints
 │   └── experiments/          # Hardware experiments

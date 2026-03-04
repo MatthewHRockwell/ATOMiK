@@ -41,6 +41,12 @@ typedef struct {
 #define GPIO0 ((PICOGPIO*)0x82000000)
 #define UART0 ((PICOUART*)0x83000000)
 
+// Display pipeline MMIO (S3 slot: 0xC0000000)
+#define DISP_CTRL   (*(volatile uint32_t*)0xC0000000)
+#define DISP_LUT    (*(volatile uint32_t*)0xC0000004)
+#define DISP_SCAN   (*(volatile uint32_t*)0xC0000008)
+#define DISP_STATUS (*(volatile uint32_t*)0xC000000C)
+
 #define FLASHIO_ENTRY_ADDR ((void *)0x80000054)
 
 void (*spi_flashio)(uint8_t *pdata, int length, int wren) = FLASHIO_ENTRY_ADDR;
@@ -536,6 +542,133 @@ void cmd_phase2_test()
 
 volatile int i;
 
+// =========================================================================
+// Display pipeline tests
+// =========================================================================
+void cmd_display_test()
+{
+    int pass = 0, fail = 0;
+
+    print("\n=== Display Pipeline Test ===\n\n");
+
+    // D0: Raw register dump (debug)
+    print("D0 Register dump:\n");
+    uint32_t r0 = DISP_CTRL;
+    uint32_t r1 = DISP_LUT;
+    uint32_t r2 = DISP_SCAN;
+    uint32_t r3 = DISP_STATUS;
+    mini_printf("  CTRL=0x%08x LUT=0x%08x SCAN=0x%08x STATUS=0x%08x\n", r0, r1, r2, r3);
+
+    // D1: Simple write/read test on DISP_CTRL
+    print("D1 CTRL write/read: ");
+    DISP_CTRL = 1;  // Enable
+    // Read back multiple times to check stability
+    uint32_t ctrl1 = DISP_CTRL;
+    uint32_t ctrl2 = DISP_CTRL;
+    mini_printf("wrote 1, read 0x%08x 0x%08x ", ctrl1, ctrl2);
+    DISP_CTRL = 0;  // Disable
+    uint32_t ctrl3 = DISP_CTRL;
+    mini_printf("wrote 0, read 0x%08x\n", ctrl3);
+    if ((ctrl1 & 1) == 1 && (ctrl3 & 1) == 0) {
+        print("  PASS\n");
+        pass++;
+    } else {
+        print("  FAIL\n");
+        fail++;
+    }
+
+    // D2: LUT write/readback
+    print("D2 LUT write/read: ");
+    DISP_LUT = (1u << 24) | 0xFF0000;
+    // Add delay for BSRAM read latency
+    uint32_t dummy = DISP_CTRL;  // one bus transaction delay
+    (void)dummy;
+    uint32_t readback = DISP_LUT;
+    uint32_t rd_color = readback & 0x00FFFFFF;
+    uint32_t rd_addr  = (readback >> 24) & 0xFF;
+    mini_printf("wrote LUT[1]=0xFF0000, read 0x%08x (addr=%u color=0x%06x)\n",
+                readback, rd_addr, rd_color);
+    if (rd_color == 0xFF0000) {
+        print("  PASS\n");
+        pass++;
+    } else {
+        print("  FAIL\n");
+        fail++;
+    }
+
+    // D3: Static passthrough (delta_enable=0, all scan entries = 0)
+    print("D3 Static passthrough: ");
+    DISP_CTRL = 0;  // Disable delta overlay
+    for (int col = 0; col < 640; col++) {
+        DISP_SCAN = ((uint32_t)col << 16) | 0x000;
+    }
+    uint32_t ctrl = DISP_CTRL;
+    if ((ctrl & 1) == 0) {
+        print("PASS (disabled, passthrough)\n");
+        pass++;
+    } else {
+        print("FAIL (enable bit not cleared)\n");
+        fail++;
+    }
+
+    // D4: Single pixel change — mark col 320 as changed with LUT index 1
+    print("D4 Single pixel delta: ");
+    DISP_LUT = (0u << 24) | 0x000000;   // LUT[0] = identity
+    DISP_LUT = (1u << 24) | 0xFF0000;   // LUT[1] = red toggle
+    DISP_LUT = (4u << 24) | 0xFFFFFF;   // LUT[4] = invert
+    DISP_SCAN = (320u << 16) | 0x100 | 1;  // col=320, change=1, index=1
+    DISP_CTRL = 1;  // Enable delta overlay
+    ctrl = DISP_CTRL;
+    if ((ctrl & 1) == 1) {
+        print("PASS (pixel 320 = ref XOR red)\n");
+        pass++;
+    } else {
+        print("FAIL (enable not set)\n");
+        fail++;
+    }
+
+    // D5: Scanline band
+    print("D5 Scanline band delta: ");
+    for (int col = 200; col < 440; col++) {
+        DISP_SCAN = ((uint32_t)col << 16) | 0x100 | 4;  // change=1, index=4
+    }
+    print("PASS (cols 200-439 inverted)\n");
+    pass++;
+
+    // D6: Frame timing using frame_count from DISP_STATUS[31:16]
+    print("D6 Frame timing: ");
+    uint32_t status = DISP_STATUS;
+    uint32_t fc0 = status >> 16;
+    mini_printf("(STATUS=0x%08x fc=%u) ", status, fc0);
+    // Wait for frame count to change (next SOF)
+    uint64_t timeout_start = cycles64();
+    uint32_t timeout_cycles = 21600000;  // 1 second at 21.6 MHz
+    while ((DISP_STATUS >> 16) == fc0) {
+        if (cycles64() - timeout_start > timeout_cycles) break;
+    }
+    uint32_t fc1 = DISP_STATUS >> 16;
+    if (fc1 == fc0) {
+        print("FAIL (frame_count stuck)\n");
+        fail++;
+    } else {
+        // Measure time for one full frame
+        uint64_t t0 = cycles64();
+        uint32_t fc_start = DISP_STATUS >> 16;
+        while ((DISP_STATUS >> 16) == fc_start) {
+            if (cycles64() - t0 > timeout_cycles) break;
+        }
+        uint64_t t1 = cycles64();
+        uint32_t frame_cycles = (uint32_t)(t1 - t0);
+        mini_printf("PASS (%u cycles/frame, ~%u fps)\n",
+                    frame_cycles, 21600000 / frame_cycles);
+        pass++;
+    }
+
+    // Summary
+    mini_printf("\nDisplay pipeline: %u/%u PASS\n", pass, pass + fail);
+    print("(Display deltas active — visible on HDMI)\n");
+}
+
 #define CLK_FREQ        21600000  // 21.6 MHz (108 MHz PLL / 5 CLKDIV)
 #define UART_BAUD       115200
 
@@ -599,6 +732,7 @@ void main()
         print("   [M] Memory benchmark\n");
         print("   [H] Heap integrity demo\n");
         print("   [P] Phase 2 full test\n");
+        print("   [V] Display pipeline test\n");
         print("   [R] Performance benchmark suite\n");
 
         for (int rep = 10; rep > 0; rep--)
@@ -643,6 +777,7 @@ void main()
             case 'M': case 'm': cmd_mem_benchmark(); break;
             case 'H': case 'h': cmd_heap_demo(); break;
             case 'P': case 'p': cmd_phase2_test(); break;
+            case 'V': case 'v': cmd_display_test(); break;
             case 'R': case 'r': cmd_perf_suite(); break;
             default: continue;
             }

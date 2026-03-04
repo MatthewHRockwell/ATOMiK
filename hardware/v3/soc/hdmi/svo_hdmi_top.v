@@ -33,6 +33,14 @@ module svo_hdmi_top (
 	output term_out_tready,
 	input [7:0] term_in_tdata,
 
+	// Display pipeline MMIO (from S3 bus slot)
+	input         disp_mmio_valid,
+	output        disp_mmio_ready,
+	input  [31:0] disp_mmio_addr,
+	input  [31:0] disp_mmio_wdata,
+	input  [3:0]  disp_mmio_wstrb,
+	output [31:0] disp_mmio_rdata,
+
 	// output signals
 	output       tmds_clk_n,
 	output       tmds_clk_p,
@@ -53,6 +61,11 @@ module svo_hdmi_top (
 	wire vdma_tready;
 	wire [SVO_BITS_PER_PIXEL-1:0] vdma_tdata;
 	wire [0:0] vdma_tuser;
+
+	wire overlay_tvalid;
+	wire overlay_tready;
+	wire [SVO_BITS_PER_PIXEL-1:0] overlay_tdata;
+	wire [0:0] overlay_tuser;
 
 	wire video_tvalid;
 	wire video_tready;
@@ -126,10 +139,32 @@ module svo_hdmi_top (
 		.over_axis_tdata(white_pixval),
 		.over_axis_tuser({term_out_tdata == 2'b10, term_out_tuser}),
 
+		.out_axis_tvalid(overlay_tvalid),
+		.out_axis_tready(overlay_tready),
+		.out_axis_tdata(overlay_tdata),
+		.out_axis_tuser(overlay_tuser)
+	);
+
+	atomik_delta_display #( `SVO_PASS_PARAMS ) u_delta_display (
+		.clk(clk_pixel),
+		.resetn(clk_pixel_resetn),
+
+		.in_axis_tvalid(overlay_tvalid),
+		.in_axis_tready(overlay_tready),
+		.in_axis_tdata(overlay_tdata),
+		.in_axis_tuser(overlay_tuser),
+
 		.out_axis_tvalid(video_tvalid),
 		.out_axis_tready(video_tready),
 		.out_axis_tdata(video_tdata),
-		.out_axis_tuser(video_tuser)
+		.out_axis_tuser(video_tuser),
+
+		.mmio_valid(disp_mmio_valid),
+		.mmio_ready(disp_mmio_ready),
+		.mmio_addr(disp_mmio_addr),
+		.mmio_wdata(disp_mmio_wdata),
+		.mmio_wstrb(disp_mmio_wstrb),
+		.mmio_rdata(disp_mmio_rdata)
 	);
 
 	svo_enc #( `SVO_PASS_PARAMS ) svo_enc (

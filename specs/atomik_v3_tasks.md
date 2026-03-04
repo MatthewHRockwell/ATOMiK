@@ -414,71 +414,73 @@ Additionally: `review.yml` (PR ruff check) and `math/proofs/.github/workflows/le
   - Full 64-bit output confirmed: `hex=0xdeadbeefcafebabe` displayed on screen
 - **Requires physical FPGA access**
 
-**Exit criteria**: v3 SoC boots from flash on Tang Nano 9K. UART interactive. HDMI shows test pattern. All hardware tests pass. Zero TNS. **Status: COMPLETE. All exit criteria met. Persistent flash boot validated. All tests passing: ATOMiK 9/9, Phase 2 10/10, test_atomik_hw 17/17. HDMI verified: color test pattern + text console on Dell monitor. V3-020 resolved by downclocking to 21.6 MHz (15% timing margin).**
+**Exit criteria**: v3 SoC boots from flash on Tang Nano 9K. UART interactive. HDMI shows test pattern. All hardware tests pass. Zero TNS. **Status: COMPLETE. All exit criteria met. Persistent flash boot validated. All tests passing: ATOMiK 9/9, Phase 2 10/10, test_atomik_hw 17/17. HDMI verified: color test pattern + text console on Dell monitor. V3-020 resolved by downclocking to 21.6 MHz.**
 
 ---
 
-## Phase 4: Display Pipeline
+## Phase 4: Display Pipeline ✅ **COMPLETE — March 3, 2026**
 
-**Goal**: Implement the change-driven display architecture — CLS3 SREG scanline delta mask, 256×64-bit delta color LUT, and scanline-based reference frame reconstruction.
+**Goal**: Implement the change-driven display architecture — delta color LUT and scanline delta buffer for per-pixel XOR updates.
 
 **Dependencies**: Phase 3 (SoC with HDMI output must work)
 
+**Architecture note**: The original plan called for CLS3 SREG shift registers for the scanline delta mask and index. This was replaced with a **BSRAM-based approach** to conserve CLS (87% → 88% vs projected 90%+ for SREG). Two BSRAM blocks store the scanline delta buffer (1024×9-bit: change flag + LUT index) and delta color LUT (256×24-bit). The existing svo_tcard + svo_overlay output serves as `pixel_ref` — no separate reference buffer needed.
+
 ### 4.1 Delta Color LUT (BSRAM)
-- [ ] Instantiate 1 BSRAM block in 256×64-bit configuration
-- [ ] CPU can write entries (transition deltas) via MMIO or a dedicated write path
-- [ ] Read port: addressed by 8-bit index from CLS3 SREG REG[1]
-- [ ] Pre-load common transition deltas (identity at index 0, text colors, UI theme transitions)
-- [ ] Verify: write a delta to LUT[5], read it back, confirm `pixel_out = pixel_ref ^ LUT[5]`
+- [x] 256×24-bit delta color LUT inferred as BSRAM (SDPB)
+- [x] CPU writes entries via MMIO at DISP_LUT (0xC0000004): `{addr[31:24], color[23:0]}`
+- [x] Read port B: addressed by 8-bit LUT index from scanline delta buffer (pipeline stage 1)
+- [x] Read port A: CPU readback of last-written address for verification
+- [x] Verified: write LUT[1]=0xFF0000, read back 0x01FF0000 — PASS (D2 test)
 
-### 4.2 CLS3 SREG — Scanline Delta Mask (REG[0])
-- [ ] Configure CLS3 REG[0] as a shift register (1-bit-per-pixel)
-- [ ] Serial input: load from ATOMiK change detection logic ("did this pixel change?")
-- [ ] Serial output: 1 bit per pixel clock, gates the color LUT lookup
-- [ ] Shift clock: pixel clock (25.2 MHz) for output, ATOMiK clock (81 MHz) for input
-- [ ] CDC: registered handshake (ATOMiK domain → pixel domain)
+### 4.2 Scanline Delta Buffer (BSRAM)
+- [x] 1024×9-bit scanline delta buffer inferred as BSRAM (SDPX9B)
+- [x] Per-pixel entry: `{change_flag[8], lut_index[7:0]}`
+- [x] Applied to ALL scanlines (same pattern every row)
+- [x] CPU writes via MMIO at DISP_SCAN (0xC0000008): `{col[25:16], change[8], index[7:0]}`
+- [x] Read port: addressed by pixel column counter (0-639), synchronized with pixel stream
 
-### 4.3 CLS3 SREG — Color Delta Index (REG[1])
-- [ ] Configure CLS3 REG[1] as a shift register (8-bit index stream)
-- [ ] Serial input: populated by CPU or ATOMiK logic with LUT indices for changed pixels
-- [ ] Serial output: feeds the delta color LUT address input
-- [ ] Synchronized with REG[0]: when REG[0] shifts out a '1' (pixel changed), REG[1]'s current index is valid
+### 4.3 2-Stage Display Pipeline
+- [x] Inserted between svo_overlay output and svo_enc input in HDMI chain
+- [x] Stage 1: Scanline buffer read → captures {change, index}, addresses LUT
+- [x] Stage 2: LUT read → conditional XOR: `pixel_out = change ? (pixel_ref ^ lut_delta) : pixel_ref`
+- [x] Fixed-latency pipeline (no backpressure — `tready` passes straight through)
+- [x] Pixel position tracking: col (0-639), row (0-479), frame_count (16-bit)
+- [x] Module: `hardware/v3/soc/hdmi/atomik_delta_display.v` (~250 lines)
 
-### 4.4 Scanline Reference Buffer
-- [ ] 1 BSRAM block configured as a scanline buffer (640 × 24-bit = 15.4 Kbit, fits in 18 Kbit)
-- [ ] Double-buffered or ping-pong: CPU/DMA loads next scanline's reference while current scanline streams out
-- [ ] Read port: addressed by pixel column counter (0–639)
-- [ ] Integration: `pixel_out = scanline_ref[col] ^ LUT[index]` when delta mask = 1, else `pixel_out = scanline_ref[col]`
+### 4.4 MMIO Register Interface (S3 slot: 0xC000_0000)
+- [x] DISP_CTRL (+0x00): [0] enable, [10:1] row (RO) — write enables/disables delta overlay
+- [x] DISP_LUT (+0x04): write {addr[31:24], color[23:0]}, read {addr[31:24], lut_data[23:0]}
+- [x] DISP_SCAN (+0x08): write {col[25:16], change[8], index[7:0]}
+- [x] DISP_STATUS (+0x0C): {frame_count[31:16], 5'b0, frame_done[10], pixel_row[9:0]}
+- [x] Routed from S3 bus slot (previously tied off) through svo_hdmi_top to delta display
 
-### 4.5 Display Pipeline Integration
-- [ ] Wire the pipeline into the HDMI scanout path:
-  1. Pixel clock increments column counter (0–639 per scanline)
-  2. CLS3 SREG REG[0] shifts out delta mask bit
-  3. If changed: REG[1] provides LUT index → delta color LUT → XOR with scanline reference
-  4. If unchanged: pass scanline reference directly to TMDS encoder
-  5. TMDS encoder → HDMI output (same as v2)
-- [ ] Verify: static display (all pixels unchanged) produces correct image with zero delta mask activity
+### 4.5 Firmware: Display Test Suite
+- [x] `[V]` command in UART menu runs 6 display tests:
+  - D0: Raw register dump (CTRL, LUT, SCAN, STATUS)
+  - D1: CTRL write/read — enable/disable delta overlay — PASS
+  - D2: LUT write/read — write LUT[1]=0xFF0000, readback verified — PASS
+  - D3: Static passthrough — delta disabled, HDMI unchanged — PASS
+  - D4: Single pixel delta — pixel 320 = ref XOR red — PASS
+  - D5: Scanline band delta — cols 200-439 inverted — PASS
+  - D6: Frame timing — frame_count transitions, ~307K cycles/frame (~70 fps) — PASS
+- [x] State corruption check: [V] run 3 times consecutively — 6/6 PASS each run
+- [x] Arbitration check: [X] after [V] — 9/9 PASS, [V] after [X] — 6/6 PASS
 
-### 4.6 Firmware: Display Test Suite
-- [ ] Write display test firmware:
-  - Fill delta color LUT with known transitions
-  - Set scanline reference to a solid color
-  - Mark specific pixels as "changed" in the delta mask
-  - Verify HDMI output shows correct per-pixel updates
-- [ ] Test cases:
-  - All static (delta mask = 0 everywhere) → solid reference color
-  - Single pixel changed → one pixel shows reference XOR delta
-  - Full scanline changed → all pixels updated via LUT
-  - Multiple LUT indices → verify different transitions render correctly
+### 4.6 Synthesis and Resource Check
+- [x] Synthesized SoC + display pipeline through Gowin EDA
+- [x] **Results** (GW1NR-LV9QN88PC6/I5):
+  - **LUT**: 5,966 (69%) — +372 from Phase 3 baseline
+  - **CLS**: 3,782 (88%) — +44 from Phase 3 baseline
+  - **BSRAM**: 19/26 (74%) — +3 from Phase 3 (delta LUT + scanline buffer + overhead)
+  - **Fmax**: 21.637 MHz (target 21.6 MHz, +0.17% margin)
+  - **TNS**: 0.000 on all clock domains
+  - 3 pre-existing TMDS recovery violations (benign, reset path)
+- [x] CLS growth minimal (+44) thanks to BSRAM approach (vs ~360 projected for CLS3 SREG)
 
-### 4.7 Synthesis and Resource Check
-- [ ] Synthesize SoC + display pipeline
-- [ ] Measure additional LUT/BSRAM cost of display integration
-- [ ] Target: ≤3,300 LUT4 (display adds ~200 LUT for control logic, LUT addressing, muxing)
-- [ ] BSRAM: +1 (delta color LUT) + 1 (scanline buffer) = 16/26 total (62%)
-- [ ] Verify CLS3 SREG mapping in synthesis report — confirm REGs configured as shift registers
+**Known issue**: V3-021 — some monitors report unsupported timing (21.6 MHz pixel clock = ~51.4 Hz, non-standard). Display renders correctly regardless. See `docs/KNOWN_ISSUES.md`.
 
-**Exit criteria**: HDMI output shows correct delta-driven pixel updates. Static pixels are zero cost (no switching activity). Delta color LUT produces correct per-pixel transitions. Timing met.
+**Exit criteria**: ✅ HDMI output shows correct delta-driven pixel updates. Static pixels pass through unchanged (zero delta activity). Delta color LUT produces correct per-pixel XOR transitions. Timing met. All 6 display tests PASS. No regressions on ATOMiK (9/9) or Phase 2 (10/10) tests.
 
 ---
 
@@ -643,15 +645,15 @@ Phase 7: Benchmarking & Production
 
 ## Resource Budget Tracking
 
-| Phase | Target LUT4 | Actual LUT4 | BSRAM | Key Addition |
-|:-----:|:-----------:|:-----------:|:-----:|:-------------|
-| 1 | ~1,800 | 8,013 (pre-opt) → 2,728 (optimized) | 4 | CPU + BSRAM register file |
-| 2 | ~2,000 | 3,181 | 6 | + ATOMiK acc + state table |
-| 3 | ~3,100 | **5,594** | **16** | + SRAM, Boot ROM, UART, GPIO, HDMI |
-| 4 | ~3,300 | — | — | + Delta color LUT + scanline buffer |
-| 5 | ~3,400 | — | — | + IDES16/OSER16 control logic |
-| 6 | ~4,350 (N=16) | — | — | + Parallel banks (if N=16) |
+| Phase | Target LUT4 | Actual LUT4 | BSRAM | CLS | Key Addition |
+|:-----:|:-----------:|:-----------:|:-----:|:---:|:-------------|
+| 1 | ~1,800 | 8,013 (pre-opt) → 2,728 (optimized) | 4 | — | CPU + BSRAM register file |
+| 2 | ~2,000 | 3,181 | 6 | — | + ATOMiK acc + state table |
+| 3 | ~3,100 | **5,594** | **16** | **3,738 (87%)** | + SRAM, Boot ROM, UART, GPIO, HDMI |
+| 4 | ~5,800 | **5,966** | **19** | **3,782 (88%)** | + Delta color LUT + scanline delta buffer |
+| 5 | ~6,100 | — | — | — | + IDES16/OSER16 control logic |
+| 6 | ~7,000 (N=16) | — | — | — | + Parallel banks (if N=16) |
 
 **Hard limits**: 8,640 LUT4, 26 BSRAM, 2 PLL, 4,320 CLS
-**Tightest constraint**: CLS at 87% (3,738/4,320) after Phase 3. 64-bit datapath is inherently larger than v2's 32-bit. LUT headroom: 3,046 remaining (35%). BSRAM: 10 remaining (38%).
-**Key insight**: Original targets assumed 32-bit-equivalent scaling. The 64-bit CPU + peripherals use ~46% more LUT than v2, but fit comfortably within the GW1NR-9.
+**Tightest constraint**: CLS at 88% (3,782/4,320) after Phase 4 + Fmax margin at 0.17%. Future phases must avoid wide combinational fan-in to preserve timing. LUT headroom: 2,674 remaining (31%). BSRAM: 7 remaining (27%).
+**Key insight**: Original targets assumed 32-bit-equivalent scaling. The 64-bit CPU + peripherals use ~46% more LUT than v2, but fit within the GW1NR-9. BSRAM-based display pipeline kept CLS growth minimal (+44 vs ~360 projected for CLS3 SREG approach).

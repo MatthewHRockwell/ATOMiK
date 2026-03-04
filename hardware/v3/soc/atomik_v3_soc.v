@@ -18,7 +18,7 @@
 //   0x81000000  SPI Flash Config
 //   0x82000000  GPIO (7-bit)
 //   0x83000000  UART (115200)
-//   0xC0000000  (Tied off — unused)
+//   0xC0000000  Display Pipeline MMIO (delta color LUT, scanline buffer)
 //
 // BSRAM budget: 4 regfile + 2 ATOMiK + 4 BROM + 4 SRAM = 14/26 (54%)
 // =============================================================================
@@ -126,7 +126,7 @@ wire picop_valid, picop_ready;
 wire [31:0] picop_addr, picop_wdata, picop_rdata;
 wire [3:0]  picop_wstrb;
 
-// S3 → Tied off (was ATOMiK MMIO in v2)
+// S3 → Display Pipeline MMIO
 wire wbp_valid, wbp_ready;
 wire [31:0] wbp_addr, wbp_wdata, wbp_rdata;
 wire [3:0]  wbp_wstrb;
@@ -153,7 +153,7 @@ wire [3:0]  uart_wstrb;
 // S0 0x0000_0000 → SPI Flash XIP
 // S1 0x4000_0000 → SRAM
 // S2 0x8000_0000 → PicoPeriph
-// S3 0xC000_0000 → Tied off
+// S3 0xC000_0000 → Display MMIO
 // =========================================================================
 PicoMem_Mux_1_4 u_bus_mux (
     .picom_valid (mem_valid),
@@ -192,9 +192,7 @@ PicoMem_Mux_1_4 u_bus_mux (
     .picos3_rdata(wbp_rdata)
 );
 
-// S3 tie-off: immediate ready, zero data
-assign wbp_ready = wbp_valid;
-assign wbp_rdata = 32'h0;
+// S3 → Display pipeline MMIO (routed through svo_hdmi_top to atomik_delta_display)
 
 // =========================================================================
 // Debug outputs - UART WRITE DETAIL TEST
@@ -406,6 +404,14 @@ svo_hdmi_top u_hdmi (
     .term_in_tvalid (svo_term_valid),
     .term_out_tready(),
     .term_in_tdata  (term_data_hold),
+
+    // Display pipeline MMIO (S3 bus)
+    .disp_mmio_valid (wbp_valid),
+    .disp_mmio_ready (wbp_ready),
+    .disp_mmio_addr  (wbp_addr),
+    .disp_mmio_wdata (wbp_wdata),
+    .disp_mmio_wstrb (wbp_wstrb),
+    .disp_mmio_rdata (wbp_rdata),
 
     .tmds_clk_n   (tmds_clk_n),
     .tmds_clk_p   (tmds_clk_p),
