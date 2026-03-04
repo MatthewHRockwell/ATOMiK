@@ -9,8 +9,9 @@
 #   ATOMIK_SWAP  rd=old_state(a2), rs1=new_addr(a0)     → save current, switch to a0, acc=0
 #
 # Expected output:
-#   1=AB 2=54 3=AB 4=DE 5P 6=5A 7=AA 8P 9P AP BP CP DP
+#   1=AB 2=54 3=AB 4=DE 5P 6=5A 7=AA 8P 9P AP BP CP DP GP
 #   E:B=XXXX L=XXXX A=XXXX R=XXXX S=XXXX
+#   F:B=XXXX N=XXXX L=XXXX A=XXXX R=XXXX S=XXXX
 #   OK
 #
 # Tests:
@@ -27,7 +28,9 @@
 #   B: SRAM bus traffic doesn't corrupt ATOMiK accumulator (0xBEEF^0xFF=0xBE10) (P/F)
 #   C: SRAM boundary — store/load at last valid word 0x40001FFC (P/F)
 #   D: 64-bit round-trip: ATOMiK READ → SD to SRAM → LD back → compare (P/F)
-#   E: Cycle counter measurement: LOAD, ACCUM, READ, SWAP (prints hex deltas)
+#   E: Cycle counter measurement from XIP: LOAD, ACCUM, READ, SWAP (prints hex deltas)
+#   F: SRAM-based cycle measurement: eliminates XIP fetch overhead, 1024-iteration loops
+#   G: SRAM wrap-around: verify 0x40002000 aliases to 0x40000000 (no trap, addr truncation)
 
 .section .text
 .global _start
@@ -443,10 +446,35 @@ c_done:
 d_pass:
     PRINT_CHAR 'P'
 d_done:
+    PRINT_CHAR ' '
+
+    # =========================================================================
+    # Test G: SRAM wrap-around — verify 8KB boundary wraps (no trap)
+    # Address 0x40002000 should alias to 0x40000000 (addr[12:2] truncation)
+    # Bus mux uses addr[31:30] → both go to SRAM slave.
+    # SRAM module uses addr[12:2] (11 bits) → 0x2000 wraps to word 0.
+    # Expected: GP
+    # =========================================================================
+    PRINT_CHAR 'G'
+
+    li t4, 0x40000000
+    li t5, 0x12345678          # bit 31 clear — no sign-ext mismatch
+    sw t5, 0(t4)               # write to SRAM base
+
+    li t4, 0x40002000          # beyond 8KB — should alias to base
+    lw t6, 0(t4)               # read via alias
+
+    beq t5, t6, g_pass
+    PRINT_CHAR 'F'
+    addi s1, s1, 1
+    j g_done
+g_pass:
+    PRINT_CHAR 'P'
+g_done:
     PRINT_CHAR '\n'
 
     # =========================================================================
-    # Test E: Cycle counter measurements
+    # Test E: Cycle counter measurements (from XIP)
     # Measures cycle cost of each ATOMiK operation using mcycle CSR.
     # Each measurement: csrr before, operation, csrr after, delta = after - before.
     # The delta includes the csrr overhead (~4 cycles per read).
@@ -509,6 +537,113 @@ d_done:
     PRINT_CHAR '\n'
 
     # =========================================================================
+    # Test F: SRAM-based cycle measurements (eliminates XIP fetch overhead)
+    # Copies benchmark loop to SRAM, patches NOP slot with ATOMiK instructions,
+    # runs 1024 iterations per measurement. Isolates true op latency.
+    #
+    # Template (8 instructions, 32 bytes):
+    #   +0  csrr s3, mcycle
+    #   +4  li   t0, 1024
+    #   +8  nop              ← PATCH SLOT (ATOMiK instruction goes here)
+    #   +12 addi t0, t0, -1
+    #   +16 bnez t0, -8      (back to +8)
+    #   +20 csrr s4, mcycle
+    #   +24 sub  s5, s4, s3
+    #   +28 ret
+    #
+    # Output: F:B=XXXX N=XXXX L=XXXX A=XXXX R=XXXX S=XXXX
+    #   B = single-shot csrr→csrr from SRAM (compare with XIP baseline)
+    #   N = 1024×NOP total (loop overhead baseline)
+    #   L/A/R/S = 1024×ATOMiK op total
+    # =========================================================================
+    PRINT_CHAR 'F'
+    PRINT_CHAR ':'
+
+    # --- Copy loop template from flash to SRAM at 0x40000800 ---
+    la   t1, sram_loop_template
+    la   t3, sram_loop_template_end
+    li   s6, 0x40000800            # SRAM code base for loop
+    mv   t2, s6
+f_copy1:
+    lw   t4, 0(t1)
+    sw   t4, 0(t2)
+    addi t1, t1, 4
+    addi t2, t2, 4
+    blt  t1, t3, f_copy1
+
+    # --- Copy single-shot template right after loop ---
+    mv   s7, t2                    # s7 = SRAM addr of single-shot routine
+    la   t1, sram_single_template
+    la   t3, sram_single_template_end
+f_copy2:
+    lw   t4, 0(t1)
+    sw   t4, 0(t2)
+    addi t1, t1, 4
+    addi t2, t2, 4
+    blt  t1, t3, f_copy2
+
+    # --- B: Single-shot baseline from SRAM ---
+    jalr ra, 0(s7)
+    PRINT_CHAR 'B'
+    PRINT_CHAR '='
+    PRINT_HEX_WORD s5
+    PRINT_CHAR ' '
+
+    # --- N: NOP loop baseline (1024 iterations) ---
+    # NOP is already in patch slot from copy
+    li   a0, 70
+    li   a1, 0x42
+    ATOMIK_LOAD(a0, a1)            # pre-load context (from XIP)
+    jalr ra, 0(s6)
+    PRINT_CHAR 'N'
+    PRINT_CHAR '='
+    PRINT_HEX_WORD s5
+    PRINT_CHAR ' '
+
+    # --- L: LOAD loop (1024 iterations) ---
+    li   t4, 0x00B5000B            # ATOMIK_LOAD(a0, a1) encoding
+    sw   t4, 8(s6)                 # patch NOP slot at offset +8
+    li   a0, 70
+    li   a1, 0x42
+    jalr ra, 0(s6)
+    PRINT_CHAR 'L'
+    PRINT_CHAR '='
+    PRINT_HEX_WORD s5
+    PRINT_CHAR ' '
+
+    # --- A: ACCUM loop (1024 iterations) ---
+    li   t4, 0x0005100B            # ATOMIK_ACCUM(a0) encoding
+    sw   t4, 8(s6)                 # patch
+    li   a0, 0x77                  # delta value
+    jalr ra, 0(s6)
+    PRINT_CHAR 'A'
+    PRINT_CHAR '='
+    PRINT_HEX_WORD s5
+    PRINT_CHAR ' '
+
+    # --- R: READ loop (1024 iterations) ---
+    li   t4, 0x0000260B            # ATOMIK_READ(a2) encoding
+    sw   t4, 8(s6)                 # patch
+    jalr ra, 0(s6)
+    PRINT_CHAR 'R'
+    PRINT_CHAR '='
+    PRINT_HEX_WORD s5
+    PRINT_CHAR ' '
+
+    # --- S: SWAP loop (1024 iterations) ---
+    li   t4, 0x0005360B            # ATOMIK_SWAP(a2, a0) encoding
+    sw   t4, 8(s6)                 # patch
+    li   a0, 71
+    li   a1, 0x33
+    ATOMIK_LOAD(a0, a1)            # pre-load swap target (from XIP)
+    li   a0, 71                    # swap target
+    jalr ra, 0(s6)
+    PRINT_CHAR 'S'
+    PRINT_CHAR '='
+    PRINT_HEX_WORD s5
+    PRINT_CHAR '\n'
+
+    # =========================================================================
     # Final result
     # =========================================================================
     bnez s1, fail_final
@@ -527,6 +662,37 @@ fail_final:
 
 done:
     j done
+
+# ==========================================================================
+# SRAM benchmark templates (copied to SRAM at runtime, never executed from flash)
+# ==========================================================================
+
+# Loop template: runs N=1024 iterations of the patch-slot instruction.
+# Input:  a0, a1 = ATOMiK operands (pre-set by caller)
+# Output: s5 = total cycles for 1024 iterations
+# Clobbers: t0, s3, s4, s5
+.balign 4
+sram_loop_template:
+    csrr s3, mcycle
+    li   t0, 1024
+sram_loop_nop:
+    nop                       # PATCH SLOT (+8 bytes from template start)
+    addi t0, t0, -1
+    bnez t0, sram_loop_nop
+    csrr s4, mcycle
+    sub  s5, s4, s3
+    ret
+sram_loop_template_end:
+
+# Single-shot baseline: measures csrr-to-csrr latency from SRAM.
+# Output: s5 = cycles for back-to-back csrr
+.balign 4
+sram_single_template:
+    csrr s3, mcycle
+    csrr s4, mcycle
+    sub  s5, s4, s3
+    ret
+sram_single_template_end:
 
 # ==========================================================================
 # Trap handler — prints !CC_AAAA\n (same as test_trap.S)
