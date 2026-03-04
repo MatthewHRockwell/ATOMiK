@@ -11,7 +11,7 @@
 # Expected output:
 #   1=AB 2=54 3=AB 4=DE 5P 6=5A 7=AA 8P 9P AP BP CP DP GP
 #   E:B=XXXX L=XXXX A=XXXX R=XXXX S=XXXX
-#   F:B=XXXX N=XXXX L=XXXX A=XXXX R=XXXX S=XXXX
+#   F:B=XXXX/XXXX N=XXXX/XXXX L=XXXX/XXXX A=XXXX/XXXX R=XXXX/XXXX S=XXXX/XXXX
 #   OK
 #
 # Tests:
@@ -551,10 +551,19 @@ g_done:
     #   +24 sub  s5, s4, s3
     #   +28 ret
     #
-    # Output: F:B=XXXX N=XXXX L=XXXX A=XXXX R=XXXX S=XXXX
-    #   B = single-shot csrr→csrr from SRAM (compare with XIP baseline)
+    # Measures both mcycle (s5) and minstret (s2) for each variant.
+    # Also verifies LOAD actually executed via state check (L! = patch fail).
+    #
+    # Output: F:B=XXXX/XXXX N=XXXX/XXXX L=XXXX/XXXX A=XXXX/XXXX R=XXXX/XXXX S=XXXX/XXXX
+    #   Format: mcycle/minstret for each variant
+    #   B = single-shot csrr→csrr from SRAM
     #   N = 1024×NOP total (loop overhead baseline)
     #   L/A/R/S = 1024×ATOMiK op total
+    #
+    # Expected minstret values (deterministic):
+    #   B: 0x0005 (jalr + 3 template instrs + ret = 5)
+    #   N/L/A/R/S: 0x0C06 (jalr + csrr + li + 3072 loop + csrr + sub + ret = 3078)
+    #   If all variants show same minstret, same instruction count retired.
     # =========================================================================
     PRINT_CHAR 'F'
     PRINT_CHAR ':'
@@ -583,10 +592,15 @@ f_copy2:
     blt  t1, t3, f_copy2
 
     # --- B: Single-shot baseline from SRAM ---
+    csrr s8, minstret
     jalr ra, 0(s7)
+    csrr s9, minstret
+    sub  s2, s9, s8                # s2 = minstret delta
     PRINT_CHAR 'B'
     PRINT_CHAR '='
     PRINT_HEX_WORD s5
+    PRINT_CHAR '/'
+    PRINT_HEX_WORD s2
     PRINT_CHAR ' '
 
     # --- N: NOP loop baseline (1024 iterations) ---
@@ -594,40 +608,73 @@ f_copy2:
     li   a0, 70
     li   a1, 0x42
     ATOMIK_LOAD(a0, a1)            # pre-load context (from XIP)
+    csrr s8, minstret
     jalr ra, 0(s6)
+    csrr s9, minstret
+    sub  s2, s9, s8
     PRINT_CHAR 'N'
     PRINT_CHAR '='
     PRINT_HEX_WORD s5
+    PRINT_CHAR '/'
+    PRINT_HEX_WORD s2
     PRINT_CHAR ' '
 
     # --- L: LOAD loop (1024 iterations) ---
+    # Use 0x99 (different from NOP pre-load 0x42) so we can verify execution
     li   t4, 0x00B5000B            # ATOMIK_LOAD(a0, a1) encoding
     sw   t4, 8(s6)                 # patch NOP slot at offset +8
     li   a0, 70
-    li   a1, 0x42
+    li   a1, 0x99                  # distinct from NOP pre-load (0x42)
+    csrr s8, minstret
     jalr ra, 0(s6)
+    csrr s9, minstret
+    sub  s2, s9, s8
+    # Verify LOAD actually executed: after 1024 LOADs of (70, 0x99),
+    # state[70] = 0x99, acc = 0. READ should return 0x99.
+    # If patch failed (NOP), state[70] = 0x42 (from NOP pre-load).
+    ATOMIK_READ(a2)
+    li   a3, 0x99
+    beq  a2, a3, f_load_ok
     PRINT_CHAR 'L'
+    PRINT_CHAR '!'                 # patch verification FAIL
+    addi s1, s1, 1
+    j    f_load_print
+f_load_ok:
+    PRINT_CHAR 'L'
+f_load_print:
     PRINT_CHAR '='
     PRINT_HEX_WORD s5
+    PRINT_CHAR '/'
+    PRINT_HEX_WORD s2
     PRINT_CHAR ' '
 
     # --- A: ACCUM loop (1024 iterations) ---
     li   t4, 0x0005100B            # ATOMIK_ACCUM(a0) encoding
     sw   t4, 8(s6)                 # patch
     li   a0, 0x77                  # delta value
+    csrr s8, minstret
     jalr ra, 0(s6)
+    csrr s9, minstret
+    sub  s2, s9, s8
     PRINT_CHAR 'A'
     PRINT_CHAR '='
     PRINT_HEX_WORD s5
+    PRINT_CHAR '/'
+    PRINT_HEX_WORD s2
     PRINT_CHAR ' '
 
     # --- R: READ loop (1024 iterations) ---
     li   t4, 0x0000260B            # ATOMIK_READ(a2) encoding
     sw   t4, 8(s6)                 # patch
+    csrr s8, minstret
     jalr ra, 0(s6)
+    csrr s9, minstret
+    sub  s2, s9, s8
     PRINT_CHAR 'R'
     PRINT_CHAR '='
     PRINT_HEX_WORD s5
+    PRINT_CHAR '/'
+    PRINT_HEX_WORD s2
     PRINT_CHAR ' '
 
     # --- S: SWAP loop (1024 iterations) ---
@@ -637,10 +684,15 @@ f_copy2:
     li   a1, 0x33
     ATOMIK_LOAD(a0, a1)            # pre-load swap target (from XIP)
     li   a0, 71                    # swap target
+    csrr s8, minstret
     jalr ra, 0(s6)
+    csrr s9, minstret
+    sub  s2, s9, s8
     PRINT_CHAR 'S'
     PRINT_CHAR '='
     PRINT_HEX_WORD s5
+    PRINT_CHAR '/'
+    PRINT_HEX_WORD s2
     PRINT_CHAR '\n'
 
     # =========================================================================
