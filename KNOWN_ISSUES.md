@@ -800,24 +800,13 @@ end
 
 **Severity:** Medium
 **Date:** March 5, 2026
-**Status:** Open (under investigation)
+**Status:** RESOLVED (March 5, 2026)
 
-**Symptom:** After restoring dual-PLL architecture (V3-021 fix), UART serial output is garbled at all standard baud rates. The HDMI terminal output is legible, confirming the CPU is running and firmware is executing correctly.
+**Symptom:** After restoring dual-PLL architecture (V3-021 fix), UART serial output was garbled at 115200 baud. HDMI terminal output was legible, confirming CPU was running correctly.
 
-**Likely Root Cause:** The firmware in external SPI flash was compiled with a baud rate divisor calibrated for the previous clock frequency. The CPU clock is now 21.6 MHz (PLL1: 108 MHz ÷ 5), which differs from earlier configurations:
-- v3 Phase 3 used 25.2 MHz (126 ÷ 5)
-- v3 early bringup used 27 MHz (crystal direct, CLKDIV not working)
+**Root Cause:** Stale firmware in SPI flash. The firmware source (`CLK_FREQ = 21600000`) was already correct for 21.6 MHz, but the firmware in flash had not been re-programmed after the clock architecture change. The baud divisor in flash was calibrated for a previous clock frequency.
 
-The firmware's `CLK_FREQ` constant determines the UART baud divisor: `CLKDIV = CLK_FREQ / BAUD - 2`. If `CLK_FREQ` is set to 25200000 or 27000000 but the CPU actually runs at 21600000, the baud rate will be wrong.
-
-**Expected Fix:**
-1. Update firmware `CLK_FREQ` to 21600000
-2. Recalculate UART baud divisor: 21600000 / 115200 - 2 = 185
-3. Rebuild and re-flash firmware via ISP programmer
-
-**Impact:** UART serial console unusable. HDMI terminal works correctly. All CPU functionality confirmed working via HDMI output.
-
-**Priority:** Next item after current commit.
+**Fix:** Rebuilt firmware and re-flashed via ISP programmer (`isp_flash_programmer.py`). 84 pages programmed, all checksums verified. Boot test confirmed clean UART output at 115200 baud — full banner, menu, and all commands working.
 
 ---
 
