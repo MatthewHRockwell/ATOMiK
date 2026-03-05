@@ -1,0 +1,55 @@
+<?xml version="1" encoding="UTF-8"?>
+<!DOCTYPE gowin-fpga-project>
+<Project>
+    <Template>FPGA</Template>
+    <Version>5</Version>
+    <Device name="GW1NR-9C" pn="GW1NR-LV9QN88PC6/I5">gw1nr9c-004</Device>
+    <FileList>
+        <!-- ATOMiK v3 CPU RTL -->
+        <File path="../rtl/atomik_v3_alu.v" type="file.verilog" enable="1"/>
+        <File path="../rtl/atomik_v3_atomik.v" type="file.verilog" enable="1"/>
+        <File path="../rtl/atomik_v3_branch.v" type="file.verilog" enable="1"/>
+        <File path="../rtl/atomik_v3_control.v" type="file.verilog" enable="1"/>
+        <File path="../rtl/atomik_v3_cpu.v" type="file.verilog" enable="1"/>
+        <File path="../rtl/atomik_v3_csr.v" type="file.verilog" enable="1"/>
+        <File path="../rtl/atomik_v3_decode.v" type="file.verilog" enable="1"/>
+        <File path="../rtl/atomik_v3_fetch.v" type="file.verilog" enable="1"/>
+        <File path="../rtl/atomik_v3_lsu.v" type="file.verilog" enable="1"/>
+        <File path="../rtl/atomik_v3_regfile.v" type="file.verilog" enable="1"/>
+
+        <!-- SoC top and peripherals -->
+        <File path="../soc/atomik_v3_soc.v" type="file.verilog" enable="1"/>
+        <File path="../soc/picoperipheral.v" type="file.verilog" enable="1"/>
+        <File path="../soc/simpleuart.v" type="file.verilog" enable="1"/>
+        <File path="../soc/spimemio_puya.v" type="file.verilog" enable="1"/>
+        <File path="../soc/picomemory.v" type="file.verilog" enable="1"/>
+
+        <!-- HDMI -->
+        <File path="../soc/hdmi/svo_defines.vh" type="file.verilog" enable="1"/>
+        <File path="../soc/hdmi/svo_enc.v" type="file.verilog" enable="1"/>
+        <File path="../soc/hdmi/svo_hdmi_top.v" type="file.verilog" enable="1"/>
+        <File path="../soc/hdmi/svo_openldi.v" type="file.verilog" enable="1"/>
+        <File path="../soc/hdmi/svo_tcard.v" type="file.verilog" enable="1"/>
+        <File path="../soc/hdmi/svo_term.v" type="file.verilog" enable="1"/>
+        <File path="../soc/hdmi/svo_tmds.v" type="file.verilog" enable="1"/>
+        <File path="../soc/hdmi/svo_utils.v" type="file.verilog" enable="1"/>
+        <File path="../soc/hdmi/svo_vdma.v" type="file.verilog" enable="1"/>
+        <File path="../soc/hdmi/atomik_delta_display.v" type="file.verilog" enable="1"/>
+        <File path="../soc/hdmi/disp_mmio_cdc.v" type="file.verilog" enable="1"/>
+
+        <!-- Gowin IP -->
+        <File path="../soc/gowin_ip/gowin_rpll/gowin_rpll.v" type="file.verilog" enable="1"/>
+        <File path="../soc/gowin_ip/gowin_clkdiv/gowin_clkdiv.v" type="file.verilog" enable="1"/>
+        <File path="../soc/gowin_ip/gowin_rpll_hdmi/gowin_rpll_hdmi.v" type="file.verilog" enable="1"/>
+        <File path="../soc/gowin_ip/gowin_clkdiv_hdmi/gowin_clkdiv_hdmi.v" type="file.verilog" enable="1"/>
+        <File path="../soc/gowin_ip/sram_2kx8/sram_2kx8.v" type="file.verilog" enable="1"/>
+        <File path="../soc/gowin_ip/bootram_2kx8_0/bootram_2kx8_0.v" type="file.verilog" enable="1"/>
+        <File path="../soc/gowin_ip/bootram_2kx8_1/bootram_2kx8_1.v" type="file.verilog" enable="1"/>
+        <File path="../soc/gowin_ip/bootram_2kx8_2/bootram_2kx8_2.v" type="file.verilog" enable="1"/>
+        <File path="../soc/gowin_ip/bootram_2kx8_3/bootram_2kx8_3.v" type="file.verilog" enable="1"/>
+
+        <!-- Constraints -->
+        <File path="atomik_v3_soc.cst" type="file.cst" enable="1"/>
+        <File path="atomik_v3_soc.sdc" type="file.sdc" enable="1"/>
+    </FileList>
+</Project>

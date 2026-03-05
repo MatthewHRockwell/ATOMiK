@@ -3,13 +3,14 @@
 //
 // Port of v2 picotiny.v:
 //   - Replace PicoRV32 with atomik_v3_cpu (RV64I + ATOMiK custom instructions)
-//   - Remove ATOMiK bus wrapper, CDC bridge, second PLL (ATOMiK is direct-wired)
-//   - Tie off S3 (0xC0000000) — ATOMiK MMIO slot freed
-//   - Same peripheral hierarchy, same HDMI, same memory map
+//   - ATOMiK direct-wired via custom instructions (no bus wrapper needed)
+//   - Display pipeline MMIO via CDC bridge (CPU → pixel clock domain)
+//   - Same peripheral hierarchy, same memory map
 //
-// Clock: PLL1 27 MHz → 108 MHz (CLKOUT), CLKDIV ÷5 → 21.6 MHz (clk_cpu)
-// No PLL2 needed: ATOMiK runs in CPU clock domain via custom instructions
-// V3-020 fix: Lowered from 126/25.2 MHz to 108/21.6 MHz for timing closure
+// Clocks:
+//   PLL1: 27 MHz → 108 MHz, CLKDIV ÷5 → 21.6 MHz (clk_cpu)
+//   PLL2: 27 MHz → 126 MHz, CLKDIV ÷5 → 25.2 MHz (clk_pixel, HDMI standard)
+//         126 MHz → HDMI 5x serializer
 //
 // Memory Map:
 //   0x00000000  SPI Flash XIP (8 MB)
@@ -49,36 +50,70 @@ module atomik_v3_soc (
 );
 
 // =========================================================================
-// Clock generation: PLL + CLKDIV
-// PLL: 27 MHz → 108 MHz (clk_p5 for HDMI 5x serializer)
-// CLKDIV: 108 MHz ÷ 5 → 21.6 MHz (clk_p for CPU + HDMI pixel clock)
-// V3-020: Reduced from 126/25.2 MHz — Fmax was 24.745 MHz (40 violations)
+// Clock generation: Dual-PLL architecture
+//
+// PLL1 (CPU):  27 MHz → 108 MHz → CLKDIV ÷5 → 21.6 MHz (clk_p)
+// PLL2 (HDMI): 27 MHz → 126 MHz → CLKDIV2 ÷5 → 25.2 MHz (clk_pixel)
+//   126 MHz also used for HDMI 5x serializer (OSER10 FCLK)
+//
+// CPU domain (21.6 MHz): RV64I core, SRAM, peripherals, ATOMiK
+// Pixel domain (25.2 MHz): HDMI pipeline (svo_tcard → enc → tmds → OSER10)
+// CDC: disp_mmio_cdc bridge for display MMIO, toggle-sync for terminal
 // =========================================================================
-wire clk_p;       // 21.6 MHz CPU + pixel clock
-wire clk_p5;      // 108 MHz HDMI 5x serializer clock
+wire clk_p;           // 21.6 MHz CPU clock
+wire clk_p5;          // 108 MHz PLL1 output
+wire clk_pixel;       // 25.2 MHz HDMI pixel clock
+wire clk_pixel_5x;    // 126 MHz HDMI serializer clock
 wire sys_resetn;
-wire pll_lock;    // PLL lock indicator
+wire pll_lock;        // CPU PLL lock
+wire hdmi_pll_lock;   // HDMI PLL lock
 
+// PLL1: 27 → 108 MHz (CPU)
 Gowin_rPLL u_pll (
     .clkin  (clk),
     .clkout (clk_p5),
     .lock   (pll_lock)
 );
 
+// CLKDIV1: 108 ÷ 5 → 21.6 MHz (CPU)
 Gowin_CLKDIV u_div_5 (
     .clkout (clk_p),
     .hclkin (clk_p5),
     .resetn (pll_lock)
 );
 
-// Power-on reset generator (hold reset until PLL locks + 16 cycles)
-// Reset synchronization - gated by PLL lock
+// PLL2: 27 → 126 MHz (HDMI)
+Gowin_rPLL_HDMI u_hdmi_pll (
+    .clkin  (clk),
+    .clkout (clk_pixel_5x),
+    .lock   (hdmi_pll_lock)
+);
+
+// CLKDIV2: 126 ÷ 5 → 25.2 MHz (pixel)
+Gowin_CLKDIV_HDMI u_div_pixel (
+    .clkout (clk_pixel),
+    .hclkin (clk_pixel_5x),
+    .resetn (hdmi_pll_lock)
+);
+
+// Power-on reset generator (CPU domain)
 Reset_Sync u_Reset_Sync (
     .clk       (clk_p),
-    .ext_reset (resetn),   // External reset button
-    .pll_lock  (pll_lock), // Hold reset until PLL stable
+    .ext_reset (resetn),
+    .pll_lock  (pll_lock),
     .resetn    (sys_resetn)
 );
+
+// Pixel-domain reset: sync sys_resetn into clk_pixel, gated by HDMI PLL lock
+reg [3:0] rst_pixel_sync;
+wire rst_pixel_n = rst_pixel_sync[3] & hdmi_pll_lock;
+
+always @(posedge clk_pixel or negedge sys_resetn) begin
+    if (!sys_resetn)
+        rst_pixel_sync <= 4'b0;
+    else
+        rst_pixel_sync <= {rst_pixel_sync[2:0], 1'b1};
+end
 
 // =========================================================================
 // CPU bus signals (32-bit valid/ready, same as PicoRV32)
@@ -192,7 +227,37 @@ PicoMem_Mux_1_4 u_bus_mux (
     .picos3_rdata(wbp_rdata)
 );
 
-// S3 → Display pipeline MMIO (routed through svo_hdmi_top to atomik_delta_display)
+// S3 → Display pipeline MMIO (via CDC bridge to pixel clock domain)
+
+// CDC bridge pixel-side signals (clk_pixel domain)
+wire        disp_cdc_valid;
+wire        disp_cdc_ready;
+wire [31:0] disp_cdc_addr;
+wire [31:0] disp_cdc_wdata;
+wire [3:0]  disp_cdc_wstrb;
+wire [31:0] disp_cdc_rdata;
+
+disp_mmio_cdc u_disp_cdc (
+    // CPU side (21.6 MHz)
+    .clk_cpu     (clk_p),
+    .rst_cpu_n   (sys_resetn),
+    .cpu_valid   (wbp_valid),
+    .cpu_ready   (wbp_ready),
+    .cpu_addr    (wbp_addr),
+    .cpu_wdata   (wbp_wdata),
+    .cpu_wstrb   (wbp_wstrb),
+    .cpu_rdata   (wbp_rdata),
+
+    // Pixel side (25.2 MHz)
+    .clk_pixel   (clk_pixel),
+    .rst_pixel_n (rst_pixel_n),
+    .disp_valid  (disp_cdc_valid),
+    .disp_ready  (disp_cdc_ready),
+    .disp_addr   (disp_cdc_addr),
+    .disp_wdata  (disp_cdc_wdata),
+    .disp_wstrb  (disp_cdc_wstrb),
+    .disp_rdata  (disp_cdc_rdata)
+);
 
 // =========================================================================
 // Debug outputs - UART WRITE DETAIL TEST
@@ -359,8 +424,8 @@ PicoMem_UART u_uart (
 // =========================================================================
 // HDMI output
 // =========================================================================
-// CDC: UART write → HDMI terminal (same clock domain, but toggle-based
-// protocol preserved from v2 for compatibility with svo_term)
+// CDC: UART write → HDMI terminal (CPU → pixel clock domain)
+// CPU side: capture UART data writes, toggle signal
 wire svo_term_valid_cpu;
 assign svo_term_valid_cpu = (uart_valid && uart_ready) & (~uart_addr[2]) & uart_wstrb[0];
 
@@ -376,11 +441,10 @@ always @(posedge clk_p or negedge sys_resetn) begin
     end
 end
 
-// 2FF synchronizer (CPU and pixel clock are the same, but keep the
-// toggle-edge protocol for svo_term compatibility)
+// 2FF synchronizer: CPU toggle → pixel clock domain
 reg term_toggle_s1, term_toggle_s2, term_toggle_s3;
-always @(posedge clk_p or negedge sys_resetn) begin
-    if (!sys_resetn) begin
+always @(posedge clk_pixel or negedge rst_pixel_n) begin
+    if (!rst_pixel_n) begin
         term_toggle_s1 <= 1'b0;
         term_toggle_s2 <= 1'b0;
         term_toggle_s3 <= 1'b0;
@@ -394,24 +458,24 @@ end
 wire svo_term_valid = term_toggle_s2 ^ term_toggle_s3;
 
 svo_hdmi_top u_hdmi (
-    .clk          (clk_p),
-    .resetn       (sys_resetn),
+    .clk          (clk_pixel),
+    .resetn       (rst_pixel_n),
 
-    .clk_pixel    (clk_p),
-    .clk_5x_pixel (clk_p5),
-    .locked       (pll_lock),
+    .clk_pixel    (clk_pixel),
+    .clk_5x_pixel (clk_pixel_5x),
+    .locked       (hdmi_pll_lock),
 
     .term_in_tvalid (svo_term_valid),
     .term_out_tready(),
     .term_in_tdata  (term_data_hold),
 
-    // Display pipeline MMIO (S3 bus)
-    .disp_mmio_valid (wbp_valid),
-    .disp_mmio_ready (wbp_ready),
-    .disp_mmio_addr  (wbp_addr),
-    .disp_mmio_wdata (wbp_wdata),
-    .disp_mmio_wstrb (wbp_wstrb),
-    .disp_mmio_rdata (wbp_rdata),
+    // Display pipeline MMIO (pixel domain, via CDC bridge)
+    .disp_mmio_valid (disp_cdc_valid),
+    .disp_mmio_ready (disp_cdc_ready),
+    .disp_mmio_addr  (disp_cdc_addr),
+    .disp_mmio_wdata (disp_cdc_wdata),
+    .disp_mmio_wstrb (disp_cdc_wstrb),
+    .disp_mmio_rdata (disp_cdc_rdata),
 
     .tmds_clk_n   (tmds_clk_n),
     .tmds_clk_p   (tmds_clk_p),

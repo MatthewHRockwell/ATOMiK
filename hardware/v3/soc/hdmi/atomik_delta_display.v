@@ -129,7 +129,11 @@ module atomik_delta_display #( `SVO_DEFAULT_PARAMS ) (
     end
 
     // =========================================================================
-    // 2-Stage Pipeline
+    // 2-Stage Pipeline with backpressure (stall-capable)
+    //
+    // Pipeline advances only when output is consumed (tready) or output is
+    // empty (!valid_d2). This prevents pixel loss when svo_enc deasserts
+    // tready during blanking periods.
     //
     // Cycle N:   scan_mem.rd_addr = pixel_col_N (combinational from counter)
     // Cycle N+1: scan_rd_data_b = {change_N, index_N}
@@ -139,10 +143,15 @@ module atomik_delta_display #( `SVO_DEFAULT_PARAMS ) (
     //            pixel_out = change_d1 ? (pixel_d2 ^ lut_delta) : pixel_d2
     // =========================================================================
 
+    // Pipeline advance signal: move data forward when output can accept
+    wire pipe_advance = out_axis_tready || !valid_d2;
+
     // Pipeline stage 1 registers
     reg [SVO_BITS_PER_PIXEL-1:0] pixel_d1;
     reg        valid_d1;
     reg [0:0]  tuser_d1;
+    reg [7:0]  scan_index_d1;
+    reg        scan_change_d1;
 
     // Pipeline stage 2 registers
     reg [SVO_BITS_PER_PIXEL-1:0] pixel_d2;
@@ -152,25 +161,29 @@ module atomik_delta_display #( `SVO_DEFAULT_PARAMS ) (
 
     always @(posedge clk) begin
         if (!resetn) begin
-            valid_d1  <= 1'b0;
-            valid_d2  <= 1'b0;
-            pixel_d1  <= {SVO_BITS_PER_PIXEL{1'b0}};
-            pixel_d2  <= {SVO_BITS_PER_PIXEL{1'b0}};
-            tuser_d1  <= 1'b0;
-            tuser_d2  <= 1'b0;
-            change_d1 <= 1'b0;
-        end else begin
-            // Stage 1: Capture pixel data, address LUT from scanline buffer result
-            pixel_d1  <= in_axis_tdata;
-            valid_d1  <= in_axis_tvalid & in_axis_tready;
-            tuser_d1  <= in_axis_tuser;
-            lut_rd_addr_b <= scan_rd_data_b[7:0];  // LUT index from scanline buffer
+            valid_d1      <= 1'b0;
+            valid_d2      <= 1'b0;
+            pixel_d1      <= {SVO_BITS_PER_PIXEL{1'b0}};
+            pixel_d2      <= {SVO_BITS_PER_PIXEL{1'b0}};
+            tuser_d1      <= 1'b0;
+            tuser_d2      <= 1'b0;
+            change_d1     <= 1'b0;
+            scan_index_d1 <= 8'b0;
+            scan_change_d1<= 1'b0;
+        end else if (pipe_advance) begin
+            // Stage 1: Capture pixel data and scanline buffer result
+            pixel_d1      <= in_axis_tdata;
+            valid_d1      <= in_axis_tvalid & in_axis_tready;
+            tuser_d1      <= in_axis_tuser;
+            scan_index_d1 <= scan_rd_data_b[7:0];
+            scan_change_d1<= scan_rd_data_b[8];
 
             // Stage 2: Capture for XOR application
-            pixel_d2  <= pixel_d1;
-            valid_d2  <= valid_d1;
-            tuser_d2  <= tuser_d1;
-            change_d1 <= scan_rd_data_b[8];  // Change flag from scanline buffer
+            pixel_d2      <= pixel_d1;
+            valid_d2      <= valid_d1;
+            tuser_d2      <= tuser_d1;
+            change_d1     <= scan_change_d1;
+            lut_rd_addr_b <= scan_index_d1;  // LUT address from stage 1
         end
     end
 
@@ -182,8 +195,8 @@ module atomik_delta_display #( `SVO_DEFAULT_PARAMS ) (
     assign out_axis_tvalid = valid_d2;
     assign out_axis_tuser  = tuser_d2;
 
-    // Pass tready straight through (pipeline is fixed-latency, no stalling)
-    assign in_axis_tready = out_axis_tready;
+    // Accept input only when pipeline can advance
+    assign in_axis_tready = pipe_advance;
 
     // =========================================================================
     // MMIO Register Interface

@@ -738,23 +738,86 @@ end
 
 ---
 
-### V3-021: HDMI Output Timing Not Recognized by Some Monitors
+### V3-021: HDMI Output Timing Not Recognized by Monitor
 
-**Severity:** Low
+**Severity:** High
 **Date:** March 3, 2026
-**Status:** Open (cosmetic — display functions correctly)
+**Status:** ✅ Resolved (March 5, 2026)
 
-**Symptom:** Some monitors display "The current input timing is not supported by the monitor display" and suggest changing to the monitor's native timing (e.g., 3440x1440 @ 60Hz). Despite this warning, the HDMI output has been functional throughout development and testing — the test card, text overlay, and delta-driven display pipeline all render correctly.
+**Symptom:** Monitor displays "The current input timing is not supported by the monitor display" — no video output visible.
 
-**Root Cause:** The v3 SoC runs at 21.6 MHz pixel clock (downclocked from 25.2 MHz to resolve V3-020 timing violations). This produces a non-standard refresh rate of ~51.4 Hz (vs the standard 640x480 @ 60 Hz which requires 25.175 MHz). Some monitors' EDID timing validation rejects this as unsupported, even though the TMDS encoding and signal integrity are correct.
+**Root Cause (Multi-Factor):**
 
-The svo_tcard module generates only active pixels (640x480 with no blanking intervals in the pixel stream); blanking is inserted by svo_enc internally. The combination of non-standard pixel clock and the SVO pipeline's timing characteristics produces a frame rate that falls outside many monitors' declared supported range.
+1. **Non-standard pixel clock (original issue):** V3-020 lowered the CPU+pixel clock from 25.2 MHz to 21.6 MHz, producing ~51.4 Hz refresh instead of the standard 60 Hz. Since CPU and pixel shared a single PLL, the HDMI got dragged down with the CPU.
 
-**Impact:** Cosmetic only. Display output is correct and verified on multiple monitors during testing. The warning message may overlay the display content on some monitors.
+2. **atomik_delta_display pipeline backpressure bug (discovered during fix):** The 2-stage pixel pipeline in `atomik_delta_display.v` did NOT stall when `svo_enc` deasserted `tready` (pixel FIFO full during blanking periods). Pixels in the pipeline were overwritten before being consumed, causing `svo_enc`'s pixel FIFO to starve below its 6-entry startup threshold. TMDS output never began — the monitor saw no valid HDMI signal at all.
 
-**Workaround:** Use a monitor that accepts non-standard timings (most modern monitors and HDMI capture devices work fine). Alternatively, a future phase could restore 25.2 MHz pixel clock by pipelining the CPU decode stage to meet timing at the higher frequency.
+**Fix (Dual-PLL + Pipeline Backpressure):**
 
-**Long-term fix:** Restore 25.2 MHz operation by adding a pipeline register between fetch and decode stages (breaks the critical path). This would produce standard 640x480 @ ~60 Hz timing that all monitors accept.
+1. **Added dedicated HDMI PLL (PLL2):** 27 → 126 MHz → CLKDIV ÷5 → 25.2 MHz pixel clock. CPU stays at 21.6 MHz (PLL1). Standard 640×480 @ 60 Hz restored.
+
+2. **Added CDC bridge (`disp_mmio_cdc`):** Toggle-handshake protocol between CPU domain (21.6 MHz) and pixel domain (25.2 MHz) for display MMIO registers. ~5-6 cycle latency per MMIO access.
+
+3. **Fixed pipeline backpressure in `atomik_delta_display.v`:**
+   ```verilog
+   // Before (broken): pipeline always clocks, losing pixels on backpressure
+   end else begin
+       valid_d1 <= in_axis_tvalid & in_axis_tready;
+       pixel_d2 <= pixel_d1;  // Overwrites unconsumed data!
+   end
+   assign in_axis_tready = out_axis_tready;
+
+   // After (fixed): pipeline stalls when output can't accept
+   wire pipe_advance = out_axis_tready || !valid_d2;
+   end else if (pipe_advance) begin
+       valid_d1 <= in_axis_tvalid & in_axis_tready;
+       pixel_d2 <= pixel_d1;  // Only advances when output consumed
+   end
+   assign in_axis_tready = pipe_advance;
+   ```
+
+**Files Modified:**
+- `soc/atomik_v3_soc.v` — Dual-PLL, pixel-domain reset, CDC bridge, HDMI clock routing
+- `soc/hdmi/atomik_delta_display.v` — Pipeline stall logic
+- `synth/atomik_v3_soc.sdc` — Added clk_pixel constraint + CDC false paths
+
+**Files Created:**
+- `soc/gowin_ip/gowin_rpll_hdmi/gowin_rpll_hdmi.v` — HDMI PLL (27→126 MHz)
+- `soc/gowin_ip/gowin_clkdiv_hdmi/gowin_clkdiv_hdmi.v` — HDMI CLKDIV (÷5→25.2 MHz)
+- `soc/hdmi/disp_mmio_cdc.v` — Toggle-handshake CDC bridge
+
+**Timing Results (post-fix):**
+- CPU Fmax: 21.987 MHz (target 21.6, +1.8% margin)
+- Pixel Fmax: 33.964 MHz (target 25.2, +34.8% margin)
+- TNS: 0.000 on all clocks
+- rPLL: 2/2 (100%)
+
+**Lesson:** Any registered pipeline stage inserted into the SVO video path MUST handle AXI-Stream backpressure. Without stall logic, `svo_enc`'s pixel FIFO starves and TMDS output never starts. Use `pipe_advance = out_axis_tready || !valid` to gate pipeline registers.
+
+---
+
+### V3-022: UART Output Garbled After Dual-PLL Clock Change
+
+**Severity:** Medium
+**Date:** March 5, 2026
+**Status:** Open (under investigation)
+
+**Symptom:** After restoring dual-PLL architecture (V3-021 fix), UART serial output is garbled at all standard baud rates. The HDMI terminal output is legible, confirming the CPU is running and firmware is executing correctly.
+
+**Likely Root Cause:** The firmware in external SPI flash was compiled with a baud rate divisor calibrated for the previous clock frequency. The CPU clock is now 21.6 MHz (PLL1: 108 MHz ÷ 5), which differs from earlier configurations:
+- v3 Phase 3 used 25.2 MHz (126 ÷ 5)
+- v3 early bringup used 27 MHz (crystal direct, CLKDIV not working)
+
+The firmware's `CLK_FREQ` constant determines the UART baud divisor: `CLKDIV = CLK_FREQ / BAUD - 2`. If `CLK_FREQ` is set to 25200000 or 27000000 but the CPU actually runs at 21600000, the baud rate will be wrong.
+
+**Expected Fix:**
+1. Update firmware `CLK_FREQ` to 21600000
+2. Recalculate UART baud divisor: 21600000 / 115200 - 2 = 185
+3. Rebuild and re-flash firmware via ISP programmer
+
+**Impact:** UART serial console unusable. HDMI terminal works correctly. All CPU functionality confirmed working via HDMI output.
+
+**Priority:** Next item after current commit.
 
 ---
 
