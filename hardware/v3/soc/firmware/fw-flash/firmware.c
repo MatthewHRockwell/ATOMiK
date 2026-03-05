@@ -669,6 +669,272 @@ void cmd_display_test()
     print("(Display deltas active — visible on HDMI)\n");
 }
 
+// =========================================================================
+// Interactive Shell
+// =========================================================================
+
+static int shell_getline(char *buf, int maxlen)
+{
+    int pos = 0;
+    while (pos < maxlen - 1) {
+        char c = getchar();
+        if (c == '\r' || c == '\n') {
+            putchar('\n');
+            break;
+        } else if (c == 8 || c == 127) {  // backspace or delete
+            if (pos > 0) {
+                pos--;
+                print("\b \b");
+            }
+        } else if (c >= 32 && c < 127) {
+            buf[pos++] = c;
+            putchar(c);
+        }
+    }
+    buf[pos] = '\0';
+    return pos;
+}
+
+static uint64_t shell_parse_hex(const char *s)
+{
+    uint64_t val = 0;
+    if (s[0] == '0' && (s[1] == 'x' || s[1] == 'X'))
+        s += 2;
+    while (*s) {
+        char c = *s++;
+        if (c >= '0' && c <= '9') val = (val << 4) | (c - '0');
+        else if (c >= 'a' && c <= 'f') val = (val << 4) | (c - 'a' + 10);
+        else if (c >= 'A' && c <= 'F') val = (val << 4) | (c - 'A' + 10);
+        else break;
+    }
+    return val;
+}
+
+static int shell_tokenize(char *line, char **tokens, int max_tokens)
+{
+    int n = 0;
+    while (*line && n < max_tokens) {
+        while (*line == ' ') line++;
+        if (!*line) break;
+        tokens[n++] = line;
+        while (*line && *line != ' ') line++;
+        if (*line) *line++ = '\0';
+    }
+    return n;
+}
+
+static int str_eq(const char *a, const char *b)
+{
+    while (*a && *b) {
+        if (*a != *b) return 0;
+        a++; b++;
+    }
+    return *a == *b;
+}
+
+static void shell_cmd_help(void)
+{
+    print("Commands:\n");
+    print("  help                       Show this help\n");
+    print("  status                     System info\n");
+    print("  atomik load <addr> <val>   Load reference state\n");
+    print("  atomik accum <val>         Accumulate delta\n");
+    print("  atomik read [addr]         Read current state\n");
+    print("  atomik swap [addr]         Swap reference\n");
+    print("  atomik demo                Interactive demo\n");
+    print("  disp enable|disable        Toggle display overlay\n");
+    print("  disp lut <idx> <color>     Set LUT entry\n");
+    print("  disp scan <col> <chg> <i>  Set scanline delta\n");
+    print("  disp clear                 Clear all deltas\n");
+    print("  disp fill <color>          Fill scanline with color\n");
+    print("  mem read <addr>            Read 32-bit word\n");
+    print("  mem write <addr> <val>     Write 32-bit word\n");
+    print("  test                       Run all test suites\n");
+    print("  exit                       Return to menu\n");
+}
+
+static void shell_cmd_status(void)
+{
+    uint64_t cy = cycles64();
+    uint32_t sec = 0;
+    uint64_t rem = cy;
+    // Compute seconds via repeated subtraction (no div instruction)
+    while (rem >= 21600000ULL) { sec++; rem -= 21600000ULL; }
+    mini_printf("ATOMiK v3 SoC Status\n");
+    mini_printf("  CPU:     RV64I @ 21.6 MHz\n");
+    mini_printf("  ATOMiK:  Direct-wire custom instructions (64-bit)\n");
+    mini_printf("  Uptime:  %u seconds (~%u M cycles)\n", sec, (uint32_t)(cy / 1000000ULL));
+    uint32_t disp_ctrl = DISP_CTRL;
+    uint32_t disp_status = DISP_STATUS;
+    mini_printf("  Display: %s (frame %u)\n",
+                (disp_ctrl & 1) ? "ENABLED" : "disabled",
+                disp_status >> 16);
+    // Read ATOMiK state for slot 0
+    uint64_t state = atomik_read(0);
+    mini_printf("  ATOMiK slot 0 state: 0x%lx\n", state);
+}
+
+static void shell_cmd_atomik(char **tokens, int ntok)
+{
+    if (ntok < 2) { print("Usage: atomik <load|accum|read|swap|demo>\n"); return; }
+
+    if (str_eq(tokens[1], "load")) {
+        if (ntok < 4) { print("Usage: atomik load <addr> <value>\n"); return; }
+        uint64_t addr = shell_parse_hex(tokens[2]);
+        uint64_t val = shell_parse_hex(tokens[3]);
+        atomik_load(addr, val);
+        mini_printf("Loaded slot %u = 0x%lx\n", (uint32_t)addr, val);
+    } else if (str_eq(tokens[1], "accum")) {
+        if (ntok < 3) { print("Usage: atomik accum <value>\n"); return; }
+        uint64_t val = shell_parse_hex(tokens[2]);
+        atomik_accum(val);
+        mini_printf("Accumulated delta 0x%lx\n", val);
+    } else if (str_eq(tokens[1], "read")) {
+        uint64_t addr = (ntok >= 3) ? shell_parse_hex(tokens[2]) : 0;
+        uint64_t state = atomik_read(addr);
+        mini_printf("Slot %u state = 0x%lx\n", (uint32_t)addr, state);
+    } else if (str_eq(tokens[1], "swap")) {
+        uint64_t addr = (ntok >= 3) ? shell_parse_hex(tokens[2]) : 0;
+        uint64_t old = atomik_swap(addr);
+        mini_printf("Swapped slot %u, old state = 0x%lx\n", (uint32_t)addr, old);
+    } else if (str_eq(tokens[1], "demo")) {
+        print("\n--- ATOMiK Interactive Demo ---\n\n");
+        print("1. Load reference state 0xCAFEBABE...\n");
+        atomik_load(0, 0xCAFEBABEDEADBEEFULL);
+        uint64_t s = atomik_read(0);
+        mini_printf("   State = 0x%lx\n", s);
+
+        print("2. Accumulate delta 0xFF...\n");
+        atomik_accum(0xFFULL);
+        s = atomik_read(0);
+        mini_printf("   State = 0x%lx (ref XOR 0xFF)\n", s);
+
+        print("3. Undo (accumulate same delta again)...\n");
+        atomik_accum(0xFFULL);
+        s = atomik_read(0);
+        mini_printf("   State = 0x%lx (restored!)\n", s);
+
+        print("4. Multiple deltas: 0x1000 then 0x2000...\n");
+        atomik_accum(0x1000ULL);
+        atomik_accum(0x2000ULL);
+        s = atomik_read(0);
+        mini_printf("   State = 0x%lx\n", s);
+
+        print("5. Swap reference (checkpoint)...\n");
+        uint64_t old = atomik_swap(0);
+        mini_printf("   Old state = 0x%lx\n", old);
+        s = atomik_read(0);
+        mini_printf("   New state = 0x%lx (accumulator cleared)\n", s);
+
+        print("\nDemo complete. XOR algebra: commutative, self-inverse, zero-cost undo.\n");
+    } else {
+        print("Unknown: atomik ");
+        print(tokens[1]);
+        print("\n");
+    }
+}
+
+static void shell_cmd_disp(char **tokens, int ntok)
+{
+    if (ntok < 2) { print("Usage: disp <enable|disable|lut|scan|clear|fill>\n"); return; }
+
+    if (str_eq(tokens[1], "enable")) {
+        DISP_CTRL = 1;
+        print("Display delta overlay enabled\n");
+    } else if (str_eq(tokens[1], "disable")) {
+        DISP_CTRL = 0;
+        print("Display delta overlay disabled\n");
+    } else if (str_eq(tokens[1], "lut")) {
+        if (ntok < 4) { print("Usage: disp lut <index> <color>\n"); return; }
+        uint32_t idx = (uint32_t)shell_parse_hex(tokens[2]);
+        uint32_t color = (uint32_t)shell_parse_hex(tokens[3]);
+        DISP_LUT = (idx << 24) | (color & 0xFFFFFF);
+        mini_printf("LUT[%u] = 0x%06x\n", idx, color & 0xFFFFFF);
+    } else if (str_eq(tokens[1], "scan")) {
+        if (ntok < 5) { print("Usage: disp scan <col> <change> <index>\n"); return; }
+        uint32_t col = (uint32_t)shell_parse_hex(tokens[2]);
+        uint32_t chg = (uint32_t)shell_parse_hex(tokens[3]);
+        uint32_t idx = (uint32_t)shell_parse_hex(tokens[4]);
+        DISP_SCAN = (col << 16) | ((chg & 1) << 8) | (idx & 0xFF);
+        mini_printf("Scan[%u] = change=%u index=%u\n", col, chg & 1, idx & 0xFF);
+    } else if (str_eq(tokens[1], "clear")) {
+        for (int col = 0; col < 640; col++)
+            DISP_SCAN = ((uint32_t)col << 16) | 0x000;
+        print("Scanline deltas cleared (640 entries)\n");
+    } else if (str_eq(tokens[1], "fill")) {
+        if (ntok < 3) { print("Usage: disp fill <color>\n"); return; }
+        uint32_t color = (uint32_t)shell_parse_hex(tokens[2]);
+        DISP_LUT = (255u << 24) | (color & 0xFFFFFF);
+        for (int col = 0; col < 640; col++)
+            DISP_SCAN = ((uint32_t)col << 16) | 0x1FF;  // change=1, index=255
+        mini_printf("Filled scanline with delta 0x%06x (LUT[255])\n", color & 0xFFFFFF);
+    } else {
+        print("Unknown: disp ");
+        print(tokens[1]);
+        print("\n");
+    }
+}
+
+static void shell_cmd_mem(char **tokens, int ntok)
+{
+    if (ntok < 3) { print("Usage: mem read|write <addr> [value]\n"); return; }
+
+    uint32_t addr = (uint32_t)shell_parse_hex(tokens[2]);
+
+    if (str_eq(tokens[1], "read")) {
+        uint32_t val = *(volatile uint32_t *)(uintptr_t)addr;
+        mini_printf("[0x%08x] = 0x%08x\n", addr, val);
+    } else if (str_eq(tokens[1], "write")) {
+        if (ntok < 4) { print("Usage: mem write <addr> <value>\n"); return; }
+        uint32_t val = (uint32_t)shell_parse_hex(tokens[3]);
+        *(volatile uint32_t *)(uintptr_t)addr = val;
+        mini_printf("[0x%08x] <- 0x%08x\n", addr, val);
+    } else {
+        print("Usage: mem read|write <addr> [value]\n");
+    }
+}
+
+void cmd_shell(void)
+{
+    char line[128];
+    char *tokens[8];
+
+    print("\nATOMiK v3 Interactive Shell\n");
+    print("Type 'help' for commands, 'exit' to return to menu.\n\n");
+
+    while (1) {
+        print("atomik> ");
+        int len = shell_getline(line, sizeof(line));
+        if (len == 0) continue;
+
+        int ntok = shell_tokenize(line, tokens, 8);
+        if (ntok == 0) continue;
+
+        if (str_eq(tokens[0], "help")) {
+            shell_cmd_help();
+        } else if (str_eq(tokens[0], "status")) {
+            shell_cmd_status();
+        } else if (str_eq(tokens[0], "atomik")) {
+            shell_cmd_atomik(tokens, ntok);
+        } else if (str_eq(tokens[0], "disp")) {
+            shell_cmd_disp(tokens, ntok);
+        } else if (str_eq(tokens[0], "mem")) {
+            shell_cmd_mem(tokens, ntok);
+        } else if (str_eq(tokens[0], "test")) {
+            cmd_atomik_test();
+            cmd_phase2_test();
+            cmd_display_test();
+        } else if (str_eq(tokens[0], "exit") || str_eq(tokens[0], "quit")) {
+            print("Returning to menu.\n");
+            break;
+        } else {
+            print("Unknown command: ");
+            print(tokens[0]);
+            print(" (type 'help')\n");
+        }
+    }
+}
+
 #define CLK_FREQ        21600000  // 21.6 MHz (108 MHz PLL / 5 CLKDIV)
 #define UART_BAUD       115200
 
@@ -734,6 +1000,7 @@ void main()
         print("   [P] Phase 2 full test\n");
         print("   [V] Display pipeline test\n");
         print("   [R] Performance benchmark suite\n");
+        print("   [>] Interactive shell\n");
 
         for (int rep = 10; rep > 0; rep--)
         {
@@ -779,6 +1046,7 @@ void main()
             case 'P': case 'p': cmd_phase2_test(); break;
             case 'V': case 'v': cmd_display_test(); break;
             case 'R': case 'r': cmd_perf_suite(); break;
+            case '>': cmd_shell(); break;
             default: continue;
             }
         }
