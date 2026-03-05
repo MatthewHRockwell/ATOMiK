@@ -2,6 +2,11 @@
 // ATOMiK v3 Register File Testbench (iverilog)
 //
 // Tests: x0 hardwire, read-after-write, all 32 registers, reset.
+//
+// BSRAM timing: reads are registered (1-cycle latency).
+//   - Write: committed on posedge when rd_wen=1
+//   - Read: address must be stable before posedge; data available after posedge
+//   - After write, need 1 extra cycle before read sees new data
 // =============================================================================
 
 `timescale 1ns / 1ps
@@ -51,6 +56,32 @@ module tb_v3_regfile;
         end
     endtask
 
+    // Helper: write a register (sets up at negedge, commits on posedge)
+    task write_reg;
+        input [4:0]  addr;
+        input [63:0] data;
+        begin
+            @(negedge clk);
+            rd_addr = addr;
+            rd_data = data;
+            rd_wen  = 1;
+            @(posedge clk);  // Write committed here
+            #1;
+            rd_wen = 0;
+        end
+    endtask
+
+    // Helper: read rs1 port (present addr at negedge, latch on posedge)
+    task read_rs1;
+        input [4:0] addr;
+        begin
+            @(negedge clk);
+            rs1_addr = addr;
+            @(posedge clk);  // Read registered here
+            #1;              // Small delay for output to settle
+        end
+    endtask
+
     initial begin
         $display("==============================================");
         $display("ATOMiK v3 Register File Testbench");
@@ -72,77 +103,55 @@ module tb_v3_regfile;
         @(posedge clk);
 
         // --- x0 always reads zero ---
-        rs1_addr = 5'd0;
-        @(negedge clk);
+        read_rs1(5'd0);
         check(rs1_data, 64'h0, "x0 reads zero");
 
         // --- Write to x0 should be ignored ---
-        rd_addr = 5'd0;
-        rd_data = 64'hDEADBEEFCAFEBABE;
-        rd_wen = 1;
-        @(posedge clk);
-        rd_wen = 0;
-        @(negedge clk);
-        rs1_addr = 5'd0;
-        @(negedge clk);
+        write_reg(5'd0, 64'hDEADBEEFCAFEBABE);
+        read_rs1(5'd0);
         check(rs1_data, 64'h0, "x0 write ignored");
 
         // --- Write and read x1 ---
-        @(negedge clk);
-        rd_addr = 5'd1;
-        rd_data = 64'h1111_2222_3333_4444;
-        rd_wen = 1;
-        @(posedge clk);
-        #1;
-        rd_wen = 0;
-        rs1_addr = 5'd1;
-        #1;
+        write_reg(5'd1, 64'h1111_2222_3333_4444);
+        read_rs1(5'd1);
         check(rs1_data, 64'h1111_2222_3333_4444, "x1 write/read");
 
         // --- Dual-port read: x1 on port1, x2 on port2 ---
+        write_reg(5'd2, 64'hAAAA_BBBB_CCCC_DDDD);
+        // Present both addresses at negedge, latch on posedge
         @(negedge clk);
-        rd_addr = 5'd2;
-        rd_data = 64'hAAAA_BBBB_CCCC_DDDD;
-        rd_wen = 1;
-        @(posedge clk);
-        #1;
-        rd_wen = 0;
         rs1_addr = 5'd1;
         rs2_addr = 5'd2;
+        @(posedge clk);
         #1;
         check(rs1_data, 64'h1111_2222_3333_4444, "dual read: x1");
         check(rs2_data, 64'hAAAA_BBBB_CCCC_DDDD, "dual read: x2");
 
         // --- Write all 31 registers, then read back ---
         for (i = 1; i < 32; i = i + 1) begin
-            @(negedge clk);
-            rd_addr = i[4:0];
-            rd_data = {32'h0, i[31:0]} * 64'h0101_0101_0101_0101;
-            rd_wen = 1;
-            @(posedge clk);
-            #1;
+            write_reg(i[4:0], {32'h0, i[31:0]} * 64'h0101_0101_0101_0101);
         end
-        rd_wen = 0;
 
         for (i = 1; i < 32; i = i + 1) begin
-            rs1_addr = i[4:0];
-            #1;
+            read_rs1(i[4:0]);
             check(rs1_data, {32'h0, i[31:0]} * 64'h0101_0101_0101_0101,
                   "all regs readback");
         end
 
-        // --- Reset clears all ---
+        // --- Reset: x0 still hardwired to zero ---
+        // Note: BSRAM does not support reset. x1-x31 retain values
+        // through reset (rst_n is unused). Only x0 is guaranteed zero
+        // via the output mux hardwire.
         rst_n = 0;
         @(posedge clk);
         @(posedge clk);
         rst_n = 1;
         @(posedge clk);
-        rs1_addr = 5'd1;
-        @(negedge clk);
-        check(rs1_data, 64'h0, "reset clears x1");
-        rs1_addr = 5'd31;
-        @(negedge clk);
-        check(rs1_data, 64'h0, "reset clears x31");
+        read_rs1(5'd0);
+        check(rs1_data, 64'h0, "x0 zero after reset");
+        // x1 retains old value (BSRAM has no reset)
+        read_rs1(5'd1);
+        check(rs1_data, 64'h0101_0101_0101_0101, "x1 retained after reset");
 
         // =================================================================
         // Summary
