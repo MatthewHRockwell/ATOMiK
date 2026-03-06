@@ -47,7 +47,7 @@ module svo_hdmi_top (
 	output [2:0] tmds_d_n,
 	output [2:0] tmds_d_p
 );
-	parameter SVO_MODE             =   "800x600";
+	parameter SVO_MODE             =   "1280x720";
 	parameter SVO_FRAMERATE        =   60;
 	parameter SVO_BITS_PER_PIXEL   =   24;
 	parameter SVO_BITS_PER_RED     =    8;
@@ -184,12 +184,25 @@ module svo_hdmi_top (
 
 	assign video_enc_tready = 1;
 
+	// Register buffer: break enc→tmds routing critical path
+	reg [SVO_BITS_PER_PIXEL-1:0] enc_buf_tdata;
+	reg [3:0] enc_buf_tuser;
+	always @(posedge clk_pixel) begin
+		if (!clk_pixel_resetn) begin
+			enc_buf_tdata <= 0;
+			enc_buf_tuser <= 4'b1000;
+		end else begin
+			enc_buf_tdata <= video_enc_tdata;
+			enc_buf_tuser <= video_enc_tuser;
+		end
+	end
+
 	svo_tmds svo_tmds_0 (
 		.clk(clk_pixel),
 		.resetn(clk_pixel_resetn),
-		.de(!video_enc_tuser[3]),
-		.ctrl(video_enc_tuser[2:1]),
-		.din(video_enc_tdata[23:16]),
+		.de(!enc_buf_tuser[3]),
+		.ctrl(enc_buf_tuser[2:1]),
+		.din(enc_buf_tdata[23:16]),
 		.dout({tmds_d9[0], tmds_d8[0], tmds_d7[0], tmds_d6[0], tmds_d5[0],
 		       tmds_d4[0], tmds_d3[0], tmds_d2[0], tmds_d1[0], tmds_d0[0]})
 	);
@@ -197,9 +210,9 @@ module svo_hdmi_top (
 	svo_tmds svo_tmds_1 (
 		.clk(clk_pixel),
 		.resetn(clk_pixel_resetn),
-		.de(!video_enc_tuser[3]),
+		.de(!enc_buf_tuser[3]),
 		.ctrl(2'b0),
-		.din(video_enc_tdata[15:8]),
+		.din(enc_buf_tdata[15:8]),
 		.dout({tmds_d9[1], tmds_d8[1], tmds_d7[1], tmds_d6[1], tmds_d5[1],
 		       tmds_d4[1], tmds_d3[1], tmds_d2[1], tmds_d1[1], tmds_d0[1]})
 	);
@@ -207,9 +220,9 @@ module svo_hdmi_top (
 	svo_tmds svo_tmds_2 (
 		.clk(clk_pixel),
 		.resetn(clk_pixel_resetn),
-		.de(!video_enc_tuser[3]),
+		.de(!enc_buf_tuser[3]),
 		.ctrl(2'b0),
-		.din(video_enc_tdata[7:0]),
+		.din(enc_buf_tdata[7:0]),
 		.dout({tmds_d9[2], tmds_d8[2], tmds_d7[2], tmds_d6[2], tmds_d5[2],
 		       tmds_d4[2], tmds_d3[2], tmds_d2[2], tmds_d1[2], tmds_d0[2]})
 	);

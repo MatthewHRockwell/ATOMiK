@@ -9,8 +9,8 @@
 //
 // Clocks:
 //   PLL1: 27 MHz → 108 MHz, CLKDIV ÷5 → 21.6 MHz (clk_cpu)
-//   PLL2: 27 MHz → 126 MHz, CLKDIV ÷5 → 25.2 MHz (clk_pixel, HDMI standard)
-//         126 MHz → HDMI 5x serializer
+//   PLL2: 27 MHz → 371.25 MHz, CLKDIV ÷5 → 74.25 MHz (clk_pixel, 1280x720@60Hz)
+//         371.25 MHz → HDMI 5x serializer
 //
 // Memory Map:
 //   0x00000000  SPI Flash XIP (8 MB)

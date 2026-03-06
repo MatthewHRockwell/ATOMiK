@@ -2,11 +2,11 @@
  *  SVO - Simple Video Out FPGA Core
  *
  *  Copyright (C) 2014  Clifford Wolf <clifford@clifford.at>
- *  
+ *
  *  Permission to use, copy, modify, and/or distribute this software for any
  *  purpose with or without fee is hereby granted, provided that the above
  *  copyright notice and this permission notice appear in all copies.
- *  
+ *
  *  THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
  *  WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
  *  MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
@@ -15,6 +15,8 @@
  *  ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  *  OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *
+ *  Modified: Pre-registered next_mem_start/stop to break critical path
+ *  for 74+ MHz pixel clock operation.
  */
 
 `timescale 1ns / 1ps
@@ -88,11 +90,17 @@ module svo_term #(
 		end
 	endfunction
 
+	// Parallel prefix gray-to-binary: O(log2(N)) depth instead of O(N)
+	// For MEM_ABITS=11, this is 4 LUT levels instead of ~10 XOR levels
 	function [MEM_ABITS-1:0] mem_gray2bin(input [MEM_ABITS-1:0] in);
-		integer i;
+		reg [MEM_ABITS-1:0] b;
 		begin
-			for (i=0; i<MEM_ABITS; i=i+1)
-				mem_gray2bin[i] = ^(in >> i);
+			b = in;
+			b = b ^ (b >> 1);
+			b = b ^ (b >> 2);
+			b = b ^ (b >> 4);
+			b = b ^ (b >> 8);
+			mem_gray2bin = b;
 		end
 	endfunction
 
@@ -140,19 +148,42 @@ module svo_term #(
 	end
 
 	reg remove_line;
-	wire [MEM_ABITS-1:0] next_mem_start, next_mem_stop;
-	assign next_mem_start = mem_start == MEM_DEPTH-1 ? 0 : mem_start + 1;
-	assign next_mem_stop = mem_stop == MEM_DEPTH-1 ? 0 : mem_stop + 1;
-	assign in_axis_tready = next_mem_stop != mem_start && !remove_line;
+
+	// Pre-registered wrap-around increments (break critical path)
+	reg [MEM_ABITS-1:0] next_mem_start_r, next_mem_stop_r;
+	reg                  stop_eq_start_r;  // registered comparison
+	reg                  nextstop_eq_start_r;
+
+	always @(posedge clk) begin
+		if (!resetn) begin
+			next_mem_start_r <= 1;
+			next_mem_stop_r <= 1;
+			stop_eq_start_r <= 1;
+			nextstop_eq_start_r <= 0;
+		end else begin
+			next_mem_start_r <= (mem_start == MEM_DEPTH-1) ? {MEM_ABITS{1'b0}} : mem_start + 1;
+			next_mem_stop_r <= (mem_stop == MEM_DEPTH-1) ? {MEM_ABITS{1'b0}} : mem_stop + 1;
+			stop_eq_start_r <= (mem_stop == mem_start);
+			nextstop_eq_start_r <= (((mem_stop == MEM_DEPTH-1) ? {MEM_ABITS{1'b0}} : mem_stop + 1) == mem_start);
+		end
+	end
+
+	assign in_axis_tready = !nextstop_eq_start_r && !remove_line;
+
+	// Pre-register BSRAM read comparison to break DOA → addr critical path
+	reg rdata_is_newline_r;
+	always @(posedge clk) begin
+		rdata_is_newline_r <= (mem_portA_rdata == "\n");
+	end
 
 	always @(posedge clk) begin
 		mem_portA_wen <= 0;
 		mem_portA_wdata <= in_axis_tdata;
 		mem_portA_addr <= mem_start;
 
-		if (request_remove_line && mem_start != mem_stop) begin
-			mem_portA_addr <= next_mem_start;
-			mem_start <= next_mem_start;
+		if (request_remove_line && !stop_eq_start_r) begin
+			mem_portA_addr <= next_mem_start_r;
+			mem_start <= next_mem_start_r;
 			remove_line <= 1;
 		end
 
@@ -162,23 +193,23 @@ module svo_term #(
 			mem_stop <= 0;
 		end else begin
 			if (remove_line) begin
-				if (mem_portA_rdata == "\n" || mem_start == mem_stop) begin
+				if (rdata_is_newline_r || stop_eq_start_r) begin
 					remove_line <= 0;
 				end else begin
-					mem_portA_addr <= next_mem_start;
-					mem_start <= next_mem_start;
+					mem_portA_addr <= next_mem_start_r;
+					mem_start <= next_mem_start_r;
 				end
 			end else
-			if (next_mem_stop == mem_start) begin
+			if (nextstop_eq_start_r) begin
 				if (mem_portA_addr == mem_start) begin
-					mem_portA_addr <= next_mem_start;
-					mem_start <= next_mem_start;
+					mem_portA_addr <= next_mem_start_r;
+					mem_start <= next_mem_start_r;
 					remove_line <= 1;
 				end
 			end else
 			if (in_axis_tvalid && in_axis_tready) begin
 				if (in_axis_tdata >= 32 || in_axis_tdata == "\n") begin
-					mem_stop <= next_mem_stop;
+					mem_stop <= next_mem_stop_r;
 					mem_portA_addr <= mem_stop;
 					mem_portA_wen <= 1;
 				end else
@@ -188,7 +219,7 @@ module svo_term #(
 				end else
 				if (in_axis_tdata == 8) begin
 					// BS removes the last char
-					if (mem_stop != mem_start)
+					if (!stop_eq_start_r)
 						mem_stop <= mem_stop == 0 ? MEM_DEPTH-1 : mem_stop-1;
 				end
 			end
@@ -388,6 +419,14 @@ module svo_term #(
 	wire [MEM_ABITS-1:0] next_mem_portB_addr;
 	assign next_mem_portB_addr = mem_portB_addr == MEM_DEPTH-1 ? 0 : mem_portB_addr + 1;
 
+	// Pre-register portB comparisons (break DOB → addr critical path)
+	reg portB_not_newline_r;  // registered: mem_portB_rdata != "\n"
+	reg portB_not_at_stop_r;  // registered: mem_portB_addr != mem_stop_B
+	always @(posedge oclk) begin
+		portB_not_newline_r <= (mem_portB_rdata != "\n");
+		portB_not_at_stop_r <= (mem_portB_addr != mem_stop_B);
+	end
+
 	always @(posedge oclk) begin
 		if (!oresetn) begin
 			p2_valid <= 0;
@@ -400,7 +439,7 @@ module svo_term #(
 			p2_start_of_line <= p1_start_of_line;
 			p2_valid <= p1_valid;
 
-			if (mem_portB_addr == mem_stop_B)
+			if (!portB_not_at_stop_r)
 				p2_found_end <= 1;
 
 			if (p1_start_of_frame) begin
@@ -420,7 +459,7 @@ module svo_term #(
 			end else
 			if (p1_start_of_line) begin
 				if (p2_y == 7) begin
-					if (mem_portB_addr != mem_stop_B) begin
+					if (portB_not_at_stop_r) begin
 						mem_portB_addr <= next_mem_portB_addr;
 						p2_line_start_addr <= next_mem_portB_addr;
 					end else begin
@@ -433,7 +472,7 @@ module svo_term #(
 				p2_y <= p2_y + 1;
 			end else begin
 				if (p2_x == 7) begin
-					if (mem_portB_addr != mem_stop_B && mem_portB_rdata != "\n")
+					if (portB_not_at_stop_r && portB_not_newline_r)
 						mem_portB_addr <= next_mem_portB_addr;
 				end
 				p2_x <= p2_x + 1;
@@ -484,9 +523,10 @@ module svo_term #(
 	end
 
 	// --------------------------------------------------------------
-	// Pipeline stage 5: font lookup
+	// Pipeline stage 5: font lookup + range check (registered)
 
-	reg [1:0] p5_outval;
+	reg p5_font_bit;
+	reg p5_in_range;
 	reg p5_start_of_frame;
 	reg p5_valid;
 
@@ -495,22 +535,37 @@ module svo_term #(
 			p5_valid <= 0;
 		end else
 		if (pipeline_en) begin
-			if (32 <= p4_c && p4_c < 128)
-				p5_outval <= font(p4_c, p4_x, p4_y) ? 2'b10 : 2'b01;
-			else
-				p5_outval <= 0;
+			p5_font_bit <= font(p4_c, p4_x, p4_y);
+			p5_in_range <= (32 <= p4_c && p4_c < 128);
 			p5_start_of_frame <= p4_start_of_frame;
 			p5_valid <= p4_valid;
 		end
 	end
 
 	// --------------------------------------------------------------
+	// Pipeline stage 6: output mux (trivial: 1-2 levels)
+
+	reg [1:0] p6_outval;
+	reg p6_start_of_frame;
+	reg p6_valid;
+
+	always @(posedge oclk) begin
+		if (!oresetn) begin
+			p6_valid <= 0;
+		end else
+		if (pipeline_en) begin
+			p6_outval <= p5_in_range ? (p5_font_bit ? 2'b10 : 2'b01) : 2'b00;
+			p6_start_of_frame <= p5_start_of_frame;
+			p6_valid <= p5_valid;
+		end
+	end
+
+	// --------------------------------------------------------------
 	// Pipeline output stage
 
-	assign pipeline_en = !p5_valid || out_axis_tready;
+	assign pipeline_en = !p6_valid || out_axis_tready;
 
-	assign out_axis_tvalid = p5_valid;
-	assign out_axis_tdata = p5_outval;
-	assign out_axis_tuser = p5_start_of_frame;
+	assign out_axis_tvalid = p6_valid;
+	assign out_axis_tdata = p6_outval;
+	assign out_axis_tuser = p6_start_of_frame;
 endmodule
-
