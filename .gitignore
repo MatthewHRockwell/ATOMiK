@@ -57,6 +57,12 @@ hardware/sweep/top/
 hardware/sweep/project_*/
 hardware/sweep/impl/
 hardware/v3/synth/impl/
+hardware/v3/sweep/impl/
+hardware/v3/sweep/pll/
+hardware/v3/sweep/tcl/
+hardware/v3/sweep/top/
+hardware/v3/sweep/sdc/
+hardware/v3/sweep/project_*/
 
 # Bitstreams (The compiled binary for the board)
 # Generally, you don't commit these to source control,

@@ -1,0 +1,785 @@
+"""Phase 6: v3 Automated Hardware Synthesis Sweep
+
+Generates PLL configurations, synthesizes at multiple (frequency x N_BANKS)
+combinations on the GW1NR-9, and collects timing/resource reports.
+
+v3 differences from v2:
+  - Uses atomik_v3_parallel.v (BSRAM state table, 64-bit fixed)
+  - Single source file (no separate acc/state_rec modules)
+  - Target: ~45 LUT + 32 FF per bank (vs v2's ~65 LUT + 64 FF)
+
+Usage:
+  python hardware/v3/scripts/phase6_hw_sweep_v3.py                # Full sweep
+  python hardware/v3/scripts/phase6_hw_sweep_v3.py --banks 4      # Single N_BANKS
+  python hardware/v3/scripts/phase6_hw_sweep_v3.py --quick        # Quick: 81 MHz x [1,4,8,16]
+  python hardware/v3/scripts/phase6_hw_sweep_v3.py --gen-only     # Generate files only
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import re
+import subprocess
+import sys
+import textwrap
+from dataclasses import dataclass
+from pathlib import Path
+
+# ---------------------------------------------------------------------------
+# Constants
+# ---------------------------------------------------------------------------
+
+FCLKIN = 27.0  # MHz — Tang Nano 9K onboard crystal
+VCO_MIN = 400.0
+VCO_MAX = 1200.0
+ODIV_OPTIONS = [2, 4, 8, 16, 32, 48, 64, 80, 96, 112, 128]
+
+SCRIPT_DIR = Path(__file__).resolve().parent
+V3_DIR = SCRIPT_DIR.parent  # hardware/v3/
+PROJECT_ROOT = V3_DIR.parent.parent  # ATOMiK/
+
+BANK_CONFIGS = [1, 2, 4, 8, 16]
+
+FREQ_TARGETS = [
+    27.0,    # 1x crystal
+    54.0,    # 2x crystal
+    67.5,    # 2.5x crystal
+    81.0,    # 3x crystal
+    94.5,    # 3.5x crystal
+    108.0,   # 4x crystal
+    121.5,   # 4.5x crystal
+    135.0,   # 5x crystal
+]
+
+
+# ---------------------------------------------------------------------------
+# PLL Parameter Solver (same as v2)
+# ---------------------------------------------------------------------------
+
+@dataclass
+class PLLConfig:
+    freq_mhz: float
+    idiv_sel: int
+    fbdiv_sel: int
+    odiv_sel: int
+    fvco_mhz: float
+
+    @property
+    def idiv(self) -> int:
+        return self.idiv_sel + 1
+
+    @property
+    def fbdiv(self) -> int:
+        return self.fbdiv_sel + 1
+
+    @property
+    def actual_freq(self) -> float:
+        return FCLKIN * self.fbdiv / self.idiv
+
+    def __repr__(self) -> str:
+        return (f"PLL({self.actual_freq:.1f}MHz: "
+                f"IDIV_SEL={self.idiv_sel}, FBDIV_SEL={self.fbdiv_sel}, "
+                f"ODIV_SEL={self.odiv_sel}, FVCO={self.fvco_mhz:.0f}MHz)")
+
+
+def solve_pll(target_mhz: float, tolerance: float = 0.01) -> PLLConfig | None:
+    best: PLLConfig | None = None
+    best_error = float("inf")
+
+    for idiv_sel in range(64):
+        for fbdiv_sel in range(64):
+            fout = FCLKIN * (fbdiv_sel + 1) / (idiv_sel + 1)
+            error = abs(fout - target_mhz)
+            if error > tolerance * target_mhz:
+                continue
+            for odiv in ODIV_OPTIONS:
+                fvco = fout * odiv
+                if VCO_MIN <= fvco <= VCO_MAX:
+                    if error < best_error:
+                        best_error = error
+                        best = PLLConfig(
+                            freq_mhz=target_mhz,
+                            idiv_sel=idiv_sel,
+                            fbdiv_sel=fbdiv_sel,
+                            odiv_sel=odiv,
+                            fvco_mhz=fvco,
+                        )
+                    break
+    return best
+
+
+# ---------------------------------------------------------------------------
+# File Generators
+# ---------------------------------------------------------------------------
+
+def generate_pll_verilog(cfg: PLLConfig) -> str:
+    freq_tag = f"{cfg.actual_freq:.1f}".replace(".", "p")
+    module_name = f"atomik_pll_{freq_tag}m"
+
+    return textwrap.dedent(f"""\
+        // Auto-generated PLL for {cfg.actual_freq:.1f} MHz
+        // Target: GW1NR-LV9QN88PC6/I5
+
+        module {module_name} (clkout, lock, reset, clkin);
+
+        output clkout;
+        output lock;
+        input reset;
+        input clkin;
+
+        wire clkoutp_o;
+        wire clkoutd_o;
+        wire clkoutd3_o;
+        wire gw_gnd;
+
+        assign gw_gnd = 1'b0;
+
+        rPLL rpll_inst (
+            .CLKOUT(clkout),
+            .LOCK(lock),
+            .CLKOUTP(clkoutp_o),
+            .CLKOUTD(clkoutd_o),
+            .CLKOUTD3(clkoutd3_o),
+            .RESET(reset),
+            .RESET_P(gw_gnd),
+            .CLKIN(clkin),
+            .CLKFB(gw_gnd),
+            .FBDSEL({{gw_gnd,gw_gnd,gw_gnd,gw_gnd,gw_gnd,gw_gnd}}),
+            .IDSEL({{gw_gnd,gw_gnd,gw_gnd,gw_gnd,gw_gnd,gw_gnd}}),
+            .ODSEL({{gw_gnd,gw_gnd,gw_gnd,gw_gnd,gw_gnd,gw_gnd}}),
+            .PSDA({{gw_gnd,gw_gnd,gw_gnd,gw_gnd}}),
+            .DUTYDA({{gw_gnd,gw_gnd,gw_gnd,gw_gnd}}),
+            .FDLY({{gw_gnd,gw_gnd,gw_gnd,gw_gnd}})
+        );
+
+        defparam rpll_inst.FCLKIN = "27";
+        defparam rpll_inst.DYN_IDIV_SEL = "false";
+        defparam rpll_inst.IDIV_SEL = {cfg.idiv_sel};
+        defparam rpll_inst.DYN_FBDIV_SEL = "false";
+        defparam rpll_inst.FBDIV_SEL = {cfg.fbdiv_sel};
+        defparam rpll_inst.DYN_ODIV_SEL = "false";
+        defparam rpll_inst.ODIV_SEL = {cfg.odiv_sel};
+        defparam rpll_inst.PSDA_SEL = "0000";
+        defparam rpll_inst.DYN_DA_EN = "false";
+        defparam rpll_inst.DUTYDA_SEL = "1000";
+        defparam rpll_inst.CLKOUT_FT_DIR = 1'b1;
+        defparam rpll_inst.CLKOUTP_FT_DIR = 1'b1;
+        defparam rpll_inst.CLKOUT_DLY_STEP = 0;
+        defparam rpll_inst.CLKOUTP_DLY_STEP = 0;
+        defparam rpll_inst.CLKFB_SEL = "internal";
+        defparam rpll_inst.CLKOUT_BYPASS = "false";
+        defparam rpll_inst.CLKOUTP_BYPASS = "false";
+        defparam rpll_inst.CLKOUTD_BYPASS = "false";
+        defparam rpll_inst.DYN_SDIV_SEL = 2;
+        defparam rpll_inst.CLKOUTD_SRC = "CLKOUT";
+        defparam rpll_inst.CLKOUTD3_SRC = "CLKOUT";
+        defparam rpll_inst.DEVICE = "GW1NR-9C";
+
+        endmodule //{module_name}
+    """)
+
+
+def generate_top_wrapper_v3(n_banks: int, pll_module: str, freq_mhz: float) -> str:
+    """Generate top wrapper for v3 parallel accumulator sweep.
+
+    Uses atomik_v3_parallel instead of v2's atomik_parallel_acc.
+    Interface: UART commands L(load), A(accum), R(read), S(status).
+    """
+    freq_hz = int(freq_mhz * 1_000_000)
+
+    return textwrap.dedent(f"""\
+        // =============================================================================
+        // v3 Sweep Configuration: N_BANKS={n_banks}, Freq={freq_mhz:.1f} MHz
+        // Generated by phase6_hw_sweep_v3.py
+        // =============================================================================
+
+        module atomik_top_sweep (
+            input  wire       sys_clk,
+            input  wire       sys_rst_n,
+            input  wire       uart_rx,
+            output wire       uart_tx,
+            output wire [5:0] led
+        );
+
+            // Clock Generation
+            wire clk_int;
+            wire pll_lock;
+
+            {pll_module} u_pll (
+                .clkin  (sys_clk),
+                .reset  (~sys_rst_n),
+                .clkout (clk_int),
+                .lock   (pll_lock)
+            );
+
+            // Reset Synchronization
+            reg [15:0] por_cnt = 16'd0;
+            always @(posedge sys_clk or negedge sys_rst_n) begin
+                if (!sys_rst_n) por_cnt <= 16'd0;
+                else if (por_cnt != 16'hFFFF) por_cnt <= por_cnt + 16'd1;
+            end
+            wire por_done = (por_cnt == 16'hFFFF);
+
+            reg [2:0] rst_sync;
+            always @(posedge clk_int or negedge sys_rst_n) begin
+                if (!sys_rst_n) rst_sync <= 3'b000;
+                else rst_sync <= {{rst_sync[1:0], (por_done & pll_lock)}};
+            end
+            wire internal_rst_n = rst_sync[2];
+
+            // Heartbeat
+            reg [23:0] heartbeat_cnt;
+            always @(posedge clk_int or negedge internal_rst_n) begin
+                if (!internal_rst_n) heartbeat_cnt <= 24'd0;
+                else heartbeat_cnt <= heartbeat_cnt + 24'd1;
+            end
+
+            // UART RX
+            localparam integer BAUD_DIV = {freq_hz} / 115200;
+            localparam integer HALF_BIT = BAUD_DIV / 2;
+
+            reg [15:0] rx_baud_cnt;
+            reg [3:0]  rx_bit_cnt;
+            reg [7:0]  rx_shift, rx_data;
+            reg        rx_valid;
+            reg [1:0]  rx_state;
+            reg [2:0]  rx_sync;
+            wire rx_pin = rx_sync[2];
+
+            always @(posedge clk_int or negedge internal_rst_n) begin
+                if (!internal_rst_n) rx_sync <= 3'b111;
+                else rx_sync <= {{rx_sync[1:0], uart_rx}};
+            end
+
+            localparam RX_IDLE=2'd0, RX_START=2'd1, RX_DATA=2'd2, RX_STOP=2'd3;
+            always @(posedge clk_int or negedge internal_rst_n) begin
+                if (!internal_rst_n) begin
+                    rx_state<=RX_IDLE; rx_baud_cnt<=16'd0; rx_bit_cnt<=4'd0;
+                    rx_shift<=8'd0; rx_data<=8'd0; rx_valid<=1'b0;
+                end else begin
+                    rx_valid <= 1'b0;
+                    case (rx_state)
+                        RX_IDLE: if (!rx_pin) begin rx_state<=RX_START; rx_baud_cnt<=16'd0; end
+                        RX_START: if (rx_baud_cnt==HALF_BIT[15:0]) begin
+                            if (!rx_pin) begin rx_state<=RX_DATA; rx_baud_cnt<=16'd0; rx_bit_cnt<=4'd0; end
+                            else rx_state<=RX_IDLE;
+                        end else rx_baud_cnt<=rx_baud_cnt+16'd1;
+                        RX_DATA: if (rx_baud_cnt==BAUD_DIV[15:0]-1) begin
+                            rx_baud_cnt<=16'd0; rx_shift<={{rx_pin,rx_shift[7:1]}};
+                            if (rx_bit_cnt==4'd7) rx_state<=RX_STOP; else rx_bit_cnt<=rx_bit_cnt+4'd1;
+                        end else rx_baud_cnt<=rx_baud_cnt+16'd1;
+                        RX_STOP: if (rx_baud_cnt==BAUD_DIV[15:0]-1) begin
+                            rx_data<=rx_shift; rx_valid<=1'b1; rx_state<=RX_IDLE;
+                        end else rx_baud_cnt<=rx_baud_cnt+16'd1;
+                    endcase
+                end
+            end
+
+            // UART TX
+            reg [15:0] tx_baud_cnt;
+            reg [3:0]  tx_bit_cnt;
+            reg [7:0]  tx_shift;
+            reg        tx_busy, tx_out, tx_start;
+            reg [7:0]  tx_data;
+            assign uart_tx = tx_out;
+
+            always @(posedge clk_int or negedge internal_rst_n) begin
+                if (!internal_rst_n) begin
+                    tx_baud_cnt<=16'd0; tx_bit_cnt<=4'd0; tx_shift<=8'hFF;
+                    tx_busy<=1'b0; tx_out<=1'b1;
+                end else begin
+                    if (!tx_busy && tx_start) begin
+                        tx_shift<=tx_data; tx_busy<=1'b1; tx_bit_cnt<=4'd0;
+                        tx_baud_cnt<=16'd0; tx_out<=1'b0;
+                    end else if (tx_busy) begin
+                        if (tx_baud_cnt==BAUD_DIV[15:0]-1) begin
+                            tx_baud_cnt<=16'd0; tx_bit_cnt<=tx_bit_cnt+4'd1;
+                            case (tx_bit_cnt)
+                                4'd0,4'd1,4'd2,4'd3,4'd4,4'd5,4'd6,4'd7: begin
+                                    tx_out<=tx_shift[0]; tx_shift<={{1'b1,tx_shift[7:1]}};
+                                end
+                                4'd8: tx_out<=1'b1;
+                                4'd9: begin tx_busy<=1'b0; tx_out<=1'b1; end
+                                default: begin tx_busy<=1'b0; tx_out<=1'b1; end
+                            endcase
+                        end else tx_baud_cnt<=tx_baud_cnt+16'd1;
+                    end
+                end
+            end
+
+            // v3 Parallel Accumulator
+            reg         par_load_en, par_accum_en, par_swap_en;
+            reg  [7:0]  par_addr_in;
+            reg  [63:0] par_delta_in, par_init_data;
+            wire [63:0] par_current_state;
+            wire        par_acc_zero;
+
+            atomik_v3_parallel #(.N_BANKS({n_banks})) u_par (
+                .clk(clk_int), .rst_n(internal_rst_n),
+                .load_en(par_load_en), .accum_en(par_accum_en), .swap_en(par_swap_en),
+                .addr_in(par_addr_in), .delta_in(par_delta_in), .init_data(par_init_data),
+                .delta_parallel_in({{{n_banks}*64{{1'b0}}}}),
+                .delta_parallel_valid({{{n_banks}{{1'b0}}}}),
+                .parallel_mode(1'b0),
+                .current_state(par_current_state), .acc_zero(par_acc_zero),
+                .current_bank(), .bank_active()
+            );
+
+            // Command State Machine
+            // L + 8 bytes addr + 8 bytes data: LOAD (addr=first byte, data=next 8)
+            // A + 8 bytes: ACCUM
+            // R: READ (sends 8 bytes)
+            // S: STATUS (sends 1 byte)
+            localparam CMD_IDLE=4'd0, CMD_LOAD_A=4'd1, CMD_LOAD_D=4'd2,
+                       CMD_ACCUM=4'd3, CMD_READ=4'd4, CMD_RWAIT=4'd5,
+                       CMD_STATUS=4'd6, CMD_TXS=4'd7, CMD_TXW=4'd8, CMD_TXD=4'd9;
+            reg [3:0] cmd_state; reg [3:0] byte_cnt;
+            reg [63:0] cmd_buffer, tx_buffer;
+            reg [3:0] tx_byte_cnt, tx_bytes_total;
+            reg cmd_active;
+
+            always @(posedge clk_int or negedge internal_rst_n) begin
+                if (!internal_rst_n) begin
+                    cmd_state<=CMD_IDLE; byte_cnt<=4'd0; cmd_buffer<=64'd0;
+                    tx_buffer<=64'd0; tx_byte_cnt<=4'd0; tx_bytes_total<=4'd0;
+                    tx_start<=1'b0; tx_data<=8'd0; cmd_active<=1'b0;
+                    par_load_en<=1'b0; par_accum_en<=1'b0; par_swap_en<=1'b0;
+                    par_addr_in<=8'd0; par_delta_in<=64'd0; par_init_data<=64'd0;
+                end else begin
+                    tx_start<=1'b0;
+                    par_load_en<=1'b0; par_accum_en<=1'b0; par_swap_en<=1'b0;
+                    case (cmd_state)
+                        CMD_IDLE: begin
+                            cmd_active<=1'b0;
+                            if (rx_valid) case (rx_data)
+                                8'h4C: begin cmd_state<=CMD_LOAD_A; byte_cnt<=4'd0; cmd_buffer<=64'd0; cmd_active<=1'b1; end
+                                8'h41: begin cmd_state<=CMD_ACCUM; byte_cnt<=4'd0; cmd_buffer<=64'd0; cmd_active<=1'b1; end
+                                8'h52: begin cmd_state<=CMD_READ; cmd_active<=1'b1; end
+                                8'h53: begin cmd_state<=CMD_STATUS; cmd_active<=1'b1; end
+                                default: ;
+                            endcase
+                        end
+                        CMD_LOAD_A: if (rx_valid) begin
+                            // First byte is address
+                            par_addr_in <= rx_data;
+                            cmd_state <= CMD_LOAD_D;
+                            byte_cnt <= 4'd0;
+                            cmd_buffer <= 64'd0;
+                        end
+                        CMD_LOAD_D: if (rx_valid) begin
+                            cmd_buffer<={{cmd_buffer[55:0],rx_data}};
+                            if (byte_cnt==4'd7) begin
+                                par_init_data<={{cmd_buffer[55:0],rx_data}};
+                                par_load_en<=1'b1; cmd_state<=CMD_IDLE; cmd_active<=1'b0;
+                            end else byte_cnt<=byte_cnt+4'd1;
+                        end
+                        CMD_ACCUM: if (rx_valid) begin
+                            cmd_buffer<={{cmd_buffer[55:0],rx_data}};
+                            if (byte_cnt==4'd7) begin
+                                par_delta_in<={{cmd_buffer[55:0],rx_data}};
+                                par_accum_en<=1'b1; cmd_state<=CMD_IDLE; cmd_active<=1'b0;
+                            end else byte_cnt<=byte_cnt+4'd1;
+                        end
+                        CMD_READ: cmd_state<=CMD_RWAIT;
+                        CMD_RWAIT: begin
+                            tx_buffer<=par_current_state; tx_byte_cnt<=4'd0;
+                            tx_bytes_total<=4'd8; cmd_state<=CMD_TXS;
+                        end
+                        CMD_STATUS: begin
+                            tx_buffer<={{par_acc_zero,63'd0}}; tx_byte_cnt<=4'd0;
+                            tx_bytes_total<=4'd1; cmd_state<=CMD_TXS;
+                        end
+                        CMD_TXS: if (tx_byte_cnt<tx_bytes_total) begin
+                            tx_data<=tx_buffer[63:56]; tx_buffer<={{tx_buffer[55:0],8'd0}};
+                            tx_start<=1'b1; tx_byte_cnt<=tx_byte_cnt+4'd1; cmd_state<=CMD_TXW;
+                        end else cmd_state<=CMD_IDLE;
+                        CMD_TXW: if (tx_busy) cmd_state<=CMD_TXD;
+                        CMD_TXD: if (!tx_busy) begin
+                            if (tx_byte_cnt<tx_bytes_total) cmd_state<=CMD_TXS;
+                            else cmd_state<=CMD_IDLE;
+                        end
+                        default: cmd_state<=CMD_IDLE;
+                    endcase
+                end
+            end
+
+            // LEDs
+            reg [19:0] rx_activity;
+            always @(posedge clk_int or negedge internal_rst_n) begin
+                if (!internal_rst_n) rx_activity<=20'd0;
+                else if (rx_valid) rx_activity<=20'hFFFFF;
+                else if (rx_activity!=20'd0) rx_activity<=rx_activity-20'd1;
+            end
+            assign led[5]=~pll_lock; assign led[4]=~heartbeat_cnt[23];
+            assign led[3]=~cmd_active; assign led[2]=~par_acc_zero;
+            assign led[1]=~tx_busy; assign led[0]=~(rx_activity!=20'd0);
+
+        endmodule
+    """)
+
+
+def generate_sdc(freq_mhz: float) -> str:
+    period_ns = 1000.0 / freq_mhz
+    half_ns = period_ns / 2.0
+    return textwrap.dedent(f"""\
+        # Auto-generated SDC for {freq_mhz:.1f} MHz
+        create_clock -name sys_clk -period 37.037 -waveform {{0 18.518}} [get_ports {{sys_clk}}]
+        create_clock -name atomik_clk -period {period_ns:.3f} -waveform {{0 {half_ns:.3f}}} [get_pins {{u_pll/rpll_inst/CLKOUT}}]
+        set_clock_groups -asynchronous -group [get_clocks {{sys_clk}}] -group [get_clocks {{atomik_clk}}]
+        set_input_delay -clock atomik_clk -max 2.0 [get_ports {{uart_rx}}]
+        set_output_delay -clock atomik_clk -max 2.0 [get_ports {{uart_tx}}]
+        set_false_path -from [get_ports {{sys_rst_n}}]
+        set_false_path -to [get_ports {{led[*]}}]
+    """)
+
+
+def generate_project(pll_file: str, top_file: str, sdc_file: str) -> str:
+    """Generate Gowin project XML. RTL path is relative to sweep/ directory."""
+    return textwrap.dedent(f"""\
+        <?xml version="1" encoding="UTF-8"?>
+        <!DOCTYPE gowin-fpga-project>
+        <Project>
+            <Template>FPGA</Template>
+            <Version>5</Version>
+            <Device name="GW1NR-9C" pn="GW1NR-LV9QN88PC6/I5">gw1nr9c-004</Device>
+            <FileList>
+                <File path="{pll_file}" type="file.verilog" enable="1"/>
+                <File path="../rtl/atomik_v3_parallel.v" type="file.verilog" enable="1"/>
+                <File path="{top_file}" type="file.verilog" enable="1"/>
+                <File path="../constraints/atomik_v3_constraints.cst" type="file.cst" enable="1"/>
+                <File path="{sdc_file}" type="file.sdc" enable="1"/>
+            </FileList>
+        </Project>
+    """)
+
+
+def generate_tcl(project_filename: str, config_tag: str) -> str:
+    return textwrap.dedent(f"""\
+        # Auto-generated synthesis script: {config_tag}
+        set SCRIPT_DIR [file dirname [info script]]
+        set SWEEP_DIR [file normalize "$SCRIPT_DIR/.."]
+        set PROJECT_FILE "$SWEEP_DIR/{project_filename}"
+
+        if {{![file exists $PROJECT_FILE]}} {{
+            puts "ERROR: Project file not found: $PROJECT_FILE"
+            exit 1
+        }}
+
+        open_project $PROJECT_FILE
+        set_option -top_module atomik_top_sweep
+        set_option -verilog_std v2001
+        set_option -use_sspi_as_gpio 1
+        set_option -use_mspi_as_gpio 1
+        set_option -timing_driven 1
+        set_option -print_all_synthesis_warning 1
+
+        puts "=== Synthesizing: {config_tag} ==="
+        run syn
+        puts "=== Place & Route: {config_tag} ==="
+        run pnr
+        puts "=== Complete: {config_tag} ==="
+    """)
+
+
+# ---------------------------------------------------------------------------
+# Report Parser
+# ---------------------------------------------------------------------------
+
+@dataclass
+class SynthResult:
+    freq_mhz: float
+    n_banks: int
+    actual_fmax_mhz: float = 0.0
+    logic_levels: int = 0
+    luts: int = 0
+    alus: int = 0
+    ffs: int = 0
+    cls: int = 0
+    bsram: int = 0
+    logic_total: int = 0
+    timing_met: bool = False
+    throughput_mops: float = 0.0
+
+
+def parse_rpt(rpt_path: Path) -> dict:
+    result = {}
+    text = rpt_path.read_text(errors="replace")
+
+    m = re.search(r"Logic\s+\|\s+(\d+)/(\d+)", text)
+    if m:
+        result["logic_total"] = int(m.group(1))
+
+    m = re.search(r"(\d+)\s+LUT,\s+(\d+)\s+ALU", text)
+    if m:
+        result["luts"] = int(m.group(1))
+        result["alus"] = int(m.group(2))
+
+    m = re.search(r"Register\s+\|\s+(\d+)/(\d+)", text)
+    if m:
+        result["ffs"] = int(m.group(1))
+
+    m = re.search(r"CLS\s+\|\s+(\d+)/(\d+)", text)
+    if m:
+        result["cls"] = int(m.group(1))
+
+    m = re.search(r"BSRAM\s+\|\s+(\d+)/(\d+)", text)
+    if m:
+        result["bsram"] = int(m.group(1))
+
+    return result
+
+
+def parse_timing(tr_content_path: Path) -> dict:
+    result = {}
+    if not tr_content_path.exists():
+        return result
+
+    text = tr_content_path.read_text(errors="replace")
+
+    fmax_rows = re.findall(
+        r"<td>(\d+)</td>\s*<td>([\w._/]+)</td>\s*<td>[\d.]+\(MHz\)</td>\s*"
+        r"<td[^>]*>([\d.]+)\(MHz\)</td>\s*<td>(\d+)</td>",
+        text
+    )
+    for row_num, clk_name, fmax, levels in fmax_rows:
+        if "atomik_clk" in clk_name:
+            result["actual_fmax"] = float(fmax)
+            result["logic_levels"] = int(levels)
+            break
+
+    return result
+
+
+# ---------------------------------------------------------------------------
+# Sweep Runner
+# ---------------------------------------------------------------------------
+
+def find_gw_sh() -> str | None:
+    """Find gw_sh in common locations."""
+    candidates = [
+        Path("/opt/gowin/IDE/bin/gw_sh"),
+        Path.home() / "gowin/IDE/bin/gw_sh",
+    ]
+    for p in candidates:
+        if p.exists():
+            return str(p)
+    # Try PATH
+    import shutil
+    return shutil.which("gw_sh")
+
+
+def run_sweep(
+    freqs: list[float],
+    banks: list[int],
+    gen_only: bool = False,
+) -> list[SynthResult]:
+
+    sweep_dir = V3_DIR / "sweep"
+    sweep_dir.mkdir(exist_ok=True)
+    (sweep_dir / "pll").mkdir(exist_ok=True)
+    (sweep_dir / "top").mkdir(exist_ok=True)
+    (sweep_dir / "sdc").mkdir(exist_ok=True)
+    (sweep_dir / "tcl").mkdir(exist_ok=True)
+
+    results: list[SynthResult] = []
+    configs: list[tuple[float, int, PLLConfig, str]] = []
+
+    print("=" * 72)
+    print("Phase 6: v3 Automated Hardware Synthesis Sweep")
+    print("=" * 72)
+    print()
+
+    # Step 1: Solve PLL configurations
+    print("--- PLL Configuration ---")
+    pll_cache: dict[float, PLLConfig] = {}
+    for freq in freqs:
+        cfg = solve_pll(freq)
+        if cfg is None:
+            print(f"  SKIP {freq:.1f} MHz -- no valid PLL config found")
+            continue
+        pll_cache[freq] = cfg
+        print(f"  {cfg}")
+    print()
+
+    # Step 2: Generate files
+    print("--- Generating Files ---")
+    for freq in freqs:
+        if freq not in pll_cache:
+            continue
+        pll_cfg = pll_cache[freq]
+        freq_tag = f"{pll_cfg.actual_freq:.1f}".replace(".", "p")
+        pll_module = f"atomik_pll_{freq_tag}m"
+
+        pll_path = sweep_dir / "pll" / f"{pll_module}.v"
+        pll_path.write_text(generate_pll_verilog(pll_cfg))
+
+        for n in banks:
+            config_tag = f"N{n}_F{freq_tag}"
+
+            top_path = sweep_dir / "top" / f"top_{config_tag}.v"
+            top_path.write_text(generate_top_wrapper_v3(n, pll_module, pll_cfg.actual_freq))
+
+            sdc_path = sweep_dir / "sdc" / f"timing_{config_tag}.sdc"
+            sdc_path.write_text(generate_sdc(pll_cfg.actual_freq))
+
+            proj_path = sweep_dir / f"project_{config_tag}.gprj"
+            proj_path.write_text(generate_project(
+                pll_file=f"pll/{pll_module}.v",
+                top_file=f"top/top_{config_tag}.v",
+                sdc_file=f"sdc/timing_{config_tag}.sdc",
+            ))
+
+            tcl_path = sweep_dir / "tcl" / f"synth_{config_tag}.tcl"
+            tcl_path.write_text(generate_tcl(f"project_{config_tag}.gprj", config_tag))
+
+            configs.append((freq, n, pll_cfg, config_tag))
+            print(f"  Generated: {config_tag}")
+
+    print(f"  Total configurations: {len(configs)}")
+    print()
+
+    if gen_only:
+        print("--gen-only: Skipping synthesis runs.")
+        return results
+
+    # Step 3: Run synthesis
+    gw_sh_path = find_gw_sh()
+    if not gw_sh_path:
+        print("ERROR: gw_sh not found (install Gowin EDA or set PATH)")
+        return results
+
+    # Gowin workaround
+    import os
+    env = os.environ.copy()
+    env["LD_PRELOAD"] = "/lib/x86_64-linux-gnu/libstdc++.so.6"
+    env["LD_LIBRARY_PATH"] = "/opt/gowin/IDE/lib:/lib/x86_64-linux-gnu"
+    env["QT_PLUGIN_PATH"] = "/opt/gowin/IDE/plugins/qt"
+
+    print("--- Running Synthesis ---")
+    for freq, n, pll_cfg, config_tag in configs:
+        print(f"\n  [{config_tag}] Synthesizing...")
+        tcl_path = sweep_dir / "tcl" / f"synth_{config_tag}.tcl"
+
+        try:
+            proc = subprocess.run(
+                [gw_sh_path, str(tcl_path)],
+                cwd=str(sweep_dir),
+                capture_output=True,
+                text=True,
+                timeout=300,
+                env=env,
+            )
+            if proc.returncode != 0:
+                print(f"    FAILED (rc={proc.returncode})")
+                if proc.stderr:
+                    for line in proc.stderr.strip().split("\n")[:5]:
+                        print(f"    stderr: {line}")
+                continue
+        except subprocess.TimeoutExpired:
+            print("    TIMEOUT")
+            continue
+        except Exception as e:
+            print(f"    ERROR: {e}")
+            continue
+
+        impl_dir = sweep_dir / "impl" / "pnr"
+        proj_name = f"project_{config_tag}"
+        rpt_candidates = list(impl_dir.glob(f"{proj_name}.rpt.txt"))
+        tr_candidates = list(impl_dir.glob(f"{proj_name}_tr_content.html"))
+
+        r = SynthResult(freq_mhz=freq, n_banks=n)
+
+        if rpt_candidates:
+            rpt_data = parse_rpt(rpt_candidates[0])
+            r.luts = rpt_data.get("luts", 0)
+            r.alus = rpt_data.get("alus", 0)
+            r.ffs = rpt_data.get("ffs", 0)
+            r.cls = rpt_data.get("cls", 0)
+            r.bsram = rpt_data.get("bsram", 0)
+            r.logic_total = rpt_data.get("logic_total", 0)
+
+        if tr_candidates:
+            tr_data = parse_timing(tr_candidates[0])
+            r.actual_fmax_mhz = tr_data.get("actual_fmax", 0.0)
+            r.logic_levels = tr_data.get("logic_levels", 0)
+
+        r.timing_met = r.actual_fmax_mhz >= freq
+        r.throughput_mops = min(r.actual_fmax_mhz, freq) * n
+
+        results.append(r)
+        met = "PASS" if r.timing_met else "FAIL"
+        print(f"    Fmax={r.actual_fmax_mhz:.1f} MHz, "
+              f"LUT={r.luts}, FF={r.ffs}, CLS={r.cls}, BSRAM={r.bsram}, "
+              f"Levels={r.logic_levels}, Timing={met}, "
+              f"Throughput={r.throughput_mops:.1f} Mops/s")
+
+    # Step 4: Summary
+    print()
+    print("=" * 80)
+    print("v3 Synthesis Sweep Results")
+    print("=" * 80)
+    print()
+    print(f"{'Config':<16} {'Target':>7} {'Fmax':>7} {'Met':>4} "
+          f"{'LUT':>5} {'FF':>5} {'CLS':>5} {'BSRAM':>5} {'Lvl':>4} {'Tput':>10}")
+    print("-" * 80)
+    for r in results:
+        freq_tag = f"{r.freq_mhz:.1f}".replace(".", "p")
+        config = f"N{r.n_banks}_F{freq_tag}"
+        met = "YES" if r.timing_met else "NO"
+        print(f"{config:<16} {r.freq_mhz:>6.1f}M {r.actual_fmax_mhz:>6.1f}M {met:>4} "
+              f"{r.luts:>5} {r.ffs:>5} {r.cls:>5} {r.bsram:>5} {r.logic_levels:>4} "
+              f"{r.throughput_mops:>8.1f}M")
+
+    # Save results
+    results_path = V3_DIR / "sweep" / "sweep_results_v3.json"
+    results_data = [
+        {
+            "freq_mhz": r.freq_mhz,
+            "n_banks": r.n_banks,
+            "actual_fmax_mhz": r.actual_fmax_mhz,
+            "logic_levels": r.logic_levels,
+            "luts": r.luts,
+            "alus": r.alus,
+            "ffs": r.ffs,
+            "cls": r.cls,
+            "bsram": r.bsram,
+            "timing_met": r.timing_met,
+            "throughput_mops": r.throughput_mops,
+        }
+        for r in results
+    ]
+    results_path.write_text(json.dumps(results_data, indent=2))
+    print(f"\nResults saved to: {results_path}")
+
+    return results
+
+
+# ---------------------------------------------------------------------------
+# Main
+# ---------------------------------------------------------------------------
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Phase 6: v3 automated hardware synthesis sweep"
+    )
+    parser.add_argument("--banks", type=int, nargs="+", default=BANK_CONFIGS,
+                        help="N_BANKS values to test (default: 1 2 4 8 16)")
+    parser.add_argument("--freq", type=float, nargs="+", default=FREQ_TARGETS,
+                        help="Target frequencies in MHz")
+    parser.add_argument("--gen-only", action="store_true",
+                        help="Generate files without running synthesis")
+    parser.add_argument("--quick", action="store_true",
+                        help="Quick sweep: 81 MHz x [1,4,8,16] banks only")
+
+    args = parser.parse_args()
+
+    if args.quick:
+        args.freq = [81.0]
+        args.banks = [1, 4, 8, 16]
+
+    run_sweep(args.freq, args.banks, gen_only=args.gen_only)
+
+
+if __name__ == "__main__":
+    main()
