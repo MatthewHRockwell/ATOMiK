@@ -1,6 +1,6 @@
 # ATOMiK Known Issues & Error Log
 
-**Last Updated:** March 3, 2026
+**Last Updated:** March 6, 2026
 
 This document tracks hardware and software issues encountered during development, their root causes, and resolutions. It serves as a troubleshooting reference for future work.
 
