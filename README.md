@@ -101,19 +101,18 @@ python -m software.demos.state_sync_benchmark
 | **Parallel Accumulator Banks** | 16x linear scaling, 1,056 Mops/s, 80/80 HW tests | ✅ Complete |
 | **Production SoC Deployment** | PicoRV32 + ATOMiK @ 25.2/81 MHz, persistent flash | ✅ Complete |
 
-### Next-Generation Hardware (v3 - In Progress)
+### Next-Generation Hardware (v3)
 | Milestone | Description | Status |
 |-----------|-------------|--------|
 | **RV64I CPU Core** | Custom 64-bit RISC-V with integrated ATOMiK datapath | ✅ Complete (53/54 compliance) |
 | **Timing Closure** | 21.6 MHz CPU clock, zero TNS | ✅ Complete |
-| **CPU Hang Debug** | Root cause identified & fixed (timing violations) | ✅ Complete |
-| **Hardware Validation** | Repeated MMIO stress testing | ✅ Complete (62/62 PASS) |
-| **ISP Flasher** | Boot ROM with UART ISP protocol for flash programming | ✅ Complete |
-| **Flash Boot Chain** | BROM → ISP timeout → SPI XIP execution | ✅ Complete (validated, golden tag) |
+| **Hardware Validation** | MMIO stress testing, 62/62 PASS | ✅ Complete |
+| **Flash Boot Chain** | BROM → ISP timeout → SPI XIP execution | ✅ Complete (golden tag) |
 | **ATOMiK Hardware Tests** | 9 ATOMiK + 10 Phase 2 tests on v3 hardware | ✅ Complete (9/9 + 10/10 PASS) |
-| **Timing Violation Fix** | Resolved by downclocking to 21.6 MHz (V3-020) | ✅ Complete |
 | **Production SoC Deployment** | Tang Nano 9K @ 21.6 MHz, 0 TNS, persistent flash | ✅ **Deployed** |
-| **Delta-Driven Display** | Change-driven HDMI pipeline: `pixel_out = pixel_ref ⊕ LUT[index]` | ✅ Complete (6/6 PASS) |
+| **Delta-Driven Display** | `pixel_out = pixel_ref ⊕ LUT[index]` — HDMI 640×480 | ✅ Complete (6/6 PASS) |
+| **Parallel Banks** | N=16 @ 67.5 MHz = 1,080 Mops/s, 20/20 sim tests | ✅ Complete (synthesis-validated) |
+| **v2 vs v3 Benchmarks** | ATOMiK memcpy: +12% overhead → **-84.5% faster** | ✅ Complete (530 measurements, zero variance) |
 
 ---
 
@@ -216,6 +215,8 @@ N=16 breaks the **1 Gops/s barrier** on the Tang Nano 9K. Scaling is exactly lin
 | **HDMI** | 640x480 with delta-driven display pipeline |
 | **Display Pipeline** | `pixel_out = pixel_ref ⊕ LUT[index]` — zero-cost unchanged pixels |
 | **Flash Deployment** | Persistent SPI flash (bitstream + firmware via ISP programmer) |
+| **Parallel Banks (standalone)** | N=16 @ 67.5 MHz = 1,080 Mops/s (synthesis-validated, 20/20 sim tests) |
+| **ATOMiK Memcpy Speedup** | 6.4x faster than software (v2 was 12% slower) |
 | **Validation** | ATOMiK 9/9, Phase 2 10/10, Display 6/6 — all PASS |
 
 ### Standalone Core Performance
@@ -363,7 +364,9 @@ ATOMiK/
 | [Hardware Synthesis](docs/HARDWARE_SYNTHESIS.md) | Parallel bank synthesis sweep and HW validation |
 | [SDK Orchestration](docs/SDK_ORCHESTRATION.md) | Agentic orchestration architecture |
 | [Known Issues](docs/KNOWN_ISSUES.md) | Hardware/software issue tracker and troubleshooting |
-| [Production Deployment](docs/PRODUCTION_DEPLOYMENT.md) | Tang Nano 9K v2 SoC deployment guide |
+| [Production Deployment](docs/PRODUCTION_DEPLOYMENT.md) | Tang Nano 9K v2 + v3 SoC deployment guide |
+| [v3 Migration Guide](docs/V3_MIGRATION_GUIDE.md) | Porting firmware from v2 MMIO to v3 custom instructions |
+| [v2 vs v3 Comparison](hardware/v3/experiments/V2_VS_V3_COMPARISON.md) | Head-to-head benchmark analysis |
 | [v3 Task List](specs/atomik_v3_tasks.md) | v3 phased implementation tracker |
 
 ---

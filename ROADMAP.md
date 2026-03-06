@@ -1,9 +1,9 @@
 # ATOMiK — Roadmap & Execution Plan
 
-**Document Version:** 2.1
-**Date:** March 3, 2026
+**Document Version:** 2.2
+**Date:** March 6, 2026
 **Author:** Matt Rockwell + Claude (Planning Partner)
-**Status:** ACTIVE — v2 Production SoC deployed, v3 boot chain validated
+**Status:** ACTIVE — v2 Production SoC deployed, v3 production deployed (benchmarked + parallel banks validated)
 
 ---
 
@@ -664,23 +664,36 @@ The v3 architecture is a ground-up redesign: custom RV64I CPU with ATOMiK custom
 - **Phase 0**: Tooling & infrastructure (Verilator, iverilog, compliance runner, Gowin synthesis)
 - **Phase 1**: Custom RV64I CPU core — 53/54 rv64ui-p-* compliance (only `ma_data` misaligned access fails, expected)
 - **Phase 2**: ATOMiK v3 datapath — 4 custom instructions (LOAD, ACCUM, READ, SWAP), 1.016 CLS/bit mapping, 21+11 tests passing
-- **Phase 3 (partial)**: SoC integration — 5,594 LUT, 16 BSRAM, full SoC on Tang Nano 9K
-  - SRAM deployment working, UART functional
+- **Phase 3**: SoC integration — 5,594 LUT, 16 BSRAM, full SoC on Tang Nano 9K
+  - SRAM + persistent flash deployment working, UART functional
   - ISP flasher ported to RV64I, flash programming validated
-  - **Boot chain validated**: BROM → ISP timeout → JUMP! → XIP → F!F! (golden tag: `v3-boot-chain-golden`)
-
-### In Progress
-- **Timing violations (V3-020)**: 40 setup violations at 25.2 MHz, Fmax 24.745 MHz — needs clock reduction or decode pipeline optimization
-- **ISP protocol robustness**: NACK/error codes, readback verify (command 0x50)
-- **Full firmware port**: v2 UART menu + ATOMiK test suite on flash-resident firmware
+  - Boot chain validated: BROM → ISP timeout → JUMP! → XIP → full firmware (golden tag: `v3-boot-chain-golden`)
+  - All v2 tests ported: ATOMiK 9/9, Phase 2 10/10, Checkpoint, Memory, Heap — all PASS
+  - V3-020 resolved: downclocked to 21.6 MHz, zero TNS
+- **Phase 4**: Delta-driven display pipeline
+  - `pixel_out = pixel_ref ⊕ LUT[index]` — zero-cost unchanged pixels
+  - BSRAM-based: delta color LUT (256×24-bit) + scanline delta buffer (1024×9-bit)
+  - 6/6 display tests PASS, HDMI 640×480 @ 60 Hz on Dell monitor
+  - Dual-PLL architecture: CPU @ 21.6 MHz (PLL1), HDMI @ 25.2 MHz (PLL2)
+  - +372 LUT, +3 BSRAM from Phase 3 baseline
+- **Phase 6**: Parallel banks (synthesis-validated)
+  - `atomik_v3_parallel.v`: N=1,2,4,8,16 banks with XOR merge tree
+  - Shared BSRAM state table (constant 2 blocks regardless of N)
+  - 20/20 simulation tests PASS, 20-config synthesis sweep
+  - Best timing-met: N=16 @ 67.5 MHz = **1,080 Mops/s** (+2.3% vs v2)
+  - Per-bit LUT efficiency: 1.36 LUT/bit/bank (v3) vs 2.71 (v2) — 50% better
+- **Phase 7**: Benchmarking & production hardening
+  - 530 hardware measurements, all perfectly deterministic (zero variance)
+  - ATOMiK roundtrip: 285 cy (v2) → 160 cy (v3), **-44%**
+  - ATOMiK memcpy 256B: +12% overhead (v2) → **-84.5% faster** (v3)
+  - Change detection 256B: -80% (v2) → **-89.4%** (v3)
+  - Full comparison: [`hardware/v3/experiments/V2_VS_V3_COMPARISON.md`](hardware/v3/experiments/V2_VS_V3_COMPARISON.md)
 
 ### Pending
-- Phase 4: Display pipeline (delta color LUT, CLS3 SREG scanline mask)
-- Phase 5: I/O & multi-node streaming (IDES16/OSER16 LVDS)
-- Phase 6: Parallel banks & PLL optimization
-- Phase 7: Benchmarking & production hardening
+- **Phase 5**: I/O & multi-node streaming (IDES16/OSER16 LVDS)
+- **Phase 7.5**: Final release tag (`v3.0.0`)
 
 ---
 
 *This document is a living roadmap. Update as decisions are made and phases are completed.*
-*Last updated: March 3, 2026*
+*Last updated: March 6, 2026*
