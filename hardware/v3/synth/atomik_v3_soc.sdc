@@ -12,10 +12,10 @@
 //   FBDIV_SEL=3 (×4), IDIV_SEL=0 (÷1), ODIV_SEL=4: 27×4=108, VCO=432 MHz
 //   ATOMiK: Direct-wired via custom instructions (same domain as CPU)
 //
-// PLL2 (HDMI): 27 MHz → 126 MHz → CLKDIV2 ÷5 → 25.2 MHz (clk_pixel)
-//   FBDIV_SEL=13 (×14), IDIV_SEL=2 (÷3), ODIV_SEL=4: 27×14/3=126, VCO=504 MHz
-//   Standard 640×480 @ 60 Hz (25.2 MHz pixel clock)
-//   126 MHz used for HDMI 5x serializer
+// PLL2 (HDMI): 27 MHz → 200.57 MHz → CLKDIV2 ÷5 → 40.11 MHz (clk_pixel)
+//   FBDIV_SEL=51 (×52), IDIV_SEL=6 (÷7), ODIV_SEL=4: 27×52/7=200.57, VCO=802.3 MHz
+//   800×600 @ 60 Hz (40.11 MHz pixel clock, +0.3% from ideal 40 MHz)
+//   200.57 MHz used for HDMI 5x serializer
 //
 // CDC: Toggle-handshake bridge between CPU and pixel domains (disp_mmio_cdc)
 // ============================================================================
@@ -31,8 +31,8 @@ create_clock -name clk_osc -period 37.037 -waveform {0 18.518} [get_ports {clk}]
 // CPU clock: 21.6 MHz (period 46.296 ns) — PLL1 108 MHz ÷ 5
 create_clock -name clk_cpu -period 46.296 -waveform {0 23.148} [get_nets {clk_p}]
 
-// HDMI pixel clock: 25.2 MHz (period 39.683 ns) — PLL2 126 MHz ÷ 5
-create_clock -name clk_pixel -period 39.683 -waveform {0 19.841} [get_nets {clk_pixel}]
+// HDMI pixel clock: 40.11 MHz (period 24.931 ns) — PLL2 200.57 MHz ÷ 5
+create_clock -name clk_pixel -period 24.931 -waveform {0 12.466} [get_nets {clk_pixel}]
 
 // CDC false paths: toggle-handshake synchronizers handle timing
 set_false_path -from [get_clocks {clk_cpu}] -to [get_clocks {clk_pixel}]

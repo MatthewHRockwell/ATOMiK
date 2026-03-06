@@ -3,7 +3,7 @@
 `define SVO_XYBITS 14
 
 `define SVO_DEFAULT_PARAMS parameter \
-    SVO_MODE             =  "640x480", \
+    SVO_MODE             =  "800x600", \
     SVO_FRAMERATE        =  60, \
     SVO_BITS_PER_PIXEL   =  24, \
     SVO_BITS_PER_RED     =   8, \

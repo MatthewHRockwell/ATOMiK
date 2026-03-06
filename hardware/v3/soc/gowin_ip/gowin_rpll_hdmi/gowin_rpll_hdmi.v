@@ -1,12 +1,11 @@
-// HDMI PLL: 27 MHz → 126 MHz
-// Same parameters as v2 production PLL (proven working for HDMI)
+// HDMI PLL: 27 MHz → 200 MHz (800×600 @ 60 Hz)
 //
 // Gowin rPLL calculation:
 //   CLKOUT = FCLKIN × (FBDIV_SEL + 1) / (IDIV_SEL + 1)
-//          = 27 × 14 / 3 = 126 MHz
-//   VCO    = CLKOUT × ODIV_SEL = 126 × 4 = 504 MHz (400-1200 range OK)
+//          = 27 × 52 / 7 = 200.57 MHz
+//   VCO    = CLKOUT × ODIV_SEL = 200.57 × 4 = 802.3 MHz (400-1200 range OK)
 //
-// Used with CLKDIV ÷5 → 25.2 MHz pixel clock (standard 640×480 @ 60 Hz)
+// Used with CLKDIV ÷5 → 40.11 MHz pixel clock (800×600 @ 60 Hz, +0.3%)
 // Part Number: GW1NR-LV9QN88PC6/I5
 
 module Gowin_rPLL_HDMI (clkout, lock, clkin);
@@ -42,9 +41,9 @@ rPLL rpll_inst (
 
 defparam rpll_inst.FCLKIN = "27";
 defparam rpll_inst.DYN_IDIV_SEL = "false";
-defparam rpll_inst.IDIV_SEL = 2;
+defparam rpll_inst.IDIV_SEL = 6;
 defparam rpll_inst.DYN_FBDIV_SEL = "false";
-defparam rpll_inst.FBDIV_SEL = 13;
+defparam rpll_inst.FBDIV_SEL = 51;
 defparam rpll_inst.DYN_ODIV_SEL = "false";
 defparam rpll_inst.ODIV_SEL = 4;
 defparam rpll_inst.PSDA_SEL = "0000";

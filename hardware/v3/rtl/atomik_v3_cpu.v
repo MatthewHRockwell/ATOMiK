@@ -98,15 +98,76 @@ module atomik_v3_cpu #(
     wire        misaligned_trap;
 
     // FSM state constants (must match atomik_v3_control.v)
+    localparam S_DECODE    = 3'd1;
     localparam S_EXECUTE   = 3'd2;
     localparam S_MEMORY    = 3'd3;
+
+    // =========================================================================
+    // Registered decode outputs — breaks critical path from instr→decode→control
+    // Latched during DECODE state (1 cycle), valid from EXECUTE onward.
+    // No extra cycle added — DECODE already takes 1 cycle.
+    // =========================================================================
+    reg [63:0] dec_imm_r;
+    reg [4:0]  dec_alu_op_r;
+    reg        dec_alu_src_b_imm_r;
+    reg        dec_is_word_op_r;
+    reg        dec_is_lui_r, dec_is_auipc_r, dec_is_jal_r, dec_is_jalr_r;
+    reg        dec_is_branch_r, dec_is_load_r, dec_is_store_r;
+    reg        dec_is_alu_reg_r, dec_is_alu_imm_r;
+    reg        dec_is_system_r, dec_is_fence_r, dec_is_custom0_r;
+    reg [2:0]  dec_mem_size_r, dec_funct3_r;
+    reg        dec_illegal_r;
+
+    always @(posedge clk) begin
+        if (!rst_n) begin
+            dec_imm_r           <= 64'b0;
+            dec_alu_op_r        <= 5'b0;
+            dec_alu_src_b_imm_r <= 1'b0;
+            dec_is_word_op_r    <= 1'b0;
+            dec_is_lui_r        <= 1'b0;
+            dec_is_auipc_r      <= 1'b0;
+            dec_is_jal_r        <= 1'b0;
+            dec_is_jalr_r       <= 1'b0;
+            dec_is_branch_r     <= 1'b0;
+            dec_is_load_r       <= 1'b0;
+            dec_is_store_r      <= 1'b0;
+            dec_is_alu_reg_r    <= 1'b0;
+            dec_is_alu_imm_r    <= 1'b0;
+            dec_is_system_r     <= 1'b0;
+            dec_is_fence_r      <= 1'b0;
+            dec_is_custom0_r    <= 1'b0;
+            dec_mem_size_r      <= 3'b0;
+            dec_funct3_r        <= 3'b0;
+            dec_illegal_r       <= 1'b0;
+        end else if (state_out == S_DECODE) begin
+            dec_imm_r           <= dec_imm;
+            dec_alu_op_r        <= dec_alu_op;
+            dec_alu_src_b_imm_r <= dec_alu_src_b_imm;
+            dec_is_word_op_r    <= dec_is_word_op;
+            dec_is_lui_r        <= dec_is_lui;
+            dec_is_auipc_r      <= dec_is_auipc;
+            dec_is_jal_r        <= dec_is_jal;
+            dec_is_jalr_r       <= dec_is_jalr;
+            dec_is_branch_r     <= dec_is_branch;
+            dec_is_load_r       <= dec_is_load;
+            dec_is_store_r      <= dec_is_store;
+            dec_is_alu_reg_r    <= dec_is_alu_reg;
+            dec_is_alu_imm_r    <= dec_is_alu_imm;
+            dec_is_system_r     <= dec_is_system;
+            dec_is_fence_r      <= dec_is_fence;
+            dec_is_custom0_r    <= dec_is_custom0;
+            dec_mem_size_r      <= dec_mem_size;
+            dec_funct3_r        <= dec_funct3;
+            dec_illegal_r       <= dec_illegal;
+        end
+    end
 
     // =========================================================================
     // Bus arbitration: fetch vs LSU
     // FSM guarantees mutual exclusion — fetch only active in FETCH state,
     // LSU only active in MEMORY state
     // =========================================================================
-    wire lsu_has_bus = (state_out == S_MEMORY) || (state_out == S_EXECUTE && (dec_is_load || dec_is_store));
+    wire lsu_has_bus = (state_out == S_MEMORY) || (state_out == S_EXECUTE && (dec_is_load_r || dec_is_store_r));
 
     // synthesis translate_off
     // Bus mutual exclusion assertion: fetch and LSU must never drive bus simultaneously
@@ -196,10 +257,10 @@ module atomik_v3_cpu #(
     // ALU operand muxing
     // =========================================================================
     // Operand A: PC for AUIPC/branch/JAL (target = PC + imm), else RS1
-    assign alu_operand_a = (dec_is_auipc || dec_is_branch || dec_is_jal) ? pc : rs1_data;
+    assign alu_operand_a = (dec_is_auipc_r || dec_is_branch_r || dec_is_jal_r) ? pc : rs1_data;
 
     // Operand B: immediate if flagged, else RS2
-    assign alu_operand_b = dec_alu_src_b_imm ? dec_imm : rs2_data;
+    assign alu_operand_b = dec_alu_src_b_imm_r ? dec_imm_r : rs2_data;
 
     // =========================================================================
     // ALU
@@ -207,8 +268,8 @@ module atomik_v3_cpu #(
     atomik_v3_alu u_alu (
         .operand_a  (alu_operand_a),
         .operand_b  (alu_operand_b),
-        .alu_op     (dec_alu_op),
-        .is_word_op (dec_is_word_op),
+        .alu_op     (dec_alu_op_r),
+        .is_word_op (dec_is_word_op_r),
         .result     (alu_result)
     );
 
@@ -218,7 +279,7 @@ module atomik_v3_cpu #(
     atomik_v3_branch u_branch (
         .rs1_val      (rs1_data),
         .rs2_val      (rs2_data),
-        .funct3       (dec_funct3),
+        .funct3       (dec_funct3_r),
         .branch_taken (branch_taken)
     );
 
@@ -229,8 +290,8 @@ module atomik_v3_cpu #(
         .clk          (clk),
         .rst_n        (rst_n),
         .lsu_start    (lsu_start),
-        .lsu_is_store (dec_is_store),
-        .lsu_size     (dec_mem_size),
+        .lsu_is_store (dec_is_store_r),
+        .lsu_size     (dec_mem_size_r),
         .lsu_addr     (alu_result),     // Effective addr = rs1 + imm (from ALU)
         .lsu_wdata    (rs2_data),
         .lsu_rdata    (lsu_rdata),
@@ -248,7 +309,7 @@ module atomik_v3_cpu #(
     // CSR Unit
     // =========================================================================
     // CSR write data: for CSRRWI/CSRRSI/CSRRCI, use zero-extended zimm (rs1 field)
-    wire [63:0] csr_wdata_mux = (dec_funct3[2]) ?
+    wire [63:0] csr_wdata_mux = (dec_funct3_r[2]) ?
         {59'b0, dec_rs1} : rs1_data;
 
     atomik_v3_csr u_csr (
@@ -256,16 +317,16 @@ module atomik_v3_cpu #(
         .rst_n        (rst_n),
         .csr_addr     (instr[31:20]),   // CSR address from immediate field
         .csr_wdata    (csr_wdata_mux),
-        .csr_op       (dec_funct3),
+        .csr_op       (dec_funct3_r),
         .csr_wen      (csr_wen),
         .csr_rdata    (csr_rdata),
         .trap_enter   (trap_enter),
         .trap_pc      (pc),
         .trap_cause   (misaligned_trap ?
-                       (dec_is_store ? 64'd6 : 64'd4) :  // Store/load address misaligned
-                       dec_is_system && dec_funct3 == 3'b000 && instr[20] ?
+                       (dec_is_store_r ? 64'd6 : 64'd4) :  // Store/load address misaligned
+                       dec_is_system_r && dec_funct3_r == 3'b000 && instr[20] ?
                        64'd3 :  // EBREAK = cause 3
-                       dec_illegal ? 64'd2 :  // Illegal instruction = cause 2
+                       dec_illegal_r ? 64'd2 :  // Illegal instruction = cause 2
                        64'd11),  // ECALL from M-mode = cause 11
         .trap_return  (trap_return),
         .mtvec_out    (mtvec_out),
@@ -277,9 +338,9 @@ module atomik_v3_cpu #(
     // ATOMiK Datapath (accumulator, state table, reconstructor)
     // =========================================================================
     // Custom-0 sub-type decode
-    wire atomik_load  = dec_is_custom0 && (dec_funct3 == 3'b000);
-    wire atomik_accum = dec_is_custom0 && (dec_funct3 == 3'b001);
-    wire atomik_swap  = dec_is_custom0 && (dec_funct3 == 3'b011);
+    wire atomik_load  = dec_is_custom0_r && (dec_funct3_r == 3'b000);
+    wire atomik_accum = dec_is_custom0_r && (dec_funct3_r == 3'b001);
+    wire atomik_swap  = dec_is_custom0_r && (dec_funct3_r == 3'b011);
 
     // Enable signals: fire once during EXECUTE state
     wire atomik_load_en  = (state_out == S_EXECUTE) && atomik_load;
@@ -321,20 +382,20 @@ module atomik_v3_cpu #(
         .rst_n         (rst_n),
         .fetch_start   (fetch_start),
         .fetch_done    (fetch_done),
-        .is_lui        (dec_is_lui),
-        .is_auipc      (dec_is_auipc),
-        .is_jal        (dec_is_jal),
-        .is_jalr       (dec_is_jalr),
-        .is_branch     (dec_is_branch),
-        .is_load       (dec_is_load),
-        .is_store      (dec_is_store),
-        .is_alu_reg    (dec_is_alu_reg),
-        .is_alu_imm    (dec_is_alu_imm),
-        .is_system     (dec_is_system),
-        .is_fence      (dec_is_fence),
-        .is_custom0    (dec_is_custom0),
-        .illegal_instr (dec_illegal),
-        .funct3        (dec_funct3),
+        .is_lui        (dec_is_lui_r),
+        .is_auipc      (dec_is_auipc_r),
+        .is_jal        (dec_is_jal_r),
+        .is_jalr       (dec_is_jalr_r),
+        .is_branch     (dec_is_branch_r),
+        .is_load       (dec_is_load_r),
+        .is_store      (dec_is_store_r),
+        .is_alu_reg    (dec_is_alu_reg_r),
+        .is_alu_imm    (dec_is_alu_imm_r),
+        .is_system     (dec_is_system_r),
+        .is_fence      (dec_is_fence_r),
+        .is_custom0    (dec_is_custom0_r),
+        .illegal_instr (dec_illegal_r),
+        .funct3        (dec_funct3_r),
         .instr         (instr),
         .branch_taken  (branch_taken),
         .lsu_start     (lsu_start),

@@ -47,7 +47,7 @@ module svo_hdmi_top (
 	output [2:0] tmds_d_n,
 	output [2:0] tmds_d_p
 );
-	parameter SVO_MODE             =   "640x480V";
+	parameter SVO_MODE             =   "800x600";
 	parameter SVO_FRAMERATE        =   60;
 	parameter SVO_BITS_PER_PIXEL   =   24;
 	parameter SVO_BITS_PER_RED     =    8;

@@ -7,7 +7,7 @@
 // Sits between svo_overlay output and svo_enc input in the HDMI pipeline.
 // Two BSRAM blocks (inferred by synthesis):
 //   1. Delta Color LUT: 256 × 24-bit transition delta colors
-//   2. Scanline Delta Buffer: 640 × 9-bit {change_flag, lut_index[7:0]}
+//   2. Scanline Delta Buffer: SVO_HOR_PIXELS × 9-bit {change_flag, lut_index[7:0]}
 //
 // MMIO at 0xC000_0000 (S3 bus slot):
 //   +0x00  DISP_CTRL   [0] enable, [1] vblank (RO), [11:2] row (RO)
@@ -48,6 +48,10 @@ module atomik_delta_display #( `SVO_DEFAULT_PARAMS ) (
 );
     `SVO_DECLS
 
+    // Scanline buffer depth: next power-of-2 >= SVO_HOR_PIXELS for clean BSRAM
+    localparam SCAN_BUF_DEPTH = (SVO_HOR_PIXELS <= 1024) ? 1024 : 2048;
+    localparam COL_BITS = (SVO_HOR_PIXELS <= 1024) ? 10 : 11;
+
     // =========================================================================
     // Control registers
     // =========================================================================
@@ -57,8 +61,8 @@ module atomik_delta_display #( `SVO_DEFAULT_PARAMS ) (
     // =========================================================================
     // Pixel position tracking
     // =========================================================================
-    reg [9:0] pixel_col;    // 0-639
-    reg [9:0] pixel_row;    // 0-479
+    reg [COL_BITS-1:0] pixel_col;
+    reg [10:0]         pixel_row;   // 11 bits for up to 2048 rows
     reg       frame_done;   // Set when last active pixel completes
     reg [15:0] frame_count; // Increments on each SOF (wraps at 65535)
 
@@ -66,26 +70,26 @@ module atomik_delta_display #( `SVO_DEFAULT_PARAMS ) (
 
     always @(posedge clk) begin
         if (!resetn) begin
-            pixel_col   <= 10'd0;
-            pixel_row   <= 10'd0;
+            pixel_col   <= {COL_BITS{1'b0}};
+            pixel_row   <= 11'd0;
             frame_done  <= 1'b0;
             frame_count <= 16'd0;
         end else if (pixel_advance) begin
             if (in_axis_tuser[0]) begin
                 // Start of frame
-                pixel_col   <= 10'd0;
-                pixel_row   <= 10'd0;
+                pixel_col   <= {COL_BITS{1'b0}};
+                pixel_row   <= 11'd0;
                 frame_done  <= 1'b0;
                 frame_count <= frame_count + 16'd1;
             end else if (pixel_col == SVO_HOR_PIXELS - 1) begin
-                pixel_col <= 10'd0;
+                pixel_col <= {COL_BITS{1'b0}};
                 if (pixel_row == SVO_VER_PIXELS - 1) begin
                     frame_done <= 1'b1;
                 end else begin
-                    pixel_row <= pixel_row + 10'd1;
+                    pixel_row <= pixel_row + 11'd1;
                 end
             end else begin
-                pixel_col <= pixel_col + 10'd1;
+                pixel_col <= pixel_col + {{(COL_BITS-1){1'b0}}, 1'b1};
             end
         end
     end
@@ -113,13 +117,13 @@ module atomik_delta_display #( `SVO_DEFAULT_PARAMS ) (
     end
 
     // =========================================================================
-    // Scanline Delta Buffer — 1024 × 9-bit (inferred as BSRAM)
+    // Scanline Delta Buffer — SCAN_BUF_DEPTH × 9-bit (inferred as BSRAM)
     // {change_flag[8], lut_index[7:0]}
     // Applied to ALL scanlines (same pattern every row)
     // Port A: CPU write via MMIO
     // Port B: Display pipeline read
     // =========================================================================
-    reg [8:0] scan_mem [0:1023];
+    reg [8:0] scan_mem [0:SCAN_BUF_DEPTH-1];
 
     // Port B: Display read (addressed by pixel_col)
     reg [8:0] scan_rd_data_b;
@@ -220,7 +224,7 @@ module atomik_delta_display #( `SVO_DEFAULT_PARAMS ) (
                     2'b00: begin  // DISP_CTRL
                         if (mmio_is_write)
                             delta_enable <= mmio_wdata[0];
-                        mmio_rdata <= {20'b0, pixel_row, 1'b0, delta_enable};
+                        mmio_rdata <= {19'b0, pixel_row, 1'b0, delta_enable};
                     end
 
                     2'b01: begin  // DISP_LUT
@@ -233,13 +237,13 @@ module atomik_delta_display #( `SVO_DEFAULT_PARAMS ) (
 
                     2'b10: begin  // DISP_SCAN
                         if (mmio_is_write) begin
-                            scan_mem[mmio_wdata[25:16]] <= mmio_wdata[8:0];
+                            scan_mem[mmio_wdata[26:16]] <= mmio_wdata[8:0];
                         end
                         mmio_rdata <= 32'h0;
                     end
 
                     2'b11: begin  // DISP_STATUS
-                        mmio_rdata <= {frame_count, 5'b0, frame_done, pixel_row};
+                        mmio_rdata <= {frame_count, 4'b0, frame_done, pixel_row};
                     end
                 endcase
             end
@@ -253,7 +257,7 @@ module atomik_delta_display #( `SVO_DEFAULT_PARAMS ) (
     initial begin
         for (i = 0; i < 256; i = i + 1)
             lut_mem[i] = 24'h0;
-        for (i = 0; i < 1024; i = i + 1)
+        for (i = 0; i < SVO_HOR_PIXELS; i = i + 1)
             scan_mem[i] = 9'h0;
     end
 

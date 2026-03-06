@@ -53,8 +53,8 @@ module atomik_v3_soc (
 // Clock generation: Dual-PLL architecture
 //
 // PLL1 (CPU):  27 MHz → 108 MHz → CLKDIV ÷5 → 21.6 MHz (clk_p)
-// PLL2 (HDMI): 27 MHz → 126 MHz → CLKDIV2 ÷5 → 25.2 MHz (clk_pixel)
-//   126 MHz also used for HDMI 5x serializer (OSER10 FCLK)
+// PLL2 (HDMI): 27 MHz → 200.57 MHz → CLKDIV2 ÷5 → 40.11 MHz (clk_pixel)
+//   200.57 MHz also used for HDMI 5x serializer (OSER10 FCLK)
 //
 // CPU domain (21.6 MHz): RV64I core, SRAM, peripherals, ATOMiK
 // Pixel domain (25.2 MHz): HDMI pipeline (svo_tcard → enc → tmds → OSER10)
