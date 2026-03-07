@@ -10,7 +10,7 @@
 //   2. Scanline Delta Buffer: SVO_HOR_PIXELS × 9-bit {change_flag, lut_index[7:0]}
 //
 // MMIO at 0xC000_0000 (S3 bus slot):
-//   +0x00  DISP_CTRL   [0] enable, [1] vblank (RO), [11:2] row (RO)
+//   +0x00  DISP_CTRL   [0] delta_enable, [1] solid_bg, [11:2] row (RO)
 //   +0x04  DISP_LUT    Write: {addr[31:24], color[23:0]}
 //                       Read: {addr[31:24], lut_data[23:0]} at last addr
 //   +0x08  DISP_SCAN   Write: {col[25:16], change[8], index[7:0]}
@@ -44,7 +44,10 @@ module atomik_delta_display #( `SVO_DEFAULT_PARAMS ) (
     input  wire [31:0] mmio_addr,
     input  wire [31:0] mmio_wdata,
     input  wire [3:0]  mmio_wstrb,
-    output reg  [31:0] mmio_rdata
+    output reg  [31:0] mmio_rdata,
+
+    // Solid background control (active-high: replace tcard with black)
+    output wire        solid_bg
 );
     `SVO_DECLS
 
@@ -56,7 +59,10 @@ module atomik_delta_display #( `SVO_DEFAULT_PARAMS ) (
     // Control registers
     // =========================================================================
     reg delta_enable;   // Bit 0 of DISP_CTRL
+    reg solid_bg_r;     // Bit 1 of DISP_CTRL: replace tcard with black
     reg [7:0] lut_addr_reg;  // Last-written LUT address (for readback)
+
+    assign solid_bg = solid_bg_r;
 
     // =========================================================================
     // Pixel position tracking
@@ -213,6 +219,7 @@ module atomik_delta_display #( `SVO_DEFAULT_PARAMS ) (
             mmio_ready   <= 1'b0;
             mmio_rdata   <= 32'h0;
             delta_enable <= 1'b0;
+            solid_bg_r   <= 1'b0;
             lut_addr_reg <= 8'h0;
         end else begin
             mmio_ready <= 1'b0;
@@ -222,9 +229,11 @@ module atomik_delta_display #( `SVO_DEFAULT_PARAMS ) (
 
                 case (mmio_reg_sel)
                     2'b00: begin  // DISP_CTRL
-                        if (mmio_is_write)
+                        if (mmio_is_write) begin
                             delta_enable <= mmio_wdata[0];
-                        mmio_rdata <= {19'b0, pixel_row, 1'b0, delta_enable};
+                            solid_bg_r   <= mmio_wdata[1];
+                        end
+                        mmio_rdata <= {19'b0, pixel_row, solid_bg_r, delta_enable};
                     end
 
                     2'b01: begin  // DISP_LUT

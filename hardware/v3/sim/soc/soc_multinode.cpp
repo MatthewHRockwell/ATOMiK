@@ -198,6 +198,8 @@ int main(int argc, char **argv) {
     uint64_t sim_time = 40;
 
     // Track which commands have been sent
+    bool a_break_sent = false;  // Break demo_loop on SoC A
+    bool b_break_sent = false;  // Break demo_loop on SoC B
     bool a_sent_n = false;
     bool b_sent_n = false;
     bool a_sent_n5 = false;
@@ -226,6 +228,16 @@ int main(int argc, char **argv) {
         // Monitor UARTs
         mon_a.tick(soc_a->ser_tx);
         mon_b.tick(soc_b->ser_tx);
+
+        // Break demo_loop on both SoCs as soon as banner appears
+        if (mon_a.has("ATOMiK") && !a_break_sent) {
+            inj_a.queue(' ');
+            a_break_sent = true;
+        }
+        if (mon_b.has("ATOMiK") && !b_break_sent) {
+            inj_b.queue(' ');
+            b_break_sent = true;
+        }
 
         // State machine: wait for Command prompt, then send test commands
         // SoC B: set to listen mode (N4) first

@@ -124,6 +124,10 @@ module svo_hdmi_top (
 		.out_axis_tuser(term_out_tuser)
 	);
 
+	// Solid background mode: replace tcard output with black
+	wire solid_bg;
+	wire [SVO_BITS_PER_PIXEL-1:0] bg_tdata = solid_bg ? {SVO_BITS_PER_PIXEL{1'b0}} : vdma_tdata;
+
 	svo_overlay #( `SVO_PASS_PARAMS ) svo_overlay (
 		.clk(clk_pixel),
 		.resetn(clk_pixel_resetn),
@@ -131,7 +135,7 @@ module svo_hdmi_top (
 
 		.in_axis_tvalid(vdma_tvalid),
 		.in_axis_tready(vdma_tready),
-		.in_axis_tdata(vdma_tdata),
+		.in_axis_tdata(bg_tdata),
 		.in_axis_tuser(vdma_tuser),
 
 		.over_axis_tvalid(term_out_tvalid),
@@ -164,7 +168,8 @@ module svo_hdmi_top (
 		.mmio_addr(disp_mmio_addr),
 		.mmio_wdata(disp_mmio_wdata),
 		.mmio_wstrb(disp_mmio_wstrb),
-		.mmio_rdata(disp_mmio_rdata)
+		.mmio_rdata(disp_mmio_rdata),
+		.solid_bg(solid_bg)
 	);
 
 	svo_enc #( `SVO_PASS_PARAMS ) svo_enc (

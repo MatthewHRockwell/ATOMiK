@@ -238,9 +238,13 @@ int main(int argc, char **argv) {
     // this takes ~5M+ cycles. For faster sim, we'll inject the 'X'
     // command once the banner appears.
 
-    // Run simulation — firmware auto-runs test suite on boot, no keystroke needed
+    // Run simulation — firmware starts in demo_loop() which waits for display
+    // hardware frame ticks. Since sim has no display, demo_loop will spin on
+    // the cycle-count fallback. We inject a serial character after the banner
+    // prints to break out of demo_loop and trigger cmd_run_all().
     uint64_t cycle = 0;
     uint64_t sim_time = 40;  // Continue from reset phase
+    bool injected_break = false;
 
     printf("--- UART Output ---\n");
     while (cycle < max_cycles && !Verilated::gotFinish()) {
@@ -255,6 +259,13 @@ int main(int argc, char **argv) {
 
         // Monitor UART on rising edge
         uart_mon.tick(top->ser_tx);
+
+        // Once banner appears, inject a character to break demo_loop
+        if (uart_mon.found_banner && !injected_break) {
+            uart_inj.queue(' ');  // Any char breaks demo_loop
+            injected_break = true;
+            printf("\n[SIM] Injecting serial break to exit demo_loop\n");
+        }
 
         // Check for boot self-test completion
         if (uart_mon.buffer.find("Boot Self-Test Complete") != std::string::npos) {
