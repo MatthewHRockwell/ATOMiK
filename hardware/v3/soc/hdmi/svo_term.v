@@ -24,7 +24,7 @@
 
 module svo_term #(
 	`SVO_DEFAULT_PARAMS,
-	parameter MEM_DEPTH = 2048
+	parameter MEM_DEPTH = 8192
 ) (
 	// resetn clock domain: clk
 	input clk, oclk, resetn,
