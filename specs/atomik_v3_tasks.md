@@ -541,7 +541,25 @@ Additionally: `review.yml` (PR ruff check) and `math/proofs/.github/workflows/le
 - [ ] Compare against v2's USB serial baseline (~12 Mbit/s)
 - [ ] Target: ≥100 Mbit/s sustained (accounting for protocol overhead)
 
-**Exit criteria**: Two boards exchange delta streams at ≥100 Mbit/s. Both boards converge to identical reconstructed state. Commutativity verified on hardware.
+### 5.6 Simulation-Based Multi-Node (Precursor) ✅ **COMPLETE — March 7, 2026**
+- [x] Dual-SoC Verilator simulation with cross-connected link UARTs
+  - `soc_multinode.cpp`: Two `sim_soc_top` instances, A.link_tx → B.link_rx and vice versa
+  - Link UART at 115200 baud (CLKDIV=185) — CLKDIV=9 overflows 1-byte RX buffer
+- [x] Firmware link protocol: sync (0xA5) + cmd + len + payload + CRC-8 XOR
+  - `cmd_link_send_deltas()`: 5 deltas (0x1111..., 0x2222..., 0x4444..., 0x8888..., 0x0F0F...)
+  - `cmd_link_listen()`: Receive deltas, accumulate via ATOMiK custom instructions
+- [x] State convergence verified: both SoCs report 0xF0F0F0F0F0F0F0F0 (all 7 checks PASS)
+- [x] `make sim-multinode` in CI-ready Makefile target
+
+### 5.7 Standalone Demo Mode ✅ **COMPLETE — March 7, 2026**
+- [x] Auto-run boot self-test: all test suites execute on power-up without serial input
+  - ATOMiK test (9/9), Phase 2 test (10/10), checkpoint demo, memory benchmark, heap demo
+  - Output renders on HDMI via svo_term (no USB terminal needed)
+- [x] `make sim-soc` validates auto-run (banner + ALL PASS + "Boot Self-Test Complete")
+- [x] Menu still available after auto-run for interactive use when serial is connected
+  - Added `[A] Run all tests` menu command for manual re-trigger
+
+**Exit criteria**: Two boards exchange delta streams at ≥100 Mbit/s. Both boards converge to identical reconstructed state. Commutativity verified on hardware. **Partial**: Simulation-verified convergence complete. Hardware LVDS streaming blocked on second board.
 
 ---
 

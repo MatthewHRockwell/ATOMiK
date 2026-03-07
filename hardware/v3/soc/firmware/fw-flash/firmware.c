@@ -1299,6 +1299,29 @@ void cmd_shell(void)
     }
 }
 
+// --------------------------------------------------------
+// Auto-Run: Boot Self-Test Suite
+// --------------------------------------------------------
+// Runs all test suites and demos on boot (no user input needed).
+// Output goes to both UART and HDMI text terminal.
+
+void cmd_run_all(void)
+{
+    print("\n========================================\n");
+    print("  ATOMiK v3 Boot Self-Test\n");
+    print("========================================\n");
+
+    cmd_atomik_test();      // 9/9 custom instruction tests
+    cmd_phase2_test();      // 10/10 integration tests
+    cmd_checkpoint_demo();  // checkpoint/rollback demo
+    cmd_mem_benchmark();    // memory performance
+    cmd_heap_demo();        // heap integrity
+
+    print("\n========================================\n");
+    print("  Boot Self-Test Complete\n");
+    print("========================================\n\n");
+}
+
 #define CLK_FREQ        21600000  // 21.6 MHz (108 MHz PLL / 5 CLKDIV)
 #define UART_BAUD       115200
 
@@ -1347,6 +1370,9 @@ void main()
     GPIO0->OUT = 0x3F;
     for (i = 0; i < 10000; i++);
 
+    // Auto-run test suite on boot (output on HDMI + UART)
+    cmd_run_all();
+
     while (1)
     {
         print("\n");
@@ -1365,6 +1391,7 @@ void main()
         print("   [V] Display pipeline test\n");
         print("   [R] Performance benchmark suite\n");
         print("   [N] Multi-node link operations\n");
+        print("   [A] Run all test suites\n");
         print("   [>] Interactive shell\n");
 
         for (int rep = 10; rep > 0; rep--)
@@ -1412,6 +1439,7 @@ void main()
             case 'V': case 'v': cmd_display_test(); break;
             case 'R': case 'r': cmd_perf_suite(); break;
             case 'N': case 'n': cmd_multinode(); break;
+            case 'A': case 'a': cmd_run_all(); break;
             case '>': cmd_shell(); break;
             default: continue;
             }

@@ -176,7 +176,7 @@ int main(int argc, char **argv) {
     // Defaults
     std::string brom_path = "hardware/v3/soc/firmware/fw-brom/build/fw-brom.v32";
     std::string flash_path = "hardware/v3/soc/firmware/fw-flash/build/fw-flash.v";
-    uint64_t max_cycles = 20000000;  // 20M cycles @ 25 MHz ≈ 0.8s
+    uint64_t max_cycles = 40000000;  // 40M cycles — boot self-test runs 5 suites
     bool trace_en = false;
 
     // Parse args
@@ -238,17 +238,16 @@ int main(int argc, char **argv) {
     // this takes ~5M+ cycles. For faster sim, we'll inject the 'X'
     // command once the banner appears.
 
-    // Run simulation
+    // Run simulation — firmware auto-runs test suite on boot, no keystroke needed
     uint64_t cycle = 0;
     uint64_t sim_time = 40;  // Continue from reset phase
-    bool command_sent = false;
 
     printf("--- UART Output ---\n");
     while (cycle < max_cycles && !Verilated::gotFinish()) {
         // Rising edge
         top->clk = 1;
         top->ser_rx = uart_inj.tick();
-        top->link_rx = top->link_tx;  // Loopback for N1 test
+        top->link_rx = 1;  // Link UART idle
         top->eval();
 #ifdef TRACE
         if (tfp) tfp->dump(sim_time++);
@@ -257,19 +256,11 @@ int main(int argc, char **argv) {
         // Monitor UART on rising edge
         uart_mon.tick(top->ser_tx);
 
-        // Once we see "Command>", send 'X' for ATOMiK hardware test
-        if (uart_mon.found_banner && !command_sent &&
-            uart_mon.buffer.find("Command>") != std::string::npos) {
-            uart_inj.queue('X');
-            command_sent = true;
-        }
-
-        // Check for completion (ATOMiK ALL PASS)
-        if (uart_mon.found_allpass) {
-            // Let a few more characters drain
-            for (int i = 0; i < 100000; i++) {
+        // Check for boot self-test completion
+        if (uart_mon.buffer.find("Boot Self-Test Complete") != std::string::npos) {
+            // Drain a bit more for the menu prompt to print
+            for (int i = 0; i < 200000; i++) {
                 top->clk = !top->clk;
-                top->ser_rx = uart_inj.tick();
                 top->eval();
 #ifdef TRACE
                 if (tfp) tfp->dump(sim_time++);
@@ -301,13 +292,18 @@ int main(int argc, char **argv) {
     }
 
     if (uart_mon.found_allpass) {
-        printf("PASS: ATOMiK tests ALL PASS\n");
-    } else if (uart_mon.found_atomik) {
-        printf("FAIL: ATOMiK tests started but did not complete\n");
-        result = 1;
+        printf("PASS: Boot self-test ALL PASS\n");
     } else {
-        printf("INFO: ATOMiK tests not run (timeout before Command>)\n");
-        // Not a hard failure — the ISP timeout is long
+        printf("FAIL: Boot self-test did not complete or had failures\n");
+        result = 1;
+    }
+
+    // Check that boot self-test completed
+    if (uart_mon.buffer.find("Boot Self-Test Complete") != std::string::npos) {
+        printf("PASS: Boot self-test completed\n");
+    } else {
+        printf("FAIL: Boot self-test did not finish (timeout)\n");
+        result = 1;
     }
 
     printf("\nSimulated %lu cycles\n", cycle);

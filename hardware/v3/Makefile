@@ -325,7 +325,7 @@ else
 		$(SIM_SOC)/soc_smoke.cpp \
 		-o soc_smoke
 	@echo "=== Running SoC simulation ==="
-	cd $(SOC_BUILD) && ./soc_smoke --timeout 25000000
+	cd $(SOC_BUILD) && ./soc_smoke --timeout 40000000
 endif
 
 # -----------------------------------------------------------------------------
