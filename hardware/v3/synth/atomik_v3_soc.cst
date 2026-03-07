@@ -45,3 +45,10 @@ IO_PORT "debug_reset_n" IO_TYPE=LVCMOS18 PULL_MODE=NONE DRIVE=8;
 
 IO_LOC "debug_clk_toggle" 16;
 IO_PORT "debug_clk_toggle" IO_TYPE=LVCMOS18 PULL_MODE=NONE DRIVE=8;
+
+// Inter-board link UART (Phase 5: multi-node delta streaming)
+// Left header (J1): Bank 2, regular IO pins
+IO_LOC "link_tx" 25;
+IO_PORT "link_tx" IO_TYPE=LVCMOS33 PULL_MODE=NONE DRIVE=8;
+IO_LOC "link_rx" 26;
+IO_PORT "link_rx" IO_TYPE=LVCMOS33 PULL_MODE=UP;

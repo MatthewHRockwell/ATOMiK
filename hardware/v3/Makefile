@@ -307,7 +307,8 @@ ifeq ($(VERILATOR),)
 else
 	@mkdir -p $(SOC_BUILD)
 	@echo "=== Preparing firmware hex files ==="
-	python3 $(FW_SCRIPTS)/v_to_hex32.py $(FW_BROM)/build/fw-brom.v $(SOC_BUILD)/fw-brom.hex32 0x80000000
+	@echo "=== Preparing firmware hex files ==="
+	cp $(SIM_SOC)/fw-brom-sim.hex32 $(SOC_BUILD)/fw-brom.hex32
 	python3 $(FW_SCRIPTS)/v_to_hex32.py $(FW_FLASH)/build/fw-flash.v $(SOC_BUILD)/fw-flash.hex32 0x00000000
 	@echo "=== Building SoC simulation ==="
 	$(VERILATOR) --cc --exe --build --trace-fst \
@@ -325,6 +326,35 @@ else
 		-o soc_smoke
 	@echo "=== Running SoC simulation ==="
 	cd $(SOC_BUILD) && ./soc_smoke --timeout 25000000
+endif
+
+# -----------------------------------------------------------------------------
+# sim-multinode: Dual-SoC convergence simulation
+# -----------------------------------------------------------------------------
+sim-multinode: firmware
+ifeq ($(VERILATOR),)
+	@echo "SKIP: verilator not found"
+else
+	@mkdir -p $(SOC_BUILD)
+	@echo "=== Preparing firmware hex files ==="
+	cp $(SIM_SOC)/fw-brom-sim.hex32 $(SOC_BUILD)/fw-brom.hex32
+	python3 $(FW_SCRIPTS)/v_to_hex32.py $(FW_FLASH)/build/fw-flash.v $(SOC_BUILD)/fw-flash.hex32 0x00000000
+	@echo "=== Building dual-SoC multi-node simulation ==="
+	$(VERILATOR) --cc --exe --build --trace-fst \
+		-DTRACE \
+		-CFLAGS "-DTRACE" \
+		-Wno-TIMESCALEMOD -Wno-WIDTHTRUNC -Wno-WIDTHEXPAND \
+		--top-module sim_soc_top \
+		--Mdir $(SOC_BUILD) \
+		-I$(RTL_DIR) -I$(SOC_DIR) \
+		$(RTL_CPU) \
+		$(SOC_DIR)/picoperipheral.v \
+		$(SOC_DIR)/simpleuart.v \
+		$(SIM_SOC)/sim_soc_top.v \
+		$(SIM_SOC)/soc_multinode.cpp \
+		-o soc_multinode
+	@echo "=== Running dual-SoC convergence test ==="
+	cd $(SOC_BUILD) && ./soc_multinode --timeout 50000000
 endif
 
 # -----------------------------------------------------------------------------

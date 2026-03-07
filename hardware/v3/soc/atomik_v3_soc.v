@@ -20,6 +20,7 @@
 //   0x82000000  GPIO (7-bit)
 //   0x83000000  UART (115200)
 //   0xC0000000  Display Pipeline MMIO (delta color LUT, scanline buffer)
+//   0xC0000100  Link UART (inter-board, ~2 Mbaud)
 //
 // BSRAM budget: 4 regfile + 2 ATOMiK + 4 BROM + 4 SRAM = 14/26 (54%)
 // =============================================================================
@@ -43,6 +44,10 @@ module atomik_v3_soc (
     input  ser_rx,
     output ser_tx,
     inout [4:0] gpio,  // Reduced from [6:0] to free pins 15,16 for debug
+
+    // Inter-board link UART (Phase 5: multi-node delta streaming)
+    input  link_rx,
+    output link_tx,
 
     // Debug outputs
     output wire debug_reset_n,    // LED: HIGH when CPU out of reset
@@ -227,7 +232,26 @@ PicoMem_Mux_1_4 u_bus_mux (
     .picos3_rdata(wbp_rdata)
 );
 
-// S3 → Display pipeline MMIO (via CDC bridge to pixel clock domain)
+// =========================================================================
+// S3 sub-mux: addr[8] splits display MMIO vs link UART
+//   0xC000_0000 - 0xC000_00FF → Display MMIO (via CDC to pixel domain)
+//   0xC000_0100 - 0xC000_01FF → Link UART (CPU domain, no CDC)
+// =========================================================================
+wire s3_sel_link = wbp_addr[8];  // 1 = link UART, 0 = display
+
+// Display path (addr[8]==0)
+wire        disp_cpu_valid = wbp_valid & ~s3_sel_link;
+wire        disp_cpu_ready;
+wire [31:0] disp_cpu_rdata;
+
+// Link UART path (addr[8]==1)
+wire        link_valid = wbp_valid & s3_sel_link;
+wire        link_ready;
+wire [31:0] link_rdata;
+
+// Mux ready/rdata back to bus
+assign wbp_ready = s3_sel_link ? link_ready : disp_cpu_ready;
+assign wbp_rdata = s3_sel_link ? link_rdata : disp_cpu_rdata;
 
 // CDC bridge pixel-side signals (clk_pixel domain)
 wire        disp_cdc_valid;
@@ -241,12 +265,12 @@ disp_mmio_cdc u_disp_cdc (
     // CPU side (21.6 MHz)
     .clk_cpu     (clk_p),
     .rst_cpu_n   (sys_resetn),
-    .cpu_valid   (wbp_valid),
-    .cpu_ready   (wbp_ready),
+    .cpu_valid   (disp_cpu_valid),
+    .cpu_ready   (disp_cpu_ready),
     .cpu_addr    (wbp_addr),
     .cpu_wdata   (wbp_wdata),
     .cpu_wstrb   (wbp_wstrb),
-    .cpu_rdata   (wbp_rdata),
+    .cpu_rdata   (disp_cpu_rdata),
 
     // Pixel side (25.2 MHz)
     .clk_pixel   (clk_pixel),
@@ -257,6 +281,23 @@ disp_mmio_cdc u_disp_cdc (
     .disp_wdata  (disp_cdc_wdata),
     .disp_wstrb  (disp_cdc_wstrb),
     .disp_rdata  (disp_cdc_rdata)
+);
+
+// =========================================================================
+// Link UART (inter-board, ~2 Mbaud at CLKDIV=9)
+// Same PicoMem_UART wrapper as console UART, on header pins 55/53
+// =========================================================================
+PicoMem_UART u_link_uart (
+    .resetn     (sys_resetn),
+    .clk        (clk_p),
+    .mem_s_valid(link_valid),
+    .mem_s_ready(link_ready),
+    .mem_s_addr (wbp_addr),
+    .mem_s_wdata(wbp_wdata),
+    .mem_s_wstrb(wbp_wstrb),
+    .mem_s_rdata(link_rdata),
+    .ser_rx     (link_rx),
+    .ser_tx     (link_tx)
 );
 
 // =========================================================================

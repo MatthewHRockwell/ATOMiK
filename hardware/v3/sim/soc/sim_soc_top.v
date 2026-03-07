@@ -26,8 +26,17 @@ module sim_soc_top (
     input  wire        ser_rx,
     output wire        ser_tx,
 
+    // Link UART pins (inter-board)
+    input  wire        link_rx,
+    output wire        link_tx,
+
     // GPIO (directly exposed for monitoring)
-    output wire [6:0]  gpio_out
+    output wire [6:0]  gpio_out,
+
+    // Debug: link UART internal state
+    output wire        dbg_link_recv_valid,
+    output wire [7:0]  dbg_link_recv_data,
+    output wire [31:0] dbg_link_cfg_div
 );
 
     // =========================================================================
@@ -231,9 +240,41 @@ module sim_soc_top (
     );
 
     // =========================================================================
-    // Unused region (0xC0000000) — immediate ready
+    // S3 region (0xC0000000) — sub-mux: display MMIO stub + link UART
+    //   addr[8]=0 → Display MMIO (stub: immediate ready, zero data)
+    //   addr[8]=1 → Link UART (real simpleuart)
     // =========================================================================
-    wire unused_ready = mem_valid && unused_sel;
+    wire s3_sel = unused_sel;
+    wire s3_link_sel = s3_sel && mem_addr[8];
+    wire s3_disp_sel = s3_sel && !mem_addr[8];
+
+    // Display MMIO stub
+    wire s3_disp_ready = mem_valid && s3_disp_sel;
+
+    // Link UART
+    wire s3_link_ready;
+    wire [31:0] s3_link_rdata;
+
+    PicoMem_UART u_link_uart (
+        .resetn     (rst_n),
+        .clk        (clk),
+        .mem_s_valid(mem_valid && s3_link_sel),
+        .mem_s_ready(s3_link_ready),
+        .mem_s_addr (mem_addr),
+        .mem_s_wdata(mem_wdata),
+        .mem_s_wstrb(mem_wstrb),
+        .mem_s_rdata(s3_link_rdata),
+        .ser_rx     (link_rx),
+        .ser_tx     (link_tx)
+    );
+
+    wire s3_ready = s3_link_sel ? s3_link_ready : s3_disp_ready;
+    wire [31:0] s3_rdata = s3_link_sel ? s3_link_rdata : 32'h0;
+
+    // Debug: expose link UART internal state
+    assign dbg_link_recv_valid = u_link_uart.u_uart.recv_buf_valid;
+    assign dbg_link_recv_data  = u_link_uart.u_uart.recv_buf_data;
+    assign dbg_link_cfg_div    = u_link_uart.u_uart.cfg_divider;
 
     // =========================================================================
     // Bus mux
@@ -244,7 +285,7 @@ module sim_soc_top (
                        spicfg_sel  ? spicfg_ready :
                        gpio_sel    ? gpio_ready :
                        uart_sel    ? uart_ready_w :
-                       unused_sel  ? unused_ready :
+                       s3_sel      ? s3_ready :
                        1'b0;
 
     assign mem_rdata = flash_sel   ? flash_rdata :
@@ -253,6 +294,7 @@ module sim_soc_top (
                        spicfg_sel  ? spicfg_rdata :
                        gpio_sel    ? gpio_rdata :
                        uart_sel    ? uart_rdata_w :
+                       s3_sel      ? s3_rdata :
                        32'h0;
 
 endmodule

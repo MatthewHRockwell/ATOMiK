@@ -209,14 +209,16 @@ int main(int argc, char **argv) {
     }
 #endif
 
-    // UART monitor (25.2 MHz clock, 115200 baud)
-    UartMonitor uart_mon(25175000, 115200);
-    UartInjector uart_inj(25175000, 115200);
+    // UART monitor — firmware sets CLKDIV=185, simpleuart uses CLKDIV+2=187
+    // cycles per bit. Use 21.6 MHz (actual CPU clock) for correct timing.
+    UartMonitor uart_mon(21600000, 115200);
+    UartInjector uart_inj(21600000, 115200);
 
     // Reset
     top->clk = 0;
     top->rst_n = 0;
-    top->ser_rx = 1;  // Idle high
+    top->ser_rx = 1;   // Idle high
+    top->link_rx = 1;  // Idle high
 
     // Hold reset for 20 cycles
     for (int i = 0; i < 40; i++) {
@@ -246,6 +248,7 @@ int main(int argc, char **argv) {
         // Rising edge
         top->clk = 1;
         top->ser_rx = uart_inj.tick();
+        top->link_rx = top->link_tx;  // Loopback for N1 test
         top->eval();
 #ifdef TRACE
         if (tfp) tfp->dump(sim_time++);
@@ -254,14 +257,14 @@ int main(int argc, char **argv) {
         // Monitor UART on rising edge
         uart_mon.tick(top->ser_tx);
 
-        // Once we see "Command>", send 'X' to trigger ATOMiK test
+        // Once we see "Command>", send 'X' for ATOMiK hardware test
         if (uart_mon.found_banner && !command_sent &&
             uart_mon.buffer.find("Command>") != std::string::npos) {
             uart_inj.queue('X');
             command_sent = true;
         }
 
-        // Check for completion
+        // Check for completion (ATOMiK ALL PASS)
         if (uart_mon.found_allpass) {
             // Let a few more characters drain
             for (int i = 0; i < 100000; i++) {

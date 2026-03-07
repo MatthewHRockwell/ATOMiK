@@ -41,11 +41,14 @@ typedef struct {
 #define GPIO0 ((PICOGPIO*)0x82000000)
 #define UART0 ((PICOUART*)0x83000000)
 
-// Display pipeline MMIO (S3 slot: 0xC0000000)
+// Display pipeline MMIO (S3 slot: 0xC0000000, addr[8]=0)
 #define DISP_CTRL   (*(volatile uint32_t*)0xC0000000)
 #define DISP_LUT    (*(volatile uint32_t*)0xC0000004)
 #define DISP_SCAN   (*(volatile uint32_t*)0xC0000008)
 #define DISP_STATUS (*(volatile uint32_t*)0xC000000C)
+
+// Link UART (S3 slot: 0xC0000100, addr[8]=1, inter-board)
+#define LINK0 ((PICOUART*)0xC0000100)
 
 #define FLASHIO_ENTRY_ADDR ((void *)0x80000054)
 
@@ -162,6 +165,367 @@ void cmd_read_flash_id()
     for (int i = 1; i <= 3; i++) { putchar(' '); print_hex(buffer[i], 2); }
     putchar('\n');
     cmd_set_dspi(pre_dspi);
+}
+
+// --------------------------------------------------------
+// Link UART Driver (inter-board, ~2 Mbaud)
+// --------------------------------------------------------
+
+// Protocol: [0xA5] [CMD] [LEN] [PAYLOAD...] [CRC8]
+// CRC8 = XOR of all bytes (sync + cmd + len + payload)
+#define LINK_SYNC   0xA5
+#define LINK_CMD_DELTA     0x01  // 8-byte delta value
+#define LINK_CMD_PING      0x02  // no payload
+#define LINK_CMD_PONG      0x03  // no payload
+#define LINK_CMD_STATE_REQ 0x04  // request peer state
+#define LINK_CMD_STATE_RSP 0x05  // 8-byte state value
+
+// Link baud: 21.6 MHz / (CLKDIV+2) ≈ 115200 at CLKDIV=185
+// Note: CLKDIV=9 (~2 Mbaud) is too fast for software polling — the 1-byte
+// RX buffer overflows before the CPU can read each byte. CLKDIV=185 gives
+// ~1870 cycles/byte, plenty of margin for the XIP polling loop.
+#define LINK_CLKDIV_VAL  185
+
+static void link_init(void)
+{
+    LINK0->CLKDIV = LINK_CLKDIV_VAL;
+}
+
+static void link_putchar(uint8_t c)
+{
+    LINK0->DATA = c;
+}
+
+static int link_getchar(void)
+{
+    return (int32_t)LINK0->DATA;
+}
+
+// Non-blocking receive with timeout (in cycles)
+static int link_getchar_timeout(uint32_t timeout_cycles)
+{
+    uint64_t start = cycles64();
+    int c;
+    while ((c = link_getchar()) < 0) {
+        if ((uint32_t)(cycles64() - start) > timeout_cycles)
+            return -1;
+    }
+    return c;
+}
+
+static void link_send_packet(uint8_t cmd, const uint8_t *payload, uint8_t len)
+{
+    uint8_t crc = LINK_SYNC ^ cmd ^ len;
+    link_putchar(LINK_SYNC);
+    link_putchar(cmd);
+    link_putchar(len);
+    for (uint8_t i = 0; i < len; i++) {
+        link_putchar(payload[i]);
+        crc ^= payload[i];
+    }
+    link_putchar(crc);
+}
+
+// Receive a packet. Returns cmd on success, -1 on timeout/error.
+// payload buffer must be >= 8 bytes. *out_len set to payload length.
+static int link_recv_packet(uint8_t *payload, uint8_t *out_len, uint32_t timeout)
+{
+    // Wait for sync byte
+    int c = link_getchar_timeout(timeout);
+    if (c < 0) return -1;
+    if (c != LINK_SYNC) return -1;
+
+    int cmd = link_getchar_timeout(timeout);
+    if (cmd < 0) return -1;
+
+    int len = link_getchar_timeout(timeout);
+    if (len < 0 || len > 8) return -1;
+
+    uint8_t crc = LINK_SYNC ^ (uint8_t)cmd ^ (uint8_t)len;
+    for (int i = 0; i < len; i++) {
+        c = link_getchar_timeout(timeout);
+        if (c < 0) return -1;
+        payload[i] = (uint8_t)c;
+        crc ^= (uint8_t)c;
+    }
+
+    c = link_getchar_timeout(timeout);
+    if (c < 0 || (uint8_t)c != crc) return -1;
+
+    *out_len = (uint8_t)len;
+    return cmd;
+}
+
+static void link_send_delta(uint64_t delta)
+{
+    uint8_t buf[8];
+    for (int i = 0; i < 8; i++)
+        buf[i] = (uint8_t)(delta >> (i * 8));
+    link_send_packet(LINK_CMD_DELTA, buf, 8);
+}
+
+static void link_send_ping(void)
+{
+    link_send_packet(LINK_CMD_PING, 0, 0);
+}
+
+static void link_send_pong(void)
+{
+    link_send_packet(LINK_CMD_PONG, 0, 0);
+}
+
+static void link_send_state(uint64_t state)
+{
+    uint8_t buf[8];
+    for (int i = 0; i < 8; i++)
+        buf[i] = (uint8_t)(state >> (i * 8));
+    link_send_packet(LINK_CMD_STATE_RSP, buf, 8);
+}
+
+static uint64_t link_payload_to_u64(const uint8_t *buf)
+{
+    uint64_t val = 0;
+    for (int i = 7; i >= 0; i--)
+        val = (val << 8) | buf[i];
+    return val;
+}
+
+// --------------------------------------------------------
+// Multi-Node Tests [N]
+// --------------------------------------------------------
+
+static void cmd_link_loopback(void)
+{
+    // N1: Loopback test — requires jumper wire TX→RX (pin 25→26)
+    print("\nN1: Link UART Loopback Test\n");
+    print("  (Requires jumper: pin 25 → pin 26)\n\n");
+
+    link_init();
+
+    int pass = 0, fail = 0;
+    uint8_t test_bytes[] = { 0x00, 0x55, 0xAA, 0xFF, 0x42 };
+
+    // Test 1: Raw byte echo
+    print("  Raw byte echo: ");
+    for (int i = 0; i < 5; i++) {
+        link_putchar(test_bytes[i]);
+        int c = link_getchar_timeout(216000);  // 10ms timeout
+        if (c == test_bytes[i]) {
+            pass++;
+        } else {
+            mini_printf("FAIL (sent 0x%02x, got 0x%02x)\n", test_bytes[i], c);
+            fail++;
+        }
+    }
+    if (fail == 0) print("PASS (5/5)\n");
+
+    // Test 2: Framed delta packet
+    print("  Delta packet:   ");
+    link_send_delta(0xCAFEBABE12345678ULL);
+    uint8_t payload[8];
+    uint8_t plen;
+    int cmd = link_recv_packet(payload, &plen, 216000);
+    if (cmd == LINK_CMD_DELTA && plen == 8) {
+        uint64_t val = link_payload_to_u64(payload);
+        if (val == 0xCAFEBABE12345678ULL) {
+            print("PASS\n");
+            pass++;
+        } else {
+            mini_printf("FAIL (got 0x%lx)\n", val);
+            fail++;
+        }
+    } else {
+        mini_printf("FAIL (cmd=%d len=%d)\n", cmd, plen);
+        fail++;
+    }
+
+    // Test 3: Ping/pong
+    print("  Ping loopback:  ");
+    link_send_ping();
+    cmd = link_recv_packet(payload, &plen, 216000);
+    if (cmd == LINK_CMD_PING && plen == 0) {
+        print("PASS\n");
+        pass++;
+    } else {
+        mini_printf("FAIL (cmd=%d)\n", cmd);
+        fail++;
+    }
+
+    mini_printf("\nN1 Result: %u/%u PASS\n", pass, pass + fail);
+}
+
+static void cmd_link_ping(void)
+{
+    // N2: Ping peer and measure round-trip
+    print("\nN2: Ping Peer\n\n");
+    link_init();
+
+    link_send_ping();
+    uint64_t t0 = cycles64();
+    uint8_t payload[8];
+    uint8_t plen;
+    int cmd = link_recv_packet(payload, &plen, 21600000);  // 1s timeout
+    uint64_t t1 = cycles64();
+
+    if (cmd == LINK_CMD_PONG) {
+        mini_printf("PONG received: %u cycles round-trip\n", (uint32_t)(t1 - t0));
+    } else if (cmd == LINK_CMD_PING) {
+        // Peer also sent a ping — respond with pong
+        link_send_pong();
+        print("Received PING (peer also pinged), sent PONG\n");
+    } else {
+        print("No response (timeout)\n");
+    }
+}
+
+static void cmd_link_convergence(void)
+{
+    // N5: Convergence test — both boards accumulate same deltas, compare states
+    print("\nN5: Convergence Test\n\n");
+    link_init();
+
+    // Initialize ATOMiK slot 0
+    atomik_load(0, 0x0ULL);
+
+    // Accumulate local deltas
+    uint64_t deltas[] = { 0x1111111111111111ULL,
+                          0x2222222222222222ULL,
+                          0x4444444444444444ULL };
+    for (int i = 0; i < 3; i++) {
+        atomik_accum(deltas[i]);
+        mini_printf("  Accumulated delta 0x%lx\n", deltas[i]);
+    }
+
+    // Send deltas to peer
+    print("  Sending deltas to peer...\n");
+    for (int i = 0; i < 3; i++)
+        link_send_delta(deltas[i]);
+
+    // Also try to receive deltas from peer (bidirectional)
+    print("  Receiving deltas from peer...\n");
+    uint8_t payload[8];
+    uint8_t plen;
+    int recv_count = 0;
+    for (int i = 0; i < 3; i++) {
+        int cmd = link_recv_packet(payload, &plen, 21600000);
+        if (cmd == LINK_CMD_DELTA && plen == 8) {
+            uint64_t d = link_payload_to_u64(payload);
+            atomik_accum(d);
+            mini_printf("  Received delta 0x%lx\n", d);
+            recv_count++;
+        }
+    }
+
+    // Read final state
+    uint64_t state = atomik_read(0);
+    mini_printf("\n  Local state:  0x%lx\n", state);
+    mini_printf("  Deltas recv:  %d\n", recv_count);
+
+    // Request peer state
+    link_send_packet(LINK_CMD_STATE_REQ, 0, 0);
+    int cmd = link_recv_packet(payload, &plen, 21600000);
+    if (cmd == LINK_CMD_STATE_RSP && plen == 8) {
+        uint64_t peer_state = link_payload_to_u64(payload);
+        mini_printf("  Peer state:   0x%lx\n", peer_state);
+        if (state == peer_state) {
+            print("\n  CONVERGENCE: PASS (states match)\n");
+        } else {
+            print("\n  CONVERGENCE: FAIL (states differ)\n");
+        }
+    } else {
+        print("  Could not get peer state\n");
+    }
+}
+
+static void cmd_link_listen(void)
+{
+    // N4: Receive mode — accumulate incoming deltas, respond to pings
+    print("\nN4: Link Listen Mode (Ctrl-C or 'q' to exit)\n\n");
+    link_init();
+
+    atomik_load(0, 0x0ULL);
+    int delta_count = 0;
+
+    while (1) {
+        // Check for console input to exit
+        int console = (int32_t)UART0->DATA;
+        if (console == 'q' || console == 3) break;  // 'q' or Ctrl-C
+
+        uint8_t payload[8];
+        uint8_t plen;
+        int cmd = link_recv_packet(payload, &plen, 216000);  // 10ms timeout
+
+        if (cmd == LINK_CMD_DELTA && plen == 8) {
+            uint64_t d = link_payload_to_u64(payload);
+            atomik_accum(d);
+            delta_count++;
+            // Don't print per-delta — console UART stall (~1870 cy/char)
+            // causes next packet's bytes to overflow the 1-byte RX buffer.
+            // Print summary after loop exits instead.
+            putchar('+');  // minimal progress indicator (single char)
+        } else if (cmd == LINK_CMD_PING) {
+            link_send_pong();
+            print("  PING -> PONG\n");
+        } else if (cmd == LINK_CMD_STATE_REQ) {
+            uint64_t state = atomik_read(0);
+            link_send_state(state);
+            mini_printf("  STATE_REQ -> 0x%lx\n", state);
+        }
+    }
+
+    mini_printf("\nReceived %d deltas, final state: 0x%lx\n",
+                delta_count, atomik_read(0));
+}
+
+static void cmd_link_send(void)
+{
+    // N3: Send delta stream to peer
+    print("\nN3: Send Delta Stream\n\n");
+    link_init();
+
+    uint64_t deltas[] = {
+        0x1111111111111111ULL,
+        0x2222222222222222ULL,
+        0x4444444444444444ULL,
+        0x8888888888888888ULL,
+        0x0F0F0F0F0F0F0F0FULL
+    };
+
+    // Accumulate locally and send
+    atomik_load(0, 0x0ULL);
+    for (int i = 0; i < 5; i++) {
+        atomik_accum(deltas[i]);
+        link_send_delta(deltas[i]);
+        mini_printf("  Sent delta 0x%lx\n", deltas[i]);
+    }
+
+    uint64_t state = atomik_read(0);
+    mini_printf("\n  Local state: 0x%lx\n", state);
+    print("  (Peer should converge to same state)\n");
+}
+
+static void cmd_multinode(void)
+{
+    print("\n=== Multi-Node Operations ===\n");
+    print("  N1: Loopback test (pin 25 → pin 26 jumper)\n");
+    print("  N2: Ping peer\n");
+    print("  N3: Send delta stream\n");
+    print("  N4: Listen mode (receive deltas)\n");
+    print("  N5: Convergence test\n");
+    print("\nSelect: ");
+
+    char c = getchar();
+    putchar(c);
+    putchar('\n');
+
+    switch (c) {
+    case '1': cmd_link_loopback(); break;
+    case '2': cmd_link_ping(); break;
+    case '3': cmd_link_send(); break;
+    case '4': cmd_link_listen(); break;
+    case '5': cmd_link_convergence(); break;
+    default: print("Unknown sub-command\n"); break;
+    }
 }
 
 // --------------------------------------------------------
@@ -1000,6 +1364,7 @@ void main()
         print("   [P] Phase 2 full test\n");
         print("   [V] Display pipeline test\n");
         print("   [R] Performance benchmark suite\n");
+        print("   [N] Multi-node link operations\n");
         print("   [>] Interactive shell\n");
 
         for (int rep = 10; rep > 0; rep--)
@@ -1046,6 +1411,7 @@ void main()
             case 'P': case 'p': cmd_phase2_test(); break;
             case 'V': case 'v': cmd_display_test(); break;
             case 'R': case 'r': cmd_perf_suite(); break;
+            case 'N': case 'n': cmd_multinode(); break;
             case '>': cmd_shell(); break;
             default: continue;
             }
