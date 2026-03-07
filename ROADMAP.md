@@ -1,9 +1,9 @@
 # ATOMiK — Roadmap & Execution Plan
 
-**Document Version:** 2.2
+**Document Version:** 2.3
 **Date:** March 6, 2026
 **Author:** Matt Rockwell + Claude (Planning Partner)
-**Status:** ACTIVE — v2 Production SoC deployed, v3 production deployed (benchmarked + parallel banks validated)
+**Status:** ACTIVE — v2 Production SoC deployed, v3.1.0 production deployed (HD 1280x720 HDMI, benchmarked + parallel banks validated)
 
 ---
 
@@ -670,12 +670,14 @@ The v3 architecture is a ground-up redesign: custom RV64I CPU with ATOMiK custom
   - Boot chain validated: BROM → ISP timeout → JUMP! → XIP → full firmware (golden tag: `v3-boot-chain-golden`)
   - All v2 tests ported: ATOMiK 9/9, Phase 2 10/10, Checkpoint, Memory, Heap — all PASS
   - V3-020 resolved: downclocked to 21.6 MHz, zero TNS
-- **Phase 4**: Delta-driven display pipeline
+- **Phase 4**: Delta-driven display pipeline + HD HDMI
   - `pixel_out = pixel_ref ⊕ LUT[index]` — zero-cost unchanged pixels
-  - BSRAM-based: delta color LUT (256×24-bit) + scanline delta buffer (1024×9-bit)
-  - 6/6 display tests PASS, HDMI 640×480 @ 60 Hz on Dell monitor
-  - Dual-PLL architecture: CPU @ 21.6 MHz (PLL1), HDMI @ 25.2 MHz (PLL2)
-  - +372 LUT, +3 BSRAM from Phase 3 baseline
+  - BSRAM-based: delta color LUT (256×24-bit) + scanline delta buffer (1280×9-bit)
+  - 6/6 display tests PASS, **HDMI 1280×720 @ 60 Hz** on Dell monitor
+  - Dual-PLL architecture: CPU @ 21.6 MHz (PLL1), HDMI pixel @ 74.25 MHz (PLL2: 371.25 MHz ÷5)
+  - Decode pipelining: DECODE_REG state added, CPU Fmax 23.2 MHz (+7.4% margin)
+  - Pixel pipeline optimized: 3-stage TMDS, 3-stage svo_tcard, parallel prefix gray2bin, enc→tmds register buffer
+  - +321 LUT, +1 BSRAM from Phase 3 baseline (v3.0.0); +693 LUT total at v3.1.0
 - **Phase 6**: Parallel banks (synthesis-validated)
   - `atomik_v3_parallel.v`: N=1,2,4,8,16 banks with XOR merge tree
   - Shared BSRAM state table (constant 2 blocks regardless of N)
@@ -689,9 +691,19 @@ The v3 architecture is a ground-up redesign: custom RV64I CPU with ATOMiK custom
   - Change detection 256B: -80% (v2) → **-89.4%** (v3)
   - Full comparison: [`hardware/v3/experiments/V2_VS_V3_COMPARISON.md`](hardware/v3/experiments/V2_VS_V3_COMPARISON.md)
 
+### Releases
+- **v3.0.0** — Production SoC: RV64I + ATOMiK + 640×480 HDMI + all tests passing
+- **v3.1.0** — HD HDMI upgrade: 1280×720@60Hz + decode pipelining + pixel pipeline optimization
+  - LUT: 6,287 (73%), CLS: 3,783 (88%), BSRAM: 20 (77%)
+  - Pixel Fmax: 74.384 MHz (+0.18% margin), CPU Fmax: 23.192 MHz (+7.4% margin)
+  - All tests passing: 53/54 compliance, 9/9 ATOMiK, 10/10 integration, 6/6 display
+
 ### Pending
 - **Phase 5**: I/O & multi-node streaming (IDES16/OSER16 LVDS)
-- **Phase 7.5**: Final release tag (`v3.0.0`)
+
+### Assessed & Closed (No Further Action)
+- **CPU clock upgrade** (21.6→27 MHz): Blocked — CPU Fmax only 23.2 MHz, need ≥30 MHz for 27 MHz target
+- **QSPI enable**: Low priority — 2-5% speedup, instruction fetch rarely the bottleneck on single-issue in-order cores
 
 ---
 

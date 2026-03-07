@@ -418,13 +418,13 @@ Additionally: `review.yml` (PR ruff check) and `math/proofs/.github/workflows/le
 
 ---
 
-## Phase 4: Display Pipeline ✅ **COMPLETE — March 3, 2026**
+## Phase 4: Display Pipeline + HD HDMI ✅ **COMPLETE — March 6, 2026**
 
-**Goal**: Implement the change-driven display architecture — delta color LUT and scanline delta buffer for per-pixel XOR updates.
+**Goal**: Implement the change-driven display architecture — delta color LUT and scanline delta buffer for per-pixel XOR updates. Maximize HDMI resolution.
 
 **Dependencies**: Phase 3 (SoC with HDMI output must work)
 
-**Architecture note**: The original plan called for CLS3 SREG shift registers for the scanline delta mask and index. This was replaced with a **BSRAM-based approach** to conserve CLS (87% → 88% vs projected 90%+ for SREG). Two BSRAM blocks store the scanline delta buffer (1024×9-bit: change flag + LUT index) and delta color LUT (256×24-bit). The existing svo_tcard + svo_overlay output serves as `pixel_ref` — no separate reference buffer needed.
+**Architecture note**: The original plan called for CLS3 SREG shift registers for the scanline delta mask and index. This was replaced with a **BSRAM-based approach** to conserve CLS (87% → 88% vs projected 90%+ for SREG). Two BSRAM blocks store the scanline delta buffer (1280×9-bit: change flag + LUT index) and delta color LUT (256×24-bit). The existing svo_tcard + svo_overlay output serves as `pixel_ref` — no separate reference buffer needed.
 
 ### 4.1 Delta Color LUT (BSRAM)
 - [x] 256×24-bit delta color LUT inferred as BSRAM (SDPB)
@@ -434,11 +434,11 @@ Additionally: `review.yml` (PR ruff check) and `math/proofs/.github/workflows/le
 - [x] Verified: write LUT[1]=0xFF0000, read back 0x01FF0000 — PASS (D2 test)
 
 ### 4.2 Scanline Delta Buffer (BSRAM)
-- [x] 1024×9-bit scanline delta buffer inferred as BSRAM (SDPX9B)
+- [x] 1280×9-bit scanline delta buffer inferred as BSRAM (SDPX9B) — parameterized to `SVO_HOR_PIXELS`
 - [x] Per-pixel entry: `{change_flag[8], lut_index[7:0]}`
 - [x] Applied to ALL scanlines (same pattern every row)
 - [x] CPU writes via MMIO at DISP_SCAN (0xC0000008): `{col[25:16], change[8], index[7:0]}`
-- [x] Read port: addressed by pixel column counter (0-639), synchronized with pixel stream
+- [x] Read port: addressed by pixel column counter (0-1279), synchronized with pixel stream
 
 ### 4.3 2-Stage Display Pipeline
 - [x] Inserted between svo_overlay output and svo_enc input in HDMI chain
@@ -469,18 +469,36 @@ Additionally: `review.yml` (PR ruff check) and `math/proofs/.github/workflows/le
 
 ### 4.6 Synthesis and Resource Check
 - [x] Synthesized SoC + display pipeline through Gowin EDA
-- [x] **Results** (GW1NR-LV9QN88PC6/I5):
+- [x] **v3.0.0 Results** (640×480@60Hz, GW1NR-LV9QN88PC6/I5):
   - **LUT**: 5,966 (69%) — +372 from Phase 3 baseline
   - **CLS**: 3,782 (88%) — +44 from Phase 3 baseline
   - **BSRAM**: 19/26 (74%) — +3 from Phase 3 (delta LUT + scanline buffer + overhead)
   - **Fmax**: 21.637 MHz (target 21.6 MHz, +0.17% margin)
   - **TNS**: 0.000 on all clock domains
-  - 3 pre-existing TMDS recovery violations (benign, reset path)
 - [x] CLS growth minimal (+44) thanks to BSRAM approach (vs ~360 projected for CLS3 SREG)
 
-**Known issue**: V3-021 — some monitors report unsupported timing (21.6 MHz pixel clock = ~51.4 Hz, non-standard). Display renders correctly regardless. See `docs/KNOWN_ISSUES.md`.
+### 4.7 HD HDMI Upgrade (1280×720@60Hz) ✅ **v3.1.0 — March 6, 2026**
+- [x] Parameterized scanline buffer: `scan_mem [0:SVO_HOR_PIXELS-1]` (was hardcoded `[0:1023]`)
+- [x] PLL2 reconfigured: 27 × 55/4 = 371.25 MHz, CLKDIV ÷5 = 74.25 MHz pixel clock
+- [x] SVO_MODE changed to "1280x720" in `svo_defines.vh`
+- [x] Decode pipelining: added DECODE_REG state between DECODE and EXECUTE (+1 cycle/insn)
+- [x] Pixel pipeline optimization chain (36 → 74.4 MHz):
+  - 3-stage TMDS pipeline (`svo_tmds.v`) — +21.8 MHz
+  - 3-stage svo_tcard pipeline with pre-registered RNG and cursor flags — +10.6 MHz
+  - Parallel prefix gray2bin in svo_term — eliminated O(n) XOR reduction
+  - Font lookup pipeline split (p5→p6) in svo_term — broke BSRAM → output path
+  - Pre-registered portA/portB BSRAM comparisons in svo_term
+  - enc→tmds register buffer in svo_hdmi_top — broke routing critical path
+- [x] **v3.1.0 Results** (1280×720@60Hz):
+  - **LUT**: 6,287 (73%)
+  - **CLS**: 3,783 (88%)
+  - **BSRAM**: 20/26 (77%)
+  - **Pixel Fmax**: 74.384 MHz (target 74.250, +0.18% margin)
+  - **CPU Fmax**: 23.192 MHz (target 21.600, +7.4% margin)
+  - **TNS**: 0.000 on all clock domains
+  - All tests: 53/54 compliance, 9/9 ATOMiK, 10/10 integration, 6/6 display (~59.7 fps)
 
-**Exit criteria**: ✅ HDMI output shows correct delta-driven pixel updates. Static pixels pass through unchanged (zero delta activity). Delta color LUT produces correct per-pixel XOR transitions. Timing met. All 6 display tests PASS. No regressions on ATOMiK (9/9) or Phase 2 (10/10) tests.
+**Exit criteria**: ✅ HDMI output shows correct delta-driven pixel updates at 1280×720@60Hz. Static pixels pass through unchanged. Delta color LUT produces correct per-pixel XOR transitions. Timing met. All 6 display tests PASS. No regressions on ATOMiK (9/9) or Phase 2 (10/10) tests.
 
 ---
 
@@ -673,10 +691,13 @@ Phase 7: Benchmarking & Production
 | 1 | ~1,800 | 8,013 (pre-opt) → 2,728 (optimized) | 4 | — | CPU + BSRAM register file |
 | 2 | ~2,000 | 3,181 | 6 | — | + ATOMiK acc + state table |
 | 3 | ~3,100 | **5,594** | **16** | **3,738 (87%)** | + SRAM, Boot ROM, UART, GPIO, HDMI |
-| 4 | ~5,800 | **5,966** | **19** | **3,782 (88%)** | + Delta color LUT + scanline delta buffer |
+| 4 (v3.0.0) | ~5,800 | **5,966** | **19** | **3,782 (88%)** | + Delta color LUT + scanline delta buffer (640×480) |
+| 4 (v3.1.0) | — | **6,287** | **20** | **3,783 (88%)** | + HD 1280×720 HDMI + decode pipelining + pixel pipeline opt |
 | 5 | ~6,100 | — | — | — | + IDES16/OSER16 control logic |
 | 6 | ~7,000 (N=16) | **1,781** (standalone) | **2** | **1,292** | + Parallel banks (N=16 @ 67.5 MHz = 1,080 Mops/s) |
 
 **Hard limits**: 8,640 LUT4, 26 BSRAM, 2 PLL, 4,320 CLS
-**Tightest constraint**: CLS at 88% (3,782/4,320) after Phase 4 + Fmax margin at 0.17%. Future phases must avoid wide combinational fan-in to preserve timing. LUT headroom: 2,674 remaining (31%). BSRAM: 7 remaining (27%).
-**Key insight**: Original targets assumed 32-bit-equivalent scaling. The 64-bit CPU + peripherals use ~46% more LUT than v2, but fit within the GW1NR-9. BSRAM-based display pipeline kept CLS growth minimal (+44 vs ~360 projected for CLS3 SREG approach).
+**Current utilization (v3.1.0)**: LUT 6,287 (73%), CLS 3,783 (88%), BSRAM 20 (77%), PLL 2/2 (100%)
+**Tightest constraint**: CLS at 88% (3,783/4,320). LUT headroom: 2,353 remaining (27%). BSRAM: 6 remaining (23%). PLLs: fully committed (CPU + HDMI).
+**Pixel domain margin**: 0.18% (74.384 vs 74.250 MHz target) — production-tight but timing-met.
+**Key insight**: Original targets assumed 32-bit-equivalent scaling. The 64-bit CPU + peripherals use ~46% more LUT than v2, but fit within the GW1NR-9. BSRAM-based display pipeline kept CLS growth minimal. HD 1280×720@60Hz achieved through systematic pixel pipeline optimization (6 separate optimizations to reach 74.25 MHz).

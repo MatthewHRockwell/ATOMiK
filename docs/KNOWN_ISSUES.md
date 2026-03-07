@@ -742,7 +742,7 @@ end
 
 **Severity:** High
 **Date:** March 3, 2026
-**Status:** ✅ Resolved (March 5, 2026)
+**Status:** ✅ Resolved (March 5, 2026) — upgraded to 1280×720@60Hz in v3.1.0 (March 6, 2026)
 
 **Symptom:** Monitor displays "The current input timing is not supported by the monitor display" — no video output visible.
 
@@ -778,19 +778,23 @@ end
 
 **Files Modified:**
 - `soc/atomik_v3_soc.v` — Dual-PLL, pixel-domain reset, CDC bridge, HDMI clock routing
-- `soc/hdmi/atomik_delta_display.v` — Pipeline stall logic
+- `soc/hdmi/atomik_delta_display.v` — Pipeline stall logic + parameterized scanline buffer
 - `synth/atomik_v3_soc.sdc` — Added clk_pixel constraint + CDC false paths
 
 **Files Created:**
-- `soc/gowin_ip/gowin_rpll_hdmi/gowin_rpll_hdmi.v` — HDMI PLL (27→126 MHz)
-- `soc/gowin_ip/gowin_clkdiv_hdmi/gowin_clkdiv_hdmi.v` — HDMI CLKDIV (÷5→25.2 MHz)
+- `soc/gowin_ip/gowin_rpll_hdmi/gowin_rpll_hdmi.v` — HDMI PLL (27→126 MHz initially, later 371.25 MHz for 720p)
+- `soc/gowin_ip/gowin_clkdiv_hdmi/gowin_clkdiv_hdmi.v` — HDMI CLKDIV (÷5)
 - `soc/hdmi/disp_mmio_cdc.v` — Toggle-handshake CDC bridge
 
-**Timing Results (post-fix):**
-- CPU Fmax: 21.987 MHz (target 21.6, +1.8% margin)
-- Pixel Fmax: 33.964 MHz (target 25.2, +34.8% margin)
+**Timing Results (v3.1.0 — 1280×720@60Hz):**
+- CPU Fmax: 23.192 MHz (target 21.6, +7.4% margin)
+- Pixel Fmax: 74.384 MHz (target 74.25, +0.18% margin)
 - TNS: 0.000 on all clocks
 - rPLL: 2/2 (100%)
+
+**Resolution progression:**
+1. v3.0.0: 640×480@60Hz with dedicated HDMI PLL (25.2 MHz pixel, +34.8% margin)
+2. v3.1.0: **1280×720@60Hz** — 6 pixel pipeline optimizations to reach 74.25 MHz (TMDS pipeline, svo_tcard pipeline, gray2bin, font pipeline, portB pre-reg, enc→tmds buffer)
 
 **Lesson:** Any registered pipeline stage inserted into the SVO video path MUST handle AXI-Stream backpressure. Without stall logic, `svo_enc`'s pixel FIFO starves and TMDS output never starts. Use `pipe_advance = out_axis_tready || !valid` to gate pipeline registers.
 
