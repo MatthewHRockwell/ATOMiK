@@ -92,6 +92,9 @@ hardware/zynq/vivado/atomik_zynq/
 # --- Vendor Temporary Files ---
 *_tmp.v
 
+# --- Reference Documents (vendor PDFs, kept locally, not in git) ---
+reference-documents-tmp/
+
 # --- Tool Caches ---
 .ruff_cache/
 
