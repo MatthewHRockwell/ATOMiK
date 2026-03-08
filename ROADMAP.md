@@ -707,5 +707,59 @@ The v3 architecture is a ground-up redesign: custom RV64I CPU with ATOMiK custom
 
 ---
 
+## 15. ATOMiK Zynq Port (ALINX AX7020)
+
+The Zynq port brings ATOMiK to a Xilinx Zynq-7000 SoC (XC7Z020-2CLG400I). This is a **parallel development track** alongside the Tang Nano 9K v3 SoC. The Zynq provides 6x more LUT (each more capable), 10x more BRAM, 11x more DSP, and dual ARM Cortex-A9 cores running Linux — enabling multi-bank scaling well beyond what the Gowin device supports.
+
+On the Zynq, ATOMiK operates as an **AXI4-Lite peripheral** in the PL fabric, accessed from Linux userspace via UIO. The ARM Cortex-A9 runs the OS; there is no RV64I CPU port.
+
+Full task list: [`specs/zynq_port_tasks.md`](specs/zynq_port_tasks.md)
+Architecture spec: [`specs/zynq_port.md`](specs/zynq_port.md)
+Reference docs: [`docs/reference/xilinx/`](docs/reference/xilinx/)
+
+### Hardware
+
+| Item | Details |
+|------|---------|
+| **Board** | ALINX AX7020 ($195, on order) |
+| **FPGA** | XC7Z020-2CLG400I (industrial grade, -2 speed) |
+| **CPU** | Dual ARM Cortex-A9 @ 667 MHz |
+| **DDR3** | 1 GB (32-bit, on PS) |
+| **PL Resources** | 53,200 LUT6, 106,400 FF, 140 BRAM36, 220 DSP48E1, 4 MMCM |
+| **HDMI** | In/Out |
+| **Ethernet** | Gigabit (PS-side) |
+| **Instruments** | USB-C inline power sensor (on order), thermocouple (on order) |
+
+### Platform Comparison
+
+| Resource | Tang Nano 9K | ALINX AX7020 | Ratio |
+|----------|:-----------:|:------------:|:-----:|
+| LUT | 8,640 (LUT4) | 53,200 (LUT6) | 6.2x (effective ~12x) |
+| FF | 6,480 | 106,400 | 16.4x |
+| BRAM | 468 Kb | 4,900 Kb | 10.5x |
+| DSP | 20 | 220 | 11x |
+| PLL/MMCM | 2 | 6 | 3x |
+| Memory | 8 KB SRAM | 1 GB DDR3 | 131,072x |
+| CPU | Soft (PicoRV32/v3 RV64I) | Hard (dual Cortex-A9) | -- |
+| OS | Bare-metal | Linux (Ubuntu) | -- |
+| Price | $13.50 | $195 | 14.4x |
+
+### Status
+
+- **Zynq Phase 0**: Documentation & tooling — **IN PROGRESS**
+- **Zynq Phase 1**: ATOMiK PL bringup (N=1) — PENDING (board on order)
+- **Zynq Phase 2**: Multi-bank scaling (N=16, 64, 256) — PENDING
+- **Zynq Phase 3**: Display & integration — PENDING
+
+### Key Design Decisions
+
+1. **ATOMiK is an accelerator** — ARM PS runs Linux, ATOMiK is an AXI4-Lite peripheral in PL
+2. **32-bit AXI, 64-bit datapath** — LO/HI register pair, HI write triggers operation
+3. **UIO driver** — mmap registers into userspace, no custom kernel module
+4. **Same benchmark suite** — identical test vectors on Zynq and Gowin for cross-platform comparison
+5. **Shared RTL** — core ATOMiK modules from `hardware/v3/rtl/`, no duplication
+
+---
+
 *This document is a living roadmap. Update as decisions are made and phases are completed.*
-*Last updated: March 6, 2026*
+*Last updated: March 7, 2026*
