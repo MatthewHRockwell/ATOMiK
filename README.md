@@ -22,20 +22,20 @@
 
 ## 🎯 Production Hardware
 
-**ATOMiK is deployed on Tang Nano 9K as a RISC-V SoC accelerator:**
+**Two production SoC generations deployed on Tang Nano 9K ($13.50):**
 
-- ✅ **PicoRV32 + ATOMiK**: Dual-clock architecture (25.2 MHz CPU, 81 MHz accelerator)
-- ✅ **Clean timing closure**: Zero TNS, +23% margin on ATOMiK, +21% margin on CPU
-- ✅ **Persistent flash**: Bitstream and firmware in SPI flash, boots on power-up
-- ✅ **Full validation**: All 5 test suites passing (hardware delta ops, runtime API, checkpoints, memory ops, heap integrity)
-- ✅ **Open source hardware**: Complete SoC source at [`TangNano-9K-example/picotiny`](https://github.com/MatthewHRockwell/TangNano-9K-example/tree/main/picotiny)
+- ✅ **v2 SoC**: PicoRV32 + ATOMiK accelerator (25.2 MHz CPU, 81 MHz ATOMiK, dual-clock CDC)
+- ✅ **v3 SoC**: Custom RV64I CPU + ATOMiK direct-wire (21.6 MHz CPU, 74.25 MHz pixel, 1280x720 HDMI)
+- ✅ **8-screen auto-cycling HDMI demo**: Splash, self-test, performance, matrix integrity, energy, architecture, security, algebra
+- ✅ **Persistent flash**: Bitstream + firmware in SPI flash, boots on power-up
+- ✅ **Full validation**: All test suites passing (9/9 ATOMiK, 10/10 Phase 2, 6/6 Display)
+- ✅ **Zynq port in progress**: AXI4-Lite wrapper for Xilinx XC7Z020 (ALINX AX7020), 52/52 sim tests
 
 **Get the hardware:**
 ```bash
-git clone https://github.com/MatthewHRockwell/TangNano-9K-example.git
-cd TangNano-9K-example/picotiny
-# Synthesis: cd project && gowin_sh synth.tcl
-# Flash: openFPGALoader -b tangnano9k -f picotiny.fs
+git clone https://github.com/MatthewHRockwell/ATOMiK.git && cd ATOMiK
+# v3 SoC synthesis: cd hardware/v3/synth && make
+# v3 persistent flash: openFPGALoader -b tangnano9k -f impl/pnr/atomik_v3_soc.fs
 ```
 
 ---
@@ -105,14 +105,23 @@ python -m software.demos.state_sync_benchmark
 | Milestone | Description | Status |
 |-----------|-------------|--------|
 | **RV64I CPU Core** | Custom 64-bit RISC-V with integrated ATOMiK datapath | ✅ Complete (53/54 compliance) |
-| **Timing Closure** | 21.6 MHz CPU clock, zero TNS | ✅ Complete |
+| **Timing Closure** | 21.6 MHz CPU, 74.25 MHz pixel, zero TNS | ✅ Complete |
 | **Hardware Validation** | MMIO stress testing, 62/62 PASS | ✅ Complete |
 | **Flash Boot Chain** | BROM → ISP timeout → SPI XIP execution | ✅ Complete (golden tag) |
 | **ATOMiK Hardware Tests** | 9 ATOMiK + 10 Phase 2 tests on v3 hardware | ✅ Complete (9/9 + 10/10 PASS) |
 | **Production SoC Deployment** | Tang Nano 9K @ 21.6 MHz, 0 TNS, persistent flash | ✅ **Deployed** |
-| **Delta-Driven Display** | `pixel_out = pixel_ref ⊕ LUT[index]` — HDMI 640×480 | ✅ Complete (6/6 PASS) |
+| **Delta-Driven Display** | `pixel_out = pixel_ref ⊕ LUT[index]` — HDMI 1280×720@60Hz | ✅ Complete (6/6 PASS) |
+| **8-Screen HDMI Demo** | Auto-cycling investor demo with gradient overlays | ✅ Complete |
 | **Parallel Banks** | N=16 @ 67.5 MHz = 1,080 Mops/s, 20/20 sim tests | ✅ Complete (synthesis-validated) |
 | **v2 vs v3 Benchmarks** | ATOMiK memcpy: +12% overhead → **-84.5% faster** | ✅ Complete (530 measurements, zero variance) |
+
+### Zynq Port (ALINX AX7020 — XC7Z020)
+| Milestone | Description | Status |
+|-----------|-------------|--------|
+| **AXI4-Lite Wrapper** | PS-to-PL interface with 32→64 bit bridging | ✅ Complete (52/52 sim tests) |
+| **Vivado Build Infrastructure** | TCL scripts, block design, constraints, Makefile | ✅ Complete |
+| **Reference Documentation** | Board pinout, PS config, AXI guide, Vivado build guide | ✅ Complete (13 docs) |
+| **Hardware Bringup** | Synthesis + deployment on AX7020 | Pending (board on order) |
 
 ---
 
@@ -207,13 +216,15 @@ N=16 breaks the **1 Gops/s barrier** on the Tang Nano 9K. Scaling is exactly lin
 | Metric | Result |
 |--------|--------|
 | **Target Device** | Gowin GW1NR-9 (Tang Nano 9K) |
-| **Architecture** | Custom RV64I CPU + ATOMiK direct-wire (single clock domain) |
+| **Architecture** | Custom RV64I CPU + ATOMiK direct-wire, dual-PLL (CPU + HDMI) |
 | **CPU Clock** | 21.6 MHz (PLL 108 MHz ÷ 5) |
-| **Timing Closure** | Fmax 21.637 MHz (+0.17% margin), zero TNS |
+| **Pixel Clock** | 74.25 MHz (PLL 371.25 MHz ÷ 5) |
+| **Timing Closure** | CPU: 21.6 MHz (+7.4% margin), Pixel: 74.25 MHz (+0.18% margin), zero TNS |
 | **Logic Utilization** | 69% (5,966/8,640 LUTs), 88% CLS |
 | **BSRAM** | 19/26 (74%) — regfile, state table, SRAM, BROM, SPI, HDMI, display LUT + scanline |
-| **HDMI** | 640x480 with delta-driven display pipeline |
+| **HDMI** | 1280x720@60Hz with delta-driven display pipeline |
 | **Display Pipeline** | `pixel_out = pixel_ref ⊕ LUT[index]` — zero-cost unchanged pixels |
+| **HDMI Demo** | 8-screen auto-cycling investor demo with gradient overlays and live ATOMiK tests |
 | **Flash Deployment** | Persistent SPI flash (bitstream + firmware via ISP programmer) |
 | **Parallel Banks (standalone)** | N=16 @ 67.5 MHz = 1,080 Mops/s (synthesis-validated, 20/20 sim tests) |
 | **ATOMiK Memcpy Speedup** | 6.4x faster than software (v2 was 12% slower) |
@@ -325,6 +336,11 @@ ATOMiK/
 │   │   ├── soc/              # SoC integration (peripherals, HDMI, firmware)
 │   │   ├── synth/            # Gowin synthesis project and bitstream
 │   │   └── sim/              # Verilator and iverilog testbenches
+│   ├── zynq/                 # Zynq port (ALINX AX7020, XC7Z020)
+│   │   ├── rtl/              # AXI4-Lite wrapper, clock module, PL top
+│   │   ├── sim/              # iverilog testbench (52/52 PASS)
+│   │   ├── vivado/           # TCL scripts (build, block design, program)
+│   │   └── constraints/      # XDC timing constraints
 │   ├── sim/                  # v2 testbenches (single-core + parallel)
 │   ├── sweep/                # Parallel bank synthesis sweep (25 configs)
 │   ├── synth/                # v2 synthesis output and reports
@@ -368,6 +384,9 @@ ATOMiK/
 | [v3 Migration Guide](docs/V3_MIGRATION_GUIDE.md) | Porting firmware from v2 MMIO to v3 custom instructions |
 | [v2 vs v3 Comparison](hardware/v3/experiments/V2_VS_V3_COMPARISON.md) | Head-to-head benchmark analysis |
 | [v3 Task List](specs/atomik_v3_tasks.md) | v3 phased implementation tracker |
+| [Zynq Port Tasks](specs/zynq_port_tasks.md) | Zynq ALINX AX7020 implementation tracker |
+| [Zynq Architecture](specs/zynq_port_architecture.md) | AXI4-Lite wrapper and Zynq PS+PL architecture |
+| [Vivado Build Guide](docs/reference/xilinx/VIVADO_BUILD_GUIDE.md) | Vivado TCL flow and block design reference |
 
 ---
 

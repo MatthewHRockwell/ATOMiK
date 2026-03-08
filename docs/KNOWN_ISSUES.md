@@ -1,6 +1,6 @@
 # ATOMiK Known Issues & Error Log
 
-**Last Updated:** March 7, 2026
+**Last Updated:** March 8, 2026
 
 This document tracks hardware and software issues encountered during development, their root causes, and resolutions. It serves as a troubleshooting reference for future work.
 
@@ -1064,6 +1064,76 @@ case 0x30:  // ESEC
 **Future improvement:** Pipeline the decode stage (add register between fetch and decode) to restore 25.2 MHz operation. This would require FSM changes but is the long-term fix.
 
 **Validated:** Boot chain (BROM → ISP → XIP → F!F!) confirmed working at 21.6 MHz with zero corruption.
+
+---
+
+## Hardware Procedures (Mandatory Checklists)
+
+### PROC-001: Always Perform Persistent Flash Before Concluding Hardware Work
+
+**Severity:** Critical (Process)
+**Date:** March 8, 2026
+**Status:** Active (permanent rule)
+
+**Background:** During v3 development, SRAM-only bitstream loads were used for rapid iteration. When the Tang Nano 9K was disconnected from the laptop (to plug into a USB block for HDMI testing), the volatile SRAM bitstream was lost. The board reverted to whatever was previously in embedded flash (factory demo). Worse, the BL702 USB bridge chip lost its firmware (`ffff:ffff` USB enumeration), requiring a multi-step recovery process.
+
+**Rule:** Before disconnecting or power-cycling any FPGA board after a development session, ALWAYS perform a persistent flash of both bitstream and firmware.
+
+**Tang Nano 9K Persistent Flash Checklist:**
+
+1. **Flash bitstream to embedded flash (persistent):**
+   ```bash
+   openFPGALoader -b tangnano9k -f <bitstream>.fs
+   # The -f flag writes to embedded flash (persistent across power cycles)
+   # Without -f, writes to SRAM only (lost on power cycle)
+   ```
+
+2. **Flash firmware via ISP programmer:**
+   ```bash
+   # SRAM reload to trigger ISP boot window
+   openFPGALoader -b tangnano9k <bitstream>.fs
+   # Wait for ISP bootloader timeout (~5-6 seconds)
+   sleep 6
+   # Then run ISP firmware programmer
+   python3 isp_flash_programmer.py --port /dev/ttyUSB1 <firmware>.v
+   ```
+   Or use the inline UART-only method if the programmer's internal openFPGALoader call conflicts:
+   ```bash
+   # 1. SRAM reload first
+   openFPGALoader -b tangnano9k <bitstream>.fs
+   # 2. Wait, then run firmware programming script (UART-only, no openFPGALoader)
+   ```
+
+3. **Verify persistent boot:**
+   ```bash
+   # Power cycle (unplug USB completely, wait 10s for cap discharge)
+   # Plug back in, wait 5s for ISP timeout
+   # Confirm UART output or HDMI display
+   ```
+
+**BL702 Recovery (if USB bridge firmware is lost):**
+
+If the Tang Nano 9K shows as `ffff:ffff` in `lsusb` with manufacturer "BLIOT" and product "CDC Virtual ComPort":
+
+1. The BL702 USB bridge has lost its firmware and is in bootloader mode
+2. It will appear as `/dev/ttyACM0` (NOT `/dev/ttyUSB*`)
+3. Recovery requires `bflb-iot-tool`:
+   ```bash
+   pip install bflb-iot-tool
+   # Download firmware from Sipeed
+   wget https://api.dl.sipeed.com/TANG/Debugger/onboard/BL702/default/Nano_9K/usb2uartjtag_bl702.bin -O /tmp/usb2uartjtag_bl702.bin
+   # Unplug Tang Nano, wait 3s, plug back in
+   # Then immediately flash:
+   chmod 666 /dev/ttyACM0
+   bflb-iot-tool --chipname=bl702 --port=/dev/ttyACM0 --baudrate=500000 \
+     --firmware=/tmp/usb2uartjtag_bl702.bin --addr 0x2000
+   ```
+4. After flashing, **fully disconnect ALL power** (including HDMI — it can backfeed power via 5V pin) and wait 10+ seconds for capacitors to discharge
+5. Plug back in — should now enumerate as `0403:6010` (FTDI) with `/dev/ttyUSB0` and `/dev/ttyUSB1`
+
+**HDMI Power Backfeed Warning:** The HDMI connector supplies 5V which can keep the BL702 powered even when USB is disconnected. Always unplug HDMI before power-cycling the Tang Nano 9K to ensure a full reset.
+
+**Lesson:** SRAM bitstream loads are volatile. Never assume the board will retain its configuration across a power cycle. Always persistent-flash before disconnecting.
 
 ---
 
