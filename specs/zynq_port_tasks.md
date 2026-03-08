@@ -79,21 +79,29 @@
 - [ ] Update docs with measured values (replace ~ estimates)
 
 ### Z1.5 Linux UIO Driver
-- [ ] Write device tree overlay for ATOMiK peripheral (`compatible = "generic-uio"`)
+- [x] Write device tree overlay for ATOMiK peripheral (`compatible = "generic-uio"`)
+  - `hardware/zynq/dts/atomik_uio.dtsi` — ATOMiK at 0x43C00000, generic-uio compatible
 - [ ] Rebuild PetaLinux with UIO kernel config (`CONFIG_UIO`, `CONFIG_UIO_PDRV_GENIRQ`)
-- [ ] Write userspace test program:
+- [x] Write userspace test program:
   - Open `/dev/uio0`, mmap register space
   - LOAD initial state, ACCUM delta, READ current_state
   - Verify XOR cancellation: `load(x), accum(x), read() == 0`
   - Verify state reconstruction: `load(a), accum(d), read() == a^d`
+  - `software/libatomik/test_libatomik.c` — 33 tests, mock mode passes locally
 - [ ] Verify from command line: `devmem2` reads at ATOMiK base address
 
 ### Z1.6 libatomik C Library
-- [ ] Write `libatomik.h` / `libatomik.c` (UIO mmap wrapper)
-- [ ] Functions: `atomik_open()`, `atomik_close()`, `atomik_load()`, `atomik_accum()`, `atomik_read()`, `atomik_swap()`
-- [ ] Handles LO/HI register splitting internally
-- [ ] Build as shared library (`libatomik.so`)
-- [ ] Unit tests on target
+- [x] Write `libatomik.h` / `libatomik.c` (UIO mmap wrapper)
+  - `software/libatomik/libatomik.h` — public API with register map, handle struct, all operations
+  - `software/libatomik/libatomik.c` — UIO mmap implementation
+- [x] Functions: `atomik_open()`, `atomik_close()`, `atomik_load()`, `atomik_accum()`, `atomik_read()`, `atomik_swap()`
+  - Plus: `atomik_acc_zero()`, `atomik_bank_count()`, `atomik_version()`, `atomik_set_enable()`, `atomik_is_enabled()`
+- [x] Handles LO/HI register splitting internally
+- [x] Build as shared library (`libatomik.so`)
+  - `software/libatomik/Makefile` — targets: test-mock, lib, test-hw, clean
+  - Compiles with `-Wall -Wextra -Werror` zero warnings
+- [x] Mock test suite: 33/33 PASS (runs locally without hardware)
+- [ ] Unit tests on target (requires hardware)
 
 **Exit criteria**: ATOMiK N=1 operational as AXI4-Lite peripheral. UIO driver working. `libatomik.so` passes all unit tests on target. XOR cancellation and state reconstruction verified from Linux userspace. Synthesis report shows LUT6/FF/BRAM usage and Fmax.
 

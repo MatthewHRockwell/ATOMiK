@@ -1,0 +1,37 @@
+/*
+ * atomik_uio.dtsi - ATOMiK UIO Device Tree Include
+ *
+ * Device tree fragment for the ATOMiK AXI4-Lite peripheral on Zynq.
+ * Include this in your PetaLinux system-user.dtsi or device tree overlay.
+ *
+ * Address: 0x43C00000 (4 KB range, via M_AXI_GP0)
+ * Driver:  generic-uio (Linux UIO framework)
+ *
+ * Usage in system-user.dtsi:
+ *
+ *   /include/ "atomik_uio.dtsi"
+ *
+ * Or add the atomik@43c00000 node directly under &amba { ... }.
+ *
+ * Kernel config requirements:
+ *   CONFIG_UIO=y (or =m)
+ *   CONFIG_UIO_PDRV_GENIRQ=y (or =m)
+ *
+ * Boot parameter (required for generic-uio):
+ *   uio_pdrv_genirq.of_id=generic-uio
+ *
+ * After boot, the device appears as /dev/uio0 (first UIO device).
+ * Userspace access via libatomik: atomik_open("/dev/uio0")
+ *
+ * ATOMiK Project — March 2026
+ */
+
+/ {
+	amba {
+		atomik@43c00000 {
+			compatible = "generic-uio";
+			reg = <0x43c00000 0x1000>;
+			status = "okay";
+		};
+	};
+};
