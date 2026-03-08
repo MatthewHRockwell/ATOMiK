@@ -1,6 +1,6 @@
 # ATOMiK Known Issues & Error Log
 
-**Last Updated:** March 6, 2026
+**Last Updated:** March 7, 2026
 
 This document tracks hardware and software issues encountered during development, their root causes, and resolutions. It serves as a troubleshooting reference for future work.
 
@@ -1064,5 +1064,13 @@ case 0x30:  // ESEC
 **Future improvement:** Pipeline the decode stage (add register between fetch and decode) to restore 25.2 MHz operation. This would require FSM changes but is the long-term fix.
 
 **Validated:** Boot chain (BROM → ISP → XIP → F!F!) confirmed working at 21.6 MHz with zero corruption.
+
+---
+
+## Zynq Port Issues (ALINX AX7020)
+
+*Board: XC7Z020-2CLG400I on ALINX AX7020. Issues will be logged here during Zynq bringup.*
+
+*No issues logged yet — board on order, pre-board documentation phase.*
 
 ---
