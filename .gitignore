@@ -37,6 +37,11 @@ desktop.ini
 a.out
 sim_par
 sim_cmp
+hardware/v3/sim/iverilog/tb_*
+!hardware/v3/sim/iverilog/tb_*.v
+
+# Synthesis logs (regenerable)
+hardware/v3/synth/*.log
 
 # Gowin EDA Build Artifacts
 # 'impl' and 'temp' contain intermediate synthesis files
