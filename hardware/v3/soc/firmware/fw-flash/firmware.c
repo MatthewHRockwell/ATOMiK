@@ -1322,8 +1322,32 @@ void cmd_shell(void)
 #define CH_BTEE    '\x89'
 #define CH_CROSS   '\x8A'
 #define CH_FULL    '\x8B'
+#define CH_75      '\x8C'   // 75% density block (dense)
+#define CH_50      '\x8D'   // 50% density block (checkerboard)
+#define CH_25      '\x8E'   // 25% density block (sparse)
+#define CH_UHALF   '\x8F'   // upper half block
+#define CH_LHALF   '\x90'   // lower half block
+#define CH_THIN_H  '\x91'   // thin horizontal line
+#define CH_THIN_V  '\x92'   // thin vertical line
 #define CH_BULLET  '\x93'
 #define CH_ARROW   '\x94'
+#define CH_DIAMOND '\x95'
+
+// 64-bit LFSR pseudo-random generator (xorshift64)
+static uint64_t lfsr_state = 0xACE1ACE1ACE1ACE1ULL;
+
+static uint64_t rand64(void) {
+    uint64_t s = lfsr_state;
+    s ^= s << 13;
+    s ^= s >> 7;
+    s ^= s << 17;
+    lfsr_state = s;
+    return s;
+}
+
+static void seed_rand(uint64_t seed) {
+    lfsr_state = seed ? seed : 0xACE1ACE1ACE1ACE1ULL;
+}
 
 static void clear_screen(void) { putchar(0x04); }
 
@@ -1466,6 +1490,53 @@ static void setup_overlay_sym(uint32_t color, int width_chars)
     disp_fill_cols((160 - width_chars) * 8, 1280, 1);
 }
 
+// Draw section divider: ┠──────────────────────────┨
+static void draw_divider(int pad, int inner_w)
+{
+    pad_spaces(pad);
+    putchar(CH_LTEE);
+    repeat_char(CH_THIN_H, inner_w);
+    putchar(CH_RTEE);
+    putchar('\n');
+}
+
+// Draw gradient bar chart (█▓▒░ at trailing edge)
+static void draw_hbar_gradient(int filled, int total)
+{
+    int full_end = filled > 3 ? filled - 3 : 0;
+    for (int j = 0; j < total; j++) {
+        if (j < full_end)                          putchar(CH_FULL);
+        else if (j == full_end && j < filled)      putchar(CH_75);
+        else if (j == full_end+1 && j < filled)    putchar(CH_50);
+        else if (j == full_end+2 && j < filled)    putchar(CH_25);
+        else                                       putchar(' ');
+    }
+}
+
+// Setup gradient delta overlay bands (4-zone fade, left+right symmetric)
+static void setup_overlay_gradient4(uint32_t c1, uint32_t c2, uint32_t c3, uint32_t c4,
+                                     int width_chars)
+{
+    disp_clear_cols();
+    DISP_LUT = (1 << 24) | c1;  // outermost
+    DISP_LUT = (2 << 24) | c2;
+    DISP_LUT = (3 << 24) | c3;
+    DISP_LUT = (4 << 24) | c4;  // innermost
+    int zone = (width_chars * 8) / 4;
+    int w_px = width_chars * 8;
+    // Left gradient: outer→inner
+    disp_fill_cols(0, zone, 1);
+    disp_fill_cols(zone, zone*2, 2);
+    disp_fill_cols(zone*2, zone*3, 3);
+    disp_fill_cols(zone*3, w_px, 4);
+    // Right gradient: inner→outer (mirror)
+    int rs = (160 - width_chars) * 8;
+    disp_fill_cols(rs, rs + zone, 4);
+    disp_fill_cols(rs + zone, rs + zone*2, 3);
+    disp_fill_cols(rs + zone*2, rs + zone*3, 2);
+    disp_fill_cols(rs + zone*3, 1280, 1);
+}
+
 // ---- Demo Screens ----
 
 #define PAD    10      // Left padding (characters)
@@ -1474,7 +1545,7 @@ static void setup_overlay_sym(uint32_t color, int width_chars)
 static void demo_splash(void)
 {
     clear_screen();
-    setup_overlay_sym(0x001840, 20);  // Dark blue symmetric bands
+    setup_overlay_gradient4(0x000810, 0x001020, 0x001830, 0x002040, 20);
 
     center_vertical(14);
 
@@ -1508,7 +1579,7 @@ static void demo_splash(void)
 static int demo_selftest(void)
 {
     clear_screen();
-    setup_overlay_sym(0x002800, 20);  // Green symmetric bands
+    setup_overlay_gradient4(0x000C00, 0x001400, 0x001C00, 0x002800, 20);
 
     center_vertical(16);
     draw_top(PAD, "Boot Self-Test", BOX_W);
@@ -1654,9 +1725,9 @@ static int demo_selftest(void)
 static int demo_performance(void)
 {
     clear_screen();
-    setup_overlay_sym(0x002040, 20);  // Cyan symmetric bands
+    setup_overlay_gradient4(0x001010, 0x001818, 0x002020, 0x002828, 20);
 
-    center_vertical(20);
+    center_vertical(28);
     draw_top(PAD, "Performance", BOX_W);
     draw_empty(PAD, BOX_W);
 
@@ -1668,6 +1739,8 @@ static int demo_performance(void)
     pad_spaces(BOX_W - 114);
     putchar(CH_VLINE); putchar('\n');
     draw_line(PAD, "(vs. conventional store-and-forward)", BOX_W);
+    draw_empty(PAD, BOX_W);
+    draw_divider(PAD, BOX_W);
     draw_empty(PAD, BOX_W);
 
     // Change detection — run live benchmark
@@ -1703,17 +1776,19 @@ static int demo_performance(void)
 
         pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(2);
         print("ATOMiK  ");
-        draw_hbar(atomik_bar, 80);
+        draw_hbar_gradient(atomik_bar, 80);
         mini_printf("  %u%% faster", pct);
         pad_spaces(BOX_W - 104);
         putchar(CH_VLINE); putchar('\n');
 
         pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(2);
         print("memcmp  ");
-        draw_hbar(memcmp_bar, 80);
+        draw_hbar_gradient(memcmp_bar, 80);
         pad_spaces(BOX_W - 92);
         putchar(CH_VLINE); putchar('\n');
     }
+    draw_empty(PAD, BOX_W);
+    draw_divider(PAD, BOX_W);
     draw_empty(PAD, BOX_W);
 
     // Deterministic latency
@@ -1741,6 +1816,8 @@ static int demo_performance(void)
         putchar(CH_VLINE); putchar('\n');
     }
     draw_line(PAD, "Zero timing side channels by design", BOX_W);
+    draw_empty(PAD, BOX_W);
+    draw_divider(PAD, BOX_W);
     draw_empty(PAD, BOX_W);
 
     // Core operation timing
@@ -1771,7 +1848,7 @@ static int demo_performance(void)
 static int demo_architecture(void)
 {
     clear_screen();
-    setup_overlay_sym(0x180030, 24);  // Purple symmetric bands
+    setup_overlay_gradient4(0x080018, 0x100020, 0x180028, 0x180030, 24);
 
     center_vertical(20);
     draw_top(PAD, "Why ATOMiK", BOX_W);
@@ -1871,7 +1948,7 @@ static int demo_architecture(void)
 static int demo_algebra(void)
 {
     clear_screen();
-    setup_overlay_sym(0x301800, 28);  // Orange symmetric bands
+    setup_overlay_gradient4(0x100800, 0x201000, 0x281400, 0x301800, 28);
 
     center_vertical(22);
     draw_top(PAD, "Live Delta-State Algebra", BOX_W);
@@ -1956,13 +2033,220 @@ static int demo_algebra(void)
     return delay_sec(10);
 }
 
+static int demo_matrix(void)
+{
+    clear_screen();
+    // Teal gradient overlay
+    setup_overlay_gradient4(0x001818, 0x002020, 0x002828, 0x003030, 20);
+
+    center_vertical(34);
+    draw_top(PAD, "Matrix Integrity Demo", BOX_W);
+    draw_empty(PAD, BOX_W);
+    draw_line(PAD, "Streaming 16x16 Random Matrix (2048 bytes, generated on-the-fly)", BOX_W);
+    draw_empty(PAD, BOX_W);
+
+    // Seed LFSR from cycle counter for unique patterns each loop
+    seed_rand(cycles64());
+    uint64_t saved_seed = lfsr_state;
+
+    // Display 16x16 density block visualization
+    // Each cell: generate uint64_t, take top byte, map to density char
+    for (int row = 0; row < 16; row++) {
+        pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(4);
+        for (int col = 0; col < 16; col++) {
+            uint64_t val = rand64();
+            uint8_t byte = (uint8_t)(val >> 56);
+            // Map byte to density: 0-63=░, 64-127=▒, 128-191=▓, 192-255=█
+            char ch;
+            if (byte < 64)       ch = CH_25;
+            else if (byte < 128) ch = CH_50;
+            else if (byte < 192) ch = CH_75;
+            else                 ch = CH_FULL;
+            putchar(ch); putchar(ch); putchar(ch); putchar(ch);
+            if (col < 15) { putchar(' '); putchar(' '); }
+        }
+        // 16*4 + 15*2 = 94 chars + 4 pad = 98 content chars
+        pad_spaces(BOX_W - 98);
+        putchar(CH_VLINE); putchar('\n');
+    }
+    draw_empty(PAD, BOX_W);
+
+    // Fingerprint the matrix (replay LFSR through ATOMiK)
+    seed_rand(saved_seed);
+    uint64_t c0 = cycles64();
+    atomik_load_state(0, 0);
+    for (int i = 0; i < 256; i++)
+        atomik_accumulate(0, rand64());
+    uint64_t fp_orig = atomik_state(0);
+    uint32_t fp_cycles = (uint32_t)(cycles64() - c0);
+
+    pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(2);
+    putchar(CH_ARROW); print(" Fingerprint: 0x");
+    print_hex64(fp_orig, 16);
+    mini_printf("  (%u cy)", fp_cycles);
+    pad_spaces(BOX_W - 48);
+    putchar(CH_VLINE); putchar('\n');
+
+    draw_empty(PAD, BOX_W);
+    draw_divider(PAD, BOX_W);
+    draw_empty(PAD, BOX_W);
+
+    // Mutation detection
+    draw_line(PAD, "Mutation Detection", BOX_W);
+
+    // Replay matrix, inject fault at element [7][3] = index 115
+    seed_rand(saved_seed);
+    c0 = cycles64();
+    atomik_load_state(0, 0);
+    uint64_t orig_val = 0, mutated_val = 0;
+    for (int i = 0; i < 256; i++) {
+        uint64_t val = rand64();
+        if (i == 115) {
+            orig_val = val;
+            val ^= 0x01;  // flip 1 bit
+            mutated_val = val;
+        }
+        atomik_accumulate(0, val);
+    }
+    uint64_t fp_mutated = atomik_state(0);
+    uint32_t detect_cy = (uint32_t)(cycles64() - c0);
+    uint32_t detect_nj = (detect_cy * 856) / 10000;
+    uint32_t detect_frac = ((detect_cy * 856) / 1000) % 10;
+
+    pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(4);
+    print("Injecting single-bit fault at row 7, col 3...");
+    pad_spaces(BOX_W - 52);
+    putchar(CH_VLINE); putchar('\n');
+
+    pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(4);
+    print("Original:  0x"); print_hex64(orig_val, 16);
+    pad_spaces(BOX_W - 37);
+    putchar(CH_VLINE); putchar('\n');
+
+    pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(4);
+    print("Mutated:   0x"); print_hex64(mutated_val, 16);
+    pad_spaces(BOX_W - 37);
+    putchar(CH_VLINE); putchar('\n');
+
+    pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(4);
+    putchar(CH_ARROW); putchar(' ');
+    if (fp_orig != fp_mutated)
+        mini_printf("Tamper detected in %u cycles  (%u.%u nJ)", detect_cy, detect_nj, detect_frac);
+    else
+        print("ERROR: Tamper not detected");
+    pad_spaces(BOX_W - 50);
+    putchar(CH_VLINE); putchar('\n');
+
+    draw_empty(PAD, BOX_W);
+    draw_divider(PAD, BOX_W);
+    draw_empty(PAD, BOX_W);
+
+    // Full matrix verification comparison
+    draw_line(PAD, "Full Matrix Verification (256 words, 100 iterations)", BOX_W);
+    draw_empty(PAD, BOX_W);
+    {
+        // ATOMiK: fingerprint 256 LFSR words x100
+        c0 = cycles64();
+        for (int iter = 0; iter < 100; iter++) {
+            seed_rand(saved_seed);
+            atomik_load_state(0, 0);
+            for (int i = 0; i < 256; i++)
+                atomik_accumulate(0, rand64());
+            volatile uint64_t fp = atomik_state(0);
+            (void)fp;
+        }
+        uint32_t atomik_total = (uint32_t)(cycles64() - c0);
+
+        // Software: regenerate + byte-compare x100
+        // Store 32-word reference, compare regenerated LFSR against it
+        uint64_t ref_buf[32];
+        seed_rand(saved_seed);
+        for (int j = 0; j < 32; j++) ref_buf[j] = rand64();
+
+        c0 = cycles64();
+        for (int iter = 0; iter < 100; iter++) {
+            seed_rand(saved_seed);
+            volatile int same = 1;
+            for (int i = 0; i < 256; i++) {
+                uint64_t val = rand64();
+                if (i < 32) {
+                    if (val != ref_buf[i]) same = 0;
+                }
+            }
+            (void)same;
+        }
+        uint32_t sw_total = (uint32_t)(cycles64() - c0);
+
+        // Energy in uJ (large iteration counts → many nJ, use uJ)
+        uint32_t atomik_uj = (atomik_total / 1000) * 856 / 10000;
+        uint32_t atomik_uf = ((atomik_total / 1000) * 856 / 1000) % 10;
+        uint32_t sw_uj = (sw_total / 1000) * 856 / 10000;
+        uint32_t sw_uf = ((sw_total / 1000) * 856 / 1000) % 10;
+
+        // Bar chart (shorter bars to fit energy values)
+        int atomik_bar = 60;
+        int sw_bar = 60;
+        if (sw_total > atomik_total)
+            atomik_bar = (int)((uint32_t)atomik_total * 60 / sw_total);
+        else
+            sw_bar = (int)((uint32_t)sw_total * 60 / atomik_total);
+        if (atomik_bar < 1) atomik_bar = 1;
+        if (sw_bar < 1) sw_bar = 1;
+
+        pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(4);
+        print("ATOMiK  ");
+        draw_hbar_gradient(atomik_bar, 60);
+        mini_printf("  %u.%u uJ", atomik_uj, atomik_uf);
+        pad_spaces(BOX_W - 84);
+        putchar(CH_VLINE); putchar('\n');
+
+        pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(4);
+        print("memcmp  ");
+        draw_hbar_gradient(sw_bar, 60);
+        mini_printf("  %u.%u uJ", sw_uj, sw_uf);
+        pad_spaces(BOX_W - 84);
+        putchar(CH_VLINE); putchar('\n');
+
+        uint32_t pct = 0;
+        if (sw_total > atomik_total)
+            pct = (uint32_t)(((sw_total - atomik_total) * 100) / sw_total);
+
+        pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(4);
+        putchar(CH_ARROW); putchar(' ');
+        mini_printf("ATOMiK %u%% faster, streamed without storing matrix", pct);
+        pad_spaces(BOX_W - 58);
+        putchar(CH_VLINE); putchar('\n');
+    }
+
+    draw_empty(PAD, BOX_W);
+    draw_bottom(PAD, BOX_W);
+
+    return delay_sec(15);
+}
+
 static int demo_energy(void)
 {
     clear_screen();
-    setup_overlay_sym(0x302010, 24);  // Gold symmetric bands
+    setup_overlay_gradient4(0x100800, 0x201008, 0x281810, 0x302010, 24);
 
-    center_vertical(28);
+    center_vertical(42);
     draw_top(PAD, "Energy Efficiency", BOX_W);
+    draw_empty(PAD, BOX_W);
+
+    // Hero metric
+    pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(2);
+    putchar(CH_DIAMOND); putchar(' ');
+    print("0.085 nJ per ATOMiK cycle");
+    pad_spaces(BOX_W - 31);
+    putchar(CH_VLINE); putchar('\n');
+
+    pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(4);
+    print("Processor runs cool to the touch at full speed");
+    pad_spaces(BOX_W - 52);
+    putchar(CH_VLINE); putchar('\n');
+
+    draw_empty(PAD, BOX_W);
+    draw_divider(PAD, BOX_W);
     draw_empty(PAD, BOX_W);
 
     // Section 1: System power breakdown (Gowin synthesis data)
@@ -1997,6 +2281,8 @@ static int demo_energy(void)
     pad_spaces(BOX_W - 35);
     putchar(CH_VLINE); putchar('\n');
 
+    draw_empty(PAD, BOX_W);
+    draw_divider(PAD, BOX_W);
     draw_empty(PAD, BOX_W);
 
     // Section 2: Live energy per operation
@@ -2039,6 +2325,8 @@ static int demo_energy(void)
     }
 
     draw_empty(PAD, BOX_W);
+    draw_divider(PAD, BOX_W);
+    draw_empty(PAD, BOX_W);
 
     // Section 3: Workload energy comparison
     draw_line(PAD, "Change Detection Energy (256 bytes, 100 iterations)", BOX_W);
@@ -2075,14 +2363,14 @@ static int demo_energy(void)
 
         pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(4);
         print("ATOMiK  ");
-        draw_hbar(atomik_bar, 80);
+        draw_hbar_gradient(atomik_bar, 80);
         mini_printf("  %u.%u uJ", atomik_uj, atomik_uf);
         pad_spaces(BOX_W - 102);
         putchar(CH_VLINE); putchar('\n');
 
         pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(4);
         print("memcmp  ");
-        draw_hbar(80, 80);
+        draw_hbar_gradient(80, 80);
         mini_printf("  %u.%u uJ", memcmp_uj, memcmp_uf);
         pad_spaces(BOX_W - 102);
         putchar(CH_VLINE); putchar('\n');
@@ -2098,6 +2386,8 @@ static int demo_energy(void)
         putchar(CH_VLINE); putchar('\n');
     }
 
+    draw_empty(PAD, BOX_W);
+    draw_divider(PAD, BOX_W);
     draw_empty(PAD, BOX_W);
 
     // Section 4: Scale message
@@ -2117,9 +2407,9 @@ static int demo_energy(void)
 static int demo_security(void)
 {
     clear_screen();
-    setup_overlay_sym(0x300808, 32);  // Red wide symmetric bands
+    setup_overlay_gradient4(0x100404, 0x200606, 0x280808, 0x300808, 32);
 
-    center_vertical(36);
+    center_vertical(44);
     draw_top(PAD, "Security Validation", BOX_W);
     draw_empty(PAD, BOX_W);
 
@@ -2180,6 +2470,8 @@ static int demo_security(void)
     }
 
     draw_empty(PAD, BOX_W);
+    draw_divider(PAD, BOX_W);
+    draw_empty(PAD, BOX_W);
 
     // Section 2: Tamper detection
     draw_line(PAD, "2. Single-Bit Tamper Detection", BOX_W);
@@ -2216,6 +2508,8 @@ static int demo_security(void)
     }
 
     draw_empty(PAD, BOX_W);
+    draw_divider(PAD, BOX_W);
+    draw_empty(PAD, BOX_W);
 
     // Section 3: Checkpoint verification
     draw_line(PAD, "3. Checkpoint Verification", BOX_W);
@@ -2247,6 +2541,8 @@ static int demo_security(void)
         putchar(CH_VLINE); putchar('\n');
     }
 
+    draw_empty(PAD, BOX_W);
+    draw_divider(PAD, BOX_W);
     draw_empty(PAD, BOX_W);
 
     // Section 4: DISA STIG control mapping
@@ -2304,6 +2600,7 @@ static void demo_loop(void)
 
         if (demo_selftest()) return;
         if (demo_performance()) return;
+        if (demo_matrix()) return;
         if (demo_energy()) return;
         if (demo_architecture()) return;
         if (demo_security()) return;
