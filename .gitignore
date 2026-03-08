@@ -69,6 +69,16 @@ hardware/v3/sweep/top/
 hardware/v3/sweep/sdc/
 hardware/v3/sweep/project_*/
 
+# Vivado Build Artifacts (Zynq)
+hardware/zynq/output/
+hardware/zynq/reports/
+hardware/zynq/.Xil/
+hardware/zynq/vivado/atomik_zynq/
+*.jou
+*.bit
+*.xsa
+*.dcp
+
 # Bitstreams (The compiled binary for the board)
 # Generally, you don't commit these to source control,
 # but you can comment these out if you want to share the binary.
