@@ -7,8 +7,8 @@ This directory contains academic papers documenting the ATOMiK architecture.
 | Paper | Title | Status | Target | Timing |
 |-------|-------|--------|--------|--------|
 | **Paper 1** | Delta-State Algebra: A Formally Verified Foundation | ✅ Complete | arXiv → PLDI/CAL | Ready for submission |
-| **Paper 2** | ATOMiK: Benchmarking Delta-State Execution | ✅ Complete | arXiv → MICRO/ASPLOS | Ready for submission |
-| **Paper 3** | Hardware Implementation and SDK Architecture | 📋 Planned | FPGA/DATE, IEEE TCAD | Post-Phase 4B |
+| **Paper 2** | ATOMiK: Empirical Validation of Delta-State Computation | ✅ Complete | Scientific Reports (Springer Nature) | Under peer review |
+| **Paper 3** | From Proofs to Silicon: Hardware Implementation | ✅ Draft complete | FPGA/DATE, IEEE TCAD, IEEE Micro | Ready for review |
 
 ## Directory Structure
 
@@ -28,8 +28,12 @@ papers/
 │   ├── figures/                   # Benchmark plots
 │   ├── compile.sh                 # Build script
 │   └── README.md                  # Paper-specific instructions
-├── paper3-hardware/               # 📋 Planned
-│   └── README.md                  # Placeholder
+├── paper3-hardware/               # ✅ Draft complete
+│   ├── Paper_3_Hardware_Implementation.tex  # LaTeX source
+│   ├── references.bib             # Bibliography
+│   ├── figures/                   # TikZ figures (inline)
+│   ├── compile.sh                 # Build script
+│   └── README.md                  # Paper-specific instructions
 └── README.md                      # This file
 ```
 
@@ -78,19 +82,32 @@ pdflatex Paper_2_ATOMiK_Benchmarks.tex
 pdflatex Paper_2_ATOMiK_Benchmarks.tex
 ```
 
-**Target venues**: IEEE MICRO, ACM ASPLOS, IEEE HPCA
+**Target venue**: Scientific Reports (Springer Nature) — under peer review
 
-## Paper 3: Hardware and SDK (Planned)
+## Paper 3: Hardware Implementation
 
-**Status**: 📋 Planned - Awaiting Phase 4B completion
+**Status**: ✅ Draft complete
 
-**Planned content**:
-- RTL architecture derived from formal proofs
-- Delta accumulator and state reconstructor design
-- FPGA synthesis results (Tang Nano 9K, 7% LUT @ 94.5 MHz)
-- Multi-language SDK architecture (5 language targets)
-- Code generation framework design
-- Hardware-software co-design methodology
+**Content**:
+- Three-generation hardware evolution (standalone → PicoRV32 SoC → custom RV64I ISA)
+- Synthesis optimization methodology (+42% Fmax via carry-chain prevention)
+- 25-configuration parallel bank sweep with 80 hardware-validated tests
+- Perfect linear scaling to 16 banks (1,056 Mops/s on $13.50 FPGA)
+- Cross-platform portability (Gowin GW1NR-9 → Xilinx Zynq-7020)
+- Custom RISC-V ISA instructions with zero-overhead CPI
+- SDK generation framework (5 languages, 353 tests)
+- Complete validation chain from Lean4 proofs to production deployment
+
+**Build**:
+```bash
+cd paper3-hardware
+./compile.sh
+# or manually:
+pdflatex Paper_3_Hardware_Implementation.tex
+bibtex Paper_3_Hardware_Implementation
+pdflatex Paper_3_Hardware_Implementation.tex
+pdflatex Paper_3_Hardware_Implementation.tex
+```
 
 **Target venues**: FPGA Conference, DATE, IEEE TCAD, IEEE Micro
 
