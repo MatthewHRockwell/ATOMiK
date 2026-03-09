@@ -90,10 +90,27 @@ report_methodology -file $ZYNQ_DIR/reports/methodology.rpt
 write_checkpoint -force $ZYNQ_DIR/output/post_impl.dcp
 
 # ------------------------------------------------------------------------------
-# Bitstream
+# Bitstream — skipped for PL-only builds
 # ------------------------------------------------------------------------------
+# Bitstream generation requires a full PS+PL block design with the Zynq PS IP
+# instantiated (provides FCLK, AXI ports, and MIO pin assignments).
+# Use block_design.tcl for bitstream-capable builds once hardware is available.
+#
+# To override (e.g., for testing with dummy I/O constraints):
+#   vivado -mode batch -source vivado/build.tcl -tclargs --bitstream
 
-write_bitstream -force $ZYNQ_DIR/output/atomik_zynq.bit
+set gen_bitstream 0
+if {[info exists argc] && $argc > 0} {
+    foreach arg $argv {
+        if {$arg eq "--bitstream"} { set gen_bitstream 1 }
+    }
+}
+
+if {$gen_bitstream} {
+    puts ""
+    puts "Generating bitstream (--bitstream flag set)..."
+    write_bitstream -force $ZYNQ_DIR/output/atomik_zynq.bit
+}
 
 # ------------------------------------------------------------------------------
 # Summary
@@ -101,11 +118,12 @@ write_bitstream -force $ZYNQ_DIR/output/atomik_zynq.bit
 
 puts ""
 puts "=============================================="
-puts " Build complete."
-puts "  Bitstream:     output/atomik_zynq.bit"
+puts " Build complete — PL synthesis + implementation"
+puts "  Checkpoint:    output/post_impl.dcp"
 puts "  Timing report: reports/timing_summary.rpt"
 puts "  Utilization:   reports/post_impl_util.rpt"
 puts "=============================================="
+puts ""
 
-# Print timing summary to console
-report_timing_summary -no_header -max_paths 5
+# Print utilization summary to console
+report_utilization -hierarchical -hierarchical_depth 1

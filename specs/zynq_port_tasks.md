@@ -24,10 +24,10 @@
 - [x] Create `hardware/zynq/` directory and `README.md`
 
 ### Z0.2 Vivado Environment Setup
-- [ ] Install Vivado WebPACK (free for XC7Z020)
+- [x] Install Vivado 2025.2 ML Standard (at `/opt/Xilinx/2025.2/`)
 - [ ] Create AX7020 board files / import ALINX BSP
 - [ ] Build trivial PL blink design, program via JTAG
-- [ ] Verify Vivado TCL flow (non-project mode)
+- [x] Verify Vivado TCL flow (non-project mode) — `build.tcl` synth+impl PASS on xc7z020
 
 ### Z0.3 PetaLinux / Linux Setup
 - [ ] Install PetaLinux (matching Vivado version)
@@ -42,7 +42,7 @@
 - [ ] Set up build system (Makefile) for userspace apps
 - [ ] Verify Python3 available on target (for scripting)
 
-**Exit criteria**: All 11 reference documents written. Vivado synthesizes a blink design for AX7020. PetaLinux boots to a Linux shell with UART and Ethernet. Cross-compiled C binary runs on target via SSH.
+**Exit criteria**: All 11 reference documents written. Vivado synthesizes for AX7020 (DONE — PL-only build PASS). Blink design on hardware (requires board). PetaLinux boots to a Linux shell with UART and Ethernet. Cross-compiled C binary runs on target via SSH.
 
 ---
 
@@ -53,11 +53,11 @@
 **Dependencies**: Zynq Phase 0 (Vivado + Linux environment required)
 
 ### Z1.1 AXI4-Lite Wrapper RTL
-- [ ] Write `atomik_axi4lite_wrapper.v` (adapts `atomik_v3_atomik.v` to AXI4-Lite)
-- [ ] Implement register map (LOAD, ACCUM, STATE, STATUS, SWAP, CONFIG)
-- [ ] Handle 32-bit AXI <-> 64-bit datapath (LO/HI register pair, HI triggers op)
-- [ ] Add `DONT_TOUCH` attributes (replacing Gowin `syn_keep`) on XOR paths
-- [ ] Simulation testbench: AXI4-Lite protocol verification (iverilog or Vivado sim)
+- [x] Write `atomik_axi4lite_wrapper.v` (adapts `atomik_v3_atomik.v` to AXI4-Lite)
+- [x] Implement register map (LOAD, ACCUM, STATE, STATUS, SWAP, CONFIG)
+- [x] Handle 32-bit AXI <-> 64-bit datapath (LO/HI register pair, HI triggers op)
+- [x] Add `DONT_TOUCH` attributes (replacing Gowin `syn_keep`) on XOR paths
+- [x] Simulation testbench: AXI4-Lite protocol verification (iverilog — `hardware/zynq/sim/tb_axi4lite_wrapper.v`)
 
 ### Z1.2 Vivado Block Design
 - [ ] Create PS block design (Zynq PS, DDR3 config, UART, ETH)
@@ -73,8 +73,10 @@
 - [ ] Run timing analysis, verify zero TNS
 
 ### Z1.4 Synthesis and Resource Check
-- [ ] Run Vivado synthesis + implementation
-- [ ] Record: LUT6, FF, BRAM, DSP, Fmax from utilization/timing reports
+- [x] Run Vivado synthesis + implementation (PL-only, `build.tcl`)
+  - 287 LUT logic (0.54%), 344 LUT RAM (1.98%), 471 FF (0.44%), 0 BRAM, 0 DSP
+  - Timing unconstrained (no PS clock source in PL-only mode — will be constrained in block design)
+- [ ] Re-run with block design (PS+PL) for definitive Fmax measurement
 - [ ] Compare against estimates in `RESOURCE_BUDGET_GUIDE.md`
 - [ ] Update docs with measured values (replace ~ estimates)
 

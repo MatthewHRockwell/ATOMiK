@@ -74,6 +74,12 @@ hardware/zynq/output/
 hardware/zynq/reports/
 hardware/zynq/.Xil/
 hardware/zynq/vivado/atomik_zynq/
+hardware/zynq/vivado.log
+hardware/zynq/vivado.jou
+hardware/zynq/vivado_*.backup.*
+hardware/zynq/clockInfo.txt
+vivado.log
+vivado*.backup.*
 *.jou
 *.bit
 *.xsa
