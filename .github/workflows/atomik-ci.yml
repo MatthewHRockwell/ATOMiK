@@ -91,7 +91,9 @@ jobs:
             # Compile with all RTL sources
             if iverilog -o "hardware/v3/sim/iverilog/${name}" \
               -I hardware/v3/rtl \
+              -I hardware/v3/soc \
               hardware/v3/rtl/*.v \
+              $(ls hardware/v3/soc/*.v 2>/dev/null) \
               "$tb" 2>&1; then
               if vvp "hardware/v3/sim/iverilog/${name}" 2>&1 | tee /tmp/${name}.log; then
                 if grep -qi "FAIL\|ERROR" /tmp/${name}.log && ! grep -qi "0 failed\|ALL.*PASS" /tmp/${name}.log; then

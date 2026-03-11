@@ -1,0 +1,20 @@
+name: CI Failure Notification
+
+on:
+  workflow_run:
+    workflows: ["ATOMiK CI/CD"]
+    types: [completed]
+
+jobs:
+  notify:
+    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Write failure summary
+        run: |
+          echo "CI_FAILED: ${{ github.event.workflow_run.name }}" > /tmp/failure.txt
+          echo "COMMIT: ${{ github.event.workflow_run.head_sha }}" >> /tmp/failure.txt
+          echo "BRANCH: ${{ github.event.workflow_run.head_branch }}" >> /tmp/failure.txt
+          echo "RUN_ID: ${{ github.event.workflow_run.id }}" >> /tmp/failure.txt
+          echo "URL: ${{ github.event.workflow_run.html_url }}" >> /tmp/failure.txt
+          cat /tmp/failure.txt
