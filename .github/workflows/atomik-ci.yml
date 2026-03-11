@@ -89,11 +89,19 @@ jobs:
             name=$(basename "$tb" .v)
             echo "--- Running $name ---"
             # Compile with all RTL sources
+            # Build source list: rtl/*.v + only sim-safe soc modules (exclude BRAM-dependent files)
+            SOC_SAFE=""
+            for sv in hardware/v3/soc/*.v; do
+              # Skip files that instantiate synthesis-only primitives (bootram, BRAM, etc.)
+              if ! grep -q 'bootram_\|Gowin_\|SDP_\|pROM' "$sv" 2>/dev/null; then
+                SOC_SAFE="$SOC_SAFE $sv"
+              fi
+            done
             if iverilog -o "hardware/v3/sim/iverilog/${name}" \
               -I hardware/v3/rtl \
               -I hardware/v3/soc \
               hardware/v3/rtl/*.v \
-              $(ls hardware/v3/soc/*.v 2>/dev/null) \
+              $SOC_SAFE \
               "$tb" 2>&1; then
               if vvp "hardware/v3/sim/iverilog/${name}" 2>&1 | tee /tmp/${name}.log; then
                 if grep -qi "FAIL\|ERROR" /tmp/${name}.log && ! grep -qi "0 failed\|ALL.*PASS" /tmp/${name}.log; then
