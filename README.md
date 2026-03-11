@@ -1,10 +1,9 @@
 # ATOMiK Architecture
 
-![CI](https://github.com/MatthewHRockwell/ATOMiK/actions/workflows/atomik-ci.yml/badge.svg)
-![Tests](https://img.shields.io/badge/tests-353_passing-brightgreen)
+[![CI/CD](https://github.com/MatthewHRockwell/ATOMiK/actions/workflows/atomik-ci.yml/badge.svg)](https://github.com/MatthewHRockwell/ATOMiK/actions/workflows/atomik-ci.yml)
+[![Code Review](https://github.com/MatthewHRockwell/ATOMiK/actions/workflows/review.yml/badge.svg)](https://github.com/MatthewHRockwell/ATOMiK/actions/workflows/review.yml)
 ![Proofs](https://img.shields.io/badge/formal_proofs-92_verified-blue)
 ![Hardware](https://img.shields.io/badge/hardware_tests-80%2F80-brightgreen)
-![Production](https://img.shields.io/badge/production-deployed-brightgreen)
 ![SDK](https://img.shields.io/badge/SDK-5_languages-orange)
 ![Throughput](https://img.shields.io/badge/throughput-1_Gops%2Fs-red)
 ![Cost](https://img.shields.io/badge/dev_cost-%24225-yellow)

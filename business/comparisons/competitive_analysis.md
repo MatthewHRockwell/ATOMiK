@@ -2,16 +2,17 @@
 
 ## Summary Matrix
 
-| Dimension | ATOMiK | Event Sourcing | CRDTs | Traditional FPGA Accel. |
-|-----------|--------|---------------|-------|------------------------|
-| **State Reconstruction** | O(1) single XOR | O(N) replay | O(1) merge | Varies |
-| **Operation Latency** | 10.6 ns (1 cycle) | Microseconds+ | Microseconds+ | Varies (multi-cycle) |
-| **Parallelism** | Lock-free (proven) | Requires ordering | Lock-free | Application-dependent |
-| **Undo/Rollback** | Free (self-inverse) | Log replay | Not built-in | Not built-in |
-| **Formal Proofs** | 92 Lean4 theorems | None | Paper proofs | None |
-| **Hardware Accel.** | Native (FPGA/ASIC) | Software only | Software only | Application-specific |
-| **Scaling** | Linear (16x proven) | Vertical only | Horizontal | Design-dependent |
-| **Memory Overhead** | 64 bits (accumulator) | O(N) event log | O(state) per replica | Varies |
+| Dimension | ATOMiK | Event Sourcing | CRDTs | Traditional FPGA Accel. | Ubitium |
+|-----------|--------|---------------|-------|------------------------|---------|
+| **State Reconstruction** | O(1) single XOR | O(N) replay | O(1) merge | Varies | Unknown |
+| **Operation Latency** | 10.6 ns (1 cycle) | Microseconds+ | Microseconds+ | Varies (multi-cycle) | Unknown (no silicon) |
+| **Parallelism** | Lock-free (proven) | Requires ordering | Lock-free | Application-dependent | Claimed universal |
+| **Undo/Rollback** | Free (self-inverse) | Log replay | Not built-in | Not built-in | Not discussed |
+| **Formal Proofs** | 92 Lean4 theorems | None | Paper proofs | None | None disclosed |
+| **Hardware Accel.** | Native (2 SoCs deployed) | Software only | Software only | Application-specific | Pre-silicon |
+| **Scaling** | Linear (16x proven) | Vertical only | Horizontal | Design-dependent | Claimed linear |
+| **Memory Overhead** | 64 bits (accumulator) | O(N) event log | O(state) per replica | Varies | Unknown |
+| **Working Hardware** | ✅ v2 + v3 deployed | N/A | N/A | Yes (custom) | ❌ No public demos |
 
 ---
 
@@ -79,6 +80,33 @@
 | Network | Not required (on-chip) | Client-server protocol |
 
 **Key advantage**: ATOMiK eliminates the read-modify-write cycle entirely. State updates are accumulative, not destructive, eliminating the need for locks, CAS operations, or optimistic concurrency.
+
+---
+
+### ATOMiK vs. Ubitium (Universal Processor)
+
+**Ubitium** is developing a "universal processor" that aims to replace CPUs, GPUs, and DSPs with a single unified architecture. They raised $3.7M in seed funding (2024) and claim their architecture can execute any workload type on the same silicon.
+
+| Aspect | ATOMiK | Ubitium |
+|--------|--------|--------|
+| Architecture type | Delta-state accelerator (XOR algebra) | Universal processor (unified ISA) |
+| Core thesis | Eliminate data movement via delta accumulation | Eliminate chip diversity via universal compute |
+| Formal proofs | 92 Lean4 machine-verified theorems | None publicly disclosed |
+| Working silicon | ✅ Two SoC generations deployed on FPGA | No public hardware demos |
+| Hardware validation | 80/80 sweep + v3: 25/25 tests | Pre-silicon (as of early 2026) |
+| Business model | IP licensing (ARM-style) | Chip sales |
+| Power envelope | ~20 mW (FPGA prototype) | Unknown (no silicon data) |
+| Cost to date | ~$225 (AI-augmented) | $3.7M raised |
+| IP protection | Patent pending + 92 formal proofs barrier | Patent applications (claimed) |
+
+**Key differentiators vs. Ubitium:**
+1. **ATOMiK has working hardware; Ubitium does not** (as of March 2026). Two deployed SoC generations with HDMI output and comprehensive test suites.
+2. **Different problem domains**: Ubitium tries to replace all processor types (extremely ambitious, unproven). ATOMiK solves a specific, well-defined problem (state management) with mathematical proof of correctness.
+3. **Formal verification moat**: ATOMiK's 92 Lean4 proofs provide a verification barrier that cannot be shortcut. Ubitium has no comparable formal foundation.
+4. **Capital efficiency**: ATOMiK achieved production hardware deployment for ~$225 in AI token costs. Ubitium has raised $3.7M with no public hardware demonstration.
+5. **Complementary positioning**: ATOMiK can integrate *into* a Ubitium processor (or any processor) as the state management layer. Ubitium must replace the entire compute stack.
+
+**Investor implication**: Ubitium's "universal processor" thesis requires replacing the entire CPU/GPU/DSP stack — a multi-billion-dollar bet with no hardware validation. ATOMiK's delta-state approach is additive: it improves any existing architecture without requiring replacement. Lower risk, faster path to revenue.
 
 ---
 

@@ -24,8 +24,9 @@ jobs:
       - name: Run code analysis
         run: |
           pip install ruff
-          ruff check software/ --output-format=json > ruff_results.json || true
+          ruff check software/ --output-format=json > ruff_results.json 2>/dev/null || true
       - name: Post review comment
+        if: github.event.pull_request.number != ''
         uses: actions/github-script@v7
         with:
           script: |
@@ -44,10 +45,21 @@ jobs:
                 `- **${r.filename}:${r.location.row}** - ${r.code}: ${r.message}`
               ).join('\n');
               
+              const total = results.length;
+              const shown = Math.min(total, 10);
+              const suffix = total > 10 ? `\n\n_Showing ${shown} of ${total} issues._` : '';
+              
               await github.rest.issues.createComment({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 issue_number: context.issue.number,
-                body: `## 🔍 Code Review Results\n\n${issues}\n\n_Automated review by ATOMiK CI_`
+                body: `## 🔍 Code Review Results\n\nFound **${total}** lint issue${total !== 1 ? 's' : ''}:\n\n${issues}${suffix}\n\n_Automated review by ATOMiK CI_`
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: `## ✅ Code Review Results\n\nNo lint issues found. Clean code!\n\n_Automated review by ATOMiK CI_`
               });
             }

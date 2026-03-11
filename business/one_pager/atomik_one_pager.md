@@ -10,18 +10,21 @@ ATOMiK is a hardware-accelerated delta-state computing architecture that replace
 
 | Metric | Value |
 |--------|-------|
-| **Deployment Status** | ✅ **PRODUCTION** — Tang Nano 9K SoC |
-| Throughput (production) | **81 Mops/s** @ 81 MHz (single-bank) |
+| **Deployment Status** | ✅ **PRODUCTION** — Two SoC generations deployed on Tang Nano 9K |
+| **v3 SoC (latest)** | Custom RV64I CPU + ATOMiK direct-wire, 1280×720 HDMI, 8-screen demo |
+| **v2 SoC** | PicoRV32 + ATOMiK accelerator, 81 MHz, dual-clock CDC |
 | Throughput (validated) | **1,056 Mops/s** (16 parallel banks) |
-| Operation latency | **12.3 ns** (single cycle @ 81 MHz) |
+| v3 Memcpy speedup | **6.4× faster** than software (v2 was 12% slower) |
+| Operation latency | **10.6 ns** (single cycle @ 94.5 MHz standalone) |
 | Memory reduction | **95-100%** (sparse deltas vs. dense state) |
-| Formal proofs | **92** (Lean4 verified) |
-| Hardware tests | **80/80** passing (sweep) + 5/5 (integration) |
-| Timing closure | **0 TNS**, +23% margin @ 81 MHz |
-| LUT utilization | **44%** (production SoC) / 20% (standalone 16-bank) |
+| Formal proofs | **92** (Lean4 verified, 0 sorry statements) |
+| Hardware tests | **80/80** passing (sweep) + v3: 9/9 ATOMiK + 10/10 Phase 2 + 6/6 Display |
+| Timing closure | **0 TNS** across all clock domains (v2 and v3) |
+| LUT utilization | **69%** (v3 SoC) / **44%** (v2 SoC) / 20% (standalone 16-bank) |
 | SDK languages | **5** (Python, Rust, C, JavaScript, Verilog) |
 | SDK tests | **353** passing |
 | Device cost | **$13.50** (Tang Nano 9K FPGA) |
+| Total dev cost | **~$225** (AI-augmented development) |
 
 ## How It Works
 
@@ -77,10 +80,14 @@ N parallel XOR accumulator banks with a binary merge tree achieve linear through
 | SDK Code Generation (5 languages) | ✅ Complete |
 | Agentic Pipeline (25 modules, 353 tests) | ✅ Complete |
 | Parallel Scaling (16x, 1 Gops/s) | ✅ Complete |
-| **Production SoC Deployment** | ✅ **DEPLOYED** |
+| **v2 Production SoC** (PicoRV32) | ✅ **DEPLOYED** (Feb 2026) |
+| **v3 Production SoC** (Custom RV64I + HDMI) | ✅ **DEPLOYED** (Mar 2026) |
 | 3-Node VC Demo | ✅ Complete |
+| Zynq Port (ALINX AX7020) | 🔄 In Progress (52/52 sim tests, board on order) |
 
-**Production Milestone** (Feb 2026): ATOMiK deployed as PicoRV32 SoC accelerator on Tang Nano 9K. Single-bank @ 81 MHz with dual-clock CDC, clean timing closure (0 TNS), persistent flash deployment. All 5 integration test suites passing on hardware.
+**v3 SoC Milestone** (Mar 2026): Custom RV64I CPU with direct-wire ATOMiK integration deployed on Tang Nano 9K. Features 1280×720@60Hz HDMI output with delta-driven display pipeline (`pixel_out = pixel_ref ⊕ LUT[index]`), 8-screen auto-cycling investor demo, and 6.4× memcpy speedup over software. All test suites passing (9/9 ATOMiK, 10/10 Phase 2, 6/6 Display). Zero TNS across all clock domains.
+
+**v2 SoC Milestone** (Feb 2026): PicoRV32 SoC accelerator with dual-clock CDC, 81 MHz ATOMiK core, clean timing closure, persistent flash deployment.
 
 ## Contact
 

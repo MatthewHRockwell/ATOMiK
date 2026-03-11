@@ -23,12 +23,13 @@
 > **Speaker Notes**: ATOMiK is a new computing primitive — a hardware-accelerated
 > delta-state algebra that replaces full-state read-modify-write with single-cycle
 > XOR delta accumulation. We achieve 1 Gops/s on a $13.50 FPGA with 92 formally
-> verified mathematical proofs. This is not an incremental improvement to an
-> existing architecture — it is a fundamentally different way to manage state in
-> silicon.
+> verified mathematical proofs. We now have two production SoC generations deployed,
+> including a v3 with a custom 64-bit RISC-V CPU and 1280×720 HDMI output running
+> an 8-screen investor demo. This is not an incremental improvement to an existing
+> architecture — it is a fundamentally different way to manage state in silicon.
 
 `[VISUAL]` Title slide with ATOMiK logo. Central KPI: "1,056 Mops/s" in large
-text. Subtitle: "$13.50 device | 10.6 ns latency | 92 formal proofs". Dark
+text. Subtitle: "$13.50 device | 10.6 ns latency | 92 formal proofs | 2 production SoCs". Dark
 background (#1e1e2e) with blue (#89b4fa) and green (#a6e3a1) accents matching
 Marp theme.
 
@@ -169,6 +170,8 @@ property table below.
 | **Parallel efficiency** | Measured vs theoretical | 0.85 (vs 0.0 baseline) |
 | **SDK coverage** | Tests passing | 353 across 5 languages |
 | **SDK languages** | Code generation targets | Python, Rust, C, JavaScript, Verilog |
+| **v3 SoC** | Custom RV64I + HDMI 1280×720 | 8-screen demo, 6.4× memcpy speedup |
+| **v3 validation** | Hardware test suites | 9/9 ATOMiK + 10/10 Phase 2 + 6/6 Display |
 | **Device cost** | Tang Nano 9K FPGA | $13.50 |
 | **Total dev budget** | AI-assisted development | ~$225 in AI token costs |
 
@@ -302,6 +305,7 @@ ATOMiK target vs ARM vs Lattice vs fabless semiconductor average.
 | Groq | $20B (NVIDIA acquisition, Dec 2025) | Inference accelerator | Inference hardware comp |
 | Tenstorrent | $2.6B valuation (Dec 2024) | RISC-V AI accelerator | AI silicon venture comp |
 | SambaNova | ~$1.6B (Intel acquisition talks) | AI hardware | AI hardware comp |
+| Ubitium | $3.7M seed (2024) | Universal processor | Direct competitor (no hardware demos) |
 | Positron AI | $51.6M Series A | FPGA inference startup | Early-stage FPGA comp |
 
 > **Speaker Notes**: We are not competing with GPUs for training. We are
@@ -332,6 +336,8 @@ valuation markers on a log-scale axis.
 | Hardware synthesis (Tang Nano 9K) | **Complete** | 94.5 MHz, 7% LUT, 80/80 tests |
 | SDK code generation (5 languages) | **Complete** | 353 tests, schema-driven pipeline |
 | Parallel scaling (N=16) | **Complete** | 1,056 Mops/s, linear scaling verified |
+| v2 SoC (PicoRV32 accelerator) | **Complete** | Production deployed, 0 TNS (Feb 2026) |
+| **v3 SoC (Custom RV64I + HDMI)** | **Complete** | 1280×720 demo, 6.4× speedup (Mar 2026) |
 | 3-node VC demo | **Complete** | Multi-device distributed merge |
 
 ### Forward Roadmap (Post-Funding)
@@ -712,43 +718,37 @@ checkmark. Counter: "92/92 proven, 0 sorry." Lean4 logo.
 
 ## Slide 8 — Production Deployment ✅
 
-# Tang Nano 9K: $13.50 FPGA, Production SoC
+# Two SoC Generations on a $13.50 FPGA
 
-### ✅ **DEPLOYED** — February 2026
+### ✅ v3 SoC **DEPLOYED** — March 2026 (Latest)
 
 | Parameter | Value |
 |-----------|-------|
 | **Deployment Status** | ✅ **Production** — Persistent SPI flash |
-| Device | Gowin GW1NR-LV9QN88PC6/I5 |
-| Board | Sipeed Tang Nano 9K |
-| Retail price | ~$13.50 |
-| Architecture | PicoRV32 RISC-V CPU + ATOMiK accelerator |
-| Total LUTs | 8,640 |
-| Total FFs | 6,693 |
-| Tool | Gowin EDA V1.9.12.01 |
+| Architecture | **Custom RV64I CPU** + ATOMiK direct-wire (no CDC needed) |
+| HDMI Output | **1280×720@60Hz** with delta-driven display pipeline |
+| Display Pipeline | `pixel_out = pixel_ref ⊕ LUT[index]` — zero-cost unchanged pixels |
+| Investor Demo | **8-screen auto-cycling** (splash, self-test, performance, matrix, energy, architecture, security, algebra) |
+| CPU Clock | 21.6 MHz (PLL 108 MHz ÷ 5) |
+| Pixel Clock | 74.25 MHz (PLL 371.25 MHz ÷ 5) |
+| LUT Utilization | **69%** (5,966/8,640) |
+| BSRAM | 19/26 (74%) |
+| Timing Closure | CPU: +7.4% margin, Pixel: +0.18% margin, **zero TNS** |
+| ATOMiK Memcpy | **6.4× faster** than software (v2 was 12% slower) |
+| Validation | ATOMiK 9/9, Phase 2 10/10, Display 6/6 — **all PASS** |
 
-### Production SoC Resources
+**Why v3 matters**: v2 used a borrowed PicoRV32 core. v3 features a **custom 64-bit RISC-V CPU** with ATOMiK wired directly into the datapath — no clock-domain crossing needed. The delta-driven HDMI display proves the architecture works for real-time video output, not just register-level benchmarks.
 
-| Resource | Used | Available | Utilization |
-|----------|:----:|:---------:|:-----------:|
-| Logic (LUT) | 3,838 | 8,640 | **44%** |
-| ALU | 707 | — | (CPU/peripherals only) |
-| CLS (slices) | 3,103 | 4,320 | **72%** |
-| PLL | 2 | 2 | **100%** (HDMI + ATOMiK) |
-| BSRAM | 12 | 26 | 47% |
+### v2 SoC (February 2026)
 
-### Timing Closure (Production)
-
-| Clock Domain | Target | Achieved Fmax | Margin | TNS |
-|--------------|:------:|:------------:|:------:|:---:|
-| ATOMiK core | 81.0 MHz | **100.2 MHz** | **+23.6%** | **0** |
-| CPU bus | 25.2 MHz | **30.6 MHz** | **+21.4%** | **0** |
-| HDMI pixel | 25.2 MHz | 34.0 MHz | +35% | 0 |
-
-- **Total Negative Slack**: 0.000 ns on all domains ✅
-- **Accumulate latency**: **1 cycle** (12.3 ns @ 81 MHz)
-- **Reconstruct latency**: **0 cycles** (combinational)
-- **CDC bridge**: Toggle-handshake (25.2 MHz ↔ 81 MHz)
+| Parameter | Value |
+|-----------|-------|
+| Architecture | PicoRV32 RISC-V CPU + ATOMiK accelerator (dual-clock CDC) |
+| ATOMiK Clock | 81 MHz (Fmax: 100.2 MHz, +23.6% margin) |
+| CPU Clock | 25.2 MHz (Fmax: 30.6 MHz, +21.4% margin) |
+| LUT Utilization | **44%** (3,838/8,640) |
+| Timing Closure | **0 TNS** on all domains |
+| Validation | 5/5 integration suites passing |
 
 ### Standalone Core (for comparison)
 
@@ -766,32 +766,34 @@ checkmark. Counter: "92/92 proven, 0 sorry." Lean4 logo.
 | Dynamic power | ~10-15 mW |
 | **Total** | **~15-20 mW** |
 
-### Production Validation ✅
+### Combined Validation ✅
 
 **Hardware Tests:**
 - **80/80** parallel bank sweep tests (N=1,2,4,8,16) ✅
-- **5/5** integration test suites on production SoC ✅
-  - `[X]` ATOMiK hardware: 11/11 PASS
-  - `[P]` Phase 2 runtime: 10/10 PASS
-  - `[K]` Checkpoint/rollback: PASS
-  - `[M]` Memory benchmarks: PASS
-  - `[H]` Heap integrity: PASS
+- **v3**: 9/9 ATOMiK + 10/10 Phase 2 + 6/6 Display ✅
+- **v2**: 5/5 integration suites (ATOMiK 11/11, Phase 2 10/10, checkpoint, memory, heap) ✅
 
-**Deployment:**
-- ✅ Persistent SPI flash (bitstream + firmware)
-- ✅ Clean timing closure (0 TNS, dual-clock CDC)
+**Deployment (both generations):**
+- ✅ Persistent SPI flash (bitstream + firmware, boots on power-up)
+- ✅ Clean timing closure (0 TNS on all clock domains)
 - ✅ All delta algebra properties confirmed in silicon
-- ✅ Production firmware: 16.4 KB (RV32I, -O3)
+- ✅ v3 HDMI demo runs continuously — no host connection required
 
-> **Speaker Notes**: This is not a demo or proof-of-concept. This is a
-> production-deployed SoC running on real silicon with persistent flash. The
-> system boots on power-up, runs a comprehensive test suite, and passes all
-> validation. Zero timing violations. Clean CDC between bus and core domains.
-> Open-source hardware at github.com/MatthewHRockwell/TangNano-9K-example.
+### Zynq Port (Next)
 
-`[VISUAL]` Photo/render of Tang Nano 9K board. Resource utilization bar chart
-(7% filled, 93% empty). Timing diagram showing 1-cycle accumulate and 0-cycle
-reconstruct. Power comparison: ATOMiK (20 mW) vs GPU (300W) — 15,000x ratio.
+AXI4-Lite wrapper for Xilinx XC7Z020 (ALINX AX7020) — **52/52 simulation tests passing**. Build infrastructure complete. Board on order, arriving ~March 22.
+
+> **Speaker Notes**: Two production SoC generations in one month. v2 proved the
+> architecture works as an accelerator. v3 proves it works as a **first-class
+> citizen in the CPU datapath** — with a custom 64-bit RISC-V core and real-time
+> HDMI output. The 8-screen demo runs unattended on power-up: plug in HDMI and
+> watch ATOMiK demonstrate itself. The v3 memcpy speedup (6.4× vs software, up
+> from 12% slower on v2) shows the direct-wire integration eliminates the CDC
+> overhead that limited v2. The Zynq port extends this to Xilinx's ecosystem.
+
+`[VISUAL]` Side-by-side: v2 SoC (simple accelerator diagram) vs v3 SoC (full
+system with HDMI output). Photo of Tang Nano 9K connected to monitor showing
+8-screen demo. Callout: "v2: 12% slower → v3: 6.4× faster" with arrow.
 
 ---
 
@@ -1256,7 +1258,10 @@ effort."
 | Groq | Acquired | $20B by NVIDIA (Dec 2025) | Inference accelerator | Strategic acquisition |
 | Tenstorrent | Private | $2.6B (Dec 2024) | RISC-V AI accelerator | Jim Keller-led |
 | SambaNova | Private | ~$1.6B (Intel talks) | AI hardware | Enterprise AI |
+| Ubitium | Seed-stage | $3.7M seed (2024) | Universal processor | No public hardware demos |
 | Positron AI | Seed-stage | $51.6M Series A | FPGA inference | FPGA-native |
+
+**Note on Ubitium**: Ubitium claims a "universal processor" replacing CPUs/GPUs/DSPs. As of March 2026, they have no public hardware demonstrations. ATOMiK is complementary to existing processors (not a replacement), has two deployed SoCs, and cost ~$225 to develop vs. Ubitium's $3.7M raised.
 
 *All valuations from public filings, Crunchbase, or reporting sources dated 2024-2025.*
 
@@ -1285,7 +1290,7 @@ business template.
 
 # From MVP to Production Silicon
 
-### Completed (6 Phases)
+### Completed (8 Milestones)
 
 | Phase | Deliverable | Key Result |
 |-------|------------|-----------|
@@ -1295,6 +1300,8 @@ business template.
 | Phase 4: SDK | 5-language code generation | 353 tests, schema-driven pipeline |
 | Phase 5: Demo | 3-node FPGA cluster | Multi-device distributed merge |
 | Phase 6: Parallel | 16-bank scaling | 1,056 Mops/s, linear scaling verified |
+| **v2 SoC** | PicoRV32 + ATOMiK accelerator | Production deployed (Feb 2026) |
+| **v3 SoC** | Custom RV64I + HDMI 1280×720 | 8-screen demo, 6.4× speedup (Mar 2026) |
 
 ### Post-Funding Roadmap
 
@@ -1534,12 +1541,15 @@ proofs with zero sorry statements.
 
 | Metric | Value |
 |--------|-------|
+| Production hardware | **Two SoC generations** deployed on $13.50 FPGA |
+| v3 SoC (latest) | Custom RV64I + 1280×720 HDMI + 8-screen demo (Mar 2026) |
 | Peak throughput | 1,056 Mops/s (16 banks on $13.50 FPGA) |
+| v3 memcpy speedup | 6.4× faster than software (v2 was 12% slower) |
 | Operation latency | 10.6 ns (single cycle @ 94.5 MHz) |
 | Memory traffic reduction | 95-100% (up to 30,740x) |
 | Write-heavy speedup | +22% to +58% (p < 0.001) |
 | Formal proofs | 92 (Lean4, 0 sorry statements) |
-| Hardware tests | 80/80 UART passing |
+| Hardware tests | 80/80 sweep + v3: 9/9 + 10/10 + 6/6 |
 | SDK tests | 353 (5 languages) |
 | Total development cost | ~$225 (AI-augmented) |
 
@@ -1706,6 +1716,6 @@ Each is labeled with a confidence level based on evidence quality.
 
 ---
 
-*Document generated: February 2026*
+*Document generated: March 2026*
 *All metrics sourced from ATOMiK repository files and cited research.*
 *No placeholder text. No invented figures.*

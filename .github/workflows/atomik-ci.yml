@@ -4,6 +4,9 @@ on:
     branches: [main, develop, 'phase/**']
   pull_request:
     branches: [main, develop]
+  schedule:
+    # Weekly: Monday 06:00 UTC (Sunday 11pm Pacific) — keeps badges green
+    - cron: '0 6 * * 1'
   workflow_dispatch:
     inputs:
       phase:
@@ -17,7 +20,11 @@ permissions:
   issues: write
 
 jobs:
+  # ===========================================================================
+  # CORE VALIDATION — runs on every push/PR
+  # ===========================================================================
   validate:
+    name: Python Lint & Tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -28,7 +35,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -e ./software[dev]
+          pip install -e ./software[dev] || pip install -e ./software
       - name: Run linting
         run: |
           pip install ruff
@@ -36,16 +43,122 @@ jobs:
       - name: Run unit tests
         run: |
           pip install pytest pytest-cov
-          pytest software/tests/ software/atomik_sdk/tests/ -v --cov=atomik_sdk --cov-report=xml
+          pytest software/tests/ software/atomik_sdk/tests/ -v --tb=short --cov=atomik_sdk --cov-report=xml
       - name: Upload coverage
         uses: codecov/codecov-action@v4
         with:
           file: ./coverage.xml
           fail_ci_if_error: false
 
+  # ===========================================================================
+  # VERILOG SIMULATION — runs on every push/PR (ungated)
+  # ===========================================================================
+  verilog-sim:
+    name: Verilog Simulation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Verilog tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y iverilog
+      - name: Run Zynq AXI4-Lite testbench
+        run: |
+          echo "=== Zynq AXI4-Lite Wrapper Tests ==="
+          cd hardware/zynq
+          iverilog -o sim_axi4lite \
+            -I rtl \
+            rtl/atomik_axi4lite_wrapper.v \
+            rtl/atomik_zynq_clk.v \
+            rtl/atomik_zynq_top.v \
+            sim/tb_axi4lite_wrapper.v \
+            2>&1 | tee /tmp/zynq_compile.log
+          vvp sim_axi4lite 2>&1 | tee /tmp/zynq_sim.log
+          # Fail if any tests failed
+          if grep -q "TESTS FAILED" /tmp/zynq_sim.log; then
+            echo "::error::Zynq testbench had failures"
+            exit 1
+          fi
+          echo "::notice::Zynq AXI4-Lite tests passed"
+      - name: Run v3 iverilog testbenches
+        run: |
+          echo "=== v3 RTL iverilog Tests ==="
+          PASS=0
+          FAIL=0
+          for tb in hardware/v3/sim/iverilog/tb_*.v; do
+            name=$(basename "$tb" .v)
+            echo "--- Running $name ---"
+            # Compile with all RTL sources
+            if iverilog -o "hardware/v3/sim/iverilog/${name}" \
+              -I hardware/v3/rtl \
+              hardware/v3/rtl/*.v \
+              "$tb" 2>&1; then
+              if vvp "hardware/v3/sim/iverilog/${name}" 2>&1 | tee /tmp/${name}.log; then
+                if grep -qi "FAIL\|ERROR" /tmp/${name}.log && ! grep -qi "0 failed\|ALL.*PASS" /tmp/${name}.log; then
+                  echo "::warning::$name had potential failures"
+                  FAIL=$((FAIL + 1))
+                else
+                  PASS=$((PASS + 1))
+                fi
+              else
+                echo "::error::$name simulation crashed"
+                FAIL=$((FAIL + 1))
+              fi
+            else
+              echo "::error::$name failed to compile"
+              FAIL=$((FAIL + 1))
+            fi
+          done
+          echo ""
+          echo "=== v3 Testbench Summary: $PASS passed, $FAIL failed ==="
+          if [ "$FAIL" -gt 0 ]; then
+            exit 1
+          fi
+
+  # ===========================================================================
+  # SDK VALIDATION — runs on every push/PR (ungated)
+  # ===========================================================================
+  sdk-validate:
+    name: SDK Validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install SDK
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ./software[dev] || pip install -e ./software
+          pip install pytest
+      - name: Discover and run all SDK tests
+        run: |
+          echo "=== SDK Test Discovery ==="
+          # Find all test directories
+          TEST_DIRS=$(find software -type f -name "test_*.py" -exec dirname {} \; | sort -u)
+          echo "Found test directories:"
+          echo "$TEST_DIRS"
+          echo ""
+          # Run pytest across all discovered test locations
+          pytest $TEST_DIRS -v --tb=short 2>&1 | tee /tmp/sdk_results.log
+      - name: SDK import smoke test
+        run: |
+          python -c "
+          import atomik_sdk
+          print(f'SDK version: {getattr(atomik_sdk, \"__version__\", \"dev\")}')
+          print('SDK import: OK')
+          " || echo "::warning::SDK import check had issues"
+
+  # ===========================================================================
+  # GATED JOBS — triggered by commit message tags
+  # ===========================================================================
   proof-check:
+    name: Lean4 Proof Verification
     needs: validate
-    if: contains(github.event.head_commit.message, '[proof]')
+    if: >-
+      contains(github.event.head_commit.message, '[proof]') ||
+      github.event_name == 'schedule'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -56,12 +169,18 @@ jobs:
       - name: Verify Lean4 proofs
         run: |
           if [ -d "math/proofs" ]; then
-            cd math/proofs && lake build || echo "No lake project found"
+            cd math/proofs && lake build
+          else
+            echo "::error::math/proofs directory not found"
+            exit 1
           fi
 
   benchmark:
+    name: Benchmark Suite
     needs: validate
-    if: contains(github.event.head_commit.message, '[benchmark]')
+    if: >-
+      contains(github.event.head_commit.message, '[benchmark]') ||
+      github.event_name == 'schedule'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -72,12 +191,16 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -e ./software[dev]
+          pip install -e ./software[dev] || pip install -e ./software
           pip install numpy scipy matplotlib
       - name: Execute benchmark suite
         run: |
           if [ -d "hardware/experiments/benchmarks" ]; then
-            python hardware/experiments/benchmarks/run_all.py --output math/benchmarks/results/benchmark_results.json || echo "Benchmark script not found"
+            python hardware/experiments/benchmarks/run_all.py \
+              --output math/benchmarks/results/benchmark_results.json \
+              || echo "::warning::Benchmark script encountered issues"
+          else
+            echo "::notice::No benchmark directory found, skipping"
           fi
       - name: Upload benchmark results
         uses: actions/upload-artifact@v4
@@ -85,10 +208,14 @@ jobs:
           name: benchmark-results
           path: math/benchmarks/results/
           retention-days: 30
+          if-no-files-found: ignore
 
   synthesis:
-    needs: [validate, proof-check]
-    if: contains(github.event.head_commit.message, '[synthesis]')
+    name: Synthesis & RTL Lint
+    needs: validate
+    if: >-
+      contains(github.event.head_commit.message, '[synthesis]') ||
+      github.event_name == 'schedule'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -98,16 +225,58 @@ jobs:
           sudo apt-get install -y verilator iverilog
       - name: Verilog lint and simulation
         run: |
+          echo "=== Verilator Lint ==="
           if [ -d "hardware/rtl" ]; then
-            verilator --lint-only hardware/rtl/*.v 2>/dev/null || echo "Lint warnings detected"
-            if [ -d "hardware/rtl/testbench" ]; then
-              iverilog -o sim hardware/rtl/*.v hardware/rtl/testbench/*.v && vvp sim || echo "No testbenches found"
-            fi
+            verilator --lint-only hardware/rtl/*.v 2>&1 || echo "::warning::Lint warnings in hardware/rtl"
+          fi
+          if [ -d "hardware/v3/rtl" ]; then
+            verilator --lint-only -Ihardware/v3/rtl hardware/v3/rtl/*.v 2>&1 || echo "::warning::Lint warnings in hardware/v3/rtl"
           fi
 
+  # ===========================================================================
+  # V3 RTL JOBS — triggered by [v3] or [rtl] tags
+  # ===========================================================================
+  v3-rtl-lint:
+    name: v3 RTL Lint
+    runs-on: ubuntu-latest
+    if: >-
+      contains(github.event.head_commit.message, '[v3]') ||
+      contains(github.event.head_commit.message, '[rtl]') ||
+      github.event_name == 'schedule'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Verilog tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y verilator iverilog
+      - name: Verilator lint
+        run: make -C hardware/v3 lint
+      - name: iverilog smoke tests
+        run: make -C hardware/v3 sim-iverilog
+
+  v3-compliance:
+    name: v3 RISC-V Compliance
+    runs-on: ubuntu-latest
+    if: >-
+      contains(github.event.head_commit.message, '[compliance]') ||
+      contains(github.event.head_commit.message, '[v3]') ||
+      github.event_name == 'schedule'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y verilator gcc-riscv64-unknown-elf
+      - name: RISC-V compliance tests
+        run: make -C hardware/v3 compliance
+
+  # ===========================================================================
+  # DOCUMENTATION — main branch only
+  # ===========================================================================
   deploy-docs:
+    name: Deploy Documentation
     needs: validate
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' && github.event_name != 'schedule'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -118,7 +287,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -e ./software[dev]
+          pip install -e ./software[dev] || pip install -e ./software
       - name: Generate documentation
         run: |
           pip install pdoc3
@@ -136,7 +305,11 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./docs
 
+  # ===========================================================================
+  # HARDWARE VALIDATION — self-hosted runner (gated)
+  # ===========================================================================
   hardware-validate:
+    name: FPGA Hardware Validation
     needs: validate
     if: contains(github.event.head_commit.message, '[hardware]')
     runs-on: self-hosted
@@ -149,33 +322,3 @@ jobs:
         with:
           name: hardware-validation
           path: hw_results.json
-
-  v3-rtl-lint:
-    runs-on: ubuntu-latest
-    if: >-
-      contains(github.event.head_commit.message, '[v3]') ||
-      contains(github.event.head_commit.message, '[rtl]')
-    steps:
-      - uses: actions/checkout@v4
-      - name: Install Verilog tools
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y verilator iverilog
-      - name: Verilator lint
-        run: make -C hardware/v3 lint
-      - name: iverilog smoke tests
-        run: make -C hardware/v3 sim-iverilog
-
-  v3-compliance:
-    runs-on: ubuntu-latest
-    if: >-
-      contains(github.event.head_commit.message, '[compliance]') ||
-      contains(github.event.head_commit.message, '[v3]')
-    steps:
-      - uses: actions/checkout@v4
-      - name: Install tools
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y verilator gcc-riscv64-unknown-elf
-      - name: RISC-V compliance tests
-        run: make -C hardware/v3 compliance

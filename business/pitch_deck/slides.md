@@ -94,22 +94,29 @@ These aren't aspirational — they are **machine-verified mathematical proofs**.
 
 ---
 
-# Production Deployment: Real Silicon ✅
+# Production Deployment: Two SoC Generations ✅
 
-**Deployed on Tang Nano 9K** (Feb 2026) — $13.50 FPGA, PicoRV32 SoC accelerator:
+**Two production SoCs deployed on Tang Nano 9K** ($13.50 FPGA):
 
+### v3 SoC — Custom RV64I + HDMI (Mar 2026)
 | Metric | Result |
 |--------|--------|
-| **Status** | ✅ **PRODUCTION** — Persistent flash |
-| Operation latency | **12.3 ns** (single clock @ 81 MHz) |
-| ATOMiK clock | 81 MHz (Fmax: **100.2 MHz**, +23% margin) |
-| CPU clock | 25.2 MHz (Fmax: 30.6 MHz, +21% margin) |
-| Timing closure | **0 TNS** (all domains) |
-| LUT utilization (SoC) | **44%** (3,838 / 8,640 LUTs) |
-| Integration tests | **5/5 passing** on hardware |
-| Standalone core | **7%** LUT (579 / 8,640) @ 94.5 MHz |
+| **Status** | ✅ **DEPLOYED** — Persistent flash, boots on power-up |
+| Architecture | Custom RV64I CPU + ATOMiK **direct-wire** (no CDC) |
+| HDMI output | **1280×720@60Hz** — delta-driven display pipeline |
+| Investor demo | **8-screen auto-cycling** (runs unattended) |
+| Memcpy speedup | **6.4× faster** than software (v2 was 12% slower) |
+| LUT utilization | **69%** (5,966 / 8,640 LUTs) |
+| Validation | 9/9 ATOMiK + 10/10 Phase 2 + 6/6 Display |
 
-*Every operation completes in exactly 1 clock cycle. Zero timing violations. Production-ready.*
+### v2 SoC — PicoRV32 Accelerator (Feb 2026)
+| Metric | Result |
+|--------|--------|
+| ATOMiK clock | 81 MHz (Fmax: **100.2 MHz**, +23% margin) |
+| LUT utilization | **44%** (3,838 / 8,640 LUTs) |
+| Integration tests | **5/5 passing** on hardware |
+
+*v3 proves ATOMiK works as a first-class CPU datapath element — not just a peripheral accelerator.*
 
 ---
 
@@ -264,12 +271,14 @@ JSON Schema --> ATOMiK Generator --> Python + Rust + C + JavaScript + Verilog
 
 ### Milestones Achieved
 - ✅ 92 formal mathematical proofs (Lean4 verified)
-- ✅ **Production deployment** — Tang Nano 9K SoC (Feb 2026)
+- ✅ **v3 SoC deployed** — Custom RV64I + 1280×720 HDMI + 8-screen demo (Mar 2026)
+- ✅ **v2 SoC deployed** — PicoRV32 + ATOMiK accelerator (Feb 2026)
 - ✅ 1 Gops/s hardware validation (N=16 parallel banks)
 - ✅ 5-language SDK with 353 tests passing
 - ✅ 25-module agentic pipeline
 - ✅ Patent application filed
-- ✅ 0 TNS timing closure with +23% margin
+- ✅ 0 TNS timing closure across all clock domains
+- ✅ Zynq port: 52/52 sim tests (ALINX AX7020 board on order)
 
 ---
 
