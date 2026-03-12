@@ -1,8 +1,8 @@
 # ATOMiK Zynq-7020 Port Architecture Specification
 
-**Version**: 1.0.0
-**Status**: PROPOSED
-**Date**: March 7, 2026
+**Version**: 1.1.0
+**Status**: VALIDATED (PL synthesis — 400 MHz timing-met)
+**Date**: March 12, 2026
 **Target Board**: ALINX AX7020 (XC7Z020-2CLG400I)
 
 ---
@@ -45,7 +45,8 @@ ATOMiK is being ported from the Gowin GW1NR-9 (Tang Nano 9K) to the Xilinx Zynq-
 | **ATOMiK Interface** | Custom instruction (1 cycle) | AXI4-Lite MMIO (~4-8 cycles) | -- |
 | **Board Price** | $13.50 | ~$150 | 11x |
 | **v3 SoC Utilization** | 6,287 LUT (73%) | -- (target: <10%) | -- |
-| **ATOMiK N=1 Cost** | 477 LUT4 | ~120 LUT6 (estimate) | -- |
+| **ATOMiK N=1 Cost** | 477 LUT4 | **289 LUT6 (measured)** | -- |
+| **ATOMiK N=1 Fmax** | 94.5 MHz | **400 MHz (measured)** | 4.2x |
 | **ATOMiK N=16 Cost** | 1,779 LUT4 | ~500 LUT6 (estimate) | -- |
 | **Max ATOMiK Banks** | 1 (in SoC) | ~256 (estimate) | 256x |
 
@@ -147,7 +148,7 @@ For N > 1, the parallel input mode (`delta_parallel_in`, `delta_parallel_valid`)
 
 ### 4.3 BSRAM State Table Mapping to Xilinx BRAM36
 
-The ATOMiK state table is 256x64-bit (16 Kbit). On Gowin, this maps to 2 SDPB blocks (256x32 low + 256x32 high). On Xilinx, it maps to a single BRAM36 configured as 512x36 or directly as 256x72 (using the extra parity bits for width). Vivado will infer this from the behavioral RTL when guided by `(* ram_style = "block" *)`.
+The ATOMiK state table is 256x64-bit (16 Kbit). On Gowin, this maps to 2 SDPB blocks (256x32 low + 256x32 high). On Xilinx, it maps to a single RAMB36E1 configured as 256x72. **Note**: Vivado ignores `(* ram_style = "block" *)` for this memory pattern (conditional write address), so explicit `xpm_memory_sdpram` instantiation is used to guarantee BRAM. READ_LATENCY_B=2 enables the BRAM output register (DOB_REG), which is critical for achieving 400 MHz.
 
 | Platform | State Table Config | Blocks Used | Block Type |
 |----------|-------------------|:-----------:|------------|
@@ -183,14 +184,14 @@ Gowin and Xilinx use different synthesis pragmas. The RTL source will use `ifdef
 - **MMCM** (PL-generated): Dedicated MMCM generates the ATOMiK core clock. Target frequency is ~200 MHz for N=1 (XC7Z020 -2 speed grade can sustain this for XOR-only logic). For large N, the merge tree depth increases and the target frequency will drop.
 - **CDC bridge**: Toggle-handshake between FCLK0 and MMCM domains, same architecture as the v2 CDC bridge. The AXI wrapper completes the AXI transaction only after the CDC handshake confirms the ATOMiK operation has been committed.
 
-**Frequency targets by bank count** (all ~estimates, pending synthesis):
+**Frequency targets by bank count** (N=1 validated via Vivado synthesis, multi-bank estimated):
 
-| N_BANKS | Merge Tree Depth | Target ATOMiK Clock | Estimated Throughput |
-|:-------:|:-----------------:|:-------------------:|:--------------------:|
-| 1 | 0 | ~250 MHz | ~250 Mops/s |
-| 16 | 4 | ~200 MHz | ~3,200 Mops/s |
-| 64 | 6 | ~180 MHz | ~11,520 Mops/s |
-| 256 | 8 | ~150 MHz | ~38,400 Mops/s |
+| N_BANKS | Merge Tree Depth | ATOMiK Clock | Throughput | Status |
+|:-------:|:-----------------:|:------------:|:----------:|:------:|
+| 1 | 0 | **400 MHz** | **400 Mops/s** | **Synthesis-validated** (WNS=+0.001ns) |
+| 16 | 4 | ~300 MHz (est.) | ~4,800 Mops/s | Pending sweep |
+| 64 | 6 | ~250 MHz (est.) | ~16,000 Mops/s | Pending sweep |
+| 256 | 8 | ~200 MHz (est.) | ~51,200 Mops/s | Pending sweep |
 
 ### 4.6 CDC Between AXI and ATOMiK Domains
 

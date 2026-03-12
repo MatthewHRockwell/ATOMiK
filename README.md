@@ -28,7 +28,7 @@
 - ✅ **8-screen auto-cycling HDMI demo**: Splash, self-test, performance, matrix integrity, energy, architecture, security, algebra
 - ✅ **Persistent flash**: Bitstream + firmware in SPI flash, boots on power-up
 - ✅ **Full validation**: All test suites passing (9/9 ATOMiK, 10/10 Phase 2, 6/6 Display)
-- ✅ **Zynq port in progress**: AXI4-Lite wrapper for Xilinx XC7Z020 (ALINX AX7020), 52/52 sim tests
+- ✅ **Zynq port in progress**: AXI4-Lite wrapper for Xilinx XC7Z020 (ALINX AX7020), **400 MHz timing-met** (37/37 sim tests)
 
 **Get the hardware:**
 ```bash
@@ -117,10 +117,13 @@ python -m software.demos.state_sync_benchmark
 ### Zynq Port (ALINX AX7020 — XC7Z020)
 | Milestone | Description | Status |
 |-----------|-------------|--------|
-| **AXI4-Lite Wrapper** | PS-to-PL interface with 32→64 bit bridging | ✅ Complete (52/52 sim tests) |
-| **Vivado Build Infrastructure** | TCL scripts, block design, constraints, Makefile | ✅ Complete |
+| **AXI4-Lite Wrapper** | PS-to-PL interface with 32→64 bit bridging + CDC bridge | ✅ Complete (37/37 sim tests) |
+| **MMCM Dual-Clock Architecture** | 100 MHz AXI + parameterized ATOMiK clock via MMCME2 | ✅ Complete |
+| **Zynq-Optimized Core** | XPM BRAM (RAMB36E1) + output register + 4-stage SWAP pipeline | ✅ Complete |
+| **Fmax Sweep & Optimization** | **400 MHz timing-met** — 289 LUT (0.5%), 1 BRAM, WNS=+0.001ns | ✅ Complete |
+| **Vivado Build Infrastructure** | TCL scripts, block design, constraints, Makefile, sweep automation | ✅ Complete |
 | **Reference Documentation** | Board pinout, PS config, AXI guide, Vivado build guide | ✅ Complete (13 docs) |
-| **Hardware Bringup** | Synthesis + deployment on AX7020 | Pending (board on order) |
+| **Hardware Bringup** | PS+PL block design + deployment on AX7020 | Pending (board on order) |
 
 ---
 
@@ -184,10 +187,10 @@ N=16 breaks the **1 Gops/s barrier** on the Tang Nano 9K. Scaling is exactly lin
 
 ### Projected Throughput
 
-| Platform | Est. Frequency | Single-Acc | 16-Acc (projected) |
-|----------|---------------|------------|-------------------|
+| Platform | Frequency | Single-Acc | 16-Acc (projected) |
+|----------|-----------|------------|-------------------|
 | **Gowin GW1NR-9** (Tang Nano 9K) | 66-108 MHz | 108 Mops/s | **1,056 Mops/s** (validated) |
-| **Xilinx Artix-7** | ~300 MHz | ~300 Mops/s | ~4.8 Gops/s |
+| **Xilinx XC7Z020** (Zynq-7000) | **400 MHz** | **400 Mops/s** (synthesis-validated) | ~6.4 Gops/s |
 | **Xilinx UltraScale+** | ~500 MHz | ~500 Mops/s | ~8.0 Gops/s |
 | **Intel Agilex** | ~600 MHz | ~600 Mops/s | ~9.6 Gops/s |
 | **ASIC 28nm** | ~1 GHz+ | ~1 Gops/s | ~16 Gops/s |
@@ -336,9 +339,10 @@ ATOMiK/
 │   │   ├── synth/            # Gowin synthesis project and bitstream
 │   │   └── sim/              # Verilator and iverilog testbenches
 │   ├── zynq/                 # Zynq port (ALINX AX7020, XC7Z020)
-│   │   ├── rtl/              # AXI4-Lite wrapper, clock module, PL top
-│   │   ├── sim/              # iverilog testbench (52/52 PASS)
+│   │   ├── rtl/              # AXI4-Lite wrapper, CDC bridge, BRAM core, PL top
+│   │   ├── sim/              # iverilog dual-clock testbench (37/37 PASS)
 │   │   ├── vivado/           # TCL scripts (build, block design, program)
+│   │   ├── scripts/          # Fmax sweep automation (fmax_sweep.py)
 │   │   └── constraints/      # XDC timing constraints
 │   ├── sim/                  # v2 testbenches (single-core + parallel)
 │   ├── sweep/                # Parallel bank synthesis sweep (25 configs)

@@ -3,86 +3,112 @@
 ## Company Overview
 
 **Company:** Rockwell Industries (converting to Delaware C-Corp)
-**Product:** ATOMiK — delta-state computation hardware IP
-**Stage:** Pre-seed, working hardware
+**Product:** ATOMiK — formally verified delta-state computation hardware IP
+**Stage:** Pre-seed with production hardware
 **Founder:** Matthew H. Rockwell (solo)
 **Contact:** matthew.h.rockwell@gmail.com
 **Repository:** github.com/MatthewHRockwell/ATOMiK
+**Patent:** Pending
+**Publications:** 2 on Zenodo, 1 under peer review at Scientific Reports (Springer Nature)
 
 ---
 
 ## What are you building?
 
-Hardware IP cores for delta-state computation. ATOMiK replaces traditional full-state updates with XOR-based accumulation that completes in a single clock cycle. We license the RTL to chip designers (ARM-style IP licensing model).
+Formally verified hardware IP cores for delta-state computation — a new computing primitive that replaces full-state updates with XOR-based delta accumulation. One operation, one clock cycle, 287 LUTs, 1.8 mW. We license the RTL to chip designers (ARM-style IP model).
+
+**What's already built:**
+- 92 machine-verified proofs (Lean4)
+- Production SoC on Tang Nano 9K FPGA ($13.50)
+- 1,056 Mops/s throughput, 120x–30,720x memory traffic reduction
+- 80/80 hardware tests, 353 SDK tests across 5 languages
+- Total development cost: **$225**
+
+This is not a concept. It's working silicon.
 
 ## What problem does it solve?
 
-Every computing system that manages state — databases, trading engines, IoT sensors, distributed systems — copies full state on every update. This creates three problems:
+Every computing system that manages state — databases, trading engines, IoT sensors, AI inference — copies full state on every update. This wastes 120x–30,720x more memory bandwidth than necessary and creates three hard problems:
+
 1. **Latency**: Read-modify-write cycles take multiple clock cycles with carry propagation
-2. **Memory**: Full state copies consume bandwidth (O(N) per update)
+2. **Memory bandwidth**: Full state copies consume O(N) bandwidth per update
 3. **Concurrency**: Full-state writes require locks or CAS operations
 
-ATOMiK eliminates all three. XOR accumulation is single-cycle (no carry chains), uses constant memory (64-bit accumulator), and is lock-free by mathematical proof (commutative).
+ATOMiK eliminates all three. XOR accumulation is single-cycle (no carry chains, 10.6 ns), uses constant memory (64-bit accumulator), and is lock-free by mathematical proof (commutative, associative, self-inverse — all formally verified).
 
-## Hardware Status — Working Silicon
+## Hardware Specifications
 
-This is not a slide deck. ATOMiK runs on real hardware today:
-
-| Milestone | Status |
-|-----------|--------|
-| Mathematical proofs | ✅ 92 theorems, Lean4 verified |
-| FPGA synthesis | ✅ Tang Nano 9K, timing closed |
-| Hardware tests | ✅ 80/80 sweep + 5/5 integration |
-| Production SoC | ✅ v3 with custom RV64I CPU + HDMI |
-| SDK | ✅ 5 languages, 353 tests |
-| Throughput | ✅ 1 Gops/s (16 banks, validated) |
-| Patent | ✅ Pending |
-
-**Total hardware development cost: $225.**
+| Metric | Value |
+|--------|-------|
+| Mathematical proofs | 92 theorems, Lean4 machine-verified |
+| Core size | **287 LUTs** (single delta-state bank) |
+| Power | **1.8 mW** |
+| Throughput | **1,056 Mops/s** (16 parallel banks) |
+| Memory traffic reduction | **120x–30,720x** vs. full-state |
+| State reconstruction | O(1), 10.6 ns |
+| Current FPGA | Tang Nano 9K (GW1NR-9, **$13.50**) |
+| SoC version | v3: custom RV64I CPU + delta engine + HDMI |
+| Timing margin | +23% positive slack |
+| FPGA utilization | 7% (single bank) to 44% (full SoC) |
+| Hardware tests | 80/80 sweep + 5/5 integration |
+| SDK tests | 353 across Python, Rust, C, JavaScript, Verilog |
+| Patent | Pending |
+| Total BOM | **$225** |
 
 ## Path to ASIC
 
-ATOMiK's architecture is designed for ASIC from the start:
+ATOMiK's architecture is ASIC-ready by design:
 
-1. **Current**: Tang Nano 9K FPGA (GW1NR-9, $13.50) — production SoC
-2. **Next**: Zynq port (ALINX AX7020) — larger device, more banks, ARM integration
-3. **Target**: ASIC tape-out via shuttle run (e.g., Efabless/Google MPW or TSMC through Silicon Catalyst)
-4. **Scale**: IP licensing of verified RTL blocks to SoC designers
+1. **Current**: Tang Nano 9K FPGA (GW1NR-9, $13.50) — production SoC running
+2. **In progress**: Zynq port (ALINX AX7020) — ARM Cortex-A9 + FPGA, heterogeneous SoC validation
+3. **Next**: ASIC tape-out via shuttle run (Efabless/Google MPW or TSMC through Silicon Catalyst)
+4. **Scale**: IP licensing of verified RTL blocks to SoC designers globally
 
-The RTL is clean, parameterized SystemVerilog. Timing is already closed with +23% margin. LUT utilization is 7% (single bank) to 44% (full SoC). The architecture translates directly to standard cells.
+The RTL is clean, parameterized SystemVerilog. 287 LUTs maps to ~1,000 standard cells. Timing is closed with +23% margin. The delta-state engine translates directly to ASIC — no FPGA-specific primitives, no vendor lock-in.
 
 ## Why HAX?
 
-1. **Hardware expertise**: HAX understands the hardware-to-market journey. We need help with supply chain, manufacturing partnerships, and NRE cost management for ASIC.
-2. **Prototyping resources**: Access to more FPGA platforms and test equipment would accelerate the Zynq port and multi-board demo.
-3. **Network**: HAX's 348+ hardware portfolio means warm intros to potential licensees who integrate IP into their products.
-4. **Shenzhen access**: For FPGA evaluation boards and potential ASIC packaging partners.
+HAX is the right accelerator for ATOMiK because this is a **hardware IP to silicon** story:
+
+1. **Hardware-to-market expertise**: HAX has guided 348+ hardware companies from prototype to product. We need help navigating the ASIC tape-out process, NRE cost management, and foundry relationships.
+2. **Manufacturing network**: Shenzhen access for evaluation boards, packaging partners, and ASIC test infrastructure.
+3. **Licensee introductions**: HAX's hardware portfolio includes companies that *integrate* IP into their products — our exact customer profile.
+4. **Prototyping resources**: Additional FPGA platforms and test equipment to accelerate multi-board demos and customer evaluation kits.
 
 ## What makes this defensible?
 
-- **92 Lean4 proofs**: Machine-verified. Takes years of specialized expertise to replicate.
-- **Patent pending**: Architecture and execution model.
-- **Full stack**: Math + RTL + SoC + SDK. Competitors would need to rebuild everything.
-- **Working silicon**: Not simulation results — real FPGA hardware, passing real tests.
+1. **92 Lean4 proofs**: Machine-verified mathematical properties. Takes years of specialized expertise in both formal methods and hardware design to replicate. No competitor has anything close.
+2. **Patent pending**: Architecture and execution model protected.
+3. **Full-stack ownership**: Math → RTL → SoC → SDK. Competitors would need to rebuild the entire vertical.
+4. **Working silicon**: Not simulation — real FPGA hardware passing real tests at 1,056 Mops/s.
+5. **Published research**: 2 papers on Zenodo, 1 under peer review at Springer Nature. Academic credibility compounds.
 
 ## Market
 
-Semiconductor IP licensing market (TAM: $7B+, growing with custom silicon trend). Our slice: state management IP blocks.
+**TAM**: Semiconductor IP licensing market: $7B+ and growing as custom silicon adoption accelerates (Apple, Google, Amazon, automotive OEMs all designing chips).
+
+**Why now**: Edge AI is exploding — Jetson, NPUs in phones, RISC-V custom silicon — and every edge chip needs efficient state management at milliwatt power budgets. No one is shipping formally verified IP for this. We're first.
 
 **Initial verticals:**
-- HFT: Single-cycle tick processing, instant trade reversal ($50-500K/license)
-- IoT: Lock-free multi-stream merge at edge power budgets ($10-50K/license)
-- Database: O(1) state reconstruction vs. O(N) replay ($50-200K/license)
+- **HFT**: Single-cycle tick processing, instant trade reversal ($50K–$500K/license)
+- **Edge AI/IoT**: Lock-free multi-stream merge at 1.8 mW ($10K–$50K/license + royalties)
+- **Database accelerators**: O(1) state reconstruction vs. O(N) replay ($50K–$200K/license)
 
 ## Team
 
-**Matthew H. Rockwell — Founder**
-Built the entire ATOMiK stack solo: 92 Lean4 formal proofs, SystemVerilog RTL, production SoC with custom RV64I CPU, 5-language SDK (353 tests), and agentic development pipeline. $225 total development cost. Patent pending inventor.
+**Matthew H. Rockwell — Founder & CEO**
+
+Mechanical engineer turned semiconductor architect. Built the complete ATOMiK stack solo in 6 months: 92 Lean4 formal proofs, SystemVerilog RTL, production SoC with custom RV64I CPU, 5-language SDK (353 tests), patent application, and 2 published papers. $225 total development cost.
+
+**On being solo**: The hardest part — proving novel math correct and translating it to silicon — is done. Seed funding hires a verification engineer and an applications engineer. I'm not trying to do everything forever; I did everything *first* to prove it works.
 
 ## Ask
 
-Seeking HAX investment ($250-500K) and program participation to:
-1. Complete Zynq port (larger FPGA, ARM integration)
-2. Prepare ASIC-ready RTL with DFT and standard cell targeting
-3. Sign first commercial IP license
-4. Build 2-person hardware team (verification engineer + applications engineer)
+Seeking HAX investment and program participation to:
+
+1. **Complete Zynq port** — ARM+FPGA heterogeneous SoC, larger device, more parallel banks
+2. **Prepare ASIC-ready RTL** — DFT insertion, standard cell targeting, foundry PDK integration
+3. **Sign first commercial IP license** — pilot program with HFT or edge AI customer
+4. **Hire first 2 engineers** — verification engineer + applications engineer
+
+We're raising a $3–4M seed round. HAX participation would validate the hardware path and accelerate commercial licensing.

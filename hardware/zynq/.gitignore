@@ -1,0 +1,10 @@
+# Vivado build artifacts
+output/
+reports/
+.Xil/
+vivado/atomik_zynq/
+vivado*.log
+vivado*.jou
+
+# Sweep generated files and reports (regenerable via scripts/fmax_sweep.py)
+sweep/

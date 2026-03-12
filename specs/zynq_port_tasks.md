@@ -67,18 +67,28 @@
 - [ ] Generate output products, create HDL wrapper
 
 ### Z1.3 MMCM Clock Configuration
-- [ ] Configure MMCM for ATOMiK clock domain (target: 100 MHz from 50 MHz FCLK)
-- [ ] Implement CDC bridge between AXI clock and ATOMiK clock
-- [ ] Write XDC timing constraints for both domains
-- [ ] Run timing analysis, verify zero TNS
+- [x] Configure MMCM for ATOMiK clock domain (target: 100–500 MHz from 50 MHz FCLK)
+  - MMCM instantiated in `atomik_axi4lite_wrapper.v`, parameterized via `CORE_FREQ_MHZ`
+  - Fmax sweep script (`scripts/fmax_sweep.py`) tests 100–500 MHz in 10 MHz steps
+- [x] Implement CDC bridge between AXI clock and ATOMiK clock
+  - `rtl/atomik_cdc_bridge.v` — toggle-handshake protocol, 2FF synchronizers both directions
+  - Core-side FSM: 11 states (IDLE→EXEC→WAIT1-7→SETTLE→ACK) for 4-stage SWAP pipeline + BRAM output register
+  - AXI-side FSM: 3 states (IDLE→WAIT→DONE)
+- [x] Write XDC timing constraints for both domains
+  - `vivado/timing.xdc` — dual-clock constraints, false paths on CDC toggle signals
+- [x] Run timing analysis, verify zero TNS
+  - **400 MHz timing-met** (WNS=+0.001ns) with aggressive Vivado directives
+  - Fmax sweep: 100–400 MHz all PASS, 444 MHz achieves 431 MHz, 500 MHz achieves 460 MHz
 
 ### Z1.4 Synthesis and Resource Check
 - [x] Run Vivado synthesis + implementation (PL-only, `build.tcl`)
-  - 287 LUT logic (0.54%), 344 LUT RAM (1.98%), 471 FF (0.44%), 0 BRAM, 0 DSP
-  - Timing unconstrained (no PS clock source in PL-only mode — will be constrained in block design)
-- [ ] Re-run with block design (PS+PL) for definitive Fmax measurement
-- [ ] Compare against estimates in `RESOURCE_BUDGET_GUIDE.md`
-- [ ] Update docs with measured values (replace ~ estimates)
+  - Initial: 287 LUT logic (0.54%), 344 LUT RAM (1.98%), 471 FF (0.44%), 0 BRAM, 0 DSP
+  - After XPM BRAM optimization: 289 LUT (0.54%), 1 BRAM36, 0 LUTRAM — state table in dedicated BRAM
+- [x] Fmax sweep with MMCM-driven core clock (PL-only, `scripts/fmax_sweep.py`)
+  - 400 MHz timing-met (WNS=+0.001ns) — 4.2x improvement over Gowin GW1NR-9 (95.9 MHz)
+  - Key optimizations: XPM BRAM (READ_LATENCY_B=2), 4-stage SWAP pipeline, aggressive Vivado directives
+- [x] Compare against estimates in `RESOURCE_BUDGET_GUIDE.md`
+- [x] Update docs with measured values (replace ~ estimates)
 
 ### Z1.5 Linux UIO Driver
 - [x] Write device tree overlay for ATOMiK peripheral (`compatible = "generic-uio"`)

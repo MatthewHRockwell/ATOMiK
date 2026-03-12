@@ -1,9 +1,9 @@
 # ATOMiK — Roadmap & Execution Plan
 
-**Document Version:** 2.3
-**Date:** March 6, 2026
+**Document Version:** 2.4
+**Date:** March 12, 2026
 **Author:** Matt Rockwell + Claude (Planning Partner)
-**Status:** ACTIVE — v2 Production SoC deployed, v3.1.0 production deployed (HD 1280x720 HDMI, benchmarked + parallel banks validated)
+**Status:** ACTIVE — v2 Production SoC deployed, v3.1.0 production deployed (HD 1280x720 HDMI, benchmarked + parallel banks validated), Zynq port: 400 MHz synthesis-validated
 
 ---
 
@@ -744,10 +744,27 @@ Reference docs: [`docs/reference/xilinx/`](docs/reference/xilinx/)
 | OS | Bare-metal | Linux (Ubuntu) | -- |
 | Price | $13.50 | $195 | 14.4x |
 
+### Synthesis Results (Pre-Hardware)
+
+| Config | Target | Achieved Fmax | LUT | BRAM | Status |
+|--------|--------|---------------|-----|------|--------|
+| N=1 @ 200 MHz | 200 MHz | 220 MHz | 268 (0.5%) | 1 | **PASS** (+10% margin) |
+| N=1 @ 348 MHz | 348 MHz | 386 MHz | 275 (0.5%) | 1 | **PASS** (+11% margin) |
+| **N=1 @ 400 MHz** | **400 MHz** | **400 MHz** | **289 (0.5%)** | **1** | **PASS** (WNS=+0.001ns) |
+| N=1 @ 444 MHz | 444 MHz | 431 MHz | 302 (0.6%) | 1 | FAIL (WNS=-0.069ns) |
+| N=1 @ 500 MHz | 500 MHz | 460 MHz | 318 (0.6%) | 1 | FAIL (Fmax wall) |
+
+**Key optimizations** that enabled 400 MHz (up from initial ~260 MHz):
+1. **XPM BRAM instantiation** — Vivado ignored `(* ram_style = "block" *)`, kept 688 dist RAM slices. Explicit `xpm_memory_sdpram` forced RAMB36E1, cutting LUT from 1,150 to 289.
+2. **BRAM output register** (READ_LATENCY=2) — Broke the 2.1ns BRAM Tco critical path by enabling the DOB_REG flip-flop inside the BRAM tile.
+3. **4-stage SWAP pipeline** — Accounts for BRAM registered read latency. Deterministic, fixed-depth for all operations.
+4. **Aggressive implementation directives** — `ExtraTimingOpt` placement + `AggressiveExplore` routing closed the final 61ps gap.
+
 ### Status
 
-- **Zynq Phase 0**: Documentation & tooling — **IN PROGRESS**
-- **Zynq Phase 1**: ATOMiK PL bringup (N=1) — PENDING (board on order)
+- **Zynq Phase 0**: Documentation & tooling — **COMPLETE** (13 reference docs, Vivado environment validated)
+- **Zynq Phase 0.5**: Pre-hardware optimization — **COMPLETE** (400 MHz timing-met, 37/37 CDC sim tests, Fmax sweep infrastructure)
+- **Zynq Phase 1**: ATOMiK PL bringup (N=1) — PENDING (board on order, ~March 22)
 - **Zynq Phase 2**: Multi-bank scaling (N=16, 64, 256) — PENDING
 - **Zynq Phase 3**: Display & integration — PENDING
 
@@ -755,11 +772,12 @@ Reference docs: [`docs/reference/xilinx/`](docs/reference/xilinx/)
 
 1. **ATOMiK is an accelerator** — ARM PS runs Linux, ATOMiK is an AXI4-Lite peripheral in PL
 2. **32-bit AXI, 64-bit datapath** — LO/HI register pair, HI write triggers operation
-3. **UIO driver** — mmap registers into userspace, no custom kernel module
-4. **Same benchmark suite** — identical test vectors on Zynq and Gowin for cross-platform comparison
-5. **Shared RTL** — core ATOMiK modules from `hardware/v3/rtl/`, no duplication
+3. **Dual-clock CDC** — 100 MHz AXI domain + parameterized ATOMiK domain (up to 400 MHz) via MMCME2 + toggle-handshake
+4. **Zynq-optimized core** — XPM BRAM (RAMB36E1) with output register, 4-stage SWAP pipeline, deterministic latency
+5. **UIO driver** — mmap registers into userspace, no custom kernel module
+6. **Same benchmark suite** — identical test vectors on Zynq and Gowin for cross-platform comparison
 
 ---
 
 *This document is a living roadmap. Update as decisions are made and phases are completed.*
-*Last updated: March 7, 2026*
+*Last updated: March 12, 2026*

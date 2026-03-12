@@ -4,7 +4,8 @@
 #
 # Usage:
 #   make help         Show available targets
-#   make sim          Run iverilog simulation (52 tests)
+#   make sim          Run single-clock iverilog simulation (Phase 1 wrapper)
+#   make sim-cdc      Run dual-clock CDC simulation (Phase 2 full path)
 #   make blockdesign  Build PS+PL block design (primary flow)
 #   make bitstream    Build PL-only bitstream (non-project mode)
 #   make program      Program FPGA via JTAG (volatile)
@@ -21,32 +22,60 @@ VVP      := $(shell command -v vvp 2>/dev/null)
 
 # RTL sources
 ZYNQ_RTL := $(ZYNQ_DIR)rtl/atomik_axi4lite_wrapper.v \
+            $(ZYNQ_DIR)rtl/atomik_cdc_bridge.v \
+            $(ZYNQ_DIR)rtl/atomik_core_zynq.v \
             $(ZYNQ_DIR)rtl/atomik_zynq_clk.v \
             $(ZYNQ_DIR)rtl/atomik_zynq_top.v
-CORE_RTL := $(V3_RTL)/atomik_v3_atomik.v
-TB_SRC   := $(ZYNQ_DIR)sim/tb_axi4lite_wrapper.v
+CORE_RTL :=
+
+# Testbenches
+TB_CDC   := $(ZYNQ_DIR)sim/tb_cdc_wrapper.v
 
 # Build outputs
 BUILD_DIR  := $(ZYNQ_DIR)output
-SIM_BIN    := $(BUILD_DIR)/tb_axi4lite
+SIM_CDC    := $(BUILD_DIR)/tb_cdc_wrapper
 
-.PHONY: all sim bitstream blockdesign program clean help
+.PHONY: all sim sim-cdc bitstream blockdesign program clean help
 
-all: sim
+all: sim-cdc
 
 # ------------------------------------------------------------------------------
 # Simulation (iverilog)
 # ------------------------------------------------------------------------------
 
-sim: $(TB_SRC) $(ZYNQ_RTL) $(CORE_RTL)
+## Run dual-clock CDC testbench (primary validation)
+sim-cdc: $(TB_CDC) $(ZYNQ_RTL) $(CORE_RTL)
 ifdef IVERILOG
 	@mkdir -p $(BUILD_DIR)
-	$(IVERILOG) -o $(SIM_BIN) $(TB_SRC) $(ZYNQ_RTL) $(CORE_RTL)
-	cd $(BUILD_DIR) && $(VVP) $(SIM_BIN)
-	@rm -f $(BUILD_DIR)/tb_axi4lite_wrapper.vcd
+	$(IVERILOG) -DSIMULATION -o $(SIM_CDC) $(TB_CDC) $(ZYNQ_RTL) $(CORE_RTL)
+	cd $(BUILD_DIR) && $(VVP) $(SIM_CDC)
+	@rm -f $(BUILD_DIR)/tb_cdc_wrapper.vcd
 else
 	@echo "iverilog not found — skipping simulation"
 endif
+
+## Alias for backward compatibility
+sim: sim-cdc
+
+# ------------------------------------------------------------------------------
+# Fmax Sweep (Vivado batch — generates configs, runs synth+impl, parses reports)
+# ------------------------------------------------------------------------------
+
+## Quick Fmax sweep: 200, 300, 400 MHz (N=1)
+sweep-quick:
+	cd $(ZYNQ_DIR) && python3 scripts/fmax_sweep.py --quick
+
+## Full Fmax sweep: 200-500 MHz (N=1)
+sweep:
+	cd $(ZYNQ_DIR) && python3 scripts/fmax_sweep.py
+
+## Full Fmax + multi-bank sweep
+sweep-full:
+	cd $(ZYNQ_DIR) && python3 scripts/fmax_sweep.py --banks 1,4,8,16
+
+## Generate sweep files only (no Vivado)
+sweep-gen:
+	cd $(ZYNQ_DIR) && python3 scripts/fmax_sweep.py --gen-only
 
 # ------------------------------------------------------------------------------
 # Vivado Builds (require Vivado installation)
@@ -71,13 +100,19 @@ program:
 clean:
 	rm -rf $(ZYNQ_DIR)output/ $(ZYNQ_DIR)reports/
 	rm -rf $(ZYNQ_DIR).Xil/ $(ZYNQ_DIR)vivado/atomik_zynq/
+	rm -rf $(ZYNQ_DIR)sweep/
 	rm -f $(ZYNQ_DIR)vivado*.log $(ZYNQ_DIR)vivado*.jou
 
 help:
 	@echo "ATOMiK Zynq Build Targets:"
-	@echo "  make sim          - Run iverilog AXI4-Lite testbench (52 tests)"
+	@echo "  make sim-cdc      - Run dual-clock CDC testbench (primary)"
+	@echo "  make sim          - Alias for sim-cdc"
 	@echo "  make blockdesign  - Build Zynq PS+PL block design (primary flow)"
 	@echo "  make bitstream    - Build PL-only bitstream (non-project mode)"
 	@echo "  make program      - Program FPGA via JTAG (volatile)"
 	@echo "  make clean        - Remove all build artifacts"
+	@echo "  make sweep-quick  - Quick Fmax sweep: 200, 300, 400 MHz"
+	@echo "  make sweep        - Full Fmax sweep: 200-500 MHz"
+	@echo "  make sweep-full   - Full Fmax + multi-bank sweep (N=1,4,8,16)"
+	@echo "  make sweep-gen    - Generate sweep files only (no Vivado)"
 	@echo "  make help         - Show this help"

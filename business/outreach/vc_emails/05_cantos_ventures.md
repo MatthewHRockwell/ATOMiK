@@ -6,7 +6,7 @@ Hi team,
 
 Cantos backs deep tech at the earliest stages, which is exactly where ATOMiK is — except we have working silicon, 92 formal proofs, and a patent pending architecture. Not bad for $225 total spend.
 
-ATOMiK is delta-state computation in hardware. XOR-based accumulation gives you single-cycle operations, lock-free parallelism, and free rollback — all mathematically proven in Lean4. On a $13.50 FPGA, it hits 1 billion operations per second.
+ATOMiK is delta-state computation in hardware. XOR-based accumulation gives you single-cycle operations, lock-free parallelism, and free rollback — all mathematically proven in Lean4. On a $13.50 FPGA, it hits 1,056 Mops/s.
 
 The stack:
 - 92 formally verified proofs (Lean4)
@@ -15,11 +15,11 @@ The stack:
 - Production SoC deployed (v3, with HDMI output)
 - One person built everything
 
-I'm building an IP licensing company in the semiconductor space. The formal verification moat is years deep — you can't shortcut 92 machine-verified theorems. Looking for a seed partner who understands deep tech timelines.
+I'm building an IP licensing company in the semiconductor space. The formal verification moat is years deep — you can't shortcut 92 machine-verified theorems. Raising a $3-4M seed for ASIC tape-out. Looking for a partner who understands deep tech timelines.
 
 Would you have 15 minutes for a call?
 
-Matt Rockwell
+Matthew H. Rockwell
 Founder, Rockwell Industries
 matthew.h.rockwell@gmail.com
 github.com/MatthewHRockwell/ATOMiK

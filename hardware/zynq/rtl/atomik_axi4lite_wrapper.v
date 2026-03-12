@@ -2,9 +2,12 @@
 // ATOMiK AXI4-Lite Slave Wrapper
 //
 // Module:      atomik_axi4lite_wrapper
-// Description: AXI4-Lite slave interface wrapping a single atomik_v3_atomik
-//              core instance. Provides memory-mapped register access for
-//              Linux userspace via UIO on Zynq PS.
+// Description: AXI4-Lite slave interface for ATOMiK on Zynq.
+//              Provides memory-mapped register access for Linux userspace
+//              via UIO on Zynq PS.
+//
+//              Connects to ATOMiK core through a CDC bridge when running
+//              in dual-clock mode (AXI @ 100 MHz, core @ 200+ MHz).
 //
 //              Register Map (32-bit AXI, 64-bit ATOMiK datapath):
 //                0x00  LOAD_ADDR     (W)   Address for next LOAD [7:0]
@@ -18,11 +21,8 @@
 //                0x20  SWAP_ADDR     (W)   Address + triggers SWAP [7:0]
 //                0x24  CONFIG        (R/W) Bit 0 = enable (resets to 1)
 //
-//              32-bit AXI ↔ 64-bit datapath: HI write triggers the operation.
+//              32-bit AXI to 64-bit datapath: HI write triggers the operation.
 //              Software must write LO first, then HI.
-//
-// Phase 1: Single clock domain (no CDC). Both s_axi_aclk and core run on
-//          the same FCLK_CLK0.
 //
 // Author: ATOMiK Project
 // Date:   March 2026
@@ -63,7 +63,23 @@ module atomik_axi4lite_wrapper #(
     output reg  [DATA_WIDTH-1:0]   s_axi_rdata,
     output reg  [1:0]              s_axi_rresp,
     output reg                     s_axi_rvalid,
-    input  wire                    s_axi_rready
+    input  wire                    s_axi_rready,
+
+    // CDC bridge interface (active when dual-clock)
+    output reg         cdc_req_valid,
+    input  wire        cdc_req_ready,
+    output reg         cdc_req_load_en,
+    output reg         cdc_req_accum_en,
+    output reg         cdc_req_swap_en,
+    output reg  [7:0]  cdc_req_addr,
+    output reg  [63:0] cdc_req_data,
+
+    input  wire [63:0] cdc_resp_state,
+    input  wire        cdc_resp_acc_zero,
+    input  wire        cdc_resp_valid,
+
+    // Core enable (directly drives core reset)
+    output wire        core_enable
 );
 
     // =========================================================================
@@ -83,22 +99,8 @@ module atomik_axi4lite_wrapper #(
     // =========================================================================
     // Configuration constants
     // =========================================================================
-    localparam [7:0] VERSION  = 8'h01;
+    localparam [7:0] VERSION  = 8'h02;  // v2: CDC-capable
     localparam [7:0] N_BANKS  = 8'h01;
-
-    // =========================================================================
-    // ATOMiK core signals
-    // =========================================================================
-    wire        core_clk;
-    wire        core_rst_n;
-    reg         core_load_en;
-    reg         core_accum_en;
-    reg         core_swap_en;
-    reg  [7:0]  core_addr;
-    reg  [63:0] core_delta;
-    reg  [63:0] core_init_data;
-    wire [63:0] core_current_state;
-    wire        core_acc_zero;
 
     // =========================================================================
     // Soft registers (buffered halves, config)
@@ -108,12 +110,36 @@ module atomik_axi4lite_wrapper #(
     reg  [31:0] reg_accum_lo;
     reg         reg_enable;          // CONFIG bit 0
     reg  [63:0] state_snapshot;      // Latched on STATE_LO read
+    reg         acc_zero_snapshot;   // Latched with state
+
+    assign core_enable = reg_enable;
 
     // =========================================================================
-    // Clock assignment (Phase 1: single domain)
+    // Cached response from CDC bridge
     // =========================================================================
-    assign core_clk   = s_axi_aclk;
-    assign core_rst_n = s_axi_aresetn & reg_enable;
+    reg  [63:0] cached_state;
+    reg         cached_acc_zero;
+
+    // Capture CDC responses as they arrive
+    always @(posedge s_axi_aclk) begin
+        if (!s_axi_aresetn) begin
+            cached_state    <= 64'b0;
+            cached_acc_zero <= 1'b1;
+        end else if (cdc_resp_valid) begin
+            cached_state    <= cdc_resp_state;
+            cached_acc_zero <= cdc_resp_acc_zero;
+        end
+    end
+
+    // =========================================================================
+    // Operation sequencer — serializes AXI register writes into CDC requests
+    // =========================================================================
+    // When a trigger register is written (LOAD_DATA_HI, ACCUM_HI, SWAP_ADDR),
+    // we issue a CDC request and stall the AXI write response until the CDC
+    // bridge acknowledges completion. This ensures the response read after a
+    // write reflects the operation result.
+
+    reg        op_pending;     // Operation in flight through CDC
 
     // =========================================================================
     // Write channel: independent AW/W capture
@@ -123,8 +149,12 @@ module atomik_axi4lite_wrapper #(
     reg  [ADDR_WIDTH-1:0] aw_addr_reg;
     reg  [DATA_WIDTH-1:0] w_data_reg;
 
-    // Write processing flag — goes high for one cycle when both AW+W captured
-    wire write_fire = aw_captured & w_captured;
+    wire write_fire = aw_captured & w_captured & !op_pending;
+
+    // Trigger registers: BRESP deferred until CDC completes
+    wire is_trigger_write = (aw_addr_reg == REG_LOAD_DATA_HI) ||
+                            (aw_addr_reg == REG_ACCUM_HI) ||
+                            (aw_addr_reg == REG_SWAP_ADDR);
 
     always @(posedge s_axi_aclk) begin
         if (!s_axi_aresetn) begin
@@ -137,7 +167,6 @@ module atomik_axi4lite_wrapper #(
             s_axi_bvalid  <= 1'b0;
             s_axi_bresp   <= 2'b00;
         end else begin
-            // Default: ready to accept new AW/W when not captured
             if (!aw_captured)
                 s_axi_awready <= 1'b1;
             if (!w_captured)
@@ -157,41 +186,53 @@ module atomik_axi4lite_wrapper #(
                 s_axi_wready <= 1'b0;
             end
 
-            // Both captured → process write, issue BRESP
+            // Both captured + no pending op → process write
             if (write_fire) begin
                 aw_captured <= 1'b0;
                 w_captured  <= 1'b0;
-                s_axi_bvalid <= 1'b1;
-                s_axi_bresp  <= 2'b00;  // OKAY
+                // Non-trigger registers: immediate BRESP
+                // Trigger registers: defer BRESP until CDC completes
+                if (!is_trigger_write) begin
+                    s_axi_bvalid <= 1'b1;
+                    s_axi_bresp  <= 2'b00;
+                end
             end
 
             // BRESP handshake complete
             if (s_axi_bvalid && s_axi_bready) begin
                 s_axi_bvalid <= 1'b0;
             end
+
+            // Issue deferred BRESP when CDC operation completes
+            if (op_pending && cdc_resp_valid) begin
+                s_axi_bvalid <= 1'b1;
+                s_axi_bresp  <= 2'b00;
+            end
         end
     end
 
     // =========================================================================
-    // Write register decode — one-cycle trigger pulses
+    // Write register decode + CDC request generation
     // =========================================================================
     always @(posedge s_axi_aclk) begin
         if (!s_axi_aresetn) begin
             reg_load_addr    <= 8'h00;
             reg_load_data_lo <= 32'h0;
             reg_accum_lo     <= 32'h0;
-            reg_enable       <= 1'b1;   // Default: enabled
-            core_load_en     <= 1'b0;
-            core_accum_en    <= 1'b0;
-            core_swap_en     <= 1'b0;
-            core_addr        <= 8'h00;
-            core_delta       <= 64'h0;
-            core_init_data   <= 64'h0;
+            reg_enable       <= 1'b1;
+            cdc_req_valid    <= 1'b0;
+            cdc_req_load_en  <= 1'b0;
+            cdc_req_accum_en <= 1'b0;
+            cdc_req_swap_en  <= 1'b0;
+            cdc_req_addr     <= 8'h00;
+            cdc_req_data     <= 64'h0;
+            op_pending       <= 1'b0;
         end else begin
-            // Default: clear trigger pulses (one-cycle only)
-            core_load_en  <= 1'b0;
-            core_accum_en <= 1'b0;
-            core_swap_en  <= 1'b0;
+            cdc_req_valid <= 1'b0;
+
+            // Clear pending when CDC responds
+            if (op_pending && cdc_resp_valid)
+                op_pending <= 1'b0;
 
             if (write_fire) begin
                 case (aw_addr_reg)
@@ -204,10 +245,14 @@ module atomik_axi4lite_wrapper #(
                     end
 
                     REG_LOAD_DATA_HI: begin
-                        // HI write triggers LOAD
-                        core_load_en   <= 1'b1;
-                        core_addr      <= reg_load_addr;
-                        core_init_data <= {w_data_reg, reg_load_data_lo};
+                        // HI write triggers LOAD via CDC
+                        cdc_req_valid    <= 1'b1;
+                        cdc_req_load_en  <= 1'b1;
+                        cdc_req_accum_en <= 1'b0;
+                        cdc_req_swap_en  <= 1'b0;
+                        cdc_req_addr     <= reg_load_addr;
+                        cdc_req_data     <= {w_data_reg, reg_load_data_lo};
+                        op_pending       <= 1'b1;
                     end
 
                     REG_ACCUM_LO: begin
@@ -215,22 +260,32 @@ module atomik_axi4lite_wrapper #(
                     end
 
                     REG_ACCUM_HI: begin
-                        // HI write triggers ACCUM
-                        core_accum_en <= 1'b1;
-                        core_delta    <= {w_data_reg, reg_accum_lo};
+                        // HI write triggers ACCUM via CDC
+                        cdc_req_valid    <= 1'b1;
+                        cdc_req_load_en  <= 1'b0;
+                        cdc_req_accum_en <= 1'b1;
+                        cdc_req_swap_en  <= 1'b0;
+                        cdc_req_addr     <= 8'h00;
+                        cdc_req_data     <= {w_data_reg, reg_accum_lo};
+                        op_pending       <= 1'b1;
                     end
 
                     REG_SWAP_ADDR: begin
-                        // Write triggers SWAP
-                        core_swap_en <= 1'b1;
-                        core_addr    <= w_data_reg[7:0];
+                        // Write triggers SWAP via CDC
+                        cdc_req_valid    <= 1'b1;
+                        cdc_req_load_en  <= 1'b0;
+                        cdc_req_accum_en <= 1'b0;
+                        cdc_req_swap_en  <= 1'b1;
+                        cdc_req_addr     <= w_data_reg[7:0];
+                        cdc_req_data     <= 64'h0;
+                        op_pending       <= 1'b1;
                     end
 
                     REG_CONFIG: begin
                         reg_enable <= w_data_reg[0];
                     end
 
-                    default: ;  // Ignore writes to read-only/undefined registers
+                    default: ;
                 endcase
             end
         end
@@ -251,6 +306,7 @@ module atomik_axi4lite_wrapper #(
             s_axi_rdata   <= {DATA_WIDTH{1'b0}};
             s_axi_rresp   <= 2'b00;
             state_snapshot <= 64'h0;
+            acc_zero_snapshot <= 1'b1;
         end else begin
             if (!ar_captured)
                 s_axi_arready <= 1'b1;
@@ -266,22 +322,22 @@ module atomik_axi4lite_wrapper #(
             if (ar_captured && !s_axi_rvalid) begin
                 ar_captured  <= 1'b0;
                 s_axi_rvalid <= 1'b1;
-                s_axi_rresp  <= 2'b00;  // OKAY
+                s_axi_rresp  <= 2'b00;
 
                 case (ar_addr_reg)
                     REG_STATE_LO: begin
                         // Latch full 64-bit snapshot on LO read
-                        state_snapshot <= core_current_state;
-                        s_axi_rdata    <= core_current_state[31:0];
+                        state_snapshot    <= cached_state;
+                        acc_zero_snapshot <= cached_acc_zero;
+                        s_axi_rdata       <= cached_state[31:0];
                     end
 
                     REG_STATE_HI: begin
-                        // Return upper half from snapshot
                         s_axi_rdata <= state_snapshot[63:32];
                     end
 
                     REG_STATUS: begin
-                        s_axi_rdata <= {8'h00, VERSION, N_BANKS, 7'h00, core_acc_zero};
+                        s_axi_rdata <= {8'h00, VERSION, N_BANKS, 7'h00, acc_zero_snapshot};
                     end
 
                     REG_CONFIG: begin
@@ -300,21 +356,5 @@ module atomik_axi4lite_wrapper #(
             end
         end
     end
-
-    // =========================================================================
-    // ATOMiK Core Instance
-    // =========================================================================
-    atomik_v3_atomik u_atomik (
-        .clk           (core_clk),
-        .rst_n         (core_rst_n),
-        .load_en       (core_load_en),
-        .accum_en      (core_accum_en),
-        .swap_en       (core_swap_en),
-        .addr_in       (core_addr),
-        .delta_in      (core_delta),
-        .init_data     (core_init_data),
-        .current_state (core_current_state),
-        .acc_zero      (core_acc_zero)
-    );
 
 endmodule

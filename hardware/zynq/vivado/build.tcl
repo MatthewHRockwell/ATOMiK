@@ -39,11 +39,12 @@ file mkdir $ZYNQ_DIR/output
 # Read Sources
 # ------------------------------------------------------------------------------
 
-# ATOMiK core RTL (shared with v3 — Phase 1: single bank only)
-read_verilog $V3_RTL_DIR/atomik_v3_atomik.v
+# ATOMiK core RTL — Zynq-optimized (BRAM + pipelined SWAP)
+read_verilog $ZYNQ_DIR/rtl/atomik_core_zynq.v
 
-# Zynq-specific wrapper, clock module, and top-level
+# Zynq-specific wrapper, CDC bridge, clock module, and top-level
 read_verilog $ZYNQ_DIR/rtl/atomik_axi4lite_wrapper.v
+read_verilog $ZYNQ_DIR/rtl/atomik_cdc_bridge.v
 read_verilog $ZYNQ_DIR/rtl/atomik_zynq_clk.v
 read_verilog $ZYNQ_DIR/rtl/atomik_zynq_top.v
 
@@ -58,6 +59,7 @@ puts ""
 puts "Running synthesis..."
 puts "----------------------------------------------"
 
+auto_detect_xpm
 synth_design -top atomik_zynq_top -part xc7z020clg400-2
 
 # Post-synthesis reports

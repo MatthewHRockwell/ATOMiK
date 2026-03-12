@@ -137,12 +137,23 @@ ATOMiK:       State = S₀ ⊕ δ₁ ⊕ δ₂ ⊕ ... ⊕ δₙ  (single-cycle 
 2. **Lock-free parallel**: Commutativity means N banks operate independently
 3. **Instant undo**: Apply a delta twice and it cancels — zero-cost reversal
 
+**Where it doesn't work**: ATOMiK's advantage depends on the read/write ratio.
+It wins on write-heavy workloads (55% faster at 90% writes) and loses on
+read-heavy ones (32% slower at 90% reads). Crossover is around 50%. It is a
+purpose-built accelerator for state-tracking workloads, not a general-purpose
+memory replacement.
+
+**Footprint**: 287 LUT on Xilinx Zynq (0.54% of device), 1.8 mW. Embeds
+alongside existing customer logic with negligible resource cost. Same RTL
+synthesizes on Xilinx and Gowin with zero changes.
+
 > **Speaker Notes**: XOR forms an Abelian group over bit vectors. This is not an
 > optimization technique — it is a complete computational model. We've proven
 > Turing completeness in Lean4. The Abelian group structure guarantees that
 > parallel composition produces identical results to sequential execution,
 > regardless of ordering or grouping. This guarantee is mathematical, not
-> empirical.
+> empirical. Be upfront about the crossover: write-heavy wins, read-heavy loses.
+> This honesty builds trust and helps customers self-select into the right use cases.
 
 `[VISUAL]` Flow diagram: Input deltas flow into XOR accumulator, single cycle
 produces accumulated result. Side-by-side: Traditional (multi-cycle
@@ -218,23 +229,26 @@ architecture provides direct technical advantage.
 accelerator IP, and real-time data processing infrastructure where memory
 bandwidth is the bottleneck.
 
-**SOM (Serviceable Obtainable Market, Year 5)**: ~$80M — based on capturing
-1% of SAM through IP licensing and SDK subscriptions in initial verticals.
+**SOM (Serviceable Obtainable Market, Year 5)**: $15M–$82.5M depending on
+execution scenario — bottom-up from unit economics, not top-down from TAM.
 
 ### Three Beachhead Applications
 
 | Beachhead | Pain Point | ATOMiK Value |
 |-----------|-----------|--------------|
-| **High-Frequency Trading** | Tick-to-trade latency, trade reversal cost | Single-cycle updates (10.6 ns), instant undo via self-inverse |
-| **Edge Sensor Fusion** | Power budget, lock contention in multi-stream merge | Lock-free parallel merge at ~20 mW, linear scaling with sensors |
-| **Streaming Transforms** | Memory bandwidth in video/signal pipelines | 95-100% memory traffic reduction, 55% speedup on write-heavy |
+| **Edge Sensor Fusion** | Power budget, lock contention in multi-stream merge | Lock-free parallel merge at 1.8 mW, linear scaling with sensors |
+| **Industrial/Defense Real-Time** | Deterministic latency, no timing side channels | 2-cycle jitter, no speculative execution, safety-critical viable |
+| **HFT/Low-Latency Infrastructure** | Tick-to-trade latency, trade reversal cost | Single-cycle updates (10.6 ns), instant undo via self-inverse |
 
 > **Speaker Notes**: We size TAM conservatively using midpoint estimates from
 > multiple analyst firms. The SAM narrows to segments where memory bandwidth is
 > the primary bottleneck and FPGA/custom silicon is the deployment form factor.
-> SOM assumes 1% SAM capture by Year 5 — achievable with 10-20 IP licensing
-> deals and a growing SDK subscriber base. Each beachhead has a clear technical
-> proof point already demonstrated in our benchmarks.
+> SOM is rebuilt bottom-up from unit economics across three scenarios: conservative
+> (single-vertical, $15M Y5), base (edge + industrial, $35.2M Y5), and bull
+> (multi-vertical + ASIC licensing, $82.5M Y5). We lead with edge sensor fusion
+> because those buyers already evaluate third-party IP cores — the procurement
+> motion is established. HFT is highest-value but hardest to penetrate without
+> warm introductions.
 
 `[VISUAL]` TAM/SAM/SOM concentric circles with dollar amounts. Below: three
 beachhead cards with icons (trading chart, sensor node, video stream), each
@@ -255,10 +269,11 @@ showing the key metric that makes ATOMiK compelling for that vertical.
 | **SDK Platform** | Annual subscription for schema-driven codegen | 90%+ |
 | **Professional Services** | Custom integration engagements | 50-60% |
 
-### Unit Economics (IP Licensing)
+### Commercial Motion
 
-- **License fee**: Upfront per-design fee (comparable to ARM Cortex-M IP)
-- **Royalty**: Per-unit shipped, scaled to device price
+- **Paid technical evaluation**: $50K–$200K NRE per customer pilot
+- **Per-design license**: $250K–$2M upon successful integration
+- **Per-unit royalty**: Scaled to device price
 - **Blended gross margin**: >85% (ARM achieves 97% on pure IP)
 
 ### Pricing Rationale (Comparable: ARM Holdings FY2025)
@@ -340,22 +355,38 @@ valuation markers on a log-scale axis.
 | **v3 SoC (Custom RV64I + HDMI)** | **Complete** | 1280×720 demo, 6.4× speedup (Mar 2026) |
 | 3-node VC demo | **Complete** | Multi-device distributed merge |
 
-### Forward Roadmap (Post-Funding)
+### Near-Term Milestones (Next 90 Days Post-Funding)
+
+**Technical**
+- Complete physical validation on Xilinx Zynq-7020 platform
+- Release first public benchmark package and evaluation documentation
+- Extend multi-bank FPGA demonstration to N=32+
+
+**Commercial**
+- Conduct 10–15 exploratory conversations with embedded/edge companies building sensor-processing pipelines
+- Identify 2–3 candidate partners for paid technical evaluation ($50K–$200K NRE)
+- Publish developer documentation and SDK examples
+
+**Team**
+- Recruit first FPGA/ASIC engineer ($150K–$200K + 1.0–2.0% equity)
+- Finalize advisory board: semiconductor veteran, IP licensing exec, embedded domain expert
+
+### Forward Roadmap (Post-90 Days)
 
 | Milestone | Description |
 |-----------|-------------|
 | **Larger FPGA port** | Port to Xilinx/Lattice mid-range FPGA (N=64+, target >4 Gops/s) |
-| **ASIC feasibility study** | Engage foundry partner for area/power/performance estimates at 28nm |
-| **Vertical SDK modules** | Pre-built HFT, sensor fusion, and streaming transform modules |
-| **Pilot deployments** | 2-3 design wins with partners in finance and edge AI |
-| **Production silicon evaluation** | ASIC tape-out feasibility for high-volume applications |
+| **ASIC feasibility study** | $150K–$300K study — die size, power, foundry selection, go/no-go (Month 9–18) |
+| **Vertical SDK modules** | Pre-built sensor fusion, industrial, and streaming transform modules |
+| **Pilot deployments** | 2-3 design wins in edge embedded and industrial verticals |
 
-> **Speaker Notes**: Six complete engineering phases with full validation at
-> each gate. The forward roadmap is deliberately conservative — larger FPGA
-> first (low risk, high visibility), then ASIC feasibility (higher investment,
-> higher payoff). We are not asking investors to fund a chip tape-out at seed.
-> We are asking for capital to extend the proven architecture to larger devices
-> and land first design wins.
+> **Speaker Notes**: The 90-day plan focuses on three goals: Zynq validation on a
+> mainstream FPGA platform, beginning market discovery with embedded systems teams,
+> and the first hire. The seed round does NOT fund a tapeout — only a feasibility
+> study ($150K–$300K). Decision gates for proceeding to ASIC: customer demand with
+> committed volume (>100K units/year), completed feasibility signoff, identified
+> design-services partner. I should be direct: no customers have been contacted yet.
+> The seed capital funds both product work and outreach to begin those conversations.
 
 `[VISUAL]` Horizontal timeline: six completed phases (green checks) on the left,
 four forward milestones (blue circles) on the right. Each phase has a small icon
@@ -388,10 +419,20 @@ exceed $100M (Crunchbase).
 ### Key Milestones (Seed Stage)
 
 1. Port to mid-range FPGA with N=64+ banks (target >4 Gops/s)
-2. Land 2 pilot design wins (HFT and edge AI)
-3. Complete ASIC feasibility study with foundry partner
-4. Grow SDK community to 500+ developers
-5. File continuation patents on parallel scaling and merge tree innovations
+2. Land 2 paid technical evaluations ($50K–$200K NRE each) in edge embedded
+3. Complete ASIC feasibility study ($150K–$300K) with go/no-go decision gates
+4. Hire FPGA/ASIC engineer + application engineer (15% of raise, $450K–$600K)
+5. Seat advisory board: semiconductor veteran, IP licensing exec, domain expert
+
+### What I Still Need to Prove
+
+| Open Question | How We'll Answer It | Timeline |
+|---------------|--------------------| ---------|
+| Will a customer pay for this IP? | Outreach to edge/embedded buyers, paid pilot | Month 6–12 |
+| Does the SDK hold up in production? | First customer integration, real workloads | Month 9–15 |
+| Can a 3-person team execute? | First 2 hires, delivery against milestones | Month 3–6 |
+| Does ATOMiK work on physical Zynq? | Board arriving, full PS+PL deployment | Month 1–2 |
+| Is ASIC economically viable? | Feasibility study | Month 9–18 |
 
 ### What Makes This Fundable Now
 
@@ -400,14 +441,14 @@ exceed $100M (Crunchbase).
 - **Capital efficiency**: ~$225 total spend to date demonstrates extreme capital efficiency
 - **Clear IP moat**: Patent pending, formal verification barrier
 
-> **Speaker Notes**: We've done more with $225 in AI token costs than most
-> seed-stage hardware startups accomplish with $2-5M. This is because our
-> AI-augmented development model compresses the timeline from concept to
-> working silicon. The seed capital unlocks the next stage: larger devices,
-> real customer pilots, and ASIC economics. The risk profile is unusually low
-> for hardware — we have working silicon, formal proofs, and a full SDK. The
-> remaining risk is commercial (will customers adopt?), not technical (does it
-> work?).
+> **Speaker Notes**: The seed capital exists to answer the open questions above.
+> The technical foundation is built. The commercial foundation is not. No customers
+> have been contacted yet — the seed funds both product work and outreach.
+> The ~$225 total spend demonstrates that this AI-augmented model compresses
+> timelines, but the remaining risk is commercial (will customers adopt?),
+> not technical (does it work?). The first 3–5 customer conversations will
+> determine whether the right motion is low-six-figure evaluations or
+> mid-six-figure licenses.
 
 `[VISUAL]` Use-of-funds pie chart with four slices. Milestone timeline with
 numbered markers. Callout box: "~$225 total development cost to date." Closing
@@ -597,6 +638,12 @@ well-behaved algebraic structure for parallel computation:
 - **Linear parallel scaling**: N banks = N× throughput (verified to N=16)
 - **95-100% memory traffic reduction**: Deltas are 8 bytes vs 32 KB+ state
 - **Zero overflow risk**: XOR never overflows (0% vs 150.7% for adder, 1,000 trials)
+- **Tiny footprint**: 287 LUT on Xilinx Zynq (0.54%), 1.8 mW — negligible resource cost
+
+### Where It Doesn't Work
+ATOMiK's advantage depends on read/write ratio: +55% faster at 90% writes,
+-32% slower at 90% reads, crossover ~50%. It is a purpose-built accelerator
+for state-tracking workloads, not a general-purpose memory replacement.
 
 > **Speaker Notes**: This is not an incremental optimization. It is a change in
 > the computational model. Traditional architectures are based on mutable state
@@ -937,7 +984,37 @@ showing transparency builds credibility.
 
 # Three Beachhead Markets
 
-### 1. High-Frequency Trading
+### 1. Edge Sensor Fusion (Primary Beachhead)
+
+| Metric | ATOMiK Value |
+|--------|-------------|
+| Multi-stream merge | Lock-free (commutativity) |
+| Power budget | 1.8 mW (fits battery-powered devices) |
+| Footprint | 287 LUT on Zynq (0.54% utilization) |
+| Scaling | Add sensors = add banks (linear) |
+| Memory | 95% reduction in traffic between sensor and processor |
+
+**Why this market first**: These buyers already integrate third-party IP cores
+into FPGA/SoC designs — the evaluation and procurement motion is established.
+ATOMiK's resource footprint fits within their design constraints. Sensor fusion
+is write-dominant by nature — sensor inputs arrive continuously, full state is
+read only at decision points. This is exactly the workload profile where
+ATOMiK's advantage is largest.
+
+### 2. Industrial/Defense Real-Time Systems
+
+| Metric | ATOMiK Value |
+|--------|-------------|
+| Latency determinism | ≤2-cycle jitter (hardware measured) |
+| Timing side channels | None — no caches, no speculation |
+| Safety-critical viable | Formally verified (92 Lean4 proofs) |
+| Undo/rollback | Free (self-inverse: δ ⊕ δ = 0) |
+
+**Pain point**: Deterministic latency and no timing side channels are relevant
+to safety-critical and security-sensitive applications. 12–24 month sales
+cycles, but higher contract values ($250K–$2M per design).
+
+### 3. HFT/Low-Latency Infrastructure (Highest Value, Hardest Access)
 
 | Metric | ATOMiK Value |
 |--------|-------------|
@@ -947,41 +1024,15 @@ showing transparency builds credibility.
 | Power | ~20 mW vs ~200W server |
 
 **Pain point**: HFT firms spend millions on nanosecond latency reduction.
-Trade reversal infrastructure (error correction, regulatory undo) is a major
-operational cost. ATOMiK provides single-cycle tick processing with
-mathematically guaranteed instant undo.
+Highest-value target, but hardest to penetrate as a solo founder without warm
+introductions. Remains a priority but not a first-deal assumption.
 
-### 2. Edge Sensor Fusion
-
-| Metric | ATOMiK Value |
-|--------|-------------|
-| Multi-stream merge | Lock-free (commutativity) |
-| Power budget | ~20 mW (fits battery-powered devices) |
-| Scaling | Add sensors = add banks (linear) |
-| Memory | 95% reduction in traffic between sensor and processor |
-
-**Pain point**: IoT edge devices face hard power constraints. Multi-sensor
-fusion requires lock-free merge of concurrent streams. ATOMiK's commutative
-merge on a $13.50 FPGA directly addresses this.
-
-### 3. Streaming Data Transforms
-
-| Metric | ATOMiK Value |
-|--------|-------------|
-| Memory reduction | 95-100% (measured) |
-| Pipeline speedup | +55% on streaming workloads (p < 0.0001) |
-| Write-heavy advantage | +22% to +58% faster than baseline |
-| Frame deltas | Natural fit for video/signal processing |
-
-**Pain point**: Video processing, signal analysis, and streaming analytics are
-write-heavy pipelines where memory bandwidth is the bottleneck. ATOMiK's
-delta storage eliminates the memory traffic.
-
-> **Speaker Notes**: We start with three verticals where the technical proof
-> points already exist in our benchmarks. HFT is the highest-value beachhead
-> (willingness to pay for nanoseconds). Edge sensor fusion has the largest
-> volume (billions of IoT devices). Streaming transforms is the broadest
-> horizontal play (any write-heavy pipeline benefits).
+> **Speaker Notes**: We lead with edge embedded because those buyers already
+> evaluate third-party IP cores — the procurement motion exists. Industrial/
+> defense is higher ACV but longer cycles. HFT is highest value but requires
+> warm introductions we don't yet have. I should be direct: no customers have
+> been contacted yet. The seed capital funds both the product work and the
+> outreach to begin these conversations.
 
 `[VISUAL]` Three vertical panels, each with: icon, headline, key metric, pain
 point summary. Below each: "Proof point" referencing the specific benchmark
@@ -1050,17 +1101,17 @@ schema snippet. Badge: "353/353 tests passing."
 - **Revenue**: $0 (investment phase)
 
 ### Phase 2: IP Licensing (+6 → +24 months)
-- License RTL IP to FPGA-heavy verticals (finance, defense, telecom)
-- Per-design license fee + per-unit royalty
-- Pre-built vertical modules (HFT tick processor, sensor fusion core)
-- Target: 5-10 design wins
-- **Revenue**: License fees + royalties
+- Paid technical evaluations ($50K–$200K NRE) with edge/embedded and industrial buyers
+- Per-design license ($250K–$2M) upon successful integration
+- Pre-built vertical modules (sensor fusion core, industrial state tracker)
+- Target: 2–5 design wins
+- **Revenue**: NRE + license fees + royalties
 
 ### Phase 3: ASIC Partnerships (+18 → +36 months)
-- Engage foundry partners for high-volume applications (IoT, automotive)
-- ASIC feasibility study → tape-out partnership
-- Long-term royalty stream on shipped silicon
-- Target: 1-2 ASIC partnership agreements
+- ASIC feasibility study ($150K–$300K) funded by this raise — simulation exercise producing die size, power, foundry selection, go/no-go
+- Decision gates: customer demand >100K units/year, feasibility signoff, design-services partner, co-development customer sharing NRE
+- If gates not met, ASIC path does not proceed — FPGA IP licensing is sufficient
+- Shuttle run ($200K–$500K) and full tapeout ($2M–$5M at 28nm) funded by Series A/B
 - **Revenue**: Upfront NRE + volume royalties
 
 ### Competitive Strategy
@@ -1108,28 +1159,31 @@ SAM narrows TAM to segments where:
 This includes: FPGA IP licensing (~$3B), edge AI accelerator IP (~$3B),
 real-time data processing infrastructure (~$2B).
 
-### Serviceable Obtainable Market (SOM, Year 5): ~$80M
+### Serviceable Obtainable Market — Three Scenarios (Y5)
 
-SOM assumes:
-- 1% capture of SAM through IP licensing and SDK subscriptions
-- 10-20 design wins at average $2-4M license + royalty per design
-- 200+ SDK subscribers at average $50K/year
-- Conservative ramp reflecting hardware adoption cycles
+Revenue = Cumulative Customers × Blended ACV. Commercial motion: paid technical
+evaluation ($50K–$200K NRE) → per-design license ($250K–$2M) upon successful
+integration.
 
-### Math Check
+| | Y1 | Y2 | Y3 | Y4 | Y5 |
+|--|----|----|----|----|-----|
+| **Conservative** (single-vertical, no royalty) | $0 | $800K | $3M | $7.2M | **$15M** |
+| **Base** (edge + industrial, 1 large deal Y4) | $0 | $1.5M | $6M | $16.5M | **$35.2M** |
+| **Bull** (multi-vertical, ASIC licensing Y4) | $0 | $2.5M | $14M | $40.5M | **$82.5M** |
 
-- 15 design wins × $3M average = $45M
-- 200 SDK subscribers × $50K = $10M
-- Royalties (Year 5 ramp) = ~$25M
-- **Total SOM**: ~$80M
-- **SAM penetration**: 1.0% — conservative for a unique technology
+These are planning models, not forecasts. Early revenue will be lumpy — a small
+number of design wins contributing the majority of initial ARR. ACV bands
+($300K–$3M) are based on ARM/CEVA/Imagination comparables, not customer-validated
+pricing. The first 3–5 conversations will determine whether the right motion is
+low-six-figure evaluations or mid-six-figure licenses.
 
-> **Speaker Notes**: We derive SOM bottom-up from unit economics, not top-down
-> from TAM percentage. The top-down ceiling check (1% of SAM) confirms the
-> bottom-up number is conservative. Hardware IP adoption is slower than software
-> SaaS — design cycles run 12-24 months. The Year 5 SOM of $80M reflects this
-> reality. Longer-term, if ATOMiK becomes a standard primitive, the SAM
-> itself grows as delta-state computing enables new application categories.
+> **Speaker Notes**: The original $80M Y5 SOM was top-down — we rebuilt it
+> bottom-up from unit economics across three scenarios. The conservative case
+> assumes a single vertical (edge embedded) with no royalty stream. The base
+> case adds industrial/defense and one large deal. The bull case assumes ASIC
+> licensing begins in Y4. All three assume $0 in Y1 — hardware adoption cycles
+> are 12-24 months. The key variable is whether paid evaluations convert to
+> per-design licenses, and at what ACV.
 
 `[VISUAL]` Concentric circles: TAM ($85B) → SAM ($8B) → SOM ($80M). Each ring
 labeled with segment breakdown. Bottom-up SOM calculation table. Right panel:
@@ -1150,11 +1204,12 @@ growth trajectories for each market segment with cited sources.
 | **SDK Subscription** | Annual per-seat or per-team | Supporting | Growing | 90%+ |
 | **Professional Services** | Custom integration | Supporting | Declining (%) | 50-60% |
 
-### Unit Economics: IP Licensing
+### Commercial Motion & Unit Economics
 
 | Component | Range | Comparable |
 |-----------|:-----:|-----------|
-| License fee (per design) | $500K - $5M | ARM Cortex-M: $1-5M per design |
+| Paid technical evaluation (NRE) | $50K–$200K | Standard for IP evaluation |
+| Per-design license (upon integration) | $250K–$2M | ARM/CEVA/Imagination comparables |
 | Per-unit royalty | $0.01 - $1.00 | Scales with device ASP |
 | Typical design cycle | 12-24 months | Standard for IP integration |
 | Renewal rate (expected) | 80%+ | ARM: 90%+ retention |
@@ -1356,28 +1411,40 @@ development thesis**. If one person with AI tools can produce 92 proofs,
 working hardware, and a 5-language SDK, a funded team can move exponentially
 faster.
 
-### Team Needs (Post-Funding)
+### First Two Hires (15% of raise, $450K–$600K)
 
-| Role | Priority | Purpose |
-|------|:--------:|---------|
-| FPGA/ASIC engineer | High | Larger device ports, synthesis optimization |
-| Application engineer | High | Vertical modules, customer integration |
-| DevRel / community | Medium | SDK ecosystem growth |
-| Business development | Medium | Partnership and licensing deals |
+| Role | Timing | Compensation | Purpose |
+|------|:------:|:------------:|---------|
+| FPGA/ASIC Engineer | Month 3–4 | $150K–$200K + 1.0–2.0% equity | RTL development, Zynq deployment, ASIC feasibility |
+| Application Engineer | Month 5–6 | $130K–$170K + 0.5–1.5% equity | SDK hardening, vertical modules, customer pilots |
 
-### Advisory Needs
+Both sourced primarily through advisor networks once the board is seated.
 
-- Semiconductor IP licensing (ARM/MIPS model)
-- FPGA/ASIC manufacturing partnerships
-- Target vertical domain experts (HFT, IoT)
+### Advisory Board (60-Day Formation Target)
 
-> **Speaker Notes**: The solo-founder + AI model is unusual and may raise
-> "bus factor" concerns. We address this with: (1) every deliverable is
-> documented and reproducible, (2) formal proofs are machine-checked and
-> cannot regress, (3) the SDK generates code from schemas, not manual
-> authoring. The AI-augmented model is also a proof point for the thesis
-> that AI tooling changes the economics of hardware development — which is
-> exactly the market ATOMiK serves.
+| Role | Target Profile | Compensation |
+|------|---------------|:------------:|
+| Semiconductor/FPGA veteran | VP/Director from AMD/Xilinx, Lattice, or Intel PSG | 0.25–0.5% equity, 2yr vest |
+| IP licensing executive | BD from ARM, CEVA, or Imagination | 0.25–0.5% equity, 2yr vest |
+| Embedded domain expert | Infrastructure lead from edge/industrial company | 0.25–0.5% equity, 2yr vest |
+
+No named advisors yet — outreach beginning this week. This remains a live gap.
+
+### Addressing Solo Founder Risk
+
+The solo founder model was sufficient for technical incubation — it is not the
+right structure for commercial execution. The repository is structured for
+reproducibility — `make` builds hardware, `lake build` checks proofs, `pytest`
+runs SDK tests, flash scripts deploy in <60 seconds. Three manuscripts document
+the architecture. This reduces onboarding friction but does not materially remove
+key-person risk. The first hires and advisors are intended to begin distributing
+the burden.
+
+> **Speaker Notes**: Be direct about the gap: no named advisors yet, no second
+> engineer. The plan is specific and the formation timeline is aggressive (60 days).
+> Key-person risk is real — the mitigation is reproducibility and documentation,
+> not hand-waving. The AI-augmented model produced output equivalent to a small
+> team, but commercial execution requires actual people.
 
 `[VISUAL]` Founder profile card with key competencies. AI development model
 comparison table. Org chart showing current (1) and target (5) team size.
@@ -1396,7 +1463,9 @@ Advisory needs as open seats.
 | **Tooling: Gowin ecosystem is niche** | Low | Architecture is vendor-agnostic Verilog. Xilinx/Lattice ports are straightforward. Gowin was chosen for cost ($13.50), not lock-in. |
 | **Manufacturing: ASIC tape-out risk** | Medium | ASIC is Phase 3 of GTM, not Phase 1. FPGA deployment is the initial revenue path. ASIC feasibility study de-risks before commitment. |
 | **Competition: Large players could replicate** | Medium | 92 proofs + patent + ecosystem create multi-layer moat. Time-to-replicate is 6-12+ months even for well-resourced teams. First-mover advantage in IP licensing. |
-| **Bus factor: Solo founder** | Medium | All work is documented, machine-verified, and reproducible. Post-funding team expansion addresses this directly. Formal proofs are permanent — they don't depend on the author. |
+| **Bus factor: Solo founder** | Medium | All work documented, machine-verified, reproducible (`make` builds hardware, `lake build` checks proofs, `pytest` runs SDK tests). Post-funding: 2 hires + advisory board within 60 days. Formal proofs are permanent. |
+| **No customers yet** | High | No customers have been contacted. Seed capital funds outreach. First 3–5 conversations will validate pricing and commercial motion. |
+| **Read-heavy workload penalty** | Low | ATOMiK loses at >50% reads (32% slower at 90% reads). Beachhead markets (sensor fusion, streaming) are write-dominant by nature. SDK documentation will clearly scope applicability. |
 
 > **Speaker Notes**: We enumerate risks rather than hiding them. The highest-
 > severity risk is adoption — delta-state computing is a new paradigm, and
@@ -1439,10 +1508,10 @@ likelihood). Color coding: green (mitigated), yellow (monitoring), orange
 ### Milestones (Seed Stage)
 
 1. Port to mid-range FPGA: N=64+ banks, target >4 Gops/s
-2. Land 2 pilot design wins (HFT and edge AI verticals)
-3. Complete ASIC feasibility study with foundry partner
-4. Grow SDK community to 500+ developers
-5. File 2+ continuation patents
+2. Land 2 paid technical evaluations ($50K–$200K NRE) in edge embedded
+3. Complete ASIC feasibility study ($150K–$300K) — this raise funds feasibility only, NOT tapeout
+4. Hire FPGA/ASIC engineer (Month 3–4) + application engineer (Month 5–6)
+5. Seat advisory board within 60 days (semiconductor, IP licensing, domain)
 
 ### Investor Return Thesis
 
@@ -1454,6 +1523,7 @@ likelihood). Color coding: green (mitigated), yellow (monitoring), orange
 - **Near-term exits**: Strategic acquisition by FPGA vendor (Lattice, AMD/Xilinx),
   AI chip company (NVIDIA, Intel), or hyperscaler (for internal deployment).
 - **De-risked**: Working hardware + formal proofs + SDK = technical risk retired.
+  Remaining risk is commercial — will customers adopt? Seed answers this question.
 
 > **Speaker Notes**: We are not asking investors to fund a research project.
 > We have working silicon, formal proofs, and a full SDK. We are asking for
@@ -1557,7 +1627,16 @@ proofs with zero sorry statements.
 
 TAM: ~$85B across FPGA ($10-14B), edge computing ($61B), and AI hardware
 accelerator ($10.2B) markets. SAM: ~$8B in memory-bandwidth-bottlenecked
-segments. SOM (Year 5): ~$80M through IP licensing and SDK subscriptions.
+segments. SOM (Year 5): $15M–$82.5M across three scenarios (conservative single-
+vertical to bull multi-vertical + ASIC licensing), rebuilt bottom-up from unit
+economics.
+
+### Beachhead
+
+Edge and embedded systems performing real-time sensor processing — buyers who
+already evaluate third-party IP cores. Secondary: industrial/defense (higher ACV,
+longer cycles). HFT is highest-value but hardest to access without warm
+introductions.
 
 ### Business Model
 
@@ -1568,16 +1647,19 @@ ATOMiK targets the same pure-IP structure for delta-state accelerator cores.
 ### Team
 
 Solo technical founder with AI-augmented development model. ~$225 total spend
-demonstrates extreme capital efficiency. Post-funding: hire FPGA engineer and
-application engineer. Advisory needs in semiconductor IP licensing and target
-vertical domains.
+demonstrates extreme capital efficiency. Post-funding: FPGA/ASIC engineer
+($150K–$200K + equity, Month 3–4) and application engineer ($130K–$170K + equity,
+Month 5–6). Advisory board (60-day formation): semiconductor veteran, IP licensing
+exec, embedded domain expert. No named advisors yet — this remains a live gap.
 
 ### The Ask
 
 Seed capital to bridge from proof-of-concept to first design wins. Use of funds:
 Hardware R&D (40%), SDK platform (25%), business development (20%), team (15%).
-Key milestones: larger FPGA port (>4 Gops/s), 2 pilot design wins, ASIC
-feasibility study, 500+ developer community.
+Key milestones: Zynq validation, 2 paid evaluations ($50K–$200K NRE each),
+ASIC feasibility study ($150K–$300K, feasibility only — not tapeout), first two
+hires, advisory board seated within 60 days. No customers contacted yet — the
+seed funds both product work and outreach.
 
 ---
 

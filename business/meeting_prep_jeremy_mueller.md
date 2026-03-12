@@ -134,3 +134,34 @@ He reached out to YOU — that's a warm signal. He saw something worth schedulin
 ---
 
 *This meeting could open the door to 350+ VCs who take warm intros seriously. Treat it accordingly.*
+
+---
+
+## Additional Insights from Materials Review (Added March 11)
+
+### Strengths to Emphasize
+- **v3 SoC is brand new (March 2026)** — custom 64-bit RISC-V CPU with HDMI demo. This is extremely fresh and shows rapid iteration. Mention that v2 was February, v3 was March — two production SoCs in one month.
+- **The 6.4× memcpy speedup story** is compelling: v2 was actually 12% *slower* than software due to CDC overhead. v3 with direct-wire integration flipped that to 6.4× faster. This shows engineering learning and iteration, not just blind building.
+- **The deck has a full data room checklist** — if Jeremy asks "do you have X for due diligence," the answer is almost certainly yes. Mention the data room is ready.
+- **Comparable companies are well-researched** — Positron AI ($51.6M Series A for FPGA inference) is the strongest comp for SVP context. Ubitium ($3.7M seed, no hardware demos) shows ATOMiK is further along on less capital.
+
+### Potential Weak Spots to Prepare For
+- **SoCal geographic requirement** — this could be a blocker. Lead with this question early. Have a plan: willingness to register in SoCal, establish a presence, or travel for committee presentations.
+- **No revenue / no customers yet** — be honest and frame it: "Technical risk is retired. The seed funds commercial validation." The $4.8M SVP average raise suggests their companies are typically pre-revenue or early-revenue.
+- **Solo founder concern** — the AI-augmented development narrative is strong but unusual. Frame it as: "I built what most teams of 5-10 build, for 1/10,000th the cost. The seed hires the first two engineers."
+- **The one-pager includes v3 SoC details** — it's up to date. Good to go.
+
+### Materials Status
+- [x] One-pager: Current, includes v3 SoC metrics ✅
+- [x] Pitch deck: Comprehensive (10-slide partner + 23-slide IC + exec summary + data room) ✅
+- [x] Application brief: Created at `business/outreach/alliance_socal_application_brief.md` ✅
+- [x] Follow-up email template: Created at `business/outreach/jeremy_followup_template.md` ✅
+- [ ] Benchmark appendix from Chris Bolt due diligence — have this accessible during call
+
+### Tactical Notes for the Call
+- **Open with gratitude** that Jeremy reached out — reinforce the warm signal
+- **Ask the SoCal question within the first 5 minutes** — don't waste 30 minutes if it's a geographic blocker
+- **Offer to ship a $13.50 board** — "You can hold the proof in your hand" is a memorable close
+- **Name-drop the peer review** — "Under peer review at Scientific Reports (Springer Nature)" adds credibility
+- **If he asks about the Catalyst Fund**, express strong interest — a direct investment from the Alliance plus SVP introductions would be ideal
+- **Close by asking**: "What would make me a strong application? What should I emphasize for your committee?"

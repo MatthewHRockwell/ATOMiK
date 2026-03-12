@@ -4,9 +4,9 @@
 
 Hi team,
 
-Founders Fund backs companies that look like bad ideas to most people but are actually right. Here's mine: a solo founder building a semiconductor IP company with $225, a $13.50 FPGA, and 92 formal mathematical proofs.
+Founders Fund backs companies that look like bad ideas to most people but are actually right. Here's mine: a solo founder building a semiconductor IP company with $225, a $13.50 FPGA, and 92 formal mathematical proofs. Raising $3-4M seed.
 
-ATOMiK is a new computing primitive. Delta-state accumulation via XOR — single-cycle, zero carry chains, lock-free by construction. The math is formally verified in Lean4 (92 theorems, machine-checked). The hardware works (1 Gops/s, 80/80 tests). The SoC runs a custom RV64I CPU with HDMI output.
+ATOMiK is a new computing primitive. Delta-state accumulation via XOR — single-cycle, zero carry chains, lock-free by construction. The math is formally verified in Lean4 (92 theorems, machine-checked). The hardware works (1,056 Mops/s, 80/80 tests). The SoC runs a custom RV64I CPU with HDMI output.
 
 Why this looks contrarian:
 - One person built the entire hardware + software + proof stack
@@ -21,7 +21,7 @@ Why it's right:
 
 I'd love 15 minutes to make the case.
 
-Matt Rockwell
+Matthew H. Rockwell
 Founder, Rockwell Industries
 matthew.h.rockwell@gmail.com
 github.com/MatthewHRockwell/ATOMiK

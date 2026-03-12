@@ -229,7 +229,7 @@ add_textbox(slide, Inches(1), Inches(2.5), Inches(10), Inches(0.7),
 
 # Tagline
 add_textbox(slide, Inches(1), Inches(3.4), Inches(10), Inches(0.5),
-            "1 Billion Operations/Second on a $10 Chip", font_size=22,
+            "1 Billion Operations/Second on a $13.50 Chip", font_size=22,
             bold=True, colour=GREEN, alignment=PP_ALIGN.LEFT)
 
 # Descriptors
@@ -248,7 +248,7 @@ kpis = [
     ("1,056 Mops/s",  "Peak Throughput (16 banks)",  GREEN),
     ("10.6 ns",        "Single-Op Latency",           BLUE),
     ("92 Proofs",      "Lean4 Verified, 0 Sorry",     PURPLE),
-    ("$10 Device",     "Tang Nano 9K FPGA",           YELLOW),
+    ("$13.50 Device",  "Tang Nano 9K FPGA",           YELLOW),
 ]
 
 for i, (val, lbl, clr) in enumerate(kpis):
@@ -517,6 +517,18 @@ for i, (title, desc, clr) in enumerate(cons):
                 cw - Inches(0.6), Inches(1.2), desc,
                 font_size=11, colour=DIM, line_space=1.3)
 
+# ── Crossover / honesty note ──
+add_textbox(slide, Inches(0.8), Inches(6.3), Inches(11.5), Inches(0.7),
+            [("Where it doesn\u2019t work: ", YELLOW, True),
+             ("Write-heavy wins (+55% at 90% writes). Read-heavy loses (\u221232% at 90% reads). "
+              "Crossover ~50%. Purpose-built for state-tracking, not general-purpose.", DIM, False)],
+            font_size=11)
+
+# ── Zynq footprint note ──
+add_textbox(slide, Inches(0.8), Inches(6.85), Inches(11.5), Inches(0.3),
+            "Footprint: 287 LUT on Xilinx Zynq (0.54%), 1.8 mW \u2014 vendor-portable RTL (Xilinx + Gowin, zero changes)",
+            font_size=11, colour=DIM)
+
 slide_number(slide, 4)
 
 
@@ -537,7 +549,7 @@ kpi_data = [
     ("10.6 ns",   "",               "Single-op latency",          BLUE),
     ("92",        "proofs",         "Lean4 verified, 0 sorry",    PURPLE),
     ("80/80",     "",               "Hardware tests passing",     GREEN),
-    ("314",       "tests",          "SDK (5 languages)",          TEAL),
+    ("353",       "tests",          "SDK (5 languages)",          TEAL),
     ("95\u2013100%",  "",           "Memory traffic reduction",   YELLOW),
     ("+35.7%",    "",               "XOR vs adder speed (p<.0001)", GREEN),
     ("0%",        "overflow",       "XOR risk (vs 150.7% adder)", GREEN),
@@ -657,7 +669,7 @@ s.line.color.rgb = GREEN
 s.line.width = Pt(2)
 add_textbox(slide, cx_center - som_r, cy_center - som_r + Inches(0.08),
             som_r * 2, Inches(0.55),
-            [("SOM", GREEN, True), ("~$80M (Yr 5)", GREEN, False)],
+            [("SOM", GREEN, True), ("$15\u2013$82.5M (Yr 5)", GREEN, False)],
             font_size=11, alignment=PP_ALIGN.CENTER)
 
 # TAM breakdown labels
@@ -670,18 +682,18 @@ add_textbox(slide, breakdown_x, breakdown_y, Inches(5.2), Inches(0.8),
 
 # ── Beachhead cards (right) ──
 beachheads = [
-    ("High-Frequency\nTrading",
+    ("Edge Sensor\nFusion",
+     "1.8 mW, 287 LUT (0.54%)\nLock-free multi-stream merge\nLinear scaling with sensors",
+     TEAL,
+     "Primary beachhead"),
+    ("Industrial /\nDefense RT",
+     "\u22642-cycle jitter, no side channels\nFormally verified (92 proofs)\nSafety-critical viable",
+     PURPLE,
+     "Higher ACV"),
+    ("HFT / Low-\nLatency Infra",
      "10.6 ns tick processing\nInstant trade reversal\nLock-free parallel streams",
      RGBColor(0xF3, 0x8B, 0xA8),
-     "$12B market"),
-    ("Edge Sensor\nFusion",
-     "~20 mW power budget\nLock-free multi-stream merge\nLinear scaling with sensors",
-     TEAL,
-     "$61B\u2192$232B market"),
-    ("Streaming\nTransforms",
-     "95\u2013100% memory reduction\n+55% pipeline speedup\nFrame/signal delta native",
-     YELLOW,
-     "Write-heavy verticals"),
+     "Highest value"),
 ]
 
 bh_w = Inches(3.5)
@@ -706,7 +718,7 @@ for i, (title, desc, clr, mkt) in enumerate(beachheads):
 
 # SOM derivation
 add_textbox(slide, Inches(6.2), Inches(6.15), Inches(6), Inches(0.6),
-            [("SOM math: 15 design wins \u00d7 $3M + 200 SDK subs \u00d7 $50K + royalties = ~$80M",
+            [("3 scenarios: Conservative $15M / Base $35.2M / Bull $82.5M (Y5, bottom-up unit economics)",
               DIM, False)],
             font_size=10)
 
@@ -734,7 +746,7 @@ streams = [
      "Primary revenue.\nARM Cortex-M comparable.",
      BLUE),
     ("Vertical\nAccelerator IP",
-     "Pre-built domain\nmodules (HFT, IoT)",
+     "Pre-built domain\nmodules (sensor, industrial)",
      "85%+",
      "Higher value.\nDomain-specific RTL.",
      PURPLE),
@@ -890,7 +902,7 @@ phases_done = [
     ("Phase 1", "Math\nFormalization", "92 Lean4\nproofs", PURPLE),
     ("Phase 2", "SCORE\nBenchmarks", "95\u2013100%\nmem reduction", BLUE),
     ("Phase 3", "Hardware\nSynthesis", "94.5 MHz\n80/80 tests", TEAL),
-    ("Phase 4", "SDK\nGeneration", "5 languages\n314 tests", GREEN),
+    ("Phase 4", "SDK\nGeneration", "5 languages\n353 tests", GREEN),
     ("Phase 5", "3-Node\nDemo", "Multi-device\nmerge", YELLOW),
     ("Phase 6", "Parallel\nScaling", "1,056 Mops/s\n16\u00d7 linear", GREEN),
 ]
@@ -947,9 +959,9 @@ add_textbox(slide, inflection_x - Inches(0.4), tl_y - Inches(0.15),
 # ── Forward milestones ──
 forward = [
     ("Larger FPGA", "N=64+ banks\n>4 Gops/s target", BLUE),
-    ("Vertical SDK\nModules", "HFT, sensor,\nstreaming packages", PURPLE),
-    ("ASIC Feasibility", "Foundry partner\n28nm estimates", TEAL),
-    ("Pilot Design\nWins", "2\u20133 revenue\ncustomers", GREEN),
+    ("Vertical SDK\nModules", "Sensor fusion,\nindustrial packages", PURPLE),
+    ("ASIC Feasibility", "$150K\u2013$300K study\ngo/no-go gates", TEAL),
+    ("Paid Pilots", "2\u20133 edge embedded\n$50K\u2013$200K NRE", GREEN),
 ]
 
 fw_y = Inches(4.3)
@@ -1080,10 +1092,10 @@ add_textbox(slide, Inches(0.8), Inches(4.4), Inches(5), Inches(0.4),
 
 milestones = [
     ("Port to mid-range FPGA: N=64+ banks, >4 Gops/s", GREEN),
-    ("Land 2 pilot design wins (HFT + edge AI)", GREEN),
-    ("Complete ASIC feasibility study with foundry", TEAL),
-    ("Grow SDK community to 500+ developers", BLUE),
-    ("File 2+ continuation patents", PURPLE),
+    ("Land 2 paid evaluations ($50K\u2013$200K NRE) in edge embedded", GREEN),
+    ("ASIC feasibility study ($150K\u2013$300K) \u2014 feasibility only, not tapeout", TEAL),
+    ("Hire FPGA/ASIC engineer + application engineer (15% of raise)", BLUE),
+    ("Seat advisory board within 60 days", PURPLE),
 ]
 
 for i, (ms, clr) in enumerate(milestones):
@@ -1107,7 +1119,7 @@ add_textbox(slide, panel_x + Inches(0.2), Inches(4.5),
             colour=GREEN)
 
 fundable = [
-    ("\u2713  Technical risk retired", "92 proofs + working silicon + 314 tests"),
+    ("\u2713  Technical risk retired", "92 proofs + working silicon + 353 tests"),
     ("\u2713  Market timing", "$300B+ hyperscaler AI capex cycle in progress"),
     ("\u2713  Capital efficiency", "~$225 total spend \u2192 1 Gops/s hardware"),
     ("\u2713  Clear IP moat", "Patent pending + formal verification barrier"),
