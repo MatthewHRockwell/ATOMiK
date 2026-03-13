@@ -87,6 +87,30 @@ jobs:
             echo "::error::Zynq CDC testbench did not produce a summary"
             exit 1
           fi
+      - name: Run Zynq parallel bank testbench (N=4, 10 tests)
+        run: |
+          echo "=== Zynq Parallel Bank Tests (N_BANKS=4) ==="
+          cd hardware/zynq
+          iverilog -o sim_parallel_banks \
+            -DSIMULATION \
+            -I rtl \
+            rtl/*.v \
+            sim/tb_parallel_banks.v \
+            2>&1 | tee /tmp/zynq_parallel_compile.log
+          if [ $? -ne 0 ]; then
+            echo "::error::Zynq parallel testbench failed to compile"
+            exit 1
+          fi
+          vvp sim_parallel_banks 2>&1 | tee /tmp/zynq_parallel_sim.log
+          if grep -q "ALL TESTS PASSED" /tmp/zynq_parallel_sim.log; then
+            echo "::notice::Zynq parallel bank tests passed (10/10)"
+          elif grep -q "TESTS FAILED\|TIMEOUT" /tmp/zynq_parallel_sim.log; then
+            echo "::error::Zynq parallel testbench had failures"
+            exit 1
+          else
+            echo "::error::Zynq parallel testbench did not produce a summary"
+            exit 1
+          fi
       - name: Run v3 iverilog testbenches
         run: |
           echo "=== v3 RTL iverilog Tests ==="

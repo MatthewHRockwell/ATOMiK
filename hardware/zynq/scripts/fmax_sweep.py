@@ -40,7 +40,6 @@ VCO_MHZ = FCLK_MHZ * VCO_MULT  # 1000 MHz
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 ZYNQ_DIR = SCRIPT_DIR.parent
-V3_RTL_DIR = ZYNQ_DIR.parent / "v3" / "rtl"
 
 PART = "xc7z020clg400-2"
 
@@ -95,76 +94,14 @@ class SweepResult:
 # ---------------------------------------------------------------------------
 
 def gen_sweep_top(cfg: SweepConfig, out_dir: Path) -> Path:
-    """Generate a thin top-level wrapper with specific parameters."""
+    """Generate a thin top-level wrapper with specific parameters.
+
+    Both single-bank and multi-bank use atomik_zynq_top with N_BANKS parameter.
+    The top instantiates atomik_core_zynq_parallel which handles 1..N banks.
+    """
     path = out_dir / f"sweep_top_{cfg.tag}.v"
 
-    # For N_BANKS > 1, we need a modified top that uses atomik_v3_parallel
-    if cfg.n_banks > 1:
-        content = gen_multibank_top(cfg)
-    else:
-        content = textwrap.dedent(f"""\
-        `timescale 1ns / 1ps
-        module sweep_top_{cfg.tag} (
-            input  wire        fclk_clk0,
-            input  wire        fclk_reset_n,
-            output wire        locked,
-            input  wire [5:0]  s_axi_awaddr,
-            input  wire        s_axi_awvalid,
-            output wire        s_axi_awready,
-            input  wire [31:0] s_axi_wdata,
-            input  wire [3:0]  s_axi_wstrb,
-            input  wire        s_axi_wvalid,
-            output wire        s_axi_wready,
-            output wire [1:0]  s_axi_bresp,
-            output wire        s_axi_bvalid,
-            input  wire        s_axi_bready,
-            input  wire [5:0]  s_axi_araddr,
-            input  wire        s_axi_arvalid,
-            output wire        s_axi_arready,
-            output wire [31:0] s_axi_rdata,
-            output wire [1:0]  s_axi_rresp,
-            output wire        s_axi_rvalid,
-            input  wire        s_axi_rready
-        );
-            atomik_zynq_top #(
-                .ATOMIK_CLK_DIV({cfg.clk_div})
-            ) u_top (
-                .fclk_clk0     (fclk_clk0),
-                .fclk_reset_n  (fclk_reset_n),
-                .locked        (locked),
-                .s_axi_awaddr  (s_axi_awaddr),
-                .s_axi_awvalid (s_axi_awvalid),
-                .s_axi_awready (s_axi_awready),
-                .s_axi_wdata   (s_axi_wdata),
-                .s_axi_wstrb   (s_axi_wstrb),
-                .s_axi_wvalid  (s_axi_wvalid),
-                .s_axi_wready  (s_axi_wready),
-                .s_axi_bresp   (s_axi_bresp),
-                .s_axi_bvalid  (s_axi_bvalid),
-                .s_axi_bready  (s_axi_bready),
-                .s_axi_araddr  (s_axi_araddr),
-                .s_axi_arvalid (s_axi_arvalid),
-                .s_axi_arready (s_axi_arready),
-                .s_axi_rdata   (s_axi_rdata),
-                .s_axi_rresp   (s_axi_rresp),
-                .s_axi_rvalid  (s_axi_rvalid),
-                .s_axi_rready  (s_axi_rready)
-            );
-        endmodule
-        """)
-
-    path.write_text(content)
-    return path
-
-
-def gen_multibank_top(cfg: SweepConfig) -> str:
-    """Generate a top-level that uses atomik_v3_parallel instead of atomik_v3_atomik.
-
-    This is a standalone top (not wrapping atomik_zynq_top) because the core
-    instantiation is inside atomik_zynq_top and can't be parameterized from outside.
-    We replicate the structure with atomik_v3_parallel + tied-off parallel ports.
-    """
-    return textwrap.dedent(f"""\
+    content = textwrap.dedent(f"""\
     `timescale 1ns / 1ps
     module sweep_top_{cfg.tag} (
         input  wire        fclk_clk0,
@@ -188,78 +125,37 @@ def gen_multibank_top(cfg: SweepConfig) -> str:
         output wire        s_axi_rvalid,
         input  wire        s_axi_rready
     );
-        wire axi_clk, atomik_clk;
-        wire core_enable, core_rst_n, axi_rst_n;
-
-        assign core_rst_n = fclk_reset_n & locked & core_enable;
-        assign axi_rst_n  = fclk_reset_n & locked;
-
-        atomik_zynq_clk #(
+        atomik_zynq_top #(
+            .N_BANKS({cfg.n_banks}),
             .ATOMIK_CLK_DIV({cfg.clk_div})
-        ) u_clk (
-            .fclk_clk0  (fclk_clk0),
-            .rst_n      (fclk_reset_n),
-            .axi_clk    (axi_clk),
-            .atomik_clk (atomik_clk),
-            .locked     (locked)
-        );
-
-        wire        cdc_req_valid, cdc_req_ready;
-        wire        cdc_req_load_en, cdc_req_accum_en, cdc_req_swap_en;
-        wire [7:0]  cdc_req_addr;
-        wire [63:0] cdc_req_data;
-        wire [63:0] cdc_resp_state;
-        wire        cdc_resp_acc_zero, cdc_resp_valid;
-
-        wire        core_load_en, core_accum_en, core_swap_en;
-        wire [7:0]  core_addr;
-        wire [63:0] core_delta, core_init_data;
-        wire [63:0] core_current_state;
-        wire        core_acc_zero;
-
-        atomik_axi4lite_wrapper #(.ADDR_WIDTH(6), .DATA_WIDTH(32)) u_wrapper (
-            .s_axi_aclk(axi_clk), .s_axi_aresetn(axi_rst_n),
-            .s_axi_awaddr(s_axi_awaddr), .s_axi_awvalid(s_axi_awvalid), .s_axi_awready(s_axi_awready),
-            .s_axi_wdata(s_axi_wdata), .s_axi_wstrb(s_axi_wstrb),
-            .s_axi_wvalid(s_axi_wvalid), .s_axi_wready(s_axi_wready),
-            .s_axi_bresp(s_axi_bresp), .s_axi_bvalid(s_axi_bvalid), .s_axi_bready(s_axi_bready),
-            .s_axi_araddr(s_axi_araddr), .s_axi_arvalid(s_axi_arvalid), .s_axi_arready(s_axi_arready),
-            .s_axi_rdata(s_axi_rdata), .s_axi_rresp(s_axi_rresp),
-            .s_axi_rvalid(s_axi_rvalid), .s_axi_rready(s_axi_rready),
-            .cdc_req_valid(cdc_req_valid), .cdc_req_ready(cdc_req_ready),
-            .cdc_req_load_en(cdc_req_load_en), .cdc_req_accum_en(cdc_req_accum_en),
-            .cdc_req_swap_en(cdc_req_swap_en), .cdc_req_addr(cdc_req_addr),
-            .cdc_req_data(cdc_req_data),
-            .cdc_resp_state(cdc_resp_state), .cdc_resp_acc_zero(cdc_resp_acc_zero),
-            .cdc_resp_valid(cdc_resp_valid), .core_enable(core_enable)
-        );
-
-        atomik_cdc_bridge u_cdc (
-            .clk_axi(axi_clk), .rst_axi_n(axi_rst_n),
-            .req_valid(cdc_req_valid), .req_ready(cdc_req_ready),
-            .req_load_en(cdc_req_load_en), .req_accum_en(cdc_req_accum_en),
-            .req_swap_en(cdc_req_swap_en), .req_addr(cdc_req_addr), .req_data(cdc_req_data),
-            .resp_state(cdc_resp_state), .resp_acc_zero(cdc_resp_acc_zero),
-            .resp_valid(cdc_resp_valid),
-            .clk_core(atomik_clk), .rst_core_n(core_rst_n),
-            .core_load_en(core_load_en), .core_accum_en(core_accum_en),
-            .core_swap_en(core_swap_en), .core_addr(core_addr),
-            .core_delta(core_delta), .core_init_data(core_init_data),
-            .core_current_state(core_current_state), .core_acc_zero(core_acc_zero)
-        );
-
-        atomik_v3_parallel #(.N_BANKS({cfg.n_banks})) u_atomik (
-            .clk(atomik_clk), .rst_n(core_rst_n),
-            .load_en(core_load_en), .accum_en(core_accum_en), .swap_en(core_swap_en),
-            .addr_in(core_addr), .delta_in(core_delta), .init_data(core_init_data),
-            .delta_parallel_in({{{cfg.n_banks * 64}{{1'b0}}}}),
-            .delta_parallel_valid({{{cfg.n_banks}{{1'b0}}}}),
-            .parallel_mode(1'b0),
-            .current_state(core_current_state), .acc_zero(core_acc_zero),
-            .current_bank(), .bank_active()
+        ) u_top (
+            .fclk_clk0     (fclk_clk0),
+            .fclk_reset_n  (fclk_reset_n),
+            .locked        (locked),
+            .s_axi_awaddr  (s_axi_awaddr),
+            .s_axi_awvalid (s_axi_awvalid),
+            .s_axi_awready (s_axi_awready),
+            .s_axi_wdata   (s_axi_wdata),
+            .s_axi_wstrb   (s_axi_wstrb),
+            .s_axi_wvalid  (s_axi_wvalid),
+            .s_axi_wready  (s_axi_wready),
+            .s_axi_bresp   (s_axi_bresp),
+            .s_axi_bvalid  (s_axi_bvalid),
+            .s_axi_bready  (s_axi_bready),
+            .s_axi_araddr  (s_axi_araddr),
+            .s_axi_arvalid (s_axi_arvalid),
+            .s_axi_arready (s_axi_arready),
+            .s_axi_rdata   (s_axi_rdata),
+            .s_axi_rresp   (s_axi_rresp),
+            .s_axi_rvalid  (s_axi_rvalid),
+            .s_axi_rready  (s_axi_rready)
         );
     endmodule
     """)
+
+    path.write_text(content)
+    return path
+
 
 
 def gen_sweep_xdc(cfg: SweepConfig, out_dir: Path) -> Path:
@@ -299,14 +195,12 @@ def gen_sweep_tcl(cfg: SweepConfig, top_path: Path, xdc_path: Path,
 
     rtl_sources = [
         str(ZYNQ_DIR / "rtl" / "atomik_core_zynq.v"),
+        str(ZYNQ_DIR / "rtl" / "atomik_core_zynq_parallel.v"),
         str(ZYNQ_DIR / "rtl" / "atomik_axi4lite_wrapper.v"),
         str(ZYNQ_DIR / "rtl" / "atomik_cdc_bridge.v"),
         str(ZYNQ_DIR / "rtl" / "atomik_zynq_clk.v"),
         str(ZYNQ_DIR / "rtl" / "atomik_zynq_top.v"),
     ]
-
-    if cfg.n_banks > 1:
-        rtl_sources.append(str(V3_RTL_DIR / "atomik_v3_parallel.v"))
 
     rtl_sources.append(str(top_path))
 

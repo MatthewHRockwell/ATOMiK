@@ -17,6 +17,7 @@
 module atomik_zynq_top #(
     parameter ADDR_WIDTH     = 6,
     parameter DATA_WIDTH     = 32,
+    parameter N_BANKS        = 1,          // Parallel accumulator banks
     parameter real ATOMIK_CLK_DIV = 5.0   // 1000/5 = 200 MHz (sweep: 4.0→250, 3.0→333)
 ) (
     // PS interface
@@ -192,8 +193,11 @@ module atomik_zynq_top #(
     // =========================================================================
     // ATOMiK Core (ATOMiK clock domain — 200+ MHz)
     // Zynq-optimized: BRAM state table + pipelined SWAP write-back
+    // N_BANKS parallel accumulators with XOR merge tree
     // =========================================================================
-    atomik_core_zynq u_atomik (
+    atomik_core_zynq_parallel #(
+        .N_BANKS (N_BANKS)
+    ) u_atomik (
         .clk           (atomik_clk),
         .rst_n         (core_rst_n),
         .load_en       (core_load_en),
