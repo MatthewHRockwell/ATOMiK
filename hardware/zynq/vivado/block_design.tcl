@@ -3,8 +3,8 @@
 #
 # Target:  ALINX AX7020 (XC7Z020-2CLG400I)
 # Purpose: Create Zynq PS + ATOMiK PL design via IP Integrator.
-#          This is the primary build path — auto-configures PS, AXI
-#          interconnect, reset infrastructure, and exports XSA.
+#          Phase A: ATOMiK N=16 accelerator via AXI4-Lite + UIO
+#          Phase B: RV64I co-processor with DDR3 access + mailbox
 #
 # Usage:
 #   vivado -mode batch -source vivado/block_design.tcl
@@ -23,6 +23,8 @@ set V3_RTL_DIR [file normalize "$ZYNQ_DIR/../v3/rtl"]
 
 puts "=============================================="
 puts " ATOMiK Zynq Block Design — PS + PL"
+puts "  Phase A: ATOMiK N=16 accelerator"
+puts "  Phase B: RV64I co-processor"
 puts "=============================================="
 puts ""
 
@@ -34,11 +36,40 @@ file mkdir $ZYNQ_DIR/output
 
 create_project atomik_zynq $ZYNQ_DIR/vivado/atomik_zynq -part xc7z020clg400-2 -force
 
-# Add ATOMiK RTL sources
+# Add ATOMiK Zynq RTL sources (Phase A: accelerator)
 add_files [list \
     $ZYNQ_DIR/rtl/atomik_axi4lite_wrapper.v \
-    $V3_RTL_DIR/atomik_v3_atomik.v \
+    $ZYNQ_DIR/rtl/atomik_cdc_bridge.v \
+    $ZYNQ_DIR/rtl/atomik_core_zynq.v \
+    $ZYNQ_DIR/rtl/atomik_core_zynq_parallel.v \
+    $ZYNQ_DIR/rtl/atomik_zynq_clk.v \
+    $ZYNQ_DIR/rtl/atomik_zynq_top.v \
 ]
+
+# Add Phase B RTL sources (co-processor)
+add_files [list \
+    $ZYNQ_DIR/rtl/atomik_v3_cpu_zynq.v \
+    $ZYNQ_DIR/rtl/atomik_v3_regfile_zynq.v \
+    $ZYNQ_DIR/rtl/atomik_v3_atomik_zynq.v \
+    $ZYNQ_DIR/rtl/atomik_v3_bus_to_axi.v \
+    $ZYNQ_DIR/rtl/atomik_mailbox.v \
+    $ZYNQ_DIR/rtl/atomik_coprocessor_top.v \
+]
+
+# Add v3 vendor-independent submodules (shared with Tang Nano)
+add_files [list \
+    $V3_RTL_DIR/atomik_v3_alu.v \
+    $V3_RTL_DIR/atomik_v3_branch.v \
+    $V3_RTL_DIR/atomik_v3_control.v \
+    $V3_RTL_DIR/atomik_v3_csr.v \
+    $V3_RTL_DIR/atomik_v3_decode.v \
+    $V3_RTL_DIR/atomik_v3_fetch.v \
+    $V3_RTL_DIR/atomik_v3_lsu.v \
+]
+
+# Enable automatic XPM detection (required for BRAM inference in parallel core)
+set_property -name {STEPS.SYNTH_DESIGN.ARGS.MORE OPTIONS} -value {-mode out_of_context} -objects [get_runs synth_1] -quiet
+auto_detect_xpm
 
 # ------------------------------------------------------------------------------
 # Create Block Design
@@ -94,28 +125,53 @@ set_property -dict [list \
     CONFIG.PCW_QSPI_GRP_SINGLE_SS_ENABLE {1} \
 ] [get_bd_cells ps7]
 
-# GP AXI Master 0 (for ATOMiK peripheral access)
+# GP AXI Master 0 (for ATOMiK + mailbox peripheral access)
 set_property -dict [list \
     CONFIG.PCW_USE_M_AXI_GP0 {1} \
 ] [get_bd_cells ps7]
 
-# FCLK_CLK0: 100 MHz (Phase 1 — single clock for both AXI and ATOMiK)
+# HP AXI Slave 0 (for RV64I co-processor DDR3 access — Phase B)
+set_property -dict [list \
+    CONFIG.PCW_USE_S_AXI_HP0 {1} \
+] [get_bd_cells ps7]
+
+# Fabric-to-PS interrupt (for mailbox doorbell — Phase B)
+set_property -dict [list \
+    CONFIG.PCW_USE_FABRIC_INTERRUPT {1} \
+    CONFIG.PCW_IRQ_F2P_INTR {1} \
+] [get_bd_cells ps7]
+
+# FCLK_CLK0: 100 MHz
 set_property -dict [list \
     CONFIG.PCW_FPGA0_PERIPHERAL_FREQMHZ {100} \
 ] [get_bd_cells ps7]
 
 # ------------------------------------------------------------------------------
-# Add ATOMiK AXI4-Lite Peripheral
+# Phase A: ATOMiK N=16 Accelerator (AXI4-Lite)
 # ------------------------------------------------------------------------------
 
-create_bd_cell -type module -reference atomik_axi4lite_wrapper atomik_0
+# Add atomik_zynq_top with N_BANKS=16
+create_bd_cell -type module -reference atomik_zynq_top atomik_0
+set_property -dict [list \
+    CONFIG.N_BANKS {16} \
+    CONFIG.ATOMIK_CLK_DIV {3.75} \
+] [get_bd_cells atomik_0]
+# 1000 / 3.75 = 266.7 MHz (N=16 ceiling from characterization)
 
 # ------------------------------------------------------------------------------
-# Add AXI Interconnect
+# Phase B: RV64I Co-Processor
+# ------------------------------------------------------------------------------
+
+create_bd_cell -type module -reference atomik_coprocessor_top coprocessor_0
+
+# ------------------------------------------------------------------------------
+# Add AXI Interconnect (GP0 → ATOMiK + Mailbox)
 # ------------------------------------------------------------------------------
 
 create_bd_cell -type ip -vlnv xilinx.com:ip:axi_interconnect:2.1 axi_interconnect_0
-set_property CONFIG.NUM_MI {1} [get_bd_cells axi_interconnect_0]
+set_property CONFIG.NUM_MI {2} [get_bd_cells axi_interconnect_0]
+# M00 → ATOMiK accelerator (Phase A)
+# M01 → Co-processor mailbox (Phase B)
 
 # ------------------------------------------------------------------------------
 # Add Processor System Reset
@@ -127,18 +183,31 @@ create_bd_cell -type ip -vlnv xilinx.com:ip:proc_sys_reset:5.0 proc_sys_reset_0
 # Connect Everything
 # ------------------------------------------------------------------------------
 
-# PS GP AXI Master → AXI Interconnect → ATOMiK
+# PS GP AXI Master → AXI Interconnect
 connect_bd_intf_net [get_bd_intf_pins ps7/M_AXI_GP0] \
                     [get_bd_intf_pins axi_interconnect_0/S00_AXI]
+
+# M00 → ATOMiK accelerator (Phase A)
 connect_bd_intf_net [get_bd_intf_pins axi_interconnect_0/M00_AXI] \
                     [get_bd_intf_pins atomik_0/S_AXI]
 
-# Clocks
+# M01 → Co-processor mailbox (Phase B)
+connect_bd_intf_net [get_bd_intf_pins axi_interconnect_0/M01_AXI] \
+                    [get_bd_intf_pins coprocessor_0/S_AXI_MBOX]
+
+# Co-processor AXI Master → PS HP0 (DDR3 access)
+connect_bd_intf_net [get_bd_intf_pins coprocessor_0/M_AXI] \
+                    [get_bd_intf_pins ps7/S_AXI_HP0]
+
+# Clocks — FCLK_CLK0 to all components
 connect_bd_net [get_bd_pins ps7/FCLK_CLK0] \
                [get_bd_pins axi_interconnect_0/ACLK] \
                [get_bd_pins axi_interconnect_0/S00_ACLK] \
                [get_bd_pins axi_interconnect_0/M00_ACLK] \
-               [get_bd_pins atomik_0/s_axi_aclk] \
+               [get_bd_pins axi_interconnect_0/M01_ACLK] \
+               [get_bd_pins atomik_0/fclk_clk0] \
+               [get_bd_pins coprocessor_0/clk] \
+               [get_bd_pins ps7/S_AXI_HP0_ACLK] \
                [get_bd_pins proc_sys_reset_0/slowest_sync_clk]
 
 # Resets
@@ -148,7 +217,13 @@ connect_bd_net [get_bd_pins proc_sys_reset_0/peripheral_aresetn] \
                [get_bd_pins axi_interconnect_0/ARESETN] \
                [get_bd_pins axi_interconnect_0/S00_ARESETN] \
                [get_bd_pins axi_interconnect_0/M00_ARESETN] \
-               [get_bd_pins atomik_0/s_axi_aresetn]
+               [get_bd_pins axi_interconnect_0/M01_ARESETN] \
+               [get_bd_pins atomik_0/fclk_reset_n] \
+               [get_bd_pins coprocessor_0/ext_rst_n]
+
+# Interrupt: co-processor mailbox → PS IRQ_F2P
+connect_bd_net [get_bd_pins coprocessor_0/irq_to_arm] \
+               [get_bd_pins ps7/IRQ_F2P]
 
 # PS FIXED_IO and DDR (mandatory external connections)
 apply_bd_automation -rule xilinx.com:bd_rule:processing_system7 \
@@ -158,10 +233,20 @@ apply_bd_automation -rule xilinx.com:bd_rule:processing_system7 \
 # Address Assignment
 # ------------------------------------------------------------------------------
 
-# ATOMiK at 0x43C0_0000 (4 KB range)
+# ATOMiK accelerator at 0x43C0_0000 (4 KB range)
 assign_bd_address -target_address_space /ps7/Data \
     [get_bd_addr_segs atomik_0/S_AXI/reg0] \
     -range 4K -offset 0x43C00000
+
+# Co-processor mailbox at 0x43C1_0000 (4 KB range)
+assign_bd_address -target_address_space /ps7/Data \
+    [get_bd_addr_segs coprocessor_0/S_AXI_MBOX/reg0] \
+    -range 4K -offset 0x43C10000
+
+# HP0 address range for co-processor DDR3 access (256 MB at 0x0000_0000)
+assign_bd_address -target_address_space /coprocessor_0/M_AXI \
+    [get_bd_addr_segs ps7/S_AXI_HP0/HP0_DDR_LOWOCM] \
+    -range 256M -offset 0x00000000
 
 # ------------------------------------------------------------------------------
 # Generate and Build
@@ -191,4 +276,7 @@ puts ""
 puts "=============================================="
 puts " Block design build complete."
 puts "  XSA file: output/atomik_zynq.xsa"
+puts "  Phase A: ATOMiK N=16 @ 0x43C00000"
+puts "  Phase B: Mailbox    @ 0x43C10000"
+puts "           RV64I DDR3 via S_AXI_HP0"
 puts "=============================================="

@@ -13,29 +13,50 @@
 # ==============================================================================
 
 ZYNQ_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
-V3_RTL   := $(ZYNQ_DIR)../v3/rtl
+V3_RTL_DIR := $(ZYNQ_DIR)../v3/rtl
 
 # Tools
 VIVADO   := vivado -mode batch -source
 IVERILOG := $(shell command -v iverilog 2>/dev/null)
 VVP      := $(shell command -v vvp 2>/dev/null)
 
-# RTL sources
+# RTL sources — Phase A (accelerator)
 ZYNQ_RTL := $(ZYNQ_DIR)rtl/atomik_axi4lite_wrapper.v \
             $(ZYNQ_DIR)rtl/atomik_cdc_bridge.v \
             $(ZYNQ_DIR)rtl/atomik_core_zynq.v \
+            $(ZYNQ_DIR)rtl/atomik_core_zynq_parallel.v \
             $(ZYNQ_DIR)rtl/atomik_zynq_clk.v \
             $(ZYNQ_DIR)rtl/atomik_zynq_top.v
+
+# RTL sources — Phase B (co-processor)
+COPROC_RTL := $(ZYNQ_DIR)rtl/atomik_v3_cpu_zynq.v \
+              $(ZYNQ_DIR)rtl/atomik_v3_regfile_zynq.v \
+              $(ZYNQ_DIR)rtl/atomik_v3_atomik_zynq.v \
+              $(ZYNQ_DIR)rtl/atomik_v3_bus_to_axi.v \
+              $(ZYNQ_DIR)rtl/atomik_mailbox.v \
+              $(ZYNQ_DIR)rtl/atomik_coprocessor_top.v
+
+# v3 vendor-independent submodules (shared with Tang Nano)
+V3_RTL := $(V3_RTL_DIR)/atomik_v3_alu.v \
+          $(V3_RTL_DIR)/atomik_v3_branch.v \
+          $(V3_RTL_DIR)/atomik_v3_control.v \
+          $(V3_RTL_DIR)/atomik_v3_csr.v \
+          $(V3_RTL_DIR)/atomik_v3_decode.v \
+          $(V3_RTL_DIR)/atomik_v3_fetch.v \
+          $(V3_RTL_DIR)/atomik_v3_lsu.v
+
 CORE_RTL :=
 
 # Testbenches
 TB_CDC   := $(ZYNQ_DIR)sim/tb_cdc_wrapper.v
+TB_COPROC := $(ZYNQ_DIR)sim/tb_coprocessor.v
 
 # Build outputs
 BUILD_DIR  := $(ZYNQ_DIR)output
 SIM_CDC    := $(BUILD_DIR)/tb_cdc_wrapper
+SIM_COPROC := $(BUILD_DIR)/tb_coprocessor
 
-.PHONY: all sim sim-cdc bitstream blockdesign program clean help
+.PHONY: all sim sim-cdc sim-coproc bitstream blockdesign program clean help
 
 all: sim-cdc
 
@@ -50,6 +71,17 @@ ifdef IVERILOG
 	$(IVERILOG) -DSIMULATION -o $(SIM_CDC) $(TB_CDC) $(ZYNQ_RTL) $(CORE_RTL)
 	cd $(BUILD_DIR) && $(VVP) $(SIM_CDC)
 	@rm -f $(BUILD_DIR)/tb_cdc_wrapper.vcd
+else
+	@echo "iverilog not found — skipping simulation"
+endif
+
+## Run co-processor testbench (Phase B: RV64I + mailbox + DDR3)
+sim-coproc: $(TB_COPROC) $(COPROC_RTL) $(V3_RTL)
+ifdef IVERILOG
+	@mkdir -p $(BUILD_DIR)
+	$(IVERILOG) -DSIMULATION -o $(SIM_COPROC) $(TB_COPROC) $(COPROC_RTL) $(V3_RTL)
+	cd $(BUILD_DIR) && $(VVP) $(SIM_COPROC)
+	@rm -f $(BUILD_DIR)/tb_coprocessor.vcd
 else
 	@echo "iverilog not found — skipping simulation"
 endif
@@ -105,7 +137,8 @@ clean:
 
 help:
 	@echo "ATOMiK Zynq Build Targets:"
-	@echo "  make sim-cdc      - Run dual-clock CDC testbench (primary)"
+	@echo "  make sim-cdc      - Run dual-clock CDC testbench (Phase A)"
+	@echo "  make sim-coproc   - Run co-processor testbench (Phase B)"
 	@echo "  make sim          - Alias for sim-cdc"
 	@echo "  make blockdesign  - Build Zynq PS+PL block design (primary flow)"
 	@echo "  make bitstream    - Build PL-only bitstream (non-project mode)"
