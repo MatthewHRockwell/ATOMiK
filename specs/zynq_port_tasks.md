@@ -150,7 +150,8 @@
   - Strategy depends on design size: small N → aggressive, medium N → maximum, large N → aggressive/baseline
   - All configs share 1 BRAM (256x64 state table)
   - Peak throughput: 69.7 Gops/s (N=512 @ 135.6 MHz)
-- [ ] N=1024 ceiling sweep (in progress — estimated ~100 MHz, ~40K LUT)
+- [x] N=1024 attempted: 47,263 LUT (88.8%) fits in LUT slots, but 66,820 FF + LUT packing requires 14,331 slices vs 13,300 available — **cannot place on XC7Z020**
+- [x] **N=512 confirmed as maximum configuration** for XC7Z020 (for N=1024+ need XC7Z045 or UltraScale+)
 
 ### Z2.3 Userspace Benchmark Suite (Pending Hardware)
 - [ ] Port `perf_bench` measurement framework to Linux userspace (UIO-based)

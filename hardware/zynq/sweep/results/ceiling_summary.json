@@ -402,5 +402,19 @@
       "build_time_s": 2342.6,
       "error": "ERROR: [Place 46-13] The placer could not place more than 5 percent of the moveable instances in the design. This could be due to tight pblock constraints or other physical constraints. Please analyze your design to see if more placement flexibility can be provided to the tools (ie. Make pblock sizes larger).  The first 20 instances that could not be placed are listed below. ; ERROR: [Place 30-99] Placer failed with error: 'Need spiral search for more than 5% of movable instances!'; Please review all ERROR, CRITICAL WARNING, and WARNING messages during placement to understand the cause for failure."
     }
-  ]
+  ],
+  "notes": {
+    "n1024_placement_failure": {
+      "n_banks": 1024,
+      "lut_used": 47263,
+      "lut_total": 53200,
+      "lut_pct": 88.84,
+      "ff_used": 66820,
+      "ff_total": 106400,
+      "slices_required": 14331,
+      "slices_available": 13300,
+      "status": "CANNOT_PLACE \u2014 FF+LUT packing exceeds slice count",
+      "conclusion": "N=512 is the maximum configuration for XC7Z020"
+    }
+  }
 }
