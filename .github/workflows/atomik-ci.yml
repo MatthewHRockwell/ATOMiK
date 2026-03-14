@@ -66,10 +66,16 @@ jobs:
         run: |
           echo "=== Zynq CDC + AXI4-Lite Wrapper Tests ==="
           cd hardware/zynq
+          # Phase A RTL only (accelerator path — no v3 CPU deps)
           iverilog -o sim_cdc_wrapper \
             -DSIMULATION \
             -I rtl \
-            rtl/*.v \
+            rtl/atomik_axi4lite_wrapper.v \
+            rtl/atomik_cdc_bridge.v \
+            rtl/atomik_core_zynq.v \
+            rtl/atomik_core_zynq_parallel.v \
+            rtl/atomik_zynq_clk.v \
+            rtl/atomik_zynq_top.v \
             sim/tb_cdc_wrapper.v \
             2>&1 | tee /tmp/zynq_compile.log
           if [ $? -ne 0 ]; then
@@ -94,7 +100,12 @@ jobs:
           iverilog -o sim_parallel_banks \
             -DSIMULATION \
             -I rtl \
-            rtl/*.v \
+            rtl/atomik_axi4lite_wrapper.v \
+            rtl/atomik_cdc_bridge.v \
+            rtl/atomik_core_zynq.v \
+            rtl/atomik_core_zynq_parallel.v \
+            rtl/atomik_zynq_clk.v \
+            rtl/atomik_zynq_top.v \
             sim/tb_parallel_banks.v \
             2>&1 | tee /tmp/zynq_parallel_compile.log
           if [ $? -ne 0 ]; then
@@ -109,6 +120,41 @@ jobs:
             exit 1
           else
             echo "::error::Zynq parallel testbench did not produce a summary"
+            exit 1
+          fi
+      - name: Run Zynq co-processor testbench (7 tests)
+        run: |
+          echo "=== Zynq Co-Processor Tests (Phase B: RV64I + mailbox) ==="
+          cd hardware/zynq
+          iverilog -o sim_coprocessor \
+            -DSIMULATION \
+            rtl/atomik_coprocessor_top.v \
+            rtl/atomik_v3_cpu_zynq.v \
+            rtl/atomik_v3_regfile_zynq.v \
+            rtl/atomik_v3_atomik_zynq.v \
+            rtl/atomik_v3_bus_to_axi.v \
+            rtl/atomik_mailbox.v \
+            ../v3/rtl/atomik_v3_alu.v \
+            ../v3/rtl/atomik_v3_branch.v \
+            ../v3/rtl/atomik_v3_control.v \
+            ../v3/rtl/atomik_v3_csr.v \
+            ../v3/rtl/atomik_v3_decode.v \
+            ../v3/rtl/atomik_v3_fetch.v \
+            ../v3/rtl/atomik_v3_lsu.v \
+            sim/tb_coprocessor.v \
+            2>&1 | tee /tmp/zynq_coproc_compile.log
+          if [ $? -ne 0 ]; then
+            echo "::error::Zynq co-processor testbench failed to compile"
+            exit 1
+          fi
+          vvp sim_coprocessor 2>&1 | tee /tmp/zynq_coproc_sim.log
+          if grep -q "ALL TESTS PASSED" /tmp/zynq_coproc_sim.log; then
+            echo "::notice::Zynq co-processor tests passed (7/7)"
+          elif grep -q "TESTS FAILED\|TIMEOUT" /tmp/zynq_coproc_sim.log; then
+            echo "::error::Zynq co-processor testbench had failures"
+            exit 1
+          else
+            echo "::error::Zynq co-processor testbench did not produce a summary"
             exit 1
           fi
       - name: Run v3 iverilog testbenches
