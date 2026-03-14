@@ -61,7 +61,7 @@ jobs:
       - name: Install Verilog tools
         run: |
           sudo apt-get update
-          sudo apt-get install -y iverilog
+          sudo apt-get install -y iverilog verilator
       - name: Run Zynq CDC testbench (37 tests)
         run: |
           echo "=== Zynq CDC + AXI4-Lite Wrapper Tests ==="
