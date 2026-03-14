@@ -1,0 +1,39 @@
+{
+    "DESIGN_NAME": "atomik_asic_top",
+    "DESIGN_IS_CORE": false,
+
+    "VERILOG_FILES": [
+        "dir::../rtl/atomik_asic_top.v",
+        "dir::../rtl/atomik_core_asic.v",
+        "dir::../rtl/atomik_sram_dp.v",
+        "dir::../rtl/atomik_bist.v",
+        "dir::../rtl/atomik_dft_wrapper.v"
+    ],
+
+    "CLOCK_PORT": "clk",
+    "CLOCK_PERIOD": 5.0,
+
+    "FP_SIZING": "relative",
+    "FP_CORE_UTIL": 40,
+    "PL_TARGET_DENSITY_PCT": 45,
+
+    "STA_REPORT_POWER": true,
+
+    "SYNTH_STRATEGY": "AREA 3",
+    "SYNTH_MAX_FANOUT": 20,
+
+    "DIODE_INSERTION_STRATEGY": 3,
+
+    "RUN_CVC": true,
+
+    "pdk::sky130A": {
+        "MAX_FANOUT_CONSTRAINT": 10,
+        "FP_CORE_UTIL": 35,
+        "scl::sky130_fd_sc_hd": {
+            "CLOCK_PERIOD": 10.0
+        },
+        "scl::sky130_fd_sc_hs": {
+            "CLOCK_PERIOD": 7.5
+        }
+    }
+}

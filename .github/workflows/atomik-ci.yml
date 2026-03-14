@@ -157,6 +157,40 @@ jobs:
             echo "::error::Zynq co-processor testbench did not produce a summary"
             exit 1
           fi
+      - name: Run ASIC BIST testbench (10 tests)
+        run: |
+          echo "=== ASIC BIST + Functional Tests ==="
+          cd hardware/asic
+          iverilog -DSIMULATION -o sim_asic_top \
+            sim/tb_asic_top.v \
+            rtl/atomik_asic_top.v \
+            rtl/atomik_core_asic.v \
+            rtl/atomik_sram_dp.v \
+            rtl/atomik_bist.v \
+            rtl/atomik_dft_wrapper.v \
+            2>&1 | tee /tmp/asic_compile.log
+          if [ $? -ne 0 ]; then
+            echo "::error::ASIC testbench failed to compile"
+            exit 1
+          fi
+          vvp sim_asic_top 2>&1 | tee /tmp/asic_sim.log
+          if grep -q "All tests passed" /tmp/asic_sim.log; then
+            echo "::notice::ASIC BIST + functional tests passed (10/10)"
+          else
+            echo "::error::ASIC testbench had failures"
+            exit 1
+          fi
+          rm -f sim_asic_top
+      - name: Verilator lint check (ASIC RTL)
+        run: |
+          echo "=== Verilator Lint: ASIC RTL ==="
+          verilator --lint-only -Wall --top-module atomik_asic_top \
+            hardware/asic/rtl/atomik_asic_top.v \
+            hardware/asic/rtl/atomik_core_asic.v \
+            hardware/asic/rtl/atomik_sram_dp.v \
+            hardware/asic/rtl/atomik_bist.v \
+            hardware/asic/rtl/atomik_dft_wrapper.v
+          echo "::notice::ASIC RTL lint clean (0 warnings)"
       - name: Run v3 iverilog testbenches
         run: |
           echo "=== v3 RTL iverilog Tests ==="

@@ -105,7 +105,7 @@ module atomik_parallel_acc #(
             bank_sel <= {BANK_SEL_W{1'b0}};
         end
         else if (!parallel_mode && delta_valid) begin
-            if (bank_sel == N_BANKS - 1)
+            if (bank_sel == N_BANKS[BANK_SEL_W-1:0] - 1'b1)
                 bank_sel <= {BANK_SEL_W{1'b0}};
             else
                 bank_sel <= bank_sel + 1'b1;
@@ -151,9 +151,11 @@ module atomik_parallel_acc #(
                 .delta_valid          (bank_delta_valid[gi]),
                 .initial_state_in     ({DELTA_WIDTH{1'b0}}),
                 .load_initial         (load_initial),
+                /* verilator lint_off PINCONNECTEMPTY */
                 .initial_state_out    (),  // Not used; shared initial_state
-                .delta_accumulator_out(bank_acc[gi]),
-                .accumulator_zero     ()   // Checked on merged result
+                .accumulator_zero     (),  // Checked on merged result
+                /* verilator lint_on PINCONNECTEMPTY */
+                .delta_accumulator_out(bank_acc[gi])
             );
         end
     endgenerate
@@ -173,7 +175,9 @@ module atomik_parallel_acc #(
     // Depth: log₂(N) XOR levels, NO carry propagation, NO ALU inference.
     // This avoids the serial chain that results from a for-loop.
 
+    /* verilator lint_off UNOPTFLAT */
     wire [DELTA_WIDTH-1:0] merge_node [0:2*N_BANKS-2];
+    /* verilator lint_on UNOPTFLAT */
 
     generate
         // Leaf nodes: directly connected to bank accumulator outputs

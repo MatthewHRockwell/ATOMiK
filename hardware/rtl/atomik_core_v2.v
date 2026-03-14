@@ -90,14 +90,12 @@ module atomik_core_v2 #(
     // Control signals derived from operation code
     wire load_en;
     wire accumulate_en;
-    wire read_en;
-    
+
     // =========================================================================
     // Operation Decode (Combinational)
     // =========================================================================
     assign load_en       = (operation == `OP_LOAD);
     assign accumulate_en = (operation == `OP_ACCUMULATE);
-    assign read_en       = (operation == `OP_READ);
     
     // =========================================================================
     // Delta Accumulator Instance

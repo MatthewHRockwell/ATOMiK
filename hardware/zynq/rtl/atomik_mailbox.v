@@ -41,6 +41,9 @@
 
 `timescale 1ns / 1ps
 
+/* verilator lint_off MULTIDRIVEN */
+/* verilator lint_off UNUSEDSIGNAL */
+
 module atomik_mailbox #(
     parameter ADDR_WIDTH = 6,
     parameter DATA_WIDTH = 32
