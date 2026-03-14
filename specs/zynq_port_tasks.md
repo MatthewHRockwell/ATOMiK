@@ -163,6 +163,63 @@
 
 ---
 
+## Zynq Phase B: RV64I Co-Processor ✅ (RTL + Sim Complete)
+
+**Goal**: Port v3 CPU to Zynq PL with direct-wire ATOMiK custom instructions. ARM dispatches work via shared DDR3 + mailbox.
+
+**Status**: All RTL modules complete, 60/60 simulation tests passing, firmware infrastructure ready.
+
+### ZB.1 RTL Modules (Complete)
+- [x] `atomik_v3_regfile_zynq.v` — Distributed RAM register file (32x64-bit, 2 copies)
+- [x] `atomik_v3_atomik_zynq.v` — Distributed RAM ATOMiK state table (256x64-bit)
+- [x] `atomik_v3_cpu_zynq.v` — RV64I CPU wrapper (instantiates Zynq-ported submodules)
+- [x] `atomik_mailbox.v` — Dual-port ARM↔RV64I mailbox (AXI4-Lite + v3 bus)
+- [x] `atomik_v3_bus_to_axi.v` — v3 32-bit bus → AXI4 master bridge (DDR3 access)
+- [x] `atomik_coprocessor_top.v` — Top-level: CPU + bus mux + BRAM + mailbox + AXI bridge
+
+### ZB.2 Block Design (Complete)
+- [x] Updated `vivado/block_design.tcl` — Phase A + B integration
+  - AXI Interconnect: M00→ATOMiK N=16, M01→Mailbox
+  - S_AXI_HP0 for co-processor DDR3 access
+  - IRQ_F2P for mailbox doorbell interrupt
+  - Address map: ATOMiK @ 0x43C00000, Mailbox @ 0x43C10000, HP0 DDR3 256MB
+
+### ZB.3 Simulation (Complete — 60/60)
+- [x] CDC testbench: 37/37 tests (Phase A accelerator path)
+- [x] Parallel bank testbench: 10/10 tests (N=4 configuration)
+- [x] Co-processor testbench: 13/13 tests
+  - Mailbox register R/W (5 tests)
+  - CPU boot + BRAM round-trip (2 tests)
+  - ATOMIK.LOAD + READ (1 test)
+  - ATOMIK.ACCUM + READ (1 test)
+  - XOR self-inverse (1 test)
+  - ATOMIK.SWAP + READ after (2 tests)
+  - ACCUM after SWAP (1 test)
+
+### ZB.4 Firmware Infrastructure (Complete)
+- [x] `firmware/crt_zynq.S` — Startup code (trap→mailbox, data copy, BSS zero)
+- [x] `firmware/linker_ddr3.ld` — Linker script (DDR3 code, BRAM data/stack)
+- [x] `firmware/atomik_v3.h` — Custom instruction wrappers (same encoding as v3)
+- [x] `firmware/mailbox.h` — RV64I-side mailbox register access
+- [x] `firmware/demo_atomik.c` — Demo firmware (self-test, workload dispatch, benchmark)
+- [x] `firmware/Makefile` — Build system (1,080 bytes output)
+
+### ZB.5 ARM-Side Software (Complete)
+- [x] `software/libatomik/atomik_coprocessor.h` — Co-processor dispatch API
+- [x] `software/libatomik/atomik_coprocessor.c` — Implementation (firmware load, mailbox, cmd/resp)
+- [x] Updated `software/libatomik/Makefile` — `lib-coproc` target
+
+### ZB.6 Hardware Validation (Pending Board)
+- [ ] Vivado synthesis at 100 MHz target
+- [ ] ARM boot → load demo firmware → verify boot magic (0xB007ED) via mailbox
+- [ ] Run self-test command → verify 8/8 ATOMiK tests pass
+- [ ] Run benchmark command → measure ATOMiK throughput from RV64I
+- [ ] ARM dispatches ACCUM workload → verify result via shared DDR3
+
+**Exit criteria**: All RTL simulation PASS (DONE). Firmware builds (DONE). Hardware validation pending board arrival (~Mar 22).
+
+---
+
 ## Zynq Phase 3: Display & Integration
 
 **Goal**: HDMI output, external sensor validation (power + thermal), documentation finalization.
@@ -217,7 +274,10 @@ Zynq Phase 0: Docs & Tooling ─────────────┐
 Zynq Phase 1: ATOMiK PL Bringup (N=1) ────┤
     │                                       │
     v                                       │
-Zynq Phase 2: Multi-Bank Scaling            │
+Zynq Phase 2: Multi-Bank Scaling ✅         │
+    │                                       │
+    v                                       │
+Zynq Phase B: RV64I Co-Processor ✅ (sim)   │
     │                                       │
     v                                       │
 Zynq Phase 3: Display & Integration ───────┘
@@ -225,4 +285,5 @@ Zynq Phase 3: Display & Integration ───────┘
 
 Phase 0 must complete before Phase 1 can begin (Vivado + Linux environment required).
 Phase 1 must complete before Phase 2 (AXI wrapper + UIO driver required).
+Phase B RTL and sim are complete — hardware validation requires board (~Mar 22).
 Phase 2 and Phase 3 are partially independent — HDMI and sensor work can start during Phase 2.

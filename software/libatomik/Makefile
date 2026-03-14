@@ -29,17 +29,21 @@ LDFLAGS =
 BUILD   = build
 
 # Sources
-LIB_SRC = libatomik.c
-LIB_HDR = libatomik.h
-TEST_SRC = test_libatomik.c
+LIB_SRC     = libatomik.c
+LIB_HDR     = libatomik.h
+COPROC_SRC  = atomik_coprocessor.c
+COPROC_HDR  = atomik_coprocessor.h
+TEST_SRC    = test_libatomik.c
 
 # Targets
-LIB_SO   = $(BUILD)/libatomik.so
-LIB_A    = $(BUILD)/libatomik.a
+LIB_SO    = $(BUILD)/libatomik.so
+LIB_A     = $(BUILD)/libatomik.a
+COPROC_SO = $(BUILD)/libatomik_coproc.so
+COPROC_A  = $(BUILD)/libatomik_coproc.a
 TEST_MOCK = $(BUILD)/test_libatomik_mock
 TEST_HW   = $(BUILD)/test_libatomik_hw
 
-.PHONY: all test-mock lib test-hw clean help
+.PHONY: all test-mock lib lib-coproc test-hw clean help
 
 all: test-mock
 
@@ -66,6 +70,20 @@ $(LIB_SO): $(BUILD)/libatomik.o
 	$(CC) -shared -o $@ $< $(LDFLAGS)
 
 $(LIB_A): $(BUILD)/libatomik.o
+	$(AR) rcs $@ $<
+
+# ==============================================================================
+# Co-processor dispatch library (for ARM target)
+# ==============================================================================
+lib-coproc: $(COPROC_SO) $(COPROC_A)
+
+$(BUILD)/atomik_coprocessor.o: $(COPROC_SRC) $(COPROC_HDR) | $(BUILD)
+	$(CC) $(CFLAGS) -fPIC -c -o $@ $<
+
+$(COPROC_SO): $(BUILD)/atomik_coprocessor.o
+	$(CC) -shared -o $@ $< $(LDFLAGS)
+
+$(COPROC_A): $(BUILD)/atomik_coprocessor.o
 	$(AR) rcs $@ $<
 
 # ==============================================================================
@@ -97,6 +115,7 @@ help:
 	@echo "Targets:"
 	@echo "  make test-mock     Build + run tests with mock backend (default)"
 	@echo "  make lib           Build libatomik.so/.a (cross-compile with CROSS=)"
+	@echo "  make lib-coproc    Build co-processor dispatch library"
 	@echo "  make test-hw       Build test binary for hardware target"
 	@echo "  make clean         Remove build artifacts"
 	@echo "  make help          Show this help"
