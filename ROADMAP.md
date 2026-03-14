@@ -1,9 +1,9 @@
 # ATOMiK — Roadmap & Execution Plan
 
-**Document Version:** 2.4
-**Date:** March 12, 2026
+**Document Version:** 2.5
+**Date:** March 14, 2026
 **Author:** Matt Rockwell + Claude (Planning Partner)
-**Status:** ACTIVE — v2 Production SoC deployed, v3.1.0 production deployed (HD 1280x720 HDMI, benchmarked + parallel banks validated), Zynq port: 400 MHz synthesis-validated
+**Status:** ACTIVE — v2 Production SoC deployed, v3.1.0 production deployed (HD 1280x720 HDMI, benchmarked + parallel banks validated), Zynq port: 444 MHz ceiling (N=1), 69.7 Gops/s (N=512), N=1024 sweep in progress
 
 ---
 

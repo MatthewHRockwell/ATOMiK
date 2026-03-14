@@ -1,0 +1,10 @@
+# Generated sweep files (reproducible from fmax_sweep.py)
+tcl/
+top/
+xdc/
+
+# Vivado artifacts
+*.jou
+*.log
+*.str
+*.dcp

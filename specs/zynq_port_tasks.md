@@ -77,8 +77,8 @@
 - [x] Write XDC timing constraints for both domains
   - `vivado/timing.xdc` — dual-clock constraints, false paths on CDC toggle signals
 - [x] Run timing analysis, verify zero TNS
-  - **400 MHz timing-met** (WNS=+0.001ns) with aggressive Vivado directives
-  - Fmax sweep: 100–400 MHz all PASS, 444 MHz achieves 431 MHz, 500 MHz achieves 460 MHz
+  - **444.4 MHz ceiling** (WNS=+0.009ns) with aggressive Vivado directives
+  - Full ceiling characterization: N=1 (444 MHz) through N=512 (136 MHz) — see Phase 2
 
 ### Z1.4 Synthesis and Resource Check
 - [x] Run Vivado synthesis + implementation (PL-only, `build.tcl`)
@@ -119,42 +119,46 @@
 
 ---
 
-## Zynq Phase 2: Multi-Bank Scaling
+## Zynq Phase 2: Multi-Bank Scaling ✅ (Ceiling Characterization Complete)
 
-**Goal**: Scale to N=16 and N=64 banks, benchmark against Gowin results. Explore Zynq-exclusive configurations impossible on the GW1NR-9.
+**Goal**: Scale to N=16 and beyond, benchmark against Gowin results. Explore Zynq-exclusive configurations impossible on the GW1NR-9.
 
-**Dependencies**: Zynq Phase 1 (AXI wrapper + UIO driver required)
+**Status**: Ceiling characterization complete for N=1,4,16,64,256,512. N=1024 sweep in progress.
 
-### Z2.1 N=16 Instantiation
-- [ ] Update block design with `atomik_v3_parallel.v` (N_BANKS=16)
-- [ ] AXI wrapper: add bank_select register, parallel input support
-- [ ] Synthesis, implementation, timing closure at target frequency
-- [ ] Record resource usage and Fmax
-- [ ] Benchmark: throughput vs. N=1, compare against Gowin N=16 (864 Mops/s)
+### Z2.1 N-Bank Parallel Core
+- [x] Write `atomik_core_zynq_parallel.v` — parameterized 1-512+ banks
+- [x] Balanced binary XOR merge tree (no DONT_TOUCH — Vivado LUT6 packing optimal)
+- [x] Shared XPM BRAM (256x64 state table), 4-stage SWAP pipeline
+- [x] Simulation: 10/10 tests for N=4 (`sim/tb_parallel_banks.v`)
+- [x] CI integration: parallel bank testbench in GitHub Actions
 
-### Z2.2 N=64 Exploration
-- [ ] Instantiate N_BANKS=64 (Zynq-exclusive — impossible on Gowin)
-- [ ] Synthesis, implementation, timing closure
-- [ ] Record resource usage, Fmax, throughput
-- [ ] Document scaling curve (N vs. LUT, N vs. Fmax, N vs. throughput)
+### Z2.2 Ceiling Frequency Characterization
+- [x] Enhanced `fmax_sweep.py` with 4 strategy presets + ceiling search algorithm
+- [x] Characterized 6 bank configurations with all-strategy boundary comparison:
 
-### Z2.3 N=256 Stress Test (Optional)
-- [ ] Instantiate N_BANKS=256 (pushing Zynq limits)
-- [ ] Record resource usage (expected ~18,000 LUT6, ~34% utilization)
-- [ ] Determine maximum feasible Fmax
-- [ ] Assess diminishing returns vs. AXI bandwidth bottleneck
+| N | Ceiling | Fmax | LUT (%) | Throughput | Best Strategy |
+|--:|--------:|-----:|--------:|-----------:|:-------------|
+| 1 | 444.4 MHz | 446.2 | 302 (0.6%) | 446 Mops/s | aggressive |
+| 4 | 347.8 MHz | 350.3 | 543 (1.0%) | 1.4 Gops/s | maximum |
+| 16 | 266.7 MHz | 274.0 | 941 (1.8%) | 4.4 Gops/s | maximum |
+| 64 | 205.1 MHz | 209.9 | 3,498 (6.6%) | 13.4 Gops/s | aggressive |
+| 256 | 148.1 MHz | 149.0 | 15,197 (28.6%) | 38.1 Gops/s | baseline |
+| 512 | 135.6 MHz | 136.1 | 23,542 (44.3%) | **69.7 Gops/s** | aggressive |
 
-### Z2.4 Userspace Benchmark Suite
+- [x] Key findings:
+  - Sub-linear LUT scaling: ~34 marginal LUT/bank at N=256→512
+  - Strategy depends on design size: small N → aggressive, medium N → maximum, large N → aggressive/baseline
+  - All configs share 1 BRAM (256x64 state table)
+  - Peak throughput: 69.7 Gops/s (N=512 @ 135.6 MHz)
+- [ ] N=1024 ceiling sweep (in progress — estimated ~100 MHz, ~40K LUT)
+
+### Z2.3 Userspace Benchmark Suite (Pending Hardware)
 - [ ] Port `perf_bench` measurement framework to Linux userspace (UIO-based)
-- [ ] Capture 530+ measurements (matching v3 suite):
-  - Single-op latency: load, accum, read, swap
-  - Burst accumulate: 1, 4, 16, 64, 256 operations
-  - Change detection: ATOMiK vs. software memcmp (256B, 1KB, 4KB)
-  - Memory overhead: ATOMiK tracking cost vs. plain memcpy
+- [ ] Capture 530+ measurements (matching v3 suite)
 - [ ] Cross-platform comparison table: Zynq vs. Gowin (same test vectors)
 - [ ] Store results in `hardware/zynq/experiments/data/` (JSONL pool format)
 
-**Exit criteria**: N=16 timing met, throughput measured and compared against Gowin N=16 (1,080 Mops/s). N=64 synthesized and characterized (Zynq-exclusive data point). Benchmark suite produces 530+ measurements with cross-platform comparison. Scaling curve documented.
+**Exit criteria**: Ceiling characterization COMPLETE for N=1 through N=512. Hardware benchmarks pending board arrival (~Mar 22).
 
 ---
 
