@@ -122,7 +122,7 @@ jobs:
             echo "::error::Zynq parallel testbench did not produce a summary"
             exit 1
           fi
-      - name: Run Zynq co-processor testbench (7 tests)
+      - name: Run Zynq co-processor testbench (13 tests)
         run: |
           echo "=== Zynq Co-Processor Tests (Phase B: RV64I + mailbox) ==="
           cd hardware/zynq
@@ -149,7 +149,7 @@ jobs:
           fi
           vvp sim_coprocessor 2>&1 | tee /tmp/zynq_coproc_sim.log
           if grep -q "ALL TESTS PASSED" /tmp/zynq_coproc_sim.log; then
-            echo "::notice::Zynq co-processor tests passed (7/7)"
+            echo "::notice::Zynq co-processor tests passed (13/13)"
           elif grep -q "TESTS FAILED\|TIMEOUT" /tmp/zynq_coproc_sim.log; then
             echo "::error::Zynq co-processor testbench had failures"
             exit 1
