@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ATOMiK — Delta-State Computing</title>
+    <meta name="description" content="ATOMiK: O(1) state reconstruction, 95-99.9% bandwidth reduction, formally proven with 92 Lean4 theorems. Software library + FPGA hardware.">
+    <style>
+        :root {
+            --bg: #0a0a0f;
+            --surface: #12121a;
+            --border: #1e1e2e;
+            --text: #e0e0e8;
+            --muted: #8888a0;
+            --accent: #4f8fff;
+            --accent2: #22d3ee;
+            --green: #22c55e;
+            --orange: #f59e0b;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+        .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+
+        /* Nav */
+        nav {
+            border-bottom: 1px solid var(--border);
+            padding: 16px 0;
+            position: sticky; top: 0; z-index: 100;
+            background: rgba(10, 10, 15, 0.95);
+            backdrop-filter: blur(8px);
+        }
+        nav .container { display: flex; justify-content: space-between; align-items: center; }
+        nav .logo { font-size: 24px; font-weight: 700; letter-spacing: -0.5px; }
+        nav .logo span { color: var(--accent); }
+        nav .links a {
+            color: var(--muted); text-decoration: none; margin-left: 32px;
+            font-size: 14px; font-weight: 500; transition: color 0.2s;
+        }
+        nav .links a:hover { color: var(--text); }
+
+        /* Hero */
+        .hero { padding: 100px 0 80px; text-align: center; }
+        .hero h1 {
+            font-size: 56px; font-weight: 800; letter-spacing: -2px;
+            line-height: 1.1; margin-bottom: 24px;
+        }
+        .hero h1 .highlight { color: var(--accent); }
+        .hero .subtitle {
+            font-size: 20px; color: var(--muted); max-width: 600px;
+            margin: 0 auto 40px;
+        }
+        .hero .cta-row { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+        .btn {
+            display: inline-block; padding: 14px 28px; border-radius: 8px;
+            font-size: 16px; font-weight: 600; text-decoration: none;
+            transition: all 0.2s;
+        }
+        .btn-primary { background: var(--accent); color: #fff; }
+        .btn-primary:hover { background: #3a7aee; transform: translateY(-1px); }
+        .btn-secondary {
+            background: transparent; color: var(--text);
+            border: 1px solid var(--border);
+        }
+        .btn-secondary:hover { border-color: var(--muted); }
+        .install-cmd {
+            display: inline-block; background: var(--surface); border: 1px solid var(--border);
+            border-radius: 8px; padding: 12px 24px; margin-top: 24px;
+            font-family: 'SF Mono', 'Fira Code', monospace; font-size: 15px;
+            color: var(--accent2); cursor: pointer;
+        }
+        .install-cmd:hover { border-color: var(--accent2); }
+
+        /* Metrics */
+        .metrics {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px;
+            padding: 60px 0;
+        }
+        .metric {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 12px; padding: 32px 24px; text-align: center;
+        }
+        .metric .value { font-size: 36px; font-weight: 800; color: var(--accent2); }
+        .metric .unit { font-size: 16px; color: var(--muted); }
+        .metric .label { font-size: 13px; color: var(--muted); margin-top: 8px; }
+
+        /* Sections */
+        section { padding: 80px 0; }
+        section h2 {
+            font-size: 36px; font-weight: 700; margin-bottom: 16px;
+            letter-spacing: -1px;
+        }
+        section .section-sub { color: var(--muted); font-size: 18px; margin-bottom: 48px; }
+
+        /* Feature grid */
+        .features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+        .feature {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 12px; padding: 32px;
+        }
+        .feature h3 { font-size: 18px; margin-bottom: 12px; }
+        .feature p { color: var(--muted); font-size: 14px; }
+        .feature .tag {
+            display: inline-block; background: rgba(79, 143, 255, 0.1);
+            color: var(--accent); font-size: 12px; font-weight: 600;
+            padding: 4px 10px; border-radius: 4px; margin-bottom: 16px;
+        }
+
+        /* Code block */
+        .code-section { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; }
+        .code-block {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 12px; padding: 32px; font-family: 'SF Mono', 'Fira Code', monospace;
+            font-size: 14px; line-height: 1.8; overflow-x: auto;
+        }
+        .code-block .kw { color: var(--accent); }
+        .code-block .fn { color: var(--accent2); }
+        .code-block .str { color: var(--green); }
+        .code-block .num { color: var(--orange); }
+        .code-block .cmt { color: #555; }
+
+        /* Benchmark table */
+        .bench-table {
+            width: 100%; border-collapse: collapse;
+            background: var(--surface); border-radius: 12px;
+            overflow: hidden; border: 1px solid var(--border);
+        }
+        .bench-table th {
+            text-align: left; padding: 16px 20px;
+            font-size: 13px; color: var(--muted); text-transform: uppercase;
+            letter-spacing: 0.5px; border-bottom: 1px solid var(--border);
+        }
+        .bench-table td {
+            padding: 16px 20px; border-bottom: 1px solid var(--border);
+            font-size: 15px;
+        }
+        .bench-table tr:last-child td { border-bottom: none; }
+        .bench-table .advantage {
+            color: var(--green); font-weight: 700;
+        }
+
+        /* Pricing */
+        .pricing { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+        .price-card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 12px; padding: 40px 32px;
+        }
+        .price-card.featured { border-color: var(--accent); }
+        .price-card h3 { font-size: 20px; margin-bottom: 8px; }
+        .price-card .price {
+            font-size: 36px; font-weight: 800; margin: 16px 0;
+        }
+        .price-card .price span { font-size: 16px; color: var(--muted); font-weight: 400; }
+        .price-card ul {
+            list-style: none; margin: 24px 0;
+        }
+        .price-card li {
+            padding: 8px 0; font-size: 14px; color: var(--muted);
+            border-bottom: 1px solid var(--border);
+        }
+        .price-card li::before { content: ""; margin-right: 8px; color: var(--green); }
+
+        /* Investor section */
+        .investor-section {
+            background: linear-gradient(135deg, rgba(79,143,255,0.05), rgba(34,211,238,0.05));
+            border: 1px solid var(--border); border-radius: 16px;
+            padding: 64px; text-align: center;
+        }
+        .investor-section h2 { margin-bottom: 16px; }
+        .investor-stats {
+            display: flex; justify-content: center; gap: 48px; margin: 32px 0;
+        }
+        .investor-stat .val { font-size: 28px; font-weight: 700; color: var(--accent2); }
+        .investor-stat .lbl { font-size: 13px; color: var(--muted); }
+
+        /* Footer */
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 40px 0; text-align: center;
+            color: var(--muted); font-size: 13px;
+        }
+        footer a { color: var(--accent); text-decoration: none; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 36px; }
+            .metrics { grid-template-columns: repeat(2, 1fr); }
+            .features { grid-template-columns: 1fr; }
+            .code-section { grid-template-columns: 1fr; }
+            .pricing { grid-template-columns: 1fr; }
+            .investor-stats { flex-direction: column; gap: 16px; }
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <div class="container">
+        <div class="logo">ATOM<span>i</span>K</div>
+        <div class="links">
+            <a href="#features">Features</a>
+            <a href="#benchmarks">Benchmarks</a>
+            <a href="#pricing">Pricing</a>
+            <a href="#investors">Investors</a>
+            <a href="https://github.com/MatthewHRockwell/ATOMiK">GitHub</a>
+        </div>
+    </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+    <div class="container">
+        <h1>State management,<br><span class="highlight">reconstructed.</span></h1>
+        <p class="subtitle">
+            ATOMiK replaces snapshots, event replay, and full-state replication
+            with a 4-operation algebra that reduces bandwidth by 99% and
+            reconstructs state in O(1). Formally proven. Hardware-accelerated.
+        </p>
+        <div class="cta-row">
+            <a href="#pricing" class="btn btn-primary">Get Started</a>
+            <a href="https://github.com/MatthewHRockwell/ATOMiK" class="btn btn-secondary">View on GitHub</a>
+        </div>
+        <div class="install-cmd" onclick="navigator.clipboard.writeText('pip install atomik-core')" title="Click to copy">
+            $ pip install atomik-core
+        </div>
+    </div>
+</section>
+
+<!-- Key Metrics -->
+<div class="container">
+    <div class="metrics">
+        <div class="metric">
+            <div class="value">99.9%</div>
+            <div class="label">Bandwidth Reduction</div>
+        </div>
+        <div class="metric">
+            <div class="value">92</div>
+            <div class="label">Lean4 Formal Proofs</div>
+        </div>
+        <div class="metric">
+            <div class="value">333,333x</div>
+            <div class="label">Memory Savings (Rollback)</div>
+        </div>
+        <div class="metric">
+            <div class="value">1,291x</div>
+            <div class="label">Faster Change Detection</div>
+        </div>
+    </div>
+</div>
+
+<!-- Features -->
+<section id="features">
+    <div class="container">
+        <h2>Why ATOMiK</h2>
+        <p class="section-sub">Four operations. Zero dependencies. Formally proven correctness.</p>
+        <div class="features">
+            <div class="feature">
+                <div class="tag">BANDWIDTH</div>
+                <h3>95-99.9% Less Traffic</h3>
+                <p>Send 8-byte deltas instead of full state copies. A 64KB state with 10,000 updates: ATOMiK sends 80KB total. Full replication sends 655MB.</p>
+            </div>
+            <div class="feature">
+                <div class="tag">CONVERGENCE</div>
+                <h3>No Consensus Protocol</h3>
+                <p>XOR commutativity means deltas can arrive in any order. No Raft, no Paxos, no leader election. All nodes converge to the same state.</p>
+            </div>
+            <div class="feature">
+                <div class="tag">MEMORY</div>
+                <h3>O(1) State Tracking</h3>
+                <p>24 bytes per context regardless of history length. 1 million checkpoints costs 24 bytes, not 8MB of snapshots.</p>
+            </div>
+            <div class="feature">
+                <div class="tag">CORRECTNESS</div>
+                <h3>92 Lean4 Proofs</h3>
+                <p>Every algebraic property is formally proven: commutativity, associativity, self-inverse, identity. Not tested — proven.</p>
+            </div>
+            <div class="feature">
+                <div class="tag">DETECTION</div>
+                <h3>1,291x Faster Changes</h3>
+                <p>Incremental fingerprinting detects changes in O(1) per field update. SHA-256 rescans the entire buffer every time.</p>
+            </div>
+            <div class="feature">
+                <div class="tag">UPGRADE PATH</div>
+                <h3>Software &rarr; Hardware</h3>
+                <p>Same API, same algebra. When you need more: C library (50-100x), FPGA (1,000x), ASIC (10,000x). No code changes.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Code Example -->
+<section style="border-top: 1px solid var(--border);">
+    <div class="container">
+        <div class="code-section">
+            <div>
+                <h2>4 operations. That's it.</h2>
+                <p class="section-sub" style="margin-bottom: 24px;">
+                    LOAD sets the reference. ACCUM XORs a delta.
+                    READ reconstructs the state. SWAP starts a new epoch.
+                    Everything else — rollback, merge, fingerprinting —
+                    is built on these four.
+                </p>
+                <p style="color: var(--muted); font-size: 14px;">
+                    Works on Python 3.9+, any CPU. Zero dependencies.<br>
+                    C header-only library also available.
+                </p>
+            </div>
+            <div class="code-block">
+<span class="kw">from</span> atomik_core <span class="kw">import</span> AtomikContext
+
+ctx = AtomikContext()
+ctx.<span class="fn">load</span>(<span class="num">0xDEADBEEF</span>)
+ctx.<span class="fn">accum</span>(<span class="num">0x000000FF</span>)    <span class="cmt"># XOR delta</span>
+state = ctx.<span class="fn">read</span>()       <span class="cmt"># 0xDEADBE10</span>
+
+<span class="cmt"># Undo? Just re-apply the same delta.</span>
+ctx.<span class="fn">rollback</span>(<span class="num">0x000000FF</span>)
+<span class="kw">assert</span> ctx.<span class="fn">read</span>() == <span class="num">0xDEADBEEF</span>
+
+<span class="cmt"># Merge two independent accumulators.</span>
+<span class="cmt"># Order doesn't matter (commutativity).</span>
+a = AtomikContext()
+b = AtomikContext()
+a.<span class="fn">load</span>(<span class="num">0xCAFE</span>); b.<span class="fn">load</span>(<span class="num">0xCAFE</span>)
+a.<span class="fn">accum</span>(<span class="num">0x11</span>); b.<span class="fn">accum</span>(<span class="num">0x22</span>)
+a.<span class="fn">merge</span>(b)  <span class="cmt"># a now has both deltas</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Benchmarks -->
+<section id="benchmarks" style="border-top: 1px solid var(--border);">
+    <div class="container">
+        <h2>Benchmarks</h2>
+        <p class="section-sub">Measured on x86 (Python 3.12). C library is 50-100x faster. FPGA hardware is 1,000x faster.</p>
+        <table class="bench-table">
+            <thead>
+                <tr>
+                    <th>Metric</th>
+                    <th>ATOMiK</th>
+                    <th>Conventional</th>
+                    <th>Advantage</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Network bandwidth (1KB state, 10K updates)</td>
+                    <td>80 KB</td>
+                    <td>10.2 MB (full copies)</td>
+                    <td class="advantage">128x reduction</td>
+                </tr>
+                <tr>
+                    <td>Network bandwidth (64KB state, 10K updates)</td>
+                    <td>80 KB</td>
+                    <td>655 MB (full copies)</td>
+                    <td class="advantage">8,192x reduction</td>
+                </tr>
+                <tr>
+                    <td>Rollback memory (10K checkpoints)</td>
+                    <td>24 bytes</td>
+                    <td>80 KB (snapshot stack)</td>
+                    <td class="advantage">3,333x less memory</td>
+                </tr>
+                <tr>
+                    <td>Rollback memory (1M checkpoints)</td>
+                    <td>24 bytes</td>
+                    <td>8 MB (snapshot stack)</td>
+                    <td class="advantage">333,333x less memory</td>
+                </tr>
+                <tr>
+                    <td>Change detection (1MB buffer, incremental)</td>
+                    <td>6 ms</td>
+                    <td>7,864 ms (SHA-256)</td>
+                    <td class="advantage">1,291x faster</td>
+                </tr>
+                <tr>
+                    <td>Multi-node convergence (8 nodes)</td>
+                    <td>No ordering needed</td>
+                    <td>Sort 8,000 events</td>
+                    <td class="advantage">1.7x + no consensus</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<!-- Pricing -->
+<section id="pricing" style="border-top: 1px solid var(--border);">
+    <div class="container">
+        <h2>Pricing</h2>
+        <p class="section-sub">Start free. Scale when ready.</p>
+        <div class="pricing">
+            <div class="price-card">
+                <h3>Community</h3>
+                <div class="price">Free</div>
+                <ul>
+                    <li>Full atomik-core library</li>
+                    <li>Python + C implementations</li>
+                    <li>4-operation API</li>
+                    <li>AtomikTable, DeltaStream, Fingerprint</li>
+                    <li>Apache 2.0 (evaluation)</li>
+                    <li>Community support</li>
+                </ul>
+                <a href="https://github.com/MatthewHRockwell/ATOMiK" class="btn btn-secondary" style="width:100%;text-align:center;">Get Started</a>
+            </div>
+            <div class="price-card featured">
+                <h3>Professional</h3>
+                <div class="price">$99<span>/mo per seat</span></div>
+                <ul>
+                    <li>Everything in Community</li>
+                    <li>Production license</li>
+                    <li>Priority email support (48hr SLA)</li>
+                    <li>Benchmarking suite</li>
+                    <li>Integration guides</li>
+                    <li>Rust + JavaScript libraries</li>
+                </ul>
+                <a href="mailto:matt@atomik.dev?subject=ATOMiK Professional License" class="btn btn-primary" style="width:100%;text-align:center;">Contact Sales</a>
+            </div>
+            <div class="price-card">
+                <h3>Enterprise</h3>
+                <div class="price">$499<span>/mo per seat</span></div>
+                <ul>
+                    <li>Everything in Professional</li>
+                    <li>4-hour response SLA</li>
+                    <li>Dedicated support channel</li>
+                    <li>Custom integration consulting</li>
+                    <li>Formal verification certificate</li>
+                    <li>Hardware acceleration path</li>
+                </ul>
+                <a href="mailto:matt@atomik.dev?subject=ATOMiK Enterprise License" class="btn btn-secondary" style="width:100%;text-align:center;">Contact Sales</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Investor Section -->
+<section id="investors" style="border-top: 1px solid var(--border);">
+    <div class="container">
+        <div class="investor-section">
+            <h2>For Investors</h2>
+            <p style="color: var(--muted); font-size: 18px; margin-bottom: 16px;">
+                ATOMiK is a fundamentally new approach to state management —
+                proven mathematically, validated in hardware, ready for market.
+            </p>
+            <div class="investor-stats">
+                <div class="investor-stat">
+                    <div class="val">92</div>
+                    <div class="lbl">Lean4 Formal Proofs</div>
+                </div>
+                <div class="investor-stat">
+                    <div class="val">417+</div>
+                    <div class="lbl">Tests (SW + HW)</div>
+                </div>
+                <div class="investor-stat">
+                    <div class="val">3</div>
+                    <div class="lbl">FPGA Platforms Validated</div>
+                </div>
+                <div class="investor-stat">
+                    <div class="val">69.7</div>
+                    <div class="lbl">Gops/s Peak (FPGA)</div>
+                </div>
+                <div class="investor-stat">
+                    <div class="val">$50B</div>
+                    <div class="lbl">Serviceable Market</div>
+                </div>
+            </div>
+            <p style="color: var(--muted); font-size: 14px; margin: 24px 0;">
+                Patent pending. Software + hardware IP licensing model.
+                ARM-comparable business model with 85-95% gross margins.
+            </p>
+            <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
+                <a href="mailto:matt@atomik.dev?subject=ATOMiK Investment Inquiry" class="btn btn-primary">Contact Founder</a>
+                <a href="https://github.com/MatthewHRockwell/ATOMiK" class="btn btn-secondary">Technical Deep Dive</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer>
+    <div class="container">
+        <p>&copy; 2026 ATOMiK Project. Patent Pending. <a href="https://github.com/MatthewHRockwell/ATOMiK">GitHub</a></p>
+    </div>
+</footer>
+
+</body>
+</html>

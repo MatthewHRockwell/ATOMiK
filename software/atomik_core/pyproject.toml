@@ -1,0 +1,59 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "atomik-core"
+version = "0.1.0"
+description = "ATOMiK delta-state algebra — O(1) state reconstruction for any processor"
+readme = "README.md"
+license = {text = "Apache-2.0"}
+requires-python = ">=3.9"
+authors = [
+    {name = "ATOMiK Project", email = "matt@atomik.dev"}
+]
+keywords = [
+    "state-management",
+    "delta-state",
+    "xor-algebra",
+    "lock-free",
+    "distributed-systems",
+    "fingerprinting",
+    "change-detection",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: System :: Distributed Computing",
+    "Typing :: Typed",
+]
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/MatthewHRockwell/ATOMiK"
+Repository = "https://github.com/MatthewHRockwell/ATOMiK.git"
+Issues = "https://github.com/MatthewHRockwell/ATOMiK/issues"
+
+[tool.setuptools.packages.find]
+include = ["atomik_core*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = "-v --tb=short"
