@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Installation Guide — ATOMiK</title>
+    <meta name="description" content="Install ATOMiK delta-state computing libraries and kernel module. Python, C, and Linux kernel module installation instructions.">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <style>
+        :root {
+            --bg: #ffffff;
+            --surface: #f8f9fa;
+            --surface2: #f0f1f3;
+            --border: #e2e4e8;
+            --text: #1a1a2e;
+            --muted: #6b7280;
+            --accent: #4f8fff;
+            --accent2: #0ea5e9;
+            --green: #16a34a;
+            --orange: #d97706;
+            --code-bg: #1e1e2e;
+            --code-text: #cdd6f4;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Nav - light theme */
+        nav {
+            border-bottom: 1px solid var(--border);
+            padding: 16px 0;
+            position: sticky; top: 0; z-index: 100;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(16px);
+        }
+        nav .container { display: flex; justify-content: space-between; align-items: center; }
+        nav .logo { font-size: 24px; font-weight: 700; letter-spacing: -0.5px; text-decoration: none; color: var(--text); }
+        nav .logo span { color: var(--accent); }
+        nav .links a {
+            color: var(--muted); text-decoration: none; margin-left: 32px;
+            font-size: 14px; font-weight: 500; transition: color 0.2s;
+        }
+        nav .links a:hover { color: var(--text); }
+
+        .container { max-width: 900px; margin: 0 auto; padding: 0 24px; }
+
+        /* Welcome banner */
+        .welcome-banner {
+            background: linear-gradient(135deg, rgba(79,143,255,0.08), rgba(14,165,233,0.08));
+            border: 1px solid rgba(79,143,255,0.2);
+            border-radius: 12px;
+            padding: 24px 32px;
+            margin: 40px 0 48px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .welcome-banner .welcome-icon {
+            width: 48px; height: 48px;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+            color: #fff;
+            font-size: 24px;
+        }
+        .welcome-banner h2 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+        .welcome-banner p {
+            font-size: 14px;
+            color: var(--muted);
+        }
+
+        /* Page header */
+        .page-header {
+            padding: 48px 0 0;
+            text-align: center;
+        }
+        .page-header h1 {
+            font-size: 36px;
+            font-weight: 700;
+            letter-spacing: -1px;
+            margin-bottom: 8px;
+        }
+        .page-header p {
+            font-size: 16px;
+            color: var(--muted);
+        }
+
+        /* Tab selector */
+        .tab-bar {
+            display: flex;
+            gap: 0;
+            border-bottom: 2px solid var(--border);
+            margin-bottom: 40px;
+        }
+        .tab {
+            padding: 14px 28px;
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--muted);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.2s;
+            background: none;
+            border-top: none;
+            border-left: none;
+            border-right: none;
+            font-family: inherit;
+        }
+        .tab:hover {
+            color: var(--text);
+        }
+        .tab.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+            font-weight: 600;
+        }
+
+        /* Install sections */
+        .install-section {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        .install-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .step {
+            margin-bottom: 36px;
+        }
+        .step-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        .step-num {
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            color: #fff;
+            font-size: 14px;
+            font-weight: 700;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .step-header h3 {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        .step p {
+            color: var(--muted);
+            font-size: 14px;
+            margin-bottom: 12px;
+            padding-left: 44px;
+        }
+
+        /* Code blocks */
+        .code-block {
+            background: var(--code-bg);
+            color: var(--code-text);
+            border-radius: 10px;
+            padding: 20px 24px;
+            font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+            font-size: 14px;
+            line-height: 1.7;
+            overflow-x: auto;
+            position: relative;
+            margin-left: 44px;
+            margin-bottom: 8px;
+        }
+        .code-block .lang-tag {
+            position: absolute;
+            top: 8px; right: 12px;
+            font-size: 11px;
+            color: #6b7280;
+            font-family: -apple-system, system-ui, sans-serif;
+            font-weight: 500;
+        }
+        .code-block .copy-btn {
+            position: absolute;
+            top: 8px; right: 60px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 4px;
+            color: #888;
+            font-size: 11px;
+            padding: 2px 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: -apple-system, system-ui, sans-serif;
+        }
+        .code-block .copy-btn:hover {
+            background: rgba(255,255,255,0.15);
+            color: #ccc;
+        }
+        .code-comment { color: #6a9955; }
+        .code-cmd { color: #dcdcaa; }
+        .code-flag { color: #ce9178; }
+        .code-string { color: #ce9178; }
+        .code-keyword { color: #569cd6; }
+
+        /* Info boxes */
+        .info-box {
+            background: rgba(79,143,255,0.06);
+            border: 1px solid rgba(79,143,255,0.2);
+            border-radius: 8px;
+            padding: 14px 20px;
+            font-size: 14px;
+            color: var(--muted);
+            margin: 12px 0 12px 44px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+        .info-box .info-icon {
+            color: var(--accent);
+            font-size: 16px;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .success-box {
+            background: rgba(22,163,74,0.06);
+            border: 1px solid rgba(22,163,74,0.2);
+            border-radius: 8px;
+            padding: 14px 20px;
+            font-size: 14px;
+            color: var(--muted);
+            margin: 12px 0 12px 44px;
+        }
+        .success-box strong { color: var(--green); }
+
+        /* Next steps */
+        .next-steps {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 32px;
+            margin-top: 48px;
+            margin-bottom: 60px;
+        }
+        .next-steps h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+        .next-steps-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+        .next-step-card {
+            padding: 20px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: var(--bg);
+            transition: all 0.2s;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        .next-step-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+        }
+        .next-step-card h4 {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .next-step-card p {
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        /* Footer */
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 32px 0;
+            text-align: center;
+            color: var(--muted);
+            font-size: 13px;
+        }
+        footer a { color: var(--accent); text-decoration: none; }
+        footer a:hover { text-decoration: underline; }
+
+        @media (max-width: 768px) {
+            .tab-bar { overflow-x: auto; }
+            .tab { padding: 12px 16px; font-size: 13px; white-space: nowrap; }
+            .code-block { margin-left: 0; }
+            .step p { padding-left: 0; }
+            .info-box { margin-left: 0; }
+            .success-box { margin-left: 0; }
+            .next-steps-grid { grid-template-columns: 1fr; }
+            .welcome-banner { flex-direction: column; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <div class="container">
+        <a href="/landing.html" class="logo">ATOM<span>i</span>K</a>
+        <div class="links">
+            <a href="/landing.html">Home</a>
+            <a href="/landing.html#pricing">Pricing</a>
+            <a href="https://github.com/MatthewHRockwell/ATOMiK">GitHub</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="welcome-banner" id="welcome-banner" style="display: none;">
+        <div class="welcome-icon">&#x2295;</div>
+        <div>
+            <h2 id="welcome-name">Welcome to ATOMiK!</h2>
+            <p>Your account has been created. Follow the steps below to start using delta-state computing.</p>
+        </div>
+    </div>
+
+    <div class="page-header">
+        <h1>Installation Guide</h1>
+        <p>Choose your platform and follow the steps to get started.</p>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tab-bar">
+        <button class="tab active" onclick="showTab('python')">Python</button>
+        <button class="tab" onclick="showTab('c')">C / C++</button>
+        <button class="tab" onclick="showTab('kernel')">Linux Kernel Module</button>
+    </div>
+
+    <!-- ===== Python ===== -->
+    <div class="install-section active" id="tab-python">
+        <div class="step">
+            <div class="step-header">
+                <div class="step-num">1</div>
+                <h3>Install the library</h3>
+            </div>
+            <p>ATOMiK requires Python 3.9 or later. Install from source:</p>
+            <div class="code-block">
+                <span class="copy-btn" onclick="copyCode(this)">Copy</span>
+                <span class="lang-tag">Terminal</span>
+git clone https://github.com/MatthewHRockwell/ATOMiK.git
+cd ATOMiK/software/atomik_core
+pip install -e .
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-header">
+                <div class="step-num">2</div>
+                <h3>Verify the installation</h3>
+            </div>
+            <p>Run a quick test to confirm everything works:</p>
+            <div class="code-block">
+                <span class="copy-btn" onclick="copyCode(this)">Copy</span>
+                <span class="lang-tag">Python</span>
+<span class="code-keyword">from</span> atomik_core <span class="code-keyword">import</span> AtomikContext
+
+ctx = AtomikContext()
+ctx.load(<span class="code-string">0xDEADBEEF</span>)
+ctx.accum(<span class="code-string">0x000000FF</span>)
+<span class="code-keyword">assert</span> ctx.read() == <span class="code-string">0xDEADBE10</span>
+<span class="code-keyword">print</span>(<span class="code-string">"ATOMiK is working!"</span>)
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-header">
+                <div class="step-num">3</div>
+                <h3>Run the test suite</h3>
+            </div>
+            <p>Validate all 353 tests pass on your system:</p>
+            <div class="code-block">
+                <span class="copy-btn" onclick="copyCode(this)">Copy</span>
+                <span class="lang-tag">Terminal</span>
+cd ATOMiK/software/atomik_core
+python -m pytest tests/ -v
+            </div>
+            <div class="success-box">
+                <strong>Expected:</strong> 353 tests passed, covering all algebraic properties, edge cases, and integration scenarios.
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== C / C++ ===== -->
+    <div class="install-section" id="tab-c">
+        <div class="step">
+            <div class="step-header">
+                <div class="step-num">1</div>
+                <h3>Download the header</h3>
+            </div>
+            <p>ATOMiK for C is a single header file. No dependencies, no build system required.</p>
+            <div class="code-block">
+                <span class="copy-btn" onclick="copyCode(this)">Copy</span>
+                <span class="lang-tag">Terminal</span>
+git clone https://github.com/MatthewHRockwell/ATOMiK.git
+<span class="code-comment"># The header is at:</span>
+<span class="code-comment"># ATOMiK/software/atomik_core_c/atomik_core.h</span>
+            </div>
+            <div class="info-box">
+                <span class="info-icon">i</span>
+                <span>Copy <code>atomik_core.h</code> into your project's include directory. That's all you need.</span>
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-header">
+                <div class="step-num">2</div>
+                <h3>Include and use</h3>
+            </div>
+            <p>Include the header and start using the 4-operation API:</p>
+            <div class="code-block">
+                <span class="copy-btn" onclick="copyCode(this)">Copy</span>
+                <span class="lang-tag">C</span>
+<span class="code-keyword">#include</span> <span class="code-string">"atomik_core.h"</span>
+
+<span class="code-keyword">int</span> main() {
+    <span class="code-keyword">struct</span> atomik_table *t = atomik_table_create(<span class="code-string">1024</span>);
+    atomik_load(t, <span class="code-string">0</span>, <span class="code-string">0xDEADBEEF</span>);
+    atomik_accum(t, <span class="code-string">0</span>, <span class="code-string">0x000000FF</span>);
+
+    uint64_t state = atomik_read(t, <span class="code-string">0</span>);
+    <span class="code-comment">// state == 0xDEADBE10</span>
+
+    atomik_table_destroy(t);
+    <span class="code-keyword">return</span> <span class="code-string">0</span>;
+}
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-header">
+                <div class="step-num">3</div>
+                <h3>Compile</h3>
+            </div>
+            <p>Compile with any C99-compatible compiler:</p>
+            <div class="code-block">
+                <span class="copy-btn" onclick="copyCode(this)">Copy</span>
+                <span class="lang-tag">Terminal</span>
+gcc -O2 -o myapp myapp.c
+<span class="code-comment"># Or with C++:</span>
+g++ -O2 -std=c++17 -o myapp myapp.cpp
+            </div>
+            <div class="success-box">
+                <strong>Performance:</strong> The C library achieves ~500M ops/sec on modern x86 hardware. Zero dependencies, zero allocations after init.
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Kernel Module ===== -->
+    <div class="install-section" id="tab-kernel">
+        <div class="info-box" style="margin-left: 0; margin-bottom: 24px;">
+            <span class="info-icon">i</span>
+            <span>The kernel module requires a <strong>Professional</strong> or <strong>Enterprise</strong> subscription. It includes a 90-day free trial. <a href="/get-started.html?plan=professional" style="color: var(--accent);">Start your trial</a></span>
+        </div>
+
+        <div class="step">
+            <div class="step-header">
+                <div class="step-num">1</div>
+                <h3>Prerequisites</h3>
+            </div>
+            <p>Ensure you have kernel headers and build tools installed:</p>
+            <div class="code-block">
+                <span class="copy-btn" onclick="copyCode(this)">Copy</span>
+                <span class="lang-tag">Terminal</span>
+<span class="code-comment"># Ubuntu / Debian</span>
+sudo apt update
+sudo apt install build-essential linux-headers-$(uname -r) dkms
+
+<span class="code-comment"># Fedora / RHEL</span>
+sudo dnf install kernel-devel kernel-headers gcc make dkms
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-header">
+                <div class="step-num">2</div>
+                <h3>Clone and install</h3>
+            </div>
+            <p>Run the automated installer:</p>
+            <div class="code-block">
+                <span class="copy-btn" onclick="copyCode(this)">Copy</span>
+                <span class="lang-tag">Terminal</span>
+git clone https://github.com/MatthewHRockwell/ATOMiK.git
+cd ATOMiK/software/atomik_kmod
+sudo ./install.sh
+            </div>
+            <p>The installer will:</p>
+            <div class="info-box">
+                <span class="info-icon">&#x2713;</span>
+                <span>Build the module and userspace tools, set up DKMS for automatic kernel upgrades, create the <code>atomik</code> system group, install the systemd service, and configure udev rules.</span>
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-header">
+                <div class="step-num">3</div>
+                <h3>Verify the installation</h3>
+            </div>
+            <p>Check that the module is loaded and running:</p>
+            <div class="code-block">
+                <span class="copy-btn" onclick="copyCode(this)">Copy</span>
+                <span class="lang-tag">Terminal</span>
+<span class="code-comment"># Check module status</span>
+atomik-status
+
+<span class="code-comment"># Expected output:</span>
+<span class="code-comment"># ATOMiK v0.1.0 -- Delta-State Accelerator</span>
+<span class="code-comment">#   Backend:     software</span>
+<span class="code-comment">#   License:     trial (90 days remaining)</span>
+<span class="code-comment">#   Status:      ACTIVE</span>
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-header">
+                <div class="step-num">4</div>
+                <h3>Run the test suite</h3>
+            </div>
+            <p>Validate all 34 tests pass:</p>
+            <div class="code-block">
+                <span class="copy-btn" onclick="copyCode(this)">Copy</span>
+                <span class="lang-tag">Terminal</span>
+<span class="code-comment"># Quick smoke test (18 tests)</span>
+sg atomik -c "./tools/atomik-test"
+
+<span class="code-comment"># Full test suite (34 tests)</span>
+sudo ./tools/atomik-full-test.sh
+            </div>
+            <div class="success-box">
+                <strong>Expected:</strong> 34/34 tests pass covering functional correctness, security, licensing, and stability.
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-header">
+                <div class="step-num">5</div>
+                <h3>Add your license key (optional)</h3>
+            </div>
+            <p>After purchasing, add your license key to persist across reboots:</p>
+            <div class="code-block">
+                <span class="copy-btn" onclick="copyCode(this)">Copy</span>
+                <span class="lang-tag">Terminal</span>
+<span class="code-comment"># Add your license key</span>
+echo 'options atomik license_key=ATOMIK-XXXXXXXX-XXXXXXXX-XXXXXXXX-XXXXXXXX-XXXXXXXX' | \
+    sudo tee /etc/modprobe.d/atomik.conf
+sudo chmod 600 /etc/modprobe.d/atomik.conf
+
+<span class="code-comment"># Reload the module</span>
+sudo systemctl restart atomik
+            </div>
+        </div>
+    </div>
+
+    <!-- Next Steps -->
+    <div class="next-steps">
+        <h3>Next Steps</h3>
+        <div class="next-steps-grid">
+            <a href="https://github.com/MatthewHRockwell/ATOMiK/tree/main/software/atomik_core/examples" class="next-step-card">
+                <h4>Examples</h4>
+                <p>Working code samples for common use cases.</p>
+            </a>
+            <a href="https://github.com/MatthewHRockwell/ATOMiK/tree/main/docs" class="next-step-card">
+                <h4>Documentation</h4>
+                <p>Full API reference and architecture guides.</p>
+            </a>
+            <a href="https://github.com/MatthewHRockwell/ATOMiK" class="next-step-card">
+                <h4>Source Code</h4>
+                <p>Browse the full repository, formal proofs, and hardware designs.</p>
+            </a>
+        </div>
+    </div>
+</div>
+
+<footer>
+    <div class="container">
+        <p>&copy; 2026 ATOMiK Project. Patent Pending. All rights reserved.</p>
+        <p style="margin-top: 8px;">
+            <a href="/landing.html">Home</a> &nbsp;&middot;&nbsp;
+            <a href="/privacy">Privacy</a> &nbsp;&middot;&nbsp;
+            <a href="/terms">Terms</a> &nbsp;&middot;&nbsp;
+            <a href="mailto:support@atomik.tech">Support</a>
+        </p>
+    </div>
+</footer>
+
+<script>
+// Show welcome banner if coming from signup
+const params = new URLSearchParams(window.location.search);
+const userName = params.get('name');
+const userPlan = params.get('plan');
+
+if (userName) {
+    const banner = document.getElementById('welcome-banner');
+    banner.style.display = 'flex';
+    document.getElementById('welcome-name').textContent = 'Welcome, ' + userName + '!';
+
+    // Auto-select the right tab based on plan
+    if (userPlan === 'professional' || userPlan === 'enterprise') {
+        showTab('kernel');
+    }
+}
+
+function showTab(tabId) {
+    // Update tab buttons
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => {
+        if (t.textContent.toLowerCase().includes(tabId) ||
+            (tabId === 'python' && t.textContent === 'Python') ||
+            (tabId === 'c' && t.textContent === 'C / C++') ||
+            (tabId === 'kernel' && t.textContent === 'Linux Kernel Module')) {
+            t.classList.add('active');
+        }
+    });
+
+    // Show corresponding section
+    document.querySelectorAll('.install-section').forEach(s => s.classList.remove('active'));
+    document.getElementById('tab-' + tabId).classList.add('active');
+}
+
+function copyCode(btn) {
+    const block = btn.parentElement;
+    const text = block.textContent
+        .replace('Copy', '')
+        .replace(block.querySelector('.lang-tag')?.textContent || '', '')
+        .trim();
+    navigator.clipboard.writeText(text).then(() => {
+        btn.textContent = 'Copied!';
+        setTimeout(() => { btn.textContent = 'Copy'; }, 1500);
+    });
+}
+</script>
+
+</body>
+</html>
