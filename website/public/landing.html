@@ -204,11 +204,70 @@
         /* ========== Algebra Diagram (Hero) ========== */
         .algebra-visual {
             margin: 56px auto 0;
-            max-width: 700px;
+            max-width: 740px;
             animation: fadeUp 0.8s ease-out 0.6s both;
             position: relative;
         }
-        .algebra-visual svg { width: 100%; height: auto; }
+        .algebra-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0;
+        }
+        .algebra-box {
+            background: rgba(12,12,20,0.9);
+            border-radius: 10px;
+            padding: 12px 20px;
+            text-align: center;
+            min-width: 150px;
+            overflow: hidden;
+            position: relative;
+        }
+        .algebra-box.ref { border: 1.5px solid #4f8fff; }
+        .algebra-box.acc { border: 1.5px solid #22d3ee; }
+        .algebra-box.res { border: 1.5px solid #22c55e; min-width: 170px; }
+        .algebra-label {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+        .algebra-box.ref .algebra-label { color: #4f8fff; }
+        .algebra-box.acc .algebra-label { color: #22d3ee; }
+        .algebra-box.res .algebra-label { color: #22c55e; }
+        .algebra-scroller {
+            height: 22px;
+            overflow: hidden;
+            position: relative;
+        }
+        .algebra-scroller-inner {
+            position: absolute;
+            left: 0; right: 0;
+            transition: transform 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+        .algebra-val {
+            font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+            font-size: 14px;
+            font-weight: 700;
+            color: #e0e0e8;
+            height: 22px;
+            line-height: 22px;
+            white-space: nowrap;
+        }
+        .algebra-op {
+            font-size: 28px;
+            font-weight: 700;
+            color: #a855f7;
+            padding: 0 16px;
+            line-height: 1;
+        }
+        .algebra-eq {
+            font-size: 22px;
+            font-weight: 700;
+            color: #8888a0;
+            padding: 0 16px;
+            font-family: monospace;
+        }
 
         /* ========== Metrics ========== */
         .metrics {
@@ -698,30 +757,28 @@
 
         <!-- Algebra Visual -->
         <div class="algebra-visual">
-            <svg viewBox="0 0 700 120" xmlns="http://www.w3.org/2000/svg">
-                <!-- Reference box -->
-                <rect x="20" y="25" width="140" height="70" rx="10" fill="#12121a" stroke="#4f8fff" stroke-width="1.5"/>
-                <text x="90" y="55" text-anchor="middle" fill="#4f8fff" font-size="12" font-weight="600" font-family="system-ui">REFERENCE</text>
-                <text x="90" y="75" text-anchor="middle" fill="#e0e0e8" font-size="14" font-weight="700" font-family="monospace">0xDEADBEEF</text>
-
-                <!-- XOR symbol (centered between boxes) -->
-                <text x="210" y="68" text-anchor="middle" fill="#a855f7" font-size="32" font-weight="700" font-family="system-ui">&#x2295;</text>
-                <line x1="165" y1="60" x2="195" y2="60" stroke="#1e1e2e" stroke-width="1.5" stroke-dasharray="4,4"/>
-
-                <!-- Accumulator box -->
-                <rect x="260" y="25" width="140" height="70" rx="10" fill="#12121a" stroke="#22d3ee" stroke-width="1.5"/>
-                <text x="330" y="55" text-anchor="middle" fill="#22d3ee" font-size="12" font-weight="600" font-family="system-ui">ACCUMULATOR</text>
-                <text x="330" y="75" text-anchor="middle" fill="#e0e0e8" font-size="14" font-weight="700" font-family="monospace">0x000000FF</text>
-
-                <!-- Equals -->
-                <text x="450" y="66" text-anchor="middle" fill="#8888a0" font-size="24" font-weight="700" font-family="monospace">=</text>
-                <line x1="405" y1="60" x2="435" y2="60" stroke="#1e1e2e" stroke-width="1.5" stroke-dasharray="4,4"/>
-
-                <!-- Result box -->
-                <rect x="480" y="25" width="190" height="70" rx="10" fill="#12121a" stroke="#22c55e" stroke-width="1.5"/>
-                <text x="575" y="55" text-anchor="middle" fill="#22c55e" font-size="12" font-weight="600" font-family="system-ui">CURRENT STATE</text>
-                <text x="575" y="75" text-anchor="middle" fill="#e0e0e8" font-size="14" font-weight="700" font-family="monospace">0xDEADBE10</text>
-            </svg>
+            <div class="algebra-row">
+                <div class="algebra-box ref">
+                    <div class="algebra-label">REFERENCE</div>
+                    <div class="algebra-scroller" id="ref-scroller">
+                        <div class="algebra-scroller-inner" id="ref-inner"></div>
+                    </div>
+                </div>
+                <div class="algebra-op">&#x2295;</div>
+                <div class="algebra-box acc">
+                    <div class="algebra-label">ACCUMULATOR</div>
+                    <div class="algebra-scroller" id="acc-scroller">
+                        <div class="algebra-scroller-inner" id="acc-inner"></div>
+                    </div>
+                </div>
+                <div class="algebra-eq">=</div>
+                <div class="algebra-box res">
+                    <div class="algebra-label">CURRENT STATE</div>
+                    <div class="algebra-scroller" id="res-scroller">
+                        <div class="algebra-scroller-inner" id="res-inner"></div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </section>
@@ -1483,6 +1540,66 @@ const observer = new IntersectionObserver((entries) => {
 }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
 
 document.querySelectorAll('.animate-on-scroll').forEach(el => observer.observe(el));
+
+// Algebra animation — scrolling reference/accumulator/result values
+(function() {
+    const POOL_SIZE = 12;
+    const INTERVAL = 2200;
+    const refInner = document.getElementById('ref-inner');
+    const accInner = document.getElementById('acc-inner');
+    const resInner = document.getElementById('res-inner');
+    if (!refInner) return;
+
+    function randHex() {
+        return '0x' + Math.floor(Math.random() * 0xFFFFFFFF).toString(16).toUpperCase().padStart(8, '0');
+    }
+
+    // Generate pool of values
+    const refs = [];
+    const accs = [];
+    for (let i = 0; i < POOL_SIZE; i++) {
+        refs.push(randHex());
+        accs.push(randHex());
+    }
+
+    function xorHex(a, b) {
+        const va = parseInt(a.slice(2), 16);
+        const vb = parseInt(b.slice(2), 16);
+        return '0x' + ((va ^ vb) >>> 0).toString(16).toUpperCase().padStart(8, '0');
+    }
+
+    function makeVal(text) {
+        const d = document.createElement('div');
+        d.className = 'algebra-val';
+        d.textContent = text;
+        return d;
+    }
+
+    // Populate initial values
+    refs.forEach(v => refInner.appendChild(makeVal(v)));
+    accs.forEach(v => accInner.appendChild(makeVal(v)));
+    refs.forEach((v, i) => resInner.appendChild(makeVal(xorHex(v, accs[i]))));
+
+    let idx = 0;
+
+    function tick() {
+        idx = (idx + 1) % POOL_SIZE;
+        // Reference scrolls down (negative = up visually, so positive = down)
+        refInner.style.transform = 'translateY(-' + (idx * 22) + 'px)';
+        // Accumulator scrolls up (same direction works since values are different)
+        accInner.style.transform = 'translateY(-' + (idx * 22) + 'px)';
+        // Result follows
+        resInner.style.transform = 'translateY(-' + (idx * 22) + 'px)';
+    }
+
+    // Append extra values so the scroll loops cleanly
+    // Show first value initially
+    refInner.style.transform = 'translateY(0)';
+    accInner.style.transform = 'translateY(0)';
+    resInner.style.transform = 'translateY(0)';
+
+    setInterval(tick, INTERVAL);
+})();
 
 // Stripe checkout
 async function checkout(tier) {
