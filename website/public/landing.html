@@ -106,7 +106,8 @@
             backdrop-filter: blur(16px);
         }
         nav .container { display: flex; justify-content: space-between; align-items: center; }
-        nav .logo { font-size: 24px; font-weight: 700; letter-spacing: -0.5px; }
+        nav .logo { font-size: 24px; font-weight: 700; letter-spacing: -0.5px; display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--text); }
+        nav .logo img { height: 32px; width: 32px; border-radius: 6px; }
         nav .logo span { color: var(--accent); }
         nav .links a {
             color: var(--muted); text-decoration: none; margin-left: 32px;
@@ -647,7 +648,7 @@
 
 <nav>
     <div class="container">
-        <div class="logo">ATOM<span>i</span>K</div>
+        <a href="/landing.html" class="logo"><img src="/SiteLogo.png" alt="ATOMiK">ATOM<span>i</span>K</a>
         <div class="links">
             <a href="#how-it-works">How It Works</a>
             <a href="#features">Features</a>
@@ -1428,7 +1429,7 @@ a.<span class="fn">merge</span>(b)  <span class="cmt"># a now has both deltas</s
     <div class="container">
         <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 40px; margin-bottom: 40px;">
             <div>
-                <div style="font-size: 20px; font-weight: 700; color: var(--text); margin-bottom: 16px;">ATOM<span style="color: var(--accent);">i</span>K</div>
+                <div style="font-size: 20px; font-weight: 700; color: var(--text); margin-bottom: 16px; display: flex; align-items: center; gap: 8px;"><img src="/SiteLogo.png" alt="ATOMiK" style="height: 28px; width: 28px; border-radius: 5px;">ATOM<span style="color: var(--accent);">i</span>K</div>
                 <p style="line-height: 1.7;">Delta-state computing infrastructure. Stop moving data. Start evolving it.</p>
             </div>
             <div>

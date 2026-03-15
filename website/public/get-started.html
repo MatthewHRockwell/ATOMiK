@@ -42,7 +42,8 @@
             backdrop-filter: blur(16px);
         }
         nav .container { display: flex; justify-content: space-between; align-items: center; }
-        nav .logo { font-size: 24px; font-weight: 700; letter-spacing: -0.5px; text-decoration: none; color: var(--text); }
+        nav .logo { font-size: 24px; font-weight: 700; letter-spacing: -0.5px; text-decoration: none; color: var(--text); display: flex; align-items: center; gap: 10px; }
+        nav .logo img { height: 32px; width: 32px; border-radius: 6px; }
         nav .logo span { color: var(--accent); }
         nav .links a {
             color: var(--muted); text-decoration: none; margin-left: 32px;
@@ -272,7 +273,7 @@
 
 <nav>
     <div class="container">
-        <a href="/landing.html" class="logo">ATOM<span>i</span>K</a>
+        <a href="/landing.html" class="logo"><img src="/SiteLogo.png" alt="ATOMiK">ATOM<span>i</span>K</a>
         <div class="links">
             <a href="/landing.html#how-it-works">How It Works</a>
             <a href="/landing.html#pricing">Pricing</a>
