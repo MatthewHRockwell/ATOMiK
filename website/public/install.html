@@ -474,7 +474,7 @@ g++ -O2 -std=c++17 -o myapp myapp.cpp
     <div class="install-section" id="tab-kernel">
         <div class="info-box" style="margin-left: 0; margin-bottom: 24px;">
             <span class="info-icon">i</span>
-            <span>The kernel module requires a <strong>Professional</strong> or <strong>Enterprise</strong> subscription. It includes a 90-day free trial. <a href="/get-started.html?plan=professional" style="color: var(--accent);">Start your trial</a></span>
+            <span>The kernel module requires a <strong>Professional</strong> or <strong>Enterprise</strong> subscription. It includes a 90-day free trial with full functionality. <a href="/get-started.html?plan=professional" style="color: var(--accent);">Start your trial</a></span>
         </div>
 
         <div class="step">
@@ -482,7 +482,7 @@ g++ -O2 -std=c++17 -o myapp myapp.cpp
                 <div class="step-num">1</div>
                 <h3>Prerequisites</h3>
             </div>
-            <p>Ensure you have kernel headers and build tools installed:</p>
+            <p>Ensure you have kernel headers and build tools installed. The installer will verify these for you, but installing them ahead of time saves a step:</p>
             <div class="code-block">
                 <span class="copy-btn" onclick="copyCode(this)">Copy</span>
                 <span class="lang-tag">Terminal</span>
@@ -493,14 +493,18 @@ sudo apt install build-essential linux-headers-$(uname -r) dkms
 <span class="code-comment"># Fedora / RHEL</span>
 sudo dnf install kernel-devel kernel-headers gcc make dkms
             </div>
+            <div class="info-box">
+                <span class="info-icon">i</span>
+                <span>Requires Linux kernel 5.15 or later, x86_64 architecture. The module auto-detects ATOMiK hardware (FPGA/ASIC) when present and falls back to software acceleration on standard systems.</span>
+            </div>
         </div>
 
         <div class="step">
             <div class="step-header">
                 <div class="step-num">2</div>
-                <h3>Clone and install</h3>
+                <h3>Download and install</h3>
             </div>
-            <p>Run the automated installer:</p>
+            <p>Clone the repository and run the automated installer:</p>
             <div class="code-block">
                 <span class="copy-btn" onclick="copyCode(this)">Copy</span>
                 <span class="lang-tag">Terminal</span>
@@ -508,10 +512,16 @@ git clone https://github.com/MatthewHRockwell/ATOMiK.git
 cd ATOMiK/software/atomik_kmod
 sudo ./install.sh
             </div>
-            <p>The installer will:</p>
+            <p>Or install with a license key:</p>
+            <div class="code-block">
+                <span class="copy-btn" onclick="copyCode(this)">Copy</span>
+                <span class="lang-tag">Terminal</span>
+sudo ./install.sh --license ATOMIK-XXXXXXXX-XXXXXXXX-XXXXXXXX-XXXXXXXX-XXXXXXXX
+            </div>
+            <p>The installer runs pre-flight checks, then:</p>
             <div class="info-box">
                 <span class="info-icon">&#x2713;</span>
-                <span>Build the module and userspace tools, set up DKMS for automatic kernel upgrades, create the <code>atomik</code> system group, install the systemd service, and configure udev rules.</span>
+                <span>Builds the kernel module and 4 userspace tools, sets up DKMS for automatic kernel upgrades, creates the <code>atomik</code> system group, installs the systemd service, and loads the module immediately.</span>
             </div>
         </div>
 
@@ -528,7 +538,7 @@ sudo ./install.sh
 atomik-status
 
 <span class="code-comment"># Expected output:</span>
-<span class="code-comment"># ATOMiK v0.1.0 -- Delta-State Accelerator</span>
+<span class="code-comment"># ATOMiK v0.2.0 — Delta-State Accelerator</span>
 <span class="code-comment">#   Backend:     software</span>
 <span class="code-comment">#   License:     trial (90 days remaining)</span>
 <span class="code-comment">#   Status:      ACTIVE</span>
@@ -540,24 +550,42 @@ atomik-status
                 <div class="step-num">4</div>
                 <h3>Run the test suite</h3>
             </div>
-            <p>Validate all 34 tests pass:</p>
+            <p>Validate everything works on your system:</p>
             <div class="code-block">
                 <span class="copy-btn" onclick="copyCode(this)">Copy</span>
                 <span class="lang-tag">Terminal</span>
 <span class="code-comment"># Quick smoke test (18 tests)</span>
-sg atomik -c "./tools/atomik-test"
+atomik-test
 
-<span class="code-comment"># Full test suite (34 tests)</span>
-sudo ./tools/atomik-full-test.sh
+<span class="code-comment"># Full suite: functional, security, licensing, stability (34 tests)</span>
+sudo atomik-full-test
             </div>
             <div class="success-box">
-                <strong>Expected:</strong> 34/34 tests pass covering functional correctness, security, licensing, and stability.
+                <strong>Expected:</strong> 34/34 tests pass covering functional correctness, security, licensing, stability, and privacy.
             </div>
         </div>
 
         <div class="step">
             <div class="step-header">
                 <div class="step-num">5</div>
+                <h3>Benchmark your system</h3>
+            </div>
+            <p>Run the performance benchmark to see ATOMiK in action:</p>
+            <div class="code-block">
+                <span class="copy-btn" onclick="copyCode(this)">Copy</span>
+                <span class="lang-tag">Terminal</span>
+<span class="code-comment"># Runs change detection, accumulation, and batch benchmarks</span>
+<span class="code-comment"># with CPU temperature and frequency monitoring</span>
+sudo atomik-bench
+            </div>
+            <div class="success-box">
+                <strong>Typical results:</strong> Batch mode achieves 50-70x speedup over individual operations. ATOMiK fingerprinting matches or beats memcmp for change detection.
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-header">
+                <div class="step-num">6</div>
                 <h3>Add your license key (optional)</h3>
             </div>
             <p>After purchasing, add your license key to persist across reboots:</p>
@@ -571,6 +599,21 @@ sudo chmod 600 /etc/modprobe.d/atomik.conf
 
 <span class="code-comment"># Reload the module</span>
 sudo systemctl restart atomik
+atomik-status
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-header">
+                <div class="step-num">7</div>
+                <h3>Uninstall (if needed)</h3>
+            </div>
+            <p>Clean removal with one command:</p>
+            <div class="code-block">
+                <span class="copy-btn" onclick="copyCode(this)">Copy</span>
+                <span class="lang-tag">Terminal</span>
+sudo atomik-uninstall          <span class="code-comment"># Keep trial state</span>
+sudo atomik-uninstall --purge  <span class="code-comment"># Remove everything</span>
             </div>
         </div>
     </div>
