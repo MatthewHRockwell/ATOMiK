@@ -1,0 +1,107 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: atomik
+  namespace: atomik-system
+  labels:
+    app: atomik
+    component: kmod
+spec:
+  selector:
+    matchLabels:
+      app: atomik
+      component: kmod
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        app: atomik
+        component: kmod
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9471"
+    spec:
+      # Run on every node, including control-plane
+      tolerations:
+        - operator: Exists
+      hostPID: false
+      hostNetwork: false
+      terminationGracePeriodSeconds: 30
+      containers:
+        - name: atomik
+          image: atomik/kmod:0.5.0
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            privileged: true
+          ports:
+            - name: metrics
+              containerPort: 9471
+              protocol: TCP
+          env:
+            - name: ATOMIK_LICENSE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: atomik-license
+                  key: license-key
+                  optional: true
+            - name: ATOMIK_PROM_PORT
+              value: "9471"
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 100m
+              memory: 128Mi
+          volumeMounts:
+            - name: lib-modules
+              mountPath: /lib/modules
+              readOnly: true
+            - name: dev
+              mountPath: /dev
+            - name: proc-atomik
+              mountPath: /proc/atomik
+              readOnly: true
+      volumes:
+        - name: lib-modules
+          hostPath:
+            path: /lib/modules
+            type: Directory
+        - name: dev
+          hostPath:
+            path: /dev
+            type: Directory
+        - name: proc-atomik
+          hostPath:
+            path: /proc/atomik
+            type: DirectoryOrCreate
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: atomik-system
+  labels:
+    app: atomik
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: atomik-metrics
+  namespace: atomik-system
+  labels:
+    app: atomik
+    component: kmod
+spec:
+  type: ClusterIP
+  clusterIP: None
+  selector:
+    app: atomik
+    component: kmod
+  ports:
+    - name: metrics
+      port: 9471
+      targetPort: metrics
+      protocol: TCP

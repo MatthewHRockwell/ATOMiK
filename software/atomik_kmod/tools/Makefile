@@ -30,6 +30,7 @@ install: $(TOOLS)
 	install -m 755 atomik-optimizer /usr/local/bin/
 	install -m 755 atomik-dashboard /usr/local/bin/
 	install -m 755 atomik-report /usr/local/bin/
+	install -m 755 atomik-exporter.py /usr/local/bin/atomik-exporter
 	install -m 755 atomik-full-test.sh /usr/local/bin/atomik-full-test
 	install -m 755 atomik-workload-bench.sh /usr/local/bin/atomik-workload-bench
 

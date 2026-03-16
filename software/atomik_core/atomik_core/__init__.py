@@ -40,6 +40,7 @@ from atomik_core.table import AtomikTable
 from atomik_core.stream import DeltaStream, DeltaMessage
 from atomik_core.fingerprint import Fingerprint
 from atomik_core.sync import SyncTable
+from atomik_core.transport import MemoryTransport, CallbackTransport
 from atomik_core.benchmark import (
     bench_rollback,
     bench_change_detection,
@@ -48,6 +49,11 @@ from atomik_core.benchmark import (
     bench_throughput,
 )
 
+try:
+    from atomik_core.device import DeviceContext, DeviceTable
+except ImportError:
+    pass  # Not available on non-Linux or without /dev/atomik
+
 __all__ = [
     "AtomikContext",
     "AtomikTable",
@@ -55,9 +61,13 @@ __all__ = [
     "DeltaMessage",
     "Fingerprint",
     "SyncTable",
+    "MemoryTransport",
+    "CallbackTransport",
     "bench_rollback",
     "bench_change_detection",
     "bench_convergence",
     "bench_bandwidth",
     "bench_throughput",
+    "DeviceContext",
+    "DeviceTable",
 ]

@@ -1,0 +1,37 @@
+# ATOMiK Helm chart — default values
+
+image:
+  repository: atomik/kmod
+  tag: "0.5.0"
+  pullPolicy: IfNotPresent
+
+# License key — set via --set or a values override file.
+# Leave empty for community edition.
+licenseKey: ""
+
+# Prometheus metrics exporter
+prometheus:
+  port: 9471
+  # Create a ServiceMonitor CR for prometheus-operator
+  serviceMonitor:
+    enabled: false
+    interval: 30s
+    labels: {}
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    cpu: 100m
+    memory: 128Mi
+
+# Node selector — empty means all nodes
+nodeSelector: {}
+
+# Tolerations — default tolerates everything so the DaemonSet covers all nodes
+tolerations:
+  - operator: Exists
+
+# Namespace override (defaults to Release.Namespace)
+namespaceOverride: ""

@@ -1,0 +1,14 @@
+apiVersion: v2
+name: atomik
+description: ATOMiK delta-state accelerator kernel module
+type: application
+version: 0.5.0
+appVersion: "0.5.0"
+keywords:
+  - kernel-module
+  - delta-state
+  - accelerator
+home: https://github.com/MatthewHRockwell/ATOMiK
+maintainers:
+  - name: ATOMiK
+    url: https://github.com/MatthewHRockwell/ATOMiK

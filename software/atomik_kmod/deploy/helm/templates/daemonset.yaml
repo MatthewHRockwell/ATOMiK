@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: atomik
+  namespace: {{ include "atomik.namespace" . }}
+  labels:
+    {{- include "atomik.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "atomik.selectorLabels" . | nindent 6 }}
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        {{- include "atomik.selectorLabels" . | nindent 8 }}
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: {{ .Values.prometheus.port | quote }}
+    spec:
+      tolerations:
+        {{- toYaml .Values.tolerations | nindent 8 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      hostPID: false
+      hostNetwork: false
+      terminationGracePeriodSeconds: 30
+      containers:
+        - name: atomik
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          securityContext:
+            privileged: true
+          ports:
+            - name: metrics
+              containerPort: {{ .Values.prometheus.port }}
+              protocol: TCP
+          env:
+            - name: ATOMIK_LICENSE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: atomik-license
+                  key: license-key
+                  optional: true
+            - name: ATOMIK_PROM_PORT
+              value: {{ .Values.prometheus.port | quote }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: lib-modules
+              mountPath: /lib/modules
+              readOnly: true
+            - name: dev
+              mountPath: /dev
+            - name: proc-atomik
+              mountPath: /proc/atomik
+              readOnly: true
+      volumes:
+        - name: lib-modules
+          hostPath:
+            path: /lib/modules
+            type: Directory
+        - name: dev
+          hostPath:
+            path: /dev
+            type: Directory
+        - name: proc-atomik
+          hostPath:
+            path: /proc/atomik
+            type: DirectoryOrCreate
