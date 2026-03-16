@@ -1,0 +1,33 @@
+{
+  "name": "@atomik/core",
+  "version": "0.4.0",
+  "description": "ATOMiK delta-state algebra — O(1) state reconstruction, change detection, and lock-free convergence. Same 4-operation algebra as the Python SDK.",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "files": ["dist"],
+  "keywords": [
+    "state-management", "delta-state", "xor", "distributed-systems",
+    "crdt-alternative", "change-detection", "fingerprinting", "convergence",
+    "lock-free", "sync"
+  ],
+  "author": "ATOMiK Project <mrockwell@atomik.tech>",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MatthewHRockwell/ATOMiK.git",
+    "directory": "software/atomik_js"
+  },
+  "homepage": "https://atomik.tech",
+  "scripts": {
+    "build": "tsc && tsc --module ESNext --outDir dist/esm",
+    "test": "node --test src/*.test.js",
+    "prepublishOnly": "npm run build"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

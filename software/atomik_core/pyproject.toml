@@ -45,7 +45,12 @@ dev = [
 ]
 ws = ["websockets>=12.0"]
 redis = ["redis>=5.0"]
-all = ["websockets>=12.0", "redis>=5.0"]
+fastapi = ["atomik-core"]  # no extra deps needed, it's pure ASGI
+sqlalchemy = ["sqlalchemy>=2.0"]
+all = ["websockets>=12.0", "redis>=5.0", "sqlalchemy>=2.0"]
+
+[project.scripts]
+atomik = "atomik_core.__main__:cli_main"
 
 [project.urls]
 Homepage = "https://atomik.tech"
