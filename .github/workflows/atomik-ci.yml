@@ -47,7 +47,11 @@ jobs:
       - name: Run unit tests
         run: |
           pip install pytest pytest-cov
-          pytest software/tests/ software/atomik_sdk/tests/ software/atomik_core/tests/ -v --tb=short --cov=atomik_sdk --cov=atomik_core --cov-report=xml
+          pytest software/tests/ software/atomik_sdk/tests/ -v --tb=short --cov=atomik_sdk --cov-report=xml
+      - name: Run atomik_core tests
+        run: |
+          cd software/atomik_core
+          pytest tests/ -v --tb=short
       - name: Upload coverage
         uses: codecov/codecov-action@v4
         with:
