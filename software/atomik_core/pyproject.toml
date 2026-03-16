@@ -10,7 +10,7 @@ readme = "README.md"
 license = "Apache-2.0"
 requires-python = ">=3.9"
 authors = [
-    {name = "ATOMiK Project", email = "matt@atomik.dev"}
+    {name = "ATOMiK Project", email = "mrockwell@atomik.tech"}
 ]
 keywords = [
     "state-management",

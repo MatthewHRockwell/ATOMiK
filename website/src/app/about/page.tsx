@@ -22,7 +22,7 @@ const timelineItems = [
     year: "2025",
     title: "Software SDK",
     description:
-      "Python and C libraries with 353+ tests. Pipeline orchestration, delta generators, and agentic scheduling. Available via pip install atomik-core.",
+      "Python and C libraries with 218+ tests. Pipeline orchestration, delta generators, and agentic scheduling. Available via pip install atomik-core.",
     color: "text-blue-400",
     border: "border-blue-500/40",
     bg: "bg-blue-500/5",

@@ -12,9 +12,10 @@ export const metadata: Metadata = {
 const steps = [
   {
     icon: "01",
-    title: "Install the SDK",
-    code: "pip install atomik-core",
-    description: "Zero dependencies. Python 3.9+. Works on Linux, macOS, Windows.",
+    title: "Install and benchmark",
+    code: `pip install atomik-core
+python -m atomik_core benchmark --share`,
+    description: "Zero dependencies. Run the benchmark, get a shareable results card with your hardware specs.",
   },
   {
     icon: "02",
@@ -61,7 +62,7 @@ const paths = [
       "Delta-state algebra in pure Python",
       "Fingerprinting & change detection",
       "Multi-context streaming",
-      "353+ tests, fully typed",
+      "218+ tests, fully typed",
     ],
     cta: "View on PyPI",
     ctaHref: "https://pypi.org/project/atomik-core/",

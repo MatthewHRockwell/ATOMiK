@@ -421,7 +421,7 @@ export default function WhitepaperPage() {
                 {
                   value: "417+",
                   unit: "tests",
-                  desc: "Across SDK (353), hardware (80), CDC (37), and kernel module. All passing.",
+                  desc: "Across atomik-core (218), SDK pipeline (353), hardware (80), CDC (37). All passing.",
                   color: "#22c55e",
                 },
                 {

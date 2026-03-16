@@ -1,33 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { readFile, writeFile, mkdir } from 'fs/promises';
-import path from 'path';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const DATA_DIR = path.join(process.cwd(), 'data');
-const SUBSCRIBERS_FILE = path.join(DATA_DIR, 'subscribers.json');
 
-interface Subscriber {
-  email: string;
-  subscribedAt: string;
-}
-
-async function readSubscribers(): Promise<Subscriber[]> {
-  try {
-    const data = await readFile(SUBSCRIBERS_FILE, 'utf-8');
-    return JSON.parse(data);
-  } catch {
-    return [];
-  }
-}
-
-async function writeSubscribers(subscribers: Subscriber[]): Promise<void> {
-  await mkdir(DATA_DIR, { recursive: true });
-  await writeFile(SUBSCRIBERS_FILE, JSON.stringify(subscribers, null, 2));
-}
-
+/**
+ * POST /api/subscribe
+ * Captures email addresses for the newsletter/mailing list.
+ *
+ * Storage strategy: create a Stripe customer (if Stripe is configured),
+ * with metadata marking them as a newsletter subscriber. This survives
+ * Vercel redeployments because Stripe is the source of truth.
+ * Falls back to console.log if Stripe is not configured (dev mode).
+ */
 export async function POST(req: NextRequest) {
   try {
-    const { email } = await req.json();
+    const body = await req.json();
+    const email = body?.email;
 
     if (!email || typeof email !== 'string') {
       return NextResponse.json({ error: 'Email is required' }, { status: 400 });
@@ -39,14 +26,32 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid email format' }, { status: 400 });
     }
 
-    const subscribers = await readSubscribers();
+    // Try Stripe customer creation for persistent storage
+    const stripeKey = process.env.STRIPE_SECRET_KEY;
+    if (stripeKey) {
+      try {
+        const { stripe } = await import('@/lib/stripe');
 
-    if (subscribers.some((s) => s.email === normalized)) {
-      return NextResponse.json({ success: true });
+        // Check if customer already exists
+        const existing = await stripe.customers.list({ email: normalized, limit: 1 });
+        if (existing.data.length === 0) {
+          await stripe.customers.create({
+            email: normalized,
+            metadata: {
+              source: body.source || 'newsletter',
+              name: body.name || '',
+              subscribed_at: new Date().toISOString(),
+            },
+          });
+        }
+      } catch (stripeError) {
+        // Stripe failure is non-fatal — still return success to the user
+        console.error('[SUBSCRIBE] Stripe error (non-fatal):', stripeError);
+      }
     }
 
-    subscribers.push({ email: normalized, subscribedAt: new Date().toISOString() });
-    await writeSubscribers(subscribers);
+    // Always log for debugging/backup
+    console.log(`[SUBSCRIBE] ${normalized} (source: ${body.source || 'newsletter'})`);
 
     return NextResponse.json({ success: true });
   } catch (error) {

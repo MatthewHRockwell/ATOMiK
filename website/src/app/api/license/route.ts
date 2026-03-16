@@ -51,13 +51,8 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // Generate signed download tokens for each platform
-    const downloads = {
-      linux: generateDownloadToken(licenseKey, 'linux'),
-      windows: generateDownloadToken(licenseKey, 'windows'),
-      macos: generateDownloadToken(licenseKey, 'macos'),
-    };
-
+    // Generate signed download token (Linux only — kmod is Linux-only)
+    const downloadToken = generateDownloadToken(licenseKey, 'linux');
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
 
     return NextResponse.json({
@@ -65,9 +60,7 @@ export async function GET(req: NextRequest) {
       tier,
       email,
       downloads: {
-        linux: `${baseUrl}/api/download?token=${downloads.linux}`,
-        windows: `${baseUrl}/api/download?token=${downloads.windows}`,
-        macos: `${baseUrl}/api/download?token=${downloads.macos}`,
+        linux: `${baseUrl}/api/download?token=${downloadToken}`,
       },
       install: {
         linux: `git clone https://github.com/MatthewHRockwell/ATOMiK.git && cd ATOMiK/software/atomik_kmod && sudo ./install.sh --license ${licenseKey}`,
