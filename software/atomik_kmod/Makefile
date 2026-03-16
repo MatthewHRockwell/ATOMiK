@@ -28,7 +28,8 @@ dist: clean
 	   atomik_cow.c atomik_cow.h \
 	   atomik_net.c atomik_net.h \
 	   atomik_cgroup.c atomik_cgroup.h \
-	   atomik_proc.c atomik_trace.h atomik_trace_define.c \
+	   atomik_proc.c atomik_audit.c atomik_audit.h \
+	   atomik_trace.h atomik_trace_define.c \
 	   atomik_core_kern.h atomik_stats.h \
 	   README.md .gitignore \
 	   $(DIST_NAME)/

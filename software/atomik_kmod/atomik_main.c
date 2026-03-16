@@ -12,6 +12,7 @@
 #include <linux/miscdevice.h>
 #include <linux/fs.h>
 
+#include "atomik_audit.h"
 #include "atomik_cgroup.h"
 #include "atomik_core_kern.h"
 #include "atomik_cow.h"
@@ -97,6 +98,12 @@ static int __init atomik_init(void)
 		pr_warn("atomik: cgroup tracking unavailable (%d)\n", ret);
 	}
 
+	/* Initialize audit ring buffer (non-fatal if fails) */
+	ret = atomik_audit_init();
+	if (ret) {
+		pr_warn("atomik: audit ring unavailable (%d)\n", ret);
+	}
+
 	/* Create /proc/atomik interface (non-fatal if fails) */
 	ret = atomik_proc_init();
 	if (ret) {
@@ -126,6 +133,7 @@ err_hw:
 static void __exit atomik_exit(void)
 {
 	atomik_proc_exit();
+	atomik_audit_exit();
 	atomik_cgroup_exit();
 	atomik_net_exit();
 	atomik_cow_exit();

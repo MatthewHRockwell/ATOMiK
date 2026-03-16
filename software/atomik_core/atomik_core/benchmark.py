@@ -14,6 +14,7 @@ No setup required. Just run it.
 """
 
 import json
+import platform
 import time
 import copy
 import sys
@@ -285,8 +286,61 @@ def bench_throughput() -> dict:
     }
 
 
+def format_share_text(results: list[dict]) -> str:
+    """Format benchmark results as a shareable text summary.
+
+    Args:
+        results: List of benchmark result dicts from bench_* functions.
+
+    Returns:
+        A formatted multi-line string suitable for copy-pasting.
+    """
+    # Extract platform info
+    uname = platform.uname()
+    cpu = uname.processor or uname.machine
+    py_version = platform.python_version()
+    os_info = f"{uname.system} {uname.release} {uname.machine}"
+
+    # Extract key metrics from results
+    rollback = next((r for r in results if r["test"] == "rollback"), {})
+    detection = next((r for r in results if r["test"] == "change_detection"), {})
+    convergence = next((r for r in results if r["test"] == "convergence"), {})
+    bandwidth = next((r for r in results if r["test"] == "bandwidth"), {})
+    throughput = next((r for r in results if r["test"] == "throughput"), {})
+
+    rollback_x = rollback.get("speedup", 0)
+    detection_x = rollback.get("mem_reduction", 0)
+    convergence_x = convergence.get("speedup", 0)
+
+    # Bandwidth: use the largest state size entry for max reduction
+    bw_entries = bandwidth.get("entries", [])
+    bw_reduction = max((e.get("reduction", 0) for e in bw_entries), default=0)
+
+    # Throughput: use accum as the headline ops/sec
+    accum_ops = throughput.get("accum_ops_sec", 0)
+
+    lines = [
+        "ATOMiK Benchmark Results",
+        "========================",
+        f"Platform: {os_info}",
+        f"Python: {py_version}",
+        "",
+        f"Rollback:     {rollback_x:,.1f}x faster than deepcopy",
+        f"Detection:    {detection_x:,.0f}x less memory",
+        f"Convergence:  {convergence_x:,.1f}x faster than replay",
+        f"Bandwidth:    {bw_reduction:,.0f}x reduction",
+        f"Throughput:   {accum_ops/1e6:.1f}M ops/sec",
+        "",
+        "-> pip install atomik-core",
+        "-> python -m atomik_core benchmark",
+        "-> https://atomik.tech/demo",
+    ]
+    return "\n".join(lines)
+
+
 def main():
     json_mode = "--json" in sys.argv
+    share_mode = "--share" in sys.argv
 
     if json_mode:
         # Suppress printed output by redirecting stdout during benchmarks
@@ -294,7 +348,15 @@ def main():
         old_stdout = sys.stdout
         sys.stdout = io.StringIO()
 
-    if not json_mode:
+    if not json_mode and not share_mode:
+        print("╔══════════════════════════════════════════════════════════╗")
+        print("║          ATOMiK Benchmark — Delta-State Algebra         ║")
+        print("║                                                         ║")
+        print("║  Comparing traditional approaches vs ATOMiK on YOUR     ║")
+        print("║  hardware. No configuration needed — just watch.        ║")
+        print("╚══════════════════════════════════════════════════════════╝")
+    elif share_mode and not json_mode:
+        # Still show the header in share mode (benchmarks print progress)
         print("╔══════════════════════════════════════════════════════════╗")
         print("║          ATOMiK Benchmark — Delta-State Algebra         ║")
         print("║                                                         ║")
@@ -311,7 +373,10 @@ def main():
 
     if json_mode:
         sys.stdout = old_stdout
-        json.dump({"benchmarks": results}, sys.stdout, indent=2)
+        output = {"benchmarks": results}
+        if share_mode:
+            output["share_text"] = format_share_text(results)
+        json.dump(output, sys.stdout, indent=2)
         print()  # trailing newline
     else:
         print(f"\n{'='*60}")
@@ -322,6 +387,13 @@ def main():
         print(f"\n  Learn more:  https://atomik.tech")
         print(f"  Source:       https://github.com/MatthewHRockwell/ATOMiK")
         print(f"  Install:      pip install atomik-core")
+
+        if share_mode:
+            print(f"\n{'='*60}")
+            print(f"  SHAREABLE SUMMARY (copy-paste this)")
+            print(f"{'='*60}\n")
+            print(format_share_text(results))
+
         print()
 
     return results

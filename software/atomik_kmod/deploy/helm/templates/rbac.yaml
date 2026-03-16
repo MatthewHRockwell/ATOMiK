@@ -1,0 +1,28 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: atomik
+  labels:
+    {{- include "atomik.labels" . | nindent 4 }}
+rules:
+  # Minimal permissions — the DaemonSet only needs to read nodes
+  # for scheduling awareness; all actual work is host-level via
+  # /dev/atomik and /proc/atomik mounts.
+  - apiGroups: [""]
+    resources: ["nodes"]
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: atomik
+  labels:
+    {{- include "atomik.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: atomik
+subjects:
+  - kind: ServiceAccount
+    name: atomik
+    namespace: {{ include "atomik.namespace" . }}

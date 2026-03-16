@@ -14,9 +14,13 @@ Usage:
 """
 
 import argparse
+import json
+import logging
 import os
 import re
+import signal
 import sys
+import threading
 import time
 from http.server import HTTPServer, BaseHTTPRequestHandler
 
@@ -27,6 +31,20 @@ PROC_ATOMIK_SUMMARY = "/proc/atomik/summary"
 SYSFS_BASE = "/sys/class/atomik/atomik0/"
 
 DEFAULT_PORT = 9471
+
+log = logging.getLogger("atomik-exporter")
+
+
+# -- Health checks ---------------------------------------------------------
+
+def check_health():
+    """Return (ok: bool, reason: str) based on /proc/atomik readability."""
+    if not os.path.exists(PROC_ATOMIK):
+        return False, "/proc/atomik does not exist — is the module loaded?"
+    content = read_file(PROC_ATOMIK)
+    if content is None:
+        return False, "/proc/atomik exists but is unreadable"
+    return True, ""
 
 
 # -- File reading helpers --------------------------------------------------
@@ -261,7 +279,23 @@ def collect_metrics():
 # -- HTTP handler ----------------------------------------------------------
 
 class MetricsHandler(BaseHTTPRequestHandler):
-    """Serve Prometheus metrics on /metrics, health on /."""
+    """Serve Prometheus metrics, health, and readiness endpoints."""
+
+    def _send_json(self, status, obj):
+        body = json.dumps(obj).encode("utf-8")
+        self.send_response(status)
+        self.send_header("Content-Type", "application/json")
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
+
+    def _handle_health(self):
+        ok, reason = check_health()
+        if ok:
+            self._send_json(200, {"status": "ok"})
+        else:
+            log.warning("health check failed: %s", reason)
+            self._send_json(503, {"status": "error", "reason": reason})
 
     def do_GET(self):
         if self.path == "/metrics":
@@ -276,12 +310,17 @@ class MetricsHandler(BaseHTTPRequestHandler):
                 self.end_headers()
                 self.wfile.write(body.encode("utf-8"))
             except Exception as e:
+                log.error("error collecting metrics: %s", e)
                 msg = "Error collecting metrics: {}\n".format(e)
                 self.send_response(500)
                 self.send_header("Content-Type", "text/plain")
                 self.send_header("Content-Length", str(len(msg)))
                 self.end_headers()
                 self.wfile.write(msg.encode("utf-8"))
+        elif self.path == "/healthz":
+            self._handle_health()
+        elif self.path == "/ready":
+            self._handle_health()
         elif self.path == "/":
             body = (
                 "atomik-exporter\n"
@@ -297,8 +336,8 @@ class MetricsHandler(BaseHTTPRequestHandler):
             self.end_headers()
 
     def log_message(self, format, *args):
-        """Suppress default per-request logging."""
-        pass
+        """Route HTTP access logs through the logging module."""
+        log.debug(format, *args)
 
 
 # -- Main ------------------------------------------------------------------
@@ -313,31 +352,57 @@ def main():
         default=DEFAULT_PORT,
         help="HTTP port to listen on (default: {})".format(DEFAULT_PORT),
     )
+    parser.add_argument(
+        "--log-level",
+        choices=["debug", "info", "warning", "error"],
+        default="info",
+        help="Logging verbosity (default: info)",
+    )
     args = parser.parse_args()
+
+    # Configure logging
+    level = getattr(logging, args.log_level.upper())
+    logging.basicConfig(
+        level=level,
+        format="%(asctime)s %(name)s [%(levelname)s] %(message)s",
+        datefmt="%Y-%m-%dT%H:%M:%S",
+    )
 
     # Verify /proc/atomik is accessible before starting
     if not os.path.exists(PROC_ATOMIK):
-        print(
-            "ERROR: {} not found. "
-            "Is the atomik kernel module loaded?".format(PROC_ATOMIK),
-            file=sys.stderr,
+        log.error(
+            "%s not found. Is the atomik kernel module loaded?",
+            PROC_ATOMIK,
         )
         sys.exit(1)
 
     server = HTTPServer(("", args.port), MetricsHandler)
 
-    print("atomik-exporter: serving Prometheus metrics")
-    print("  Port:     {}".format(args.port))
-    print("  Endpoint: http://0.0.0.0:{}/metrics".format(args.port))
-    print("  Source:   {}".format(PROC_ATOMIK))
-    print()
-    print("Press Ctrl+C to stop.")
+    # SIGTERM handler for graceful shutdown (e.g. K8s pod termination)
+    shutdown_event = threading.Event()
+
+    def _sigterm_handler(signum, frame):
+        log.info("received SIGTERM — shutting down gracefully")
+        shutdown_event.set()
+        # shutdown() must be called from a separate thread to avoid deadlock
+        threading.Thread(target=server.shutdown, daemon=True).start()
+
+    signal.signal(signal.SIGTERM, _sigterm_handler)
+
+    log.info("atomik-exporter: serving Prometheus metrics")
+    log.info("  Port:     %d", args.port)
+    log.info("  Endpoint: http://0.0.0.0:%d/metrics", args.port)
+    log.info("  Health:   http://0.0.0.0:%d/healthz", args.port)
+    log.info("  Ready:    http://0.0.0.0:%d/ready", args.port)
+    log.info("  Source:   %s", PROC_ATOMIK)
 
     try:
         server.serve_forever()
     except KeyboardInterrupt:
-        print("\nShutting down.")
+        log.info("received SIGINT — shutting down")
+    finally:
         server.server_close()
+        log.info("server stopped")
 
 
 if __name__ == "__main__":

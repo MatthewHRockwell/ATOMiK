@@ -17,10 +17,12 @@ spec:
     metadata:
       labels:
         {{- include "atomik.selectorLabels" . | nindent 8 }}
+        pod-security.kubernetes.io/enforce: privileged
       annotations:
         prometheus.io/scrape: "true"
         prometheus.io/port: {{ .Values.prometheus.port | quote }}
     spec:
+      serviceAccountName: atomik
       tolerations:
         {{- toYaml .Values.tolerations | nindent 8 }}
       {{- with .Values.nodeSelector }}
@@ -30,16 +32,37 @@ spec:
       hostPID: false
       hostNetwork: false
       terminationGracePeriodSeconds: 30
+      securityContext:
+        runAsNonRoot: false
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: atomik
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           securityContext:
             privileged: true
+            readOnlyRootFilesystem: true
           ports:
             - name: metrics
               containerPort: {{ .Values.prometheus.port }}
               protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: metrics
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: metrics
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
           env:
             - name: ATOMIK_LICENSE_KEY
               valueFrom:

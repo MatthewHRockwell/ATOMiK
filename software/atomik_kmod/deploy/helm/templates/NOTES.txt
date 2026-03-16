@@ -1,0 +1,39 @@
+ATOMiK kernel module deployed successfully!
+
+  Release:   {{ .Release.Name }}
+  Namespace: {{ include "atomik.namespace" . }}
+  Version:   {{ .Chart.AppVersion }}
+
+1. Verify the DaemonSet is running on all target nodes:
+
+   kubectl -n {{ include "atomik.namespace" . }} get ds atomik
+
+2. Check pod logs for module load status:
+
+   kubectl -n {{ include "atomik.namespace" . }} logs -l app=atomik --tail=20
+
+3. Verify the exporter health endpoint:
+
+   kubectl -n {{ include "atomik.namespace" . }} exec -it \
+     $(kubectl -n {{ include "atomik.namespace" . }} get pod -l app=atomik -o jsonpath='{.items[0].metadata.name}') \
+     -- wget -qO- http://localhost:{{ .Values.prometheus.port }}/healthz
+
+4. View Prometheus metrics:
+
+   kubectl -n {{ include "atomik.namespace" . }} port-forward \
+     $(kubectl -n {{ include "atomik.namespace" . }} get pod -l app=atomik -o jsonpath='{.items[0].metadata.name}') \
+     {{ .Values.prometheus.port }}:{{ .Values.prometheus.port }}
+   curl http://localhost:{{ .Values.prometheus.port }}/metrics
+
+{{- if .Values.licenseKey }}
+5. License key is configured. Check activation:
+
+   kubectl -n {{ include "atomik.namespace" . }} exec -it \
+     $(kubectl -n {{ include "atomik.namespace" . }} get pod -l app=atomik -o jsonpath='{.items[0].metadata.name}') \
+     -- cat /proc/atomik | grep license
+{{- else }}
+5. No license key set — running in community/trial mode.
+   Set a license key with:
+
+   helm upgrade {{ .Release.Name }} atomik/atomik --set licenseKey=ATOMIK-XXXX-XXXX-XXXX-XXXX
+{{- end }}

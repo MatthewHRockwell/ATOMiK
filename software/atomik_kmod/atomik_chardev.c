@@ -19,6 +19,7 @@
 #include <linux/uaccess.h>
 #include <linux/mutex.h>
 
+#include "atomik_audit.h"
 #include "atomik_core_kern.h"
 #include "atomik_hw.h"
 #include "atomik_stats.h"
@@ -211,6 +212,7 @@ static long ioctl_load(struct atomik_file_ctx *fctx, unsigned long arg)
 
 	atomik_stat_inc(ops_load);
 	trace_atomik_op(ATOMIK_OP_LOAD, a.table_id, a.addr, a.initial_state);
+	atomik_audit_record(ATOMIK_OP_LOAD, a.table_id, a.addr, a.initial_state);
 	return 0;
 }
 
@@ -242,6 +244,7 @@ static long ioctl_accum(struct atomik_file_ctx *fctx, unsigned long arg)
 
 	atomik_stat_inc(ops_accum);
 	trace_atomik_op(ATOMIK_OP_ACCUM, a.table_id, a.addr, a.delta);
+	atomik_audit_record(ATOMIK_OP_ACCUM, a.table_id, a.addr, a.delta);
 	return 0;
 }
 
@@ -273,6 +276,7 @@ static long ioctl_read(struct atomik_file_ctx *fctx, unsigned long arg)
 
 	atomik_stat_inc(ops_read);
 	trace_atomik_op(ATOMIK_OP_READ, a.table_id, a.addr, a.state);
+	atomik_audit_record(ATOMIK_OP_READ, a.table_id, a.addr, a.state);
 
 	if (copy_to_user((void __user *)arg, &a, sizeof(a)))
 		return -EFAULT;
@@ -307,6 +311,7 @@ static long ioctl_swap(struct atomik_file_ctx *fctx, unsigned long arg)
 
 	atomik_stat_inc(ops_swap);
 	trace_atomik_op(ATOMIK_OP_SWAP, a.table_id, a.addr, a.old_state);
+	atomik_audit_record(ATOMIK_OP_SWAP, a.table_id, a.addr, a.old_state);
 
 	if (copy_to_user((void __user *)arg, &a, sizeof(a)))
 		return -EFAULT;

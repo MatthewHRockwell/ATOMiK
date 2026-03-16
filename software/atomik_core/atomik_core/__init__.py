@@ -33,14 +33,16 @@ Multi-context table:
 SPDX-License-Identifier: Apache-2.0
 """
 
-__version__ = "0.3.0"
+__version__ = "0.4.0"
 
 from atomik_core.context import AtomikContext
 from atomik_core.table import AtomikTable
 from atomik_core.stream import DeltaStream, DeltaMessage
 from atomik_core.fingerprint import Fingerprint
 from atomik_core.sync import SyncTable
+from atomik_core.persistent import PersistentSyncTable
 from atomik_core.transport import MemoryTransport, CallbackTransport
+from atomik_core.async_transport import AsyncCallbackTransport, AsyncSyncTable
 from atomik_core.benchmark import (
     bench_rollback,
     bench_change_detection,
@@ -61,8 +63,11 @@ __all__ = [
     "DeltaMessage",
     "Fingerprint",
     "SyncTable",
+    "PersistentSyncTable",
     "MemoryTransport",
     "CallbackTransport",
+    "AsyncCallbackTransport",
+    "AsyncSyncTable",
     "bench_rollback",
     "bench_change_detection",
     "bench_convergence",

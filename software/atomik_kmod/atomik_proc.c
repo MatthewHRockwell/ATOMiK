@@ -14,6 +14,7 @@
 #include <linux/proc_fs.h>
 #include <linux/seq_file.h>
 
+#include "atomik_audit.h"
 #include "atomik_cow.h"
 #include "atomik_hw.h"
 #include "atomik_net.h"
@@ -192,6 +193,20 @@ static const struct proc_ops summary_proc_ops = {
 	.proc_release = single_release,
 };
 
+/* --- /proc/atomik/audit --- */
+
+static int audit_proc_open(struct inode *inode, struct file *file)
+{
+	return single_open(file, atomik_audit_read, NULL);
+}
+
+static const struct proc_ops audit_proc_ops = {
+	.proc_open    = audit_proc_open,
+	.proc_read    = seq_read,
+	.proc_lseek   = seq_lseek,
+	.proc_release = single_release,
+};
+
 /* --- Init / Exit --- */
 
 int atomik_proc_init(void)
@@ -207,6 +222,8 @@ int atomik_proc_init(void)
 	if (!proc_create("net", 0444, proc_dir, &net_proc_ops))
 		goto err;
 	if (!proc_create("summary", 0444, proc_dir, &summary_proc_ops))
+		goto err;
+	if (!proc_create("audit", 0444, proc_dir, &audit_proc_ops))
 		goto err;
 
 	return 0;

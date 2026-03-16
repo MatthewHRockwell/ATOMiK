@@ -21,6 +21,38 @@ type Release = {
 
 const releases: Release[] = [
   {
+    version: "v0.4.0",
+    title: "Python SDK — Production Ready",
+    date: "March 16, 2026",
+    category: "software",
+    items: [
+      "PersistentSyncTable: crash-safe delta persistence with WAL and compaction",
+      "AsyncSyncTable + AsyncCallbackTransport for asyncio/FastAPI/aiohttp",
+      "Benchmark --share flag for shareable result summaries",
+      "DeviceContext: Python bindings for /dev/atomik kernel module ioctls",
+      "SyncTable + MemoryTransport + CallbackTransport (full transport layer)",
+      "C accelerator wired into Fingerprint hot path",
+      "200+ tests passing",
+      "pip install atomik-core==0.4.0",
+    ],
+  },
+  {
+    version: "v0.5.0",
+    title: "Kernel Module — Enterprise Features",
+    date: "March 16, 2026",
+    category: "tools",
+    items: [
+      "/proc/atomik/audit ring-buffer audit log (last 1024 operations)",
+      "perf/ftrace tracepoints wired to all 4 ioctl handlers",
+      "Memory shrinkers for COW and network hash tables",
+      "atomik-report waste analysis tool (--json/--csv/--brief)",
+      "Prometheus exporter with health endpoints (/healthz, /ready)",
+      "Grafana dashboard (3-row pre-built JSON)",
+      "Kubernetes: DaemonSet, Helm chart with RBAC + NetworkPolicy + probes",
+      "License key expiry (YYMM encoding) for subscription enforcement",
+    ],
+  },
+  {
     version: "v0.3.0",
     title: "Python SDK — Serialization & Tracing",
     date: "March 16, 2026",
