@@ -47,7 +47,7 @@ from atomik_core.context import AtomikContext
 from atomik_core.fingerprint import Fingerprint
 from atomik_core.persistent import PersistentSyncTable
 from atomik_core.stream import DeltaMessage, DeltaStream
-from atomik_core.sync import SyncTable
+from atomik_core.sync import SyncTable, WebSocketHandle
 from atomik_core.table import AtomikTable
 from atomik_core.transport import CallbackTransport, MemoryTransport
 
@@ -73,6 +73,7 @@ __all__ = [
     "bench_convergence",
     "bench_bandwidth",
     "bench_throughput",
+    "WebSocketHandle",
     "DeviceContext",
     "DeviceTable",
 ]

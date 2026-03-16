@@ -45,6 +45,15 @@ const solutions = [
     color: "#a855f7",
     keywords: ["Multiplayer", "Netcode", "Rollback"],
   },
+  {
+    href: "/solutions/database-sync",
+    title: "Database Change Detection",
+    subtitle: "No CDC, no triggers, no replication slots",
+    description:
+      "Detect which rows changed in O(1) per row using XOR fingerprinting. Works with PostgreSQL, MySQL, SQLite. Zero infrastructure — just pip install.",
+    color: "#22d3ee",
+    keywords: ["CDC alternative", "Triggers", "Row-level sync"],
+  },
 ];
 
 export default function SolutionsPage() {

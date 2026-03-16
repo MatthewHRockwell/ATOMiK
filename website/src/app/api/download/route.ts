@@ -1,9 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyDownloadToken } from '@/lib/license';
 
+const GITHUB_TARBALL_URL =
+  'https://github.com/MatthewHRockwell/ATOMiK/archive/refs/heads/main.tar.gz';
+
 /**
  * GET /api/download?token=xxx
- * Serves the platform-specific installer after verifying the download token.
+ * Verifies the download token and redirects to the GitHub source tarball.
+ * The kernel module is Linux-only — no Windows/macOS support.
  */
 export async function GET(req: NextRequest) {
   const token = req.nextUrl.searchParams.get('token');
@@ -20,38 +24,12 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  const { platform } = verified;
-
-  // TODO: Replace with actual signed URLs to package storage (S3, R2, etc.)
-  // For now, return platform-specific install instructions
-  const installInfo: Record<string, { filename: string; instructions: string }> = {
-    linux: {
-      filename: 'atomik-pro-0.4.0-linux-x86_64.tar.gz',
-      instructions: 'tar xzf atomik-pro-*.tar.gz && cd atomik-pro && sudo ./install.sh',
-    },
-    windows: {
-      filename: 'atomik-pro-0.4.0-windows-x64.exe',
-      instructions: 'Run the installer and follow the prompts.',
-    },
-    macos: {
-      filename: 'atomik-pro-0.4.0-macos-universal.pkg',
-      instructions: 'Double-click the .pkg file and follow the prompts.',
-    },
-  };
-
-  const info = installInfo[platform];
-  if (!info) {
-    return NextResponse.json({ error: 'Unknown platform' }, { status: 400 });
+  if (verified.platform !== 'linux') {
+    return NextResponse.json(
+      { error: 'ATOMiK kernel module is Linux-only. Please select the Linux platform.' },
+      { status: 400 }
+    );
   }
 
-  // When packages are built, this will redirect to the actual download:
-  // return NextResponse.redirect(`https://releases.atomik.tech/${info.filename}`);
-
-  return NextResponse.json({
-    message: 'Download verified. Package builds are being finalized.',
-    platform,
-    filename: info.filename,
-    instructions: info.instructions,
-    status: 'coming_soon',
-  });
+  return NextResponse.redirect(GITHUB_TARBALL_URL, 302);
 }

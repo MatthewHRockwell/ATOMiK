@@ -285,6 +285,26 @@ def bench_throughput() -> dict:
     }
 
 
+def _extract_metrics(results: list[dict]) -> dict:
+    """Pull headline numbers from benchmark result dicts."""
+    rollback = next((r for r in results if r["test"] == "rollback"), {})
+    convergence = next((r for r in results if r["test"] == "convergence"), {})
+    bandwidth = next((r for r in results if r["test"] == "bandwidth"), {})
+    throughput = next((r for r in results if r["test"] == "throughput"), {})
+
+    bw_entries = bandwidth.get("entries", [])
+    bw_reduction = max((e.get("reduction", 0) for e in bw_entries), default=0)
+    accum_ops = throughput.get("accum_ops_sec", 0)
+
+    return {
+        "rollback_x": rollback.get("speedup", 0),
+        "detection_x": rollback.get("mem_reduction", 0),
+        "convergence_x": convergence.get("speedup", 0),
+        "bw_reduction": bw_reduction,
+        "accum_ops": accum_ops,
+    }
+
+
 def format_share_text(results: list[dict]) -> str:
     """Format benchmark results as a shareable text summary.
 
@@ -294,28 +314,11 @@ def format_share_text(results: list[dict]) -> str:
     Returns:
         A formatted multi-line string suitable for copy-pasting.
     """
-    # Extract platform info
     uname = platform.uname()
     py_version = platform.python_version()
     os_info = f"{uname.system} {uname.release} {uname.machine}"
 
-    # Extract key metrics from results
-    rollback = next((r for r in results if r["test"] == "rollback"), {})
-    next((r for r in results if r["test"] == "change_detection"), {})
-    convergence = next((r for r in results if r["test"] == "convergence"), {})
-    bandwidth = next((r for r in results if r["test"] == "bandwidth"), {})
-    throughput = next((r for r in results if r["test"] == "throughput"), {})
-
-    rollback_x = rollback.get("speedup", 0)
-    detection_x = rollback.get("mem_reduction", 0)
-    convergence_x = convergence.get("speedup", 0)
-
-    # Bandwidth: use the largest state size entry for max reduction
-    bw_entries = bandwidth.get("entries", [])
-    bw_reduction = max((e.get("reduction", 0) for e in bw_entries), default=0)
-
-    # Throughput: use accum as the headline ops/sec
-    accum_ops = throughput.get("accum_ops_sec", 0)
+    m = _extract_metrics(results)
 
     lines = [
         "ATOMiK Benchmark Results",
@@ -323,17 +326,59 @@ def format_share_text(results: list[dict]) -> str:
         f"Platform: {os_info}",
         f"Python: {py_version}",
         "",
-        f"Rollback:     {rollback_x:,.1f}x faster than deepcopy",
-        f"Detection:    {detection_x:,.0f}x less memory",
-        f"Convergence:  {convergence_x:,.1f}x faster than replay",
-        f"Bandwidth:    {bw_reduction:,.0f}x reduction",
-        f"Throughput:   {accum_ops/1e6:.1f}M ops/sec",
+        f"Rollback:     {m['rollback_x']:,.1f}x faster than deepcopy",
+        f"Detection:    {m['detection_x']:,.0f}x less memory",
+        f"Convergence:  {m['convergence_x']:,.1f}x faster than replay",
+        f"Bandwidth:    {m['bw_reduction']:,.0f}x reduction",
+        f"Throughput:   {m['accum_ops']/1e6:.1f}M ops/sec",
         "",
         "-> pip install atomik-core",
         "-> python -m atomik_core benchmark",
         "-> https://atomik.tech/demo",
     ]
     return "\n".join(lines)
+
+
+def format_markdown_table(results: list[dict]) -> str:
+    """Format benchmark results as a Markdown table for README / GitHub.
+
+    Args:
+        results: List of benchmark result dicts from bench_* functions.
+
+    Returns:
+        A Markdown table string.
+    """
+    m = _extract_metrics(results)
+
+    rows = [
+        ("Rollback", f"{m['rollback_x']:,.1f}x", "vs deepcopy"),
+        ("Detection", f"{m['detection_x']:,.0f}x", "less memory"),
+        ("Convergence", f"{m['convergence_x']:,.1f}x", "vs sorted replay"),
+        ("Bandwidth", f"{m['bw_reduction']:,.0f}x", "reduction (1 MB state)"),
+        ("Throughput", f"{m['accum_ops']/1e6:.1f}M ops/s", "ACCUM on this machine"),
+    ]
+
+    lines = [
+        "| Benchmark | Speedup | Notes |",
+        "|-----------|---------|-------|",
+    ]
+    for name, speedup, notes in rows:
+        lines.append(f"| {name} | {speedup} | {notes} |")
+    return "\n".join(lines)
+
+
+def format_badge_url(results: list[dict]) -> str:
+    """Generate a shields.io badge URL from benchmark throughput.
+
+    Args:
+        results: List of benchmark result dicts from bench_* functions.
+
+    Returns:
+        A shields.io Markdown image string.
+    """
+    m = _extract_metrics(results)
+    ops_label = f"{m['accum_ops']/1e6:.1f}M_ops%2Fs"
+    return f"![ATOMiK](https://img.shields.io/badge/ATOMiK-{ops_label}-blue)"
 
 
 def main():
@@ -391,6 +436,16 @@ def main():
             print("  SHAREABLE SUMMARY (copy-paste this)")
             print(f"{'='*60}\n")
             print(format_share_text(results))
+
+            print(f"\n{'='*60}")
+            print("  MARKDOWN TABLE (for README / GitHub)")
+            print(f"{'='*60}\n")
+            print(format_markdown_table(results))
+
+            print(f"\n{'='*60}")
+            print("  BADGE (for README)")
+            print(f"{'='*60}\n")
+            print(format_badge_url(results))
 
         print()
 
