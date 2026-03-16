@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef } from "react";
 import Link from "next/link";
 import Nav from "@/components/Nav";
 
@@ -184,6 +184,73 @@ function BarComparison({
    Main ROI Calculator Page
    ================================================================= */
 
+function ROIReportExport() {
+  const [showForm, setShowForm] = useState(false);
+  const [form, setForm] = useState({ name: "", email: "", company: "", title: "" });
+  const [sent, setSent] = useState(false);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    try {
+      await fetch("/api/subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...form, source: "roi-report" }),
+      });
+    } catch { /* non-fatal */ }
+    setSent(true);
+  }
+
+  const inputStyle = { background: "#0a0a0f", border: "1px solid #1e1e2e", color: "#e0e0e8" };
+
+  return (
+    <section className="max-w-3xl mx-auto px-6 pb-10">
+      <div className="rounded-xl border p-6 text-center" style={{ background: "#12121a", borderColor: "#1e1e2e" }}>
+        {sent ? (
+          <>
+            <div className="text-2xl mb-2" style={{ color: "#22c55e" }}>&#10003;</div>
+            <h3 className="font-bold mb-2">Report request received</h3>
+            <p className="text-sm" style={{ color: "#8888a0" }}>
+              A custom ROI report based on your inputs will be prepared and sent to {form.email}.
+              In the meantime, bookmark this page — your slider settings are preserved in the URL.
+            </p>
+          </>
+        ) : !showForm ? (
+          <>
+            <h3 className="font-bold mb-2">Need this for a purchase decision?</h3>
+            <p className="text-sm mb-4" style={{ color: "#8888a0" }}>
+              Download a custom ROI report with your exact numbers — formatted for procurement.
+            </p>
+            <button
+              onClick={() => setShowForm(true)}
+              className="px-6 py-2.5 rounded-lg text-sm font-semibold"
+              style={{ background: "linear-gradient(135deg, #4f8fff, #8b5cf6)", color: "#fff" }}
+            >
+              Get Custom ROI Report
+            </button>
+          </>
+        ) : (
+          <form onSubmit={handleSubmit} className="text-left space-y-3">
+            <h3 className="font-bold text-center mb-3">Get Your Custom ROI Report</h3>
+            <div className="grid md:grid-cols-2 gap-3">
+              <input required type="text" placeholder="Full name" value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} className="w-full px-3 py-2 rounded-lg text-sm outline-none" style={inputStyle} />
+              <input required type="email" placeholder="Work email" value={form.email} onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))} className="w-full px-3 py-2 rounded-lg text-sm outline-none" style={inputStyle} />
+              <input type="text" placeholder="Company" value={form.company} onChange={(e) => setForm((f) => ({ ...f, company: e.target.value }))} className="w-full px-3 py-2 rounded-lg text-sm outline-none" style={inputStyle} />
+              <input type="text" placeholder="Title (e.g., VP Engineering)" value={form.title} onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))} className="w-full px-3 py-2 rounded-lg text-sm outline-none" style={inputStyle} />
+            </div>
+            <button type="submit" className="w-full py-2.5 rounded-lg text-sm font-semibold" style={{ background: "linear-gradient(135deg, #4f8fff, #8b5cf6)", color: "#fff" }}>
+              Send ROI Report
+            </button>
+            <p className="text-[10px] text-center" style={{ color: "#555" }}>
+              We&apos;ll email a PDF with your exact inputs, computed savings, and methodology notes.
+            </p>
+          </form>
+        )}
+      </div>
+    </section>
+  );
+}
+
 export default function RoiPage() {
   /* --- Slider state --- */
   const [servers, setServers] = useState(20);
@@ -208,7 +275,6 @@ export default function RoiPage() {
     const cowWasteBytes = servers * cowFaults * cowRedRate * PAGE_SIZE * HOURS_PER_MONTH;
     const netWasteBytes = servers * tcpSends * netRedRate * AVG_PACKET * HOURS_PER_MONTH;
     const totalWasteBytes = cowWasteBytes + netWasteBytes;
-    const totalWasteGB = totalWasteBytes / (1024 * 1024 * 1024);
 
     // --- Cost model ---
     // 1) Egress bandwidth: redundant network bytes at cloud egress rates
@@ -630,11 +696,11 @@ export default function RoiPage() {
               <strong>Network waste:</strong> servers &times; sends/hr &times; redundancy rate &times; 1,400B avg payload &times; 720 hrs/mo
             </li>
             <li>
-              <strong>Over-provisioning:</strong> redundant COW faults consume ~3.5% of a core per 10K/hr, redundant TCP sends ~2% per 50K/hr.
-              The capacity wasted on redundant work means you need more instances to serve real traffic.
+              <strong>Over-provisioning:</strong> redundant COW faults consume ~3.5% core per 10K/hr, TCP sends ~2% per 50K/hr.
+              At typical 70% utilization, this waste is amplified: you hit scaling thresholds sooner, forcing additional instances.
             </li>
             <li>
-              <strong>Cache pressure:</strong> redundant data movement evicts hot cache lines across all co-located workloads, modeled at $0.40/GB of wasted data volume
+              <strong>Cache pressure:</strong> redundant data movement evicts hot L3 cache lines, degrading throughput for all co-located workloads. Severity scales with per-server waste volume.
             </li>
             <li>
               <strong>ATOMiK reduction:</strong> 85% (Pro) to 93% (Team) of detected waste eliminated via delta-state deduplication
@@ -645,6 +711,8 @@ export default function RoiPage() {
           </ul>
         </div>
       </section>
+
+      <ROIReportExport />
 
       {/* CTA */}
       <section className="text-center px-6 pb-24">

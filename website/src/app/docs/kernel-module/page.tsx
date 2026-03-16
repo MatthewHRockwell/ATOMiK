@@ -10,6 +10,7 @@ import {
   varColor,
   DocsNav,
 } from "../shared";
+import UpgradeGate from "@/components/UpgradeGate";
 
 export const metadata: Metadata = {
   title: "Kernel Module — ATOMiK Docs",
@@ -109,6 +110,13 @@ export default function KernelModulePage() {
           </div>
         </div>
       </div>
+
+      <UpgradeGate
+        tier="pro"
+        title="Ready to install?"
+        description="Start your 90-day free trial to get the Linux kernel module with COW detection, network dedup, and real-time waste tracking."
+        ctaText="Start Pro Trial"
+      />
 
       {/* ioctl example */}
       <div className="mb-6">

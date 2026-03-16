@@ -37,9 +37,13 @@ export async function POST(req: NextRequest) {
         if (existing.data.length === 0) {
           await stripe.customers.create({
             email: normalized,
+            name: body.name || undefined,
             metadata: {
               source: body.source || 'newsletter',
               name: body.name || '',
+              role: body.role || '',
+              company: body.company || '',
+              interests: Array.isArray(body.interests) ? body.interests.join(', ') : '',
               subscribed_at: new Date().toISOString(),
             },
           });

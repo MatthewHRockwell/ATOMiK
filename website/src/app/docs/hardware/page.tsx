@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { DocsNav } from "../shared";
+import UpgradeGate from "@/components/UpgradeGate";
 
 export const metadata: Metadata = {
   title: "Hardware — ATOMiK Docs",
@@ -94,6 +95,13 @@ export default function HardwarePage() {
           multiple producers can feed deltas in any order and the result is identical.
         </p>
       </div>
+
+      <UpgradeGate
+        tier="enterprise"
+        title="Deploy on your FPGA"
+        description="Enterprise customers get pre-built bitstreams, device tree overlays, integration consulting, and 4-hour SLA."
+        ctaText="Contact Sales"
+      />
 
       <DocsNav
         prev={{ href: "/docs/examples", label: "Examples" }}

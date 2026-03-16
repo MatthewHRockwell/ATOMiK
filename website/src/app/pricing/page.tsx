@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import Nav from "@/components/Nav";
+import DeveloperStats from "@/components/DeveloperStats";
 import { useState } from "react";
 
 const tiers = [
@@ -11,7 +12,7 @@ const tiers = [
     period: "",
     description: "For developers exploring delta-state algebra",
     cta: "Get Started Free",
-    ctaHref: "/get-started",
+    ctaHref: "/register",
     ctaStyle: { background: "transparent", color: "#e0e0e8", border: "1px solid #1e1e2e" },
     features: [
       { text: "Python SDK + C header + examples", included: true },
@@ -147,6 +148,11 @@ export default function PricingPage() {
           Start free with the Python SDK. Add system-level optimization when you need it.
           Scale to hardware when you&apos;re ready.
         </p>
+      </section>
+
+      {/* Developer Stats */}
+      <section className="pb-12">
+        <DeveloperStats />
       </section>
 
       {/* Pricing Cards */}

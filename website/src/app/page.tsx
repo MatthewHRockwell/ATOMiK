@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Nav from "@/components/Nav";
 import EmailCapture from "@/components/EmailCapture";
 import MiniDemo from "@/components/MiniDemo";
+import DeveloperStats from "@/components/DeveloperStats";
 
 export const metadata: Metadata = {
   title: "ATOMiK — Stop moving data. Start evolving it.",
@@ -65,7 +66,7 @@ const pricingTiers = [
     period: "",
     items: ["Python SDK + C header + examples", "Full 4-operation API", "Apache 2.0 license", "Community support via GitHub"],
     cta: "Get Started Free",
-    href: "/get-started",
+    href: "/register",
     primary: false,
   },
   {
@@ -128,7 +129,7 @@ export default function Home() {
         </p>
         <div className="flex gap-4 justify-center flex-wrap mb-8">
           <Link
-            href="/get-started"
+            href="/register"
             className="px-7 py-3.5 rounded-lg text-base font-semibold text-white no-underline transition-all hover:opacity-90"
             style={{ background: "linear-gradient(135deg, #4f8fff, #3a7aee)", boxShadow: "0 4px 24px rgba(79,143,255,0.25)" }}
           >
@@ -453,6 +454,11 @@ export default function Home() {
             </div>
           </div>
         </div>
+      </section>
+
+      {/* ===== Developer Stats ===== */}
+      <section className="py-16" style={{ borderTop: "1px solid #1e1e2e" }}>
+        <DeveloperStats />
       </section>
 
       {/* ===== Email Capture ===== */}

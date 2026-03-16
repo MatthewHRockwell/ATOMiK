@@ -10,6 +10,7 @@ import {
   varColor,
   DocsNav,
 } from "../shared";
+import UpgradeGate from "@/components/UpgradeGate";
 
 export const metadata: Metadata = {
   title: "API Reference — ATOMiK Docs",
@@ -98,6 +99,13 @@ export default function ApiReferencePage() {
           </div>
         ))}
       </div>
+
+      <UpgradeGate
+        tier="team"
+        title="Generate SDKs in 5 Languages"
+        description="Team tier includes the SDK generation pipeline: Python, Rust, C, JavaScript, and Verilog from a single schema definition."
+        ctaText="Start Team Trial"
+      />
 
       {/* ─────────────── Multi-Context Tables ─────────────── */}
       <h2 className="text-3xl font-bold mb-4">Multi-Context Tables</h2>
