@@ -140,3 +140,6 @@ build/
 #Instructions to myself
 FUNDING_PROMPTS.md
 FUNDING_CONTEXT.md
+
+# --- Node.js ---
+node_modules/

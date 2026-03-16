@@ -12,6 +12,7 @@ export default function Nav({ active }: { active?: string }) {
     { href: "/docs", label: "Docs" },
     { href: "/solutions", label: "Solutions" },
     { href: "/demo", label: "Demo" },
+    { href: "/ai-demo", label: "AI Demo" },
     { href: "/pricing", label: "Pricing" },
     { href: "/blog", label: "Blog" },
     { href: "/about", label: "About" },

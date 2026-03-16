@@ -9,6 +9,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${baseUrl}/get-started`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.9 },
     { url: `${baseUrl}/pricing`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.9 },
     { url: `${baseUrl}/demo`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.8 },
+    { url: `${baseUrl}/ai-demo`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.9 },
     { url: `${baseUrl}/blog`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.8 },
     { url: `${baseUrl}/blog/announcing-atomik-kernel-module`, lastModified: new Date("2026-03-15"), changeFrequency: "monthly", priority: 0.7 },
     { url: `${baseUrl}/blog/fpga-journey-13-dollar-chip`, lastModified: new Date("2026-03-15"), changeFrequency: "monthly", priority: 0.7 },

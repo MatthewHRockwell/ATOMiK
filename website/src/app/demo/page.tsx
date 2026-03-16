@@ -170,6 +170,11 @@ export default function DemoPage() {
   const [loadInput, setLoadInput] = useState("DEADBEEF");
   const [accumInput, setAccumInput] = useState("0000FFFF");
 
+  /* --- Live sync state --- */
+  const [liveEnabled, setLiveEnabled] = useState(false);
+  const [peerCount, setPeerCount] = useState(0);
+  const wsRef = useRef<WebSocket | null>(null);
+
   const currentState = xor32(reference, accumulator);
 
   const historyEndRef = useRef<HTMLDivElement>(null);
@@ -177,6 +182,62 @@ export default function DemoPage() {
   useEffect(() => {
     historyEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [history]);
+
+  /* --- WebSocket connection for live sync --- */
+  useEffect(() => {
+    if (!liveEnabled) {
+      if (wsRef.current) {
+        wsRef.current.close();
+        wsRef.current = null;
+        setPeerCount(0);
+      }
+      return;
+    }
+
+    const ws = new WebSocket("wss://atomik-demo.matthewhrockwell.partykit.dev/party/lobby");
+    wsRef.current = ws;
+
+    ws.onmessage = (e) => {
+      try {
+        const msg = JSON.parse(e.data);
+        if (msg.type === "peers") {
+          setPeerCount(msg.count);
+        } else if (msg.type === "delta") {
+          setAccumulator((prev) => xor32(prev, msg.value));
+          setHistory((prev) => [
+            ...prev,
+            {
+              id: Date.now(),
+              op: "ACCUM" as const,
+              detail: `RECV from peer: acc ^= ${toHex(msg.value)}`,
+              resultRef: 0,
+              resultAcc: 0,
+            },
+          ]);
+        } else if (msg.type === "load") {
+          setReference(msg.value >>> 0);
+          setAccumulator(0);
+          setHistory((prev) => [
+            ...prev,
+            {
+              id: Date.now(),
+              op: "LOAD" as const,
+              detail: `RECV from peer: ref = ${toHex(msg.value)}`,
+              resultRef: msg.value >>> 0,
+              resultAcc: 0,
+            },
+          ]);
+        }
+      } catch { /* ignore malformed */ }
+    };
+
+    ws.onclose = () => setPeerCount(0);
+
+    return () => {
+      ws.close();
+      wsRef.current = null;
+    };
+  }, [liveEnabled]);
 
   /* Pulse animation helper */
   const pulse = useCallback(
@@ -208,6 +269,9 @@ export default function DemoPage() {
     setAccumulator(0);
     record("LOAD", `reference = ${toHex(v)}`, v, 0);
     pulse("ref");
+    if (wsRef.current?.readyState === WebSocket.OPEN) {
+      wsRef.current.send(JSON.stringify({ type: "load", value: v }));
+    }
   }, [loadInput, record, pulse]);
 
   const doAccum = useCallback(() => {
@@ -217,6 +281,9 @@ export default function DemoPage() {
     setAccumulator(newAcc);
     record("ACCUM", `acc ^= ${toHex(v)}`, reference, newAcc);
     pulse("acc");
+    if (wsRef.current?.readyState === WebSocket.OPEN) {
+      wsRef.current.send(JSON.stringify({ type: "delta", value: v }));
+    }
   }, [accumInput, accumulator, reference, record, pulse]);
 
   const doRead = useCallback(() => {
@@ -313,6 +380,50 @@ export default function DemoPage() {
           Try ATOMiK&apos;s four core operations in your browser. Everything runs in
           JavaScript&nbsp;&mdash; same algebra, same rules, same results as the hardware.
         </p>
+      </section>
+
+      {/* ======== Live Sync Toggle ======== */}
+      <section className="max-w-3xl mx-auto px-6 pb-4">
+        <div
+          className="rounded-xl border p-4 flex items-center justify-between"
+          style={{
+            background: liveEnabled ? "rgba(34,197,94,0.05)" : "#12121a",
+            borderColor: liveEnabled ? "rgba(34,197,94,0.3)" : "#1e1e2e",
+          }}
+        >
+          <div className="flex items-center gap-3">
+            <span
+              className="inline-block w-2.5 h-2.5 rounded-full"
+              style={{ background: liveEnabled && peerCount > 0 ? "#22c55e" : "#555" }}
+            />
+            <div>
+              <span className="text-sm font-semibold">
+                {liveEnabled ? "Live Sync Active" : "Live Sync"}
+              </span>
+              {liveEnabled && peerCount > 0 && (
+                <span className="text-xs ml-2" style={{ color: "#22c55e" }}>
+                  {peerCount} peer{peerCount !== 1 ? "s" : ""} connected
+                </span>
+              )}
+              {!liveEnabled && (
+                <span className="text-xs ml-2" style={{ color: "#8888a0" }}>
+                  Open this page in two tabs to see convergence
+                </span>
+              )}
+            </div>
+          </div>
+          <button
+            onClick={() => setLiveEnabled((p) => !p)}
+            className="px-4 py-1.5 rounded-lg text-xs font-semibold transition-colors"
+            style={{
+              background: liveEnabled ? "rgba(239,68,68,0.15)" : "rgba(34,197,94,0.15)",
+              color: liveEnabled ? "#ef4444" : "#22c55e",
+              border: `1px solid ${liveEnabled ? "rgba(239,68,68,0.3)" : "rgba(34,197,94,0.3)"}`,
+            }}
+          >
+            {liveEnabled ? "Disconnect" : "Connect"}
+          </button>
+        </div>
       </section>
 
       {/* ======== Simulator ======== */}

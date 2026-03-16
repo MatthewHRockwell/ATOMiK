@@ -1,0 +1,13 @@
+{
+  "name": "atomik-demo-relay",
+  "version": "1.0.0",
+  "description": "ATOMiK live convergence demo — PartyKit relay server. Broadcasts 16-byte XOR deltas between connected peers.",
+  "main": "src/server.ts",
+  "scripts": {
+    "dev": "npx partykit dev",
+    "deploy": "npx partykit deploy"
+  },
+  "dependencies": {
+    "partykit": "^0.0.108"
+  }
+}
