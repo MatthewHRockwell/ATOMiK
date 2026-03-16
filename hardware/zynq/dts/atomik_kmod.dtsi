@@ -1,0 +1,32 @@
+/*
+ * atomik_kmod.dtsi - ATOMiK Kernel Module Device Tree Include
+ *
+ * Device tree fragment for ATOMiK hardware acceleration via the
+ * atomik.ko kernel module. Use this INSTEAD of atomik_uio.dtsi
+ * when using the kernel module (Professional/Enterprise license).
+ *
+ * Address: 0x43C00000 (4 KB range, via M_AXI_GP0)
+ * Driver:  atomik-hw (platform_driver in atomik.ko)
+ *
+ * Usage in system-user.dtsi:
+ *
+ *   /include/ "atomik_kmod.dtsi"
+ *
+ * Or add the atomik@43c00000 node directly under &amba { ... }.
+ *
+ * The kernel module automatically detects this node via device tree
+ * matching on compatible = "atomik,delta-engine" and switches from
+ * software emulation to hardware MMIO backend.
+ *
+ * ATOMiK Project — March 2026
+ */
+
+/ {
+	amba {
+		atomik@43c00000 {
+			compatible = "atomik,delta-engine";
+			reg = <0x43c00000 0x1000>;
+			status = "okay";
+		};
+	};
+};

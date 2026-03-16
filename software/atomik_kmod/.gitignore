@@ -1,0 +1,23 @@
+# Kernel module build artifacts
+*.o
+*.ko
+*.mod
+*.mod.c
+.*.cmd
+.tmp_versions/
+Module.symvers
+modules.order
+.cache.mk
+
+# Compiled userspace tools
+tools/atomik-bench
+tools/atomik-dashboard
+tools/atomik-optimizer
+tools/atomik-status
+tools/atomik-test
+
+# Distribution tarball
+atomik-*.tar.gz
+
+# License key generator (never ship)
+tools/atomik-keygen.py

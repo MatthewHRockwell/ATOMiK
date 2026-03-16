@@ -1,0 +1,13 @@
+[Unit]
+Description=ATOMiK Delta-State Accelerator
+After=local-fs.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStartPre=/sbin/modprobe atomik
+ExecStart=/usr/local/bin/atomik-status --quiet
+ExecStop=/sbin/modprobe -r atomik
+
+[Install]
+WantedBy=multi-user.target

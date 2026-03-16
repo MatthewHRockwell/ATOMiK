@@ -1,0 +1,1 @@
+KERNEL=="atomik", GROUP="atomik", MODE="0660"

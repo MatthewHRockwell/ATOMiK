@@ -1,0 +1,317 @@
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
+----------------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2025.2 (lin64) Build 6299465 Fri Nov 14 12:34:56 MST 2025
+| Date         : Sat Mar 14 02:01:55 2026
+| Host         : Jarvis running 64-bit Ubuntu 24.04.4 LTS
+| Command      : report_timing -nworst 5 -path_type full -file /home/mattrock/Projects/ATOMiK/hardware/zynq/sweep/reports/crit_path_N512_F131p2.rpt
+| Design       : sweep_top_N512_F131p2
+| Device       : 7z020-clg400
+| Speed File   : -2  PRODUCTION 1.12 2019-11-22
+| Design State : Routed
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+Timing Report
+
+Slack (MET) :             0.213ns  (required time - arrival time)
+  Source:                 u_top/u_atomik/banks[77].bank_acc_reg[77][33]/C
+                            (rising edge-triggered cell FDRE clocked by atomik_clk  {rise@0.000ns fall@3.812ns period=7.625ns})
+  Destination:            u_top/u_cdc/core_resp_acc_zero_reg/D
+                            (rising edge-triggered cell FDCE clocked by atomik_clk  {rise@0.000ns fall@3.812ns period=7.625ns})
+  Path Group:             atomik_clk
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            7.625ns  (atomik_clk rise@7.625ns - atomik_clk rise@0.000ns)
+  Data Path Delay:        7.155ns  (logic 1.114ns (15.569%)  route 6.041ns (84.431%))
+  Logic Levels:           7  (LUT4=1 LUT5=1 LUT6=5)
+  Clock Path Skew:        -0.262ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    4.722ns = ( 12.347 - 7.625 ) 
+    Source Clock Delay      (SCD):    5.374ns
+    Clock Pessimism Removal (CPR):    0.391ns
+  Clock Uncertainty:      0.071ns  ((TSJ^2 + DJ^2)^1/2) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Discrete Jitter          (DJ):    0.123ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock atomik_clk rise edge)
+                                                      0.000     0.000 r  
+                         clock source latency         2.177     2.177    
+                         propagated clock network latency
+                                                      3.197     5.374    
+    SLICE_X3Y16          FDRE                         0.000     5.374 r  u_top/u_atomik/banks[77].bank_acc_reg[77][33]/C
+    SLICE_X3Y16          FDRE (Prop_fdre_C_Q)         0.379     5.753 r  u_top/u_atomik/banks[77].bank_acc_reg[77][33]/Q
+                         net (fo=2, routed)           1.150     6.903    u_top/u_atomik/banks[77].bank_acc_reg[77][63]_0[33]
+    SLICE_X13Y18         LUT6 (Prop_lut6_I0_O)        0.105     7.008 r  u_top/u_atomik/core_resp_state[33]_i_65/O
+                         net (fo=1, routed)           0.880     7.888    u_top/u_atomik/core_resp_state[33]_i_65_n_0
+    SLICE_X15Y20         LUT6 (Prop_lut6_I2_O)        0.105     7.993 r  u_top/u_atomik/core_resp_state[33]_i_14/O
+                         net (fo=1, routed)           0.784     8.777    u_top/u_atomik/core_resp_state[33]_i_14_n_0
+    SLICE_X26Y25         LUT6 (Prop_lut6_I5_O)        0.105     8.882 r  u_top/u_atomik/core_resp_state[33]_i_4/O
+                         net (fo=1, routed)           1.489    10.371    u_top/u_atomik/core_resp_state[33]_i_4_n_0
+    SLICE_X50Y58         LUT5 (Prop_lut5_I1_O)        0.105    10.476 f  u_top/u_atomik/core_resp_state[33]_i_2/O
+                         net (fo=2, routed)           0.842    11.317    u_top/u_atomik/p_512_in[33]
+    SLICE_X60Y62         LUT6 (Prop_lut6_I4_O)        0.105    11.422 r  u_top/u_atomik/core_resp_acc_zero_i_9/O
+                         net (fo=1, routed)           0.665    12.087    u_top/u_atomik/core_resp_acc_zero_i_9_n_0
+    SLICE_X61Y64         LUT6 (Prop_lut6_I1_O)        0.105    12.192 r  u_top/u_atomik/core_resp_acc_zero_i_5/O
+                         net (fo=1, routed)           0.232    12.425    u_top/u_atomik/core_resp_acc_zero_i_5_n_0
+    SLICE_X62Y64         LUT4 (Prop_lut4_I3_O)        0.105    12.530 r  u_top/u_atomik/core_resp_acc_zero_i_1/O
+                         net (fo=1, routed)           0.000    12.530    u_top/u_cdc/core_acc_zero
+    SLICE_X62Y64         FDCE                                         r  u_top/u_cdc/core_resp_acc_zero_reg/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock atomik_clk rise edge)
+                                                      7.625     7.625 r  
+                         clock source latency         1.935     9.560    
+                         propagated clock network latency
+                                                      2.787    12.347    
+                         clock pessimism              0.391    12.738    
+                         clock uncertainty           -0.071    12.667    
+    SLICE_X62Y64         FDCE (Setup_fdce_C_D)        0.076    12.743    u_top/u_cdc/core_resp_acc_zero_reg
+  -------------------------------------------------------------------
+                         required time                         12.743    
+                         arrival time                         -12.530    
+  -------------------------------------------------------------------
+                         slack                                  0.213    
+
+Slack (MET) :             0.213ns  (required time - arrival time)
+  Source:                 u_top/u_atomik/banks[77].bank_acc_reg[77][33]/C
+                            (rising edge-triggered cell FDRE clocked by atomik_clk  {rise@0.000ns fall@3.812ns period=7.625ns})
+  Destination:            u_top/u_cdc/core_resp_acc_zero_reg/D
+                            (rising edge-triggered cell FDCE clocked by atomik_clk  {rise@0.000ns fall@3.812ns period=7.625ns})
+  Path Group:             atomik_clk
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            7.625ns  (atomik_clk rise@7.625ns - atomik_clk rise@0.000ns)
+  Data Path Delay:        7.155ns  (logic 1.114ns (15.569%)  route 6.041ns (84.431%))
+  Logic Levels:           7  (LUT4=1 LUT5=1 LUT6=5)
+  Clock Path Skew:        -0.262ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    4.722ns = ( 12.347 - 7.625 ) 
+    Source Clock Delay      (SCD):    5.374ns
+    Clock Pessimism Removal (CPR):    0.391ns
+  Clock Uncertainty:      0.071ns  ((TSJ^2 + DJ^2)^1/2) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Discrete Jitter          (DJ):    0.123ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock atomik_clk rise edge)
+                                                      0.000     0.000 r  
+                         clock source latency         2.177     2.177    
+                         propagated clock network latency
+                                                      3.197     5.374    
+    SLICE_X3Y16          FDRE                         0.000     5.374 r  u_top/u_atomik/banks[77].bank_acc_reg[77][33]/C
+    SLICE_X3Y16          FDRE (Prop_fdre_C_Q)         0.379     5.753 r  u_top/u_atomik/banks[77].bank_acc_reg[77][33]/Q
+                         net (fo=2, routed)           1.150     6.903    u_top/u_atomik/banks[77].bank_acc_reg[77][63]_0[33]
+    SLICE_X13Y18         LUT6 (Prop_lut6_I0_O)        0.105     7.008 f  u_top/u_atomik/core_resp_state[33]_i_65/O
+                         net (fo=1, routed)           0.880     7.888    u_top/u_atomik/core_resp_state[33]_i_65_n_0
+    SLICE_X15Y20         LUT6 (Prop_lut6_I2_O)        0.105     7.993 r  u_top/u_atomik/core_resp_state[33]_i_14/O
+                         net (fo=1, routed)           0.784     8.777    u_top/u_atomik/core_resp_state[33]_i_14_n_0
+    SLICE_X26Y25         LUT6 (Prop_lut6_I5_O)        0.105     8.882 r  u_top/u_atomik/core_resp_state[33]_i_4/O
+                         net (fo=1, routed)           1.489    10.371    u_top/u_atomik/core_resp_state[33]_i_4_n_0
+    SLICE_X50Y58         LUT5 (Prop_lut5_I1_O)        0.105    10.476 f  u_top/u_atomik/core_resp_state[33]_i_2/O
+                         net (fo=2, routed)           0.842    11.317    u_top/u_atomik/p_512_in[33]
+    SLICE_X60Y62         LUT6 (Prop_lut6_I4_O)        0.105    11.422 r  u_top/u_atomik/core_resp_acc_zero_i_9/O
+                         net (fo=1, routed)           0.665    12.087    u_top/u_atomik/core_resp_acc_zero_i_9_n_0
+    SLICE_X61Y64         LUT6 (Prop_lut6_I1_O)        0.105    12.192 r  u_top/u_atomik/core_resp_acc_zero_i_5/O
+                         net (fo=1, routed)           0.232    12.425    u_top/u_atomik/core_resp_acc_zero_i_5_n_0
+    SLICE_X62Y64         LUT4 (Prop_lut4_I3_O)        0.105    12.530 r  u_top/u_atomik/core_resp_acc_zero_i_1/O
+                         net (fo=1, routed)           0.000    12.530    u_top/u_cdc/core_acc_zero
+    SLICE_X62Y64         FDCE                                         r  u_top/u_cdc/core_resp_acc_zero_reg/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock atomik_clk rise edge)
+                                                      7.625     7.625 r  
+                         clock source latency         1.935     9.560    
+                         propagated clock network latency
+                                                      2.787    12.347    
+                         clock pessimism              0.391    12.738    
+                         clock uncertainty           -0.071    12.667    
+    SLICE_X62Y64         FDCE (Setup_fdce_C_D)        0.076    12.743    u_top/u_cdc/core_resp_acc_zero_reg
+  -------------------------------------------------------------------
+                         required time                         12.743    
+                         arrival time                         -12.530    
+  -------------------------------------------------------------------
+                         slack                                  0.213    
+
+Slack (MET) :             0.213ns  (required time - arrival time)
+  Source:                 u_top/u_atomik/banks[77].bank_acc_reg[77][33]/C
+                            (rising edge-triggered cell FDRE clocked by atomik_clk  {rise@0.000ns fall@3.812ns period=7.625ns})
+  Destination:            u_top/u_cdc/core_resp_acc_zero_reg/D
+                            (rising edge-triggered cell FDCE clocked by atomik_clk  {rise@0.000ns fall@3.812ns period=7.625ns})
+  Path Group:             atomik_clk
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            7.625ns  (atomik_clk rise@7.625ns - atomik_clk rise@0.000ns)
+  Data Path Delay:        7.155ns  (logic 1.114ns (15.569%)  route 6.041ns (84.431%))
+  Logic Levels:           7  (LUT4=1 LUT5=1 LUT6=5)
+  Clock Path Skew:        -0.262ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    4.722ns = ( 12.347 - 7.625 ) 
+    Source Clock Delay      (SCD):    5.374ns
+    Clock Pessimism Removal (CPR):    0.391ns
+  Clock Uncertainty:      0.071ns  ((TSJ^2 + DJ^2)^1/2) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Discrete Jitter          (DJ):    0.123ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock atomik_clk rise edge)
+                                                      0.000     0.000 r  
+                         clock source latency         2.177     2.177    
+                         propagated clock network latency
+                                                      3.197     5.374    
+    SLICE_X3Y16          FDRE                         0.000     5.374 r  u_top/u_atomik/banks[77].bank_acc_reg[77][33]/C
+    SLICE_X3Y16          FDRE (Prop_fdre_C_Q)         0.379     5.753 r  u_top/u_atomik/banks[77].bank_acc_reg[77][33]/Q
+                         net (fo=2, routed)           1.150     6.903    u_top/u_atomik/banks[77].bank_acc_reg[77][63]_0[33]
+    SLICE_X13Y18         LUT6 (Prop_lut6_I0_O)        0.105     7.008 r  u_top/u_atomik/core_resp_state[33]_i_65/O
+                         net (fo=1, routed)           0.880     7.888    u_top/u_atomik/core_resp_state[33]_i_65_n_0
+    SLICE_X15Y20         LUT6 (Prop_lut6_I2_O)        0.105     7.993 r  u_top/u_atomik/core_resp_state[33]_i_14/O
+                         net (fo=1, routed)           0.784     8.777    u_top/u_atomik/core_resp_state[33]_i_14_n_0
+    SLICE_X26Y25         LUT6 (Prop_lut6_I5_O)        0.105     8.882 f  u_top/u_atomik/core_resp_state[33]_i_4/O
+                         net (fo=1, routed)           1.489    10.371    u_top/u_atomik/core_resp_state[33]_i_4_n_0
+    SLICE_X50Y58         LUT5 (Prop_lut5_I1_O)        0.105    10.476 f  u_top/u_atomik/core_resp_state[33]_i_2/O
+                         net (fo=2, routed)           0.842    11.317    u_top/u_atomik/p_512_in[33]
+    SLICE_X60Y62         LUT6 (Prop_lut6_I4_O)        0.105    11.422 r  u_top/u_atomik/core_resp_acc_zero_i_9/O
+                         net (fo=1, routed)           0.665    12.087    u_top/u_atomik/core_resp_acc_zero_i_9_n_0
+    SLICE_X61Y64         LUT6 (Prop_lut6_I1_O)        0.105    12.192 r  u_top/u_atomik/core_resp_acc_zero_i_5/O
+                         net (fo=1, routed)           0.232    12.425    u_top/u_atomik/core_resp_acc_zero_i_5_n_0
+    SLICE_X62Y64         LUT4 (Prop_lut4_I3_O)        0.105    12.530 r  u_top/u_atomik/core_resp_acc_zero_i_1/O
+                         net (fo=1, routed)           0.000    12.530    u_top/u_cdc/core_acc_zero
+    SLICE_X62Y64         FDCE                                         r  u_top/u_cdc/core_resp_acc_zero_reg/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock atomik_clk rise edge)
+                                                      7.625     7.625 r  
+                         clock source latency         1.935     9.560    
+                         propagated clock network latency
+                                                      2.787    12.347    
+                         clock pessimism              0.391    12.738    
+                         clock uncertainty           -0.071    12.667    
+    SLICE_X62Y64         FDCE (Setup_fdce_C_D)        0.076    12.743    u_top/u_cdc/core_resp_acc_zero_reg
+  -------------------------------------------------------------------
+                         required time                         12.743    
+                         arrival time                         -12.530    
+  -------------------------------------------------------------------
+                         slack                                  0.213    
+
+Slack (MET) :             0.213ns  (required time - arrival time)
+  Source:                 u_top/u_atomik/banks[77].bank_acc_reg[77][33]/C
+                            (rising edge-triggered cell FDRE clocked by atomik_clk  {rise@0.000ns fall@3.812ns period=7.625ns})
+  Destination:            u_top/u_cdc/core_resp_acc_zero_reg/D
+                            (rising edge-triggered cell FDCE clocked by atomik_clk  {rise@0.000ns fall@3.812ns period=7.625ns})
+  Path Group:             atomik_clk
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            7.625ns  (atomik_clk rise@7.625ns - atomik_clk rise@0.000ns)
+  Data Path Delay:        7.155ns  (logic 1.114ns (15.569%)  route 6.041ns (84.431%))
+  Logic Levels:           7  (LUT4=1 LUT5=1 LUT6=5)
+  Clock Path Skew:        -0.262ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    4.722ns = ( 12.347 - 7.625 ) 
+    Source Clock Delay      (SCD):    5.374ns
+    Clock Pessimism Removal (CPR):    0.391ns
+  Clock Uncertainty:      0.071ns  ((TSJ^2 + DJ^2)^1/2) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Discrete Jitter          (DJ):    0.123ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock atomik_clk rise edge)
+                                                      0.000     0.000 r  
+                         clock source latency         2.177     2.177    
+                         propagated clock network latency
+                                                      3.197     5.374    
+    SLICE_X3Y16          FDRE                         0.000     5.374 r  u_top/u_atomik/banks[77].bank_acc_reg[77][33]/C
+    SLICE_X3Y16          FDRE (Prop_fdre_C_Q)         0.379     5.753 r  u_top/u_atomik/banks[77].bank_acc_reg[77][33]/Q
+                         net (fo=2, routed)           1.150     6.903    u_top/u_atomik/banks[77].bank_acc_reg[77][63]_0[33]
+    SLICE_X13Y18         LUT6 (Prop_lut6_I0_O)        0.105     7.008 f  u_top/u_atomik/core_resp_state[33]_i_65/O
+                         net (fo=1, routed)           0.880     7.888    u_top/u_atomik/core_resp_state[33]_i_65_n_0
+    SLICE_X15Y20         LUT6 (Prop_lut6_I2_O)        0.105     7.993 r  u_top/u_atomik/core_resp_state[33]_i_14/O
+                         net (fo=1, routed)           0.784     8.777    u_top/u_atomik/core_resp_state[33]_i_14_n_0
+    SLICE_X26Y25         LUT6 (Prop_lut6_I5_O)        0.105     8.882 f  u_top/u_atomik/core_resp_state[33]_i_4/O
+                         net (fo=1, routed)           1.489    10.371    u_top/u_atomik/core_resp_state[33]_i_4_n_0
+    SLICE_X50Y58         LUT5 (Prop_lut5_I1_O)        0.105    10.476 f  u_top/u_atomik/core_resp_state[33]_i_2/O
+                         net (fo=2, routed)           0.842    11.317    u_top/u_atomik/p_512_in[33]
+    SLICE_X60Y62         LUT6 (Prop_lut6_I4_O)        0.105    11.422 r  u_top/u_atomik/core_resp_acc_zero_i_9/O
+                         net (fo=1, routed)           0.665    12.087    u_top/u_atomik/core_resp_acc_zero_i_9_n_0
+    SLICE_X61Y64         LUT6 (Prop_lut6_I1_O)        0.105    12.192 r  u_top/u_atomik/core_resp_acc_zero_i_5/O
+                         net (fo=1, routed)           0.232    12.425    u_top/u_atomik/core_resp_acc_zero_i_5_n_0
+    SLICE_X62Y64         LUT4 (Prop_lut4_I3_O)        0.105    12.530 r  u_top/u_atomik/core_resp_acc_zero_i_1/O
+                         net (fo=1, routed)           0.000    12.530    u_top/u_cdc/core_acc_zero
+    SLICE_X62Y64         FDCE                                         r  u_top/u_cdc/core_resp_acc_zero_reg/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock atomik_clk rise edge)
+                                                      7.625     7.625 r  
+                         clock source latency         1.935     9.560    
+                         propagated clock network latency
+                                                      2.787    12.347    
+                         clock pessimism              0.391    12.738    
+                         clock uncertainty           -0.071    12.667    
+    SLICE_X62Y64         FDCE (Setup_fdce_C_D)        0.076    12.743    u_top/u_cdc/core_resp_acc_zero_reg
+  -------------------------------------------------------------------
+                         required time                         12.743    
+                         arrival time                         -12.530    
+  -------------------------------------------------------------------
+                         slack                                  0.213    
+
+Slack (MET) :             0.213ns  (required time - arrival time)
+  Source:                 u_top/u_atomik/banks[77].bank_acc_reg[77][33]/C
+                            (rising edge-triggered cell FDRE clocked by atomik_clk  {rise@0.000ns fall@3.812ns period=7.625ns})
+  Destination:            u_top/u_cdc/core_resp_acc_zero_reg/D
+                            (rising edge-triggered cell FDCE clocked by atomik_clk  {rise@0.000ns fall@3.812ns period=7.625ns})
+  Path Group:             atomik_clk
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            7.625ns  (atomik_clk rise@7.625ns - atomik_clk rise@0.000ns)
+  Data Path Delay:        7.155ns  (logic 1.114ns (15.569%)  route 6.041ns (84.431%))
+  Logic Levels:           7  (LUT4=1 LUT5=1 LUT6=5)
+  Clock Path Skew:        -0.262ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    4.722ns = ( 12.347 - 7.625 ) 
+    Source Clock Delay      (SCD):    5.374ns
+    Clock Pessimism Removal (CPR):    0.391ns
+  Clock Uncertainty:      0.071ns  ((TSJ^2 + DJ^2)^1/2) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Discrete Jitter          (DJ):    0.123ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock atomik_clk rise edge)
+                                                      0.000     0.000 r  
+                         clock source latency         2.177     2.177    
+                         propagated clock network latency
+                                                      3.197     5.374    
+    SLICE_X3Y16          FDRE                         0.000     5.374 r  u_top/u_atomik/banks[77].bank_acc_reg[77][33]/C
+    SLICE_X3Y16          FDRE (Prop_fdre_C_Q)         0.379     5.753 r  u_top/u_atomik/banks[77].bank_acc_reg[77][33]/Q
+                         net (fo=2, routed)           1.150     6.903    u_top/u_atomik/banks[77].bank_acc_reg[77][63]_0[33]
+    SLICE_X13Y18         LUT6 (Prop_lut6_I0_O)        0.105     7.008 r  u_top/u_atomik/core_resp_state[33]_i_65/O
+                         net (fo=1, routed)           0.880     7.888    u_top/u_atomik/core_resp_state[33]_i_65_n_0
+    SLICE_X15Y20         LUT6 (Prop_lut6_I2_O)        0.105     7.993 f  u_top/u_atomik/core_resp_state[33]_i_14/O
+                         net (fo=1, routed)           0.784     8.777    u_top/u_atomik/core_resp_state[33]_i_14_n_0
+    SLICE_X26Y25         LUT6 (Prop_lut6_I5_O)        0.105     8.882 f  u_top/u_atomik/core_resp_state[33]_i_4/O
+                         net (fo=1, routed)           1.489    10.371    u_top/u_atomik/core_resp_state[33]_i_4_n_0
+    SLICE_X50Y58         LUT5 (Prop_lut5_I1_O)        0.105    10.476 f  u_top/u_atomik/core_resp_state[33]_i_2/O
+                         net (fo=2, routed)           0.842    11.317    u_top/u_atomik/p_512_in[33]
+    SLICE_X60Y62         LUT6 (Prop_lut6_I4_O)        0.105    11.422 r  u_top/u_atomik/core_resp_acc_zero_i_9/O
+                         net (fo=1, routed)           0.665    12.087    u_top/u_atomik/core_resp_acc_zero_i_9_n_0
+    SLICE_X61Y64         LUT6 (Prop_lut6_I1_O)        0.105    12.192 r  u_top/u_atomik/core_resp_acc_zero_i_5/O
+                         net (fo=1, routed)           0.232    12.425    u_top/u_atomik/core_resp_acc_zero_i_5_n_0
+    SLICE_X62Y64         LUT4 (Prop_lut4_I3_O)        0.105    12.530 r  u_top/u_atomik/core_resp_acc_zero_i_1/O
+                         net (fo=1, routed)           0.000    12.530    u_top/u_cdc/core_acc_zero
+    SLICE_X62Y64         FDCE                                         r  u_top/u_cdc/core_resp_acc_zero_reg/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock atomik_clk rise edge)
+                                                      7.625     7.625 r  
+                         clock source latency         1.935     9.560    
+                         propagated clock network latency
+                                                      2.787    12.347    
+                         clock pessimism              0.391    12.738    
+                         clock uncertainty           -0.071    12.667    
+    SLICE_X62Y64         FDCE (Setup_fdce_C_D)        0.076    12.743    u_top/u_cdc/core_resp_acc_zero_reg
+  -------------------------------------------------------------------
+                         required time                         12.743    
+                         arrival time                         -12.530    
+  -------------------------------------------------------------------
+                         slack                                  0.213    
+
+
+
+

@@ -105,7 +105,9 @@ reference-documents-tmp/
 .ruff_cache/
 
 # --- Editor/Tool Local Settings ---
-.claude/settings.local.json
+.claude/
+hs_err_pid*.log
+hardware/zynq/hs_err_pid*.log
 
 # --- Sensitive Configuration (contains credentials) ---
 business/funding_strategy/config.yaml

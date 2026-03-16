@@ -1,0 +1,34 @@
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2025.2 (lin64) Build 6299465 Fri Nov 14 12:34:56 MST 2025
+| Date         : Sat Mar 14 02:56:16 2026
+| Host         : Jarvis running 64-bit Ubuntu 24.04.4 LTS
+| Command      : report_utilization -hierarchical -hierarchical_depth 2 -file /home/mattrock/Projects/ATOMiK/hardware/zynq/sweep/reports/hier_util_N512_F133p3.rpt
+| Design       : sweep_top_N512_F133p3
+| Device       : xc7z020clg400-2
+| Speed File   : -2
+| Design State : Routed
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Utilization Design Information
+
+Table of Contents
+-----------------
+1. Utilization by Hierarchy
+
+1. Utilization by Hierarchy
+---------------------------
+
++---------------------------+---------------------------+------------+------------+---------+------+-------+--------+--------+------------+
+|          Instance         |           Module          | Total LUTs | Logic LUTs | LUTRAMs | SRLs |  FFs  | RAMB36 | RAMB18 | DSP Blocks |
++---------------------------+---------------------------+------------+------------+---------+------+-------+--------+--------+------------+
+| sweep_top_N512_F133p3     |                     (top) |      23533 |      23533 |       0 |    0 | 33770 |      1 |      0 |          0 |
+|   (sweep_top_N512_F133p3) |                     (top) |          0 |          0 |       0 |    0 |     0 |      0 |      0 |          0 |
+|   u_top                   |           atomik_zynq_top |      23533 |      23533 |       0 |    0 | 33770 |      1 |      0 |          0 |
+|     (u_atomik)            | atomik_core_zynq_parallel |       6995 |       6995 |       0 |    0 | 32878 |      0 |      0 |          0 |
+|     u_cdc                 |         atomik_cdc_bridge |      16436 |      16436 |       0 |    0 |   560 |      0 |      0 |          0 |
+|     u_wrapper             |   atomik_axi4lite_wrapper |        102 |        102 |       0 |    0 |   332 |      0 |      0 |          0 |
++---------------------------+---------------------------+------------+------------+---------+------+-------+--------+--------+------------+
+* Note: The sum of lower-level cells may be larger than their parent cells total, due to cross-hierarchy LUT combining
+
+

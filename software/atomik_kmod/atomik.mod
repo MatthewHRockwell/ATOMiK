@@ -1,0 +1,9 @@
+./atomik_main.o
+./atomik_chardev.o
+./atomik_fingerprint.o
+./atomik_sysfs.o
+./atomik_hw.o
+./atomik_license.o
+./atomik_cow.o
+./atomik_net.o
+./atomik_cgroup.o

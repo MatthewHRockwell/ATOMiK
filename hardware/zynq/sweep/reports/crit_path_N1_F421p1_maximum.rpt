@@ -1,0 +1,268 @@
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
+----------------------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2025.2 (lin64) Build 6299465 Fri Nov 14 12:34:56 MST 2025
+| Date         : Fri Mar 13 09:28:00 2026
+| Host         : Jarvis running 64-bit Ubuntu 24.04.4 LTS
+| Command      : report_timing -nworst 5 -path_type full -file /home/mattrock/Projects/ATOMiK/hardware/zynq/sweep/reports/crit_path_N1_F421p1_maximum.rpt
+| Design       : sweep_top_N1_F421p1_maximum
+| Device       : 7z020-clg400
+| Speed File   : -2  PRODUCTION 1.12 2019-11-22
+| Design State : Routed
+----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Timing Report
+
+Slack (MET) :             0.011ns  (required time - arrival time)
+  Source:                 u_top/u_atomik/banks[0].bank_acc_reg[0][42]/C
+                            (rising edge-triggered cell FDRE clocked by atomik_clk  {rise@0.000ns fall@1.187ns period=2.375ns})
+  Destination:            u_top/u_cdc/core_resp_acc_zero_reg/D
+                            (rising edge-triggered cell FDCE clocked by atomik_clk  {rise@0.000ns fall@1.187ns period=2.375ns})
+  Path Group:             atomik_clk
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            2.375ns  (atomik_clk rise@2.375ns - atomik_clk rise@0.000ns)
+  Data Path Delay:        2.305ns  (logic 0.748ns (32.449%)  route 1.557ns (67.551%))
+  Logic Levels:           3  (LUT4=1 LUT6=2)
+  Clock Path Skew:        -0.028ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    4.942ns = ( 7.317 - 2.375 ) 
+    Source Clock Delay      (SCD):    5.507ns
+    Clock Pessimism Removal (CPR):    0.538ns
+  Clock Uncertainty:      0.060ns  ((TSJ^2 + DJ^2)^1/2) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Discrete Jitter          (DJ):    0.098ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock atomik_clk rise edge)
+                                                      0.000     0.000 r  
+                         clock source latency         2.177     2.177    
+                         propagated clock network latency
+                                                      3.330     5.507    
+    SLICE_X94Y102        FDRE                         0.000     5.507 r  u_top/u_atomik/banks[0].bank_acc_reg[0][42]/C
+    SLICE_X94Y102        FDRE (Prop_fdre_C_Q)         0.433     5.940 f  u_top/u_atomik/banks[0].bank_acc_reg[0][42]/Q
+                         net (fo=3, routed)           0.789     6.729    u_top/u_atomik/Q[42]
+    SLICE_X95Y104        LUT6 (Prop_lut6_I0_O)        0.105     6.834 r  u_top/u_atomik/core_resp_acc_zero_i_11/O
+                         net (fo=1, routed)           0.653     7.487    u_top/u_atomik/core_resp_acc_zero_i_11_n_0
+    SLICE_X95Y105        LUT6 (Prop_lut6_I3_O)        0.105     7.592 r  u_top/u_atomik/core_resp_acc_zero_i_5/O
+                         net (fo=1, routed)           0.116     7.708    u_top/u_atomik/core_resp_acc_zero_i_5_n_0
+    SLICE_X95Y105        LUT4 (Prop_lut4_I3_O)        0.105     7.813 r  u_top/u_atomik/core_resp_acc_zero_i_1/O
+                         net (fo=1, routed)           0.000     7.813    u_top/u_cdc/acc_zero
+    SLICE_X95Y105        FDCE                                         r  u_top/u_cdc/core_resp_acc_zero_reg/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock atomik_clk rise edge)
+                                                      2.375     2.375 r  
+                         clock source latency         1.935     4.310    
+                         propagated clock network latency
+                                                      3.006     7.317    
+                         clock pessimism              0.538     7.854    
+                         clock uncertainty           -0.060     7.794    
+    SLICE_X95Y105        FDCE (Setup_fdce_C_D)        0.030     7.824    u_top/u_cdc/core_resp_acc_zero_reg
+  -------------------------------------------------------------------
+                         required time                          7.824    
+                         arrival time                          -7.813    
+  -------------------------------------------------------------------
+                         slack                                  0.011    
+
+Slack (MET) :             0.011ns  (required time - arrival time)
+  Source:                 u_top/u_atomik/banks[0].bank_acc_reg[0][42]/C
+                            (rising edge-triggered cell FDRE clocked by atomik_clk  {rise@0.000ns fall@1.187ns period=2.375ns})
+  Destination:            u_top/u_cdc/core_resp_acc_zero_reg/D
+                            (rising edge-triggered cell FDCE clocked by atomik_clk  {rise@0.000ns fall@1.187ns period=2.375ns})
+  Path Group:             atomik_clk
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            2.375ns  (atomik_clk rise@2.375ns - atomik_clk rise@0.000ns)
+  Data Path Delay:        2.305ns  (logic 0.748ns (32.449%)  route 1.557ns (67.551%))
+  Logic Levels:           3  (LUT4=1 LUT6=2)
+  Clock Path Skew:        -0.028ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    4.942ns = ( 7.317 - 2.375 ) 
+    Source Clock Delay      (SCD):    5.507ns
+    Clock Pessimism Removal (CPR):    0.538ns
+  Clock Uncertainty:      0.060ns  ((TSJ^2 + DJ^2)^1/2) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Discrete Jitter          (DJ):    0.098ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock atomik_clk rise edge)
+                                                      0.000     0.000 r  
+                         clock source latency         2.177     2.177    
+                         propagated clock network latency
+                                                      3.330     5.507    
+    SLICE_X94Y102        FDRE                         0.000     5.507 r  u_top/u_atomik/banks[0].bank_acc_reg[0][42]/C
+    SLICE_X94Y102        FDRE (Prop_fdre_C_Q)         0.433     5.940 r  u_top/u_atomik/banks[0].bank_acc_reg[0][42]/Q
+                         net (fo=3, routed)           0.789     6.729    u_top/u_atomik/Q[42]
+    SLICE_X95Y104        LUT6 (Prop_lut6_I0_O)        0.105     6.834 f  u_top/u_atomik/core_resp_acc_zero_i_11/O
+                         net (fo=1, routed)           0.653     7.487    u_top/u_atomik/core_resp_acc_zero_i_11_n_0
+    SLICE_X95Y105        LUT6 (Prop_lut6_I3_O)        0.105     7.592 f  u_top/u_atomik/core_resp_acc_zero_i_5/O
+                         net (fo=1, routed)           0.116     7.708    u_top/u_atomik/core_resp_acc_zero_i_5_n_0
+    SLICE_X95Y105        LUT4 (Prop_lut4_I3_O)        0.105     7.813 f  u_top/u_atomik/core_resp_acc_zero_i_1/O
+                         net (fo=1, routed)           0.000     7.813    u_top/u_cdc/acc_zero
+    SLICE_X95Y105        FDCE                                         f  u_top/u_cdc/core_resp_acc_zero_reg/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock atomik_clk rise edge)
+                                                      2.375     2.375 r  
+                         clock source latency         1.935     4.310    
+                         propagated clock network latency
+                                                      3.006     7.317    
+                         clock pessimism              0.538     7.854    
+                         clock uncertainty           -0.060     7.794    
+    SLICE_X95Y105        FDCE (Setup_fdce_C_D)        0.030     7.824    u_top/u_cdc/core_resp_acc_zero_reg
+  -------------------------------------------------------------------
+                         required time                          7.824    
+                         arrival time                          -7.813    
+  -------------------------------------------------------------------
+                         slack                                  0.011    
+
+Slack (MET) :             0.031ns  (required time - arrival time)
+  Source:                 u_top/u_cdc/core_load_en_reg_replica/C
+                            (rising edge-triggered cell FDCE clocked by atomik_clk  {rise@0.000ns fall@1.187ns period=2.375ns})
+  Destination:            u_top/u_atomik/u_state_bram/xpm_memory_base_inst/gen_wr_a.gen_word_narrow.mem_reg/DIBDI[13]
+                            (rising edge-triggered cell RAMB36E1 clocked by atomik_clk  {rise@0.000ns fall@1.187ns period=2.375ns})
+  Path Group:             atomik_clk
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            2.375ns  (atomik_clk rise@2.375ns - atomik_clk rise@0.000ns)
+  Data Path Delay:        1.874ns  (logic 0.493ns (26.311%)  route 1.381ns (73.689%))
+  Logic Levels:           1  (LUT3=1)
+  Clock Path Skew:        -0.026ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    4.979ns = ( 7.354 - 2.375 ) 
+    Source Clock Delay      (SCD):    5.507ns
+    Clock Pessimism Removal (CPR):    0.502ns
+  Clock Uncertainty:      0.060ns  ((TSJ^2 + DJ^2)^1/2) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Discrete Jitter          (DJ):    0.098ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock atomik_clk rise edge)
+                                                      0.000     0.000 r  
+                         clock source latency         2.177     2.177    
+                         propagated clock network latency
+                                                      3.330     5.507    
+    SLICE_X95Y103        FDCE                         0.000     5.507 r  u_top/u_cdc/core_load_en_reg_replica/C
+    SLICE_X95Y103        FDCE (Prop_fdce_C_Q)         0.379     5.886 r  u_top/u_cdc/core_load_en_reg_replica/Q
+                         net (fo=63, routed)          0.993     6.879    u_top/u_cdc/core_load_en_repN
+    SLICE_X93Y109        LUT3 (Prop_lut3_I1_O)        0.114     6.993 r  u_top/u_cdc/u_state_bram_i_28/O
+                         net (fo=1, routed)           0.388     7.381    u_top/u_atomik/u_state_bram/xpm_memory_base_inst/dina[45]
+    RAMB36_X4Y21         RAMB36E1                                     r  u_top/u_atomik/u_state_bram/xpm_memory_base_inst/gen_wr_a.gen_word_narrow.mem_reg/DIBDI[13]
+  -------------------------------------------------------------------    -------------------
+
+                         (clock atomik_clk rise edge)
+                                                      2.375     2.375 r  
+                         clock source latency         1.935     4.310    
+                         propagated clock network latency
+                                                      3.044     7.354    
+                         clock pessimism              0.502     7.856    
+                         clock uncertainty           -0.060     7.796    
+    RAMB36_X4Y21         RAMB36E1 (Setup_ramb36e1_CLKBWRCLK_DIBDI[13])
+                                                     -0.383     7.413    u_top/u_atomik/u_state_bram/xpm_memory_base_inst/gen_wr_a.gen_word_narrow.mem_reg
+  -------------------------------------------------------------------
+                         required time                          7.413    
+                         arrival time                          -7.381    
+  -------------------------------------------------------------------
+                         slack                                  0.031    
+
+Slack (MET) :             0.031ns  (required time - arrival time)
+  Source:                 u_top/u_cdc/core_load_en_reg_replica/C
+                            (rising edge-triggered cell FDCE clocked by atomik_clk  {rise@0.000ns fall@1.187ns period=2.375ns})
+  Destination:            u_top/u_atomik/u_state_bram/xpm_memory_base_inst/gen_wr_a.gen_word_narrow.mem_reg/DIBDI[13]
+                            (rising edge-triggered cell RAMB36E1 clocked by atomik_clk  {rise@0.000ns fall@1.187ns period=2.375ns})
+  Path Group:             atomik_clk
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            2.375ns  (atomik_clk rise@2.375ns - atomik_clk rise@0.000ns)
+  Data Path Delay:        1.874ns  (logic 0.493ns (26.311%)  route 1.381ns (73.689%))
+  Logic Levels:           1  (LUT3=1)
+  Clock Path Skew:        -0.026ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    4.979ns = ( 7.354 - 2.375 ) 
+    Source Clock Delay      (SCD):    5.507ns
+    Clock Pessimism Removal (CPR):    0.502ns
+  Clock Uncertainty:      0.060ns  ((TSJ^2 + DJ^2)^1/2) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Discrete Jitter          (DJ):    0.098ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock atomik_clk rise edge)
+                                                      0.000     0.000 r  
+                         clock source latency         2.177     2.177    
+                         propagated clock network latency
+                                                      3.330     5.507    
+    SLICE_X95Y103        FDCE                         0.000     5.507 r  u_top/u_cdc/core_load_en_reg_replica/C
+    SLICE_X95Y103        FDCE (Prop_fdce_C_Q)         0.379     5.886 f  u_top/u_cdc/core_load_en_reg_replica/Q
+                         net (fo=63, routed)          0.993     6.879    u_top/u_cdc/core_load_en_repN
+    SLICE_X93Y109        LUT3 (Prop_lut3_I1_O)        0.114     6.993 r  u_top/u_cdc/u_state_bram_i_28/O
+                         net (fo=1, routed)           0.388     7.381    u_top/u_atomik/u_state_bram/xpm_memory_base_inst/dina[45]
+    RAMB36_X4Y21         RAMB36E1                                     r  u_top/u_atomik/u_state_bram/xpm_memory_base_inst/gen_wr_a.gen_word_narrow.mem_reg/DIBDI[13]
+  -------------------------------------------------------------------    -------------------
+
+                         (clock atomik_clk rise edge)
+                                                      2.375     2.375 r  
+                         clock source latency         1.935     4.310    
+                         propagated clock network latency
+                                                      3.044     7.354    
+                         clock pessimism              0.502     7.856    
+                         clock uncertainty           -0.060     7.796    
+    RAMB36_X4Y21         RAMB36E1 (Setup_ramb36e1_CLKBWRCLK_DIBDI[13])
+                                                     -0.383     7.413    u_top/u_atomik/u_state_bram/xpm_memory_base_inst/gen_wr_a.gen_word_narrow.mem_reg
+  -------------------------------------------------------------------
+                         required time                          7.413    
+                         arrival time                          -7.381    
+  -------------------------------------------------------------------
+                         slack                                  0.031    
+
+Slack (MET) :             0.031ns  (required time - arrival time)
+  Source:                 u_top/u_cdc/core_load_en_reg_replica/C
+                            (rising edge-triggered cell FDCE clocked by atomik_clk  {rise@0.000ns fall@1.187ns period=2.375ns})
+  Destination:            u_top/u_atomik/u_state_bram/xpm_memory_base_inst/gen_wr_a.gen_word_narrow.mem_reg/DIBDI[13]
+                            (rising edge-triggered cell RAMB36E1 clocked by atomik_clk  {rise@0.000ns fall@1.187ns period=2.375ns})
+  Path Group:             atomik_clk
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            2.375ns  (atomik_clk rise@2.375ns - atomik_clk rise@0.000ns)
+  Data Path Delay:        1.874ns  (logic 0.493ns (26.311%)  route 1.381ns (73.689%))
+  Logic Levels:           1  (LUT3=1)
+  Clock Path Skew:        -0.026ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    4.979ns = ( 7.354 - 2.375 ) 
+    Source Clock Delay      (SCD):    5.507ns
+    Clock Pessimism Removal (CPR):    0.502ns
+  Clock Uncertainty:      0.060ns  ((TSJ^2 + DJ^2)^1/2) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Discrete Jitter          (DJ):    0.098ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock atomik_clk rise edge)
+                                                      0.000     0.000 r  
+                         clock source latency         2.177     2.177    
+                         propagated clock network latency
+                                                      3.330     5.507    
+    SLICE_X95Y103        FDCE                         0.000     5.507 r  u_top/u_cdc/core_load_en_reg_replica/C
+    SLICE_X95Y103        FDCE (Prop_fdce_C_Q)         0.379     5.886 r  u_top/u_cdc/core_load_en_reg_replica/Q
+                         net (fo=63, routed)          0.993     6.879    u_top/u_cdc/core_load_en_repN
+    SLICE_X93Y109        LUT3 (Prop_lut3_I1_O)        0.114     6.993 f  u_top/u_cdc/u_state_bram_i_28/O
+                         net (fo=1, routed)           0.388     7.381    u_top/u_atomik/u_state_bram/xpm_memory_base_inst/dina[45]
+    RAMB36_X4Y21         RAMB36E1                                     f  u_top/u_atomik/u_state_bram/xpm_memory_base_inst/gen_wr_a.gen_word_narrow.mem_reg/DIBDI[13]
+  -------------------------------------------------------------------    -------------------
+
+                         (clock atomik_clk rise edge)
+                                                      2.375     2.375 r  
+                         clock source latency         1.935     4.310    
+                         propagated clock network latency
+                                                      3.044     7.354    
+                         clock pessimism              0.502     7.856    
+                         clock uncertainty           -0.060     7.796    
+    RAMB36_X4Y21         RAMB36E1 (Setup_ramb36e1_CLKBWRCLK_DIBDI[13])
+                                                     -0.383     7.413    u_top/u_atomik/u_state_bram/xpm_memory_base_inst/gen_wr_a.gen_word_narrow.mem_reg
+  -------------------------------------------------------------------
+                         required time                          7.413    
+                         arrival time                          -7.381    
+  -------------------------------------------------------------------
+                         slack                                  0.031    
+
+
+
+
