@@ -38,7 +38,7 @@ jobs:
           pip install -e ./software[dev] || pip install -e ./software
       - name: Install atomik_core
         run: |
-          pip install -e ./software/atomik_core || true
+          pip install -e ./software/atomik_core
       - name: Run linting
         run: |
           pip install ruff
