@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Nav from "@/components/Nav";
 
 export const metadata: Metadata = {
   title: "About ATOMiK — Delta-State Computing",
@@ -112,31 +113,7 @@ const proofPoints = [
 export default function AboutPage() {
   return (
     <div className="min-h-screen" style={{ background: "#0a0a0f", color: "#e0e0e8" }}>
-      {/* Navigation */}
-      <nav
-        className="sticky top-0 z-50 backdrop-blur-md border-b"
-        style={{ background: "rgba(10, 10, 15, 0.85)", borderColor: "#1e1e2e" }}
-      >
-        <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link
-            href="/"
-            className="text-lg font-bold tracking-tight hover:opacity-80 transition-opacity"
-          >
-            <span style={{ color: "#8b5cf6" }}>ATOM</span>
-            <span style={{ color: "#4f8fff" }}>i</span>
-            <span style={{ color: "#8b5cf6" }}>K</span>
-          </Link>
-          <div className="flex items-center gap-6 text-sm" style={{ color: "#8888a0" }}>
-            <Link href="/" className="hover:text-white transition-colors">
-              Home
-            </Link>
-            <span className="text-white font-medium">About</span>
-            <Link href="/about/roadmap" className="hover:text-white transition-colors">
-              ASIC Roadmap
-            </Link>
-          </div>
-        </div>
-      </nav>
+      <Nav active="About" />
 
       {/* Hero Section */}
       <section className="relative overflow-hidden">

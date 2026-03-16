@@ -39,6 +39,44 @@ export const metadata: Metadata = {
   },
 };
 
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  name: "ATOMiK",
+  applicationCategory: "DeveloperApplication",
+  operatingSystem: "Linux",
+  description:
+    "Delta-state algebra for O(1) state reconstruction. 99% less bandwidth, 333,333x less memory. Formally proven with 92 Lean4 theorems.",
+  url: "https://atomik.tech",
+  offers: [
+    {
+      "@type": "Offer",
+      name: "Community",
+      price: "0",
+      priceCurrency: "USD",
+      description: "Python SDK, Apache 2.0",
+    },
+    {
+      "@type": "Offer",
+      name: "Professional",
+      price: "99",
+      priceCurrency: "USD",
+      description: "Linux kernel module with COW detection and network monitoring",
+    },
+    {
+      "@type": "Offer",
+      name: "Enterprise",
+      price: "499",
+      priceCurrency: "USD",
+      description: "Hardware acceleration path with dedicated support",
+    },
+  ],
+  author: {
+    "@type": "Person",
+    name: "Matt Rockwell",
+  },
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -46,6 +84,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >

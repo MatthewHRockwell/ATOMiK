@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Nav from "@/components/Nav";
 
 export const metadata: Metadata = {
   title: "ASIC Roadmap | ATOMiK",
@@ -300,6 +301,7 @@ function ScalingChart() {
 export default function ASICRoadmapPage() {
   return (
     <div className="min-h-screen" style={{ background: bg, color: "#e4e4eb" }}>
+      <Nav active="ASIC Roadmap" />
       {/* ---- Hero ---- */}
       <section className="relative overflow-hidden px-6 pb-16 pt-24 text-center">
         {/* Gradient glow */}
