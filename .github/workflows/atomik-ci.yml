@@ -36,14 +36,18 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -e ./software[dev] || pip install -e ./software
+      - name: Install atomik_core
+        run: |
+          pip install -e ./software/atomik_core || true
       - name: Run linting
         run: |
           pip install ruff
           ruff check software/atomik_sdk/
+          ruff check software/atomik_core/
       - name: Run unit tests
         run: |
           pip install pytest pytest-cov
-          pytest software/tests/ software/atomik_sdk/tests/ -v --tb=short --cov=atomik_sdk --cov-report=xml
+          pytest software/tests/ software/atomik_sdk/tests/ software/atomik_core/tests/ -v --tb=short --cov=atomik_sdk --cov=atomik_core --cov-report=xml
       - name: Upload coverage
         uses: codecov/codecov-action@v4
         with:
@@ -298,6 +302,21 @@ jobs:
           print(f'SDK version: {getattr(atomik_sdk, \"__version__\", \"dev\")}')
           print('SDK import: OK')
           " || echo "::warning::SDK import check had issues"
+      - name: atomik_core import smoke test
+        run: |
+          python -c "
+          import atomik_core
+          print(f'atomik_core version: {atomik_core.__version__}')
+          from atomik_core import AtomikContext, AtomikTable, Fingerprint
+          ctx = AtomikContext()
+          ctx.load(0xDEADBEEF)
+          ctx.accum(0xFF)
+          assert ctx.read() == 0xDEADBEEF ^ 0xFF
+          print('atomik_core import + smoke test: OK')
+          "
+      - name: atomik_core CLI smoke test
+        run: |
+          python -m atomik_core version
 
   # ===========================================================================
   # GATED JOBS — triggered by commit message tags

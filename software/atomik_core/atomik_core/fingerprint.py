@@ -111,7 +111,22 @@ class Fingerprint:
         self._ctx._set_accumulator(0)
 
     def _reduce(self, data: bytes | bytearray | memoryview) -> int:
-        """XOR-reduce data into a single width-bit value."""
+        """XOR-reduce data into a single width-bit value.
+
+        Uses C accelerator for 64-bit fingerprints on large buffers (>64 bytes).
+        Falls back to pure Python for small buffers or non-64-bit widths.
+        """
+        # Fast path: use C accelerator for 64-bit fingerprints on large buffers
+        if self._ctx.width == 64 and len(data) >= 64:
+            try:
+                from atomik_core._accelerator import c_fp_reduce, is_available
+                if is_available():
+                    buf = bytes(data) if isinstance(data, memoryview) else data
+                    return c_fp_reduce(buf)
+            except ImportError:
+                pass
+
+        # Pure Python fallback
         chunk_size = self._chunk_size
         result = 0
         mv = memoryview(data) if not isinstance(data, memoryview) else data

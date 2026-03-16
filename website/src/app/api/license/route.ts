@@ -1,15 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe';
 import { generateDownloadToken } from '@/lib/license';
-import { getLicenseBySession } from '@/lib/licenses';
 
 /**
  * GET /api/license?session_id=cs_xxx
  * Returns license key and download links after successful checkout.
  *
- * Lookup order:
- *   1. Local JSON store (fast path -- populated by webhook)
- *   2. Stripe subscription metadata (fallback if webhook hasn't fired yet)
+ * Lookup: session_id -> Stripe session -> subscription_id -> subscription metadata.
+ * Stripe subscription metadata is the sole source of truth for license keys.
  */
 export async function GET(req: NextRequest) {
   const sessionId = req.nextUrl.searchParams.get('session_id');
@@ -28,28 +26,21 @@ export async function GET(req: NextRequest) {
     const email = session.customer_email || session.customer_details?.email || '';
     const tier = (session.metadata?.tier || 'professional') as 'professional' | 'enterprise';
 
-    // Fast path: look up from local JSON store
+    // Look up license key from Stripe subscription metadata
     let licenseKey: string | null = null;
-    const storedLicense = await getLicenseBySession(sessionId);
-    if (storedLicense) {
-      licenseKey = storedLicense.key;
-    }
 
-    // Fallback: check Stripe subscription metadata
-    if (!licenseKey) {
-      const subscriptionId = typeof session.subscription === 'string'
-        ? session.subscription
-        : session.subscription?.id || '';
+    const subscriptionId = typeof session.subscription === 'string'
+      ? session.subscription
+      : session.subscription?.id || '';
 
-      if (subscriptionId) {
-        try {
-          const subscription = await stripe.subscriptions.retrieve(subscriptionId);
-          if (subscription.metadata?.license_key) {
-            licenseKey = subscription.metadata.license_key;
-          }
-        } catch {
-          // Subscription lookup failed -- continue without it
+    if (subscriptionId) {
+      try {
+        const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+        if (subscription.metadata?.license_key) {
+          licenseKey = subscription.metadata.license_key;
         }
+      } catch {
+        // Subscription lookup failed -- continue without it
       }
     }
 

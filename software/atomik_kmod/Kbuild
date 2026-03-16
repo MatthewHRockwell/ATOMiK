@@ -3,3 +3,5 @@ atomik-y := atomik_main.o atomik_chardev.o atomik_fingerprint.o \
             atomik_sysfs.o atomik_hw.o atomik_license.o atomik_cow.o \
             atomik_net.o atomik_cgroup.o atomik_proc.o atomik_trace_define.o
 ccflags-y := -I$(src)/include -I$(src)
+# Production: override the HMAC secret used for offline license validation.
+# ccflags-y += -DATOMIK_HMAC_SECRET='{0x..., 0x..., ...}'  # 32 bytes

@@ -21,3 +21,6 @@ atomik-*.tar.gz
 
 # License key generator (never ship)
 tools/atomik-keygen.py
+
+# Production HMAC secret header (never commit)
+atomik_secret.h

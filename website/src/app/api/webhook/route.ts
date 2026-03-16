@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe';
-import { generateSecureLicenseKey, saveLicense } from '@/lib/licenses';
+import { generateSecureLicenseKey } from '@/lib/licenses';
 
 export async function POST(req: NextRequest) {
   const body = await req.text();
@@ -30,32 +30,25 @@ export async function POST(req: NextRequest) {
       // Generate a cryptographically random license key
       const licenseKey = generateSecureLicenseKey();
 
-      // Persist the license to local JSON store (idempotent on retry)
-      const license = await saveLicense({
-        key: licenseKey,
-        email,
-        tier,
-        stripeSessionId: session.id,
-        createdAt: new Date().toISOString(),
-      });
-
-      console.log(`[LICENSE] Generated for ${email}: ${license.key} (${tier})`);
+      console.log(`[LICENSE] Generated for ${email}: ${licenseKey} (${tier})`);
       console.log(`[LICENSE] Session: ${session.id}, Subscription: ${subscriptionId}`);
 
-      // Update the Stripe subscription metadata with the license key
+      // Store the license key in Stripe subscription metadata (source of truth)
       if (subscriptionId) {
         try {
           await stripe.subscriptions.update(subscriptionId, {
-            metadata: { license_key: license.key, tier },
+            metadata: { license_key: licenseKey, tier },
           });
+          console.log(`[LICENSE] Stored in subscription ${subscriptionId} metadata`);
         } catch (err) {
           console.error(`[LICENSE] Failed to update subscription metadata:`, err);
-          // Non-fatal: license is already persisted locally
         }
+      } else {
+        console.warn(`[LICENSE] No subscription ID — license key not persisted!`);
       }
 
       // TODO: Send license email via SendGrid/Resend
-      // await sendLicenseEmail({ email, licenseKey: license.key, tier });
+      // await sendLicenseEmail({ email, licenseKey, tier });
 
       break;
     }

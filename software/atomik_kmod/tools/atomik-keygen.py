@@ -24,15 +24,36 @@ distributed to customers. Keep it on the license generation server only.
 import argparse
 import hashlib
 import hmac
+import os
 import sys
 
-# This MUST match the hmac_secret in atomik_license.c exactly
-HMAC_SECRET = bytes([
-    0xa7, 0x3c, 0x19, 0x8e, 0x42, 0xf5, 0xd1, 0x6b,
-    0x90, 0x2d, 0xe8, 0x54, 0xc3, 0x7a, 0x0f, 0xb6,
-    0x5e, 0x81, 0x3d, 0xf9, 0x27, 0x64, 0xab, 0xc0,
-    0x48, 0x95, 0x1e, 0xd2, 0x73, 0xba, 0x06, 0x5f
+# Default development secret: "ATOMiK_DEV_ONLY" (ASCII) + zero padding.
+# For production, set ATOMIK_HMAC_SECRET env var to 64-char hex string.
+_DEV_SECRET = bytes([
+    0x41, 0x54, 0x4f, 0x4d, 0x69, 0x4b, 0x5f, 0x44,
+    0x45, 0x56, 0x5f, 0x4f, 0x4e, 0x4c, 0x59, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 ])
+
+_env_secret = os.environ.get('ATOMIK_HMAC_SECRET')
+if _env_secret:
+    try:
+        HMAC_SECRET = bytes.fromhex(_env_secret)
+        if len(HMAC_SECRET) != 32:
+            print("WARNING: ATOMIK_HMAC_SECRET must be exactly 32 bytes (64 hex chars), "
+                  f"got {len(HMAC_SECRET)} bytes — falling back to dev key",
+                  file=sys.stderr)
+            HMAC_SECRET = _DEV_SECRET
+    except ValueError:
+        print("WARNING: ATOMIK_HMAC_SECRET is not valid hex — falling back to dev key",
+              file=sys.stderr)
+        HMAC_SECRET = _DEV_SECRET
+else:
+    print("WARNING: ATOMIK_HMAC_SECRET not set — using development key. "
+          "Keys generated with this secret will NOT work in production builds.",
+          file=sys.stderr)
+    HMAC_SECRET = _DEV_SECRET
 
 TIERS = {
     'professional': 0x01,

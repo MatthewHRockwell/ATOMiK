@@ -93,8 +93,10 @@ mkdir -p "${DKMS_SRC}"
 # Copy only kernel module source — NO keygen, NO internal tools
 cp Kbuild Makefile dkms.conf \
    atomik_main.c atomik_chardev.c atomik_fingerprint.c \
-   atomik_sysfs.c atomik_hw.c atomik_license.c \
-   atomik_core_kern.h atomik_stats.h \
+   atomik_sysfs.c atomik_hw.c atomik_license.c atomik_cow.c \
+   atomik_net.c atomik_cgroup.c atomik_proc.c atomik_trace_define.c \
+   atomik_core_kern.h atomik_stats.h atomik_hw.h atomik_cow.h \
+   atomik_net.h atomik_cgroup.h atomik_trace.h \
    "${DKMS_SRC}/"
 cp -r include/ "${DKMS_SRC}/"
 
