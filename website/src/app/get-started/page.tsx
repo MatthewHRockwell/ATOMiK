@@ -41,8 +41,10 @@ state = ctx.read()  # Reconstructed in O(1)`,
     code: `from atomik_core import Fingerprint
 
 fp = Fingerprint()
-fp.update(data_block)
-changed = fp.check(data_block)  # O(1) per page`,
+fp.load(original_data)          # Set reference fingerprint
+fp.update(possibly_changed)     # Compare against reference
+if fp.changed:                  # True if any bit differs
+    print(f"Delta: 0x{fp.delta:x}")`,
     description:
       "Page-level XOR fingerprinting detects changes without comparing bytes.",
   },

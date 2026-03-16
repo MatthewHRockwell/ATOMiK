@@ -79,8 +79,8 @@ export async function GET(req: NextRequest) {
         macos: `${baseUrl}/api/download?token=${downloads.macos}`,
       },
       install: {
-        linux: `curl -sL atomik.tech/install.sh | ATOMIK_LICENSE=${licenseKey} bash`,
-        pip: `ATOMIK_LICENSE=${licenseKey} pip install atomik-core-pro`,
+        linux: `git clone https://github.com/MatthewHRockwell/ATOMiK.git && cd ATOMiK/software/atomik_kmod && sudo ./install.sh --license ${licenseKey}`,
+        pip: `pip install atomik-core`,
       },
     });
   } catch (error) {

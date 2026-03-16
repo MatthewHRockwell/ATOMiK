@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
         tier,
       },
       success_url: `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${baseUrl}/#pricing`,
+      cancel_url: `${baseUrl}/pricing`,
     });
 
     return NextResponse.json({ url: session.url });

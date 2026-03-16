@@ -4,6 +4,7 @@ export default function Nav({ active }: { active?: string }) {
   const links = [
     { href: "/", label: "Home" },
     { href: "/docs", label: "Docs" },
+    { href: "/solutions", label: "Solutions" },
     { href: "/demo", label: "Demo" },
     { href: "/pricing", label: "Pricing" },
     { href: "/blog", label: "Blog" },
