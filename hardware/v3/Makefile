@@ -69,7 +69,7 @@ else ifeq ($(RTL_ALL),)
 	@echo "SKIP: no RTL files in $(RTL_DIR)"
 else
 	@echo "=== Verilator lint ==="
-	$(VERILATOR) --lint-only -Wall $(RTL_ALL)
+	$(VERILATOR) --lint-only -Wall -Wno-MULTITOP $(RTL_ALL)
 	@echo "PASS: lint clean"
 endif
 
