@@ -10,6 +10,14 @@ export const metadata: Metadata = {
 
 const posts = [
   {
+    slug: "building-distributed-cache-in-50-lines",
+    title: "Build a Distributed Cache in 50 Lines of Python",
+    date: "March 16, 2026",
+    excerpt:
+      "Step-by-step tutorial: 3-node distributed cache with automatic convergence. No consensus protocol, no leader election, no conflict resolution — just XOR.",
+    tags: ["tutorial", "python", "distributed-systems"],
+  },
+  {
     slug: "atomik-vs-event-sourcing",
     title: "ATOMiK vs Event Sourcing: When XOR Beats Append-Only Logs",
     date: "March 16, 2026",

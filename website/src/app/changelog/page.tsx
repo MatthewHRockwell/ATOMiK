@@ -21,6 +21,20 @@ type Release = {
 
 const releases: Release[] = [
   {
+    version: "v0.3.0",
+    title: "Python SDK — Serialization & Tracing",
+    date: "March 16, 2026",
+    category: "software",
+    items: [
+      "DeltaMessage serialization: to_dict/from_dict + to_bytes/from_bytes (16-byte wire format)",
+      "Fingerprint encapsulation fix: no more direct _accumulator access",
+      "Benchmark --json flag for CI pipeline integration",
+      "All bench_* functions return structured result dicts",
+      "67 tests passing (up from 60)",
+      "pip install atomik-core==0.3.0",
+    ],
+  },
+  {
     version: "v0.4.0",
     title: "Kernel Module",
     date: "March 15, 2026",

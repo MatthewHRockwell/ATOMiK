@@ -36,6 +36,15 @@ const solutions = [
     color: "#f59e0b",
     keywords: ["Trading", "P&L", "Deterministic"],
   },
+  {
+    href: "/solutions/gaming",
+    title: "Gaming & Real-Time",
+    subtitle: "5M ops/sec multiplayer state sync",
+    description:
+      "8-byte deltas for position/health/inventory updates. Commutative accumulation means player actions apply in any order. Self-inverse gives instant rollback.",
+    color: "#a855f7",
+    keywords: ["Multiplayer", "Netcode", "Rollback"],
+  },
 ];
 
 export default function SolutionsPage() {
