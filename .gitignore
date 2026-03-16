@@ -109,6 +109,9 @@ reference-documents-tmp/
 hs_err_pid*.log
 hardware/zynq/hs_err_pid*.log
 
+# --- Runtime Data (user emails, license keys) ---
+website/data/
+
 # --- Sensitive Configuration (contains credentials) ---
 business/funding_strategy/config.yaml
 business/funding_strategy/status.json

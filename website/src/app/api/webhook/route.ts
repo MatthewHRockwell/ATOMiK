@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe';
-import { generateLicenseKey } from '@/lib/license';
+import { generateSecureLicenseKey, saveLicense } from '@/lib/licenses';
 
 export async function POST(req: NextRequest) {
   const body = await req.text();
@@ -27,19 +27,35 @@ export async function POST(req: NextRequest) {
         ? session.subscription
         : session.subscription?.id || '';
 
-      const licenseKey = generateLicenseKey(email, tier, subscriptionId);
+      // Generate a cryptographically random license key
+      const licenseKey = generateSecureLicenseKey();
 
-      console.log(`[LICENSE] Generated for ${email}: ${licenseKey} (${tier})`);
+      // Persist the license to local JSON store (idempotent on retry)
+      const license = await saveLicense({
+        key: licenseKey,
+        email,
+        tier,
+        stripeSessionId: session.id,
+        createdAt: new Date().toISOString(),
+      });
 
-      // TODO: Store in database and send email via SendGrid/Resend
-      // For now, the license key is available on the success page via session metadata
+      console.log(`[LICENSE] Generated for ${email}: ${license.key} (${tier})`);
+      console.log(`[LICENSE] Session: ${session.id}, Subscription: ${subscriptionId}`);
 
-      // Update the subscription metadata with the license key
+      // Update the Stripe subscription metadata with the license key
       if (subscriptionId) {
-        await stripe.subscriptions.update(subscriptionId, {
-          metadata: { license_key: licenseKey, tier },
-        });
+        try {
+          await stripe.subscriptions.update(subscriptionId, {
+            metadata: { license_key: license.key, tier },
+          });
+        } catch (err) {
+          console.error(`[LICENSE] Failed to update subscription metadata:`, err);
+          // Non-fatal: license is already persisted locally
+        }
       }
+
+      // TODO: Send license email via SendGrid/Resend
+      // await sendLicenseEmail({ email, licenseKey: license.key, tier });
 
       break;
     }

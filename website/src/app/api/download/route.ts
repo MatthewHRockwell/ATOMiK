@@ -26,15 +26,15 @@ export async function GET(req: NextRequest) {
   // For now, return platform-specific install instructions
   const installInfo: Record<string, { filename: string; instructions: string }> = {
     linux: {
-      filename: 'atomik-pro-0.1.0-linux-x86_64.tar.gz',
+      filename: 'atomik-pro-0.4.0-linux-x86_64.tar.gz',
       instructions: 'tar xzf atomik-pro-*.tar.gz && cd atomik-pro && sudo ./install.sh',
     },
     windows: {
-      filename: 'atomik-pro-0.1.0-windows-x64.exe',
+      filename: 'atomik-pro-0.4.0-windows-x64.exe',
       instructions: 'Run the installer and follow the prompts.',
     },
     macos: {
-      filename: 'atomik-pro-0.1.0-macos-universal.pkg',
+      filename: 'atomik-pro-0.4.0-macos-universal.pkg',
       instructions: 'Double-click the .pkg file and follow the prompts.',
     },
   };
