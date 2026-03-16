@@ -39,6 +39,7 @@ from atomik_core.context import AtomikContext
 from atomik_core.table import AtomikTable
 from atomik_core.stream import DeltaStream, DeltaMessage
 from atomik_core.fingerprint import Fingerprint
+from atomik_core.sync import SyncTable
 from atomik_core.benchmark import (
     bench_rollback,
     bench_change_detection,
@@ -53,6 +54,7 @@ __all__ = [
     "DeltaStream",
     "DeltaMessage",
     "Fingerprint",
+    "SyncTable",
     "bench_rollback",
     "bench_change_detection",
     "bench_convergence",
