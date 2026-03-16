@@ -16,10 +16,6 @@ Additional benefits:
   - Lost/duplicate packets self-cancel (XOR self-inverse)
 """
 
-import sys
-import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-
 from atomik_core import AtomikContext, Fingerprint
 
 

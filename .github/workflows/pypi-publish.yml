@@ -1,0 +1,49 @@
+name: Publish to PyPI
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    environment: pypi
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install build tools
+        run: pip install build twine
+
+      - name: Run tests
+        run: |
+          cd software/atomik_core
+          pip install -e ".[dev]"
+          pytest tests/ -v
+          cd ../..
+
+      - name: Build package
+        run: |
+          cd software/atomik_core
+          python -m build
+
+      - name: Check package
+        run: |
+          cd software/atomik_core
+          twine check dist/*
+
+      - name: Publish to PyPI
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+        run: |
+          cd software/atomik_core
+          twine upload dist/*

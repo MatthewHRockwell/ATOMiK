@@ -9,7 +9,10 @@
 ![Cost](https://img.shields.io/badge/dev_cost-%24225-yellow)
 ![License](https://img.shields.io/badge/license-Apache_2.0-blue)
 
-**Delta-State Computation in Silicon — 69.7 Gops/s on a $99 FPGA, 1 Gops/s on a $13.50 Chip**
+**Delta-State Computation — 69.7 Gops/s on FPGA, 5M ops/s in pure Python. Formally proven.**
+
+[![PyPI](https://img.shields.io/pypi/v/atomik-core?color=blue&label=PyPI)](https://pypi.org/project/atomik-core/)
+[![Python](https://img.shields.io/pypi/pyversions/atomik-core)](https://pypi.org/project/atomik-core/)
 
 > **IP & PATENT NOTICE**
 >
@@ -19,7 +22,33 @@
 
 ---
 
-## 🎯 Production Hardware
+## Install
+
+```bash
+pip install atomik-core
+```
+
+Zero dependencies. Python 3.9+. Also available as a [single-header C99 library](software/atomik_core_c/).
+
+```python
+from atomik_core import AtomikContext
+
+ctx = AtomikContext()
+ctx.load(0xDEADBEEF)
+ctx.accum(0x000000FF)        # XOR delta
+print(f"0x{ctx.read():08x}") # 0xdeadbe10
+
+ctx.rollback(0x000000FF)     # Undo = re-apply
+assert ctx.read() == 0xDEADBEEF
+```
+
+**Why ATOMiK?** Send 8-byte deltas instead of full state copies (99% bandwidth reduction). Undo any operation by re-applying it (24 bytes, not snapshot stacks). Nodes converge without consensus protocols (XOR is commutative). Detect changes in O(1), not O(n).
+
+[Full Python docs](software/atomik_core/README.md) · [Examples](software/atomik_core/examples/) · [Landing page](https://matthewhrockwell.github.io/ATOMiK/)
+
+---
+
+## Production Hardware
 
 **Two production SoC generations deployed on Tang Nano 9K ($13.50):**
 

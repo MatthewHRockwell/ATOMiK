@@ -13,10 +13,6 @@ Key insight: ATOMiK is not "last writer wins" — it's "all deltas merge."
 Every node's contributions are preserved through XOR accumulation.
 """
 
-import sys
-import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-
 from atomik_core import DeltaStream, DeltaMessage
 
 

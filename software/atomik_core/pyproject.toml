@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "atomik-core"
-version = "0.1.0"
+version = "0.2.0"
 description = "ATOMiK delta-state algebra — O(1) state reconstruction for any processor"
 readme = "README.md"
 license = "Apache-2.0"
@@ -45,8 +45,10 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/MatthewHRockwell/ATOMiK"
-Repository = "https://github.com/MatthewHRockwell/ATOMiK.git"
+Homepage = "https://atomik.tech"
+Documentation = "https://atomik.tech/docs"
+Repository = "https://github.com/MatthewHRockwell/ATOMiK"
+Changelog = "https://github.com/MatthewHRockwell/ATOMiK/releases"
 Issues = "https://github.com/MatthewHRockwell/ATOMiK/issues"
 
 [tool.setuptools.packages.find]

@@ -33,12 +33,19 @@ Multi-context table:
 SPDX-License-Identifier: Apache-2.0
 """
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 from atomik_core.context import AtomikContext
 from atomik_core.table import AtomikTable
 from atomik_core.stream import DeltaStream, DeltaMessage
 from atomik_core.fingerprint import Fingerprint
+from atomik_core.benchmark import (
+    bench_rollback,
+    bench_change_detection,
+    bench_convergence,
+    bench_bandwidth,
+    bench_throughput,
+)
 
 __all__ = [
     "AtomikContext",
@@ -46,4 +53,9 @@ __all__ = [
     "DeltaStream",
     "DeltaMessage",
     "Fingerprint",
+    "bench_rollback",
+    "bench_change_detection",
+    "bench_convergence",
+    "bench_bandwidth",
+    "bench_throughput",
 ]
