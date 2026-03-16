@@ -106,3 +106,46 @@ def test_three_node_convergence():
 def test_uninitialized_address_reads_zero():
     s = DeltaStream()
     assert s.read(42) == 0
+
+
+# =========================================================================
+# Serialization (to_dict / from_dict / to_bytes / from_bytes)
+# =========================================================================
+
+def test_delta_message_to_dict():
+    """Round-trip to_dict / from_dict preserves all fields."""
+    msg = DeltaMessage(addr=7, delta=0xDEADBEEFCAFEBABE, seq=42)
+    d = msg.to_dict()
+    restored = DeltaMessage.from_dict(d)
+    assert restored.addr == msg.addr
+    assert restored.delta == msg.delta
+    assert restored.seq == msg.seq
+
+
+def test_delta_message_to_bytes():
+    """Round-trip to_bytes / from_bytes preserves all fields, exactly 16 bytes."""
+    msg = DeltaMessage(addr=0x100, delta=0xCAFEBABEDEADBEEF, seq=99)
+    raw = msg.to_bytes()
+    assert len(raw) == 16
+    restored = DeltaMessage.from_bytes(raw)
+    assert restored.addr == msg.addr
+    assert restored.delta == msg.delta
+    assert restored.seq == msg.seq
+
+
+def test_delta_message_bytes_invalid_length():
+    """from_bytes with wrong length raises ValueError."""
+    import pytest
+    with pytest.raises(ValueError):
+        DeltaMessage.from_bytes(b"\x00" * 10)
+    with pytest.raises(ValueError):
+        DeltaMessage.from_bytes(b"\x00" * 20)
+    with pytest.raises(ValueError):
+        DeltaMessage.from_bytes(b"")
+
+
+def test_delta_message_dict_fields():
+    """to_dict returns exactly {addr, delta, seq} keys."""
+    msg = DeltaMessage(addr=1, delta=2, seq=3)
+    d = msg.to_dict()
+    assert set(d.keys()) == {"addr", "delta", "seq"}

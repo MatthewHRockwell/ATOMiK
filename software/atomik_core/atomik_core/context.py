@@ -123,6 +123,14 @@ class AtomikContext:
         self._accumulator = (self._accumulator ^ other._accumulator) & self._mask
         self._delta_count += other._delta_count
 
+    def _set_accumulator(self, value: int) -> None:
+        """Internal: set accumulator directly (for encapsulated friends like Fingerprint).
+
+        Not part of the public 4-operation algebra. Avoids incrementing delta_count.
+        """
+        self._accumulator = value & self._mask
+        self._delta_count = 0
+
     @property
     def accumulator(self) -> int:
         """Raw accumulator value (XOR of all deltas since last load/swap)."""

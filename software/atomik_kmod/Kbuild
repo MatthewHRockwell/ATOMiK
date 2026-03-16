@@ -1,5 +1,5 @@
 obj-m := atomik.o
 atomik-y := atomik_main.o atomik_chardev.o atomik_fingerprint.o \
             atomik_sysfs.o atomik_hw.o atomik_license.o atomik_cow.o \
-            atomik_net.o atomik_cgroup.o atomik_proc.o
-ccflags-y := -I$(src)/include
+            atomik_net.o atomik_cgroup.o atomik_proc.o atomik_trace_define.o
+ccflags-y := -I$(src)/include -I$(src)

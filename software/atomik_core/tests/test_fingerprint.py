@@ -77,3 +77,34 @@ def test_repr():
     fp.load(b"test")
     s = repr(fp)
     assert "changed=" in s
+
+
+# =========================================================================
+# Encapsulation and reset
+# =========================================================================
+
+def test_fingerprint_encapsulation():
+    """Fingerprint uses AtomikContext internally, not raw _accumulator access.
+
+    Verify that the public Fingerprint methods (load, update, reset, changed,
+    value, delta) work via the context and that there is no direct
+    _accumulator attribute on the Fingerprint object itself.
+    """
+    fp = Fingerprint()
+    # Fingerprint should NOT have its own _accumulator — it delegates to _ctx
+    assert not hasattr(fp, "_accumulator")
+    # It should have a _ctx that is an AtomikContext
+    assert hasattr(fp, "_ctx")
+    from atomik_core import AtomikContext
+    assert isinstance(fp._ctx, AtomikContext)
+
+
+def test_fingerprint_reset():
+    """load → update(different) → reset clears changed flag and accumulator."""
+    fp = Fingerprint()
+    fp.load(b"original data here")
+    fp.update(b"modified data here")
+    assert fp.changed
+    fp.reset()
+    assert not fp.changed
+    assert fp.delta == 0  # accumulator is zero after reset

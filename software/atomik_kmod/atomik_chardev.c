@@ -22,6 +22,7 @@
 #include "atomik_core_kern.h"
 #include "atomik_hw.h"
 #include "atomik_stats.h"
+#include "atomik_trace.h"
 #include "include/uapi/atomik.h"
 
 /* Forward declarations from atomik_fingerprint.c */
@@ -209,6 +210,7 @@ static long ioctl_load(struct atomik_file_ctx *fctx, unsigned long arg)
 	mutex_unlock(&fctx->lock);
 
 	atomik_stat_inc(ops_load);
+	trace_atomik_op(ATOMIK_OP_LOAD, a.table_id, a.addr, a.initial_state);
 	return 0;
 }
 
@@ -239,6 +241,7 @@ static long ioctl_accum(struct atomik_file_ctx *fctx, unsigned long arg)
 	mutex_unlock(&fctx->lock);
 
 	atomik_stat_inc(ops_accum);
+	trace_atomik_op(ATOMIK_OP_ACCUM, a.table_id, a.addr, a.delta);
 	return 0;
 }
 
@@ -269,6 +272,7 @@ static long ioctl_read(struct atomik_file_ctx *fctx, unsigned long arg)
 	mutex_unlock(&fctx->lock);
 
 	atomik_stat_inc(ops_read);
+	trace_atomik_op(ATOMIK_OP_READ, a.table_id, a.addr, a.state);
 
 	if (copy_to_user((void __user *)arg, &a, sizeof(a)))
 		return -EFAULT;
@@ -302,6 +306,7 @@ static long ioctl_swap(struct atomik_file_ctx *fctx, unsigned long arg)
 	mutex_unlock(&fctx->lock);
 
 	atomik_stat_inc(ops_swap);
+	trace_atomik_op(ATOMIK_OP_SWAP, a.table_id, a.addr, a.old_state);
 
 	if (copy_to_user((void __user *)arg, &a, sizeof(a)))
 		return -EFAULT;

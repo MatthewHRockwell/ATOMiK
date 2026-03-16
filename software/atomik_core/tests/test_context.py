@@ -394,3 +394,22 @@ def test_merge_self_doubles_accumulator():
     # XOR with self = 0, so merge(self) zeroes the accumulator
     assert ctx.accumulator == 0
     assert ctx.read() == 0xAAAA  # back to reference
+
+
+# =========================================================================
+# _set_accumulator
+# =========================================================================
+
+def test_set_accumulator():
+    """_set_accumulator sets the value directly and resets delta_count."""
+    ctx = AtomikContext()
+    ctx.load(0xAAAA)
+    ctx.accum(0x0001)
+    ctx.accum(0x0010)
+    assert ctx.delta_count == 2
+    assert ctx.accumulator == 0x0011
+
+    ctx._set_accumulator(0xFF)
+    assert ctx.accumulator == 0xFF
+    assert ctx.delta_count == 0
+    assert ctx.read() == 0xAAAA ^ 0xFF
