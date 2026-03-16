@@ -35,6 +35,8 @@ extern void atomik_sysfs_exit(void);
 extern int atomik_license_init(const char *key);
 extern void atomik_license_exit(void);
 extern int atomik_license_check(void);
+extern int atomik_proc_init(void);
+extern void atomik_proc_exit(void);
 
 static struct miscdevice atomik_misc = {
 	.minor = MISC_DYNAMIC_MINOR,
@@ -95,6 +97,12 @@ static int __init atomik_init(void)
 		pr_warn("atomik: cgroup tracking unavailable (%d)\n", ret);
 	}
 
+	/* Create /proc/atomik interface (non-fatal if fails) */
+	ret = atomik_proc_init();
+	if (ret) {
+		pr_warn("atomik: proc interface unavailable (%d)\n", ret);
+	}
+
 	pr_info("ATOMiK v%d.%d.%d loaded [%s backend%s] — %s\n",
 		ATOMIK_VERSION_MAJOR, ATOMIK_VERSION_MINOR, ATOMIK_VERSION_PATCH,
 		atomik_hw_available() ? "hardware" : "software",
@@ -117,6 +125,7 @@ err_hw:
 
 static void __exit atomik_exit(void)
 {
+	atomik_proc_exit();
 	atomik_cgroup_exit();
 	atomik_net_exit();
 	atomik_cow_exit();

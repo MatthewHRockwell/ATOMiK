@@ -4,9 +4,10 @@ export default function Nav({ active }: { active?: string }) {
   const links = [
     { href: "/", label: "Home" },
     { href: "/docs", label: "Docs" },
+    { href: "/demo", label: "Demo" },
+    { href: "/pricing", label: "Pricing" },
     { href: "/blog", label: "Blog" },
     { href: "/about", label: "About" },
-    { href: "/about/roadmap", label: "ASIC Roadmap" },
   ];
 
   return (
