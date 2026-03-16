@@ -45,7 +45,7 @@ def main():
         print(f"   Instrument {instrument:2d}: delta=0x{delta:016x}, state=0x{current:016x}")
 
     # --- Snapshot: read all active instruments ---
-    print(f"\n3. Portfolio snapshot (O(1) per read):\n")
+    print("\n3. Portfolio snapshot (O(1) per read):\n")
     active = table.snapshot()
     for addr, state in sorted(active.items()):
         print(f"   Instrument {addr:2d}: 0x{state:016x}")
@@ -54,19 +54,19 @@ def main():
     print(f"   Snapshot size: {len(active) * 8} bytes (vs {num_instruments * 8} bytes full)")
 
     # --- Batch update ---
-    print(f"\n4. Batch update (multiple instruments at once):\n")
+    print("\n4. Batch update (multiple instruments at once):\n")
     batch = {i: (i + 1) * 0x100 for i in range(8)}
     table.batch_accum(batch)
     print(f"   Updated {len(batch)} instruments in one call")
 
     # --- SWAP for epoch boundary ---
-    print(f"\n5. End-of-day SWAP (atomic snapshot + reset):\n")
+    print("\n5. End-of-day SWAP (atomic snapshot + reset):\n")
     eod_pnl = table.swap(0)
     print(f"   Instrument 0 EOD P&L: 0x{eod_pnl:016x}")
     print(f"   Instrument 0 now:     0x{table.read(0):016x} (new epoch, acc cleared)")
 
     # --- Throughput test ---
-    print(f"\n6. Throughput test:\n")
+    print("\n6. Throughput test:\n")
     n = 500_000
     start = time.perf_counter()
     for i in range(n):

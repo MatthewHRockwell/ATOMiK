@@ -1,19 +1,18 @@
 """Tests for atomik_core.benchmark — verifies each bench_* function and CLI."""
 
+import contextlib
 import io
 import json
 import sys
-import contextlib
 
 from atomik_core.benchmark import (
-    bench_rollback,
+    bench_bandwidth,
     bench_change_detection,
     bench_convergence,
-    bench_bandwidth,
+    bench_rollback,
     bench_throughput,
     main,
 )
-
 
 # =========================================================================
 # Individual benchmark functions

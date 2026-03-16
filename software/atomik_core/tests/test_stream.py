@@ -1,6 +1,6 @@
 """Tests for DeltaStream — network state synchronization."""
 
-from atomik_core import DeltaStream, DeltaMessage
+from atomik_core import DeltaMessage, DeltaStream, SyncTable
 
 
 def test_send_receive_converge():
@@ -154,9 +154,6 @@ def test_delta_message_dict_fields():
 # =========================================================================
 # SyncTable — high-level distributed state synchronization
 # =========================================================================
-
-from atomik_core import SyncTable
-
 
 def test_sync_table_put_get():
     """put() sets state, get() reads it back."""

@@ -35,21 +35,21 @@ SPDX-License-Identifier: Apache-2.0
 
 __version__ = "0.4.0"
 
-from atomik_core.context import AtomikContext
-from atomik_core.table import AtomikTable
-from atomik_core.stream import DeltaStream, DeltaMessage
-from atomik_core.fingerprint import Fingerprint
-from atomik_core.sync import SyncTable
-from atomik_core.persistent import PersistentSyncTable
-from atomik_core.transport import MemoryTransport, CallbackTransport
 from atomik_core.async_transport import AsyncCallbackTransport, AsyncSyncTable
 from atomik_core.benchmark import (
-    bench_rollback,
+    bench_bandwidth,
     bench_change_detection,
     bench_convergence,
-    bench_bandwidth,
+    bench_rollback,
     bench_throughput,
 )
+from atomik_core.context import AtomikContext
+from atomik_core.fingerprint import Fingerprint
+from atomik_core.persistent import PersistentSyncTable
+from atomik_core.stream import DeltaMessage, DeltaStream
+from atomik_core.sync import SyncTable
+from atomik_core.table import AtomikTable
+from atomik_core.transport import CallbackTransport, MemoryTransport
 
 try:
     from atomik_core.device import DeviceContext, DeviceTable

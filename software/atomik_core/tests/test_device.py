@@ -12,45 +12,45 @@ Tests verify:
 from __future__ import annotations
 
 import struct
-from unittest.mock import patch, MagicMock, call
+from unittest.mock import patch
 
 import pytest
-
 from atomik_core.device import (
-    # ioctl number helpers
-    _IOC, _IOW, _IOR, _IOWR,
-    _IOC_WRITE, _IOC_READ,
     # ioctl command constants
     _ATOMIK_MAGIC,
-    ATOMIK_IOC_CREATE_TABLE,
-    ATOMIK_IOC_DESTROY_TABLE,
-    ATOMIK_IOC_LOAD,
-    ATOMIK_IOC_ACCUM,
-    ATOMIK_IOC_READ,
-    ATOMIK_IOC_SWAP,
-    ATOMIK_IOC_GET_INFO,
+    _FMT_ACCUM,
     # struct formats
     _FMT_CREATE_TABLE,
     _FMT_DESTROY_TABLE,
+    _FMT_INFO,
     _FMT_LOAD,
-    _FMT_ACCUM,
     _FMT_READ,
     _FMT_SWAP,
-    _FMT_INFO,
+    # ioctl number helpers
+    _IOC,
+    _IOR,
+    _IOW,
+    _IOWR,
+    _SZ_ACCUM,
     # struct sizes
     _SZ_CREATE_TABLE,
     _SZ_DESTROY_TABLE,
+    _SZ_INFO,
     _SZ_LOAD,
-    _SZ_ACCUM,
     _SZ_READ,
     _SZ_SWAP,
-    _SZ_INFO,
+    ATOMIK_IOC_ACCUM,
+    ATOMIK_IOC_CREATE_TABLE,
+    ATOMIK_IOC_DESTROY_TABLE,
+    ATOMIK_IOC_GET_INFO,
+    ATOMIK_IOC_LOAD,
+    ATOMIK_IOC_READ,
+    ATOMIK_IOC_SWAP,
     # classes
     DeviceContext,
-    DeviceTable,
     DeviceInfo,
+    DeviceTable,
 )
-
 
 # =========================================================================
 # ioctl number calculation
@@ -352,7 +352,7 @@ class TestDeviceTable:
 
         swap_call = mock_ioctl.call_args_list[1]
         assert swap_call[0][1] == ATOMIK_IOC_SWAP
-        buf = bytes(swap_call[0][2])
+        bytes(swap_call[0][2])
         # Before kernel modifies: verify new_reference was packed correctly
         # (After mock, the buffer has been modified, so check old_state from return)
         table.close()

@@ -14,6 +14,7 @@ Usage: python redis_change_detection.py
 
 from atomik_core import Fingerprint
 
+
 # --- Simulated Redis client (replace with real redis.Redis() in production) ---
 class MockRedis:
     def __init__(self):
@@ -109,7 +110,7 @@ def main():
 
     print("ATOMiK + Redis Change Detection Demo")
     print("=" * 50)
-    print(f"Simulating 1000 API requests (80% unchanged)...\n")
+    print("Simulating 1000 API requests (80% unchanged)...\n")
 
     for i in range(1000):
         # 80% of requests have unchanged data
@@ -123,13 +124,13 @@ def main():
     print(f"  Total checks:    {stats['checks']}")
     print(f"  Redis writes:    {stats['writes']}")
     print(f"  Writes skipped:  {stats['skipped']} ({stats['skip_rate']} saved)")
-    print(f"\n  Without ATOMiK:  1000 Redis writes")
+    print("\n  Without ATOMiK:  1000 Redis writes")
     print(f"  With ATOMiK:     {stats['writes']} Redis writes")
     print(f"  Reduction:       {100 - (stats['writes'] / 10):.0f}%")
-    print(f"\n  Each skipped write saves:")
-    print(f"    - 1 network RTT (~0.5ms)")
-    print(f"    - 1 Redis SET command (~0.1ms CPU)")
-    print(f"    - 1 replication event to replicas")
+    print("\n  Each skipped write saves:")
+    print("    - 1 network RTT (~0.5ms)")
+    print("    - 1 Redis SET command (~0.1ms CPU)")
+    print("    - 1 replication event to replicas")
     print(f"\n  At 10K req/s: ~{stats['skipped'] * 10} writes/sec eliminated")
 
 

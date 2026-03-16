@@ -106,7 +106,7 @@ def main():
               f"{'CHANGED' if delta != 0 else 'NO CHANGE'}")
 
     # --- Verify gateway state matches sensors ---
-    print(f"\n3. Gateway state (reconstructed from deltas):\n")
+    print("\n3. Gateway state (reconstructed from deltas):\n")
     for i in range(num_sensors):
         gw_state = gateway.read_sensor(i)
         sensor_state = sensors[i].current
@@ -114,17 +114,17 @@ def main():
         print(f"   Sensor {i}: gateway=0x{gw_state:016x}  sensor=0x{sensor_state:016x}  [{match}]")
 
     # --- Show which sensors have pending changes ---
-    print(f"\n4. Change detection (O(1) per sensor):\n")
+    print("\n4. Change detection (O(1) per sensor):\n")
     changed = gateway.any_changed()
     for sid, is_changed in changed.items():
         print(f"   Sensor {sid}: {'CHANGED' if is_changed else 'clean'}")
 
     # --- Bandwidth analysis ---
-    print(f"\n5. Bandwidth analysis:\n")
+    print("\n5. Bandwidth analysis:\n")
     print(f"   Updates transmitted:    {len(updates)}")
     print(f"   ATOMiK delta bytes:     {total_delta_bytes}")
     print(f"   Full-state bytes:       {total_full_bytes}")
-    print(f"\n   At scale (1000 sensors, 10 updates/sec, 1 KB state each):")
+    print("\n   At scale (1000 sensors, 10 updates/sec, 1 KB state each):")
     at_scale_full = 1000 * 10 * 1024  # 10 MB/sec
     at_scale_delta = 1000 * 10 * 8    # 80 KB/sec
     print(f"     Full-state: {at_scale_full/1024/1024:.1f} MB/sec")

@@ -4,10 +4,10 @@ import os
 import tempfile
 
 import pytest
+from atomik_core.persistent import _RECORD_SIZE, PersistentSyncTable
+from atomik_core.transport import MemoryTransport
 
 from atomik_core import DeltaMessage
-from atomik_core.persistent import PersistentSyncTable, _RECORD_SIZE
-from atomik_core.transport import MemoryTransport
 
 
 @pytest.fixture

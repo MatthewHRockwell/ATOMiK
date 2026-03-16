@@ -2,7 +2,6 @@
 
 from atomik_core import AtomikContext
 
-
 # =========================================================================
 # Basic operations
 # =========================================================================
@@ -183,11 +182,15 @@ def test_merge_commutative():
     b2 = AtomikContext()
     ref = 0xBBBB
 
-    a1.load(ref); a2.load(ref)
-    b1.load(ref); b2.load(ref)
+    a1.load(ref)
+    a2.load(ref)
+    b1.load(ref)
+    b2.load(ref)
 
-    a1.accum(0x0011); a2.accum(0x0011)
-    b1.accum(0x1100); b2.accum(0x1100)
+    a1.accum(0x0011)
+    a2.accum(0x0011)
+    b1.accum(0x1100)
+    b2.accum(0x1100)
 
     a1.merge(b1)  # a into a1
     b2.merge(a2)  # b into b2
@@ -389,7 +392,6 @@ def test_merge_self_doubles_accumulator():
     ctx = AtomikContext()
     ctx.load(0xAAAA)
     ctx.accum(0x00FF)
-    original_acc = ctx.accumulator
     ctx.merge(ctx)
     # XOR with self = 0, so merge(self) zeroes the accumulator
     assert ctx.accumulator == 0

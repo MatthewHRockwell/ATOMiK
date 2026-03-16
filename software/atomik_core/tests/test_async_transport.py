@@ -5,10 +5,9 @@ Uses asyncio.run() directly (no pytest-asyncio dependency required).
 
 import asyncio
 
-from atomik_core.sync import SyncTable
-from atomik_core.stream import DeltaMessage
 from atomik_core.async_transport import AsyncCallbackTransport, AsyncSyncTable
-
+from atomik_core.stream import DeltaMessage
+from atomik_core.sync import SyncTable
 
 # =========================================================================
 # AsyncCallbackTransport

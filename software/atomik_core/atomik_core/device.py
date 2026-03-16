@@ -16,11 +16,9 @@ SPDX-License-Identifier: Apache-2.0
 
 from __future__ import annotations
 
-import os
-import sys
-import struct
 import fcntl
-from typing import Optional
+import os
+import struct
 
 # =========================================================================
 # ioctl number construction (mirrors <linux/ioctl.h> on Linux)
@@ -161,7 +159,7 @@ class DeviceTable:
         self,
         num_contexts: int = 256,
         *,
-        fd: Optional[int] = None,
+        fd: int | None = None,
         device: str = ATOMIK_DEVICE,
     ):
         """Create a kernel-backed context table.
@@ -262,7 +260,7 @@ class DeviceTable:
     def __del__(self) -> None:
         self.close()
 
-    def __enter__(self) -> "DeviceTable":
+    def __enter__(self) -> DeviceTable:
         return self
 
     def __exit__(self, *_: object) -> None:
@@ -300,7 +298,7 @@ class DeviceContext:
         self,
         *,
         device: str = ATOMIK_DEVICE,
-        fd: Optional[int] = None,
+        fd: int | None = None,
         addr: int = 0,
     ):
         """Create a kernel-backed single context.
@@ -347,7 +345,7 @@ class DeviceContext:
     def __del__(self) -> None:
         self.close()
 
-    def __enter__(self) -> "DeviceContext":
+    def __enter__(self) -> DeviceContext:
         return self
 
     def __exit__(self, *_: object) -> None:

@@ -1,8 +1,8 @@
 """Tests for SyncTable + transports — distributed convergence verification."""
 
-from atomik_core import SyncTable, DeltaMessage
-from atomik_core.transport import MemoryTransport, CallbackTransport
+from atomik_core.transport import CallbackTransport, MemoryTransport
 
+from atomik_core import DeltaMessage, SyncTable
 
 # =========================================================================
 # SyncTable basics
@@ -207,7 +207,7 @@ def test_callback_transport_wire_format():
     """CallbackTransport serializes to 16-byte wire format."""
     sent = []
     t = SyncTable(16)
-    ct = CallbackTransport(t, send_fn=lambda data: sent.append(data))
+    CallbackTransport(t, send_fn=lambda data: sent.append(data))
     t.put(0, 0xDEADBEEF)
 
     assert len(sent) == 1
@@ -229,7 +229,7 @@ def test_callback_transport_roundtrip():
     b = SyncTable(16)
 
     ct_b = CallbackTransport(b)
-    ct_a = CallbackTransport(a, send_fn=lambda data: ct_b.receive_bytes(data))
+    CallbackTransport(a, send_fn=lambda data: ct_b.receive_bytes(data))
 
     a.put(0, 0xCAFE)
     assert b.get(0) == 0xCAFE

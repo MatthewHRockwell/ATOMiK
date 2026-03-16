@@ -13,7 +13,7 @@ Key insight: ATOMiK is not "last writer wins" — it's "all deltas merge."
 Every node's contributions are preserved through XOR accumulation.
 """
 
-from atomik_core import DeltaStream, DeltaMessage
+from atomik_core import DeltaMessage, DeltaStream
 
 
 class CacheNode:
@@ -68,16 +68,16 @@ def main():
     print("1. Concurrent updates (each node applies a delta):\n")
 
     # us-east increments counter by 0x0001
-    msg1 = nodes["us-east"].update(0, 0x0001)
-    print(f"   us-east: key[0] += 0x0001 (counter increment)")
+    nodes["us-east"].update(0, 0x0001)
+    print("   us-east: key[0] += 0x0001 (counter increment)")
 
     # us-west increments counter by 0x0010
-    msg2 = nodes["us-west"].update(0, 0x0010)
-    print(f"   us-west: key[0] += 0x0010 (counter increment)")
+    nodes["us-west"].update(0, 0x0010)
+    print("   us-west: key[0] += 0x0010 (counter increment)")
 
     # eu-west flips status bits on key 1
-    msg3 = nodes["eu-west"].update(1, 0x00000000000000FF)
-    print(f"   eu-west: key[1] ^= 0xFF (status flags toggled)")
+    nodes["eu-west"].update(1, 0x00000000000000FF)
+    print("   eu-west: key[1] ^= 0xFF (status flags toggled)")
 
     # --- Broadcast deltas to all peers ---
     print("\n2. Broadcasting deltas (any order is fine):\n")
@@ -119,17 +119,17 @@ def main():
     print(f"   key[1] = 0xAABB0000 ^ 0xFF = 0x{expected_k1:08x} (correct)")
 
     # --- Bandwidth analysis ---
-    print(f"\n4. Bandwidth savings:\n")
+    print("\n4. Bandwidth savings:\n")
     delta_bytes = 3 * 8  # 3 deltas × 8 bytes each
     print(f"   Total deltas transmitted:  {delta_bytes} bytes")
     print(f"   Equivalent full-state:     {2 * 8 * 3} bytes (2 keys × 8B × 3 nodes)")
-    print(f"\n   At scale (10,000 keys, 100 updates/sec, 3 nodes):")
+    print("\n   At scale (10,000 keys, 100 updates/sec, 3 nodes):")
     full_bw = 100 * 10000 * 8 * 2  # updates × keys × 8B × broadcast to 2 peers
     delta_bw = 100 * 8 * 2         # updates × 8B delta × broadcast to 2 peers
     print(f"     Full-state sync: {full_bw / 1024 / 1024:.1f} MB/sec")
     print(f"     ATOMiK deltas:   {delta_bw / 1024:.1f} KB/sec")
     print(f"     Savings:         {(1 - delta_bw/full_bw)*100:.3f}%")
-    print(f"\n   No consensus protocol. No leader election. No ordering.")
+    print("\n   No consensus protocol. No leader election. No ordering.")
 
 
 if __name__ == "__main__":

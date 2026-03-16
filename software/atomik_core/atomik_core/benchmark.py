@@ -15,9 +15,8 @@ No setup required. Just run it.
 
 import json
 import platform
-import time
-import copy
 import sys
+import time
 
 
 def _header(title: str):
@@ -73,12 +72,12 @@ def bench_rollback() -> dict:
 
     speedup = trad_time / atomik_time if atomik_time > 0 else float('inf')
     _result(trad_time, atomik_time, "rollback")
-    print(f"\n  Memory used:")
+    print("\n  Memory used:")
     print(f"    Traditional: {trad_mem:>10,} bytes (full history)")
     print(f"    ATOMiK:      {atomik_mem:>10} bytes (constant)")
     print(f"    → {trad_mem/atomik_mem:,.0f}x less memory")
     assert ctx.read() == 0xDEADBEEFCAFEBABE, "Rollback integrity check failed!"
-    print(f"  ✓ Integrity verified — state restored exactly")
+    print("  ✓ Integrity verified — state restored exactly")
 
     return {
         "test": "rollback",
@@ -120,10 +119,10 @@ def bench_change_detection() -> dict:
     speedup = trad_time / atomik_time if atomik_time > 0 else float('inf')
     _result(trad_time, atomik_time, "change detection")
     print(f"\n  Traditional scans {buf_size:,} bytes every check")
-    print(f"  ATOMiK checks a single 8-byte fingerprint")
+    print("  ATOMiK checks a single 8-byte fingerprint")
 
     # Now show incremental update detection
-    print(f"\n  Incremental update (change 1 byte in 64KB):")
+    print("\n  Incremental update (change 1 byte in 64KB):")
     buf[1000] = 0xBB
     start = time.perf_counter()
     for _ in range(n_checks):
@@ -191,7 +190,7 @@ def bench_convergence() -> dict:
     speedup = trad_time / atomik_time if atomik_time > 0 else float('inf')
     _result(trad_time, atomik_time, "convergence")
     print(f"\n  Traditional: sort {n_nodes * n_updates:,} events, then replay")
-    print(f"  ATOMiK: accumulate independently, merge (order doesn't matter)")
+    print("  ATOMiK: accumulate independently, merge (order doesn't matter)")
     print(f"  ✓ Both produce same result: {hex(state)} == {hex(contexts[0].read())}")
     assert state == contexts[0].read()
 
@@ -233,8 +232,8 @@ def bench_bandwidth() -> dict:
             "reduction": ratio,
         })
 
-    print(f"\n  ATOMiK delta is ALWAYS 8 bytes, regardless of state size.")
-    print(f"  For a 1 MB state object: 131,072x bandwidth reduction.")
+    print("\n  ATOMiK delta is ALWAYS 8 bytes, regardless of state size.")
+    print("  For a 1 MB state object: 131,072x bandwidth reduction.")
 
     return {
         "test": "bandwidth",
@@ -273,9 +272,9 @@ def bench_throughput() -> dict:
     print(f"  LOAD:  {n/load_time:>12,.0f} ops/sec  ({n/load_time/1e6:.1f}M ops/sec)")
     print(f"  ACCUM: {n/accum_time:>12,.0f} ops/sec  ({n/accum_time/1e6:.1f}M ops/sec)")
     print(f"  READ:  {n/read_time:>12,.0f} ops/sec  ({n/read_time/1e6:.1f}M ops/sec)")
-    print(f"\n  All operations are O(1) — constant time regardless of state history.")
-    print(f"  For higher throughput: ATOMiK C library (500M ops/sec)")
-    print(f"                        ATOMiK FPGA IP  (69.7B ops/sec)")
+    print("\n  All operations are O(1) — constant time regardless of state history.")
+    print("  For higher throughput: ATOMiK C library (500M ops/sec)")
+    print("                        ATOMiK FPGA IP  (69.7B ops/sec)")
 
     return {
         "test": "throughput",
@@ -297,13 +296,12 @@ def format_share_text(results: list[dict]) -> str:
     """
     # Extract platform info
     uname = platform.uname()
-    cpu = uname.processor or uname.machine
     py_version = platform.python_version()
     os_info = f"{uname.system} {uname.release} {uname.machine}"
 
     # Extract key metrics from results
     rollback = next((r for r in results if r["test"] == "rollback"), {})
-    detection = next((r for r in results if r["test"] == "change_detection"), {})
+    next((r for r in results if r["test"] == "change_detection"), {})
     convergence = next((r for r in results if r["test"] == "convergence"), {})
     bandwidth = next((r for r in results if r["test"] == "bandwidth"), {})
     throughput = next((r for r in results if r["test"] == "throughput"), {})
@@ -380,17 +378,17 @@ def main():
         print()  # trailing newline
     else:
         print(f"\n{'='*60}")
-        print(f"  BENCHMARK COMPLETE")
+        print("  BENCHMARK COMPLETE")
         print(f"{'='*60}")
-        print(f"\n  ATOMiK replaces store-and-retrieve with reconstruct-from-deltas.")
-        print(f"  Same algebra at every tier: Python → C → FPGA → ASIC.")
-        print(f"\n  Learn more:  https://atomik.tech")
-        print(f"  Source:       https://github.com/MatthewHRockwell/ATOMiK")
-        print(f"  Install:      pip install atomik-core")
+        print("\n  ATOMiK replaces store-and-retrieve with reconstruct-from-deltas.")
+        print("  Same algebra at every tier: Python → C → FPGA → ASIC.")
+        print("\n  Learn more:  https://atomik.tech")
+        print("  Source:       https://github.com/MatthewHRockwell/ATOMiK")
+        print("  Install:      pip install atomik-core")
 
         if share_mode:
             print(f"\n{'='*60}")
-            print(f"  SHAREABLE SUMMARY (copy-paste this)")
+            print("  SHAREABLE SUMMARY (copy-paste this)")
             print(f"{'='*60}\n")
             print(format_share_text(results))
 

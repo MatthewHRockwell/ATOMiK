@@ -10,8 +10,8 @@ duplicated, or be merged in transit — the result is always correct.
 from __future__ import annotations
 
 import struct
-from dataclasses import dataclass, field
-from typing import Iterator
+from collections.abc import Iterator
+from dataclasses import dataclass
 
 from atomik_core.context import AtomikContext
 

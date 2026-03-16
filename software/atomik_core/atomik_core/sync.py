@@ -22,10 +22,11 @@ SPDX-License-Identifier: Apache-2.0
 
 from __future__ import annotations
 
-from typing import Callable, Iterator
+from collections.abc import Iterator
+from typing import Callable
 
-from atomik_core.table import AtomikTable
 from atomik_core.stream import DeltaMessage
+from atomik_core.table import AtomikTable
 
 
 class SyncTable:

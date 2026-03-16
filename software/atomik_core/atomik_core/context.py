@@ -180,7 +180,7 @@ class AtomikContext:
         }
 
     @classmethod
-    def from_snapshot(cls, snap: dict) -> "AtomikContext":
+    def from_snapshot(cls, snap: dict) -> AtomikContext:
         """Restore a context from a snapshot dict.
 
         Args:
@@ -194,7 +194,7 @@ class AtomikContext:
         ctx._delta_count = snap.get("delta_count", 0)
         return ctx
 
-    def __enter__(self) -> "AtomikContext":
+    def __enter__(self) -> AtomikContext:
         """Context manager entry — returns self."""
         return self
 

@@ -14,15 +14,14 @@ ATOMiK's software value proposition:
   5. Hardware upgrade path: Move to FPGA for 100-1000x when needed
 """
 
+import hashlib
 import os
 import sys
 import time
-import struct
-import hashlib
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from atomik_core import AtomikContext, AtomikTable, DeltaStream, Fingerprint
+from atomik_core import AtomikContext, Fingerprint
 
 
 def timer(func, *args, iterations=1):
@@ -108,7 +107,7 @@ def bench_memory():
     for d in deltas:
         ctx.rollback(d)
     assert ctx.read() == 0xDEADBEEFCAFEBABE, "Rollback correctness check failed"
-    print(f"\n  Correctness verified: 1000 deltas applied and rolled back")
+    print("\n  Correctness verified: 1000 deltas applied and rolled back")
 
 
 # ==========================================================================
@@ -174,7 +173,7 @@ def bench_convergence():
     print(f"  ATOMiK merge (no ordering):  {t_atomik:8.2f} ms")
     print(f"  Ordered replay (sort first): {t_ordered:8.2f} ms")
     print(f"  ATOMiK speedup:              {t_ordered/t_atomik:.1f}x")
-    print(f"  Key: ATOMiK requires NO consensus protocol")
+    print("  Key: ATOMiK requires NO consensus protocol")
     print(f"       Conventional requires total ordering of {total_events:,} events")
     print(f"  States converge: 0x{r_atomik:016x} (verified identical)")
 
@@ -262,9 +261,9 @@ def bench_throughput():
     print(f"    ACCUM:  {t_accum:8.2f} ms  ({n/t_accum*1000:>12,.0f} ops/sec)")
     print(f"    READ:   {t_read:8.2f} ms  ({n/t_read*1000:>12,.0f} ops/sec)")
     print(f"    SWAP:   {t_swap:8.2f} ms  ({n/t_swap*1000:>12,.0f} ops/sec)")
-    print(f"\n  Note: C library is ~50-100x faster. FPGA hardware is ~1000x faster.")
-    print(f"  Software ATOMiK is for correctness + bandwidth savings, not raw speed.")
-    print(f"  When you need speed: upgrade to atomik-core C or FPGA hardware.")
+    print("\n  Note: C library is ~50-100x faster. FPGA hardware is ~1000x faster.")
+    print("  Software ATOMiK is for correctness + bandwidth savings, not raw speed.")
+    print("  When you need speed: upgrade to atomik-core C or FPGA hardware.")
 
 
 # ==========================================================================

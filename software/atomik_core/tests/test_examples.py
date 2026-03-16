@@ -3,15 +3,12 @@
 Each example uses mock/simulated backends so no external services are needed.
 """
 
-import io
-import sys
+import asyncio
 import contextlib
 import importlib.util
+import io
 import os
-import asyncio
-
-import pytest
-
+import sys
 
 EXAMPLES_DIR = os.path.join(
     os.path.dirname(__file__), os.pardir, "examples"

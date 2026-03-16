@@ -7,8 +7,8 @@ Usage:
     python -m atomik_core version      # Show version info
 """
 
-import sys
 import platform
+import sys
 
 
 def _version_info():
@@ -32,22 +32,22 @@ def _quick_demo():
 
     # LOAD
     ctx.load(0xDEADBEEFCAFEBABE)
-    print(f"  LOAD  0xDEADBEEFCAFEBABE")
+    print("  LOAD  0xDEADBEEFCAFEBABE")
     print(f"    state = {hex(ctx.read())}")
 
     # ACCUM
     ctx.accum(0x00000000000000FF)
-    print(f"  ACCUM 0x00000000000000FF")
+    print("  ACCUM 0x00000000000000FF")
     print(f"    state = {hex(ctx.read())}")
 
     # ACCUM (self-inverse)
     ctx.accum(0x00000000000000FF)
-    print(f"  ACCUM 0x00000000000000FF  (self-inverse: undo previous)")
+    print("  ACCUM 0x00000000000000FF  (self-inverse: undo previous)")
     print(f"    state = {hex(ctx.read())}")
 
     # SWAP
     snapshot = ctx.swap(0x0000000000000000)
-    print(f"  SWAP  0x0000000000000000  (atomic snapshot + new epoch)")
+    print("  SWAP  0x0000000000000000  (atomic snapshot + new epoch)")
     print(f"    snapshot = {hex(snapshot)}")
     print(f"    state    = {hex(ctx.read())}")
 

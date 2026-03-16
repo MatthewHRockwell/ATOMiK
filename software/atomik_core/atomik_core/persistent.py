@@ -24,8 +24,9 @@ SPDX-License-Identifier: Apache-2.0
 from __future__ import annotations
 
 import os
+from collections.abc import Iterator
 from pathlib import Path
-from typing import Callable, Iterator
+from typing import Callable
 
 from atomik_core.stream import DeltaMessage
 from atomik_core.sync import SyncTable

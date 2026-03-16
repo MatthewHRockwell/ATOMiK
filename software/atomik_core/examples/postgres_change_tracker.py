@@ -15,7 +15,8 @@ Usage: python postgres_change_tracker.py
 """
 
 import struct
-from atomik_core import Fingerprint, AtomikTable
+
+from atomik_core import AtomikTable
 
 
 class RowFingerprinter:
@@ -141,16 +142,16 @@ def main():
     print(f"  Unchanged: {result['unchanged']}")
     print(f"  Total:     {result['total_checked']} rows checked")
 
-    print(f"\n  Without ATOMiK: SELECT + byte-by-byte compare = O(n × row_size)")
-    print(f"  With ATOMiK:    SELECT + XOR fingerprint compare = O(n × 1)")
-    print(f"\n  For 1M rows at 1KB each:")
-    print(f"    Traditional: ~1 GB of comparison data")
-    print(f"    ATOMiK:      ~8 MB of fingerprints (64-bit per row)")
-    print(f"    Savings:     125x less memory, O(1) per row")
+    print("\n  Without ATOMiK: SELECT + byte-by-byte compare = O(n × row_size)")
+    print("  With ATOMiK:    SELECT + XOR fingerprint compare = O(n × 1)")
+    print("\n  For 1M rows at 1KB each:")
+    print("    Traditional: ~1 GB of comparison data")
+    print("    ATOMiK:      ~8 MB of fingerprints (64-bit per row)")
+    print("    Savings:     125x less memory, O(1) per row")
 
     # Update snapshot for next cycle
     tracker.update_snapshot(current_rows)
-    print(f"\n  Snapshot updated. Next sync will detect changes from this point.")
+    print("\n  Snapshot updated. Next sync will detect changes from this point.")
 
 
 if __name__ == "__main__":

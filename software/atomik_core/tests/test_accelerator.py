@@ -1,7 +1,8 @@
 """Tests for the C accelerator module."""
 
 import struct
-from atomik_core._accelerator import c_accum, c_read, c_fp_reduce, is_available
+
+from atomik_core._accelerator import c_accum, c_fp_reduce, c_read, is_available
 
 
 def test_is_available_returns_bool():
