@@ -413,3 +413,37 @@ def test_set_accumulator():
     assert ctx.accumulator == 0xFF
     assert ctx.delta_count == 0
     assert ctx.read() == 0xAAAA ^ 0xFF
+
+
+def test_snapshot_roundtrip():
+    """snapshot() and from_snapshot() preserve full context state."""
+    ctx = AtomikContext(width=64, initial_state=0xDEADBEEF)
+    ctx.accum(0x000000FF)
+    ctx.accum(0x0000FF00)
+
+    snap = ctx.snapshot()
+    assert snap["width"] == 64
+    assert snap["reference"] == 0xDEADBEEF
+    assert snap["state"] == ctx.read()
+    assert snap["delta_count"] == 2
+
+    restored = AtomikContext.from_snapshot(snap)
+    assert restored.read() == ctx.read()
+    assert restored.reference == ctx.reference
+    assert restored.accumulator == ctx.accumulator
+    assert restored.delta_count == 2
+
+
+def test_context_manager():
+    """Context manager resets state on exit."""
+    ctx = AtomikContext()
+    ctx.load(0xCAFEBABE)
+    ctx.accum(0xFF)
+
+    with ctx as c:
+        assert c.read() == 0xCAFEBABE ^ 0xFF
+        c.accum(0x01)
+
+    # After exiting, context is reset
+    assert ctx.read() == 0
+    assert ctx.accumulator == 0

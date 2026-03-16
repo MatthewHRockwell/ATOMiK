@@ -1,7 +1,7 @@
 CC ?= gcc
 CFLAGS := -Wall -O2
 
-TOOLS := atomik-status atomik-test atomik-bench atomik-optimizer atomik-dashboard
+TOOLS := atomik-status atomik-test atomik-bench atomik-optimizer atomik-dashboard atomik-report
 
 all: $(TOOLS)
 
@@ -20,12 +20,16 @@ atomik-optimizer: atomik-optimizer.c
 atomik-dashboard: atomik-dashboard.c
 	$(CC) $(CFLAGS) -o $@ $<
 
+atomik-report: atomik-report.c
+	$(CC) $(CFLAGS) -o $@ $< -lm
+
 install: $(TOOLS)
 	install -m 755 atomik-status /usr/local/bin/
 	install -m 755 atomik-test /usr/local/bin/
 	install -m 755 atomik-bench /usr/local/bin/
 	install -m 755 atomik-optimizer /usr/local/bin/
 	install -m 755 atomik-dashboard /usr/local/bin/
+	install -m 755 atomik-report /usr/local/bin/
 	install -m 755 atomik-full-test.sh /usr/local/bin/atomik-full-test
 	install -m 755 atomik-workload-bench.sh /usr/local/bin/atomik-workload-bench
 

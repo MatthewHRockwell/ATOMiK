@@ -165,6 +165,43 @@ class AtomikContext:
             f"deltas={self._delta_count})"
         )
 
+    def snapshot(self) -> dict:
+        """Capture a serializable snapshot of the context state.
+
+        Returns:
+            Dict with width, reference, accumulator, and current state.
+        """
+        return {
+            "width": self._width,
+            "reference": self._reference,
+            "accumulator": self._accumulator,
+            "state": self.read(),
+            "delta_count": self._delta_count,
+        }
+
+    @classmethod
+    def from_snapshot(cls, snap: dict) -> "AtomikContext":
+        """Restore a context from a snapshot dict.
+
+        Args:
+            snap: Dict from snapshot() with width, reference, accumulator.
+
+        Returns:
+            Restored AtomikContext.
+        """
+        ctx = cls(width=snap["width"], initial_state=snap["reference"])
+        ctx._accumulator = snap["accumulator"] & ctx._mask
+        ctx._delta_count = snap.get("delta_count", 0)
+        return ctx
+
+    def __enter__(self) -> "AtomikContext":
+        """Context manager entry — returns self."""
+        return self
+
+    def __exit__(self, *_: object) -> None:
+        """Context manager exit — resets to clean state (SWAP with zero)."""
+        self.load(0)
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, AtomikContext):
             return NotImplemented

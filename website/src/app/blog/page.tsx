@@ -10,6 +10,14 @@ export const metadata: Metadata = {
 
 const posts = [
   {
+    slug: "5-patterns-delta-state",
+    title: "5 Design Patterns for Delta-State Algebra",
+    date: "March 16, 2026",
+    excerpt:
+      "Practical patterns: accumulator fan-in, epoch checkpointing, fingerprint gates, rollback chains, and multi-stream convergence.",
+    tags: ["patterns", "architecture", "python"],
+  },
+  {
     slug: "building-distributed-cache-in-50-lines",
     title: "Build a Distributed Cache in 50 Lines of Python",
     date: "March 16, 2026",
