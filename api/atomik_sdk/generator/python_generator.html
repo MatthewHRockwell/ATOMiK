@@ -320,9 +320,9 @@ el.replaceWith(d);
         lines.append(self._indent(&#39;    True if rollback successful&#39;, 8))
         lines.append(self._indent(&#39;&#34;&#34;&#34;&#39;, 8))
 
-        # Use first field for history check (all fields should have same history)
-        first_field = field_names[0]
-        lines.append(self._indent(f&#39;if steps &gt; len(self._{first_field}_history):&#39;, 8))
+        # Check all fields have enough history for rollback
+        checks = [f&#39;len(self._{f}_history)&#39; for f in field_names]
+        lines.append(self._indent(f&#39;if steps &gt; min({&#34;, &#34;.join(checks)}):&#39;, 8))
         lines.append(self._indent(&#39;return False&#39;, 12))
         lines.append(self._indent(&#39;&#39;, 8))
 
