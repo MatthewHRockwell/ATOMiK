@@ -9,13 +9,12 @@ export default function Nav({ active }: { active?: string }) {
 
   const links = [
     { href: "/", label: "Home" },
-    { href: "/docs", label: "Docs" },
-    { href: "/solutions", label: "Solutions" },
-    { href: "/demo", label: "Demo" },
     { href: "/ai-demo", label: "AI Demo" },
+    { href: "/demo", label: "Delta Demo" },
+    { href: "/solutions", label: "Solutions" },
+    { href: "/docs", label: "Docs" },
     { href: "/pricing", label: "Pricing" },
     { href: "/blog", label: "Blog" },
-    { href: "/about", label: "About" },
   ];
 
   // Close menu when clicking outside the nav

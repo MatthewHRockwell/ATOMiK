@@ -4,20 +4,22 @@ import { useState, useCallback, useRef, useEffect } from "react";
 import Link from "next/link";
 import Nav from "@/components/Nav";
 
-/* ---------- 32-bit XOR helpers ---------- */
+/* ---------- 32-bit XOR helper ---------- */
 
 function xor32(a: number, b: number): number {
   return (a ^ b) >>> 0;
 }
 
-function toHex(v: number): string {
-  return "0x" + v.toString(16).toUpperCase().padStart(8, "0");
+/* ---------- Decimal display helpers ---------- */
+
+function fmt(v: number): string {
+  return v.toLocaleString("en-US");
 }
 
-function parseHex(s: string): number | null {
-  const cleaned = s.replace(/^0x/i, "").trim();
-  if (cleaned === "" || !/^[0-9a-fA-F]+$/.test(cleaned)) return null;
-  const v = parseInt(cleaned, 16);
+function parseDec(s: string): number | null {
+  const cleaned = s.replace(/,/g, "").trim();
+  if (cleaned === "" || !/^\d+$/.test(cleaned)) return null;
+  const v = parseInt(cleaned, 10);
   if (isNaN(v) || v < 0 || v > 0xffffffff) return null;
   return v >>> 0;
 }
@@ -59,9 +61,9 @@ function Card({
   );
 }
 
-/* ---------- Hex value display ---------- */
+/* ---------- Value display ---------- */
 
-function HexValue({
+function ValueDisplay({
   label,
   value,
   color = "#22d3ee",
@@ -85,7 +87,7 @@ function HexValue({
           textShadow: pulse ? `0 0 12px ${color}60` : "none",
         }}
       >
-        {toHex(value)}
+        {fmt(value)}
       </span>
     </div>
   );
@@ -120,9 +122,9 @@ function OpButton({
   );
 }
 
-/* ---------- Hex input ---------- */
+/* ---------- Decimal input ---------- */
 
-function HexInput({
+function DecInput({
   value,
   onChange,
   placeholder,
@@ -154,21 +156,47 @@ function HexInput({
   );
 }
 
+/* ---------- Preset button ---------- */
+
+function PresetButton({
+  label,
+  value,
+  onClick,
+}: {
+  label: string;
+  value: string;
+  onClick: (v: string) => void;
+}) {
+  return (
+    <button
+      onClick={() => onClick(value)}
+      className="px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-150 hover:opacity-90 active:scale-95"
+      style={{
+        background: "rgba(79,143,255,0.1)",
+        color: "#4f8fff",
+        border: "1px solid rgba(79,143,255,0.2)",
+      }}
+    >
+      {label}
+    </button>
+  );
+}
+
 /* ===================================================================
    Main Demo Page
    =================================================================== */
 
 export default function DemoPage() {
   /* --- Simulator state --- */
-  const [reference, setReference] = useState<number>(0x00000000 >>> 0);
-  const [accumulator, setAccumulator] = useState<number>(0x00000000 >>> 0);
+  const [reference, setReference] = useState<number>(0);
+  const [accumulator, setAccumulator] = useState<number>(0);
   const [history, setHistory] = useState<HistoryEntry[]>([]);
   const [nextId, setNextId] = useState(1);
   const [pulseField, setPulseField] = useState<"ref" | "acc" | "state" | null>(null);
 
   /* Input fields */
-  const [loadInput, setLoadInput] = useState("DEADBEEF");
-  const [accumInput, setAccumInput] = useState("0000FFFF");
+  const [loadInput, setLoadInput] = useState("1000");
+  const [accumInput, setAccumInput] = useState("50");
 
   /* --- Live sync state --- */
   const [liveEnabled, setLiveEnabled] = useState(false);
@@ -209,7 +237,7 @@ export default function DemoPage() {
             {
               id: Date.now(),
               op: "ACCUM" as const,
-              detail: `RECV from peer: acc ^= ${toHex(msg.value)}`,
+              detail: `RECV from peer: applied delta ${fmt(msg.value)}`,
               resultRef: 0,
               resultAcc: 0,
             },
@@ -222,7 +250,7 @@ export default function DemoPage() {
             {
               id: Date.now(),
               op: "LOAD" as const,
-              detail: `RECV from peer: ref = ${toHex(msg.value)}`,
+              detail: `RECV from peer: set reference to ${fmt(msg.value)}`,
               resultRef: msg.value >>> 0,
               resultAcc: 0,
             },
@@ -263,11 +291,11 @@ export default function DemoPage() {
   /* --- Operations --- */
 
   const doLoad = useCallback(() => {
-    const v = parseHex(loadInput);
+    const v = parseDec(loadInput);
     if (v === null) return;
     setReference(v);
     setAccumulator(0);
-    record("LOAD", `reference = ${toHex(v)}`, v, 0);
+    record("LOAD", `Set reference to ${fmt(v)}`, v, 0);
     pulse("ref");
     if (wsRef.current?.readyState === WebSocket.OPEN) {
       wsRef.current.send(JSON.stringify({ type: "load", value: v }));
@@ -275,11 +303,12 @@ export default function DemoPage() {
   }, [loadInput, record, pulse]);
 
   const doAccum = useCallback(() => {
-    const v = parseHex(accumInput);
+    const v = parseDec(accumInput);
     if (v === null) return;
     const newAcc = xor32(accumulator, v);
+    const newState = xor32(reference, newAcc);
     setAccumulator(newAcc);
-    record("ACCUM", `acc ^= ${toHex(v)}`, reference, newAcc);
+    record("ACCUM", `Applied delta ${fmt(v)}, state now ${fmt(newState)}`, reference, newAcc);
     pulse("acc");
     if (wsRef.current?.readyState === WebSocket.OPEN) {
       wsRef.current.send(JSON.stringify({ type: "delta", value: v }));
@@ -287,7 +316,7 @@ export default function DemoPage() {
   }, [accumInput, accumulator, reference, record, pulse]);
 
   const doRead = useCallback(() => {
-    record("READ", `state = ref ^ acc = ${toHex(currentState)}`, reference, accumulator);
+    record("READ", `Current value: ${fmt(currentState)}`, reference, accumulator);
     pulse("state");
   }, [currentState, reference, accumulator, record, pulse]);
 
@@ -295,15 +324,21 @@ export default function DemoPage() {
     const newRef = currentState;
     setReference(newRef);
     setAccumulator(0);
-    record("SWAP", `new ref = ${toHex(newRef)}, acc reset`, newRef, 0);
+    record("SWAP", `Saved state ${fmt(newRef)} as new reference`, newRef, 0);
     pulse("ref");
   }, [currentState, record, pulse]);
 
+  /* --- Preset handler --- */
+  const applyPreset = useCallback((value: string) => {
+    setLoadInput(value);
+  }, []);
+
   /* ---- Key Properties Demo state ---- */
 
-  const [commResult, setCommResult] = useState<{ ab: number; ba: number } | null>(null);
+  const [commResult, setCommResult] = useState<{ a: number; b: number; base: number; ab: number; ba: number } | null>(null);
   const [selfInvResult, setSelfInvResult] = useState<{
     original: number;
+    delta: number;
     afterOne: number;
     afterTwo: number;
   } | null>(null);
@@ -321,7 +356,7 @@ export default function DemoPage() {
     const base = randomU32();
     const ab = xor32(xor32(base, a), b);
     const ba = xor32(xor32(base, b), a);
-    setCommResult({ ab, ba });
+    setCommResult({ a, b, base, ab, ba });
   }, []);
 
   /* Self-inverse demo */
@@ -330,7 +365,7 @@ export default function DemoPage() {
     const delta = randomU32();
     const afterOne = xor32(base, delta);
     const afterTwo = xor32(afterOne, delta);
-    setSelfInvResult({ original: base, afterOne, afterTwo });
+    setSelfInvResult({ original: base, delta, afterOne, afterTwo });
   }, []);
 
   /* Order independence demo */
@@ -377,8 +412,9 @@ export default function DemoPage() {
           Demo
         </h1>
         <p className="text-lg max-w-2xl mx-auto" style={{ color: "#8888a0" }}>
-          Try ATOMiK&apos;s four core operations in your browser. Everything runs in
-          JavaScript&nbsp;&mdash; same algebra, same rules, same results as the hardware.
+          Imagine tracking a sensor reading, account balance, or game score. Try
+          ATOMiK&apos;s four core operations below&nbsp;&mdash; same algebra, same
+          rules, same results as the hardware.
         </p>
       </section>
 
@@ -432,23 +468,23 @@ export default function DemoPage() {
           {/* State display */}
           <div className="mb-6">
             <h2 className="text-sm font-semibold uppercase tracking-wider mb-4" style={{ color: "#8888a0" }}>
-              AtomikContext State
+              ATOMiK Context State
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
-              <HexValue
+              <ValueDisplay
                 label="reference"
                 value={reference}
                 color="#8b5cf6"
                 pulse={pulseField === "ref"}
               />
-              <HexValue
+              <ValueDisplay
                 label="accumulator"
                 value={accumulator}
                 color="#4f8fff"
                 pulse={pulseField === "acc"}
               />
-              <HexValue
-                label="current_state (ref XOR acc)"
+              <ValueDisplay
+                label="current state (ref XOR acc)"
                 value={currentState}
                 color="#22d3ee"
                 pulse={pulseField === "state"}
@@ -465,11 +501,24 @@ export default function DemoPage() {
                 color: "#8888a0",
               }}
             >
-              <span style={{ color: "#8b5cf6" }}>{toHex(reference)}</span>
-              {" ^ "}
-              <span style={{ color: "#4f8fff" }}>{toHex(accumulator)}</span>
+              <span style={{ color: "#8b5cf6" }}>{fmt(reference)}</span>
+              {" XOR "}
+              <span style={{ color: "#4f8fff" }}>{fmt(accumulator)}</span>
               {" = "}
-              <span style={{ color: "#22d3ee" }}>{toHex(currentState)}</span>
+              <span style={{ color: "#22d3ee" }}>{fmt(currentState)}</span>
+            </div>
+          </div>
+
+          {/* Preset buttons */}
+          <div className="mb-4">
+            <span className="text-xs font-medium uppercase tracking-wider mr-3" style={{ color: "#8888a0" }}>
+              Presets
+            </span>
+            <div className="inline-flex flex-wrap gap-2">
+              <PresetButton label="Sensor: 2,500" value="2500" onClick={applyPreset} />
+              <PresetButton label="Balance: 10,000" value="10000" onClick={applyPreset} />
+              <PresetButton label="Counter: 0" value="0" onClick={applyPreset} />
+              <PresetButton label="Score: 500" value="500" onClick={applyPreset} />
             </div>
           </div>
 
@@ -478,18 +527,18 @@ export default function DemoPage() {
             {/* LOAD */}
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
               <OpButton label="LOAD" onClick={doLoad} color="#8b5cf6" />
-              <HexInput value={loadInput} onChange={setLoadInput} placeholder="hex value, e.g. DEADBEEF" />
+              <DecInput value={loadInput} onChange={setLoadInput} placeholder="e.g. 1000 (starting balance)" />
               <span className="text-xs shrink-0" style={{ color: "#8888a0" }}>
-                Set reference, reset accumulator
+                Set initial value, reset accumulator
               </span>
             </div>
 
             {/* ACCUM */}
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
               <OpButton label="ACCUM" onClick={doAccum} color="#4f8fff" />
-              <HexInput value={accumInput} onChange={setAccumInput} placeholder="hex delta, e.g. 0000FFFF" />
+              <DecInput value={accumInput} onChange={setAccumInput} placeholder="e.g. 50 (a change/delta)" />
               <span className="text-xs shrink-0" style={{ color: "#8888a0" }}>
-                XOR delta into accumulator
+                Apply a change (XOR delta)
               </span>
             </div>
 
@@ -498,7 +547,7 @@ export default function DemoPage() {
               <OpButton label="READ" onClick={doRead} color="#22b8a6" />
               <OpButton label="SWAP" onClick={doSwap} color="#f59e0b" />
               <span className="text-xs self-center ml-2" style={{ color: "#8888a0" }}>
-                READ highlights current state &middot; SWAP promotes it to new reference
+                READ shows current value &middot; SWAP checkpoints it as new reference
               </span>
             </div>
           </div>
@@ -540,7 +589,7 @@ export default function DemoPage() {
                     </span>
                     <span style={{ color: "#b0b0c0" }}>{h.detail}</span>
                     <span className="ml-auto shrink-0" style={{ color: "#555" }}>
-                      state={toHex(xor32(h.resultRef, h.resultAcc))}
+                      state={fmt(xor32(h.resultRef, h.resultAcc))}
                     </span>
                   </div>
                 ))}
@@ -568,7 +617,7 @@ export default function DemoPage() {
               <div>
                 <h3 className="text-lg font-semibold">Commutativity</h3>
                 <p className="text-sm" style={{ color: "#8888a0" }}>
-                  A ^ B = B ^ A &mdash; order of accumulation doesn&apos;t matter.
+                  A XOR B = B XOR A &mdash; order of accumulation doesn&apos;t matter.
                 </p>
               </div>
               <OpButton label="Try it" onClick={demoCommutativity} color="#8b5cf6" />
@@ -580,11 +629,11 @@ export default function DemoPage() {
               >
                 <div>
                   <span style={{ color: "#8888a0" }}>A then B: </span>
-                  <span style={{ color: "#22d3ee" }}>{toHex(commResult.ab)}</span>
+                  <span style={{ color: "#22d3ee" }}>{fmt(commResult.ab)}</span>
                 </div>
                 <div>
                   <span style={{ color: "#8888a0" }}>B then A: </span>
-                  <span style={{ color: "#22d3ee" }}>{toHex(commResult.ba)}</span>
+                  <span style={{ color: "#22d3ee" }}>{fmt(commResult.ba)}</span>
                 </div>
                 <div className="pt-1">
                   {commResult.ab === commResult.ba ? (
@@ -603,7 +652,7 @@ export default function DemoPage() {
               <div>
                 <h3 className="text-lg font-semibold">Self-Inverse</h3>
                 <p className="text-sm" style={{ color: "#8888a0" }}>
-                  A ^ A = 0 &mdash; every delta is its own undo.
+                  A XOR A = 0 &mdash; every delta is its own undo.
                 </p>
               </div>
               <OpButton label="Try it" onClick={demoSelfInverse} color="#4f8fff" />
@@ -615,15 +664,15 @@ export default function DemoPage() {
               >
                 <div>
                   <span style={{ color: "#8888a0" }}>Original state: </span>
-                  <span style={{ color: "#8b5cf6" }}>{toHex(selfInvResult.original)}</span>
+                  <span style={{ color: "#8b5cf6" }}>{fmt(selfInvResult.original)}</span>
                 </div>
                 <div>
-                  <span style={{ color: "#8888a0" }}>After XOR delta: </span>
-                  <span style={{ color: "#f59e0b" }}>{toHex(selfInvResult.afterOne)}</span>
+                  <span style={{ color: "#8888a0" }}>After XOR delta ({fmt(selfInvResult.delta)}): </span>
+                  <span style={{ color: "#f59e0b" }}>{fmt(selfInvResult.afterOne)}</span>
                 </div>
                 <div>
                   <span style={{ color: "#8888a0" }}>After XOR same delta again: </span>
-                  <span style={{ color: "#22d3ee" }}>{toHex(selfInvResult.afterTwo)}</span>
+                  <span style={{ color: "#22d3ee" }}>{fmt(selfInvResult.afterTwo)}</span>
                 </div>
                 <div className="pt-1">
                   {selfInvResult.original === selfInvResult.afterTwo ? (
@@ -657,23 +706,23 @@ export default function DemoPage() {
                 <div>
                   <span style={{ color: "#8888a0" }}>Original order: </span>
                   <span style={{ color: "#b0b0c0" }}>
-                    {orderResult.deltas.map(toHex).join(", ")}
+                    {orderResult.deltas.map(fmt).join(", ")}
                   </span>
                 </div>
                 <div>
                   <span style={{ color: "#8888a0" }}>Shuffled order: </span>
                   <span style={{ color: "#b0b0c0" }}>
-                    {orderResult.shuffledOrder.map(toHex).join(", ")}
+                    {orderResult.shuffledOrder.map(fmt).join(", ")}
                   </span>
                 </div>
                 <div className="pt-1 flex flex-col sm:flex-row gap-4">
                   <div>
                     <span style={{ color: "#8888a0" }}>Result (ordered): </span>
-                    <span style={{ color: "#22d3ee" }}>{toHex(orderResult.ordered)}</span>
+                    <span style={{ color: "#22d3ee" }}>{fmt(orderResult.ordered)}</span>
                   </div>
                   <div>
                     <span style={{ color: "#8888a0" }}>Result (shuffled): </span>
-                    <span style={{ color: "#22d3ee" }}>{toHex(orderResult.shuffled)}</span>
+                    <span style={{ color: "#22d3ee" }}>{fmt(orderResult.shuffled)}</span>
                   </div>
                 </div>
                 <div className="pt-1">

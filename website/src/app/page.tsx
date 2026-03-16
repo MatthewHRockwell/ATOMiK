@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import Nav from "@/components/Nav";
 import EmailCapture from "@/components/EmailCapture";
+import MiniDemo from "@/components/MiniDemo";
 
 export const metadata: Metadata = {
   title: "ATOMiK — Stop moving data. Start evolving it.",
@@ -140,6 +141,13 @@ export default function Home() {
           >
             Try the Demo
           </Link>
+          <Link
+            href="/ai-demo"
+            className="px-7 py-3.5 rounded-lg text-base font-semibold text-white no-underline transition-all hover:opacity-90"
+            style={{ background: "linear-gradient(135deg, #a855f7, #7c3aed)", boxShadow: "0 4px 24px rgba(168,85,247,0.25)" }}
+          >
+            AI Inference Demo
+          </Link>
         </div>
         <div
           className="inline-flex items-center gap-3 px-6 py-3.5 rounded-lg font-mono text-sm"
@@ -269,23 +277,33 @@ export default function Home() {
               <Code k>from</Code>{" "}atomik_core{" "}<Code k>import</Code>{" "}AtomikContext{"\n"}
               {"\n"}
               ctx = AtomikContext(){"\n"}
-              ctx.<Code f>load</Code>(<Code n>0xDEADBEEF</Code>){"\n"}
-              ctx.<Code f>accum</Code>(<Code n>0x000000FF</Code>){"    "}<Code c># XOR delta</Code>{"\n"}
-              state = ctx.<Code f>read</Code>(){"       "}<Code c># 0xDEADBE10</Code>{"\n"}
+              ctx.<Code f>load</Code>(<Code n>1000</Code>){"           "}<Code c># Set initial value</Code>{"\n"}
+              ctx.<Code f>accum</Code>(<Code n>50</Code>){"            "}<Code c># Apply delta (+50)</Code>{"\n"}
+              <Code k>print</Code>(ctx.<Code f>read</Code>()){"        "}<Code c># 1018 (1000 XOR 50)</Code>{"\n"}
               {"\n"}
-              <Code c># Undo? Just re-apply the same delta.</Code>{"\n"}
-              ctx.<Code f>rollback</Code>(<Code n>0x000000FF</Code>){"\n"}
-              <Code k>assert</Code>{" "}ctx.<Code f>read</Code>() == <Code n>0xDEADBEEF</Code>{"\n"}
+              ctx.<Code f>accum</Code>(<Code n>50</Code>){"            "}<Code c># Apply same delta again</Code>{"\n"}
+              <Code k>print</Code>(ctx.<Code f>read</Code>()){"        "}<Code c># 1000 (self-inverse: undone!)</Code>{"\n"}
               {"\n"}
               <Code c># Merge two independent accumulators.</Code>{"\n"}
               <Code c># Order doesn&apos;t matter (commutativity).</Code>{"\n"}
               a = AtomikContext(){"\n"}
               b = AtomikContext(){"\n"}
-              a.<Code f>load</Code>(<Code n>0xCAFE</Code>); b.<Code f>load</Code>(<Code n>0xCAFE</Code>){"\n"}
-              a.<Code f>accum</Code>(<Code n>0x11</Code>); b.<Code f>accum</Code>(<Code n>0x22</Code>){"\n"}
+              a.<Code f>load</Code>(<Code n>1000</Code>); b.<Code f>load</Code>(<Code n>1000</Code>){"\n"}
+              a.<Code f>accum</Code>(<Code n>50</Code>); b.<Code f>accum</Code>(<Code n>100</Code>){"\n"}
               a.<Code f>merge</Code>(b){"  "}<Code c># a now has both deltas</Code>
             </pre>
           </div>
+        </div>
+      </section>
+
+      {/* ===== Try It Live ===== */}
+      <section className="px-6 py-20" style={{ borderTop: "1px solid #1e1e2e" }}>
+        <div className="max-w-3xl mx-auto">
+          <h2 className="text-3xl font-bold text-center tracking-tight mb-3">Try It Live</h2>
+          <p className="text-center text-lg mb-10" style={{ color: "#8888a0" }}>
+            See delta-state algebra in action &mdash; no install required
+          </p>
+          <MiniDemo />
         </div>
       </section>
 
