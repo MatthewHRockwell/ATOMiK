@@ -72,11 +72,10 @@ class Fingerprint:
             The fingerprint of the new data.
         """
         current = self._reduce(data)
-        # Delta = reference XOR current. Since state = ref XOR acc,
-        # we want acc to become ref XOR current, so accum(ref XOR current).
-        # But we need to reset first for a clean comparison.
-        # Simpler: just set acc = ref XOR current directly.
-        self._ctx._accumulator = (self._ctx.reference ^ current) & self._ctx._mask
+        # Delta = reference XOR current. We want the accumulator to equal
+        # (reference XOR current) so that read() = reference XOR acc = current.
+        # Use the internal setter to avoid inflating delta_count.
+        self._ctx._set_accumulator(self._ctx.reference ^ current)
         return current
 
     def accumulate_delta(self, old_chunk: int, new_chunk: int) -> None:
@@ -109,8 +108,7 @@ class Fingerprint:
 
     def reset(self) -> None:
         """Clear the accumulator (mark data as matching reference)."""
-        self._ctx._accumulator = 0
-        self._ctx._delta_count = 0
+        self._ctx._set_accumulator(0)
 
     def _reduce(self, data: bytes | bytearray | memoryview) -> int:
         """XOR-reduce data into a single width-bit value."""

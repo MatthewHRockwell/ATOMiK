@@ -39,6 +39,7 @@
 #include <linux/slab.h>
 #include <linux/uio.h>
 #include <linux/crc32.h>
+#include <linux/shrinker.h>
 
 #include "atomik_cgroup.h"
 #include "atomik_net.h"
@@ -102,6 +103,55 @@ static struct net_sock_entry *net_sock_find_or_create(struct sock *sk)
 	spin_unlock_irqrestore(&net_sock_lock, flags);
 
 	return entry;
+}
+
+/*
+ * Memory shrinker — reclaim net_sock_entry objects under pressure.
+ *
+ * The per-socket tracking table grows as new connections are seen.
+ * Under memory pressure, evict entries with zero redundant sends —
+ * sockets that never produced redundant traffic are low value.
+ */
+static struct shrinker *net_shrinker;
+
+static unsigned long net_shrinker_count_objects(struct shrinker *shrink,
+						struct shrink_control *sc)
+{
+	struct net_sock_entry *entry;
+	unsigned long count = 0;
+	unsigned long flags;
+	int bkt;
+
+	spin_lock_irqsave(&net_sock_lock, flags);
+	hash_for_each(net_sock_table, bkt, entry, node)
+		count++;
+	spin_unlock_irqrestore(&net_sock_lock, flags);
+
+	return count ? count : SHRINK_EMPTY;
+}
+
+static unsigned long net_shrinker_scan_objects(struct shrinker *shrink,
+					       struct shrink_control *sc)
+{
+	struct net_sock_entry *entry;
+	struct hlist_node *tmp;
+	unsigned long freed = 0;
+	unsigned long flags;
+	int bkt;
+
+	spin_lock_irqsave(&net_sock_lock, flags);
+	hash_for_each_safe(net_sock_table, bkt, tmp, entry, node) {
+		if (freed >= sc->nr_to_scan)
+			break;
+		if (READ_ONCE(entry->redundant_sends) == 0) {
+			hash_del(&entry->node);
+			kfree(entry);
+			freed++;
+		}
+	}
+	spin_unlock_irqrestore(&net_sock_lock, flags);
+
+	return freed ? freed : SHRINK_STOP;
 }
 
 /*
@@ -267,6 +317,17 @@ int atomik_net_init(void)
 		return ret;
 	}
 
+	/* Register memory shrinker for net_sock_table */
+	net_shrinker = shrinker_alloc(0, "atomik-net-sock");
+	if (net_shrinker) {
+		net_shrinker->count_objects = net_shrinker_count_objects;
+		net_shrinker->scan_objects  = net_shrinker_scan_objects;
+		net_shrinker->seeks         = DEFAULT_SEEKS;
+		shrinker_register(net_shrinker);
+	} else {
+		pr_warn("atomik: net sock shrinker allocation failed\n");
+	}
+
 	pr_info("ATOMiK network monitor active — monitoring tcp_sendmsg()\n");
 	return 0;
 }
@@ -277,6 +338,9 @@ void atomik_net_exit(void)
 	struct hlist_node *tmp;
 	unsigned long flags;
 	int bkt;
+
+	if (net_shrinker)
+		shrinker_free(net_shrinker);
 
 	unregister_kprobe(&net_kprobe);
 

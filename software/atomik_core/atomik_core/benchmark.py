@@ -2,6 +2,7 @@
 """ATOMiK Benchmark — See the difference on YOUR machine.
 
 Run:  python -m atomik_core.benchmark
+      python -m atomik_core.benchmark --json   (machine-readable output)
 
 Compares traditional approaches vs ATOMiK on four real workloads:
   1. State rollback (undo/redo)
@@ -12,6 +13,7 @@ Compares traditional approaches vs ATOMiK on four real workloads:
 No setup required. Just run it.
 """
 
+import json
 import time
 import copy
 import sys
@@ -33,7 +35,7 @@ def _result(trad_time: float, atomik_time: float, metric: str):
     print(f"  → {speedup:.1f}x faster  ({metric})")
 
 
-def bench_rollback():
+def bench_rollback() -> dict:
     """Test 1: State rollback — undo 10,000 changes."""
     from atomik_core import AtomikContext
 
@@ -68,6 +70,7 @@ def bench_rollback():
     atomik_time = time.perf_counter() - start
     atomik_mem = 24  # initial(8) + accumulator(8) + metadata(8)
 
+    speedup = trad_time / atomik_time if atomik_time > 0 else float('inf')
     _result(trad_time, atomik_time, "rollback")
     print(f"\n  Memory used:")
     print(f"    Traditional: {trad_mem:>10,} bytes (full history)")
@@ -76,8 +79,19 @@ def bench_rollback():
     assert ctx.read() == 0xDEADBEEFCAFEBABE, "Rollback integrity check failed!"
     print(f"  ✓ Integrity verified — state restored exactly")
 
+    return {
+        "test": "rollback",
+        "n": n,
+        "trad_time_ms": trad_time * 1000,
+        "atomik_time_ms": atomik_time * 1000,
+        "speedup": speedup,
+        "trad_mem_bytes": trad_mem,
+        "atomik_mem_bytes": atomik_mem,
+        "mem_reduction": trad_mem / atomik_mem,
+    }
 
-def bench_change_detection():
+
+def bench_change_detection() -> dict:
     """Test 2: Change detection — find if a 64KB buffer changed."""
     from atomik_core import Fingerprint
 
@@ -102,6 +116,7 @@ def bench_change_detection():
         _ = fp.changed  # single property check
     atomik_time = time.perf_counter() - start
 
+    speedup = trad_time / atomik_time if atomik_time > 0 else float('inf')
     _result(trad_time, atomik_time, "change detection")
     print(f"\n  Traditional scans {buf_size:,} bytes every check")
     print(f"  ATOMiK checks a single 8-byte fingerprint")
@@ -121,8 +136,21 @@ def bench_change_detection():
     print(f"    Traditional: {trad_incr*1000:.2f} ms (still scans full buffer)")
     print(f"    ATOMiK:      {atomik_incr*1000:.2f} ms (re-fingerprint)")
 
+    incr_speedup = trad_incr / atomik_incr if atomik_incr > 0 else float('inf')
+    return {
+        "test": "change_detection",
+        "buf_size": buf_size,
+        "n_checks": n_checks,
+        "trad_time_ms": trad_time * 1000,
+        "atomik_time_ms": atomik_time * 1000,
+        "speedup": speedup,
+        "incr_trad_time_ms": trad_incr * 1000,
+        "incr_atomik_time_ms": atomik_incr * 1000,
+        "incr_speedup": incr_speedup,
+    }
 
-def bench_convergence():
+
+def bench_convergence() -> dict:
     """Test 3: Multi-node convergence — 8 nodes, 1000 updates each."""
     from atomik_core import AtomikContext
 
@@ -159,14 +187,24 @@ def bench_convergence():
         contexts[0].merge(contexts[i])
     atomik_time = time.perf_counter() - start
 
+    speedup = trad_time / atomik_time if atomik_time > 0 else float('inf')
     _result(trad_time, atomik_time, "convergence")
     print(f"\n  Traditional: sort {n_nodes * n_updates:,} events, then replay")
     print(f"  ATOMiK: accumulate independently, merge (order doesn't matter)")
     print(f"  ✓ Both produce same result: {hex(state)} == {hex(contexts[0].read())}")
     assert state == contexts[0].read()
 
+    return {
+        "test": "convergence",
+        "n_nodes": n_nodes,
+        "n_updates": n_updates,
+        "trad_time_ms": trad_time * 1000,
+        "atomik_time_ms": atomik_time * 1000,
+        "speedup": speedup,
+    }
 
-def bench_bandwidth():
+
+def bench_bandwidth() -> dict:
     """Test 4: Bandwidth — how much data to send a state update?"""
     _header("TEST 4: Bandwidth (state update size)")
 
@@ -175,6 +213,7 @@ def bench_bandwidth():
     print(f"  {'State Size':>12}  {'Traditional':>12}  {'ATOMiK Delta':>12}  {'Reduction':>10}")
     print(f"  {'─'*12}  {'─'*12}  {'─'*12}  {'─'*10}")
 
+    entries = []
     for size in state_sizes:
         trad = size  # must send full state
         atomik = 8   # always 8 bytes (64-bit XOR delta)
@@ -186,12 +225,23 @@ def bench_bandwidth():
         else:
             label = f"{size//1048576} MB"
         print(f"  {label:>12}  {trad:>10,} B  {atomik:>10} B  {ratio:>8,.0f}x")
+        entries.append({
+            "state_bytes": size,
+            "trad_bytes": trad,
+            "atomik_bytes": atomik,
+            "reduction": ratio,
+        })
 
     print(f"\n  ATOMiK delta is ALWAYS 8 bytes, regardless of state size.")
     print(f"  For a 1 MB state object: 131,072x bandwidth reduction.")
 
+    return {
+        "test": "bandwidth",
+        "entries": entries,
+    }
 
-def bench_throughput():
+
+def bench_throughput() -> dict:
     """Test 5: Raw throughput on this machine."""
     from atomik_core import AtomikContext
 
@@ -226,30 +276,55 @@ def bench_throughput():
     print(f"  For higher throughput: ATOMiK C library (500M ops/sec)")
     print(f"                        ATOMiK FPGA IP  (69.7B ops/sec)")
 
+    return {
+        "test": "throughput",
+        "n": n,
+        "load_ops_sec": n / load_time,
+        "accum_ops_sec": n / accum_time,
+        "read_ops_sec": n / read_time,
+    }
+
 
 def main():
-    print("╔══════════════════════════════════════════════════════════╗")
-    print("║          ATOMiK Benchmark — Delta-State Algebra         ║")
-    print("║                                                         ║")
-    print("║  Comparing traditional approaches vs ATOMiK on YOUR     ║")
-    print("║  hardware. No configuration needed — just watch.        ║")
-    print("╚══════════════════════════════════════════════════════════╝")
+    json_mode = "--json" in sys.argv
 
-    bench_rollback()
-    bench_change_detection()
-    bench_convergence()
-    bench_bandwidth()
-    bench_throughput()
+    if json_mode:
+        # Suppress printed output by redirecting stdout during benchmarks
+        import io
+        old_stdout = sys.stdout
+        sys.stdout = io.StringIO()
 
-    print(f"\n{'='*60}")
-    print(f"  BENCHMARK COMPLETE")
-    print(f"{'='*60}")
-    print(f"\n  ATOMiK replaces store-and-retrieve with reconstruct-from-deltas.")
-    print(f"  Same algebra at every tier: Python → C → FPGA → ASIC.")
-    print(f"\n  Learn more:  https://atomik.tech")
-    print(f"  Source:       https://github.com/MatthewHRockwell/ATOMiK")
-    print(f"  Install:      pip install atomik-core")
-    print()
+    if not json_mode:
+        print("╔══════════════════════════════════════════════════════════╗")
+        print("║          ATOMiK Benchmark — Delta-State Algebra         ║")
+        print("║                                                         ║")
+        print("║  Comparing traditional approaches vs ATOMiK on YOUR     ║")
+        print("║  hardware. No configuration needed — just watch.        ║")
+        print("╚══════════════════════════════════════════════════════════╝")
+
+    results = []
+    results.append(bench_rollback())
+    results.append(bench_change_detection())
+    results.append(bench_convergence())
+    results.append(bench_bandwidth())
+    results.append(bench_throughput())
+
+    if json_mode:
+        sys.stdout = old_stdout
+        json.dump({"benchmarks": results}, sys.stdout, indent=2)
+        print()  # trailing newline
+    else:
+        print(f"\n{'='*60}")
+        print(f"  BENCHMARK COMPLETE")
+        print(f"{'='*60}")
+        print(f"\n  ATOMiK replaces store-and-retrieve with reconstruct-from-deltas.")
+        print(f"  Same algebra at every tier: Python → C → FPGA → ASIC.")
+        print(f"\n  Learn more:  https://atomik.tech")
+        print(f"  Source:       https://github.com/MatthewHRockwell/ATOMiK")
+        print(f"  Install:      pip install atomik-core")
+        print()
+
+    return results
 
 
 if __name__ == "__main__":

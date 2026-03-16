@@ -9,10 +9,15 @@ duplicated, or be merged in transit — the result is always correct.
 
 from __future__ import annotations
 
+import struct
 from dataclasses import dataclass, field
 from typing import Iterator
 
 from atomik_core.context import AtomikContext
+
+# Wire format: addr (uint32) + delta (uint64) + seq (uint32) = 16 bytes
+_WIRE_FORMAT = "!IQI"
+_WIRE_SIZE = struct.calcsize(_WIRE_FORMAT)  # 16
 
 
 @dataclass(frozen=True)
@@ -30,6 +35,37 @@ class DeltaMessage:
     delta: int
     epoch: int = 0
     seq: int = 0
+
+    def to_dict(self) -> dict:
+        """Serialize to a JSON-compatible dictionary."""
+        return {"addr": self.addr, "delta": self.delta, "seq": self.seq}
+
+    @classmethod
+    def from_dict(cls, d: dict) -> DeltaMessage:
+        """Deserialize from a dictionary."""
+        return cls(addr=d["addr"], delta=d["delta"], seq=d["seq"])
+
+    def to_bytes(self) -> bytes:
+        """Serialize to compact 16-byte wire format (network byte order).
+
+        Format: !IQI — addr (uint32) + delta (uint64) + seq (uint32).
+        """
+        return struct.pack(_WIRE_FORMAT, self.addr, self.delta, self.seq)
+
+    @classmethod
+    def from_bytes(cls, data: bytes) -> DeltaMessage:
+        """Deserialize from 16-byte wire format.
+
+        Args:
+            data: Exactly 16 bytes in network byte order.
+
+        Raises:
+            ValueError: If data is not exactly 16 bytes.
+        """
+        if len(data) != _WIRE_SIZE:
+            raise ValueError(f"expected {_WIRE_SIZE} bytes, got {len(data)}")
+        addr, delta, seq = struct.unpack(_WIRE_FORMAT, data)
+        return cls(addr=addr, delta=delta, seq=seq)
 
 
 class DeltaStream:

@@ -45,6 +45,7 @@
 #include <linux/atomic.h>
 #include <linux/hashtable.h>
 #include <linux/spinlock.h>
+#include <linux/shrinker.h>
 
 #include "atomik_cgroup.h"
 #include "atomik_core_kern.h"
@@ -113,6 +114,56 @@ static struct cow_pid_entry *cow_pid_find_or_create(pid_t tgid,
 	spin_unlock_irqrestore(&cow_pid_lock, flags);
 
 	return entry;
+}
+
+/*
+ * Memory shrinker — reclaim cow_pid_entry objects under pressure.
+ *
+ * The per-process tracking table grows without bound as new PIDs
+ * trigger COW faults.  Under memory pressure the VM calls our
+ * shrinker to evict stale entries (those with zero redundant count,
+ * i.e. PIDs that produced only non-redundant COW copies).
+ */
+static struct shrinker *cow_shrinker;
+
+static unsigned long cow_shrinker_count_objects(struct shrinker *shrink,
+						struct shrink_control *sc)
+{
+	struct cow_pid_entry *entry;
+	unsigned long count = 0;
+	unsigned long flags;
+	int bkt;
+
+	spin_lock_irqsave(&cow_pid_lock, flags);
+	hash_for_each(cow_pid_table, bkt, entry, node)
+		count++;
+	spin_unlock_irqrestore(&cow_pid_lock, flags);
+
+	return count ? count : SHRINK_EMPTY;
+}
+
+static unsigned long cow_shrinker_scan_objects(struct shrinker *shrink,
+					       struct shrink_control *sc)
+{
+	struct cow_pid_entry *entry;
+	struct hlist_node *tmp;
+	unsigned long freed = 0;
+	unsigned long flags;
+	int bkt;
+
+	spin_lock_irqsave(&cow_pid_lock, flags);
+	hash_for_each_safe(cow_pid_table, bkt, tmp, entry, node) {
+		if (freed >= sc->nr_to_scan)
+			break;
+		if (READ_ONCE(entry->redundant) == 0) {
+			hash_del(&entry->node);
+			kfree(entry);
+			freed++;
+		}
+	}
+	spin_unlock_irqrestore(&cow_pid_lock, flags);
+
+	return freed ? freed : SHRINK_STOP;
 }
 
 /* Per-probe instance data stored between entry and return handlers */
@@ -427,6 +478,17 @@ int atomik_cow_init(void)
 		return ret;
 	}
 
+	/* Register memory shrinker for cow_pid_table */
+	cow_shrinker = shrinker_alloc(0, "atomik-cow-pid");
+	if (cow_shrinker) {
+		cow_shrinker->count_objects = cow_shrinker_count_objects;
+		cow_shrinker->scan_objects  = cow_shrinker_scan_objects;
+		cow_shrinker->seeks         = DEFAULT_SEEKS;
+		shrinker_register(cow_shrinker);
+	} else {
+		pr_warn("atomik: COW pid shrinker allocation failed\n");
+	}
+
 	pr_info("ATOMiK COW optimizer active — monitoring wp_page_copy() "
 		"[maxactive=%d]\n", cow_kretprobe.maxactive);
 
@@ -439,6 +501,9 @@ void atomik_cow_exit(void)
 	struct hlist_node *tmp;
 	unsigned long flags;
 	int bkt;
+
+	if (cow_shrinker)
+		shrinker_free(cow_shrinker);
 
 	unregister_kretprobe(&cow_kretprobe);
 
