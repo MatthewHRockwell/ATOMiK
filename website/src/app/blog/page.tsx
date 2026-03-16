@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Nav from "@/components/Nav";
+import EmailCapture from "@/components/EmailCapture";
 
 export const metadata: Metadata = {
   title: "Blog — ATOMiK",
@@ -8,6 +9,14 @@ export const metadata: Metadata = {
 };
 
 const posts = [
+  {
+    slug: "atomik-vs-event-sourcing",
+    title: "ATOMiK vs Event Sourcing: When XOR Beats Append-Only Logs",
+    date: "March 16, 2026",
+    excerpt:
+      "A quantitative comparison of delta-state algebra vs event sourcing. O(1) reconstruction vs O(n) replay, 8 bytes vs unbounded logs, and when each approach wins.",
+    tags: ["architecture", "comparison", "event-sourcing"],
+  },
   {
     slug: "fpga-journey-13-dollar-chip",
     title: "From Math to Silicon: 69.7 Gops/s on a $13.50 Chip",
@@ -75,6 +84,10 @@ export default function BlogPage() {
               </p>
             </Link>
           ))}
+        </div>
+
+        <div className="mt-12">
+          <EmailCapture />
         </div>
       </section>
     </div>

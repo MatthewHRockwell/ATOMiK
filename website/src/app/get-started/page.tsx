@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Nav from "@/components/Nav";
+import EmailCapture from "@/components/EmailCapture";
 
 export const metadata: Metadata = {
   title: "Get Started — ATOMiK",
@@ -220,6 +221,11 @@ export default function GetStartedPage() {
             </div>
           ))}
         </div>
+      </section>
+
+      {/* Newsletter */}
+      <section className="max-w-xl mx-auto px-6 pb-12">
+        <EmailCapture />
       </section>
 
       {/* Links */}

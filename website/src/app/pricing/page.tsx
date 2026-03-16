@@ -56,7 +56,7 @@ const tiers = [
     period: "/mo per seat",
     description: "For organizations on the hardware acceleration path",
     cta: "Contact Sales",
-    ctaAction: "enterprise",
+    ctaHref: "mailto:sales@atomik.tech?subject=ATOMiK%20Enterprise%20Inquiry",
     ctaStyle: { background: "transparent", color: "#e0e0e8", border: "1px solid #1e1e2e" },
     features: [
       { text: "Everything in Professional", included: true },
