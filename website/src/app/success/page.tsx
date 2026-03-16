@@ -24,17 +24,38 @@ function SuccessContent() {
   const [license, setLicense] = useState<LicenseInfo | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [copiedInstall, setCopiedInstall] = useState(false);
+  const [retryAttempt, setRetryAttempt] = useState(0);
 
   useEffect(() => {
     if (!sessionId) return;
+    let attempt = 0;
+    const maxAttempts = 4;
+    const delays = [0, 2000, 4000, 8000];
 
-    fetch(`/api/license?session_id=${sessionId}`)
-      .then(res => res.json())
-      .then(data => {
-        if (data.error) setError(data.error);
-        else setLicense(data);
-      })
-      .catch(() => setError('Failed to retrieve license information'));
+    function tryFetch() {
+      setRetryAttempt(attempt);
+      fetch(`/api/license?session_id=${sessionId}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.error && attempt < maxAttempts - 1) {
+            attempt++;
+            setTimeout(tryFetch, delays[attempt]);
+            return;
+          }
+          if (data.error) setError(data.error);
+          else setLicense(data);
+        })
+        .catch(() => {
+          if (attempt < maxAttempts - 1) {
+            attempt++;
+            setTimeout(tryFetch, delays[attempt]);
+          } else {
+            setError('Failed to retrieve license');
+          }
+        });
+    }
+    tryFetch();
   }, [sessionId]);
 
   if (!sessionId) {
@@ -55,7 +76,9 @@ function SuccessContent() {
     return (
       <div style={styles.container}>
         <div style={styles.spinner} />
-        <p style={styles.loading}>Generating your license...</p>
+        <p style={styles.loading}>
+          Generating your license...{retryAttempt > 0 ? ` (attempt ${retryAttempt + 1}/4)` : ''}
+        </p>
       </div>
     );
   }
@@ -64,6 +87,14 @@ function SuccessContent() {
     navigator.clipboard.writeText(license.licenseKey);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const installCommand = `git clone https://github.com/MatthewHRockwell/ATOMiK.git\ncd ATOMiK/software/atomik_kmod\nsudo ./install.sh --license ${license.licenseKey}`;
+
+  const copyInstallCommand = () => {
+    navigator.clipboard.writeText(installCommand);
+    setCopiedInstall(true);
+    setTimeout(() => setCopiedInstall(false), 2000);
   };
 
   return (
@@ -81,35 +112,41 @@ function SuccessContent() {
       </div>
 
       <div style={styles.card}>
-        <h2 style={styles.cardTitle}>Download &amp; Install</h2>
+        <h2 style={styles.cardTitle}>Install Kernel Module</h2>
+        <p style={styles.installNote}>ATOMiK kernel module is Linux-only (x86_64 / arm64).</p>
 
-        <div style={styles.platformGrid}>
-          <a href={license.downloads.linux} style={styles.platformBtn}>
-            <span style={styles.platformIcon}>&#128039;</span>
-            <span>Linux</span>
-            <span style={styles.platformSub}>x86_64 / arm64</span>
-          </a>
-          <a href={license.downloads.windows} style={styles.platformBtn}>
-            <span style={styles.platformIcon}>&#9638;</span>
-            <span>Windows</span>
-            <span style={styles.platformSub}>.exe installer</span>
-          </a>
-          <a href={license.downloads.macos} style={styles.platformBtn}>
-            <span style={styles.platformIcon}>&#63743;</span>
-            <span>macOS</span>
-            <span style={styles.platformSub}>Universal binary</span>
-          </a>
+        <div style={styles.installBox} onClick={copyInstallCommand}>
+          <pre style={styles.installPre}>{installCommand}</pre>
+          <span style={styles.copyHint}>{copiedInstall ? 'Copied!' : 'Click to copy'}</span>
         </div>
 
         <div style={styles.cliSection}>
-          <h3 style={styles.cliTitle}>Or install via CLI</h3>
-          <div style={styles.cliBox}>
-            <code>{license.install.linux}</code>
-          </div>
+          <h3 style={styles.cliTitle}>Python SDK (all platforms)</h3>
           <div style={styles.cliBox}>
             <code>{license.install.pip}</code>
           </div>
         </div>
+      </div>
+
+      <div style={styles.card}>
+        <h2 style={styles.cardTitle}>Quick Start</h2>
+        <ol style={styles.stepsList}>
+          <li style={styles.step}>
+            <strong>Install the kernel module</strong> using the command above. The installer will register your license key and build the module for your kernel version.
+          </li>
+          <li style={styles.step}>
+            <strong>Verify the installation</strong> by running <code style={styles.inlineCode}>lsmod | grep atomik</code> to confirm the module is loaded.
+          </li>
+          <li style={styles.step}>
+            <strong>Install the Python SDK</strong> with <code style={styles.inlineCode}>pip install atomik-core</code> to start using ATOMiK in your applications.
+          </li>
+          <li style={styles.step}>
+            <strong>Run the example</strong> to confirm everything works:
+            <div style={{ ...styles.cliBox, marginTop: 8 }}>
+              <code>python -c &quot;import atomik_core; print(atomik_core.status())&quot;</code>
+            </div>
+          </li>
+        </ol>
       </div>
 
       <div style={styles.card}>
@@ -183,21 +220,20 @@ const styles: Record<string, React.CSSProperties> = {
   copyHint: {
     display: 'block', fontSize: 12, color: '#8888a0', marginTop: 8,
   },
-  platformGrid: {
-    display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12,
-    marginBottom: 24,
+  installNote: {
+    fontSize: 13, color: '#8888a0', marginBottom: 16,
   },
-  platformBtn: {
-    display: 'flex', flexDirection: 'column' as const,
-    alignItems: 'center', gap: 4,
+  installBox: {
     background: '#0a0a0f', border: '1px solid #1e1e2e',
-    borderRadius: 8, padding: '20px 12px',
-    color: '#e0e0e8', textDecoration: 'none',
-    fontSize: 14, fontWeight: 600,
+    borderRadius: 8, padding: '16px 20px',
+    cursor: 'pointer', marginBottom: 20,
     transition: 'border-color 0.2s',
   },
-  platformIcon: { fontSize: 28 },
-  platformSub: { fontSize: 11, color: '#8888a0', fontWeight: 400 },
+  installPre: {
+    margin: 0, whiteSpace: 'pre-wrap' as const, wordBreak: 'break-all' as const,
+    fontFamily: "'SF Mono', 'Fira Code', monospace",
+    fontSize: 13, color: '#22d3ee', lineHeight: 1.7,
+  },
   cliSection: { borderTop: '1px solid #1e1e2e', paddingTop: 20 },
   cliTitle: { fontSize: 14, color: '#8888a0', marginBottom: 12 },
   cliBox: {
@@ -205,6 +241,18 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: 6, padding: '10px 14px', marginBottom: 8,
     fontFamily: "'SF Mono', 'Fira Code', monospace",
     fontSize: 12, color: '#22d3ee', overflowX: 'auto' as const,
+  },
+  stepsList: {
+    margin: 0, paddingLeft: 20, listStyleType: 'decimal' as const,
+  },
+  step: {
+    fontSize: 14, color: '#c0c0d0', marginBottom: 16, lineHeight: 1.6,
+  },
+  inlineCode: {
+    fontFamily: "'SF Mono', 'Fira Code', monospace",
+    fontSize: 12, color: '#22d3ee',
+    background: '#0a0a0f', border: '1px solid #1e1e2e',
+    borderRadius: 4, padding: '2px 6px',
   },
   helpText: { color: '#8888a0', fontSize: 14 },
   link: { color: '#4f8fff', textDecoration: 'none' },

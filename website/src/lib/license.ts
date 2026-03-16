@@ -12,25 +12,8 @@ export interface LicenseData {
   stripeSubscriptionId: string;
 }
 
-/**
- * Generate a license key from subscription data.
- * Format: ATOMIK-XXXX-XXXX-XXXX-XXXX
- */
-export function generateLicenseKey(
-  email: string,
-  tier: string,
-  subscriptionId: string
-): string {
-  const seed = `${email}:${tier}:${subscriptionId}:${LICENSE_SECRET}`;
-  const hash = createHash('sha256').update(seed).digest('hex');
-  const parts = [
-    hash.slice(0, 4).toUpperCase(),
-    hash.slice(4, 8).toUpperCase(),
-    hash.slice(8, 12).toUpperCase(),
-    hash.slice(12, 16).toUpperCase(),
-  ];
-  return `ATOMIK-${parts.join('-')}`;
-}
+// NOTE: License key generation is in licenses.ts (plural).
+// This file only contains download token signing/verification.
 
 /**
  * Validate a license key format.

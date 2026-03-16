@@ -161,16 +161,18 @@ static int validate_web_key(const char *key, int key_len)
 {
 	int i, hex_count = 0;
 	const char *p;
+	int exp_year, exp_month;
+	struct tm tm;
+	time64_t now;
 
 	/* Total length must be ATOMIK_WEB_KEY_LEN (26) */
 	if (key_len != ATOMIK_WEB_KEY_LEN)
 		return -EINVAL;
 
-	/* Walk body after "ATOMIK-": expect XXXX-XXXX-XXXX-XXXX (19 chars) */
+	/* Walk body after "ATOMIK-": expect XXXX-XXXX-XXXX-YYMM (19 chars) */
 	p = key + 7;
 	for (i = 0; i < 19; i++) {
 		if (i == 4 || i == 9 || i == 14) {
-			/* Dash positions within body */
 			if (p[i] != '-')
 				return -EINVAL;
 		} else {
@@ -182,6 +184,32 @@ static int validate_web_key(const char *key, int key_len)
 
 	if (hex_count != 16)
 		return -EINVAL;
+
+	/*
+	 * Last 4 hex chars encode expiry: YYMM (hex-encoded year+month).
+	 * E.g., "2703" = March 2027.  "0000" = no expiry (dev/trial).
+	 * Decode and check against current date.
+	 */
+	exp_year = (hex_nibble(p[15]) << 4) | hex_nibble(p[16]);
+	exp_month = (hex_nibble(p[17]) << 4) | hex_nibble(p[18]);
+
+	/* 0000 = no expiry (trial/dev keys) */
+	if (exp_year == 0 && exp_month == 0)
+		return 0;
+
+	/* Validate month range */
+	if (exp_month < 1 || exp_month > 12)
+		return -EINVAL;
+
+	/* Check if expired: expiry is end of the given month */
+	now = ktime_get_real_seconds();
+	time64_to_tm(now, 0, &tm);
+
+	/* tm.tm_year is years since 1900, exp_year is 2-digit (20xx) */
+	if ((tm.tm_year - 100) > exp_year)
+		return -EKEYEXPIRED;
+	if ((tm.tm_year - 100) == exp_year && (tm.tm_mon + 1) > exp_month)
+		return -EKEYEXPIRED;
 
 	return 0;
 }

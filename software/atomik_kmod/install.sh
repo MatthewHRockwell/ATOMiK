@@ -77,7 +77,12 @@ echo "[2/7] Installing tools to /usr/local/bin/..."
 install -m 755 tools/atomik-status /usr/local/bin/
 install -m 755 tools/atomik-test /usr/local/bin/
 install -m 755 tools/atomik-bench /usr/local/bin/
+install -m 755 tools/atomik-report /usr/local/bin/
+install -m 755 tools/atomik-optimizer /usr/local/bin/
+install -m 755 tools/atomik-dashboard /usr/local/bin/
+install -m 755 tools/atomik-exporter.py /usr/local/bin/atomik-exporter
 install -m 755 tools/atomik-full-test.sh /usr/local/bin/atomik-full-test
+install -m 755 tools/atomik-workload-bench.sh /usr/local/bin/atomik-workload-bench
 install -m 755 uninstall.sh /usr/local/bin/atomik-uninstall
 
 # ─── Step 3: Install DKMS source ─────────────────────────────────────
