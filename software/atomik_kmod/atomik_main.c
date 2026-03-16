@@ -142,4 +142,4 @@ module_exit(atomik_exit);
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Matthew Rockwell <mrockwell@atomik.tech>");
 MODULE_DESCRIPTION("ATOMiK Delta-State Accelerator");
-MODULE_VERSION("0.4.0");
+MODULE_VERSION("0.5.0");

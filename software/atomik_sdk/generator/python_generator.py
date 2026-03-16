@@ -277,9 +277,9 @@ class PythonGenerator(CodeEmitter):
         lines.append(self._indent('    True if rollback successful', 8))
         lines.append(self._indent('"""', 8))
 
-        # Use first field for history check (all fields should have same history)
-        first_field = field_names[0]
-        lines.append(self._indent(f'if steps > len(self._{first_field}_history):', 8))
+        # Check all fields have enough history for rollback
+        checks = [f'len(self._{f}_history)' for f in field_names]
+        lines.append(self._indent(f'if steps > min({", ".join(checks)}):', 8))
         lines.append(self._indent('return False', 12))
         lines.append(self._indent('', 8))
 

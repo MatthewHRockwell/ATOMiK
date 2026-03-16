@@ -13,7 +13,7 @@
 #include <linux/ioctl.h>
 
 #define ATOMIK_VERSION_MAJOR  0
-#define ATOMIK_VERSION_MINOR  4
+#define ATOMIK_VERSION_MINOR  5
 #define ATOMIK_VERSION_PATCH  0
 
 #define ATOMIK_MAGIC 'A'

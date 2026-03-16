@@ -602,16 +602,17 @@
         }
 
         /* ========== Pricing ========== */
-        .pricing { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+        .pricing { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
         .price-card {
             background: var(--surface); border: 1px solid var(--border);
-            border-radius: 12px; padding: 40px 32px;
+            border-radius: 12px; padding: 36px 28px;
             transition: all 0.3s; position: relative;
         }
         .price-card:hover { transform: translateY(-4px); }
         .price-card.featured {
             border-color: var(--accent);
             box-shadow: 0 0 40px rgba(79,143,255,0.1);
+            background: #14142a;
         }
         .price-card.featured::before {
             content: 'MOST POPULAR';
@@ -621,11 +622,11 @@
             padding: 4px 16px; border-radius: 4px; letter-spacing: 0.5px;
         }
         .price-card h3 { font-size: 20px; margin-bottom: 8px; }
-        .price-card .price { font-size: 36px; font-weight: 800; margin: 16px 0; }
-        .price-card .price span { font-size: 16px; color: var(--muted); font-weight: 400; }
+        .price-card .price { font-size: 32px; font-weight: 800; margin: 16px 0; }
+        .price-card .price span { font-size: 14px; color: var(--muted); font-weight: 400; }
         .price-card ul { list-style: none; margin: 24px 0; }
         .price-card li {
-            padding: 10px 0; font-size: 14px; color: var(--muted);
+            padding: 8px 0; font-size: 13px; color: var(--muted);
             border-bottom: 1px solid var(--border);
             display: flex; align-items: center; gap: 10px;
         }
@@ -686,7 +687,7 @@
             .metrics { grid-template-columns: repeat(2, 1fr); }
             .features { grid-template-columns: 1fr; }
             .code-section { grid-template-columns: 1fr; }
-            .pricing { grid-template-columns: 1fr; }
+            .pricing { grid-template-columns: repeat(2, 1fr); }
             .investor-stats { gap: 16px; }
             .ops-grid { grid-template-columns: repeat(2, 1fr); }
             .compare-grid { grid-template-columns: 1fr; }
@@ -699,6 +700,7 @@
         @media (max-width: 480px) {
             .hero h1 { font-size: 32px; }
             .metrics { grid-template-columns: 1fr; }
+            .pricing { grid-template-columns: 1fr; }
             .investor-section { padding: 36px 20px; }
         }
     </style>
@@ -1382,38 +1384,49 @@ a.<span class="fn">merge</span>(b)  <span class="cmt"># a now has both deltas</s
                 <h3>Community</h3>
                 <div class="price">Free</div>
                 <ul>
-                    <li>Full atomik-core Python library</li>
-                    <li>C99 single-header library</li>
+                    <li>Python SDK + C header + examples</li>
                     <li>4-operation API (LOAD, ACCUM, READ, SWAP)</li>
-                    <li>AtomikTable, DeltaStream, Fingerprint</li>
-                    <li>Getting started documentation</li>
+                    <li>Apache 2.0 license</li>
                     <li>Community support via GitHub</li>
                 </ul>
                 <a href="/get-started" class="btn btn-secondary" style="width:100%;text-align:center;">Get Started Free</a>
             </div>
-            <div class="price-card featured animate-on-scroll">
-                <h3>Professional</h3>
-                <div class="price">$99<span>/mo per seat</span></div>
+            <div class="price-card animate-on-scroll">
+                <h3>Pro</h3>
+                <div class="price">$99<span>/mo</span></div>
                 <ul>
                     <li>Everything in Community</li>
-                    <li>Linux kernel module (90-day free trial)</li>
-                    <li>System-level delta-state acceleration</li>
+                    <li>Linux kernel module (COW, dedup, cgroup)</li>
+                    <li>27 sysfs metrics + dashboard</li>
+                    <li>atomik-bench performance suite</li>
                     <li>Priority email support (48hr SLA)</li>
-                    <li>Benchmarking suite + integration guides</li>
-                    <li>Full API documentation</li>
+                    <li>90-day free trial</li>
                 </ul>
-                <a href="/get-started?plan=professional" class="btn btn-primary" style="width:100%;text-align:center;">Start Free Trial</a>
+                <button onclick="checkout('professional')" class="btn btn-secondary" style="width:100%;text-align:center;border:1px solid var(--accent);color:var(--accent);cursor:pointer;">Start 90-Day Free Trial</button>
+            </div>
+            <div class="price-card featured animate-on-scroll">
+                <h3>Team</h3>
+                <div class="price">$299<span>/mo</span></div>
+                <ul>
+                    <li>Everything in Pro</li>
+                    <li>SDK generation (Python, Rust, C, JS, Verilog)</li>
+                    <li>atomik-report waste analysis</li>
+                    <li>Team license (5 seats)</li>
+                    <li>JSON/CSV export for CI</li>
+                    <li>Schema-driven code generation</li>
+                </ul>
+                <button onclick="checkout('team')" class="btn btn-primary" style="width:100%;text-align:center;cursor:pointer;">Start Free Trial</button>
             </div>
             <div class="price-card animate-on-scroll">
                 <h3>Enterprise</h3>
-                <div class="price">$499<span>/mo per seat</span></div>
+                <div class="price">$999<span>/mo</span></div>
                 <ul>
-                    <li>Everything in Professional</li>
+                    <li>Everything in Team</li>
+                    <li>FPGA hardware acceleration (512 banks)</li>
+                    <li>Custom RV64I CPU + ATOMiK ISA</li>
                     <li>4-hour response SLA</li>
-                    <li>Dedicated support channel</li>
-                    <li>Custom integration consulting</li>
-                    <li>Formal verification certificate</li>
-                    <li>Hardware acceleration path (FPGA/ASIC)</li>
+                    <li>Dedicated support + consulting</li>
+                    <li>Formal verification + ASIC path</li>
                 </ul>
                 <a href="/contact" class="btn btn-secondary" style="width:100%;text-align:center;border:1px solid var(--border);">Contact Sales</a>
             </div>

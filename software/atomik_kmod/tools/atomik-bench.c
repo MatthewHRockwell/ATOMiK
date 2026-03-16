@@ -521,7 +521,7 @@ int main(void)
 {
 	int fd;
 
-	printf("ATOMiK v0.4.0 — Performance Benchmark\n");
+	printf("ATOMiK v0.5.0 — Performance Benchmark\n");
 	printf("======================================\n");
 
 	fd = open("/dev/atomik", O_RDWR);

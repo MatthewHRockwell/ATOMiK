@@ -3,7 +3,7 @@
 # Usage: sudo ./uninstall.sh [--purge]
 set -e
 
-VERSION="0.4.0"
+VERSION="0.5.0"
 DKMS_SRC="/usr/src/atomik-${VERSION}"
 PURGE=0
 

@@ -14,62 +14,74 @@ const tiers = [
     ctaHref: "/get-started",
     ctaStyle: { background: "transparent", color: "#e0e0e8", border: "1px solid #1e1e2e" },
     features: [
-      { text: "atomik-core Python library", included: true },
-      { text: "C99 single-header library", included: true },
+      { text: "Python SDK + C header + examples", included: true },
       { text: "4-operation API (LOAD, ACCUM, READ, SWAP)", included: true },
       { text: "AtomikTable, DeltaStream, Fingerprint", included: true },
-      { text: "Benchmark suite (python -m atomik_core.benchmark)", included: true },
-      { text: "3 production examples", included: true },
-      { text: "Community support via GitHub", included: true },
       { text: "Apache 2.0 license", included: true },
+      { text: "Community support via GitHub", included: true },
       { text: "Linux kernel module", included: false },
-      { text: "COW / network optimization", included: false },
+      { text: "SDK generation pipeline", included: false },
       { text: "Hardware acceleration", included: false },
     ],
   },
   {
-    name: "Professional",
+    name: "Pro",
     price: "$99",
-    period: "/mo per seat",
-    description: "For teams deploying system-level optimization",
+    period: "/mo",
+    description: "System-level optimization with the Linux kernel module",
     cta: "Start 90-Day Free Trial",
     ctaAction: "professional",
-    ctaStyle: { background: "#4f8fff", color: "#fff", border: "none" },
-    featured: true,
+    ctaStyle: { background: "transparent", color: "#4f8fff", border: "1px solid #4f8fff" },
     features: [
       { text: "Everything in Community", included: true },
-      { text: "Linux kernel module (DKMS)", included: true },
-      { text: "COW redundancy detection (kretprobe)", included: true },
-      { text: "TCP send deduplication (CRC32C)", included: true },
-      { text: "Per-container/cgroup waste tracking", included: true },
-      { text: "27 real-time sysfs metrics", included: true },
+      { text: "Linux kernel module (COW detection, network dedup, cgroup tracking)", included: true },
+      { text: "27 sysfs metrics", included: true },
       { text: "atomik-status dashboard", included: true },
       { text: "atomik-bench performance suite", included: true },
       { text: "Priority email support (48hr SLA)", included: true },
-      { text: "Systemd service + udev rules", included: true },
+      { text: "90-day free trial", included: true },
+      { text: "SDK generation pipeline", included: false },
+      { text: "Hardware acceleration", included: false },
+    ],
+  },
+  {
+    name: "Team",
+    price: "$299",
+    period: "/mo",
+    description: "Multi-language SDK generation and team collaboration",
+    cta: "Start Free Trial",
+    ctaAction: "team",
+    ctaStyle: { background: "#4f8fff", color: "#fff", border: "none" },
+    featured: true,
+    features: [
+      { text: "Everything in Pro", included: true },
+      { text: "SDK generation pipeline (Python, Rust, C, JavaScript, Verilog)", included: true },
+      { text: "atomik-report waste analysis tool", included: true },
+      { text: "Team license (5 seats)", included: true },
+      { text: "JSON/CSV export for CI integration", included: true },
+      { text: "Schema-driven code generation from domain specs", included: true },
       { text: "Hardware acceleration", included: false },
     ],
   },
   {
     name: "Enterprise",
-    price: "$499",
-    period: "/mo per seat",
-    description: "For organizations on the hardware acceleration path",
+    price: "$999",
+    period: "/mo",
+    description: "FPGA hardware acceleration and dedicated support",
     cta: "Contact Sales",
     ctaHref: "/contact",
     ctaStyle: { background: "transparent", color: "#e0e0e8", border: "1px solid #1e1e2e" },
     features: [
-      { text: "Everything in Professional", included: true },
-      { text: "FPGA hardware acceleration (Zynq AXI4-Lite)", included: true },
-      { text: "Up to 512 parallel banks (69.7 Gops/s)", included: true },
-      { text: "Custom RV64I CPU with ATOMiK ISA extensions", included: true },
-      { text: "Hardware context tables (256 BRAM-backed)", included: true },
+      { text: "Everything in Team", included: true },
+      { text: "FPGA hardware acceleration (Zynq AXI4-Lite, up to 512 parallel banks)", included: true },
+      { text: "Custom RV64I CPU with ATOMiK ISA", included: true },
+      { text: "Hardware context tables", included: true },
       { text: "4-hour response SLA", included: true },
       { text: "Dedicated support channel", included: true },
       { text: "Custom integration consulting", included: true },
       { text: "Formal verification certificate", included: true },
       { text: "ASIC development path", included: true },
-      { text: "Volume licensing available", included: true },
+      { text: "Volume licensing", included: true },
     ],
   },
 ];
@@ -77,11 +89,15 @@ const tiers = [
 const faqs = [
   {
     q: "What happens after the 90-day trial?",
-    a: "The kernel module gracefully degrades — operations become no-ops and reads return zero. No crashes, no data loss. You can upgrade to Professional at any time to restore full functionality.",
+    a: "The kernel module gracefully degrades — operations become no-ops and reads return zero. No crashes, no data loss. You can upgrade to Pro at any time to restore full functionality.",
   },
   {
     q: "Do I need the kernel module to use ATOMiK?",
     a: "No. The Python SDK (atomik-core) is free, open source (Apache 2.0), and has zero dependencies. It implements the full delta-state algebra in pure Python. The kernel module adds system-level optimizations like COW detection and network deduplication.",
+  },
+  {
+    q: "What's the difference between Pro and Team?",
+    a: "Pro gives you the Linux kernel module for system-level optimization — COW detection, network dedup, cgroup tracking, and 27 sysfs metrics. Team adds the SDK generation pipeline (5 languages), the atomik-report waste analysis tool, a 5-seat team license, and CI-friendly JSON/CSV export. If you're a solo developer or small ops team, Pro is all you need. If your team builds on ATOMiK across multiple languages, Team is the right fit.",
   },
   {
     q: "What Linux kernels are supported?",
@@ -93,7 +109,7 @@ const faqs = [
   },
   {
     q: "Can I try before I buy?",
-    a: "Yes — the Professional tier includes a full 90-day free trial. No credit card required to start. Run sudo ./install.sh and you're up in 60 seconds.",
+    a: "Yes — both Pro and Team tiers include free trials. No credit card required to start. Run sudo ./install.sh and you're up in 60 seconds.",
   },
 ];
 
@@ -134,8 +150,8 @@ export default function PricingPage() {
       </section>
 
       {/* Pricing Cards */}
-      <section className="max-w-5xl mx-auto px-6 py-12">
-        <div className="grid md:grid-cols-3 gap-6">
+      <section className="max-w-6xl mx-auto px-6 py-12">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           {tiers.map((tier) => (
             <div
               key={tier.name}
@@ -208,13 +224,13 @@ export default function PricingPage() {
       </section>
 
       {/* Comparison Table */}
-      <section className="max-w-4xl mx-auto px-6 py-12">
+      <section className="max-w-5xl mx-auto px-6 py-12">
         <h2 className="text-2xl font-bold text-center mb-8">Feature comparison</h2>
         <div
-          className="rounded-xl border overflow-hidden"
+          className="rounded-xl border overflow-x-auto"
           style={{ background: "#12121a", borderColor: "#1e1e2e" }}
         >
-          <table className="w-full text-sm">
+          <table className="w-full text-sm" style={{ minWidth: "640px" }}>
             <thead>
               <tr style={{ borderBottom: "1px solid #1e1e2e" }}>
                 <th className="text-left p-4 font-semibold" style={{ color: "#8888a0" }}>
@@ -223,11 +239,14 @@ export default function PricingPage() {
                 <th className="text-center p-4 font-semibold" style={{ color: "#8888a0" }}>
                   Community
                 </th>
+                <th className="text-center p-4 font-semibold" style={{ color: "#8888a0" }}>
+                  Pro
+                </th>
                 <th
                   className="text-center p-4 font-semibold"
                   style={{ color: "#4f8fff" }}
                 >
-                  Professional
+                  Team
                 </th>
                 <th className="text-center p-4 font-semibold" style={{ color: "#8888a0" }}>
                   Enterprise
@@ -236,20 +255,22 @@ export default function PricingPage() {
             </thead>
             <tbody>
               {[
-                ["Python SDK", true, true, true],
-                ["C99 library", true, true, true],
-                ["Delta-state algebra (4 ops)", true, true, true],
-                ["Fingerprint change detection", true, true, true],
-                ["Benchmark suite", true, true, true],
-                ["Linux kernel module", false, true, true],
-                ["COW redundancy detection", false, true, true],
-                ["Network send deduplication", false, true, true],
-                ["Per-container tracking", false, true, true],
-                ["27 sysfs metrics", false, true, true],
-                ["FPGA hardware acceleration", false, false, true],
-                ["Custom CPU + ATOMiK ISA", false, false, true],
-                ["Support SLA", "GitHub", "48hr", "4hr"],
-                ["License", "Apache 2.0", "Commercial", "Commercial"],
+                ["Python SDK + C header", true, true, true, true],
+                ["Delta-state algebra (4 ops)", true, true, true, true],
+                ["Fingerprint change detection", true, true, true, true],
+                ["Examples + benchmark suite", true, true, true, true],
+                ["Linux kernel module", false, true, true, true],
+                ["COW / network dedup / cgroup tracking", false, true, true, true],
+                ["27 sysfs metrics + dashboard", false, true, true, true],
+                ["SDK generation (5 languages)", false, false, true, true],
+                ["atomik-report waste analysis", false, false, true, true],
+                ["JSON/CSV CI export", false, false, true, true],
+                ["Team license (5 seats)", false, false, true, true],
+                ["FPGA hardware acceleration", false, false, false, true],
+                ["Custom CPU + ATOMiK ISA", false, false, false, true],
+                ["Formal verification certificate", false, false, false, true],
+                ["Support SLA", "GitHub", "48hr", "48hr", "4hr"],
+                ["License", "Apache 2.0", "Commercial", "Commercial", "Commercial"],
               ].map(([feature, ...vals], i) => (
                 <tr
                   key={i}

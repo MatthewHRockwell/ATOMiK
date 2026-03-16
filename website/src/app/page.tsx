@@ -62,25 +62,34 @@ const pricingTiers = [
     name: "Community",
     price: "Free",
     period: "",
-    items: ["atomik-core Python library", "C99 single-header library", "Full 4-operation API", "AtomikTable, DeltaStream, Fingerprint", "Community support via GitHub"],
+    items: ["Python SDK + C header + examples", "Full 4-operation API", "Apache 2.0 license", "Community support via GitHub"],
     cta: "Get Started Free",
     href: "/get-started",
     primary: false,
   },
   {
-    name: "Professional",
+    name: "Pro",
     price: "$99",
-    period: "/mo per seat",
-    items: ["Everything in Community", "Linux kernel module (90-day trial)", "System-level delta-state acceleration", "Priority email support (48hr SLA)", "Benchmarking suite + integration guides"],
-    cta: "Start Free Trial",
+    period: "/mo",
+    items: ["Everything in Community", "Linux kernel module (90-day trial)", "COW detection, network dedup, cgroup tracking", "27 sysfs metrics + dashboard", "Priority email support (48hr SLA)"],
+    cta: "Start 90-Day Free Trial",
     href: "/get-started?plan=professional",
+    primary: false,
+  },
+  {
+    name: "Team",
+    price: "$299",
+    period: "/mo",
+    items: ["Everything in Pro", "SDK generation (Python, Rust, C, JS, Verilog)", "atomik-report waste analysis", "Team license (5 seats)", "JSON/CSV export for CI"],
+    cta: "Start Free Trial",
+    href: "/get-started?plan=team",
     primary: true,
   },
   {
     name: "Enterprise",
-    price: "$499",
-    period: "/mo per seat",
-    items: ["Everything in Professional", "FPGA hardware acceleration", "4-hour response SLA", "Custom integration consulting", "Formal verification certificate"],
+    price: "$999",
+    period: "/mo",
+    items: ["Everything in Team", "FPGA hardware acceleration (512 banks)", "Custom RV64I CPU + ATOMiK ISA", "4-hour response SLA", "Dedicated support + consulting"],
     cta: "Contact Sales",
     href: "/contact",
     primary: false,
@@ -319,12 +328,12 @@ export default function Home() {
 
       {/* ===== Pricing ===== */}
       <section className="px-6 py-20" style={{ borderTop: "1px solid #1e1e2e" }}>
-        <div className="max-w-5xl mx-auto">
+        <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl font-bold text-center tracking-tight mb-3">Pricing</h2>
           <p className="text-center text-lg mb-12" style={{ color: "#8888a0" }}>
             Start free. Scale when ready.
           </p>
-          <div className="grid md:grid-cols-3 gap-5">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
             {pricingTiers.map((t) => (
               <div
                 key={t.name}

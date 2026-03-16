@@ -3,7 +3,7 @@
 # Usage: sudo ./install.sh [--license ATOMIK-XXXX-XXXX-XXXX-XXXX-XXXX]
 set -e
 
-VERSION="0.4.0"
+VERSION="0.5.0"
 DKMS_SRC="/usr/src/atomik-${VERSION}"
 MIN_KERNEL="5.15"
 

@@ -1,4 +1,4 @@
-VERSION := 0.4.0
+VERSION := 0.5.0
 KDIR ?= /lib/modules/$(shell uname -r)/build
 DIST_NAME := atomik-$(VERSION)
 
@@ -28,13 +28,15 @@ dist: clean
 	   atomik_cow.c atomik_cow.h \
 	   atomik_net.c atomik_net.h \
 	   atomik_cgroup.c atomik_cgroup.h \
+	   atomik_proc.c atomik_trace.h atomik_trace_define.c \
 	   atomik_core_kern.h atomik_stats.h \
-	   README.md \
+	   README.md .gitignore \
 	   $(DIST_NAME)/
 	cp include/uapi/atomik.h $(DIST_NAME)/include/uapi/
 	cp tools/Makefile tools/atomik-status.c tools/atomik-test.c \
 	   tools/atomik-bench.c tools/atomik-optimizer.c \
-	   tools/atomik-dashboard.c tools/atomik-workload-bench.sh \
+	   tools/atomik-dashboard.c tools/atomik-report.c \
+	   tools/atomik-workload-bench.sh \
 	   tools/atomik-full-test.sh \
 	   $(DIST_NAME)/tools/
 	cp systemd/atomik.service systemd/atomik.conf systemd/99-atomik.rules \

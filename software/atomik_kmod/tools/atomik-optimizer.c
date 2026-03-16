@@ -434,7 +434,7 @@ int main(int argc, char *argv[])
 		return 0;
 	}
 
-	printf("ATOMiK COW Optimizer v0.4.0\n");
+	printf("ATOMiK COW Optimizer v0.5.0\n");
 	printf("===========================\n\n");
 
 	/* Enable KSM */

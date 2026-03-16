@@ -291,7 +291,7 @@ bench_desktop() {
 
 # --- Main ---
 
-echo "ATOMiK Workload Benchmark v0.4.0"
+echo "ATOMiK Workload Benchmark v0.5.0"
 echo "================================="
 echo ""
 echo "System: $(uname -r) on $(uname -m)"

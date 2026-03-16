@@ -72,29 +72,45 @@ const paths = [
     badge: "$99/mo",
     badgeColor: "#4f8fff",
     items: [
-      "COW redundancy detection (kretprobe)",
-      "TCP send deduplication (CRC32C)",
-      "Per-container waste tracking",
+      "COW detection, network dedup, cgroup tracking",
       "27 sysfs metrics in real-time",
-      "DKMS packaging + systemd service",
+      "atomik-status dashboard + atomik-bench",
+      "Priority email support (48hr SLA)",
+      "90-day free trial",
     ],
-    cta: "Get Professional License",
-    ctaHref: "/#pricing",
+    cta: "Start Pro Trial",
+    ctaHref: "/pricing",
+  },
+  {
+    title: "Team SDK Pipeline",
+    subtitle: "Multi-language generation",
+    badge: "$299/mo",
+    badgeColor: "#22d3ee",
+    featured: true,
+    items: [
+      "SDK generation: Python, Rust, C, JS, Verilog",
+      "atomik-report waste analysis tool",
+      "Team license (5 seats)",
+      "JSON/CSV export for CI integration",
+      "Schema-driven code generation",
+    ],
+    cta: "Start Team Trial",
+    ctaHref: "/pricing",
   },
   {
     title: "FPGA Hardware",
     subtitle: "Maximum throughput",
-    badge: "$499/mo",
+    badge: "$999/mo",
     badgeColor: "#8b5cf6",
     items: [
-      "AXI4-Lite MMIO on Zynq",
-      "Up to 69.7 Gops/s (512 banks)",
+      "AXI4-Lite MMIO on Zynq (512 banks)",
+      "Up to 69.7 Gops/s peak throughput",
       "Custom RV64I CPU with ATOMiK ISA",
-      "Hardware-accelerated context tables",
-      "Dedicated engineering support",
+      "4-hour response SLA + dedicated support",
+      "Formal verification + ASIC path",
     ],
-    cta: "Get Enterprise License",
-    ctaHref: "/#pricing",
+    cta: "Contact Sales",
+    ctaHref: "/contact",
   },
 ];
 
@@ -175,13 +191,25 @@ export default function GetStartedPage() {
           From Python SDK to FPGA silicon — scale when you&apos;re ready.
         </p>
 
-        <div className="max-w-5xl mx-auto grid md:grid-cols-3 gap-6">
+        <div className="max-w-6xl mx-auto grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           {paths.map((path) => (
             <div
               key={path.title}
-              className="rounded-xl border p-6 flex flex-col"
-              style={{ background: "#12121a", borderColor: "#1e1e2e" }}
+              className="rounded-xl border p-6 flex flex-col relative"
+              style={{
+                background: (path as { featured?: boolean }).featured ? "#14142a" : "#12121a",
+                borderColor: (path as { featured?: boolean }).featured ? "rgba(79,143,255,0.3)" : "#1e1e2e",
+                boxShadow: (path as { featured?: boolean }).featured ? "0 0 40px rgba(79,143,255,0.08)" : "none",
+              }}
             >
+              {(path as { featured?: boolean }).featured && (
+                <div
+                  className="absolute -top-3 left-1/2 -translate-x-1/2 text-[11px] font-bold px-4 py-1 rounded-full tracking-wide"
+                  style={{ background: "linear-gradient(135deg, #4f8fff, #3a7aee)", color: "#fff" }}
+                >
+                  RECOMMENDED
+                </div>
+              )}
               <div className="flex items-center justify-between mb-2">
                 <h3 className="text-lg font-semibold">{path.title}</h3>
                 <span

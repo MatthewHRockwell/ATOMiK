@@ -27,15 +27,21 @@ export const stripe = new Proxy({} as Stripe, {
 // Product/price configuration
 export const PRODUCTS = {
   professional: {
-    name: 'ATOMiK Professional',
-    description: 'Production license + priority support + all platforms',
+    name: 'ATOMiK Pro',
+    description: 'Linux kernel module + system-level optimization + priority support',
     mode: 'subscription' as const,
     priceMonthly: 9900, // $99.00 in cents
   },
+  team: {
+    name: 'ATOMiK Team',
+    description: 'SDK generation pipeline (5 languages) + waste analysis + team license',
+    mode: 'subscription' as const,
+    priceMonthly: 29900, // $299.00 in cents
+  },
   enterprise: {
     name: 'ATOMiK Enterprise',
-    description: 'Everything in Professional + dedicated support + hardware path',
+    description: 'FPGA hardware acceleration + custom CPU + dedicated support + consulting',
     mode: 'subscription' as const,
-    priceMonthly: 49900, // $499.00 in cents
+    priceMonthly: 99900, // $999.00 in cents
   },
 } as const;
