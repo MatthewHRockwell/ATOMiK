@@ -25,7 +25,6 @@ from __future__ import annotations
 import asyncio
 import threading
 from collections.abc import Iterator
-from dataclasses import dataclass, field
 from typing import Any, Callable
 
 from atomik_core.stream import DeltaMessage

@@ -51,11 +51,13 @@ class AtomikRedisCache:
             # Give a helpful message when someone passes None expecting
             # auto-construction.
             try:
-                import redis as _redis  # noqa: F811
-                raise ValueError(
-                    "redis_client must not be None. "
-                    "Pass redis.Redis() or redis.StrictRedis()."
-                )
+                import importlib.util
+                if importlib.util.find_spec("redis") is not None:
+                    raise ValueError(
+                        "redis_client must not be None. "
+                        "Pass redis.Redis() or redis.StrictRedis()."
+                    )
+                raise ImportError  # noqa: TRY301
             except ImportError:
                 raise ImportError(
                     "The 'redis' package is required for AtomikRedisCache.\n"
