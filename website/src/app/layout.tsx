@@ -66,10 +66,17 @@ const jsonLd = {
     },
     {
       "@type": "Offer",
-      name: "Enterprise",
-      price: "499",
+      name: "Team",
+      price: "299",
       priceCurrency: "USD",
-      description: "Hardware acceleration path with dedicated support",
+      description: "SDK generation pipeline (5 languages) + waste analysis + team license",
+    },
+    {
+      "@type": "Offer",
+      name: "Enterprise",
+      price: "999",
+      priceCurrency: "USD",
+      description: "FPGA hardware acceleration + dedicated support + 4-hour SLA",
     },
   ],
   author: {

@@ -8,13 +8,13 @@ export default function Nav({ active }: { active?: string }) {
   const navRef = useRef<HTMLElement>(null);
 
   const links = [
-    { href: "/", label: "Home" },
     { href: "/ai-demo", label: "AI Demo" },
     { href: "/demo", label: "Delta Demo" },
     { href: "/solutions", label: "Solutions" },
     { href: "/docs", label: "Docs" },
     { href: "/pricing", label: "Pricing" },
     { href: "/blog", label: "Blog" },
+    { href: "https://github.com/MatthewHRockwell/ATOMiK", label: "GitHub" },
   ];
 
   // Close menu when clicking outside the nav

@@ -100,7 +100,7 @@ const pricingTiers = [
 ];
 
 const investorStats: [string, string][] = [
-  ["92", "Lean4 Proofs"], ["417+", "Tests (SW + HW)"], ["3", "FPGA Platforms"],
+  ["92", "Lean4 Proofs"], ["500+", "Tests (SW + HW)"], ["3", "FPGA Platforms"],
   ["69.7B", "Ops/s Peak"], ["$50B", "Serviceable Market"],
 ];
 
@@ -149,7 +149,7 @@ export default function Home() {
           className="inline-flex items-center gap-3 px-6 py-3.5 rounded-lg font-mono text-sm"
           style={{ background: "#12121a", border: "1px solid #1e1e2e", color: "#22d3ee" }}
         >
-          $ pip install ATOMiK
+          $ pip install atomik-core
         </div>
       </section>
 
@@ -444,57 +444,6 @@ export default function Home() {
             See full feature comparison on the{" "}
             <Link href="/pricing" className="text-[#4f8fff] hover:underline">pricing page</Link>.
           </p>
-        </div>
-      </section>
-
-      {/* ===== Investors ===== */}
-      <section className="px-6 py-20" style={{ borderTop: "1px solid #1e1e2e" }}>
-        <div className="max-w-4xl mx-auto">
-          <div
-            className="rounded-2xl p-10 md:p-16 text-center relative overflow-hidden"
-            style={{
-              background: "linear-gradient(135deg, rgba(79,143,255,0.06), rgba(34,211,238,0.06), rgba(168,85,247,0.04))",
-              border: "1px solid #1e1e2e",
-            }}
-          >
-            <div
-              className="absolute top-0 left-0 right-0 h-[3px]"
-              style={{ background: "linear-gradient(90deg, #4f8fff, #22d3ee, #a855f7)" }}
-            />
-            <h2 className="text-3xl font-bold tracking-tight mb-4">For Investors</h2>
-            <p className="text-lg mb-8" style={{ color: "#8888a0" }}>
-              A fundamentally new approach to state management --
-              proven mathematically, validated in hardware, ready for market.
-            </p>
-            <div className="flex justify-center gap-4 flex-wrap mb-8">
-              {investorStats.map(([val, lbl]) => (
-                <div key={lbl} className="rounded-xl px-5 py-4 min-w-[120px]" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid #1e1e2e" }}>
-                  <div className="text-2xl font-bold bg-gradient-to-r from-[#22d3ee] to-[#4f8fff] bg-clip-text text-transparent">{val}</div>
-                  <div className="text-xs mt-1" style={{ color: "#8888a0" }}>{lbl}</div>
-                </div>
-              ))}
-            </div>
-            <p className="text-sm mb-8" style={{ color: "#8888a0" }}>
-              Patent pending. Software + hardware IP licensing model.
-              ARM-comparable business model with 85-95% gross margins.
-            </p>
-            <div className="flex gap-4 justify-center flex-wrap">
-              <a
-                href="mailto:mrockwell@atomik.tech?subject=ATOMiK Investment Inquiry"
-                className="px-7 py-3.5 rounded-lg text-sm font-semibold text-white no-underline transition-all hover:opacity-90"
-                style={{ background: "linear-gradient(135deg, #4f8fff, #3a7aee)" }}
-              >
-                Contact Founder
-              </a>
-              <a
-                href="https://github.com/MatthewHRockwell/ATOMiK"
-                className="px-7 py-3.5 rounded-lg text-sm font-semibold no-underline transition-all hover:border-[#4f8fff]"
-                style={{ background: "transparent", color: "#e0e0e8", border: "1px solid #1e1e2e" }}
-              >
-                Technical Deep Dive
-              </a>
-            </div>
-          </div>
         </div>
       </section>
 

@@ -40,7 +40,7 @@ const coverageItems = [
 const stats = [
   { value: "92", label: "Lean4 Theorems Proven", color: "#8b5cf6" },
   { value: "69.7 Gops/s", label: "Peak FPGA Throughput", color: "#4f8fff" },
-  { value: "417+", label: "Tests Passing", color: "#22c55e" },
+  { value: "500+", label: "Tests Passing", color: "#22c55e" },
   { value: "916,000x", label: "Memory Traffic Reduction", color: "#d4a843" },
 ];
 
@@ -419,7 +419,7 @@ export default function WhitepaperPage() {
                   color: "#4f8fff",
                 },
                 {
-                  value: "417+",
+                  value: "500+",
                   unit: "tests",
                   desc: "Across atomik-core (218), SDK pipeline (353), hardware (80), CDC (37). All passing.",
                   color: "#22c55e",

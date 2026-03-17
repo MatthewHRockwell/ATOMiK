@@ -12,7 +12,7 @@ const posts = [
   {
     slug: "what-is-delta-state-computing",
     title: "What is Delta-State Computing? The Definitive Guide",
-    date: "March 16, 2026",
+    date: "March 14, 2026",
     excerpt:
       "The authoritative guide to delta-state architecture. Mathematical foundations, comparisons with CRDTs, event sourcing, OT, and Raft — and why reconstructed state outperforms stored state.",
     tags: ["delta-state", "architecture", "pillar"],
@@ -20,7 +20,7 @@ const posts = [
   {
     slug: "crdt-alternative-delta-state",
     title: "CRDT Alternative: Delta-State Algebra",
-    date: "March 16, 2026",
+    date: "March 12, 2026",
     excerpt:
       "CRDTs are powerful but complex. Delta-state algebra solves the same convergence problem with one operation, zero metadata, and 92 machine-checked proofs. Side-by-side comparison with code.",
     tags: ["CRDTs", "comparison", "pillar"],
@@ -28,7 +28,7 @@ const posts = [
   {
     slug: "5-patterns-delta-state",
     title: "5 Design Patterns for Delta-State Algebra",
-    date: "March 16, 2026",
+    date: "March 10, 2026",
     excerpt:
       "Practical patterns: accumulator fan-in, epoch checkpointing, fingerprint gates, rollback chains, and multi-stream convergence.",
     tags: ["patterns", "architecture", "python"],
@@ -36,7 +36,7 @@ const posts = [
   {
     slug: "building-distributed-cache-in-50-lines",
     title: "Build a Distributed Cache in 50 Lines of Python",
-    date: "March 16, 2026",
+    date: "March 7, 2026",
     excerpt:
       "Step-by-step tutorial: 3-node distributed cache with automatic convergence. No consensus protocol, no leader election, no conflict resolution — just XOR.",
     tags: ["tutorial", "python", "distributed-systems"],
@@ -44,7 +44,7 @@ const posts = [
   {
     slug: "atomik-vs-event-sourcing",
     title: "ATOMiK vs Event Sourcing: When XOR Beats Append-Only Logs",
-    date: "March 16, 2026",
+    date: "March 4, 2026",
     excerpt:
       "A quantitative comparison of delta-state algebra vs event sourcing. O(1) reconstruction vs O(n) replay, 8 bytes vs unbounded logs, and when each approach wins.",
     tags: ["architecture", "comparison", "event-sourcing"],
@@ -52,7 +52,7 @@ const posts = [
   {
     slug: "fpga-journey-13-dollar-chip",
     title: "From Math to Silicon: 69.7 Gops/s on a $13.50 Chip",
-    date: "March 15, 2026",
+    date: "February 28, 2026",
     excerpt:
       "How we went from 92 Lean4 theorems to a custom RISC-V CPU with native delta-state instructions, HD HDMI output, and 69.7 billion operations per second on commodity FPGAs.",
     tags: ["hardware", "fpga", "risc-v", "engineering"],
@@ -60,7 +60,7 @@ const posts = [
   {
     slug: "announcing-atomik-kernel-module",
     title: "Announcing ATOMiK v0.4.0: Per-Container Waste Tracking for Kubernetes",
-    date: "March 15, 2026",
+    date: "February 21, 2026",
     excerpt:
       "The ATOMiK kernel module now detects redundant COW copies, deduplicates network sends, and attributes waste per container — all at kernel speed.",
     tags: ["release", "kernel", "kubernetes"],

@@ -91,7 +91,7 @@ const proofPoints = [
     gradient: "from-purple-400 to-purple-600",
   },
   {
-    value: "417+",
+    value: "500+",
     label: "Tests Passing",
     sublabel: "SDK + hardware",
     gradient: "from-green-400 to-green-600",
@@ -216,7 +216,7 @@ export default function AboutPage() {
             {
               step: "03",
               title: "The Software",
-              desc: "Python and C SDKs with pipeline orchestration, delta generators, and 353+ passing tests. Available on PyPI.",
+              desc: "Python and C SDKs with pipeline orchestration, delta generators, and 218+ passing tests. Available on PyPI.",
               color: "#22c55e",
             },
             {
