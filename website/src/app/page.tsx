@@ -4,6 +4,7 @@ import Nav from "@/components/Nav";
 import EmailCapture from "@/components/EmailCapture";
 import MiniDemo from "@/components/MiniDemo";
 import DeveloperStats from "@/components/DeveloperStats";
+import HeroMetrics from "@/components/HeroMetrics";
 
 export const metadata: Metadata = {
   title: "ATOMiK — Stop moving data. Start evolving it.",
@@ -103,12 +104,6 @@ const investorStats: [string, string][] = [
   ["69.7B", "Ops/s Peak"], ["$50B", "Serviceable Market"],
 ];
 
-const footerCols: { title: string; links: [string, string][] }[] = [
-  { title: "Product", links: [["/get-started", "Get Started"], ["/docs", "Documentation"], ["/pricing", "Pricing"], ["/demo", "Demo"], ["https://github.com/MatthewHRockwell/ATOMiK", "GitHub"]] },
-  { title: "Company", links: [["/about", "About"], ["/blog", "Blog"], ["mailto:mrockwell@atomik.tech", "Contact"], ["mailto:press@atomik.tech", "Press"], ["mailto:sales@atomik.tech", "Sales"]] },
-  { title: "Resources", links: [["/solutions", "Solutions"], ["https://github.com/MatthewHRockwell/ATOMiK/tree/main/math/proofs", "Formal Proofs"], ["https://github.com/MatthewHRockwell/ATOMiK/tree/main/software/atomik_core/examples", "Examples"], ["https://doi.org/10.5281/zenodo.18372213", "White Paper"]] },
-];
-
 export default function Home() {
   return (
     <div className="min-h-screen" style={{ background: "#0a0a0f", color: "#e0e0e8" }}>
@@ -158,24 +153,9 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ===== Metrics ===== */}
+      {/* ===== Metrics (animated counters) ===== */}
       <section className="max-w-5xl mx-auto px-6 pb-16">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {metrics.map((m) => (
-            <div
-              key={m.label}
-              className="rounded-xl p-6 text-center transition-all hover:-translate-y-1 hover:border-[#4f8fff]"
-              style={{ background: "#12121a", border: "1px solid #1e1e2e" }}
-            >
-              <div
-                className="text-3xl font-extrabold bg-gradient-to-r from-[#22d3ee] to-[#4f8fff] bg-clip-text text-transparent"
-              >
-                {m.value}
-              </div>
-              <div className="text-xs mt-2" style={{ color: "#8888a0" }}>{m.label}</div>
-            </div>
-          ))}
-        </div>
+        <HeroMetrics />
       </section>
 
       {/* ===== How It Works ===== */}
@@ -528,42 +508,6 @@ export default function Home() {
         <EmailCapture />
       </section>
 
-      {/* ===== Footer ===== */}
-      <footer className="px-6 pt-14 pb-10 text-sm" style={{ borderTop: "1px solid #1e1e2e", color: "#8888a0" }}>
-        <div className="max-w-5xl mx-auto">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-10 mb-10">
-            <div>
-              <div className="text-lg font-bold text-white mb-3">
-                <span style={{ color: "#8b5cf6" }}>ATOM</span><span style={{ color: "#4f8fff" }}>i</span><span style={{ color: "#8b5cf6" }}>K</span>
-              </div>
-              <p className="text-xs leading-relaxed">Delta-state computing infrastructure. Stop moving data. Start evolving it.</p>
-            </div>
-            {footerCols.map((col) => (
-              <div key={col.title}>
-                <h4 className="text-xs font-semibold uppercase tracking-wide text-white mb-3">{col.title}</h4>
-                <div className="flex flex-col gap-2">
-                  {col.links.map(([href, label]) => {
-                    const isExternal = href.startsWith("http") || href.startsWith("mailto:");
-                    const cls = "hover:text-white transition-colors text-xs no-underline";
-                    const s = { color: "#8888a0" };
-                    return isExternal
-                      ? <a key={label} href={href} className={cls} style={s}>{label}</a>
-                      : <Link key={label} href={href} className={cls} style={s}>{label}</Link>;
-                  })}
-                </div>
-              </div>
-            ))}
-          </div>
-          <div className="flex flex-wrap justify-between items-center gap-4 pt-6" style={{ borderTop: "1px solid #1e1e2e" }}>
-            <p>&copy; 2026 ATOMiK Project. Patent Pending. All rights reserved.</p>
-            <div className="flex gap-5">
-              <Link href="/privacy" className="hover:text-white transition-colors no-underline" style={{ color: "#8888a0" }}>Privacy</Link>
-              <Link href="/terms" className="hover:text-white transition-colors no-underline" style={{ color: "#8888a0" }}>Terms</Link>
-              <a href="mailto:support@atomik.tech" className="hover:text-white transition-colors no-underline" style={{ color: "#8888a0" }}>Support</a>
-            </div>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }

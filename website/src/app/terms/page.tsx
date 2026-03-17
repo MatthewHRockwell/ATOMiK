@@ -42,8 +42,13 @@ export default function TermsPage() {
                 description="Commercial license for individuals and small teams. Includes priority support (48-hour SLA), commercial use rights, and access to pre-built binaries."
               />
               <TierCard
+                name="Team"
+                price="$299/month"
+                description="SDK generation pipeline (5 languages), waste analysis tools, team license (5 seats), and CI integration."
+              />
+              <TierCard
                 name="Enterprise"
-                price="$499/month"
+                price="$999/month"
                 description="Full commercial license for organizations. Includes hardware IP cores, 4-hour support SLA, custom integration assistance, and dedicated account management."
               />
             </div>

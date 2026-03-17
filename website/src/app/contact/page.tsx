@@ -23,20 +23,21 @@ export default function ContactPage() {
     e.preventDefault();
     setStatus("sending");
 
-    // Send via mailto as a fallback — works without backend
-    const body = `Name: ${form.name}\nCompany: ${form.company}\nEmail: ${form.email}\n\nSubject: ${form.subject}\n\n${form.message}`;
-    const mailto = `mailto:sales@atomik.tech?subject=${encodeURIComponent(form.subject)}&body=${encodeURIComponent(body)}`;
-    window.location.href = mailto;
-
-    // Also store the lead
+    // Store the lead server-side FIRST (captures even if mailto fails)
     try {
       await fetch("/api/subscribe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: form.email }),
+        body: JSON.stringify({
+          email: form.email,
+          name: form.name,
+          company: form.company,
+          source: "contact-sales",
+          role: form.subject,
+        }),
       });
     } catch {
-      // Non-critical
+      // Non-critical — still show success
     }
 
     setStatus("sent");
@@ -64,10 +65,10 @@ export default function ContactPage() {
             style={{ background: "#12121a", borderColor: "#1e1e2e" }}
           >
             <div className="text-3xl mb-4" style={{ color: "#22c55e" }}>&#10003;</div>
-            <h2 className="text-xl font-bold mb-2">Message sent</h2>
+            <h2 className="text-xl font-bold mb-2">Message received</h2>
             <p style={{ color: "#8888a0" }}>
-              Your email client should have opened with a pre-filled message.
-              If it didn&apos;t, email us directly at{" "}
+              We&apos;ll get back to you within 4 hours for enterprise inquiries.
+              You can also reach us directly at{" "}
               <a href="mailto:sales@atomik.tech" style={{ color: "#4f8fff" }}>
                 sales@atomik.tech
               </a>
