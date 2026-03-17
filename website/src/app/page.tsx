@@ -345,6 +345,68 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ===== Proven Technology ===== */}
+      <section className="px-6 py-16" style={{ borderTop: "1px solid #1e1e2e" }}>
+        <div className="max-w-5xl mx-auto">
+          <h2 className="text-2xl font-bold text-center tracking-tight mb-2">Proven Technology</h2>
+          <p className="text-center text-sm mb-10" style={{ color: "#8888a0" }}>
+            Real engineering milestones &mdash; not promises.
+          </p>
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+            {[
+              {
+                value: "92",
+                label: "Lean4 Formal Proofs",
+                href: "https://github.com/MatthewHRockwell/ATOMiK/tree/main/math/proofs",
+                icon: "\u2713",
+                color: "#22c55e",
+              },
+              {
+                value: "3",
+                label: "FPGA Platforms Validated",
+                href: "https://github.com/MatthewHRockwell/ATOMiK",
+                icon: "\u25B2",
+                color: "#a855f7",
+              },
+              {
+                value: "218+",
+                label: "Automated Tests",
+                href: "https://github.com/MatthewHRockwell/ATOMiK/actions",
+                icon: "\u25CF",
+                color: "#4f8fff",
+              },
+              {
+                value: "69.7",
+                label: "Gops/s Hardware Verified",
+                href: "https://github.com/MatthewHRockwell/ATOMiK",
+                icon: "\u26A1",
+                color: "#22d3ee",
+              },
+              {
+                value: "Apache 2.0",
+                label: "Open Source",
+                href: "https://github.com/MatthewHRockwell/ATOMiK",
+                icon: "\u2691",
+                color: "#f59e0b",
+              },
+            ].map((item) => (
+              <a
+                key={item.label}
+                href={item.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rounded-xl p-5 text-center transition-all hover:-translate-y-1 no-underline block"
+                style={{ background: "#12121a", border: "1px solid #1e1e2e" }}
+              >
+                <div className="text-lg mb-1" style={{ color: item.color }}>{item.icon}</div>
+                <div className="text-xl font-extrabold mb-1" style={{ color: "#e0e0e8" }}>{item.value}</div>
+                <div className="text-[11px]" style={{ color: "#8888a0" }}>{item.label}</div>
+              </a>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ===== Pricing ===== */}
       <section className="px-6 py-20" style={{ borderTop: "1px solid #1e1e2e" }}>
         <div className="max-w-6xl mx-auto">

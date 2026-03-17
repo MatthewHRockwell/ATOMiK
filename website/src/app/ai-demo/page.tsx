@@ -454,8 +454,24 @@ export default function AIDemoPage() {
           </span>
         </h1>
         <p style={{ color: "#8888a0" }}>
-          Same AI output. Fraction of the energy. See why in 10 seconds.
+          Same AI output. Fraction of the energy. Explore the architectural advantage.
         </p>
+      </section>
+
+      {/* ── Disclaimer Banner ── */}
+      <section className="max-w-4xl mx-auto px-6 pb-6">
+        <div
+          className="flex items-start gap-3 rounded-xl px-5 py-4 text-xs leading-relaxed"
+          style={{ background: "rgba(79,143,255,0.06)", border: "1px solid rgba(79,143,255,0.12)", color: "#8888a0" }}
+        >
+          <span className="shrink-0 mt-0.5 text-sm" style={{ color: "#4f8fff" }}>&#9432;</span>
+          <span>
+            This demonstration illustrates the theoretical efficiency advantage of delta-state
+            architecture applied to AI inference workloads. Power and cost projections are based
+            on architectural analysis of data movement reduction. Production inference benchmarks
+            are in development.
+          </span>
+        </div>
       </section>
 
       {/* ── Controls ── */}
@@ -574,6 +590,43 @@ export default function AIDemoPage() {
       {/* ── Panel 3: Architecture Visualization ── */}
       <section className="max-w-4xl mx-auto px-6 pb-12">
         <ArchitecturePanel running={running} />
+      </section>
+
+      {/* ── Methodology ── */}
+      <section className="max-w-4xl mx-auto px-6 pb-8">
+        <div className="rounded-xl border p-6" style={{ background: "#12121a", borderColor: "#1e1e2e" }}>
+          <h3 className="text-sm font-bold uppercase tracking-wider mb-4" style={{ color: "#8888a0" }}>
+            Methodology
+          </h3>
+          <ul className="space-y-3 text-xs leading-relaxed" style={{ color: "#8888a0" }}>
+            <li className="flex items-start gap-2">
+              <span className="shrink-0 mt-0.5" style={{ color: "#f97316" }}>&#9632;</span>
+              <span>
+                <strong style={{ color: "#b0b0c0" }}>Traditional GPU numbers</strong> are based on
+                published TDP specifications for NVIDIA A100 (300W) and H100 (350W) in inference
+                configurations. Actual power draw varies by batch size, model, and cooling.
+              </span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="shrink-0 mt-0.5" style={{ color: "#4f8fff" }}>&#9632;</span>
+              <span>
+                <strong style={{ color: "#b0b0c0" }}>ATOMiK numbers</strong> are based on measured
+                FPGA power consumption (Tang Nano 9K: 0.5W, Zynq XC7Z020: estimated 5-20W for
+                inference-class workloads) extrapolated to inference scenarios using architectural
+                analysis of data movement reduction.
+              </span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="shrink-0 mt-0.5" style={{ color: "#8b5cf6" }}>&#9632;</span>
+              <span>
+                <strong style={{ color: "#b0b0c0" }}>These are architectural projections, not production benchmarks.</strong>{" "}
+                ATOMiK&apos;s delta-state algebra is proven for state management workloads.
+                Application to full AI inference pipelines is under active development and has not
+                been independently validated.
+              </span>
+            </li>
+          </ul>
+        </div>
       </section>
 
       {/* ── Key Takeaways ── */}
