@@ -10,6 +10,22 @@ export const metadata: Metadata = {
 
 const posts = [
   {
+    slug: "what-is-delta-state-computing",
+    title: "What is Delta-State Computing? The Definitive Guide",
+    date: "March 16, 2026",
+    excerpt:
+      "The authoritative guide to delta-state architecture. Mathematical foundations, comparisons with CRDTs, event sourcing, OT, and Raft — and why reconstructed state outperforms stored state.",
+    tags: ["delta-state", "architecture", "pillar"],
+  },
+  {
+    slug: "crdt-alternative-delta-state",
+    title: "CRDT Alternative: Delta-State Algebra",
+    date: "March 16, 2026",
+    excerpt:
+      "CRDTs are powerful but complex. Delta-state algebra solves the same convergence problem with one operation, zero metadata, and 92 machine-checked proofs. Side-by-side comparison with code.",
+    tags: ["CRDTs", "comparison", "pillar"],
+  },
+  {
     slug: "5-patterns-delta-state",
     title: "5 Design Patterns for Delta-State Algebra",
     date: "March 16, 2026",

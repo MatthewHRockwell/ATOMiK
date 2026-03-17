@@ -4,6 +4,7 @@ import { useState, FormEvent, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Nav from "@/components/Nav";
+import { CopyCodeBlock } from "@/components/CopyCodeBlock";
 
 const roles = [
   "Developer",
@@ -108,12 +109,32 @@ function RegisterForm() {
     }
   }
 
-  // --- Success state: inline confirmation ---
+  // --- Success state: First 60 Seconds experience ---
   if (status === "success") {
+    const tryThisScript = `from atomik_core import AtomikContext
+
+ctx = AtomikContext()
+
+# 1. Load and accumulate
+ctx.load(1000)
+ctx.accum(50)
+ctx.accum(100)
+print(f"State reconstructed: {ctx.read()}")
+
+# 2. Self-inverse (undo by re-applying)
+ctx.accum(100)  # applying 100 again undoes it
+print(f"After undo: {ctx.read()}")
+
+# 3. Order doesn't matter
+a, b = AtomikContext(), AtomikContext()
+a.load(500); a.accum(10); a.accum(20)
+b.load(500); b.accum(20); b.accum(10)  # reverse order
+print(f"Same result: {a.read() == b.read()}")`;
+
     return (
-      <section className="max-w-lg mx-auto px-6 pb-24">
+      <section className="max-w-2xl mx-auto px-6 pb-24">
         <div
-          className="rounded-xl p-8 space-y-6"
+          className="rounded-xl p-8 space-y-8"
           style={{ background: "#12121a", border: "1px solid #1e1e2e" }}
         >
           {/* Checkmark + heading */}
@@ -143,15 +164,21 @@ function RegisterForm() {
               You&apos;re registered!
             </h2>
             <p className="text-sm" style={{ color: "#8888a0" }}>
-              Get started with ATOMiK right now.
+              Your first 60 seconds with ATOMiK.
             </p>
           </div>
 
-          {/* Install command */}
+          {/* Step 1: Install */}
           <div>
-            <p className="text-xs font-medium mb-2" style={{ color: "#8888a0" }}>
-              Install
-            </p>
+            <div className="flex items-center gap-2 mb-3">
+              <span
+                className="inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold"
+                style={{ background: "rgba(79,143,255,0.15)", color: "#4f8fff" }}
+              >
+                1
+              </span>
+              <p className="text-sm font-semibold text-white">Install</p>
+            </div>
             <div
               className="flex items-center justify-between gap-3 rounded-lg px-4 py-3"
               style={{
@@ -173,11 +200,58 @@ function RegisterForm() {
             </div>
           </div>
 
-          {/* Verify command */}
+          {/* Step 2: Try this */}
           <div>
-            <p className="text-xs font-medium mb-2" style={{ color: "#8888a0" }}>
-              Verify it works
+            <div className="flex items-center gap-2 mb-2">
+              <span
+                className="inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold"
+                style={{ background: "rgba(34,211,238,0.15)", color: "#22d3ee" }}
+              >
+                2
+              </span>
+              <p className="text-sm font-semibold text-white">
+                Try this &mdash; three killer properties in one script
+              </p>
+            </div>
+            <p className="text-xs mb-3 ml-8" style={{ color: "#8888a0" }}>
+              Save as <code style={{ color: "#22d3ee" }}>demo.py</code> and run it.
             </p>
+            <CopyCodeBlock code={tryThisScript} />
+
+            {/* Expected output */}
+            <div className="mt-3">
+              <p className="text-xs font-medium mb-1.5 ml-1" style={{ color: "#555566" }}>
+                Expected output
+              </p>
+              <pre
+                className="rounded-lg px-4 py-3 text-xs leading-relaxed"
+                style={{
+                  background: "#0a0a0f",
+                  border: "1px solid #1a1a24",
+                  color: "#555566",
+                  fontFamily: "'SF Mono', 'Fira Code', 'Consolas', monospace",
+                }}
+              >
+{`State reconstructed: 1118
+After undo: 1018
+Same result: True`}
+              </pre>
+            </div>
+          </div>
+
+          {/* Step 3: Benchmark */}
+          <div>
+            <div className="flex items-center gap-2 mb-3">
+              <span
+                className="inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold"
+                style={{ background: "rgba(34,197,94,0.15)", color: "#22c55e" }}
+              >
+                3
+              </span>
+              <p className="text-sm font-semibold text-white">
+                Benchmark your machine
+              </p>
+            </div>
             <div
               className="flex items-center justify-between gap-3 rounded-lg px-4 py-3"
               style={{
@@ -186,20 +260,16 @@ function RegisterForm() {
               }}
             >
               <code
-                className="text-sm overflow-x-auto"
+                className="text-sm"
                 style={{
                   color: "#22d3ee",
                   fontFamily:
                     "'SF Mono', 'Fira Code', 'Consolas', monospace",
                 }}
               >
-                python -c &quot;from atomik_core import AtomikContext;
-                print(&apos;Success!&apos; if AtomikContext().read() == 0 else
-                &apos;Error&apos;)&quot;
+                python -m atomik_core benchmark --share
               </code>
-              <CopyButton
-                text={`python -c "from atomik_core import AtomikContext; print('Success!' if AtomikContext().read() == 0 else 'Error')"`}
-              />
+              <CopyButton text="python -m atomik_core benchmark --share" />
             </div>
           </div>
 

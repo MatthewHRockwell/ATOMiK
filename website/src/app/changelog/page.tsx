@@ -359,40 +359,6 @@ export default function ChangelogPage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer
-        className="border-t py-8"
-        style={{ borderColor: "#1e1e2e", background: "#0a0a0f" }}
-      >
-        <div
-          className="max-w-5xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm"
-          style={{ color: "#8888a0" }}
-        >
-          <div>
-            <span style={{ color: "#8b5cf6" }}>ATOM</span>
-            <span style={{ color: "#4f8fff" }}>i</span>
-            <span style={{ color: "#8b5cf6" }}>K</span>
-            <span className="ml-2">Delta-State Computing</span>
-          </div>
-          <div className="flex gap-6">
-            <Link href="/" className="hover:text-white transition-colors">
-              Home
-            </Link>
-            <Link href="/docs" className="hover:text-white transition-colors">
-              Docs
-            </Link>
-            <Link href="/about/roadmap" className="hover:text-white transition-colors">
-              Roadmap
-            </Link>
-            <a
-              href="mailto:mrockwell@atomik.tech"
-              className="hover:text-white transition-colors"
-            >
-              Contact
-            </a>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }

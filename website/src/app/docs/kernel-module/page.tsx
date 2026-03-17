@@ -111,6 +111,134 @@ export default function KernelModulePage() {
         </div>
       </div>
 
+      {/* What Pro Looks Like */}
+      <div className="mb-10">
+        <h2 className="text-2xl font-bold tracking-tight mb-2">What Pro Looks Like</h2>
+        <p className="text-sm mb-6" style={{ color: "#8888a0" }}>
+          Real output from the ATOMiK kernel module running on a Kubernetes cluster.
+        </p>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+          {/* atomik-status output */}
+          <div>
+            <p className="text-sm font-mono mb-2" style={{ color: "#8888a0" }}>
+              atomik-status
+            </p>
+            <div style={codeBlockStyle}>
+              <pre style={{ margin: 0 }}>
+                <code>
+                  <span style={{ color: fnColor }}>ATOMiK v0.5.0</span>
+                  {" "}
+                  <span style={{ color: cmtColor }}>[software backend]</span>
+                  {" — "}
+                  <span style={{ color: strColor }}>trial (87 days remaining)</span>
+                  {"\n\n"}
+                  <span style={{ color: varColor }}>Operations:     </span>
+                  <span style={{ color: numColor }}>14,293</span>
+                  <span style={{ color: varColor }}> total (</span>
+                  <span style={{ color: numColor }}>3,821</span>
+                  <span style={{ color: varColor }}> load, </span>
+                  <span style={{ color: numColor }}>6,104</span>
+                  <span style={{ color: varColor }}> accum, </span>
+                  <span style={{ color: numColor }}>3,891</span>
+                  <span style={{ color: varColor }}> read, </span>
+                  <span style={{ color: numColor }}>477</span>
+                  <span style={{ color: varColor }}> swap)</span>
+                  {"\n"}
+                  <span style={{ color: varColor }}>COW Detection:  </span>
+                  <span style={{ color: numColor }}>23.4%</span>
+                  <span style={{ color: varColor }}> redundancy (</span>
+                  <span style={{ color: numColor }}>3,344</span>
+                  <span style={{ color: varColor }}> / 14,293 copies redundant)</span>
+                  {"\n"}
+                  <span style={{ color: varColor }}>Network:        </span>
+                  <span style={{ color: numColor }}>8.7%</span>
+                  <span style={{ color: varColor }}> redundancy (</span>
+                  <span style={{ color: numColor }}>1,243</span>
+                  <span style={{ color: varColor }}> / 14,293 sends redundant)</span>
+                  {"\n"}
+                  <span style={{ color: varColor }}>Bytes Saved:    </span>
+                  <span style={{ color: strColor }}>847 MB</span>
+                  <span style={{ color: varColor }}> (COW: 612 MB, Network: 235 MB)</span>
+                  {"\n\n"}
+                  <span style={{ color: cmtColor }}>Top Waste by Container:</span>
+                  {"\n"}
+                  <span style={{ color: varColor }}>{"  "}api-server-7f8d4    </span>
+                  <span style={{ color: numColor }}>612 MB</span>
+                  <span style={{ color: varColor }}>{"  "}(43.2%)</span>
+                  {"\n"}
+                  <span style={{ color: varColor }}>{"  "}worker-pool-3a2c    </span>
+                  <span style={{ color: numColor }}>189 MB</span>
+                  <span style={{ color: varColor }}>{"  "}(13.4%)</span>
+                  {"\n"}
+                  <span style={{ color: varColor }}>{"  "}redis-cache-9e1b     </span>
+                  <span style={{ color: numColor }}>46 MB</span>
+                  <span style={{ color: varColor }}>{"   "}(3.3%)</span>
+                </code>
+              </pre>
+            </div>
+          </div>
+
+          {/* atomik-report output */}
+          <div>
+            <p className="text-sm font-mono mb-2" style={{ color: "#8888a0" }}>
+              atomik-report --brief
+            </p>
+            <div style={codeBlockStyle}>
+              <pre style={{ margin: 0 }}>
+                <code>
+                  <span style={{ color: fnColor }}>ATOMiK Efficiency Report</span>
+                  {"\n"}
+                  <span style={{ color: cmtColor }}>Generated: 2026-03-16 09:14:22 UTC</span>
+                  {"\n"}
+                  <span style={{ color: cmtColor }}>────────────────────────────────────</span>
+                  {"\n\n"}
+                  <span style={{ color: varColor }}>Cluster:        </span>
+                  <span style={{ color: strColor }}>prod-us-east-1</span>
+                  {"\n"}
+                  <span style={{ color: varColor }}>Nodes:          </span>
+                  <span style={{ color: numColor }}>12</span>
+                  {"\n"}
+                  <span style={{ color: varColor }}>Containers:     </span>
+                  <span style={{ color: numColor }}>87</span>
+                  {"\n"}
+                  <span style={{ color: varColor }}>Uptime:         </span>
+                  <span style={{ color: numColor }}>3d 14h 22m</span>
+                  {"\n\n"}
+                  <span style={{ color: fnColor }}>Savings Summary</span>
+                  {"\n"}
+                  <span style={{ color: varColor }}>  COW copies avoided:   </span>
+                  <span style={{ color: strColor }}>612 MB</span>
+                  {"\n"}
+                  <span style={{ color: varColor }}>  Network sends avoided: </span>
+                  <span style={{ color: strColor }}>235 MB</span>
+                  {"\n"}
+                  <span style={{ color: varColor }}>  Total saved:           </span>
+                  <span style={{ color: strColor }}>847 MB</span>
+                  {"\n"}
+                  <span style={{ color: varColor }}>  Redundancy rate:       </span>
+                  <span style={{ color: numColor }}>18.9%</span>
+                  {"\n\n"}
+                  <span style={{ color: fnColor }}>Top Recommendation</span>
+                  {"\n"}
+                  <span style={{ color: varColor }}>  api-server: </span>
+                  <span style={{ color: numColor }}>43%</span>
+                  <span style={{ color: varColor }}> of waste. Consider</span>
+                  {"\n"}
+                  <span style={{ color: varColor }}>  increasing shared memory pool or</span>
+                  {"\n"}
+                  <span style={{ color: varColor }}>  enabling delta-sync for replicas.</span>
+                </code>
+              </pre>
+            </div>
+          </div>
+        </div>
+
+        <p className="text-sm text-center" style={{ color: "#8888a0" }}>
+          This is what Pro shows you. 90-day free trial, no credit card.
+        </p>
+      </div>
+
       <UpgradeGate
         tier="pro"
         title="Ready to install?"
