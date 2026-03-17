@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Nav from "@/components/Nav";
+import EmailCapture from "@/components/EmailCapture";
 
 export const metadata: Metadata = {
   title: "ATOMiK vs Event Sourcing: When XOR Beats Append-Only Logs — ATOMiK Blog",
@@ -244,33 +245,11 @@ for replica in replicas:
 python -m atomik_core.benchmark  # See the numbers on your hardware`}</Code>
 
           <div
-            className="rounded-xl border p-8 mt-8 text-center"
+            className="rounded-xl border p-8 mt-8"
             style={{ background: "#12121a", borderColor: "#1e1e2e" }}
           >
-            <h3 className="text-xl font-bold mb-3">Ready to eliminate replay overhead?</h3>
-            <p className="text-sm mb-6" style={{ color: "#8888a0" }}>
-              O(1) reconstruction. 8-byte deltas. Zero coordination.
-            </p>
-            <div className="flex flex-wrap justify-center gap-4">
-              <Link
-                href="/demo"
-                className="px-6 py-2.5 rounded-lg text-sm font-semibold"
-                style={{ background: "#4f8fff", color: "#fff" }}
-              >
-                Try the Demo
-              </Link>
-              <Link
-                href="/solutions/distributed-systems"
-                className="px-6 py-2.5 rounded-lg text-sm font-semibold"
-                style={{
-                  background: "transparent",
-                  color: "#e0e0e8",
-                  border: "1px solid #1e1e2e",
-                }}
-              >
-                Distributed Systems Solution
-              </Link>
-            </div>
+            <h3 className="text-xl font-bold mb-4 text-center">Try ATOMiK today</h3>
+            <EmailCapture variant="blog" />
           </div>
         </div>
       </article>

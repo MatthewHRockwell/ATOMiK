@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, FormEvent, Suspense } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 import Nav from "@/components/Nav";
 
 const roles = [
@@ -14,55 +15,82 @@ const roles = [
   "Other",
 ];
 
-const interestOptions = [
-  "Python SDK",
-  "Kernel Module",
-  "FPGA Hardware",
-  "SDK Generation",
-  "Enterprise Support",
-];
+function CopyButton({ text, label }: { text: string; label?: string }) {
+  const [copied, setCopied] = useState(false);
+
+  function handleCopy() {
+    navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={handleCopy}
+      className="shrink-0 px-2.5 py-1 rounded text-xs font-medium transition-all"
+      style={{
+        background: copied ? "rgba(34,197,94,0.15)" : "rgba(79,143,255,0.1)",
+        color: copied ? "#22c55e" : "#4f8fff",
+        border: copied
+          ? "1px solid rgba(34,197,94,0.3)"
+          : "1px solid rgba(79,143,255,0.2)",
+      }}
+    >
+      {copied ? "Copied!" : label || "Copy"}
+    </button>
+  );
+}
 
 function RegisterForm() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const plan = searchParams.get("plan");
+  const isPaidTier = plan === "professional" || plan === "team";
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [company, setCompany] = useState("");
   const [role, setRole] = useState("");
-  const [interests, setInterests] = useState<string[]>([]);
-  const [acceptTerms, setAcceptTerms] = useState(false);
-  const [status, setStatus] = useState<"idle" | "loading" | "error">("idle");
+  const [status, setStatus] = useState<
+    "idle" | "loading" | "success" | "error"
+  >("idle");
   const [errorMsg, setErrorMsg] = useState("");
 
-  function toggleInterest(interest: string) {
-    setInterests((prev) =>
-      prev.includes(interest)
-        ? prev.filter((i) => i !== interest)
-        : [...prev, interest]
-    );
-  }
+  const inputStyle = {
+    background: "#0a0a0f",
+    border: "1px solid #1e1e2e",
+    color: "#e0e0e8",
+  };
+
+  const tierLabel =
+    plan === "professional"
+      ? "Professional"
+      : plan === "team"
+        ? "Team"
+        : null;
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    if (!name.trim() || !email.trim() || !acceptTerms) return;
+    if (!email.trim()) return;
+    if (isPaidTier && !name.trim()) return;
 
     setStatus("loading");
     setErrorMsg("");
 
     try {
+      const body: Record<string, string> = {
+        email: email.trim(),
+        source: "developer-program",
+      };
+      if (name.trim()) body.name = name.trim();
+      if (company.trim()) body.company = company.trim();
+      if (role) body.role = role;
+      if (plan) body.plan = plan;
+
       const res = await fetch("/api/subscribe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: email.trim(),
-          name: name.trim(),
-          source: "developer-program",
-          role,
-          company: company.trim(),
-          interests,
-        }),
+        body: JSON.stringify(body),
       });
 
       const data = await res.json();
@@ -73,251 +101,341 @@ function RegisterForm() {
         return;
       }
 
-      // Redirect to get-started, preserving plan param if present
-      if (plan) {
-        router.push(`/get-started?plan=${plan}`);
-      } else {
-        router.push("/get-started");
-      }
+      setStatus("success");
     } catch {
       setStatus("error");
       setErrorMsg("Network error. Please try again.");
     }
   }
 
-  const tierLabel =
-    plan === "professional"
-      ? "Professional"
-      : plan === "team"
-        ? "Team"
-        : null;
-
-  const inputStyle = {
-    background: "#0a0a0f",
-    border: "1px solid #1e1e2e",
-    color: "#e0e0e8",
-  };
-
-  return (
-    <>
-      {/* Plan banner */}
-      {tierLabel && (
-        <div className="max-w-lg mx-auto px-6 mb-6">
-          <div
-            className="rounded-lg px-5 py-3 text-sm text-center"
-            style={{
-              background: "rgba(79,143,255,0.08)",
-              border: "1px solid rgba(79,143,255,0.25)",
-              color: "#4f8fff",
-            }}
-          >
-            You&apos;ll be redirected to start your{" "}
-            <span className="font-semibold">{tierLabel}</span> trial after
-            registration
-          </div>
-        </div>
-      )}
-
-      {/* Registration Form */}
+  // --- Success state: inline confirmation ---
+  if (status === "success") {
+    return (
       <section className="max-w-lg mx-auto px-6 pb-24">
-        <form
-          onSubmit={handleSubmit}
-          className="rounded-xl p-8 space-y-5"
+        <div
+          className="rounded-xl p-8 space-y-6"
           style={{ background: "#12121a", border: "1px solid #1e1e2e" }}
         >
-          {/* Name */}
-          <div>
-            <label
-              htmlFor="reg-name"
-              className="block text-sm font-medium mb-1.5"
-            >
-              Name <span style={{ color: "#ef4444" }}>*</span>
-            </label>
-            <input
-              id="reg-name"
-              type="text"
-              required
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Jane Smith"
-              className="w-full px-4 py-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#4f8fff] placeholder-gray-600"
-              style={inputStyle}
-            />
-          </div>
-
-          {/* Work Email */}
-          <div>
-            <label
-              htmlFor="reg-email"
-              className="block text-sm font-medium mb-1.5"
-            >
-              Work email <span style={{ color: "#ef4444" }}>*</span>
-            </label>
-            <input
-              id="reg-email"
-              type="email"
-              required
-              value={email}
-              onChange={(e) => {
-                setEmail(e.target.value);
-                if (status === "error") setStatus("idle");
-              }}
-              placeholder="jane@company.com"
-              className="w-full px-4 py-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#4f8fff] placeholder-gray-600"
-              style={inputStyle}
-            />
-          </div>
-
-          {/* Company */}
-          <div>
-            <label
-              htmlFor="reg-company"
-              className="block text-sm font-medium mb-1.5"
-            >
-              Company{" "}
-              <span className="text-xs" style={{ color: "#8888a0" }}>
-                (optional)
-              </span>
-            </label>
-            <input
-              id="reg-company"
-              type="text"
-              value={company}
-              onChange={(e) => setCompany(e.target.value)}
-              placeholder="Acme Inc."
-              className="w-full px-4 py-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#4f8fff] placeholder-gray-600"
-              style={inputStyle}
-            />
-          </div>
-
-          {/* Role */}
-          <div>
-            <label
-              htmlFor="reg-role"
-              className="block text-sm font-medium mb-1.5"
-            >
-              Role
-            </label>
-            <select
-              id="reg-role"
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
-              className="w-full px-4 py-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#4f8fff] appearance-none"
+          {/* Checkmark + heading */}
+          <div className="text-center">
+            <div
+              className="w-14 h-14 mx-auto rounded-full flex items-center justify-center mb-4"
               style={{
-                ...inputStyle,
-                backgroundImage:
-                  'url("data:image/svg+xml,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 fill=%27none%27 viewBox=%270 0 20 20%27%3e%3cpath stroke=%27%238888a0%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27 stroke-width=%271.5%27 d=%27M6 8l4 4 4-4%27/%3e%3c/svg%3e")',
-                backgroundPosition: "right 0.75rem center",
-                backgroundRepeat: "no-repeat",
-                backgroundSize: "1.25em 1.25em",
+                background: "rgba(34,197,94,0.1)",
+                border: "2px solid rgba(34,197,94,0.3)",
               }}
             >
-              <option value="" style={{ background: "#0a0a0f" }}>
-                Select your role...
-              </option>
-              {roles.map((r) => (
-                <option key={r} value={r} style={{ background: "#0a0a0f" }}>
-                  {r}
-                </option>
-              ))}
-            </select>
+              <svg
+                className="w-7 h-7"
+                fill="none"
+                stroke="#22c55e"
+                strokeWidth={2.5}
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M5 13l4 4L19 7"
+                />
+              </svg>
+            </div>
+            <h2 className="text-2xl font-bold text-white mb-1">
+              You&apos;re registered!
+            </h2>
+            <p className="text-sm" style={{ color: "#8888a0" }}>
+              Get started with ATOMiK right now.
+            </p>
           </div>
 
-          {/* Interests */}
+          {/* Install command */}
           <div>
-            <p className="text-sm font-medium mb-2.5">
-              What are you interested in?
+            <p className="text-xs font-medium mb-2" style={{ color: "#8888a0" }}>
+              Install
             </p>
-            <div className="flex flex-wrap gap-2">
-              {interestOptions.map((interest) => {
-                const selected = interests.includes(interest);
-                return (
-                  <button
-                    key={interest}
-                    type="button"
-                    onClick={() => toggleInterest(interest)}
-                    className="px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all"
-                    style={{
-                      background: selected
-                        ? "rgba(79,143,255,0.15)"
-                        : "rgba(255,255,255,0.03)",
-                      border: selected
-                        ? "1px solid #4f8fff"
-                        : "1px solid #1e1e2e",
-                      color: selected ? "#4f8fff" : "#8888a0",
-                    }}
-                  >
-                    {selected ? "\u2713 " : ""}
-                    {interest}
-                  </button>
-                );
-              })}
+            <div
+              className="flex items-center justify-between gap-3 rounded-lg px-4 py-3"
+              style={{
+                background: "#0a0a0f",
+                border: "1px solid #1e1e2e",
+              }}
+            >
+              <code
+                className="text-sm"
+                style={{
+                  color: "#22d3ee",
+                  fontFamily:
+                    "'SF Mono', 'Fira Code', 'Consolas', monospace",
+                }}
+              >
+                pip install atomik-core
+              </code>
+              <CopyButton text="pip install atomik-core" />
             </div>
           </div>
 
-          {/* Accept Terms */}
-          <div className="flex items-start gap-3">
-            <input
-              id="reg-terms"
-              type="checkbox"
-              checked={acceptTerms}
-              onChange={(e) => setAcceptTerms(e.target.checked)}
-              className="mt-1 shrink-0 accent-[#4f8fff]"
-              required
-            />
-            <label
-              htmlFor="reg-terms"
-              className="text-xs leading-relaxed"
-              style={{ color: "#8888a0" }}
+          {/* Verify command */}
+          <div>
+            <p className="text-xs font-medium mb-2" style={{ color: "#8888a0" }}>
+              Verify it works
+            </p>
+            <div
+              className="flex items-center justify-between gap-3 rounded-lg px-4 py-3"
+              style={{
+                background: "#0a0a0f",
+                border: "1px solid #1e1e2e",
+              }}
             >
-              I agree to the{" "}
-              <a
-                href="/terms"
-                className="underline hover:text-white"
-                style={{ color: "#4f8fff" }}
+              <code
+                className="text-sm overflow-x-auto"
+                style={{
+                  color: "#22d3ee",
+                  fontFamily:
+                    "'SF Mono', 'Fira Code', 'Consolas', monospace",
+                }}
               >
-                Terms of Service
-              </a>{" "}
-              and{" "}
-              <a
-                href="/privacy"
-                className="underline hover:text-white"
-                style={{ color: "#4f8fff" }}
-              >
-                Privacy Policy
-              </a>
-              .
-            </label>
+                python -c &quot;from atomik_core import AtomikContext;
+                print(&apos;Success!&apos; if AtomikContext().read() == 0 else
+                &apos;Error&apos;)&quot;
+              </code>
+              <CopyButton
+                text={`python -c "from atomik_core import AtomikContext; print('Success!' if AtomikContext().read() == 0 else 'Error')"`}
+              />
+            </div>
           </div>
 
-          {/* Submit */}
-          <button
-            type="submit"
-            disabled={status === "loading" || !acceptTerms}
-            className="w-full py-3 rounded-lg text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
-            style={{
-              background: "linear-gradient(135deg, #4f8fff, #3a7aee)",
-              boxShadow: "0 4px 24px rgba(79,143,255,0.25)",
-            }}
-          >
-            {status === "loading"
-              ? "Creating your account..."
-              : "Join the Developer Program"}
-          </button>
-
-          {/* Error */}
-          {status === "error" && (
-            <p className="text-sm text-center" style={{ color: "#ef4444" }}>
-              {errorMsg}
-            </p>
-          )}
-
-          <p className="text-xs text-center" style={{ color: "#555566" }}>
-            Free forever. No credit card required.
-          </p>
-        </form>
+          {/* Next steps */}
+          <div className="flex flex-col gap-3 pt-2">
+            <Link
+              href="/demo"
+              className="block text-center py-3 rounded-lg text-sm font-semibold text-white transition-opacity hover:opacity-90"
+              style={{
+                background: "linear-gradient(135deg, #4f8fff, #3a7aee)",
+                boxShadow: "0 4px 24px rgba(79,143,255,0.25)",
+              }}
+            >
+              Next: Try the interactive demo
+            </Link>
+            <Link
+              href="/get-started"
+              className="block text-center py-2.5 rounded-lg text-sm font-medium transition-opacity hover:opacity-90"
+              style={{
+                color: "#4f8fff",
+                background: "rgba(79,143,255,0.08)",
+                border: "1px solid rgba(79,143,255,0.2)",
+              }}
+            >
+              Full getting started guide
+            </Link>
+          </div>
+        </div>
       </section>
-    </>
+    );
+  }
+
+  // --- Paid tier: full form ---
+  if (isPaidTier) {
+    return (
+      <>
+        {tierLabel && (
+          <div className="max-w-lg mx-auto px-6 mb-6">
+            <div
+              className="rounded-lg px-5 py-3 text-sm text-center"
+              style={{
+                background: "rgba(79,143,255,0.08)",
+                border: "1px solid rgba(79,143,255,0.25)",
+                color: "#4f8fff",
+              }}
+            >
+              Registering for the{" "}
+              <span className="font-semibold">{tierLabel}</span> plan
+            </div>
+          </div>
+        )}
+
+        <section className="max-w-lg mx-auto px-6 pb-24">
+          <form
+            onSubmit={handleSubmit}
+            className="rounded-xl p-8 space-y-5"
+            style={{ background: "#12121a", border: "1px solid #1e1e2e" }}
+          >
+            {/* Name */}
+            <div>
+              <label
+                htmlFor="reg-name"
+                className="block text-sm font-medium mb-1.5"
+              >
+                Name <span style={{ color: "#ef4444" }}>*</span>
+              </label>
+              <input
+                id="reg-name"
+                type="text"
+                required
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Jane Smith"
+                className="w-full px-4 py-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#4f8fff] placeholder-gray-600"
+                style={inputStyle}
+              />
+            </div>
+
+            {/* Email */}
+            <div>
+              <label
+                htmlFor="reg-email"
+                className="block text-sm font-medium mb-1.5"
+              >
+                Work email <span style={{ color: "#ef4444" }}>*</span>
+              </label>
+              <input
+                id="reg-email"
+                type="email"
+                required
+                value={email}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  if (status === "error") setStatus("idle");
+                }}
+                placeholder="jane@company.com"
+                className="w-full px-4 py-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#4f8fff] placeholder-gray-600"
+                style={inputStyle}
+              />
+            </div>
+
+            {/* Company */}
+            <div>
+              <label
+                htmlFor="reg-company"
+                className="block text-sm font-medium mb-1.5"
+              >
+                Company
+              </label>
+              <input
+                id="reg-company"
+                type="text"
+                value={company}
+                onChange={(e) => setCompany(e.target.value)}
+                placeholder="Acme Inc."
+                className="w-full px-4 py-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#4f8fff] placeholder-gray-600"
+                style={inputStyle}
+              />
+            </div>
+
+            {/* Role */}
+            <div>
+              <label
+                htmlFor="reg-role"
+                className="block text-sm font-medium mb-1.5"
+              >
+                Role
+              </label>
+              <select
+                id="reg-role"
+                value={role}
+                onChange={(e) => setRole(e.target.value)}
+                className="w-full px-4 py-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#4f8fff] appearance-none"
+                style={{
+                  ...inputStyle,
+                  backgroundImage:
+                    'url("data:image/svg+xml,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 fill=%27none%27 viewBox=%270 0 20 20%27%3e%3cpath stroke=%27%238888a0%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27 stroke-width=%271.5%27 d=%27M6 8l4 4 4-4%27/%3e%3c/svg%3e")',
+                  backgroundPosition: "right 0.75rem center",
+                  backgroundRepeat: "no-repeat",
+                  backgroundSize: "1.25em 1.25em",
+                }}
+              >
+                <option value="" style={{ background: "#0a0a0f" }}>
+                  Select your role...
+                </option>
+                {roles.map((r) => (
+                  <option key={r} value={r} style={{ background: "#0a0a0f" }}>
+                    {r}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Submit */}
+            <button
+              type="submit"
+              disabled={status === "loading"}
+              className="w-full py-3 rounded-lg text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+              style={{
+                background: "linear-gradient(135deg, #4f8fff, #3a7aee)",
+                boxShadow: "0 4px 24px rgba(79,143,255,0.25)",
+              }}
+            >
+              {status === "loading"
+                ? "Creating your account..."
+                : `Start ${tierLabel} Trial`}
+            </button>
+
+            {/* Error */}
+            {status === "error" && (
+              <p className="text-sm text-center" style={{ color: "#ef4444" }}>
+                {errorMsg}
+              </p>
+            )}
+          </form>
+        </section>
+      </>
+    );
+  }
+
+  // --- Free tier: email-only ---
+  return (
+    <section className="max-w-lg mx-auto px-6 pb-24">
+      <form
+        onSubmit={handleSubmit}
+        className="rounded-xl p-8 space-y-5"
+        style={{ background: "#12121a", border: "1px solid #1e1e2e" }}
+      >
+        {/* Email */}
+        <div>
+          <label
+            htmlFor="reg-email"
+            className="block text-sm font-medium mb-1.5"
+          >
+            Email address
+          </label>
+          <input
+            id="reg-email"
+            type="email"
+            required
+            value={email}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              if (status === "error") setStatus("idle");
+            }}
+            placeholder="you@example.com"
+            className="w-full px-4 py-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#4f8fff] placeholder-gray-600"
+            style={inputStyle}
+          />
+        </div>
+
+        {/* Submit */}
+        <button
+          type="submit"
+          disabled={status === "loading"}
+          className="w-full py-3 rounded-lg text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+          style={{
+            background: "linear-gradient(135deg, #4f8fff, #3a7aee)",
+            boxShadow: "0 4px 24px rgba(79,143,255,0.25)",
+          }}
+        >
+          {status === "loading" ? "Registering..." : "Register Free"}
+        </button>
+
+        {/* Error */}
+        {status === "error" && (
+          <p className="text-sm text-center" style={{ color: "#ef4444" }}>
+            {errorMsg}
+          </p>
+        )}
+
+        <p className="text-xs text-center" style={{ color: "#555566" }}>
+          Free forever. No credit card required.
+        </p>
+      </form>
+    </section>
   );
 }
 

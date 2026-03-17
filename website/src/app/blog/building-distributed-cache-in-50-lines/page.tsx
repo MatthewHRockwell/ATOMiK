@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Nav from "@/components/Nav";
+import EmailCapture from "@/components/EmailCapture";
 
 export const metadata: Metadata = {
   title: "Build a Distributed Cache in 50 Lines of Python — ATOMiK Blog",
@@ -161,20 +162,9 @@ stream.accum(msg.addr, msg.delta)`}</Code>
             <li><strong>Proven correct.</strong> 92 Lean4 theorems guarantee the algebra works.</li>
           </ul>
 
-          <div className="rounded-xl border p-8 mt-8 text-center" style={{ background: "#12121a", borderColor: "#1e1e2e" }}>
-            <h3 className="text-xl font-bold mb-3">Try it yourself</h3>
-            <Code>{`pip install atomik-core
-python -c "
-from atomik_core import DeltaStream
-s = DeltaStream()
-s.load(0, 0xCAFEBABE)
-s.accum(0, 0x14531455)
-print(f'State: 0x{s.read(0):08x}')
-"`}</Code>
-            <div className="flex flex-wrap justify-center gap-4 mt-6">
-              <Link href="/demo" className="px-6 py-2.5 rounded-lg text-sm font-semibold" style={{ background: "#4f8fff", color: "#fff" }}>Interactive Demo</Link>
-              <Link href="/docs/quickstart" className="px-6 py-2.5 rounded-lg text-sm font-semibold" style={{ background: "transparent", color: "#e0e0e8", border: "1px solid #1e1e2e" }}>Full Documentation</Link>
-            </div>
+          <div className="rounded-xl border p-8 mt-8" style={{ background: "#12121a", borderColor: "#1e1e2e" }}>
+            <h3 className="text-xl font-bold mb-4 text-center">Try ATOMiK today</h3>
+            <EmailCapture variant="blog" />
           </div>
         </div>
       </article>

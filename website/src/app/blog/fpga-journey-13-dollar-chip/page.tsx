@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Nav from "@/components/Nav";
+import EmailCapture from "@/components/EmailCapture";
 
 export const metadata: Metadata = {
   title: "From Math to Silicon: 69.7 Gops/s on a $13.50 Chip — ATOMiK Blog",
@@ -306,40 +307,11 @@ uint32_t state = *(volatile uint32_t*)ATOMIK_READ;
 
           {/* CTA */}
           <div
-            className="rounded-xl border p-8 mt-8 text-center"
+            className="rounded-xl border p-8 mt-8"
             style={{ background: "#12121a", borderColor: "#1e1e2e" }}
           >
-            <h3 className="text-xl font-bold mb-3">Try ATOMiK today</h3>
-            <p className="text-sm mb-6" style={{ color: "#8888a0" }}>
-              Start with the Python SDK, or jump straight to hardware.
-            </p>
-            <div className="flex flex-wrap justify-center gap-4">
-              <Link
-                href="/demo"
-                className="px-6 py-2.5 rounded-lg text-sm font-semibold"
-                style={{ background: "#8b5cf6", color: "#fff" }}
-              >
-                Interactive Demo
-              </Link>
-              <Link
-                href="/get-started"
-                className="px-6 py-2.5 rounded-lg text-sm font-semibold"
-                style={{ background: "#4f8fff", color: "#fff" }}
-              >
-                Get Started
-              </Link>
-              <Link
-                href="/about/roadmap"
-                className="px-6 py-2.5 rounded-lg text-sm font-semibold"
-                style={{
-                  background: "transparent",
-                  color: "#e0e0e8",
-                  border: "1px solid #1e1e2e",
-                }}
-              >
-                ASIC Roadmap
-              </Link>
-            </div>
+            <h3 className="text-xl font-bold mb-4 text-center">Try ATOMiK today</h3>
+            <EmailCapture variant="blog" />
           </div>
         </div>
       </article>

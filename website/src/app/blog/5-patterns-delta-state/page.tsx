@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Nav from "@/components/Nav";
+import EmailCapture from "@/components/EmailCapture";
 
 export const metadata: Metadata = {
   title: "5 Design Patterns for Delta-State Algebra — ATOMiK Blog",
@@ -191,13 +192,9 @@ assert stream_a.read(0) == stream_b.read(0)  # ✓`}</Code>
           </p>
         </Pattern>
 
-        <div className="rounded-xl border p-8 mt-4 text-center" style={{ background: "#12121a", borderColor: "#1e1e2e" }}>
-          <h3 className="text-xl font-bold mb-3">All 5 patterns in one package</h3>
-          <Code>{`pip install atomik-core  # Zero deps, Python 3.9+`}</Code>
-          <div className="flex flex-wrap justify-center gap-4 mt-4">
-            <Link href="/demo" className="px-6 py-2.5 rounded-lg text-sm font-semibold" style={{ background: "#8b5cf6", color: "#fff" }}>Try the Demo</Link>
-            <Link href="/docs/examples" className="px-6 py-2.5 rounded-lg text-sm font-semibold" style={{ background: "transparent", color: "#e0e0e8", border: "1px solid #1e1e2e" }}>View Examples</Link>
-          </div>
+        <div className="rounded-xl border p-8 mt-4" style={{ background: "#12121a", borderColor: "#1e1e2e" }}>
+          <h3 className="text-xl font-bold mb-4 text-center">Try ATOMiK today</h3>
+          <EmailCapture variant="blog" />
         </div>
       </article>
     </div>

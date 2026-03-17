@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Nav from "@/components/Nav";
 import EmailCapture from "@/components/EmailCapture";
+import { CopyCodeBlock, CopyInstallButton } from "@/components/CopyCodeBlock";
 
 export const metadata: Metadata = {
   title: "Get Started — ATOMiK",
@@ -64,8 +65,8 @@ const paths = [
       "Multi-context streaming",
       "218+ tests, fully typed",
     ],
-    cta: "View on PyPI",
-    ctaHref: "https://pypi.org/project/atomik-core/",
+    ctaType: "copy-install" as const,
+    ctaHref: "",
   },
   {
     title: "Linux Kernel Module",
@@ -80,6 +81,7 @@ const paths = [
       "90-day free trial",
     ],
     cta: "Start Pro Trial",
+    ctaType: "link" as const,
     ctaHref: "/pricing",
   },
   {
@@ -96,6 +98,7 @@ const paths = [
       "Schema-driven code generation",
     ],
     cta: "Start Team Trial",
+    ctaType: "link" as const,
     ctaHref: "/pricing",
   },
   {
@@ -111,6 +114,7 @@ const paths = [
       "Formal verification + ASIC path",
     ],
     cta: "Contact Sales",
+    ctaType: "link" as const,
     ctaHref: "/contact",
   },
 ];
@@ -167,17 +171,7 @@ export default function GetStartedPage() {
                   <p className="text-sm mb-3" style={{ color: "#8888a0" }}>
                     {step.description}
                   </p>
-                  <pre
-                    className="rounded-lg p-4 text-sm overflow-x-auto"
-                    style={{
-                      background: "#0a0a0f",
-                      border: "1px solid #1e1e2e",
-                      color: "#22d3ee",
-                      fontFamily: "'SF Mono', 'Fira Code', 'Consolas', monospace",
-                    }}
-                  >
-                    <code>{step.code}</code>
-                  </pre>
+                  <CopyCodeBlock code={step.code} />
                 </div>
               </div>
             </div>
@@ -239,16 +233,20 @@ export default function GetStartedPage() {
                   </li>
                 ))}
               </ul>
-              <Link
-                href={path.ctaHref}
-                className="block text-center py-2.5 rounded-lg text-sm font-semibold transition-opacity hover:opacity-90"
-                style={{
-                  background: path.badgeColor,
-                  color: "#fff",
-                }}
-              >
-                {path.cta}
-              </Link>
+              {path.ctaType === "copy-install" ? (
+                <CopyInstallButton command="pip install atomik-core" />
+              ) : (
+                <Link
+                  href={path.ctaHref}
+                  className="block text-center py-2.5 rounded-lg text-sm font-semibold transition-opacity hover:opacity-90"
+                  style={{
+                    background: path.badgeColor,
+                    color: "#fff",
+                  }}
+                >
+                  {path.cta}
+                </Link>
+              )}
             </div>
           ))}
         </div>
