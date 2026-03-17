@@ -1,0 +1,8 @@
+import { generateOGImage, ogSize } from "@/lib/og";
+export const runtime = "edge";
+export const alt = "ATOMiK";
+export const size = ogSize;
+export const contentType = "image/png";
+export default function OG() {
+  return generateOGImage({ title: "ATOMiK Documentation", subtitle: "Quick start, API reference, architecture, examples, and hardware deployment.", accent: "#4f8fff", badge: "Docs" });
+}
