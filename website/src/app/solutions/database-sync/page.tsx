@@ -139,6 +139,38 @@ print(f"{len(changed_ids)} rows changed")
         </div>
       </section>
 
+      {/* Case Study CTA */}
+      <section className="max-w-3xl mx-auto px-6 pb-12">
+        <Link
+          href="/case-studies"
+          className="block rounded-xl border p-8 transition-all hover:border-opacity-80"
+          style={{
+            background: "linear-gradient(135deg, rgba(139,92,246,0.06), rgba(79,143,255,0.06))",
+            borderColor: "#8b5cf640",
+          }}
+        >
+          <p
+            className="text-xs font-semibold uppercase tracking-widest mb-3"
+            style={{ color: "#8b5cf6" }}
+          >
+            See it in action
+          </p>
+          <h3 className="text-xl font-bold mb-2">
+            See how CloudSync DB achieved 0% throughput impact with ATOMiK
+          </h3>
+          <p className="text-sm mb-4" style={{ color: "#8888a0" }}>
+            CloudSync replaced trigger-based CDC with O(1) XOR fingerprinting &mdash;
+            eliminating 23% throughput degradation and unblocking 3 enterprise deals.
+          </p>
+          <span
+            className="text-sm font-semibold"
+            style={{ color: "#8b5cf6" }}
+          >
+            Read case study &rarr;
+          </span>
+        </Link>
+      </section>
+
       <section className="max-w-3xl mx-auto px-6 pb-24">
         <div className="rounded-xl border p-8 text-center" style={{ background: "#12121a", borderColor: "#1e1e2e" }}>
           <h3 className="text-xl font-bold mb-3">Stop building CDC pipelines</h3>

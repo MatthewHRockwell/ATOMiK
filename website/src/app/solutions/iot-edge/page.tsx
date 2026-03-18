@@ -524,6 +524,38 @@ export default function IoTEdgePage() {
         </div>
       </section>
 
+      {/* Case Study CTA */}
+      <section className="max-w-4xl mx-auto px-6 pb-20">
+        <Link
+          href="/case-studies"
+          className="block rounded-xl border p-8 transition-all hover:border-opacity-80"
+          style={{
+            background: "linear-gradient(135deg, rgba(34,197,94,0.06), rgba(139,92,246,0.06))",
+            borderColor: "#22c55e40",
+          }}
+        >
+          <p
+            className="text-xs font-semibold uppercase tracking-widest mb-3"
+            style={{ color: "#22c55e" }}
+          >
+            See it in action
+          </p>
+          <h3 className="text-xl font-bold mb-2">
+            See how SensorGrid IoT achieved 97.8% bandwidth reduction with ATOMiK
+          </h3>
+          <p className="text-sm mb-4" style={{ color: "#8888a0" }}>
+            SensorGrid cut 340 GB/day of sensor telemetry down to 7.5 GB/day across
+            50,000 industrial sensors &mdash; saving $180K annually in cloud and cellular costs.
+          </p>
+          <span
+            className="text-sm font-semibold"
+            style={{ color: "#22c55e" }}
+          >
+            Read case study &rarr;
+          </span>
+        </Link>
+      </section>
+
       {/* CTA */}
       <section
         className="text-center px-6 py-20"

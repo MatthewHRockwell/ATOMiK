@@ -42,7 +42,7 @@ export function AnimatedCounter({
   useEffect(() => {
     if (!visible) return;
 
-    // Parse the target: could be "99.9%", "69.7", "92", "5M+", "333,333x"
+    // Parse the target: could be "99.9%", "69.7", "92", "5M+", "330,000x"
     const numericStr = value.replace(/[^0-9.]/g, "");
     const target = parseFloat(numericStr);
     if (isNaN(target)) {

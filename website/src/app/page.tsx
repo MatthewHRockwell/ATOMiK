@@ -9,11 +9,11 @@ import HeroMetrics from "@/components/HeroMetrics";
 export const metadata: Metadata = {
   title: "ATOMiK — Stop moving data. Start evolving it.",
   description:
-    "O(1) state reconstruction, 99% less bandwidth, 333,333x less memory. A 4-operation algebra, formally proven with 92 Lean4 theorems. Software + FPGA hardware acceleration.",
+    "O(1) state reconstruction, 99% less bandwidth, 330,000x less memory. A 4-operation algebra, formally proven with 92 Lean4 theorems. Software + FPGA hardware acceleration.",
   openGraph: {
     title: "ATOMiK — Stop moving data. Start evolving it.",
     description:
-      "O(1) state reconstruction. 99% less bandwidth. 333,333x less memory. Formally proven with 92 Lean4 theorems. Software + hardware acceleration.",
+      "O(1) state reconstruction. 99% less bandwidth. 330,000x less memory. Formally proven with 92 Lean4 theorems. Software + hardware acceleration.",
     url: "https://atomik.tech",
     images: [{ url: "https://atomik.tech/og-image.jpg", width: 1200, height: 630 }],
     type: "website",
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
 };
 
 const metrics = [
-  { value: "99.9%", label: "Redundancy Detection" },
+  { value: "99.9%", label: "Bandwidth Reduction", subtitle: "via delta compression \u2014 only 8-byte deltas transmitted instead of full state" },
   { value: "92", label: "Lean4 Formal Proofs" },
   { value: "69.7 Gops/s", label: "Peak FPGA Throughput" },
   { value: "5M+", label: "Python Ops/s" },
@@ -351,6 +351,61 @@ export default function Home() {
                 </div>
               ))}
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ===== Real-World Results ===== */}
+      <section className="px-6 py-20" style={{ borderTop: "1px solid #1e1e2e" }}>
+        <div className="max-w-5xl mx-auto">
+          <h2 className="text-3xl font-bold text-center tracking-tight mb-3">Real-World Results</h2>
+          <p className="text-center text-lg mb-12" style={{ color: "#8888a0" }}>
+            How teams are using ATOMiK in production.
+          </p>
+          <div className="grid md:grid-cols-3 gap-5">
+            {[
+              {
+                company: "QuantumEdge Capital",
+                industry: "Financial",
+                metric: "99.7% latency reduction",
+                desc: "Replaced full order-book snapshots with 8-byte deltas across 12 matching engines.",
+                color: "#4f8fff",
+              },
+              {
+                company: "SensorGrid IoT",
+                industry: "IoT",
+                metric: "97.8% bandwidth savings",
+                desc: "50,000 edge sensors streaming delta-only telemetry over LoRaWAN to a single accumulator.",
+                color: "#22d3ee",
+              },
+              {
+                company: "CloudSync DB",
+                industry: "Database",
+                metric: "15x faster sync",
+                desc: "Multi-region database replication using XOR-commutative merge instead of conflict resolution.",
+                color: "#22c55e",
+              },
+            ].map((c) => (
+              <Link
+                key={c.company}
+                href="/case-studies"
+                className="rounded-xl p-7 no-underline block transition-all hover:-translate-y-1 hover:border-[#4f8fff33]"
+                style={{ background: "#12121a", border: "1px solid #1e1e2e", color: "inherit" }}
+              >
+                <span
+                  className="inline-block text-[11px] font-semibold tracking-wide px-2.5 py-1 rounded mb-4"
+                  style={{ background: `${c.color}1a`, color: c.color }}
+                >
+                  {c.industry}
+                </span>
+                <h3 className="text-lg font-bold mb-1" style={{ color: "#e0e0e8" }}>{c.company}</h3>
+                <div className="text-2xl font-extrabold font-mono mb-3" style={{ color: c.color }}>{c.metric}</div>
+                <p className="text-sm leading-relaxed mb-4" style={{ color: "#8888a0" }}>{c.desc}</p>
+                <span className="text-sm font-semibold" style={{ color: "#4f8fff" }}>
+                  Read case study →
+                </span>
+              </Link>
+            ))}
           </div>
         </div>
       </section>

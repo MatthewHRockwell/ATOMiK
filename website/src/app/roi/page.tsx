@@ -251,6 +251,47 @@ function ROIReportExport() {
   );
 }
 
+/* ---------- Preset scenarios ---------- */
+
+const presets = [
+  {
+    id: "microservices",
+    name: "Microservices SaaS",
+    description: "Typical multi-service backend with moderate COW pressure and network chatter between services.",
+    servers: 20,
+    cowFaults: 5000,
+    tcpSends: 10000,
+    cowRedundancy: 23,
+    netRedundancy: 31,
+    costPerGB: 0.09,
+    instanceCost: 0.50,
+  },
+  {
+    id: "iot",
+    name: "IoT Fleet",
+    description: "Large fleet of edge devices with high network volume and significant payload redundancy.",
+    servers: 200,
+    cowFaults: 500,
+    tcpSends: 50000,
+    cowRedundancy: 15,
+    netRedundancy: 45,
+    costPerGB: 0.09,
+    instanceCost: 0.10,
+  },
+  {
+    id: "enterprise",
+    name: "Enterprise Data Center",
+    description: "On-prem data center with heavy workloads, high COW rates, and large instance costs.",
+    servers: 500,
+    cowFaults: 15000,
+    tcpSends: 100000,
+    cowRedundancy: 30,
+    netRedundancy: 25,
+    costPerGB: 0.05,
+    instanceCost: 2.00,
+  },
+] as const;
+
 export default function RoiPage() {
   /* --- Slider state --- */
   const [servers, setServers] = useState(20);
@@ -260,6 +301,23 @@ export default function RoiPage() {
   const [netRedundancy, setNetRedundancy] = useState(8.7);
   const [costPerGB, setCostPerGB] = useState(0.09);
   const [instanceCost, setInstanceCost] = useState(0.40);
+  const [selectedPreset, setSelectedPreset] = useState<string | null>(null);
+
+  function applyPreset(preset: typeof presets[number]) {
+    setServers(preset.servers);
+    setCowFaults(preset.cowFaults);
+    setTcpSends(preset.tcpSends);
+    setCowRedundancy(preset.cowRedundancy);
+    setNetRedundancy(preset.netRedundancy);
+    setCostPerGB(preset.costPerGB);
+    setInstanceCost(preset.instanceCost);
+    setSelectedPreset(preset.id);
+  }
+
+  // Wrap setters to clear preset on manual slider change
+  function manualSet<T>(setter: (v: T) => void) {
+    return (v: T) => { setSelectedPreset(null); setter(v); };
+  }
 
   const PAGE_SIZE = 4096; // 4KB
   const AVG_PACKET = 1400; // average TCP payload bytes
@@ -365,6 +423,52 @@ export default function RoiPage() {
         </p>
       </section>
 
+      {/* Quick Estimate Presets */}
+      <section className="max-w-6xl mx-auto px-6 pb-6">
+        <h2
+          className="text-sm font-semibold uppercase tracking-wider mb-4"
+          style={{ color: "#8888a0" }}
+        >
+          Quick Estimate
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {presets.map((preset) => {
+            const isActive = selectedPreset === preset.id;
+            return (
+              <button
+                key={preset.id}
+                onClick={() => applyPreset(preset)}
+                className="rounded-xl border p-5 text-left transition-all hover:border-opacity-60"
+                style={{
+                  background: isActive ? "#1a1a2e" : "#12121a",
+                  borderColor: isActive ? "#4f8fff" : "#1e1e2e",
+                  boxShadow: isActive ? "0 0 0 1px #4f8fff40" : "none",
+                }}
+              >
+                <h3
+                  className="font-semibold text-sm mb-1.5"
+                  style={{ color: isActive ? "#4f8fff" : "#e0e0e8" }}
+                >
+                  {preset.name}
+                </h3>
+                <p
+                  className="text-xs leading-relaxed mb-3"
+                  style={{ color: "#8888a0" }}
+                >
+                  {preset.description}
+                </p>
+                <span
+                  className="text-xs font-semibold"
+                  style={{ color: isActive ? "#4f8fff" : "#8888a0" }}
+                >
+                  {isActive ? "Selected" : "Use this estimate"} &rarr;
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </section>
+
       {/* Calculator */}
       <section className="max-w-6xl mx-auto px-6 pb-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -381,7 +485,7 @@ export default function RoiPage() {
             <SliderInput
               label="Servers / Nodes"
               value={servers}
-              onChange={setServers}
+              onChange={manualSet(setServers)}
               min={1}
               max={500}
               step={1}
@@ -390,16 +494,16 @@ export default function RoiPage() {
             <SliderInput
               label="COW Faults / Hour / Server"
               value={cowFaults}
-              onChange={setCowFaults}
-              min={1000}
+              onChange={manualSet(setCowFaults)}
+              min={100}
               max={100000}
-              step={1000}
+              step={100}
             />
 
             <SliderInput
               label="TCP Sends / Hour / Server"
               value={tcpSends}
-              onChange={setTcpSends}
+              onChange={manualSet(setTcpSends)}
               min={10000}
               max={1000000}
               step={5000}
@@ -408,7 +512,7 @@ export default function RoiPage() {
             <SliderInput
               label="COW Redundancy Rate"
               value={cowRedundancy}
-              onChange={setCowRedundancy}
+              onChange={manualSet(setCowRedundancy)}
               min={5}
               max={50}
               step={1}
@@ -418,9 +522,9 @@ export default function RoiPage() {
             <SliderInput
               label="Network Redundancy Rate"
               value={netRedundancy}
-              onChange={setNetRedundancy}
+              onChange={manualSet(setNetRedundancy)}
               min={2}
-              max={30}
+              max={50}
               step={0.1}
               format={(v) => v.toFixed(1)}
               suffix="%"
@@ -447,7 +551,7 @@ export default function RoiPage() {
             <SliderInput
               label="Cloud Cost per GB Transferred"
               value={costPerGB}
-              onChange={setCostPerGB}
+              onChange={manualSet(setCostPerGB)}
               min={0.01}
               max={0.12}
               step={0.01}
@@ -457,7 +561,7 @@ export default function RoiPage() {
             <SliderInput
               label="Instance Cost / Hour"
               value={instanceCost}
-              onChange={setInstanceCost}
+              onChange={manualSet(setInstanceCost)}
               min={0.05}
               max={2.0}
               step={0.05}

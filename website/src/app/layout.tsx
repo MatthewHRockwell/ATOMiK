@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "ATOMiK — Delta-State Computing",
-  description: "O(1) state reconstruction, 99% less bandwidth, 333,333x less memory. Formally proven with 92 Lean4 theorems.",
+  description: "O(1) state reconstruction, 99% less bandwidth, 330,000x less memory. Formally proven with 92 Lean4 theorems.",
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "any" },
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: "ATOMiK — Stop moving data. Start evolving it.",
-    description: "O(1) state reconstruction. 99% less bandwidth. 333,333x less memory. Formally proven with 92 Lean4 theorems.",
+    description: "O(1) state reconstruction. 99% less bandwidth. 330,000x less memory. Formally proven with 92 Lean4 theorems.",
     url: "https://atomik.tech",
     siteName: "ATOMiK",
     images: [{ url: "https://atomik.tech/og-image.jpg", width: 1200, height: 630 }],
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "ATOMiK — Stop moving data. Start evolving it.",
-    description: "O(1) state reconstruction. 99% less bandwidth. 333,333x less memory.",
+    description: "O(1) state reconstruction. 99% less bandwidth. 330,000x less memory.",
     images: ["https://atomik.tech/og-image.jpg"],
   },
 };
@@ -50,7 +50,7 @@ const jsonLd = {
       logo: "https://atomik.tech/logo.png",
       sameAs: ["https://github.com/MatthewHRockwell/ATOMiK"],
       description:
-        "Delta-state algebra for O(1) state reconstruction. 99% less bandwidth, 333,333x less memory. Formally proven with 92 Lean4 theorems.",
+        "Delta-state algebra for O(1) state reconstruction. 99% less bandwidth, 330,000x less memory. Formally proven with 92 Lean4 theorems.",
     },
     {
       "@type": "SoftwareApplication",
@@ -58,7 +58,7 @@ const jsonLd = {
       applicationCategory: "DeveloperApplication",
       operatingSystem: "Linux, macOS, Windows",
       description:
-        "Delta-state algebra for O(1) state reconstruction. 99% less bandwidth, 333,333x less memory. Formally proven with 92 Lean4 theorems.",
+        "Delta-state algebra for O(1) state reconstruction. 99% less bandwidth, 330,000x less memory. Formally proven with 92 Lean4 theorems.",
       url: "https://atomik.tech",
       offers: [
         {

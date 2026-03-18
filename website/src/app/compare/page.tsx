@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Nav from "@/components/Nav";
+import DecisionTree from "@/components/DecisionTree";
 
 export const metadata: Metadata = {
   title: "ATOMiK vs Redis vs Kafka vs CRDTs — Comparison",
@@ -317,8 +318,11 @@ export default function ComparePage() {
         </p>
       </section>
 
+      {/* Decision Tree */}
+      <DecisionTree />
+
       {/* Section 1: State Synchronization */}
-      <section className="max-w-5xl mx-auto px-6 py-12">
+      <section id="compare-state-sync" className="max-w-5xl mx-auto px-6 py-12 scroll-mt-20 rounded-xl transition-all duration-500">
         <h2 className="text-2xl font-bold mb-3">State Synchronization</h2>
         <p className="text-sm mb-6 max-w-3xl leading-relaxed" style={{ color: "#8888a0" }}>
           Redis, etcd, and ZooKeeper are production-grade data stores with rich
@@ -330,10 +334,28 @@ export default function ComparePage() {
           accumulator.
         </p>
         <ComparisonTable headers={stateSyncHeaders} rows={stateSyncRows} />
+
+        {/* Migration link */}
+        <div
+          className="mt-6 rounded-lg border p-4 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4"
+          style={{ background: "rgba(139,92,246,0.04)", borderColor: "#2d2d4a" }}
+        >
+          <p className="text-sm" style={{ color: "#b0b0c0" }}>
+            Ready to switch?
+          </p>
+          <Link
+            href="/docs/migrate-crdt"
+            className="inline-flex items-center gap-2 text-sm font-semibold transition-opacity hover:opacity-80"
+            style={{ color: "#8b5cf6" }}
+          >
+            Migration Guide: From CRDTs to ATOMiK
+            <span aria-hidden="true">{"\u2192"}</span>
+          </Link>
+        </div>
       </section>
 
       {/* Section 2: Event / Stream Processing */}
-      <section className="max-w-5xl mx-auto px-6 py-12">
+      <section id="compare-stream" className="max-w-5xl mx-auto px-6 py-12 scroll-mt-20 rounded-xl transition-all duration-500">
         <h2 className="text-2xl font-bold mb-3">Event / Stream Processing</h2>
         <p className="text-sm mb-6 max-w-3xl leading-relaxed" style={{ color: "#8888a0" }}>
           Kafka and event sourcing give you ordered, replayable event logs with
@@ -345,10 +367,28 @@ export default function ComparePage() {
           has no concept of consumer groups or partitions.
         </p>
         <ComparisonTable headers={streamHeaders} rows={streamRows} />
+
+        {/* Migration link */}
+        <div
+          className="mt-6 rounded-lg border p-4 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4"
+          style={{ background: "rgba(139,92,246,0.04)", borderColor: "#2d2d4a" }}
+        >
+          <p className="text-sm" style={{ color: "#b0b0c0" }}>
+            Ready to switch?
+          </p>
+          <Link
+            href="/docs/migrate-event-sourcing"
+            className="inline-flex items-center gap-2 text-sm font-semibold transition-opacity hover:opacity-80"
+            style={{ color: "#8b5cf6" }}
+          >
+            Migration Guide: From Event Sourcing to ATOMiK
+            <span aria-hidden="true">{"\u2192"}</span>
+          </Link>
+        </div>
       </section>
 
       {/* Section 3: Change Detection */}
-      <section className="max-w-5xl mx-auto px-6 py-12">
+      <section id="compare-change" className="max-w-5xl mx-auto px-6 py-12 scroll-mt-20 rounded-xl transition-all duration-500">
         <h2 className="text-2xl font-bold mb-3">Change Detection</h2>
         <p className="text-sm mb-6 max-w-3xl leading-relaxed" style={{ color: "#8888a0" }}>
           Traditional change detection scans the full content (checksums, diff)
@@ -359,6 +399,24 @@ export default function ComparePage() {
           approaches.
         </p>
         <ComparisonTable headers={changeHeaders} rows={changeRows} />
+
+        {/* Migration link */}
+        <div
+          className="mt-6 rounded-lg border p-4 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4"
+          style={{ background: "rgba(139,92,246,0.04)", borderColor: "#2d2d4a" }}
+        >
+          <p className="text-sm" style={{ color: "#b0b0c0" }}>
+            Ready to get started?
+          </p>
+          <Link
+            href="/docs/quickstart"
+            className="inline-flex items-center gap-2 text-sm font-semibold transition-opacity hover:opacity-80"
+            style={{ color: "#8b5cf6" }}
+          >
+            Getting Started with ATOMiK Change Detection
+            <span aria-hidden="true">{"\u2192"}</span>
+          </Link>
+        </div>
       </section>
 
       {/* Section 4: Hardware Acceleration */}

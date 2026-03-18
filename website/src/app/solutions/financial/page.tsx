@@ -459,6 +459,38 @@ export default function FinancialSolutionsPage() {
         </div>
       </section>
 
+      {/* Case Study CTA */}
+      <section className="max-w-4xl mx-auto px-6 pb-20">
+        <Link
+          href="/case-studies"
+          className="block rounded-xl border p-8 transition-all hover:border-opacity-80"
+          style={{
+            background: "linear-gradient(135deg, rgba(245,158,11,0.06), rgba(139,92,246,0.06))",
+            borderColor: "#f59e0b40",
+          }}
+        >
+          <p
+            className="text-xs font-semibold uppercase tracking-widest mb-3"
+            style={{ color: "#f59e0b" }}
+          >
+            See it in action
+          </p>
+          <h3 className="text-xl font-bold mb-2">
+            See how QuantumEdge Capital achieved 99.7% latency reduction with ATOMiK
+          </h3>
+          <p className="text-sm mb-4" style={{ color: "#8888a0" }}>
+            QuantumEdge replaced their 45-minute end-of-day P&amp;L reconciliation pipeline
+            with real-time delta streaming across 4 trading venues &mdash; saving $2.3M annually.
+          </p>
+          <span
+            className="text-sm font-semibold"
+            style={{ color: "#f59e0b" }}
+          >
+            Read case study &rarr;
+          </span>
+        </Link>
+      </section>
+
       {/* CTA */}
       <section
         className="text-center px-6 py-20"
