@@ -187,6 +187,9 @@ function PresetButton({
    =================================================================== */
 
 export default function DemoPage() {
+  /* --- Guided tour state --- */
+  const [tourStep, setTourStep] = useState(0); // 0 = inactive, 1-4 = steps
+
   /* --- Simulator state --- */
   const [reference, setReference] = useState<number>(0);
   const [accumulator, setAccumulator] = useState<number>(0);
@@ -416,7 +419,115 @@ export default function DemoPage() {
           ATOMiK&apos;s four core operations below&nbsp;&mdash; same algebra, same
           rules, same results as the hardware.
         </p>
+        {tourStep === 0 && (
+          <button
+            onClick={() => setTourStep(1)}
+            className="mt-6 px-5 py-2.5 rounded-lg text-sm font-bold transition-all duration-150 hover:opacity-90 active:scale-95"
+            style={{
+              background: "rgba(79,143,255,0.15)",
+              color: "#4f8fff",
+              border: "1px solid rgba(79,143,255,0.3)",
+            }}
+          >
+            Take the Tour
+          </button>
+        )}
       </section>
+
+      {/* ======== Guided Tour Callout ======== */}
+      {tourStep >= 1 && tourStep <= 4 && (
+        <section className="max-w-3xl mx-auto px-6 pb-4">
+          <div
+            className="rounded-xl p-5"
+            style={{
+              background: "rgba(79,143,255,0.05)",
+              border: "1px solid #4f8fff",
+            }}
+          >
+            <div className="flex items-start justify-between gap-4 mb-3">
+              <div className="flex items-center gap-2">
+                <span
+                  className="inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold"
+                  style={{ background: "#4f8fff", color: "#fff" }}
+                >
+                  {tourStep}
+                </span>
+                <span className="text-xs font-medium uppercase tracking-wider" style={{ color: "#4f8fff" }}>
+                  Step {tourStep} of 4
+                </span>
+              </div>
+              <button
+                onClick={() => setTourStep(0)}
+                className="text-xs hover:underline shrink-0"
+                style={{ color: "#8888a0" }}
+              >
+                Skip tour
+              </button>
+            </div>
+            <p className="text-sm leading-relaxed mb-4" style={{ color: "#e0e0e8" }}>
+              {tourStep === 1 &&
+                "Enter a value (try 42) and click LOAD to set your initial state."}
+              {tourStep === 2 &&
+                "Now enter a delta value (try 7) and click ACCUM to XOR it with the accumulator."}
+              {tourStep === 3 &&
+                "Click READ to see the reconstructed state (initial XOR accumulator)."}
+              {tourStep === 4 &&
+                "Click SWAP to checkpoint \u2014 the state is saved and accumulator resets. That\u2019s delta-state algebra!"}
+            </p>
+            {tourStep < 4 ? (
+              <button
+                onClick={() => setTourStep((s) => s + 1)}
+                className="px-4 py-1.5 rounded-lg text-xs font-semibold transition-all duration-150 hover:opacity-90"
+                style={{
+                  background: "#4f8fff",
+                  color: "#fff",
+                }}
+              >
+                Next &rarr;
+              </button>
+            ) : (
+              <button
+                onClick={() => setTourStep(5)}
+                className="px-4 py-1.5 rounded-lg text-xs font-semibold transition-all duration-150 hover:opacity-90"
+                style={{
+                  background: "#22c55e",
+                  color: "#fff",
+                }}
+              >
+                Finish Tour
+              </button>
+            )}
+          </div>
+        </section>
+      )}
+
+      {/* ======== Tour Complete Message ======== */}
+      {tourStep === 5 && (
+        <section className="max-w-3xl mx-auto px-6 pb-4">
+          <div
+            className="rounded-xl p-5"
+            style={{
+              background: "rgba(34,197,94,0.05)",
+              border: "1px solid rgba(34,197,94,0.3)",
+            }}
+          >
+            <p className="text-sm leading-relaxed mb-2" style={{ color: "#22c55e", fontWeight: 600 }}>
+              Tour complete!
+            </p>
+            <p className="text-sm leading-relaxed" style={{ color: "#b0b0c0" }}>
+              You just performed the four fundamental ATOMiK operations. These same
+              operations run on custom RISC-V hardware at 69.7 Gops/s.
+            </p>
+            <button
+              onClick={() => setTourStep(0)}
+              className="mt-3 text-xs hover:underline"
+              style={{ color: "#8888a0" }}
+            >
+              Dismiss
+            </button>
+          </div>
+        </section>
+      )}
 
       {/* ======== Live Sync Toggle ======== */}
       <section className="max-w-3xl mx-auto px-6 pb-4">

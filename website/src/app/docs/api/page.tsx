@@ -10,6 +10,7 @@ import {
   varColor,
 } from "../shared";
 import UpgradeGate from "@/components/UpgradeGate";
+import LangTabs from "@/components/LangTabs";
 
 export const metadata: Metadata = {
   title: "API Reference — ATOMiK Docs",
@@ -106,7 +107,17 @@ export default function ApiReferencePage() {
         ctaText="Start Team Trial"
       />
 
+      {/* ─────────────── Core Operations Reference ─────────────── */}
+      <h2 className="text-3xl font-bold mb-3">Core Operations</h2>
+      <p className="mb-8 text-lg" style={{ color: "#8888a0" }}>
+        Every ATOMiK SDK exposes the same four operations. Select a language to see
+        signatures, descriptions, and examples.
+      </p>
+
+      <LangTabs />
+
       {/* ─────────────── Multi-Context Tables ─────────────── */}
+      <div className="mt-16" />
       <h2 className="text-3xl font-bold mb-4">Multi-Context Tables</h2>
       <p className="mb-8 text-lg" style={{ color: "#8888a0" }}>
         Track thousands of independent state channels in a single table.

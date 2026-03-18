@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import Nav from "@/components/Nav";
+import EmailCapture from "@/components/EmailCapture";
 
 /* ═══════════════════════════════════════════════════════════════════════
    CONSTANTS & HELPERS
@@ -452,6 +453,13 @@ export default function AIDemoPage() {
           <span className="bg-clip-text text-transparent" style={{ backgroundImage: "linear-gradient(135deg, #4f8fff, #8b5cf6)" }}>
             ATOMiK
           </span>
+          {" "}
+          <span
+            className="inline-block align-middle rounded-full px-2.5 py-0.5 text-xs font-semibold"
+            style={{ background: "rgba(245,158,11,0.15)", color: "#f59e0b" }}
+          >
+            Research Preview
+          </span>
         </h1>
         <p style={{ color: "#8888a0" }}>
           Same AI output. Fraction of the energy. Explore the architectural advantage.
@@ -466,10 +474,13 @@ export default function AIDemoPage() {
         >
           <span className="shrink-0 mt-0.5 text-sm" style={{ color: "#4f8fff" }}>&#9432;</span>
           <span>
-            This demonstration illustrates the theoretical efficiency advantage of delta-state
-            architecture applied to AI inference workloads. Power and cost projections are based
-            on architectural analysis of data movement reduction. Production inference benchmarks
-            are in development.
+            This demonstration illustrates ATOMiK&apos;s architectural advantages for AI inference
+            workloads. Performance projections are based on validated hardware benchmarks
+            (69.7 Gops/s on Zynq XC7Z020) extrapolated to inference scenarios. Production AI
+            inference benchmarks are in active development.{" "}
+            <Link href="/about/roadmap" className="underline hover:text-white transition-colors" style={{ color: "#4f8fff" }}>
+              Track progress on our roadmap
+            </Link>.
           </span>
         </div>
       </section>
@@ -644,6 +655,14 @@ export default function AIDemoPage() {
             </div>
           ))}
         </div>
+      </section>
+
+      {/* ── Notify Me ── */}
+      <section className="max-w-xl mx-auto px-6 pb-12">
+        <p className="text-center text-sm font-semibold mb-3" style={{ color: "#8888a0" }}>
+          Get notified when AI inference benchmarks are available
+        </p>
+        <EmailCapture />
       </section>
 
       {/* ── CTA ── */}

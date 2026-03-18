@@ -411,6 +411,16 @@ export default function ASICRoadmapPage() {
           <p className="mt-4 text-xs text-gray-600">
             sales@atomik.tech
           </p>
+          <p className="mt-6 text-sm text-gray-400">
+            Questions about our timeline?{" "}
+            <a
+              href="/contact"
+              className="font-medium underline transition-colors hover:text-white"
+              style={{ color: accent2 }}
+            >
+              Contact us
+            </a>
+          </p>
         </div>
       </section>
     </div>

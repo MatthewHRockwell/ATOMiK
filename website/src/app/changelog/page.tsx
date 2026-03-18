@@ -1,12 +1,8 @@
-import type { Metadata } from "next";
+"use client";
+
 import Link from "next/link";
 import Nav from "@/components/Nav";
-
-export const metadata: Metadata = {
-  title: "Changelog — ATOMiK Delta-State Computing",
-  description:
-    "Every ATOMiK release, from Python SDK to FPGA silicon. Detailed changelog with version history, features, and improvements.",
-};
+import EmailCapture from "@/components/EmailCapture";
 
 /* ── Release data ────────────────────────────────────────────────── */
 
@@ -21,25 +17,9 @@ type Release = {
 
 const releases: Release[] = [
   {
-    version: "v0.4.0",
-    title: "Python SDK — Production Ready",
-    date: "March 16, 2026",
-    category: "software",
-    items: [
-      "PersistentSyncTable: crash-safe delta persistence with WAL and compaction",
-      "AsyncSyncTable + AsyncCallbackTransport for asyncio/FastAPI/aiohttp",
-      "Benchmark --share flag for shareable result summaries",
-      "DeviceContext: Python bindings for /dev/atomik kernel module ioctls",
-      "SyncTable + MemoryTransport + CallbackTransport (full transport layer)",
-      "C accelerator wired into Fingerprint hot path",
-      "200+ tests passing",
-      "pip install atomik-core==0.4.0",
-    ],
-  },
-  {
     version: "v0.5.0",
     title: "Kernel Module — Enterprise Features",
-    date: "March 16, 2026",
+    date: "2026-03-16",
     category: "tools",
     items: [
       "/proc/atomik/audit ring-buffer audit log (last 1024 operations)",
@@ -53,9 +33,25 @@ const releases: Release[] = [
     ],
   },
   {
+    version: "v0.4.0",
+    title: "Python SDK — Production Ready",
+    date: "2026-03-16",
+    category: "software",
+    items: [
+      "PersistentSyncTable: crash-safe delta persistence with WAL and compaction",
+      "AsyncSyncTable + AsyncCallbackTransport for asyncio/FastAPI/aiohttp",
+      "Benchmark --share flag for shareable result summaries",
+      "DeviceContext: Python bindings for /dev/atomik kernel module ioctls",
+      "SyncTable + MemoryTransport + CallbackTransport (full transport layer)",
+      "C accelerator wired into Fingerprint hot path",
+      "200+ tests passing",
+      "pip install atomik-core==0.4.0",
+    ],
+  },
+  {
     version: "v0.3.0",
     title: "Python SDK — Serialization & Tracing",
-    date: "March 16, 2026",
+    date: "2026-03-16",
     category: "software",
     items: [
       "DeltaMessage serialization: to_dict/from_dict + to_bytes/from_bytes (16-byte wire format)",
@@ -67,9 +63,9 @@ const releases: Release[] = [
     ],
   },
   {
-    version: "v0.4.0",
-    title: "Kernel Module",
-    date: "March 15, 2026",
+    version: "v0.4.0-kmod",
+    title: "Kernel Module — Initial Release",
+    date: "2026-03-15",
     category: "software",
     items: [
       "COW redundancy detection via kretprobe on wp_page_copy()",
@@ -84,8 +80,8 @@ const releases: Release[] = [
   },
   {
     version: "v0.2.0",
-    title: "Python SDK",
-    date: "March 15, 2026",
+    title: "Python SDK — Benchmarks & PyPI",
+    date: "2026-03-15",
     category: "software",
     items: [
       "Benchmark module: python -m atomik_core.benchmark",
@@ -98,7 +94,7 @@ const releases: Release[] = [
   {
     version: "v0.1.0",
     title: "Initial Release",
-    date: "March 2026",
+    date: "2026-03-14",
     category: "software",
     items: [
       "AtomikContext: LOAD, ACCUM, READ, SWAP operations",
@@ -112,7 +108,7 @@ const releases: Release[] = [
   {
     version: "",
     title: "Zynq Characterization",
-    date: "February 2026",
+    date: "2026-02",
     category: "hardware",
     items: [
       "6 configs (N=1 to N=512), 4 synthesis strategies",
@@ -123,7 +119,7 @@ const releases: Release[] = [
   {
     version: "v3.1.0",
     title: "HD HDMI SoC",
-    date: "2025",
+    date: "2025-12",
     category: "hardware",
     items: [
       "1280\u00d7720@60Hz on $13.50 Tang Nano 9K",
@@ -133,9 +129,9 @@ const releases: Release[] = [
     ],
   },
   {
-    version: "v2",
-    title: "PicoRV32 Production",
-    date: "2025",
+    version: "v2.0.0",
+    title: "PicoRV32 Production SoC",
+    date: "2025-09",
     category: "hardware",
     items: [
       "Single-bank ATOMiK @ 81 MHz, 94.5 Mops/s",
@@ -204,6 +200,25 @@ export default function ChangelogPage() {
           <p className="text-xl leading-relaxed max-w-3xl" style={{ color: "#8888a0" }}>
             Every release, every improvement.
           </p>
+          <div className="mt-4">
+            <a
+              href="/feeds/changelog.xml"
+              className="inline-flex items-center gap-2 text-sm font-mono px-4 py-2 rounded-lg border transition-colors hover:bg-white/5"
+              style={{ borderColor: "#1e1e2e", color: "#d4a843" }}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <circle cx="6.18" cy="17.82" r="2.18" />
+                <path d="M4 4.44v2.83c7.03 0 12.73 5.7 12.73 12.73h2.83c0-8.59-6.97-15.56-15.56-15.56zm0 5.66v2.83c3.9 0 7.07 3.17 7.07 7.07h2.83c0-5.47-4.43-9.9-9.9-9.9z" />
+              </svg>
+              Subscribe via RSS
+            </a>
+          </div>
         </div>
       </section>
 
@@ -355,6 +370,25 @@ export default function ChangelogPage() {
                 </div>
               );
             })}
+          </div>
+        </div>
+      </section>
+
+      {/* Subscribe for release updates */}
+      <section className="max-w-5xl mx-auto px-6 pb-24">
+        <div
+          className="rounded-2xl p-8 sm:p-12 border text-center"
+          style={{
+            background: "linear-gradient(135deg, rgba(139,92,246,0.08), rgba(79,143,255,0.08))",
+            borderColor: "#8b5cf630",
+          }}
+        >
+          <h2 className="text-2xl font-bold mb-3">Subscribe for Release Updates</h2>
+          <p className="mb-6" style={{ color: "#8888a0" }}>
+            Get notified when we ship new versions. No spam, just releases.
+          </p>
+          <div className="max-w-md mx-auto">
+            <EmailCapture />
           </div>
         </div>
       </section>

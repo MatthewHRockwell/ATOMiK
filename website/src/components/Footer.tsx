@@ -25,6 +25,7 @@ const footerCols: { title: string; links: [string, string][] }[] = [
     title: "Company",
     links: [
       ["/about", "About"],
+      ["/about/roadmap", "Roadmap"],
       ["/case-studies", "Case Studies"],
       ["/solutions", "Solutions"],
       ["/compliance", "Compliance"],

@@ -223,6 +223,16 @@ export default function PricingPage() {
                   {loading === tier.ctaAction ? "Redirecting..." : tier.cta}
                 </button>
               )}
+
+              {tier.name === "Enterprise" && (
+                <Link
+                  href="/about/roadmap"
+                  className="block text-center mt-3 text-xs font-medium transition-colors hover:text-white no-underline"
+                  style={{ color: "#8b5cf6" }}
+                >
+                  View ASIC Roadmap &rarr;
+                </Link>
+              )}
             </div>
           ))}
         </div>
