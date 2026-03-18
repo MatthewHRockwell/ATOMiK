@@ -8,7 +8,6 @@ import {
   cmtColor,
   typeColor,
   varColor,
-  DocsNav,
 } from "../shared";
 import UpgradeGate from "@/components/UpgradeGate";
 
@@ -303,10 +302,6 @@ export default function KernelModulePage() {
         </div>
       </div>
 
-      <DocsNav
-        prev={{ href: "/docs/quickstart", label: "Quick Start" }}
-        next={{ href: "/docs/api", label: "API Reference" }}
-      />
     </div>
   );
 }

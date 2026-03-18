@@ -8,12 +8,11 @@ export default function Nav({ active }: { active?: string }) {
   const navRef = useRef<HTMLElement>(null);
 
   const links = [
-    { href: "/ai-demo", label: "AI Demo" },
-    { href: "/demo", label: "Delta Demo" },
     { href: "/solutions", label: "Solutions" },
     { href: "/docs", label: "Docs" },
     { href: "/pricing", label: "Pricing" },
     { href: "/blog", label: "Blog" },
+    { href: "/dashboard", label: "Dashboard" },
     { href: "https://github.com/MatthewHRockwell/ATOMiK", label: "GitHub" },
   ];
 
@@ -77,6 +76,16 @@ export default function Nav({ active }: { active?: string }) {
               </Link>
             )
           )}
+          <Link
+            href="/get-started"
+            className="px-4 py-1.5 rounded-full text-sm font-semibold text-white no-underline transition-opacity hover:opacity-85"
+            style={{
+              background: "linear-gradient(135deg, #22d3ee, #4f8fff)",
+              boxShadow: "0 2px 12px rgba(79,143,255,0.3)",
+            }}
+          >
+            Get Started
+          </Link>
         </div>
 
         {/* Hamburger button (mobile only) */}
@@ -118,7 +127,7 @@ export default function Nav({ active }: { active?: string }) {
       <div
         className="md:hidden overflow-hidden transition-all duration-300 ease-in-out"
         style={{
-          maxHeight: menuOpen ? `${links.length * 48 + 16}px` : "0px",
+          maxHeight: menuOpen ? `${(links.length + 1) * 48 + 24}px` : "0px",
           opacity: menuOpen ? 1 : 0,
           borderTop: menuOpen ? "1px solid #1e1e2e" : "none",
         }}
@@ -144,6 +153,17 @@ export default function Nav({ active }: { active?: string }) {
               </Link>
             )
           )}
+          <Link
+            href="/get-started"
+            className="mt-2 mx-2 py-2.5 rounded-full text-sm font-semibold text-white text-center no-underline transition-opacity hover:opacity-85"
+            style={{
+              background: "linear-gradient(135deg, #22d3ee, #4f8fff)",
+              boxShadow: "0 2px 12px rgba(79,143,255,0.3)",
+            }}
+            onClick={() => setMenuOpen(false)}
+          >
+            Get Started
+          </Link>
         </div>
       </div>
     </nav>

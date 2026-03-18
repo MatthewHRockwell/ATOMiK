@@ -1,6 +1,4 @@
 import type { Metadata } from "next";
-import { DocsNav } from "../shared";
-
 export const metadata: Metadata = {
   title: "Examples — ATOMiK Docs",
   description:
@@ -120,10 +118,6 @@ export default function ExamplesPage() {
         </div>
       </div>
 
-      <DocsNav
-        prev={{ href: "/docs/architecture", label: "Architecture" }}
-        next={{ href: "/docs/hardware", label: "Hardware" }}
-      />
     </div>
   );
 }

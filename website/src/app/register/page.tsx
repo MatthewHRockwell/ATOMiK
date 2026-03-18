@@ -16,6 +16,49 @@ const roles = [
   "Other",
 ];
 
+const tierSummaries: Record<string, { name: string; price: string; color: string; features: string[] }> = {
+  community: {
+    name: "Community",
+    price: "Free",
+    color: "#22c55e",
+    features: [
+      "Python SDK (atomik-core)",
+      "C99 header (atomik_core.h)",
+      "JavaScript SDK (@atomik/core)",
+      "4-operation API (LOAD, ACCUM, READ, SWAP)",
+      "AtomikTable, DeltaStream, Fingerprint",
+      "Apache 2.0 license",
+      "Community support (GitHub)",
+    ],
+  },
+  professional: {
+    name: "Pro",
+    price: "$99/mo",
+    color: "#4f8fff",
+    features: [
+      "Everything in Community",
+      "Linux kernel module (COW detection, network dedup, cgroup tracking)",
+      "27 sysfs metrics + atomik-status dashboard",
+      "atomik-bench performance suite",
+      "Priority email support (48hr SLA)",
+      "90-day free trial",
+    ],
+  },
+  team: {
+    name: "Team",
+    price: "$299/mo",
+    color: "#22d3ee",
+    features: [
+      "Everything in Pro",
+      "SDK generation pipeline (Python, Rust, C, JavaScript, Verilog)",
+      "atomik-report waste analysis",
+      "5-seat team license",
+      "JSON/CSV CI export",
+      "Schema-driven code generation",
+    ],
+  },
+};
+
 function CopyButton({ text, label }: { text: string; label?: string }) {
   const [copied, setCopied] = useState(false);
 
@@ -65,10 +108,13 @@ function RegisterForm() {
 
   const tierLabel =
     plan === "professional"
-      ? "Professional"
+      ? "Pro"
       : plan === "team"
         ? "Team"
         : null;
+
+  const tierKey = plan || "community";
+  const tierInfo = tierSummaries[tierKey] || tierSummaries.community;
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -306,21 +352,32 @@ Same result: True`}
   if (isPaidTier) {
     return (
       <>
-        {tierLabel && (
-          <div className="max-w-lg mx-auto px-6 mb-6">
-            <div
-              className="rounded-lg px-5 py-3 text-sm text-center"
-              style={{
-                background: "rgba(79,143,255,0.08)",
-                border: "1px solid rgba(79,143,255,0.25)",
-                color: "#4f8fff",
-              }}
-            >
-              Registering for the{" "}
-              <span className="font-semibold">{tierLabel}</span> plan
+        <div className="max-w-lg mx-auto px-6 mb-6">
+          <div
+            className="rounded-xl p-5"
+            style={{
+              background: "#12121a",
+              border: `1px solid ${tierInfo.color}33`,
+            }}
+          >
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-lg font-bold" style={{ color: tierInfo.color }}>
+                {tierInfo.name}
+              </h3>
+              <span className="text-sm font-semibold" style={{ color: tierInfo.color }}>
+                {tierInfo.price}
+              </span>
             </div>
+            <ul className="space-y-1.5">
+              {tierInfo.features.map((f) => (
+                <li key={f} className="flex items-start gap-2 text-xs" style={{ color: "#b0b0c0" }}>
+                  <span className="mt-0.5 shrink-0" style={{ color: "#22c55e" }}>{"\u2713"}</span>
+                  {f}
+                </li>
+              ))}
+            </ul>
           </div>
-        )}
+        </div>
 
         <section className="max-w-lg mx-auto px-6 pb-24">
           <form
@@ -435,7 +492,9 @@ Same result: True`}
             >
               {status === "loading"
                 ? "Creating your account..."
-                : `Start ${tierLabel} Trial`}
+                : tierLabel === "Pro"
+                  ? "Start Pro Trial"
+                  : "Start Team Trial"}
             </button>
 
             {/* Error */}
@@ -452,12 +511,40 @@ Same result: True`}
 
   // --- Free tier: email-only ---
   return (
-    <section className="max-w-lg mx-auto px-6 pb-24">
-      <form
-        onSubmit={handleSubmit}
-        className="rounded-xl p-8 space-y-5"
-        style={{ background: "#12121a", border: "1px solid #1e1e2e" }}
-      >
+    <>
+      <div className="max-w-lg mx-auto px-6 mb-6">
+        <div
+          className="rounded-xl p-5"
+          style={{
+            background: "#12121a",
+            border: `1px solid ${tierInfo.color}33`,
+          }}
+        >
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-lg font-bold" style={{ color: tierInfo.color }}>
+              {tierInfo.name}
+            </h3>
+            <span className="text-sm font-semibold" style={{ color: tierInfo.color }}>
+              {tierInfo.price}
+            </span>
+          </div>
+          <ul className="space-y-1.5">
+            {tierInfo.features.map((f) => (
+              <li key={f} className="flex items-start gap-2 text-xs" style={{ color: "#b0b0c0" }}>
+                <span className="mt-0.5 shrink-0" style={{ color: "#22c55e" }}>{"\u2713"}</span>
+                {f}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+
+      <section className="max-w-lg mx-auto px-6 pb-24">
+        <form
+          onSubmit={handleSubmit}
+          className="rounded-xl p-8 space-y-5"
+          style={{ background: "#12121a", border: "1px solid #1e1e2e" }}
+        >
         {/* Email */}
         <div>
           <label
@@ -491,7 +578,7 @@ Same result: True`}
             boxShadow: "0 4px 24px rgba(79,143,255,0.25)",
           }}
         >
-          {status === "loading" ? "Registering..." : "Register Free"}
+          {status === "loading" ? "Registering..." : "Get Started Free"}
         </button>
 
         {/* Error */}
@@ -506,6 +593,7 @@ Same result: True`}
         </p>
       </form>
     </section>
+    </>
   );
 }
 

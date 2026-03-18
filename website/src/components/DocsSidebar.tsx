@@ -6,11 +6,14 @@ import { usePathname } from "next/navigation";
 const sections = [
   { href: "/docs", label: "Overview" },
   { href: "/docs/quickstart", label: "Quick Start" },
-  { href: "/docs/kernel-module", label: "Kernel Module" },
   { href: "/docs/api", label: "API Reference" },
   { href: "/docs/architecture", label: "Architecture" },
   { href: "/docs/examples", label: "Examples" },
+  { href: "/docs/kernel-module", label: "Kernel Module" },
   { href: "/docs/hardware", label: "Hardware" },
+  { href: "/docs/migrate-crdt", label: "From CRDTs" },
+  { href: "/docs/migrate-event-sourcing", label: "From Event Sourcing" },
+  { href: "/docs/compatibility", label: "Compatibility" },
 ];
 
 export default function DocsSidebar() {

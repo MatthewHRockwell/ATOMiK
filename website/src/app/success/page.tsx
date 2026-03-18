@@ -100,7 +100,7 @@ function SuccessContent() {
   return (
     <div style={styles.container}>
       <div style={styles.checkmark}>&#10003;</div>
-      <h1 style={styles.title}>Welcome to ATOMiK {license.tier === 'enterprise' ? 'Enterprise' : 'Professional'}</h1>
+      <h1 style={styles.title}>Welcome to ATOMiK {license.tier === 'enterprise' ? 'Enterprise' : license.tier === 'team' ? 'Team' : 'Pro'}</h1>
       <p style={styles.subtitle}>Your license has been activated for {license.email}</p>
 
       <div style={styles.card}>
@@ -154,6 +154,37 @@ function SuccessContent() {
         <p style={styles.helpText}>
           Email <a href="mailto:support@atomik.tech" style={styles.link}>support@atomik.tech</a> for
           {license.tier === 'enterprise' ? ' 4-hour response SLA' : ' priority support (48hr SLA)'}.
+        </p>
+      </div>
+
+      <div style={styles.card}>
+        <h2 style={styles.cardTitle}>What&apos;s Next</h2>
+        <div style={styles.nextGrid}>
+          <a href="/docs/kernel-module" style={styles.nextItem}>
+            <span style={styles.nextIcon}>&#128214;</span>
+            <span style={styles.nextLabel}>Read the Kernel Module Guide</span>
+            <span style={styles.nextArrow}>&rarr;</span>
+          </a>
+          <a href="/docs/quickstart" style={styles.nextItem}>
+            <span style={styles.nextIcon}>&#9889;</span>
+            <span style={styles.nextLabel}>Run Your First Benchmark</span>
+            <span style={styles.nextArrow}>&rarr;</span>
+          </a>
+          <a href="/dashboard" style={styles.nextItem}>
+            <span style={styles.nextIcon}>&#128202;</span>
+            <span style={styles.nextLabel}>Explore the Dashboard</span>
+            <span style={styles.nextArrow}>&rarr;</span>
+          </a>
+          <a href="https://github.com/MatthewHRockwell/ATOMiK/discussions" style={styles.nextItem} target="_blank" rel="noopener noreferrer">
+            <span style={styles.nextIcon}>&#128101;</span>
+            <span style={styles.nextLabel}>Join the Community</span>
+            <span style={styles.nextArrow}>&rarr;</span>
+          </a>
+        </div>
+        <p style={styles.nextHelp}>
+          Need help? Reach out at{' '}
+          <a href="mailto:support@atomik.tech" style={styles.link}>support@atomik.tech</a>
+          {' '}&mdash; we&apos;re here to get you up and running.
         </p>
       </div>
 
@@ -263,6 +294,30 @@ const styles: Record<string, React.CSSProperties> = {
     border: '3px solid #1e1e2e', borderTopColor: '#4f8fff',
     borderRadius: '50%',
     animation: 'spin 0.8s linear infinite',
+  },
+  nextGrid: {
+    display: 'flex', flexDirection: 'column' as const, gap: 12,
+    marginBottom: 20,
+  },
+  nextItem: {
+    display: 'flex', alignItems: 'center', gap: 12,
+    padding: '14px 16px', borderRadius: 8,
+    background: '#0a0a0f', border: '1px solid #1e1e2e',
+    textDecoration: 'none', color: '#e0e0e8',
+    transition: 'border-color 0.2s, background 0.2s',
+    cursor: 'pointer',
+  },
+  nextIcon: {
+    fontSize: 20, width: 32, textAlign: 'center' as const, flexShrink: 0,
+  },
+  nextLabel: {
+    fontSize: 14, fontWeight: 500, flex: 1,
+  },
+  nextArrow: {
+    fontSize: 14, color: '#4f8fff', flexShrink: 0,
+  },
+  nextHelp: {
+    fontSize: 13, color: '#8888a0', textAlign: 'center' as const, margin: 0,
   },
   backLink: {
     display: 'block', textAlign: 'center' as const,

@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { DocsNav } from "../shared";
 import UpgradeGate from "@/components/UpgradeGate";
 
 export const metadata: Metadata = {
@@ -103,9 +102,6 @@ export default function HardwarePage() {
         ctaText="Contact Sales"
       />
 
-      <DocsNav
-        prev={{ href: "/docs/examples", label: "Examples" }}
-      />
     </div>
   );
 }

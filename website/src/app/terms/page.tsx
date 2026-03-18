@@ -29,27 +29,27 @@ export default function TermsPage() {
           </Section>
 
           <Section title="2. License Tiers">
-            <p>ATOMiK is available under three license tiers:</p>
+            <p>ATOMiK is available under four license tiers:</p>
             <div className="mt-4 space-y-4">
               <TierCard
                 name="Community"
                 price="Free"
-                description="Open-source license for personal and non-commercial use. Includes the ATOMiK Python library and C library under the terms of the applicable open-source license."
+                description="Open-source license under Apache 2.0. Includes the Python SDK (atomik-core), C99 header (atomik_core.h), JavaScript SDK (@atomik/core), 4-operation API, AtomikTable, DeltaStream, and Fingerprint. Community support via GitHub."
               />
               <TierCard
-                name="Professional"
+                name="Pro"
                 price="$99/month"
-                description="Commercial license for individuals and small teams. Includes priority support (48-hour SLA), commercial use rights, and access to pre-built binaries."
+                description="Everything in Community plus the Linux kernel module (COW detection, network dedup, cgroup tracking), 27 sysfs metrics, atomik-status dashboard, atomik-bench performance suite, and priority email support (48-hour SLA). Includes 90-day free trial."
               />
               <TierCard
                 name="Team"
                 price="$299/month"
-                description="SDK generation pipeline (5 languages), waste analysis tools, team license (5 seats), and CI integration."
+                description="Everything in Pro plus the SDK generation pipeline (Python, Rust, C, JavaScript, Verilog), atomik-report waste analysis, 5-seat team license, JSON/CSV CI export, and schema-driven code generation."
               />
               <TierCard
                 name="Enterprise"
                 price="$999/month"
-                description="Full commercial license for organizations. Includes hardware IP cores, 4-hour support SLA, custom integration assistance, and dedicated account management."
+                description="Everything in Team plus FPGA hardware acceleration (Zynq AXI4-Lite, up to 512 parallel banks), custom RV64I CPU with ATOMiK ISA extensions, 4-hour response SLA, dedicated support channel, formal verification certificate, and ASIC development path."
               />
             </div>
           </Section>
@@ -57,7 +57,7 @@ export default function TermsPage() {
           <Section title="3. Subscription and Billing">
             <ul className="list-disc list-inside space-y-2">
               <li>
-                Paid subscriptions (Professional and Enterprise) are billed monthly via Stripe.
+                Paid subscriptions (Pro, Team, and Enterprise) are billed monthly via Stripe.
               </li>
               <li>
                 Your subscription renews automatically on the same day each month unless cancelled.
@@ -110,8 +110,7 @@ export default function TermsPage() {
               </li>
               <li>Interfere with or disrupt the Services or their infrastructure.</li>
               <li>
-                Use Community-tier software for commercial purposes without upgrading to a paid
-                license.
+                Use paid-tier features (Pro, Team, or Enterprise) without an active subscription.
               </li>
             </ul>
           </Section>

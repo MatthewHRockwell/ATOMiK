@@ -67,9 +67,30 @@ const posts = [
   },
 ];
 
+const blogJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  itemListElement: posts.map((post, i) => ({
+    "@type": "ListItem",
+    position: i + 1,
+    item: {
+      "@type": "Article",
+      headline: post.title,
+      datePublished: new Date(post.date).toISOString().split("T")[0],
+      url: `https://atomik.tech/blog/${post.slug}`,
+      description: post.excerpt,
+      author: { "@type": "Person", name: "Matt Rockwell" },
+    },
+  })),
+};
+
 export default function BlogPage() {
   return (
     <div className="min-h-screen" style={{ background: "#0a0a0f", color: "#e0e0e8" }}>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(blogJsonLd) }}
+      />
       <Nav active="Blog" />
 
       <section className="max-w-3xl mx-auto px-6 pt-20 pb-8">

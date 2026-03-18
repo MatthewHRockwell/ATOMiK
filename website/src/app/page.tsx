@@ -65,7 +65,7 @@ const pricingTiers = [
     name: "Community",
     price: "Free",
     period: "",
-    items: ["Python SDK + C header + examples", "Full 4-operation API", "Apache 2.0 license", "Community support via GitHub"],
+    items: ["Python SDK (atomik-core)", "C99 header (atomik_core.h)", "JavaScript SDK (@atomik/core)", "4-operation API (LOAD, ACCUM, READ, SWAP)", "AtomikTable, DeltaStream, Fingerprint", "Apache 2.0 license", "Community support (GitHub)"],
     cta: "Get Started Free",
     href: "/register",
     primary: false,
@@ -74,8 +74,8 @@ const pricingTiers = [
     name: "Pro",
     price: "$99",
     period: "/mo",
-    items: ["Everything in Community", "Linux kernel module (90-day trial)", "COW detection, network dedup, cgroup tracking", "27 sysfs metrics + dashboard", "Priority email support (48hr SLA)"],
-    cta: "Start 90-Day Free Trial",
+    items: ["Everything in Community", "Linux kernel module (COW detection, network dedup, cgroup tracking)", "27 sysfs metrics + atomik-status dashboard", "atomik-bench performance suite", "Priority email support (48hr SLA)", "90-day free trial"],
+    cta: "Start Pro Trial",
     href: "/get-started?plan=professional",
     primary: false,
   },
@@ -83,8 +83,8 @@ const pricingTiers = [
     name: "Team",
     price: "$299",
     period: "/mo",
-    items: ["Everything in Pro", "SDK generation (Python, Rust, C, JS, Verilog)", "atomik-report waste analysis", "Team license (5 seats)", "JSON/CSV export for CI"],
-    cta: "Start Free Trial",
+    items: ["Everything in Pro", "SDK generation pipeline (Python, Rust, C, JavaScript, Verilog)", "atomik-report waste analysis", "5-seat team license", "JSON/CSV CI export", "Schema-driven code generation"],
+    cta: "Start Team Trial",
     href: "/get-started?plan=team",
     primary: true,
   },
@@ -92,7 +92,7 @@ const pricingTiers = [
     name: "Enterprise",
     price: "$999",
     period: "/mo",
-    items: ["Everything in Team", "FPGA hardware acceleration (512 banks)", "Custom RV64I CPU + ATOMiK ISA", "4-hour response SLA", "Dedicated support + consulting"],
+    items: ["Everything in Team", "FPGA hardware acceleration (Zynq AXI4-Lite, up to 512 parallel banks)", "Custom RV64I CPU with ATOMiK ISA extensions", "4-hour response SLA", "Dedicated support channel", "Formal verification certificate", "ASIC development path"],
     cta: "Contact Sales",
     href: "/contact",
     primary: false,
@@ -156,6 +156,36 @@ export default function Home() {
       {/* ===== Metrics (animated counters) ===== */}
       <section className="max-w-5xl mx-auto px-6 pb-16">
         <HeroMetrics />
+      </section>
+
+      {/* ===== Latest Releases ===== */}
+      <section className="px-6 py-4" style={{ background: "#12121a", borderTop: "1px solid #1e1e2e", borderBottom: "1px solid #1e1e2e" }}>
+        <div className="max-w-5xl mx-auto flex flex-wrap items-center justify-center gap-x-8 gap-y-2">
+          <span className="text-xs font-semibold uppercase tracking-widest" style={{ color: "#555570" }}>
+            Latest Releases
+          </span>
+          {[
+            { name: "Python SDK", version: "v0.4.0", date: "Mar 2026" },
+            { name: "Kernel Module", version: "v0.4.0", date: "Mar 2026" },
+            { name: "C Header", version: "v0.4.0", date: "Mar 2026" },
+          ].map((r) => (
+            <Link
+              key={r.name}
+              href="/changelog"
+              className="inline-flex items-center gap-2 text-xs no-underline transition-colors hover:text-white"
+              style={{ color: "#8888a0" }}
+            >
+              {r.name}
+              <span
+                className="px-1.5 py-0.5 rounded text-[10px] font-bold"
+                style={{ background: "rgba(79,143,255,0.15)", color: "#4f8fff" }}
+              >
+                {r.version}
+              </span>
+              <span className="text-[10px]" style={{ color: "#555570" }}>{r.date}</span>
+            </Link>
+          ))}
+        </div>
       </section>
 
       {/* ===== How It Works ===== */}

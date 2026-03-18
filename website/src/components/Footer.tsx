@@ -5,29 +5,30 @@ const footerCols: { title: string; links: [string, string][] }[] = [
     title: "Product",
     links: [
       ["/get-started", "Get Started"],
-      ["/docs", "Docs"],
+      ["/dashboard", "Dashboard"],
       ["/pricing", "Pricing"],
-      ["/demo", "Demo"],
-      ["https://github.com/MatthewHRockwell/ATOMiK", "GitHub"],
+      ["/integrations", "Integrations"],
+      ["/get-started#downloads", "Downloads"],
+    ],
+  },
+  {
+    title: "Developers",
+    links: [
+      ["/docs", "Docs"],
+      ["/blog", "Blog"],
+      ["/benchmarks", "Benchmarks"],
+      ["/roi", "ROI Calculator"],
+      ["/faq", "FAQ"],
     ],
   },
   {
     title: "Company",
     links: [
       ["/about", "About"],
-      ["/blog", "Blog"],
+      ["/case-studies", "Case Studies"],
+      ["/solutions", "Solutions"],
+      ["/compliance", "Compliance"],
       ["mailto:mrockwell@atomik.tech", "Contact"],
-      ["/changelog", "Changelog"],
-    ],
-  },
-  {
-    title: "Solutions",
-    links: [
-      ["/solutions/distributed-systems", "Distributed Systems"],
-      ["/solutions/iot-edge", "IoT & Edge"],
-      ["/solutions/financial", "Financial Services"],
-      ["/solutions/gaming", "Gaming & Multiplayer"],
-      ["/solutions/database-sync", "Database Sync"],
     ],
   },
   {
@@ -35,6 +36,8 @@ const footerCols: { title: string; links: [string, string][] }[] = [
     links: [
       ["/privacy", "Privacy"],
       ["/terms", "Terms"],
+      ["/changelog", "Changelog"],
+      ["https://github.com/MatthewHRockwell/ATOMiK", "GitHub"],
     ],
   },
 ];

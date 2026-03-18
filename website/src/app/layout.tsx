@@ -42,47 +42,63 @@ export const metadata: Metadata = {
 
 const jsonLd = {
   "@context": "https://schema.org",
-  "@type": "SoftwareApplication",
-  name: "ATOMiK",
-  applicationCategory: "DeveloperApplication",
-  operatingSystem: "Linux",
-  description:
-    "Delta-state algebra for O(1) state reconstruction. 99% less bandwidth, 333,333x less memory. Formally proven with 92 Lean4 theorems.",
-  url: "https://atomik.tech",
-  offers: [
+  "@graph": [
     {
-      "@type": "Offer",
-      name: "Community",
-      price: "0",
-      priceCurrency: "USD",
-      description: "Python SDK, Apache 2.0",
+      "@type": "Organization",
+      name: "ATOMiK",
+      url: "https://atomik.tech",
+      logo: "https://atomik.tech/logo.png",
+      sameAs: ["https://github.com/MatthewHRockwell/ATOMiK"],
+      description:
+        "Delta-state algebra for O(1) state reconstruction. 99% less bandwidth, 333,333x less memory. Formally proven with 92 Lean4 theorems.",
     },
     {
-      "@type": "Offer",
-      name: "Professional",
-      price: "99",
-      priceCurrency: "USD",
-      description: "Linux kernel module with COW detection and network monitoring",
-    },
-    {
-      "@type": "Offer",
-      name: "Team",
-      price: "299",
-      priceCurrency: "USD",
-      description: "SDK generation pipeline (5 languages) + waste analysis + team license",
-    },
-    {
-      "@type": "Offer",
-      name: "Enterprise",
-      price: "999",
-      priceCurrency: "USD",
-      description: "FPGA hardware acceleration + dedicated support + 4-hour SLA",
+      "@type": "SoftwareApplication",
+      name: "ATOMiK SDK",
+      applicationCategory: "DeveloperApplication",
+      operatingSystem: "Linux, macOS, Windows",
+      description:
+        "Delta-state algebra for O(1) state reconstruction. 99% less bandwidth, 333,333x less memory. Formally proven with 92 Lean4 theorems.",
+      url: "https://atomik.tech",
+      offers: [
+        {
+          "@type": "Offer",
+          name: "Community",
+          price: "0",
+          priceCurrency: "USD",
+          description: "Python SDK, C99 header, JavaScript SDK, Apache 2.0",
+        },
+        {
+          "@type": "Offer",
+          name: "Pro",
+          price: "99",
+          priceCurrency: "USD",
+          description:
+            "Linux kernel module (COW detection, network dedup, cgroup tracking), 27 sysfs metrics, atomik-bench, 48hr SLA",
+        },
+        {
+          "@type": "Offer",
+          name: "Team",
+          price: "299",
+          priceCurrency: "USD",
+          description:
+            "SDK generation pipeline (5 languages), atomik-report waste analysis, 5-seat team license, JSON/CSV CI export",
+        },
+        {
+          "@type": "Offer",
+          name: "Enterprise",
+          price: "999",
+          priceCurrency: "USD",
+          description:
+            "FPGA hardware acceleration (Zynq, 512 banks), custom RV64I CPU, 4-hour SLA, dedicated support, formal verification",
+        },
+      ],
+      author: {
+        "@type": "Person",
+        name: "Matt Rockwell",
+      },
     },
   ],
-  author: {
-    "@type": "Person",
-    name: "Matt Rockwell",
-  },
 };
 
 export default function RootLayout({

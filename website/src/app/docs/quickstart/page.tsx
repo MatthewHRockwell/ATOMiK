@@ -7,7 +7,6 @@ import {
   cmtColor,
   typeColor,
   varColor,
-  DocsNav,
 } from "../shared";
 
 export const metadata: Metadata = {
@@ -147,10 +146,6 @@ export default function QuickStartPage() {
         </p>
       </div>
 
-      <DocsNav
-        prev={{ href: "/docs", label: "Overview" }}
-        next={{ href: "/docs/kernel-module", label: "Kernel Module" }}
-      />
     </div>
   );
 }

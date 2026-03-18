@@ -1,6 +1,4 @@
 import type { Metadata } from "next";
-import { DocsNav } from "../shared";
-
 export const metadata: Metadata = {
   title: "Compatibility Matrix — ATOMiK Docs",
   description:
@@ -236,9 +234,6 @@ export default function CompatibilityPage() {
         ))}
       </div>
 
-      <DocsNav
-        prev={{ href: "/docs/hardware", label: "Hardware" }}
-      />
     </div>
   );
 }
