@@ -320,6 +320,20 @@ export default function WhitepaperPage() {
                   </Link>
                   .
                 </p>
+                <p
+                  className="text-xs mt-3 text-center"
+                  style={{ color: "#555566" }}
+                >
+                  Having trouble? Email{" "}
+                  <a
+                    href="mailto:mrockwell@atomik.tech?subject=White Paper Request"
+                    className="underline hover:text-white transition-colors"
+                    style={{ color: "#4f8fff" }}
+                  >
+                    mrockwell@atomik.tech
+                  </a>
+                  {" "}and we&apos;ll send it directly.
+                </p>
               </div>
             )}
 
@@ -346,17 +360,28 @@ export default function WhitepaperPage() {
                         White Paper Unlocked
                       </h3>
                       <p className="text-xs" style={{ color: "#8888a0" }}>
-                        Full content below. Bookmark this page to return anytime.
+                        Full content below. Download the PDF or bookmark this page.
                       </p>
                     </div>
                   </div>
-                  <button
-                    onClick={() => window.print()}
-                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold text-white transition-opacity hover:opacity-90 shrink-0"
-                    style={{ background: "#4f8fff" }}
-                  >
-                    Download PDF
-                  </button>
+                  <div className="flex gap-2 shrink-0">
+                    <a
+                      href="/ATOMiK_White_Paper.pdf"
+                      download
+                      className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold text-white transition-opacity hover:opacity-90"
+                      style={{ background: "#4f8fff" }}
+                    >
+                      Download PDF
+                    </a>
+                    <a
+                      href="/ATOMiK_Benchmarks.pdf"
+                      download
+                      className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold transition-opacity hover:opacity-90"
+                      style={{ background: "transparent", color: "#4f8fff", border: "1px solid #4f8fff33" }}
+                    >
+                      Benchmarks PDF
+                    </a>
+                  </div>
                 </div>
 
                 {/* Print-friendly whitepaper wrapper */}

@@ -234,13 +234,13 @@ module tb_v3_atomik;
         do_accum(64'h0000000000000001);
         check(64'h4000000000000001, current_state, "ctx3: acc=1");
 
-        // SWAP to context 0
+        // SWAP to context 0 — acc cleared by SWAP, ctx0 had no accumulation
         do_swap(8'd0);
-        check(64'h1000000000000001, current_state, "ctx0: acc=1 persists");
+        check(64'h1000000000000000, current_state, "ctx0: clean after SWAP (no acc)");
 
-        // SWAP to context 2
+        // SWAP to context 2 — acc cleared by SWAP, ctx2 had no accumulation
         do_swap(8'd2);
-        check(64'h3000000000000001, current_state, "ctx2: acc=1 persists");
+        check(64'h3000000000000000, current_state, "ctx2: clean after SWAP (no acc)");
 
         // =================================================================
         $display("\n=== Test Group 7: All-bits Patterns ===");
