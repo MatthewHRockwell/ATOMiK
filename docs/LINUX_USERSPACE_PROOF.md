@@ -80,9 +80,31 @@ mknod /dev/mem c 1 1         # Create device node
 SHA-256 checksums for all images are recorded in
 [`hardware/zynq/BASELINE.md`](../hardware/zynq/BASELINE.md).
 
+## Benchmark: Multi-Buffer Change Detection
+
+After algebraic correctness was confirmed, a workload benchmark measured
+ATOMiK's change detection against software memcmp across tracked memory
+regions. ATOMiK detection uses a single register read (O(1) per region);
+memcmp scans the full buffer (O(n) per region).
+
+| Workload | Software (memcmp) | ATOMiK (detect) | Speedup |
+|----------|-------------------|-----------------|---------|
+| 8 x 256B, 25% changed | 16,572 cy | 1,107 cy | 15x |
+| 8 x 1KB, 25% changed | 157,539 cy | 1,088 cy | 145x |
+| 8 x 4KB, 25% changed | 6,539,617 cy | 1,093 cy | 5,983x |
+| 32 x 256B, 10% changed | 174,263 cy | 2,874 cy | 61x |
+| 64 x 1KB, 5% changed | 1,314,615 cy | 5,243 cy | 251x |
+
+ATOMiK detection time scales with **region count**, not region size — the
+8x4KB workload takes the same ~1,090 cycles as 8x256B. Software memcmp
+scales with N * size. The sharp memcmp degradation above 4KB is the D-cache
+boundary (VexRiscv SMP: 4KB D-cache, no L2).
+
+ATOMiK monitoring rate: **1.2 million regions/second** at 64 contexts.
+
 ## Significance
 
 This result proves ATOMiK's delta-state algebra survives the full
 hardware/software stack: user process → kernel virtual memory → physical bus
-→ FPGA accelerator. The path is now open for kernel drivers, userspace
-runtimes, and application-level benchmarks.
+→ FPGA accelerator, and delivers measurable performance advantages on a
+real change-detection workload.

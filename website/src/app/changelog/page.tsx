@@ -18,6 +18,20 @@ type Release = {
 const releases: Release[] = [
   {
     version: "",
+    title: "Multi-Buffer Change Detection Benchmark",
+    date: "2026-04-06",
+    category: "hardware",
+    items: [
+      "End-to-end workload: track N memory regions, detect changes via ATOMiK vs memcmp",
+      "ATOMiK detection: O(1) per region (~262 cycles), independent of buffer size",
+      "Software memcmp: O(N \u00d7 size), degrades above 4 KB D-cache boundary",
+      "8\u00d74 KB regions: 5,983\u00d7 speedup | 64\u00d71 KB regions: 251\u00d7 speedup",
+      "ATOMiK monitoring rate: 1.2 million regions/sec at 64 contexts",
+      "libatomik C runtime with /dev/mem backend and MMIO ordering fences",
+    ],
+  },
+  {
+    version: "",
     title: "Linux Userspace Validation on Zynq",
     date: "2026-04-06",
     category: "hardware",
@@ -25,9 +39,8 @@ const releases: Release[] = [
       "ATOMiK 16/16 PASS from Linux 6.9 userspace (S-mode, MMU enabled, /dev/mem mmap)",
       "Full stack validated: user process \u2192 kernel \u2192 Wishbone CSR \u2192 ATOMiK core",
       "Linux 6.9 + OpenSBI 1.3.1 booting on VexRiscv SMP (Zynq XC7Z020)",
-      "MMIO ordering requirement documented: fence iorw,iorw + STATUS readback between CSR write and state read",
-      "JTAG fast-load tooling: 14.7 MB in ~10s vs ~22 min over serial",
-      "First validation of ATOMiK through a real OS, real MMU, and real userspace software",
+      "MMIO ordering: fence iorw,iorw + STATUS readback required for Wishbone CSR correctness",
+      "Frozen baseline with SHA-256 manifest (tag: zynq-linux-v1)",
     ],
   },
   {

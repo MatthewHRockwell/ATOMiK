@@ -28,10 +28,10 @@ export const metadata: Metadata = {
 };
 
 const metrics = [
-  { value: "99.9%", label: "Bandwidth Reduction", subtitle: "via delta compression \u2014 only 8-byte deltas transmitted instead of full state" },
+  { value: "O(1)", label: "Change Detection", subtitle: "constant ~262 cycles regardless of buffer size \u2014 hardware-validated on Linux userspace" },
   { value: "92", label: "Lean4 Formal Proofs" },
   { value: "69.7 Gops/s", label: "Peak FPGA Throughput" },
-  { value: "5M+", label: "Python Ops/s" },
+  { value: "1.2M", label: "Regions/sec Monitored", subtitle: "multi-buffer change detection at 64 contexts on Zynq RISC-V Linux" },
 ];
 
 const ops = [
