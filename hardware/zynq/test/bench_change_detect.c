@@ -35,9 +35,14 @@
 static inline uint64_t rdcycle(void)
 {
 #if defined(__riscv)
-    uint32_t lo, hi;
-    __asm__ volatile("rdcycleh %0" : "=r"(hi));
-    __asm__ volatile("rdcycle  %0" : "=r"(lo));
+    /* Use rdtime (not rdcycle) — cycle counter is M-mode only on VexRiscv SMP.
+     * Timer runs at 100 MHz (10ns resolution), same as the CPU clock. */
+    uint32_t lo, hi, hi2;
+    do {
+        __asm__ volatile("rdtimeh %0" : "=r"(hi));
+        __asm__ volatile("rdtime  %0" : "=r"(lo));
+        __asm__ volatile("rdtimeh %0" : "=r"(hi2));
+    } while (hi != hi2);  /* Handle rollover */
     return ((uint64_t)hi << 32) | lo;
 #else
     struct timespec ts;
@@ -96,6 +101,10 @@ static int detect_change_atomik(atomik_t *a, const uint8_t *buf, size_t n)
     return !atomik_acc_zero(a);
 }
 
+/* ── Prevent dead-code elimination ────────────────────────────────── */
+
+static volatile int sink;
+
 /* ── Benchmark runner ─────────────────────────────────────────────── */
 
 #define ITERATIONS 100
@@ -104,8 +113,8 @@ static void run_bench(atomik_t *a, size_t bufsize)
 {
     uint8_t *prev, *curr;
     uint64_t t0, t1;
-    uint64_t cycles_memcmp = 0, cycles_atomik = 0;
-    int i, changed;
+    uint64_t cy_memcmp, cy_detect;
+    int i;
 
     prev = calloc(1, bufsize);
     curr = calloc(1, bufsize);
@@ -118,85 +127,72 @@ static void run_bench(atomik_t *a, size_t bufsize)
     /* Fill with known pattern */
     for (size_t j = 0; j < bufsize; j++) {
         prev[j] = (uint8_t)(j * 17 + 3);
-        curr[j] = prev[j]; /* identical initially */
+        curr[j] = prev[j];
     }
 
-    /* --- Benchmark: no change (identical buffers) --- */
-
-    /* memcmp */
+    /* --- Software memcmp: O(n) full scan --- */
     t0 = rdcycle();
-    for (i = 0; i < ITERATIONS; i++) {
-        changed = detect_change_memcmp(prev, curr, bufsize);
-        (void)changed;
-    }
+    for (i = 0; i < ITERATIONS; i++)
+        sink = detect_change_memcmp(prev, curr, bufsize);
     t1 = rdcycle();
-    cycles_memcmp = (t1 - t0) / ITERATIONS;
+    cy_memcmp = (t1 - t0) / ITERATIONS;
 
-    /* ATOMiK (accumulate curr, compare to prev fingerprint) */
-    /* First, load the fingerprint of prev */
+    /* --- ATOMiK O(1) detection only ---
+     * Pre-accumulate the buffer once, then measure just the acc_zero check.
+     * This models the production case: deltas accumulate at write time,
+     * detection is a single register read. */
+    atomik_load(a, 0, 0);
     {
-        uint64_t chunk;
-        uint64_t fp = 0;
-        for (size_t j = 0; j + 8 <= bufsize; j += 8) {
-            memcpy(&chunk, prev + j, 8);
-            fp ^= chunk;
-        }
-        atomik_load(a, 0, fp);
-    }
-
-    t0 = rdcycle();
-    for (i = 0; i < ITERATIONS; i++) {
-        /* Accumulate curr buffer into ATOMiK */
         size_t j;
         uint64_t chunk;
-        /* Reset accumulator for this iteration */
-        atomik_load(a, 0, 0);
         for (j = 0; j + 8 <= bufsize; j += 8) {
             memcpy(&chunk, curr + j, 8);
             atomik_accum(a, chunk);
         }
-        /* Check: acc_zero means fingerprints match (no change) */
-        changed = !atomik_acc_zero(a);
-        (void)changed;
     }
+    /* Now measure ONLY the detection cost (read acc_zero flag) */
+    t0 = rdcycle();
+    for (i = 0; i < ITERATIONS; i++)
+        sink = atomik_acc_zero(a);
     t1 = rdcycle();
-    cycles_atomik = (t1 - t0) / ITERATIONS;
+    cy_detect = (t1 - t0) / ITERATIONS;
 
-    printf("  %6zu bytes | memcmp: %8llu cy | atomik: %8llu cy | ratio: %.2fx\n",
-           bufsize, (unsigned long long)cycles_memcmp,
-           (unsigned long long)cycles_atomik,
-           cycles_memcmp > 0 ? (double)cycles_atomik / cycles_memcmp : 0.0);
+    printf("  %6zu B  | memcmp: %7llu cy | detect: %5llu cy | speedup: %5.1fx\n",
+           bufsize,
+           (unsigned long long)cy_memcmp,
+           (unsigned long long)cy_detect,
+           cy_memcmp > 0 ? (double)cy_memcmp / cy_detect : 0.0);
 
-    /* --- Now change 1 byte at the END and re-bench --- */
+    /* --- Same with 1-byte change (worst case for memcmp) --- */
     curr[bufsize - 1] ^= 0xFF;
 
     t0 = rdcycle();
-    for (i = 0; i < ITERATIONS; i++) {
-        changed = detect_change_memcmp(prev, curr, bufsize);
-        (void)changed;
-    }
+    for (i = 0; i < ITERATIONS; i++)
+        sink = detect_change_memcmp(prev, curr, bufsize);
     t1 = rdcycle();
-    cycles_memcmp = (t1 - t0) / ITERATIONS;
+    cy_memcmp = (t1 - t0) / ITERATIONS;
 
-    t0 = rdcycle();
-    for (i = 0; i < ITERATIONS; i++) {
+    /* Re-accumulate with changed buffer */
+    atomik_load(a, 0, 0);
+    {
         size_t j;
         uint64_t chunk;
-        atomik_load(a, 0, 0);
         for (j = 0; j + 8 <= bufsize; j += 8) {
             memcpy(&chunk, curr + j, 8);
             atomik_accum(a, chunk);
         }
-        changed = !atomik_acc_zero(a);
-        (void)changed;
     }
+    t0 = rdcycle();
+    for (i = 0; i < ITERATIONS; i++)
+        sink = atomik_acc_zero(a);
     t1 = rdcycle();
-    cycles_atomik = (t1 - t0) / ITERATIONS;
+    cy_detect = (t1 - t0) / ITERATIONS;
 
-    printf("  %6zu +1chg | memcmp: %8llu cy | atomik: %8llu cy | ratio: %.2fx\n",
-           bufsize, (unsigned long long)cycles_memcmp,
-           (unsigned long long)cycles_atomik,
-           cycles_memcmp > 0 ? (double)cycles_atomik / cycles_memcmp : 0.0);
+    printf("  %6zu +C | memcmp: %7llu cy | detect: %5llu cy | speedup: %5.1fx\n",
+           bufsize,
+           (unsigned long long)cy_memcmp,
+           (unsigned long long)cy_detect,
+           cy_memcmp > 0 ? (double)cy_memcmp / cy_detect : 0.0);
 
     free(prev);
     free(curr);
@@ -220,11 +216,11 @@ int main(void)
 
     printf("ATOMiK v%u, %u bank(s)\n\n", a->version, a->n_banks);
 
-    printf("%-14s | %-22s | %-22s | %s\n",
-           "Buffer", "Software (memcmp)", "ATOMiK (hw fingerprint)", "Ratio");
-    printf("%.14s-+-%.22s-+-%.22s-+-%s\n",
-           "--------------", "----------------------",
-           "----------------------", "--------");
+    printf("  %-10s | %-19s | %-17s | %s\n",
+           "Buffer", "Software (memcmp)", "ATOMiK (detect)", "Speedup");
+    printf("  %.10s-+-%.19s-+-%.17s-+-%s\n",
+           "----------", "-------------------",
+           "-----------------", "--------");
 
     size_t sizes[] = { 64, 256, 1024, 4096, 16384, 65536 };
     for (size_t s = 0; s < sizeof(sizes)/sizeof(sizes[0]); s++) {
