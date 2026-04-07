@@ -33,6 +33,41 @@ static inline uint32_t reg_read(volatile uint32_t *regs, unsigned offset)
     return regs[offset / 4];
 }
 
+/*
+ * MMIO ordering barrier: ensures prior CSR writes complete on the Wishbone
+ * bus before subsequent reads. Required on VexRiscv SMP — without this,
+ * STATE_LO reads after LOAD/ACCUM return stale data.
+ *
+ * Uses: fence iorw,iorw + dummy STATUS read (bus round-trip).
+ */
+static inline void mmio_barrier(volatile uint32_t *regs, unsigned status_off)
+{
+#if defined(__riscv)
+    __asm__ volatile("fence iorw, iorw" ::: "memory");
+#else
+    __sync_synchronize();
+#endif
+    (void)reg_read(regs, status_off);
+}
+
+static void resolve_layout(atomik_t *a, atomik_layout_t layout)
+{
+    a->layout = layout;
+    if (layout == ATOMIK_LAYOUT_CSR) {
+        a->off_state_lo  = ATOMIK_CSR_STATE_LO;
+        a->off_state_hi  = ATOMIK_CSR_STATE_HI;
+        a->off_status    = ATOMIK_CSR_STATUS;
+        a->off_swap_addr = ATOMIK_CSR_SWAP_ADDR;
+        a->off_config    = ATOMIK_CSR_CONFIG;
+    } else {
+        a->off_state_lo  = ATOMIK_AXI_STATE_LO;
+        a->off_state_hi  = ATOMIK_AXI_STATE_HI;
+        a->off_status    = ATOMIK_AXI_STATUS;
+        a->off_swap_addr = ATOMIK_AXI_SWAP_ADDR;
+        a->off_config    = ATOMIK_AXI_CONFIG;
+    }
+}
+
 /* =========================================================================
  * Lifecycle
  * ========================================================================= */
@@ -65,8 +100,51 @@ atomik_t *atomik_open(const char *uio_dev)
         return NULL;
     }
 
+    /* UIO always uses AXI layout */
+    resolve_layout(a, ATOMIK_LAYOUT_AXI);
+
     /* Read STATUS register to populate device info */
-    status = reg_read(a->regs, ATOMIK_REG_STATUS);
+    status = reg_read(a->regs, a->off_status);
+    a->n_banks = ATOMIK_STATUS_N_BANKS(status);
+    a->version = ATOMIK_STATUS_VERSION(status);
+
+    return a;
+}
+
+atomik_t *atomik_open_devmem(unsigned long phys_addr, atomik_layout_t layout)
+{
+    atomik_t *a;
+    uint32_t status;
+    unsigned long page_base;
+    unsigned long page_offset;
+
+    a = calloc(1, sizeof(*a));
+    if (!a)
+        return NULL;
+
+    a->fd = open("/dev/mem", O_RDWR | O_SYNC);
+    if (a->fd < 0) {
+        free(a);
+        return NULL;
+    }
+
+    /* Align to page boundary */
+    page_base = phys_addr & ~(unsigned long)(ATOMIK_MMAP_SIZE - 1);
+    page_offset = phys_addr - page_base;
+
+    void *map = mmap(NULL, ATOMIK_MMAP_SIZE, PROT_READ | PROT_WRITE,
+                     MAP_SHARED, a->fd, page_base);
+    if (map == MAP_FAILED) {
+        close(a->fd);
+        free(a);
+        return NULL;
+    }
+    a->regs = (volatile uint32_t *)((char *)map + page_offset);
+
+    resolve_layout(a, layout);
+
+    /* Read STATUS register to populate device info */
+    status = reg_read(a->regs, a->off_status);
     a->n_banks = ATOMIK_STATUS_N_BANKS(status);
     a->version = ATOMIK_STATUS_VERSION(status);
 
@@ -107,6 +185,10 @@ void atomik_load(atomik_t *a, uint8_t addr, uint64_t initial_state)
               (uint32_t)(initial_state & 0xFFFFFFFF));
     reg_write(a->regs, ATOMIK_REG_LOAD_DATA_HI,
               (uint32_t)(initial_state >> 32));
+
+    /* MMIO barrier: HI write triggers LOAD on the bus. Without a round-trip
+     * read, the next STATE read can return stale data (validated on Zynq). */
+    mmio_barrier(a->regs, a->off_status);
 }
 
 void atomik_accum(atomik_t *a, uint64_t delta)
@@ -116,6 +198,8 @@ void atomik_accum(atomik_t *a, uint64_t delta)
               (uint32_t)(delta & 0xFFFFFFFF));
     reg_write(a->regs, ATOMIK_REG_ACCUM_HI,
               (uint32_t)(delta >> 32));
+
+    mmio_barrier(a->regs, a->off_status);
 }
 
 uint64_t atomik_read(atomik_t *a)
@@ -127,16 +211,16 @@ uint64_t atomik_read(atomik_t *a)
      * Then read HI — returns the upper half from the latched value.
      * This guarantees atomic 64-bit reads over a 32-bit bus.
      */
-    lo = reg_read(a->regs, ATOMIK_REG_STATE_LO);
-    hi = reg_read(a->regs, ATOMIK_REG_STATE_HI);
+    lo = reg_read(a->regs, a->off_state_lo);
+    hi = reg_read(a->regs, a->off_state_hi);
 
     return ((uint64_t)hi << 32) | lo;
 }
 
 void atomik_swap(atomik_t *a, uint8_t addr)
 {
-    /* Write triggers SWAP immediately */
-    reg_write(a->regs, ATOMIK_REG_SWAP_ADDR, addr);
+    reg_write(a->regs, a->off_swap_addr, addr);
+    mmio_barrier(a->regs, a->off_status);
 }
 
 /* =========================================================================
@@ -145,7 +229,7 @@ void atomik_swap(atomik_t *a, uint8_t addr)
 
 int atomik_acc_zero(atomik_t *a)
 {
-    uint32_t status = reg_read(a->regs, ATOMIK_REG_STATUS);
+    uint32_t status = reg_read(a->regs, a->off_status);
     return ATOMIK_STATUS_ACC_ZERO(status);
 }
 
@@ -161,11 +245,11 @@ uint8_t atomik_version(atomik_t *a)
 
 void atomik_set_enable(atomik_t *a, int enable)
 {
-    reg_write(a->regs, ATOMIK_REG_CONFIG, enable ? 1 : 0);
+    reg_write(a->regs, a->off_config, enable ? 1 : 0);
 }
 
 int atomik_is_enabled(atomik_t *a)
 {
-    uint32_t config = reg_read(a->regs, ATOMIK_REG_CONFIG);
+    uint32_t config = reg_read(a->regs, a->off_config);
     return config & 1;
 }

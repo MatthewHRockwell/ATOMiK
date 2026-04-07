@@ -29,22 +29,46 @@ extern "C" {
 #endif
 
 /* =========================================================================
- * Register map (matches atomik_axi4lite_wrapper.v)
+ * Register maps
+ *
+ * Two layouts exist depending on the bus path:
+ *   AXI4-Lite wrapper (ARM GP0 at 0x43C00000) — atomik_axi4lite_wrapper.v
+ *   LiteX Wishbone CSR (VexRiscv at 0xF0000000) — LiteX Migen CSR module
+ *
+ * Both share offsets 0x00–0x10. They differ at 0x14+.
+ * The layout is selected at open time.
  * ========================================================================= */
 
+/* --- Common registers (identical in both layouts) --- */
 #define ATOMIK_REG_LOAD_ADDR      0x00  /* (W)   Address for next LOAD [7:0]        */
 #define ATOMIK_REG_LOAD_DATA_LO   0x04  /* (W)   Initial state bits [31:0]          */
 #define ATOMIK_REG_LOAD_DATA_HI   0x08  /* (W)   Initial state bits [63:32], trigger*/
 #define ATOMIK_REG_ACCUM_LO       0x0C  /* (W)   Delta bits [31:0]                  */
 #define ATOMIK_REG_ACCUM_HI       0x10  /* (W)   Delta bits [63:32], trigger        */
-#define ATOMIK_REG_STATE_LO       0x14  /* (R)   Current state [31:0], latches snap */
-#define ATOMIK_REG_STATE_HI       0x18  /* (R)   Current state [63:32] from latch   */
-#define ATOMIK_REG_STATUS         0x1C  /* (R)   {ver[15:8], banks[7:0], acc_zero}  */
-#define ATOMIK_REG_SWAP_ADDR      0x20  /* (W)   Address + trigger SWAP [7:0]       */
-#define ATOMIK_REG_CONFIG         0x24  /* (R/W) Bit 0 = enable (resets to 1)       */
+
+/* --- AXI4-Lite layout (atomik_axi4lite_wrapper.v) --- */
+#define ATOMIK_AXI_STATE_LO       0x14
+#define ATOMIK_AXI_STATE_HI       0x18
+#define ATOMIK_AXI_STATUS         0x1C
+#define ATOMIK_AXI_SWAP_ADDR      0x20
+#define ATOMIK_AXI_CONFIG         0x24
+
+/* --- LiteX Wishbone CSR layout (validated on Zynq, 16/16 PASS) --- */
+#define ATOMIK_CSR_SWAP_ADDR      0x14
+#define ATOMIK_CSR_CONFIG         0x18
+#define ATOMIK_CSR_STATE_LO       0x1C
+#define ATOMIK_CSR_STATE_HI       0x20
+#define ATOMIK_CSR_STATUS         0x24
+
+/* Default to AXI layout for backward compat; CSR layout used by atomik_open_devmem() */
+#define ATOMIK_REG_STATE_LO       ATOMIK_AXI_STATE_LO
+#define ATOMIK_REG_STATE_HI       ATOMIK_AXI_STATE_HI
+#define ATOMIK_REG_STATUS         ATOMIK_AXI_STATUS
+#define ATOMIK_REG_SWAP_ADDR      ATOMIK_AXI_SWAP_ADDR
+#define ATOMIK_REG_CONFIG         ATOMIK_AXI_CONFIG
 
 #define ATOMIK_REG_SPACE_SIZE     0x28  /* Total register space (10 registers)      */
-#define ATOMIK_MMAP_SIZE          0x1000 /* UIO maps at page granularity            */
+#define ATOMIK_MMAP_SIZE          0x1000 /* Maps at page granularity                */
 
 /* STATUS register field extraction */
 #define ATOMIK_STATUS_ACC_ZERO(s)   ((s) & 0x1)
@@ -55,11 +79,23 @@ extern "C" {
  * Handle
  * ========================================================================= */
 
+typedef enum {
+    ATOMIK_LAYOUT_AXI,  /* AXI4-Lite wrapper (ARM GP0 path) */
+    ATOMIK_LAYOUT_CSR,  /* LiteX Wishbone CSR (VexRiscv path) */
+} atomik_layout_t;
+
 typedef struct {
     volatile uint32_t *regs;    /* mmap'd register base                     */
-    int                fd;      /* /dev/uioN file descriptor                */
+    int                fd;      /* file descriptor (/dev/uioN or /dev/mem)  */
     uint8_t            n_banks; /* Number of parallel banks (from STATUS)   */
     uint8_t            version; /* Hardware version (from STATUS)           */
+    atomik_layout_t    layout;  /* Register layout variant                  */
+    /* Per-layout register offsets (resolved at open time) */
+    uint8_t            off_state_lo;
+    uint8_t            off_state_hi;
+    uint8_t            off_status;
+    uint8_t            off_swap_addr;
+    uint8_t            off_config;
 } atomik_t;
 
 /* =========================================================================
@@ -73,6 +109,17 @@ typedef struct {
  * @return         Handle on success, NULL on failure (errno set)
  */
 atomik_t *atomik_open(const char *uio_dev);
+
+/*
+ * Open ATOMiK via /dev/mem at a known physical address.
+ * Use this when no UIO driver is available (e.g., early bringup).
+ * Includes MMIO ordering fences for Wishbone bus correctness.
+ *
+ * @param phys_addr  Physical base address of ATOMiK CSRs (e.g., 0xF0000000)
+ * @param layout     Register layout (ATOMIK_LAYOUT_AXI or ATOMIK_LAYOUT_CSR)
+ * @return           Handle on success, NULL on failure (errno set)
+ */
+atomik_t *atomik_open_devmem(unsigned long phys_addr, atomik_layout_t layout);
 
 /*
  * Close an ATOMiK device and release resources.
