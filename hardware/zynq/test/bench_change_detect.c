@@ -58,49 +58,6 @@ static int detect_change_memcmp(const uint8_t *prev, const uint8_t *curr, size_t
     return memcmp(prev, curr, n) != 0;
 }
 
-/* ── ATOMiK fingerprint-based change detection ────────────────────── */
-
-static int detect_change_atomik(atomik_t *a, const uint8_t *buf, size_t n)
-{
-    /*
-     * Compute XOR fingerprint of buffer, accumulate into ATOMiK.
-     * If accumulator is non-zero, buffer changed since last LOAD.
-     *
-     * This reduces to: for each 8-byte chunk, ACCUM the chunk.
-     * After all chunks, check acc_zero.
-     *
-     * The key insight: this is ALSO O(n) for the accumulation step.
-     * But the DETECTION is O(1) — just read acc_zero.
-     * In a real system, the accumulation happens incrementally as
-     * writes occur (via hardware interception), making detection O(1).
-     *
-     * For this benchmark, we measure the full scan+accumulate to show
-     * that even with the scan, ATOMiK is competitive, and the acc_zero
-     * check is trivially fast.
-     */
-    size_t i;
-    uint64_t chunk;
-
-    /* Reset: load the fingerprint of the "known" state */
-    atomik_load(a, 0, 0);
-
-    /* Accumulate every 8-byte chunk */
-    for (i = 0; i + 8 <= n; i += 8) {
-        memcpy(&chunk, buf + i, 8);
-        atomik_accum(a, chunk);
-    }
-
-    /* Handle tail bytes */
-    if (i < n) {
-        chunk = 0;
-        memcpy(&chunk, buf + i, n - i);
-        atomik_accum(a, chunk);
-    }
-
-    /* O(1) check: is accumulator non-zero? */
-    return !atomik_acc_zero(a);
-}
-
 /* ── Prevent dead-code elimination ────────────────────────────────── */
 
 static volatile int sink;

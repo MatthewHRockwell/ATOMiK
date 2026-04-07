@@ -121,19 +121,12 @@ static void apply_changes(uint8_t **regions, atomik_t *a,
         /* Flip last byte */
         regions[i][region_size - 1] ^= 0xFF;
 
-        /* Accumulate the delta into ATOMiK (simulates write-time tracking) */
-        uint64_t old_chunk = 0, new_chunk = 0;
+        /* Accumulate the delta into ATOMiK (simulates write-time tracking).
+         * We flipped 1 byte, so the delta has 0xFF in that byte position. */
         size_t tail_off = (region_size / 8) * 8;
         if (tail_off + 8 > region_size) tail_off = region_size - 8;
-        memcpy(&old_chunk, regions[i] + tail_off, 8);
-        /* old_chunk is the NEW value (we already flipped); original was ^0xFF */
-        /* Delta = old XOR new for the changed chunk */
-        new_chunk = old_chunk;
-        /* We need to accumulate the delta: old_val ^ new_val for that chunk */
-        /* Since we flipped 1 byte, the delta has 0xFF in that byte position */
-        uint64_t delta = 0;
         size_t byte_in_chunk = (region_size - 1) - tail_off;
-        delta = (uint64_t)0xFF << (byte_in_chunk * 8);
+        uint64_t delta = (uint64_t)0xFF << (byte_in_chunk * 8);
         atomik_swap(a, (uint8_t)i);
         atomik_accum(a, delta);
     }
