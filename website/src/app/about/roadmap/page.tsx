@@ -89,15 +89,15 @@ const milestones: Milestone[] = [
   },
   {
     phase: "Phase 2",
-    title: "Xilinx Zynq XC7Z020 \u2014 Parallel Scaling",
+    title: "Xilinx Zynq XC7Z020 \u2014 Parallel Scaling + Linux",
     status: "completed",
     bullets: [
-      "N=1 single bank: 302 LUT, 444 MHz, 446 Mops/s",
-      "N=16 parallel banks: 941 LUT, 267 MHz, 4.4 Gops/s",
       "N=512 peak config: 23,542 LUT, 136 MHz, 69.7 Gops/s",
       "Sub-linear scaling: 3.7\u00d7 LUT growth for 16\u00d7 throughput",
+      "Linux 6.9 userspace validation: 16/16 PASS via /dev/mem mmap (S-mode, MMU)",
+      "Full OS stack proven: user process \u2192 kernel \u2192 Wishbone CSR \u2192 ATOMiK core",
     ],
-    highlight: "69.7 Gops/s on a $99 FPGA",
+    highlight: "69.7 Gops/s + Linux userspace validated",
   },
   {
     phase: "Phase 3",

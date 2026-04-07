@@ -3,7 +3,7 @@
 [![CI/CD](https://github.com/MatthewHRockwell/ATOMiK/actions/workflows/atomik-ci.yml/badge.svg)](https://github.com/MatthewHRockwell/ATOMiK/actions/workflows/atomik-ci.yml)
 [![Code Review](https://github.com/MatthewHRockwell/ATOMiK/actions/workflows/review.yml/badge.svg)](https://github.com/MatthewHRockwell/ATOMiK/actions/workflows/review.yml)
 ![Proofs](https://img.shields.io/badge/formal_proofs-92_verified-blue)
-![Hardware](https://img.shields.io/badge/hardware_tests-127%2F127-brightgreen)
+![Hardware](https://img.shields.io/badge/hardware_tests-143%2F143-brightgreen)
 ![SDK](https://img.shields.io/badge/SDK-5_languages-orange)
 ![Throughput](https://img.shields.io/badge/throughput-69.7_Gops%2Fs-red)
 ![Cost](https://img.shields.io/badge/dev_cost-%24225-yellow)
@@ -57,7 +57,8 @@ assert ctx.read() == 0xDEADBEEF
 - ✅ **8-screen auto-cycling HDMI demo**: Splash, self-test, performance, matrix integrity, energy, architecture, security, algebra
 - ✅ **Persistent flash**: Bitstream + firmware in SPI flash, boots on power-up
 - ✅ **Full validation**: All test suites passing (9/9 ATOMiK, 10/10 Phase 2, 6/6 Display)
-- ✅ **Zynq port**: AXI4-Lite wrapper for Xilinx XC7Z020 (ALINX AX7020), **444 MHz single-bank ceiling**, 512-bank @ 136 MHz = **69.7 Gops/s** (47/47 sim tests)
+- ✅ **Zynq port**: AXI4-Lite wrapper for Xilinx XC7Z020, **444 MHz single-bank ceiling**, 512-bank @ 136 MHz = **69.7 Gops/s** (47/47 sim tests)
+- ✅ **Linux userspace validation**: ATOMiK 16/16 PASS from Linux 6.9 userspace via /dev/mem mmap on Zynq (VexRiscv SMP, S-mode, MMU enabled)
 
 **Get the hardware:**
 ```bash
@@ -93,7 +94,7 @@ python -m software.demos.state_sync_benchmark
 - **Live Demo**: `python -m demos.run_demo --mode simulate --web` (runs at `localhost:8000`)
 - **Benchmark Evidence**: `python -m software.demos.state_sync_benchmark`
 
-**Key metrics**: $225 total development cost | 92 formal proofs | 127/127 hardware tests | 69.7 Gops/s peak | 5-language SDK | 353 tests passing
+**Key metrics**: $225 total development cost | 92 formal proofs | 143/143 hardware tests | 69.7 Gops/s peak | 5-language SDK | 353 tests passing
 
 ---
 
@@ -153,7 +154,8 @@ python -m software.demos.state_sync_benchmark
 | **Ceiling Characterization** | 444 MHz single-bank, 136 MHz × 512 banks = **69.7 Gops/s** | ✅ Complete (6 configs, 4 strategies) |
 | **Vivado Build Infrastructure** | TCL scripts, block design, constraints, Makefile, sweep automation | ✅ Complete |
 | **Reference Documentation** | Board pinout, PS config, AXI guide, Vivado build guide | ✅ Complete (13 docs) |
-| **Hardware Bringup** | PS+PL block design + deployment on AX7020 | Pending (board arriving ~Mar 22) |
+| **Hardware Bringup** | PS+PL block design, ATOMiK BIOS tests 6/6 PASS | ✅ Complete |
+| **Linux Userspace Validation** | Linux 6.9 boot + ATOMiK 16/16 PASS from S-mode userspace | ✅ **Complete** |
 
 ---
 

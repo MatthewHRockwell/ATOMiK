@@ -1,6 +1,7 @@
 # ==============================================================================
 # ATOMiK Zynq Build Makefile
-# Target: ALINX AX7020 (XC7Z020-2CLG400I)
+# Target: HamGeek RK-ZYNQ7020-F (XC7Z020-2CLG484I)
+# PS_CLK = 32.214 MHz (measured via UART baud calibration 2026-03-30)
 #
 # Usage:
 #   make help         Show available targets
@@ -56,7 +57,7 @@ BUILD_DIR  := $(ZYNQ_DIR)output
 SIM_CDC    := $(BUILD_DIR)/tb_cdc_wrapper
 SIM_COPROC := $(BUILD_DIR)/tb_coprocessor
 
-.PHONY: all sim sim-cdc sim-coproc bitstream blockdesign program clean help
+.PHONY: all sim sim-cdc sim-coproc bitstream blockdesign program test-jtag boot boot-fast clean help
 
 all: sim-cdc
 
@@ -125,6 +126,18 @@ blockdesign:
 program:
 	cd $(ZYNQ_DIR) && $(VIVADO) vivado/program.tcl
 
+## Program + test ATOMiK via JTAG (ps7_init → bitstream → register tests)
+test-jtag:
+	cd $(ZYNQ_DIR) && xsdb scripts/jtag_test_atomik.tcl
+
+## Boot Linux via JTAG fast-load (~10s vs ~22min serial)
+boot-fast:
+	cd $(ZYNQ_DIR) && python3 scripts/auto_boot_linux.py --fast 69
+
+## Boot Linux via SFL serial upload (slow but reliable)
+boot:
+	cd $(ZYNQ_DIR) && python3 scripts/auto_boot_linux.py --images boot_linux69.json
+
 # ------------------------------------------------------------------------------
 # Housekeeping
 # ------------------------------------------------------------------------------
@@ -143,6 +156,9 @@ help:
 	@echo "  make blockdesign  - Build Zynq PS+PL block design (primary flow)"
 	@echo "  make bitstream    - Build PL-only bitstream (non-project mode)"
 	@echo "  make program      - Program FPGA via JTAG (volatile)"
+	@echo "  make test-jtag    - Program + test ATOMiK via JTAG (xsdb)"
+	@echo "  make boot-fast    - Boot Linux via JTAG DDR load (~10s)"
+	@echo "  make boot         - Boot Linux via SFL serial (~22min)"
 	@echo "  make clean        - Remove all build artifacts"
 	@echo "  make sweep-quick  - Quick Fmax sweep: 200, 300, 400 MHz"
 	@echo "  make sweep        - Full Fmax sweep: 200-500 MHz"

@@ -17,6 +17,20 @@ type Release = {
 
 const releases: Release[] = [
   {
+    version: "",
+    title: "Linux Userspace Validation on Zynq",
+    date: "2026-04-06",
+    category: "hardware",
+    items: [
+      "ATOMiK 16/16 PASS from Linux 6.9 userspace (S-mode, MMU enabled, /dev/mem mmap)",
+      "Full stack validated: user process \u2192 kernel \u2192 Wishbone CSR \u2192 ATOMiK core",
+      "Linux 6.9 + OpenSBI 1.3.1 booting on VexRiscv SMP (Zynq XC7Z020)",
+      "MMIO ordering requirement documented: fence iorw,iorw + STATUS readback between CSR write and state read",
+      "JTAG fast-load tooling: 14.7 MB in ~10s vs ~22 min over serial",
+      "First validation of ATOMiK through a real OS, real MMU, and real userspace software",
+    ],
+  },
+  {
     version: "v0.5.0",
     title: "Kernel Module — Enterprise Features",
     date: "2026-03-16",

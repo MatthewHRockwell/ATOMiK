@@ -37,6 +37,9 @@
         <File path="../soc/hdmi/atomik_delta_display.v" type="file.verilog" enable="1"/>
         <File path="../soc/hdmi/disp_mmio_cdc.v" type="file.verilog" enable="1"/>
 
+        <!-- BNN Accelerator -->
+        <File path="../soc/atomik_bnn_accel.v" type="file.verilog" enable="1"/>
+
         <!-- Gowin IP -->
         <File path="../soc/gowin_ip/gowin_rpll/gowin_rpll.v" type="file.verilog" enable="1"/>
         <File path="../soc/gowin_ip/gowin_clkdiv/gowin_clkdiv.v" type="file.verilog" enable="1"/>

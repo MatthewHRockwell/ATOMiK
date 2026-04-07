@@ -1,7 +1,9 @@
 # ==============================================================================
 # ATOMiK Zynq Build Script (Non-Project Mode)
 #
-# Target:  ALINX AX7020 (XC7Z020-2CLG400I)
+# Target:  HamGeek RK-ZYNQ7020-F (XC7Z020-2CLG484I)
+# NOTE:    PS_CLK = 32.214 MHz (not 33.333 MHz) — affects all PLL frequencies
+#          IO PLL = 32.214 × 30 = 966 MHz, FCLK = 966/5/2 ≈ 96.6 MHz
 # Purpose: PL-only synthesis for ATOMiK AXI4-Lite wrapper.
 #          Use block_design.tcl for full PS+PL builds.
 #
@@ -49,7 +51,12 @@ read_verilog $ZYNQ_DIR/rtl/atomik_zynq_clk.v
 read_verilog $ZYNQ_DIR/rtl/atomik_zynq_top.v
 
 # Constraints
-read_xdc $ZYNQ_DIR/constraints/ax7020.xdc
+# Use board-specific constraints (rk7020f for HamGeek, ax7020 for ALINX reference)
+if {[file exists $ZYNQ_DIR/constraints/rk7020f.xdc]} {
+    read_xdc $ZYNQ_DIR/constraints/rk7020f.xdc
+} else {
+    read_xdc $ZYNQ_DIR/constraints/ax7020.xdc
+}
 
 # ------------------------------------------------------------------------------
 # Synthesis
@@ -60,7 +67,7 @@ puts "Running synthesis..."
 puts "----------------------------------------------"
 
 auto_detect_xpm
-synth_design -top atomik_zynq_top -part xc7z020clg400-2
+synth_design -top atomik_zynq_top -part xc7z020clg484-2
 
 # Post-synthesis reports
 report_utilization -file $ZYNQ_DIR/reports/post_synth_util.rpt

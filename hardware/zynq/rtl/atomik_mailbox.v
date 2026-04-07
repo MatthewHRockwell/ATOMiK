@@ -140,6 +140,13 @@ module atomik_mailbox #(
     reg        irq_to_arm_r;
     assign irq_to_arm = irq_to_arm_r;
 
+    // Cross-block signals: RV64I block sets these pulses, AXI block consumes them.
+    // Avoids multiple-driver errors in synthesis (both blocks on same clock).
+    reg        rv_clear_cmd_pending;
+    reg        rv_clear_doorbell_to_rv;
+    reg        rv_set_irq;
+    reg        rv_set_doorbell_to_arm;
+
     // Control outputs
     assign rv64i_reset_n = reg_ctrl[0];  // Bit 0 = run (1=run, 0=reset)
 
@@ -191,6 +198,16 @@ module atomik_mailbox #(
         end else begin
             // Default: clear IRQ pulse
             irq_to_arm_r <= 1'b0;
+
+            // Handle cross-block signals from RV64I side
+            if (rv_clear_cmd_pending)
+                cmd_pending <= 1'b0;
+            if (rv_clear_doorbell_to_rv)
+                doorbell_to_rv <= 1'b0;
+            if (rv_set_irq)
+                irq_to_arm_r <= 1'b1;
+            if (rv_set_doorbell_to_arm)
+                doorbell_to_arm <= 1'b1;
 
             // AW handshake
             if (s_axi_awvalid && s_axi_awready) begin
@@ -317,8 +334,17 @@ module atomik_mailbox #(
             rv_rdata  <= 32'b0;
             reg_resp0 <= 32'b0;
             reg_resp1 <= 32'b0;
+            rv_clear_cmd_pending    <= 1'b0;
+            rv_clear_doorbell_to_rv <= 1'b0;
+            rv_set_irq              <= 1'b0;
+            rv_set_doorbell_to_arm  <= 1'b0;
         end else begin
             rv_ready <= 1'b0;
+            // Default: clear pulse signals
+            rv_clear_cmd_pending    <= 1'b0;
+            rv_clear_doorbell_to_rv <= 1'b0;
+            rv_set_irq              <= 1'b0;
+            rv_set_doorbell_to_arm  <= 1'b0;
 
             if (rv_valid && !rv_ready) begin
                 rv_ready <= 1'b1;
@@ -329,14 +355,14 @@ module atomik_mailbox #(
                         REG_RESP0: begin
                             reg_resp0  <= rv_wdata;
                             resp_ready <= 1'b1;
-                            irq_to_arm_r <= 1'b1;
+                            rv_set_irq <= 1'b1;
                         end
                         REG_RESP1:    reg_resp1 <= rv_wdata;
                         REG_DEBUG_PC: ;  // Read-only from RV64I (PC updated via debug_pc input)
                         REG_DOORBELL: begin
                             if (rv_wdata[1]) begin
-                                doorbell_to_arm <= 1'b1;
-                                irq_to_arm_r    <= 1'b1;
+                                rv_set_doorbell_to_arm <= 1'b1;
+                                rv_set_irq             <= 1'b1;
                             end
                         end
                         default: ;
@@ -347,8 +373,8 @@ module atomik_mailbox #(
                         REG_CTRL:     rv_rdata <= reg_ctrl;
                         REG_STATUS:   rv_rdata <= status_word;
                         REG_CMD: begin
-                            rv_rdata    <= reg_cmd;
-                            cmd_pending <= 1'b0;  // Clear on read
+                            rv_rdata             <= reg_cmd;
+                            rv_clear_cmd_pending <= 1'b1;  // Clear on read
                         end
                         REG_ARG0:     rv_rdata <= reg_arg0;
                         REG_ARG1:     rv_rdata <= reg_arg1;
@@ -359,8 +385,8 @@ module atomik_mailbox #(
                         REG_FW_ADDR:  rv_rdata <= reg_fw_addr;
                         REG_FW_SIZE:  rv_rdata <= reg_fw_size;
                         REG_DOORBELL: begin
-                            rv_rdata       <= {30'b0, doorbell_to_arm, doorbell_to_rv_sync[1]};
-                            doorbell_to_rv <= 1'b0;  // Clear on read
+                            rv_rdata                <= {30'b0, doorbell_to_arm, doorbell_to_rv_sync[1]};
+                            rv_clear_doorbell_to_rv <= 1'b1;  // Clear on read
                         end
                         default:      rv_rdata <= 32'hDEAD_BEEF;
                     endcase

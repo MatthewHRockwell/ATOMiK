@@ -7,3 +7,6 @@
 ./atomik_cow.o
 ./atomik_net.o
 ./atomik_cgroup.o
+./atomik_proc.o
+./atomik_audit.o
+./atomik_trace_define.o

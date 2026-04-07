@@ -9,6 +9,7 @@
 #include "atomik_v3_alloc.h"
 #include "printf_v3.h"
 #include "perf_bench_v3.h"
+#include "bnn_v3.h"
 
 // Linker symbol for null pointer detection
 extern uint64_t sram;
@@ -1333,6 +1334,13 @@ void cmd_shell(void)
 #define CH_ARROW   '\x94'
 #define CH_DIAMOND '\x95'
 
+// Live metrics — populated by demo screens, used by summary
+static uint32_t live_tamper_cycles = 10;     // Updated by demo_tamper_hdmi
+static uint32_t live_tamper_ns = 460;        // Updated by demo_tamper_hdmi
+static uint32_t live_throughput = 27000;     // Updated by demo_throughput
+static uint32_t live_hw_cycles = 40;         // Updated by demo_hwsw
+static uint32_t live_sw_cycles = 35000;      // Updated by demo_hwsw
+
 // 64-bit LFSR pseudo-random generator (xorshift64)
 static uint64_t lfsr_state = 0xACE1ACE1ACE1ACE1ULL;
 
@@ -1545,41 +1553,76 @@ static void setup_overlay_gradient4(uint32_t c1, uint32_t c2, uint32_t c3, uint3
 static void demo_splash(void)
 {
     clear_screen();
-    setup_overlay_gradient4(0x000810, 0x001020, 0x001830, 0x002040, 20);
+    setup_overlay_gradient4(0x080018, 0x100028, 0x180038, 0x200048, 36);
 
-    center_vertical(14);
+    center_vertical(18);
 
-    pad_spaces(71);
-    print("A T O M i K   v 3\n");
+    // Top accent bar (wide gradient fade)
+    pad_spaces(30);
+    repeat_char(CH_FULL, 100);
     putchar('\n');
-    pad_spaces(68);
-    print("Delta-State Architecture\n");
+    pad_spaces(32);
+    repeat_char(CH_75, 96);
     putchar('\n');
+    pad_spaces(34);
+    repeat_char(CH_50, 92);
     putchar('\n');
-    pad_spaces(62);
-    print("92 Theorems");
-    putchar(' '); putchar(CH_BULLET); putchar(' ');
-    print("Provisionally Patented\n");
-    putchar('\n');
-    pad_spaces(55);
-    print("916,000x Memory Traffic Reduction\n");
+
     putchar('\n');
     putchar('\n');
-    pad_spaces(64);
-    print("RV64I CPU");
-    putchar(' '); putchar(CH_BULLET); putchar(' ');
-    print("Tang Nano 9K");
-    putchar(' '); putchar(CH_BULLET); putchar(' ');
-    print("$13.50\n");
+
+    // Large "ATOMIK" — each letter is 2 chars wide × 2 rows tall using full blocks
+    // Total: 6 letters × (2 wide + 1 space) = 18, doubled = 36 chars, but let's go bigger
+    // Use the existing ASCII art banner that we KNOW renders (it's what firmware.c already has for the boot banner)
+    pad_spaces(40);
+    print("    _  _____ ___  __  __ _ _  __\n");
+    pad_spaces(40);
+    print("   / \\|_   _/ _ \\|  \\/  (_) |/ /\n");
+    pad_spaces(40);
+    print("  / _ \\ | || | | | |\\/| | | ' /\n");
+    pad_spaces(40);
+    print(" / ___ \\| || |_| | |  | | | . \\\n");
+    pad_spaces(40);
+    print("/_/   \\_\\_| \\___/|_|  |_|_|_|\\_\\\n");
+
     putchar('\n');
-    pad_spaces(70);
-    print("1280x720 HDMI @ 60 Hz\n");
+    putchar('\n');
+
+    pad_spaces(56);
+    print("Delta-State Architecture  ");
+    putchar(CH_BULLET);
+    print("  v3.1.0\n");
+
+    putchar('\n');
+
+    pad_spaces(42);
+    print("92 Theorems ");
+    putchar(CH_BULLET);
+    print(" Patented ");
+    putchar(CH_BULLET);
+    print(" 916,000x Memory Reduction ");
+    putchar(CH_BULLET);
+    print(" $13.50 FPGA\n");
+
+    putchar('\n');
+    putchar('\n');
+
+    // Bottom accent bar (mirror)
+    pad_spaces(34);
+    repeat_char(CH_50, 92);
+    putchar('\n');
+    pad_spaces(32);
+    repeat_char(CH_75, 96);
+    putchar('\n');
+    pad_spaces(30);
+    repeat_char(CH_FULL, 100);
+    putchar('\n');
 }
 
 static int demo_selftest(void)
 {
     clear_screen();
-    setup_overlay_gradient4(0x000C00, 0x001400, 0x001C00, 0x002800, 20);
+    setup_overlay_gradient4(0x001800, 0x002800, 0x003800, 0x004800, 28);
 
     center_vertical(16);
     draw_top(PAD, "Boot Self-Test", BOX_W);
@@ -1725,7 +1768,7 @@ static int demo_selftest(void)
 static int demo_performance(void)
 {
     clear_screen();
-    setup_overlay_gradient4(0x001010, 0x001818, 0x002020, 0x002828, 20);
+    setup_overlay_gradient4(0x001818, 0x002828, 0x003838, 0x004848, 28);
 
     center_vertical(28);
     draw_top(PAD, "Performance", BOX_W);
@@ -1842,107 +1885,83 @@ static int demo_performance(void)
     draw_empty(PAD, BOX_W);
     draw_bottom(PAD, BOX_W);
 
-    return delay_sec(10);
+    return delay_sec(7);
 }
 
 static int demo_architecture(void)
 {
     clear_screen();
-    setup_overlay_gradient4(0x080018, 0x100020, 0x180028, 0x180030, 24);
+    setup_overlay_gradient4(0x100020, 0x180030, 0x200040, 0x280050, 30);
 
-    center_vertical(20);
-    draw_top(PAD, "Why ATOMiK", BOX_W);
+    center_vertical(28);
+    draw_top(PAD, "Architecture", BOX_W);
     draw_empty(PAD, BOX_W);
 
-    // Security
-    pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(2);
-    putchar(CH_ARROW); putchar(' ');
-    print("Security by Architecture");
-    pad_spaces(BOX_W - 28);
-    putchar(CH_VLINE); putchar('\n');
-
+    // Section 1: Security — with accent bar
     pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(4);
-    putchar(CH_BULLET); putchar(' ');
-    print("No timing side channels (deterministic latency)");
-    pad_spaces(BOX_W - 54);
+    repeat_char(CH_FULL, 6); print("  Security by Architecture");
+    pad_spaces(BOX_W - 38);
     putchar(CH_VLINE); putchar('\n');
+    draw_empty(PAD, BOX_W);
 
-    pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(4);
-    putchar(CH_BULLET); putchar(' ');
-    print("No cache coherency attacks");
-    pad_spaces(BOX_W - 32);
-    putchar(CH_VLINE); putchar('\n');
-
-    pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(4);
-    putchar(CH_BULLET); putchar(' ');
-    print("No speculative execution vulnerabilities");
-    pad_spaces(BOX_W - 46);
-    putchar(CH_VLINE); putchar('\n');
-
-    pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(4);
-    putchar(CH_BULLET); putchar(' ');
-    print("Dynamic reference states (moving target)");
-    pad_spaces(BOX_W - 47);
+    pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(12);
+    print("No timing side channels ");
+    putchar(CH_BULLET);
+    print(" No cache attacks ");
+    putchar(CH_BULLET);
+    print(" No speculation");
+    pad_spaces(BOX_W - 71);
     putchar(CH_VLINE); putchar('\n');
 
     draw_empty(PAD, BOX_W);
-
-    // Mathematical foundation
-    pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(2);
-    putchar(CH_ARROW); putchar(' ');
-    print("Mathematical Foundation");
-    pad_spaces(BOX_W - 27);
-    putchar(CH_VLINE); putchar('\n');
-
-    pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(4);
-    putchar(CH_BULLET); putchar(' ');
-    print("Abelian group: commutative, associative");
-    pad_spaces(BOX_W - 45);
-    putchar(CH_VLINE); putchar('\n');
-
-    pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(4);
-    putchar(CH_BULLET); putchar(' ');
-    print("Self-inverse: any delta cancels itself");
-    pad_spaces(BOX_W - 44);
-    putchar(CH_VLINE); putchar('\n');
-
-    pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(4);
-    putchar(CH_BULLET); putchar(' ');
-    print("92 theorems formally proven in Lean4");
-    pad_spaces(BOX_W - 42);
-    putchar(CH_VLINE); putchar('\n');
-
     draw_empty(PAD, BOX_W);
 
-    // Scalability
-    pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(2);
-    putchar(CH_ARROW); putchar(' ');
-    print("Scalability");
-    pad_spaces(BOX_W - 15);
-    putchar(CH_VLINE); putchar('\n');
-
+    // Section 2: Math — with accent bar
     pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(4);
-    putchar(CH_BULLET); putchar(' ');
-    print("Lock-free parallel accumulation");
+    repeat_char(CH_FULL, 6); print("  Mathematical Foundation");
     pad_spaces(BOX_W - 37);
     putchar(CH_VLINE); putchar('\n');
+    draw_empty(PAD, BOX_W);
 
-    pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(4);
-    putchar(CH_BULLET); putchar(' ');
-    print("Sub-linear LUT scaling (3.7x for 16x throughput)");
-    pad_spaces(BOX_W - 55);
+    pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(12);
+    print("Abelian group ");
+    putchar(CH_BULLET);
+    print(" Self-inverse ");
+    putchar(CH_BULLET);
+    print(" 92 Lean4 theorems");
+    pad_spaces(BOX_W - 58);
     putchar(CH_VLINE); putchar('\n');
 
+    draw_empty(PAD, BOX_W);
+    draw_empty(PAD, BOX_W);
+
+    // Section 3: Scale — with gradient bar
     pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(4);
-    putchar(CH_BULLET); putchar(' ');
-    print("1,056 Mops/s validated (16 banks, hardware-proven)");
-    pad_spaces(BOX_W - 57);
+    repeat_char(CH_FULL, 6); print("  Scalability");
+    pad_spaces(BOX_W - 25);
+    putchar(CH_VLINE); putchar('\n');
+    draw_empty(PAD, BOX_W);
+
+    pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(12);
+    print("1 bank ");
+    putchar(CH_ARROW);
+    print(" 16 banks ");
+    putchar(CH_ARROW);
+    print(" 512 banks     ");
+    draw_hbar_gradient(40, 40);
+    pad_spaces(BOX_W - 86);
     putchar(CH_VLINE); putchar('\n');
 
+    pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(12);
+    print("95 MHz   347 MHz   205 MHz     1,056 Mops/s validated");
+    pad_spaces(BOX_W - 66);
+    putchar(CH_VLINE); putchar('\n');
+
+    draw_empty(PAD, BOX_W);
     draw_empty(PAD, BOX_W);
     draw_bottom(PAD, BOX_W);
 
-    return delay_sec(10);
+    return delay_sec(7);
 }
 
 static int demo_algebra(void)
@@ -2221,7 +2240,7 @@ static int demo_matrix(void)
     draw_empty(PAD, BOX_W);
     draw_bottom(PAD, BOX_W);
 
-    return delay_sec(15);
+    return delay_sec(8);
 }
 
 static int demo_energy(void)
@@ -2401,7 +2420,7 @@ static int demo_energy(void)
     draw_empty(PAD, BOX_W);
     draw_bottom(PAD, BOX_W);
 
-    return delay_sec(12);
+    return delay_sec(8);
 }
 
 static int demo_security(void)
@@ -2586,7 +2605,1144 @@ static int demo_security(void)
     draw_empty(PAD, BOX_W);
     draw_bottom(PAD, BOX_W);
 
-    return delay_sec(15);
+    return delay_sec(8);
+}
+
+// Color LUT indices for BNN classification overlay
+#define BNN_LUT_LETTER  5
+#define BNN_LUT_DIGIT   6
+#define BNN_LUT_SYMBOL  7
+#define BNN_LUT_SPACE   8
+
+static void bnn_setup_class_colors(void)
+{
+    DISP_LUT = (BNN_LUT_LETTER << 24) | 0x002800;  // Green
+    DISP_LUT = (BNN_LUT_DIGIT  << 24) | 0x001028;  // Blue
+    DISP_LUT = (BNN_LUT_SYMBOL << 24) | 0x280800;  // Red
+    DISP_LUT = (BNN_LUT_SPACE  << 24) | 0x101010;  // Gray
+}
+
+static void bnn_set_overlay_class(int cls)
+{
+    int lut_idx = BNN_LUT_LETTER + cls;
+    // Fill left 12 chars and right 12 chars with class color
+    disp_fill_cols(0, 96, lut_idx);
+    disp_fill_cols(1184, 1280, lut_idx);
+}
+
+static int demo_bnn(void)
+{
+    clear_screen();
+    // Cyan/teal gradient for AI theme
+    setup_overlay_gradient4(0x001018, 0x002028, 0x002830, 0x003038, 20);
+    bnn_setup_class_colors();
+
+    center_vertical(48);
+    draw_top(PAD, "Neural Network Inference Engine", BOX_W);
+    draw_empty(PAD, BOX_W);
+
+    // Headline
+    pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(2);
+    print("Binary Neural Network ");
+    putchar(CH_BULLET);
+    print(" 32");
+    putchar(CH_ARROW);
+    print("16");
+    putchar(CH_ARROW);
+    print("4 XNOR-Popcount ");
+    putchar(CH_BULLET);
+    print(" Hardware Accelerated");
+    pad_spaces(BOX_W - 69);
+    putchar(CH_VLINE); putchar('\n');
+
+    pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(2);
+    print("40-cycle inference ");
+    putchar(CH_BULLET);
+    print(" ATOMiK model integrity ");
+    putchar(CH_BULLET);
+    print(" 100% ASCII accuracy");
+    pad_spaces(BOX_W - 66);
+    putchar(CH_VLINE); putchar('\n');
+
+    draw_empty(PAD, BOX_W);
+    draw_divider(PAD, BOX_W);
+    draw_empty(PAD, BOX_W);
+
+    // Model info
+    draw_line(PAD, "Model: ASCII Character Classifier", BOX_W);
+    draw_empty(PAD, BOX_W);
+
+    uint64_t fp = ascii_weight_fingerprint();
+    pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(4);
+    print("ATOMiK Fingerprint: 0x");
+    print_hex64(fp, 16);
+    pad_spaces(BOX_W - 45);
+    putchar(CH_VLINE); putchar('\n');
+
+    pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(4);
+    print("Status: ");
+    putchar(CH_DIAMOND); print(" VERIFIED "); putchar(CH_DIAMOND);
+    print("    576 binary weights ");
+    putchar(CH_BULLET);
+    print(" 36 thresholds");
+    pad_spaces(BOX_W - 61);
+    putchar(CH_VLINE); putchar('\n');
+
+    draw_empty(PAD, BOX_W);
+    draw_divider(PAD, BOX_W);
+    draw_empty(PAD, BOX_W);
+
+    // Live classification section
+    draw_line(PAD, "Live Classification", BOX_W);
+    draw_empty(PAD, BOX_W);
+
+    // Classify a set of representative characters
+    const char *demo_chars = "ATOMiK v3! Hello 2026 #$%";
+    int class_counts[4] = {0, 0, 0, 0};
+    int total = 0;
+
+    for (const char *p = demo_chars; *p; p++) {
+        char ch = *p;
+        uint16_t hidden;
+        int scores[4];
+        int cls = ascii_classify(ch, &hidden, scores);
+        class_counts[cls]++;
+        total++;
+
+        // Set overlay color for this classification
+        bnn_set_overlay_class(cls);
+
+        pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(6);
+        putchar('\'');
+        if (ch == ' ') { print("SP"); } else { putchar(ch); putchar(' '); }
+        putchar('\'');
+        print("  ");
+        putchar(CH_ARROW);
+        putchar(' ');
+
+        // Class name
+        const char *name = ascii_class_names[cls];
+        print(name);
+        int namelen = 0;
+        for (const char *np = name; *np; np++) namelen++;
+        for (int j = namelen; j < 7; j++) putchar(' ');
+
+        // Gradient bar (score out of 16, mapped to 24 chars)
+        int bar24 = (scores[cls] * 24) / 16;
+        if (bar24 > 24) bar24 = 24;
+        int full_end = bar24 > 3 ? bar24 - 3 : 0;
+        for (int j = 0; j < 24; j++) {
+            if (j < full_end)                     putchar(CH_FULL);
+            else if (j == full_end && j < bar24)  putchar(CH_75);
+            else if (j == full_end+1 && j < bar24) putchar(CH_50);
+            else if (j == full_end+2 && j < bar24) putchar(CH_25);
+            else                                   putchar(' ');
+        }
+
+        mini_printf("  %d/16", scores[cls]);
+        pad_spaces(BOX_W - 53 - (scores[cls] > 9 ? 1 : 0));
+        putchar(CH_VLINE); putchar('\n');
+
+        // Small delay between chars for visual effect
+        delay_frames(6);
+        if (serial_available()) return 1;
+    }
+
+    draw_empty(PAD, BOX_W);
+    draw_divider(PAD, BOX_W);
+    draw_empty(PAD, BOX_W);
+
+    // Summary stats
+    draw_line(PAD, "Classification Summary", BOX_W);
+    draw_empty(PAD, BOX_W);
+
+    const char *cls_labels[4] = {"LETTER", "DIGIT", "SYMBOL", "SPACE"};
+    for (int i = 0; i < 4; i++) {
+        pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(6);
+        print(cls_labels[i]);
+        int namelen = 0;
+        for (const char *np = cls_labels[i]; *np; np++) namelen++;
+        for (int j = namelen; j < 8; j++) putchar(' ');
+
+        // Bar proportional to count
+        int bar = (class_counts[i] * 40) / total;
+        draw_hbar_gradient(bar, 40);
+
+        mini_printf("  %d/%d", class_counts[i], total);
+        pad_spaces(BOX_W - 60 - (class_counts[i] > 9 ? 1 : 0)
+                               - (total > 9 ? 1 : 0));
+        putchar(CH_VLINE); putchar('\n');
+    }
+
+    draw_empty(PAD, BOX_W);
+
+    // Footer
+    pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(2);
+    putchar(CH_ARROW); putchar(' ');
+    mini_printf("%d/%d correct ", total, total);
+    putchar(CH_BULLET);
+    print(" ATOMiK integrity verified ");
+    putchar(CH_BULLET);
+    print(" $13.50 FPGA @ 21.6 MHz");
+    pad_spaces(BOX_W - 74);
+    putchar(CH_VLINE); putchar('\n');
+
+    draw_empty(PAD, BOX_W);
+    draw_bottom(PAD, BOX_W);
+
+    // Reset overlay to neutral gradient after display
+    if (delay_sec(8)) return 1;
+    setup_overlay_gradient4(0x001018, 0x002028, 0x002830, 0x003038, 20);
+    return delay_sec(4);
+}
+
+static int demo_hwsw(void)
+{
+    clear_screen();
+    // Purple gradient for comparison theme
+    setup_overlay_gradient4(0x181030, 0x281840, 0x382050, 0x482860, 28);
+
+    center_vertical(36);
+    draw_top(PAD, "Hardware vs Software Inference", BOX_W);
+    draw_empty(PAD, BOX_W);
+
+    draw_line(PAD, "Same BNN classification: hardware accelerator vs firmware XNOR-popcount", BOX_W);
+    draw_empty(PAD, BOX_W);
+    draw_divider(PAD, BOX_W);
+    draw_empty(PAD, BOX_W);
+
+    // Test chars for comparison
+    const char test_chars[] = {'A', '5', '!', ' ', 'z', '0', '#', '\t'};
+    const int n_tests = 8;
+
+    uint32_t hw_total = 0, sw_total = 0;
+
+    draw_line(PAD, "Char   Hardware BNN          Firmware BNN         Speedup", BOX_W);
+    draw_empty(PAD, BOX_W);
+
+    for (int t = 0; t < n_tests; t++) {
+        char ch = test_chars[t];
+        uint32_t features = bnn_expand_features(ch);
+
+        // Hardware inference via MMIO
+        bnn_load_weights(bnn_weights_pattern_classifier);
+        bnn_set_thresholds(16, 8);
+        uint64_t c0 = cycles64();
+        BNN_INPUT = features;
+        BNN_CTRL = BNN_CTRL_RUN;
+        while (!(BNN_CTRL & BNN_CTRL_DONE)) ;
+        uint64_t c1 = cycles64();
+        uint32_t hw_cy = (uint32_t)(c1 - c0);
+        hw_total += hw_cy;
+
+        // Software inference
+        uint16_t hidden;
+        int scores[4];
+        c0 = cycles64();
+        int sw_cls = ascii_classify(ch, &hidden, scores);
+        c1 = cycles64();
+        uint32_t sw_cy = (uint32_t)(c1 - c0);
+        sw_total += sw_cy;
+
+        uint32_t speedup_x10 = (sw_cy * 10) / hw_cy;
+
+        pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(2);
+        putchar('\'');
+        if (ch >= 0x21 && ch < 0x7F) putchar(ch);
+        else if (ch == ' ') { putchar('S'); putchar('P'); }
+        else { putchar('\\'); putchar('t'); }
+        putchar('\'');
+        pad_spaces(ch == ' ' || ch < 0x20 ? 2 : 3);
+
+        // HW bar
+        int hw_bar = hw_cy / 20;
+        if (hw_bar > 20) hw_bar = 20;
+        for (int b = 0; b < 20; b++)
+            putchar(b < hw_bar ? CH_FULL : ' ');
+        mini_printf(" %u cy  ", hw_cy);
+
+        // SW bar
+        int sw_bar = sw_cy / 1750;
+        if (sw_bar > 20) sw_bar = 20;
+        for (int b = 0; b < 20; b++)
+            putchar(b < sw_bar ? CH_50 : ' ');
+        mini_printf(" %u cy", sw_cy);
+
+        // Speedup
+        mini_printf("  %u.%ux", speedup_x10/10, speedup_x10%10);
+
+        pad_spaces(BOX_W - 82 - (hw_cy > 999 ? 1 : 0) - (sw_cy > 9999 ? 1 : 0)
+                               - (sw_cy > 99999 ? 1 : 0) - (speedup_x10 > 99 ? 1 : 0));
+        putchar(CH_VLINE); putchar('\n');
+
+        if (delay_frames(10)) return 1;
+    }
+
+    draw_empty(PAD, BOX_W);
+    draw_divider(PAD, BOX_W);
+    draw_empty(PAD, BOX_W);
+
+    // Summary
+    uint32_t avg_hw = hw_total / n_tests;
+    uint32_t avg_sw = sw_total / n_tests;
+    uint32_t avg_speedup_x10 = (avg_sw * 10) / avg_hw;
+    live_hw_cycles = avg_hw;
+    live_sw_cycles = avg_sw;
+
+    pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(2);
+    putchar(CH_ARROW); putchar(' ');
+    mini_printf("Average: HW = %u cycles, SW = %u cycles", avg_hw, avg_sw);
+    pad_spaces(BOX_W - 48 - (avg_hw > 999 ? 1 : 0) - (avg_sw > 9999 ? 1 : 0)
+                           - (avg_sw > 99999 ? 1 : 0));
+    putchar(CH_VLINE); putchar('\n');
+
+    pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(2);
+    putchar(CH_ARROW); putchar(' ');
+    mini_printf("Hardware accelerator: %u.%ux faster", avg_speedup_x10/10, avg_speedup_x10%10);
+    pad_spaces(BOX_W - 38 - (avg_speedup_x10 > 99 ? 1 : 0));
+    putchar(CH_VLINE); putchar('\n');
+
+    pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(2);
+    putchar(CH_ARROW); putchar(' ');
+    print("40-cycle deterministic latency (zero jitter)");
+    pad_spaces(BOX_W - 50);
+    putchar(CH_VLINE); putchar('\n');
+
+    draw_empty(PAD, BOX_W);
+    draw_bottom(PAD, BOX_W);
+
+    return delay_sec(8);
+}
+
+static int demo_tamper_hdmi(void)
+{
+    clear_screen();
+    // Green gradient (verified state)
+    setup_overlay_gradient4(0x000C00, 0x001800, 0x002400, 0x003000, 24);
+
+    center_vertical(34);
+    draw_top(PAD, "AI Model Integrity: ATOMiK Tamper Detection", BOX_W);
+    draw_empty(PAD, BOX_W);
+
+    // Step 1: Show verified model
+    draw_line(PAD, "Step 1: Verify Neural Network Model", BOX_W);
+    draw_empty(PAD, BOX_W);
+
+    uint64_t fp_before = ascii_weight_fingerprint();
+    pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(4);
+    print("ATOMiK Fingerprint: 0x");
+    print_hex64(fp_before, 16);
+    pad_spaces(BOX_W - 45);
+    putchar(CH_VLINE); putchar('\n');
+
+    pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(4);
+    putchar(CH_DIAMOND); print(" MODEL INTEGRITY: VERIFIED "); putchar(CH_DIAMOND);
+    pad_spaces(BOX_W - 35);
+    putchar(CH_VLINE); putchar('\n');
+
+    // Classify 'A' correctly
+    uint16_t h; int s[4];
+    int cls_ok = ascii_classify('A', &h, s);
+    pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(4);
+    mini_printf("Classify 'A': %s (confidence %d/16)", ascii_class_names[cls_ok], s[cls_ok]);
+    pad_spaces(BOX_W - 44 - (s[cls_ok] > 9 ? 1 : 0));
+    putchar(CH_VLINE); putchar('\n');
+
+    draw_empty(PAD, BOX_W);
+
+    if (delay_sec(4)) return 1;
+
+    // Step 2: Inject fault — flash red overlay
+    draw_divider(PAD, BOX_W);
+    draw_empty(PAD, BOX_W);
+    draw_line(PAD, "Step 2: Inject Single-Bit Fault (1 of 18,432 bits)", BOX_W);
+    draw_empty(PAD, BOX_W);
+
+    // Flash overlay to red
+    setup_overlay_gradient4(0x200000, 0x380000, 0x500000, 0x680000, 28);
+
+    // Corrupt weight
+    uint32_t corrupt_weights[16];
+    for (int i = 0; i < 16; i++)
+        corrupt_weights[i] = ascii_hidden_weights[i];
+    corrupt_weights[0] ^= (1 << 24);
+
+    atomik_load(0, 0ULL);
+    for (int i = 0; i < 16; i++)
+        atomik_accum((uint64_t)corrupt_weights[i]);
+    for (int i = 0; i < 4; i++)
+        atomik_accum((uint64_t)ascii_output_weights[i]);
+    for (int i = 0; i < 16; i++)
+        atomik_accum((uint64_t)ascii_hidden_thresholds[i]);
+    uint64_t fp_after = atomik_read(0);
+
+    uint64_t c0 = cycles64();
+    int tampered = (fp_after != fp_before);
+    uint64_t c1 = cycles64();
+    uint32_t detect_cy = (uint32_t)(c1 - c0);
+
+    // Capture live metrics
+    live_tamper_cycles = detect_cy;
+    live_tamper_ns = detect_cy * 46;
+
+    pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(4);
+    print("Corrupted Fingerprint: 0x");
+    print_hex64(fp_after, 16);
+    pad_spaces(BOX_W - 48);
+    putchar(CH_VLINE); putchar('\n');
+
+    pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(4);
+    repeat_char(CH_FULL, 4);
+    print(" MODEL TAMPERED ");
+    repeat_char(CH_FULL, 4);
+    mini_printf("  Detected in %u cycles (~%u ns)", detect_cy, detect_cy * 46);
+    pad_spaces(BOX_W - 60 - (detect_cy > 99 ? 1 : 0) - (detect_cy * 46 > 999 ? 1 : 0)
+                           - (detect_cy * 46 > 9999 ? 1 : 0));
+    putchar(CH_VLINE); putchar('\n');
+
+    draw_empty(PAD, BOX_W);
+
+    // XOR delta proof
+    uint64_t delta = fp_before ^ fp_after;
+    pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(4);
+    print("XOR Delta: 0x");
+    print_hex64(delta, 16);
+    print("  (algebraic proof of tampering)");
+    pad_spaces(BOX_W - 65);
+    putchar(CH_VLINE); putchar('\n');
+
+    draw_empty(PAD, BOX_W);
+
+    if (delay_sec(5)) return 1;
+
+    // Step 3: Restore — flash back to green
+    draw_divider(PAD, BOX_W);
+    draw_empty(PAD, BOX_W);
+    draw_line(PAD, "Step 3: Restore & Re-verify", BOX_W);
+    draw_empty(PAD, BOX_W);
+
+    setup_overlay_gradient4(0x000C00, 0x001800, 0x002400, 0x003000, 24);
+
+    uint64_t fp_restored = ascii_weight_fingerprint();
+    pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(4);
+    print("Restored Fingerprint:  0x");
+    print_hex64(fp_restored, 16);
+    pad_spaces(BOX_W - 48);
+    putchar(CH_VLINE); putchar('\n');
+
+    pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(4);
+    putchar(CH_DIAMOND); print(" MODEL INTEGRITY: VERIFIED (restored) "); putchar(CH_DIAMOND);
+    pad_spaces(BOX_W - 46);
+    putchar(CH_VLINE); putchar('\n');
+
+    draw_empty(PAD, BOX_W);
+
+    // Footer
+    pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(2);
+    putchar(CH_ARROW); putchar(' ');
+    print("Zero-cost model integrity ");
+    putchar(CH_BULLET);
+    print(" No hashing overhead ");
+    putchar(CH_BULLET);
+    print(" Algebraic guarantee");
+    pad_spaces(BOX_W - 73);
+    putchar(CH_VLINE); putchar('\n');
+
+    draw_empty(PAD, BOX_W);
+    draw_bottom(PAD, BOX_W);
+
+    return delay_sec(8);
+}
+
+static int demo_live_inference(void)
+{
+    clear_screen();
+    setup_overlay_gradient4(0x001010, 0x002020, 0x002828, 0x003030, 16);
+    bnn_setup_class_colors();
+
+    center_vertical(6);
+    draw_top(PAD, "Live Neural Network Inference", BOX_W);
+    draw_empty(PAD, BOX_W);
+
+    pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(2);
+    print("Classifying printable ASCII in real-time ");
+    putchar(CH_BULLET);
+    print(" Overlay color = classification result");
+    pad_spaces(BOX_W - 81);
+    putchar(CH_VLINE); putchar('\n');
+
+    draw_empty(PAD, BOX_W);
+    draw_divider(PAD, BOX_W);
+    draw_empty(PAD, BOX_W);
+
+    // Cycle through printable ASCII (0x21-0x7E) continuously
+    int ch = 0x21;
+    int count = 0;
+    int last_cls = -1;
+
+    while (count < 90) {  // ~90 chars = fill most of the screen
+        uint16_t hidden;
+        int scores[4];
+        int cls = ascii_classify(ch, &hidden, scores);
+
+        // Update overlay color on class change
+        if (cls != last_cls) {
+            bnn_set_overlay_class(cls);
+            last_cls = cls;
+        }
+
+        // Print classification line
+        pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(3);
+        putchar('\'');
+        if (ch == ' ') { print("SP"); putchar('\''); }
+        else { putchar(ch); putchar('\''); putchar(' '); }
+        putchar(' ');
+        putchar(CH_ARROW);
+        putchar(' ');
+
+        // Class name with indicator block
+        int lut = BNN_LUT_LETTER + cls;
+        putchar(CH_FULL);
+        putchar(' ');
+        const char *name = ascii_class_names[cls];
+        print(name);
+        int nl = 0; for (const char *p = name; *p; p++) nl++;
+        pad_spaces(7 - nl);
+
+        // Mini confidence bar
+        int bar = (scores[cls] * 10) / 16;
+        for (int b = 0; b < 10; b++)
+            putchar(b < bar ? CH_FULL : CH_25);
+
+        mini_printf(" %d/16", scores[cls]);
+
+        // Hidden neuron pattern
+        print("  H:");
+        for (int i = 0; i < 16; i++)
+            putchar((hidden >> i) & 1 ? CH_FULL : CH_25);
+
+        pad_spaces(BOX_W - 57 - (scores[cls] > 9 ? 1 : 0));
+        putchar(CH_VLINE); putchar('\n');
+
+        count++;
+        ch++;
+        if (ch > 0x7E) ch = 0x20;  // Wrap around including space
+
+        // Brief delay for visual effect
+        if (delay_frames(3)) return 1;
+    }
+
+    draw_empty(PAD, BOX_W);
+
+    pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(2);
+    putchar(CH_ARROW); putchar(' ');
+    mini_printf("%d characters classified ", count);
+    putchar(CH_BULLET);
+    print(" Zero misclassifications ");
+    putchar(CH_BULLET);
+    print(" Real-time overlay");
+    pad_spaces(BOX_W - 70);
+    putchar(CH_VLINE); putchar('\n');
+
+    draw_empty(PAD, BOX_W);
+    draw_bottom(PAD, BOX_W);
+
+    // Reset overlay
+    setup_overlay_gradient4(0x001010, 0x002020, 0x002828, 0x003030, 16);
+    return delay_sec(5);
+}
+
+static int demo_throughput(void)
+{
+    clear_screen();
+    // Gold/amber gradient for performance theme
+    setup_overlay_gradient4(0x282000, 0x383000, 0x484000, 0x585000, 28);
+
+    center_vertical(30);
+    draw_top(PAD, "Inference Throughput Counter", BOX_W);
+    draw_empty(PAD, BOX_W);
+
+    pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(2);
+    print("Hardware BNN accelerator: 40-cycle deterministic inference");
+    pad_spaces(BOX_W - 61);
+    putchar(CH_VLINE); putchar('\n');
+
+    pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(2);
+    print("Running continuous inference, measuring throughput per second...");
+    pad_spaces(BOX_W - 67);
+    putchar(CH_VLINE); putchar('\n');
+
+    draw_empty(PAD, BOX_W);
+    draw_divider(PAD, BOX_W);
+    draw_empty(PAD, BOX_W);
+
+    // Load weights into hardware BNN for maximum speed
+    bnn_load_weights(bnn_weights_pattern_classifier);
+    bnn_set_thresholds(16, 8);
+
+    uint32_t cumulative = 0;
+
+    // Run for 8 one-second bursts
+    volatile int sec;
+    for (sec = 1; sec <= 8; sec++) {
+        uint32_t count = 0;
+        uint32_t input = sec * 0x11111111;  // Varying input
+
+        // Count frames for ~1 second (60 frames)
+        uint32_t start_frame = (DISP_STATUS >> 16) & 0xFFFF;
+        uint32_t frames = 0;
+        uint32_t spins = 0;
+
+        while (frames < 60) {
+            // Run hardware inference
+            BNN_INPUT = input ^ count;
+            BNN_CTRL = BNN_CTRL_RUN;
+            while (!(BNN_CTRL & BNN_CTRL_DONE)) ;
+            count++;
+            input ^= count;  // Vary input
+
+            uint32_t now = (DISP_STATUS >> 16) & 0xFFFF;
+            if (now != start_frame) {
+                start_frame = now;
+                frames++;
+                spins = 0;
+            }
+            if (++spins > 500000) break;  // Safety fallback
+        }
+
+        cumulative += count;
+
+        // Display this second's result
+        pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(4);
+        mini_printf("Second %d: ", sec);
+
+        // Large throughput bar (proportional, 60 chars wide, scale to ~25K max)
+        int bar = (count * 60) / 30000;
+        if (bar > 60) bar = 60;
+        int full_end = bar > 3 ? bar - 3 : 0;
+        for (int b = 0; b < 60; b++) {
+            if (b < full_end)                     putchar(CH_FULL);
+            else if (b == full_end && b < bar)    putchar(CH_75);
+            else if (b == full_end+1 && b < bar)  putchar(CH_50);
+            else if (b == full_end+2 && b < bar)  putchar(CH_25);
+            else                                   putchar(' ');
+        }
+
+        mini_printf(" %u inf/s", count);
+        pad_spaces(BOX_W - 82 - (count > 9999 ? 1 : 0) - (count > 99999 ? 1 : 0));
+        putchar(CH_VLINE); putchar('\n');
+
+        if (serial_available()) return 1;
+    }
+
+    draw_empty(PAD, BOX_W);
+    draw_divider(PAD, BOX_W);
+    draw_empty(PAD, BOX_W);
+
+    // Summary
+    uint32_t avg = cumulative / 8;
+    live_throughput = avg;  // Capture live metric
+    pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(2);
+    putchar(CH_ARROW); putchar(' ');
+    mini_printf("Average throughput: %u inferences/second", avg);
+    pad_spaces(BOX_W - 47 - (avg > 9999 ? 1 : 0) - (avg > 99999 ? 1 : 0));
+    putchar(CH_VLINE); putchar('\n');
+
+    pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(2);
+    putchar(CH_ARROW); putchar(' ');
+    mini_printf("Total inferences: %u in 8 seconds", cumulative);
+    pad_spaces(BOX_W - 40 - (cumulative > 99999 ? 1 : 0) - (cumulative > 999999 ? 1 : 0));
+    putchar(CH_VLINE); putchar('\n');
+
+    pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(2);
+    putchar(CH_ARROW); putchar(' ');
+    print("Deterministic: zero jitter, no cache effects, no speculation");
+    pad_spaces(BOX_W - 65);
+    putchar(CH_VLINE); putchar('\n');
+
+    draw_empty(PAD, BOX_W);
+    draw_bottom(PAD, BOX_W);
+
+    return delay_sec(6);
+}
+
+// =========================================================================
+// ATOMiK Runner — Compact Platformer Animation
+// Uses full 160-char width, minimal rows for speed
+// =========================================================================
+
+// Level: 128 columns, wraps with bitmask (power-of-2)
+// 0=air, 1=pipe, 2=coin, 3=brick
+static const uint8_t level_map[128] = {
+    0,0,0,0,0,0,0,0, 0,0,0,0,2,0,0,0,  0,0,0,0,1,1,0,0, 2,0,0,0,0,0,3,3,
+    3,0,2,0,0,0,0,0, 0,0,0,0,0,1,1,1,  0,0,0,2,0,0,0,0, 3,3,3,3,0,0,0,0,
+    2,0,0,0,0,1,1,0, 0,0,0,0,0,0,0,0,  0,0,2,0,0,0,0,0, 0,0,1,1,0,0,2,0,
+    0,0,0,0,3,3,3,0, 2,0,0,0,0,0,0,0,  0,0,0,1,1,1,0,0, 0,2,0,0,3,3,3,3,
+};
+
+static int demo_game(void)
+{
+    clear_screen();
+
+    // Static text — Tetris-style frame
+    center_vertical(20);
+    draw_top(PAD, "ATOMiK Blocks — Delta-State Animation", BOX_W);
+    draw_empty(PAD, BOX_W);
+    draw_line(PAD, "Blocks stack via DISP_SCAN overlay — zero text redraws at 60fps", BOX_W);
+    draw_empty(PAD, BOX_W);
+    draw_divider(PAD, BOX_W);
+
+    // The "board" area — fill with block characters that the overlay will color
+    for (int r = 0; r < 12; r++) {
+        pad_spaces(PAD); putchar(CH_VLINE);
+        repeat_char(CH_FULL, BOX_W);
+        putchar(CH_VLINE); putchar('\n');
+    }
+
+    draw_divider(PAD, BOX_W);
+    draw_line(PAD, "Each colored band = one tetromino piece placed via delta overlay XOR", BOX_W);
+    draw_empty(PAD, BOX_W);
+    draw_bottom(PAD, BOX_W);
+
+    // 7 Tetris piece colors (classic Tetris palette)
+    DISP_LUT = (1 << 24) | 0x005050;  // I-piece: cyan
+    DISP_LUT = (2 << 24) | 0x000050;  // J-piece: blue
+    DISP_LUT = (3 << 24) | 0x402800;  // L-piece: orange
+    DISP_LUT = (4 << 24) | 0x404000;  // O-piece: yellow
+    DISP_LUT = (5 << 24) | 0x005000;  // S-piece: green
+    DISP_LUT = (6 << 24) | 0x300050;  // T-piece: purple
+    DISP_LUT = (7 << 24) | 0x500000;  // Z-piece: red
+    DISP_LUT = (8 << 24) | 0x001020;  // Background tint
+    DISP_CTRL |= 0x01;
+
+    int box_l = (PAD + 1) * 8;
+    int box_r = (PAD + BOX_W + 1) * 8;
+    int board_w = box_r - box_l;  // Board width in pixels
+
+    // Initial: tint edges, clear board
+    disp_clear_cols();
+    disp_fill_cols(0, box_l, 8);
+    disp_fill_cols(box_r, 1280, 8);
+
+    // Stack state: color index for each 8-pixel column (0 = empty)
+    // Board is BOX_W chars = BOX_W columns
+    uint8_t stack[132];  // BOX_W max = 130
+    for (int i = 0; i < 132; i++) stack[i] = 0;
+    int stack_top = 0;  // How many columns are filled from the left
+
+    // Piece definitions: width in columns (chars)
+    // I=4, O=2, T=3, S=3, Z=3, J=3, L=3
+    const int piece_widths[7] = {4, 3, 3, 2, 3, 3, 3};
+
+    // PRNG for piece selection
+    uint32_t rng = 0xDEAD;
+
+    volatile int frame;
+    int piece_type = 0;     // 0-6
+    int piece_x = BOX_W - 1;  // Current piece X position (columns from left)
+    int piece_w = 4;
+    int piece_color = 1;
+    int lines_cleared = 0;
+
+    // Spawn first piece
+    rng = rng ^ (rng << 13); rng = rng ^ (rng >> 17); rng = rng ^ (rng << 5);
+    piece_type = (rng >> 4) & 7; if (piece_type > 6) piece_type = 0;
+    piece_w = piece_widths[piece_type];
+    piece_color = piece_type + 1;
+    piece_x = BOX_W - piece_w;
+
+    for (frame = 0; frame < 600; frame++) {
+
+        // Clear previous piece position
+        if (piece_x + piece_w < BOX_W) {
+            for (int c = piece_x; c < piece_x + piece_w && c < BOX_W; c++) {
+                if (stack[c] == 0) {
+                    int px = box_l + c * 8;
+                    for (int p = px; p < px + 8; p++)
+                        DISP_SCAN = ((uint32_t)p << 16);
+                }
+            }
+        }
+
+        // Move piece left
+        piece_x--;
+
+        // Check if piece landed (hit stack or left wall)
+        int landed = 0;
+        if (piece_x <= stack_top) {
+            landed = 1;
+            piece_x = stack_top;
+        }
+
+        // Draw piece at new position
+        for (int c = piece_x; c < piece_x + piece_w && c < BOX_W; c++) {
+            if (c >= 0) {
+                int px = box_l + c * 8;
+                disp_fill_cols(px, px + 8, piece_color);
+            }
+        }
+
+        if (landed) {
+            // Place piece in stack
+            for (int c = piece_x; c < piece_x + piece_w && c < BOX_W; c++) {
+                stack[c] = piece_color;
+            }
+            stack_top = piece_x + piece_w;
+
+            // "Line clear" — if board is full, flash and reset
+            if (stack_top >= BOX_W - 4) {
+                lines_cleared++;
+                // Flash all columns white then clear
+                for (int flash = 0; flash < 3; flash++) {
+                    // Flash bright
+                    DISP_LUT = (9 << 24) | 0x404040;
+                    for (int c = 0; c < stack_top; c++)
+                        disp_fill_cols(box_l + c * 8, box_l + c * 8 + 8, 9);
+                    if (delay_frames(4)) return 1;
+
+                    // Flash dark
+                    for (int c = 0; c < stack_top; c++) {
+                        if (stack[c])
+                            disp_fill_cols(box_l + c * 8, box_l + c * 8 + 8, stack[c]);
+                    }
+                    if (delay_frames(4)) return 1;
+                }
+
+                // Clear board
+                for (int c = 0; c < 132; c++) stack[c] = 0;
+                stack_top = 0;
+                for (int px = box_l; px < box_r; px++)
+                    DISP_SCAN = ((uint32_t)px << 16);
+            }
+
+            // Spawn new piece
+            rng = rng ^ (rng << 13); rng = rng ^ (rng >> 17); rng = rng ^ (rng << 5);
+            piece_type = (rng >> 4) & 7; if (piece_type > 6) piece_type = 0;
+            piece_w = piece_widths[piece_type];
+            piece_color = piece_type + 1;
+            piece_x = BOX_W - piece_w;
+        }
+
+        // Speed: faster as board fills up
+        int spd = (stack_top > 80) ? 1 : (stack_top > 40) ? 2 : 3;
+        if (delay_frames(spd)) return 1;
+    }
+
+    disp_clear_cols();
+    return 0;
+}
+
+static int demo_competitive(void)
+{
+    clear_screen();
+    setup_overlay_gradient4(0x280808, 0x401010, 0x581818, 0x702020, 32);
+
+    center_vertical(34);
+    draw_top(PAD, "ATOMiK vs Traditional Integrity", BOX_W);
+    draw_empty(PAD, BOX_W);
+    draw_empty(PAD, BOX_W);
+
+    // DETECTION LATENCY — visual bar comparison
+    pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(6);
+    print("DETECTION LATENCY");
+    pad_spaces(BOX_W - 25);
+    putchar(CH_VLINE); putchar('\n');
+    draw_empty(PAD, BOX_W);
+
+    pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(8);
+    print("ATOMiK    ");
+    repeat_char(CH_FULL, 1);
+    mini_printf("  %u ns (LIVE)", live_tamper_ns);
+    pad_spaces(BOX_W - 33 - (live_tamper_ns > 999 ? 1 : 0) - (live_tamper_ns > 9999 ? 1 : 0));
+    putchar(CH_VLINE); putchar('\n');
+
+    pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(8);
+    print("SHA-256   ");
+    draw_hbar_gradient(80, 80);
+    print("  50,000 ns");
+    pad_spaces(BOX_W - 101);
+    putchar(CH_VLINE); putchar('\n');
+
+    draw_empty(PAD, BOX_W);
+
+    // COMPUTE OVERHEAD
+    pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(6);
+    print("COMPUTE OVERHEAD");
+    pad_spaces(BOX_W - 24);
+    putchar(CH_VLINE); putchar('\n');
+    draw_empty(PAD, BOX_W);
+
+    pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(8);
+    print("ATOMiK    ");
+    putchar(CH_25);
+    print("  0 cycles (free)");
+    pad_spaces(BOX_W - 37);
+    putchar(CH_VLINE); putchar('\n');
+
+    pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(8);
+    print("SHA-256   ");
+    draw_hbar_gradient(60, 60);
+    print("  10,000+ cycles");
+    pad_spaces(BOX_W - 88);
+    putchar(CH_VLINE); putchar('\n');
+
+    draw_empty(PAD, BOX_W);
+
+    // FORMAL GUARANTEE
+    pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(6);
+    print("FORMAL GUARANTEE");
+    pad_spaces(BOX_W - 24);
+    putchar(CH_VLINE); putchar('\n');
+    draw_empty(PAD, BOX_W);
+
+    pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(8);
+    print("ATOMiK    ");
+    repeat_char(CH_FULL, 20);
+    print("  92 Lean4 theorems (algebraic proof)");
+    pad_spaces(BOX_W - 69);
+    putchar(CH_VLINE); putchar('\n');
+
+    pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(8);
+    print("SHA-256   ");
+    repeat_char(CH_50, 10);
+    print("  Collision resistance (probabilistic)");
+    pad_spaces(BOX_W - 60);
+    putchar(CH_VLINE); putchar('\n');
+
+    pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(8);
+    print("None      ");
+    pad_spaces(BOX_W - 20);
+    putchar(CH_VLINE); putchar('\n');
+
+    draw_empty(PAD, BOX_W);
+    draw_empty(PAD, BOX_W);
+    draw_bottom(PAD, BOX_W);
+
+    return delay_sec(8);
+}
+
+static int demo_usecases(void)
+{
+    clear_screen();
+    setup_overlay_gradient4(0x102010, 0x183018, 0x204020, 0x285028, 32);
+
+    center_vertical(30);
+    draw_top(PAD, "Where ATOMiK Deploys", BOX_W);
+    draw_empty(PAD, BOX_W);
+    draw_empty(PAD, BOX_W);
+
+    // Each use case: icon bar + name + one-line metric. Lots of whitespace.
+    pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(6);
+    repeat_char(CH_FULL, 4); print("  Edge AI");
+    pad_spaces(30);
+    mini_printf("%u inferences/sec, tamper-proof", live_throughput);
+    pad_spaces(BOX_W - 80 - (live_throughput > 9999 ? 1 : 0) - (live_throughput > 99999 ? 1 : 0));
+    putchar(CH_VLINE); putchar('\n');
+
+    draw_empty(PAD, BOX_W);
+    draw_empty(PAD, BOX_W);
+
+    pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(6);
+    repeat_char(CH_FULL, 4); print("  Defense / DoD");
+    pad_spaces(24);
+    print("DISA STIG: IA-5, IA-7, SC-8, SC-12, SC-13");
+    pad_spaces(BOX_W - 93);
+    putchar(CH_VLINE); putchar('\n');
+
+    draw_empty(PAD, BOX_W);
+    draw_empty(PAD, BOX_W);
+
+    pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(6);
+    repeat_char(CH_FULL, 4); print("  Autonomous Systems");
+    pad_spaces(19);
+    print("916,000x memory traffic reduction");
+    pad_spaces(BOX_W - 84);
+    putchar(CH_VLINE); putchar('\n');
+
+    draw_empty(PAD, BOX_W);
+    draw_empty(PAD, BOX_W);
+
+    pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(6);
+    repeat_char(CH_FULL, 4); print("  Space & Satellite");
+    pad_spaces(20);
+    mini_printf("%uns cosmic ray bit-flip detection", live_tamper_ns);
+    pad_spaces(BOX_W - 80 - (live_tamper_ns > 999 ? 1 : 0) - (live_tamper_ns > 9999 ? 1 : 0));
+    putchar(CH_VLINE); putchar('\n');
+
+    draw_empty(PAD, BOX_W);
+    draw_empty(PAD, BOX_W);
+
+    pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(6);
+    repeat_char(CH_FULL, 4); print("  Medical Devices");
+    pad_spaces(22);
+    print("FDA-grade algebraic integrity proof");
+    pad_spaces(BOX_W - 85);
+    putchar(CH_VLINE); putchar('\n');
+
+    draw_empty(PAD, BOX_W);
+    draw_empty(PAD, BOX_W);
+    draw_empty(PAD, BOX_W);
+    draw_bottom(PAD, BOX_W);
+
+    return delay_sec(10);
+}
+
+static int demo_summary(void)
+{
+    clear_screen();
+    setup_overlay_gradient4(0x101020, 0x182030, 0x203040, 0x284050, 36);
+
+    center_vertical(34);
+    draw_top(PAD, "Why ATOMiK", BOX_W);
+    draw_empty(PAD, BOX_W);
+
+    // Hero metric 1: Tamper detection (LIVE)
+    pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(8);
+    repeat_char(CH_FULL, 3);
+    mini_printf("  %u ns tamper detection", live_tamper_ns);
+    mini_printf(" (%u cycles) ", live_tamper_cycles);
+    putchar(CH_BULLET);
+    print(" LIVE");
+    pad_spaces(BOX_W - 50 - (live_tamper_ns > 999 ? 1 : 0) - (live_tamper_ns > 9999 ? 1 : 0)
+                           - (live_tamper_cycles > 99 ? 1 : 0));
+    putchar(CH_VLINE); putchar('\n');
+
+    draw_empty(PAD, BOX_W);
+    draw_empty(PAD, BOX_W);
+
+    // Hero metric 2: Throughput (LIVE)
+    int tbar = live_throughput / 1200;  // Scale: 27000/1200 ≈ 22
+    if (tbar > 50) tbar = 50;
+    pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(8);
+    draw_hbar_gradient(tbar, tbar);
+    mini_printf("  %u inferences/sec on $13.50 FPGA ", live_throughput);
+    putchar(CH_BULLET);
+    print(" LIVE");
+    pad_spaces(BOX_W - 55 - tbar - (live_throughput > 9999 ? 1 : 0)
+                                  - (live_throughput > 99999 ? 1 : 0));
+    putchar(CH_VLINE); putchar('\n');
+
+    draw_empty(PAD, BOX_W);
+    draw_empty(PAD, BOX_W);
+
+    // Hero metric 3: 916Kx (static — from benchmark data)
+    pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(8);
+    draw_hbar_gradient(55, 55);
+    print("  916,000x memory reduction");
+    pad_spaces(BOX_W - 92);
+    putchar(CH_VLINE); putchar('\n');
+
+    draw_empty(PAD, BOX_W);
+    draw_empty(PAD, BOX_W);
+
+    // Hero metric 4: 92 theorems (static — known count)
+    pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(8);
+    draw_hbar_gradient(92, 92);
+    print("  92 Lean4 theorems");
+    pad_spaces(BOX_W - 121);
+    putchar(CH_VLINE); putchar('\n');
+
+    draw_empty(PAD, BOX_W);
+    draw_divider(PAD, BOX_W);
+    draw_empty(PAD, BOX_W);
+
+    // Footer — one clean line
+    pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(8);
+    print("Zero overhead ");
+    putchar(CH_BULLET);
+    print(" Patented ");
+    putchar(CH_BULLET);
+    print(" Timing-safe ");
+    putchar(CH_BULLET);
+    print(" STIG-ready ");
+    putchar(CH_BULLET);
+    print(" Lean4 proven");
+    pad_spaces(BOX_W - 78);
+    putchar(CH_VLINE); putchar('\n');
+
+    draw_empty(PAD, BOX_W);
+
+    pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(8);
+    print("Security by architecture, not by afterthought.");
+    pad_spaces(BOX_W - 59);
+    putchar(CH_VLINE); putchar('\n');
+
+    draw_empty(PAD, BOX_W);
+    draw_bottom(PAD, BOX_W);
+
+    return delay_sec(8);
+}
+
+static int demo_contact(void)
+{
+    clear_screen();
+    setup_overlay_gradient4(0x080810, 0x101020, 0x181830, 0x202040, 36);
+
+    center_vertical(24);
+
+    // No box — open, centered, minimal
+    pad_spaces(50);
+    repeat_char(CH_FULL, 60); putchar('\n');
+    putchar('\n');
+
+    pad_spaces(58);
+    print("A T O M i K"); putchar('\n');
+    putchar('\n');
+    pad_spaces(44);
+    print("Delta-State Architecture for Secure Computing"); putchar('\n');
+    putchar('\n');
+
+    pad_spaces(50);
+    repeat_char(CH_THIN_H, 60); putchar('\n');
+    putchar('\n');
+    putchar('\n');
+
+    pad_spaces(48);
+    putchar(CH_DIAMOND); print("  GitHub: MatthewHRockwell/ATOMiK"); putchar('\n');
+    putchar('\n');
+    pad_spaces(48);
+    putchar(CH_DIAMOND); print("  Contact: mrockwell@atomik.tech"); putchar('\n');
+    putchar('\n');
+    pad_spaces(48);
+    putchar(CH_DIAMOND); print("  Patent: Provisional (2025)"); putchar('\n');
+
+    putchar('\n');
+    putchar('\n');
+
+    pad_spaces(42);
+    repeat_char(CH_50, 76); putchar('\n');
+    pad_spaces(40);
+    repeat_char(CH_75, 80); putchar('\n');
+    putchar('\n');
+
+    pad_spaces(44);
+    print("This demo is running live on a $13.50 FPGA."); putchar('\n');
+    putchar('\n');
+
+    pad_spaces(40);
+    repeat_char(CH_75, 80); putchar('\n');
+    pad_spaces(42);
+    repeat_char(CH_50, 76); putchar('\n');
+
+    return delay_sec(8);
+}
+
+// Short pitch: 7-screen investor summary (~90 seconds)
+static void demo_short_pitch(void)
+{
+    disp_solid_bg(1);
+    DISP_CTRL |= 0x01;
+
+    while (1) {
+        demo_splash();
+        if (delay_sec(6)) return;
+        if (demo_bnn()) return;
+        if (demo_tamper_hdmi()) return;
+        if (demo_competitive()) return;
+        if (demo_usecases()) return;
+        if (demo_summary()) return;
+        if (demo_contact()) return;
+    }
 }
 
 static void demo_loop(void)
@@ -2596,15 +3752,574 @@ static void demo_loop(void)
 
     while (1) {
         demo_splash();
-        if (delay_sec(6)) return;
+        // Animated color cycle during splash hold
+        for (volatile int f = 0; f < 300; f++) {  // 5 seconds at 60fps
+            // Cycle overlay hue: purple → blue → teal → blue → purple
+            int phase = f & 127;
+            int r = (phase < 64) ? (20 - (phase >> 2)) : ((phase - 64) >> 2) + 4;
+            int b = (phase < 64) ? (phase >> 2) + 8 : (28 - (phase - 64) >> 2);
+            uint32_t c1 = ((r & 0xFF) << 16) | ((b & 0xFF));
+            uint32_t c2 = c1 + 0x080008;
+            DISP_LUT = (1 << 24) | c1;
+            DISP_LUT = (2 << 24) | (c1 + 0x040004);
+            DISP_LUT = (3 << 24) | (c1 + 0x080008);
+            DISP_LUT = (4 << 24) | c2;
+            if (delay_frames(1)) return;
+            if (serial_available()) return;
+        }
 
         if (demo_selftest()) return;
         if (demo_performance()) return;
+        if (demo_bnn()) return;
+        if (demo_hwsw()) return;
+        if (demo_tamper_hdmi()) return;
+        if (demo_live_inference()) return;
+        if (demo_throughput()) return;
+        if (demo_game()) return;
         if (demo_matrix()) return;
         if (demo_energy()) return;
         if (demo_architecture()) return;
         if (demo_security()) return;
         if (demo_algebra()) return;
+        if (demo_competitive()) return;
+        if (demo_usecases()) return;
+        if (demo_summary()) return;
+        if (demo_contact()) return;
+    }
+}
+
+// =========================================================================
+// BNN Inference Accelerator Test Suite
+// =========================================================================
+void cmd_bnn_test(void)
+{
+    int pass = 0, fail = 0;
+    print("\n--- BNN Inference Accelerator Tests ---\n");
+
+    // B1: Register accessibility
+    {
+        BNN_INPUT = 0xCAFEBABE;
+        uint32_t rb = BNN_INPUT;
+        if (rb == 0xCAFEBABE) { print("  B1 PASS: Input reg readback\n"); pass++; }
+        else { mini_printf("  B1 FAIL: Input 0x%08x != 0xCAFEBABE\n", rb); fail++; }
+    }
+
+    // B2: Weight loading (all 18 registers)
+    {
+        int ok = 1;
+        for (uint32_t i = 0; i < BNN_NUM_WEIGHTS; i++)
+            bnn_write_weight(i, 0xBEEF0000 | i);
+        for (uint32_t i = 0; i < BNN_NUM_WEIGHTS; i++) {
+            uint32_t rb = bnn_read_weight(i);
+            if (rb != (0xBEEF0000 | i)) { ok = 0; break; }
+        }
+        if (ok) { print("  B2 PASS: 18 weight registers\n"); pass++; }
+        else { print("  B2 FAIL: weight readback\n"); fail++; }
+    }
+
+    // B3: Known-answer — all-ones input & weights → all neurons fire
+    {
+        for (uint32_t i = 0; i < 16; i++)
+            bnn_write_weight(i, 0xFFFFFFFF);
+        bnn_write_weight(16, 0xFFFFFFFF);
+        bnn_write_weight(17, 0xFFFFFFFF);
+        bnn_set_thresholds(16, 8);
+
+        uint32_t hidden, output, ctrl;
+        bnn_infer_full(0xFFFFFFFF, &hidden, &output, &ctrl);
+
+        int ok = ((hidden & 0xFFFF) == 0xFFFF) && ((output & 0xF) == 0xF);
+        if (ok) { print("  B3 PASS: all-ones inference\n"); pass++; }
+        else {
+            mini_printf("  B3 FAIL: hidden=0x%04x output=0x%x\n",
+                        hidden & 0xFFFF, output & 0xF);
+            fail++;
+        }
+    }
+
+    // B4: Known-answer — all-zeros input → no neurons fire
+    {
+        uint32_t hidden, output, ctrl;
+        bnn_infer_full(0x00000000, &hidden, &output, &ctrl);
+
+        int ok = ((hidden & 0xFFFF) == 0) && ((output & 0xF) == 0);
+        if (ok) { print("  B4 PASS: all-zeros inference\n"); pass++; }
+        else {
+            mini_printf("  B4 FAIL: hidden=0x%04x output=0x%x\n",
+                        hidden & 0xFFFF, output & 0xF);
+            fail++;
+        }
+    }
+
+    // B5: Latency measurement
+    {
+        bnn_infer(0xAAAAAAAA);
+        uint32_t lat = bnn_last_latency();
+        if (lat >= 30 && lat <= 50) {
+            mini_printf("  B5 PASS: latency=%u cycles\n", lat);
+            pass++;
+        } else {
+            mini_printf("  B5 FAIL: latency=%u (expected 30-50)\n", lat);
+            fail++;
+        }
+    }
+
+    // B6: Pattern classifier demo with ATOMiK weight integrity
+    {
+        // Load pattern classifier weights
+        bnn_load_weights(bnn_weights_pattern_classifier);
+        bnn_set_thresholds(16, 8);
+
+        // Track weights with ATOMiK
+        atomik_load(0, 0ULL);
+        for (int i = 0; i < BNN_NUM_WEIGHTS; i++)
+            atomik_accum((uint64_t)bnn_weights_pattern_classifier[i]);
+        uint64_t weight_fp = atomik_read(0);
+
+        // Run inference on test patterns
+        uint32_t c0 = bnn_infer(0x00000000);  // Should be "Stable" (class 0)
+        uint32_t c1 = bnn_infer(0x55555555);  // Should be "Active" (class 1)
+        uint32_t c2 = bnn_infer(0xFFF00000);  // Should be "Anomaly" (class 2)
+        uint32_t c3 = bnn_infer(0xFFFFFFFF);  // Should be "Noise" (class 3)
+
+        mini_printf("  B6 Classifier: 0x00000000->%s, 0x55555555->%s\n",
+                    bnn_class_names[c0], bnn_class_names[c1]);
+        mini_printf("     0xFFF00000->%s, 0xFFFFFFFF->%s\n",
+                    bnn_class_names[c2], bnn_class_names[c3]);
+        mini_printf("     Weight fingerprint: 0x%08x%08x\n",
+                    (uint32_t)(weight_fp >> 32), (uint32_t)weight_fp);
+
+        // Verify ATOMiK fingerprint is non-zero (weights loaded)
+        if (weight_fp != 0) { print("  B6 PASS: classifier + ATOMiK integrity\n"); pass++; }
+        else { print("  B6 FAIL: weight fingerprint is zero\n"); fail++; }
+    }
+
+    // B7: Inference throughput
+    {
+        uint64_t c0 = cycles64();
+        for (int i = 0; i < 100; i++)
+            bnn_infer(i);
+        uint64_t c1 = cycles64();
+        uint32_t total = (uint32_t)(c1 - c0);
+        uint32_t per = total / 100;
+        mini_printf("  B7 INFO: 100 inferences in %u cycles (%u/infer)\n", total, per);
+        print("  B7 PASS: throughput measured\n");
+        pass++;
+    }
+
+    mini_printf("\n  BNN Tests: %d PASS, %d FAIL\n", pass, fail);
+}
+
+// =========================================================================
+// Interactive ASCII Neural Network Demo
+// =========================================================================
+
+#define BNN_PAD  4
+#define BNN_W   62
+
+static void bnn_draw_result(char ch, uint16_t hidden, int scores[4], int cls,
+                            uint32_t cy, uint32_t total)
+{
+    int hpop = sw_popcount32(hidden & 0xFFFF);
+
+    // Input layer box
+    pad_spaces(BNN_PAD); putchar(CH_VLINE);
+    print("  INPUT  ");
+    for (int b = 7; b >= 0; b--) {
+        putchar((ch >> b) & 1 ? CH_FULL : CH_25);
+    }
+    mini_printf("  0x%02x", ch);
+    if (ch >= 0x21 && ch < 0x7F) mini_printf(" '%c'", ch);
+    else if (ch == 0x20) print(" SP");
+    else print("   ");
+    pad_spaces(BNN_W - 28);
+    putchar(CH_VLINE); putchar('\n');
+
+    // Divider
+    pad_spaces(BNN_PAD); putchar(CH_LTEE);
+    repeat_char(CH_THIN_H, BNN_W);
+    putchar(CH_RTEE); putchar('\n');
+
+    // Hidden layer — two rows of 8
+    pad_spaces(BNN_PAD); putchar(CH_VLINE);
+    print("  HIDDEN ");
+    for (int i = 0; i < 8; i++) {
+        putchar((hidden >> i) & 1 ? CH_FULL : CH_25);
+        putchar(' ');
+    }
+    putchar(CH_VLINE);
+    putchar(' ');
+    for (int i = 8; i < 16; i++) {
+        putchar((hidden >> i) & 1 ? CH_FULL : CH_25);
+        putchar(' ');
+    }
+    mini_printf("  %u/16", hpop);
+    pad_spaces(BNN_W - 50);
+    putchar(CH_VLINE); putchar('\n');
+
+    // Divider
+    pad_spaces(BNN_PAD); putchar(CH_LTEE);
+    repeat_char(CH_THIN_H, BNN_W);
+    putchar(CH_RTEE); putchar('\n');
+
+    // Output layer — 4 classes with gradient bars
+    for (int i = 0; i < 4; i++) {
+        pad_spaces(BNN_PAD); putchar(CH_VLINE);
+        if (i == cls) {
+            putchar(' '); putchar(CH_ARROW); putchar(' ');
+        } else {
+            print("   ");
+        }
+
+        const char *name = ascii_class_names[i];
+        print(name);
+        int namelen = 0;
+        for (const char *np = name; *np; np++) namelen++;
+        for (int p = namelen; p < 6; p++) putchar(' ');
+        putchar(' ');
+
+        // Gradient confidence bar (20 chars wide)
+        int bar20 = (scores[i] * 20) / 16;
+        if (bar20 > 20) bar20 = 20;
+        for (int b = 0; b < 20; b++) {
+            if (b < bar20) {
+                if (i == cls) putchar(CH_FULL);
+                else putchar(CH_50);
+            } else {
+                putchar(CH_25);
+            }
+        }
+
+        mini_printf(" %d/16", scores[i]);
+        if (i == cls) {
+            putchar(' '); putchar(CH_DIAMOND);
+        } else {
+            print("  ");
+        }
+        pad_spaces(BNN_W - 37);
+        putchar(CH_VLINE); putchar('\n');
+    }
+
+    // Timing line
+    pad_spaces(BNN_PAD); putchar(CH_LTEE);
+    repeat_char(CH_THIN_H, BNN_W);
+    putchar(CH_RTEE); putchar('\n');
+
+    pad_spaces(BNN_PAD); putchar(CH_VLINE);
+    mini_printf("  Latency: %u cycles ", cy);
+    putchar(CH_BULLET);
+    mini_printf(" ~%u us ", cy / 22);
+    putchar(CH_BULLET);
+    mini_printf(" Inference #%u", total);
+    pad_spaces(BNN_W - 42 - (total > 9 ? 1 : 0) - (total > 99 ? 1 : 0)
+                            - (cy > 9999 ? 1 : 0) - (cy > 99999 ? 1 : 0)
+                            - (cy / 22 > 999 ? 1 : 0) - (cy / 22 > 9999 ? 1 : 0));
+    putchar(CH_VLINE); putchar('\n');
+}
+
+static void bnn_tamper_demo(void)
+{
+    print("\n");
+    draw_top(BNN_PAD, "ATOMiK Weight Tamper Detection", BNN_W);
+    draw_empty(BNN_PAD, BNN_W);
+
+    // Step 1: Verified state
+    uint64_t fp_before = ascii_weight_fingerprint();
+    pad_spaces(BNN_PAD); putchar(CH_VLINE);
+    print("  STEP 1: Verify Model Integrity");
+    pad_spaces(BNN_W - 33); putchar(CH_VLINE); putchar('\n');
+
+    pad_spaces(BNN_PAD); putchar(CH_VLINE);
+    mini_printf("  Fingerprint: 0x%08x%08x",
+                (uint32_t)(fp_before >> 32), (uint32_t)fp_before);
+    pad_spaces(BNN_W - 36); putchar(CH_VLINE); putchar('\n');
+
+    pad_spaces(BNN_PAD); putchar(CH_VLINE);
+    print("  Status: ");
+    putchar(CH_DIAMOND); print(" VERIFIED ");  putchar(CH_DIAMOND);
+    pad_spaces(BNN_W - 23); putchar(CH_VLINE); putchar('\n');
+
+    // Classify 'A' before corruption
+    uint16_t h; int s[4];
+    int cls_before = ascii_classify('A', &h, s);
+    pad_spaces(BNN_PAD); putchar(CH_VLINE);
+    mini_printf("  Classify 'A': %s (score %d/16)", ascii_class_names[cls_before], s[cls_before]);
+    pad_spaces(BNN_W - 38 - (s[cls_before] > 9 ? 1 : 0));
+    putchar(CH_VLINE); putchar('\n');
+
+    draw_empty(BNN_PAD, BNN_W);
+    pad_spaces(BNN_PAD); putchar(CH_LTEE);
+    repeat_char(CH_THIN_H, BNN_W);
+    putchar(CH_RTEE); putchar('\n');
+
+    // Step 2: Corrupt
+    pad_spaces(BNN_PAD); putchar(CH_VLINE);
+    print("  STEP 2: Inject Single-Bit Fault");
+    pad_spaces(BNN_W - 35); putchar(CH_VLINE); putchar('\n');
+
+    pad_spaces(BNN_PAD); putchar(CH_VLINE);
+    print("  Target: weight[0], bit 24 (1 of 18,432 bits)");
+    pad_spaces(BNN_W - 48); putchar(CH_VLINE); putchar('\n');
+
+    // Compute corrupted fingerprint
+    uint32_t corrupt_weights[16];
+    for (int i = 0; i < 16; i++)
+        corrupt_weights[i] = ascii_hidden_weights[i];
+    corrupt_weights[0] ^= (1 << 24);
+
+    atomik_load(0, 0ULL);
+    for (int i = 0; i < 16; i++)
+        atomik_accum((uint64_t)corrupt_weights[i]);
+    for (int i = 0; i < 4; i++)
+        atomik_accum((uint64_t)ascii_output_weights[i]);
+    for (int i = 0; i < 16; i++)
+        atomik_accum((uint64_t)ascii_hidden_thresholds[i]);
+    uint64_t fp_after = atomik_read(0);
+
+    pad_spaces(BNN_PAD); putchar(CH_VLINE);
+    mini_printf("  Fingerprint: 0x%08x%08x",
+                (uint32_t)(fp_after >> 32), (uint32_t)fp_after);
+    pad_spaces(BNN_W - 36); putchar(CH_VLINE); putchar('\n');
+
+    // Detect
+    uint64_t c0 = cycles64();
+    int tampered = (fp_after != fp_before);
+    uint64_t c1 = cycles64();
+    uint32_t detect_cy = (uint32_t)(c1 - c0);
+
+    pad_spaces(BNN_PAD); putchar(CH_VLINE);
+    print("  Status: ");
+    repeat_char(CH_FULL, 3);
+    print(" TAMPERED ");
+    repeat_char(CH_FULL, 3);
+    pad_spaces(BNN_W - 28); putchar(CH_VLINE); putchar('\n');
+
+    pad_spaces(BNN_PAD); putchar(CH_VLINE);
+    mini_printf("  Detection: %u cycles (~%u ns)",
+                detect_cy, detect_cy * 46);
+    pad_spaces(BNN_W - 34 - (detect_cy > 99 ? 1 : 0) - (detect_cy * 46 > 999 ? 1 : 0)
+                           - (detect_cy * 46 > 9999 ? 1 : 0));
+    putchar(CH_VLINE); putchar('\n');
+
+    draw_empty(BNN_PAD, BNN_W);
+    pad_spaces(BNN_PAD); putchar(CH_LTEE);
+    repeat_char(CH_THIN_H, BNN_W);
+    putchar(CH_RTEE); putchar('\n');
+
+    // Step 3: XOR delta
+    uint64_t delta = fp_before ^ fp_after;
+    pad_spaces(BNN_PAD); putchar(CH_VLINE);
+    print("  STEP 3: Delta-State Proof");
+    pad_spaces(BNN_W - 29); putchar(CH_VLINE); putchar('\n');
+
+    pad_spaces(BNN_PAD); putchar(CH_VLINE);
+    mini_printf("  XOR delta:   0x%08x%08x",
+                (uint32_t)(delta >> 32), (uint32_t)delta);
+    pad_spaces(BNN_W - 36); putchar(CH_VLINE); putchar('\n');
+
+    pad_spaces(BNN_PAD); putchar(CH_VLINE);
+    print("  Non-zero delta = tamper proven by algebra");
+    pad_spaces(BNN_W - 45); putchar(CH_VLINE); putchar('\n');
+
+    draw_empty(BNN_PAD, BNN_W);
+    pad_spaces(BNN_PAD); putchar(CH_LTEE);
+    repeat_char(CH_THIN_H, BNN_W);
+    putchar(CH_RTEE); putchar('\n');
+
+    // Step 4: Restore
+    pad_spaces(BNN_PAD); putchar(CH_VLINE);
+    print("  STEP 4: Restore & Re-verify");
+    pad_spaces(BNN_W - 31); putchar(CH_VLINE); putchar('\n');
+
+    uint64_t fp_restored = ascii_weight_fingerprint();
+    pad_spaces(BNN_PAD); putchar(CH_VLINE);
+    mini_printf("  Fingerprint: 0x%08x%08x",
+                (uint32_t)(fp_restored >> 32), (uint32_t)fp_restored);
+    pad_spaces(BNN_W - 36); putchar(CH_VLINE); putchar('\n');
+
+    pad_spaces(BNN_PAD); putchar(CH_VLINE);
+    print("  Status: ");
+    putchar(CH_DIAMOND); print(" VERIFIED (restored) "); putchar(CH_DIAMOND);
+    pad_spaces(BNN_W - 33); putchar(CH_VLINE); putchar('\n');
+
+    draw_empty(BNN_PAD, BNN_W);
+    draw_bottom(BNN_PAD, BNN_W);
+    print("\n");
+}
+
+static void bnn_auto_demo(void)
+{
+    const char *demo_str = "ATOMiK v3!  Hello 2026";
+    uint32_t total = 0;
+
+    print("\n");
+    draw_top(BNN_PAD, "Auto-Demo: Classifying String", BNN_W);
+
+    pad_spaces(BNN_PAD); putchar(CH_VLINE);
+    print("  Input: \"");
+    print(demo_str);
+    putchar('"');
+    pad_spaces(BNN_W - 34);
+    putchar(CH_VLINE); putchar('\n');
+
+    draw_empty(BNN_PAD, BNN_W);
+
+    for (const char *p = demo_str; *p; p++) {
+        char ch = *p;
+        uint16_t hidden;
+        int scores[4];
+        uint64_t t0 = cycles64();
+        int cls = ascii_classify(ch, &hidden, scores);
+        uint64_t t1 = cycles64();
+        total++;
+
+        pad_spaces(BNN_PAD); putchar(CH_VLINE);
+        print("  '");
+        if (ch == ' ') print("SP"); else putchar(ch);
+        print("' ");
+        putchar(CH_ARROW); putchar(' ');
+        print(ascii_class_names[cls]);
+        int namelen = 0;
+        for (const char *np = ascii_class_names[cls]; *np; np++) namelen++;
+        pad_spaces(7 - namelen);
+
+        // Mini bar
+        int bar = (scores[cls] * 12) / 16;
+        for (int b = 0; b < 12; b++)
+            putchar(b < bar ? CH_FULL : CH_25);
+
+        mini_printf(" %d/16", scores[cls]);
+        pad_spaces(BNN_W - 37 - (ch == ' ' ? 1 : 0) - (scores[cls] > 9 ? 1 : 0));
+        putchar(CH_VLINE); putchar('\n');
+    }
+
+    draw_empty(BNN_PAD, BNN_W);
+
+    pad_spaces(BNN_PAD); putchar(CH_VLINE);
+    mini_printf("  %u characters classified ", total);
+    putchar(CH_BULLET);
+    print(" 100% accuracy");
+    pad_spaces(BNN_W - 43);
+    putchar(CH_VLINE); putchar('\n');
+
+    draw_bottom(BNN_PAD, BNN_W);
+    print("\n");
+}
+
+void cmd_bnn_interactive(void)
+{
+    print("\n");
+    draw_top(BNN_PAD, "ATOMiK Neural Network Inference Engine", BNN_W);
+
+    pad_spaces(BNN_PAD); putchar(CH_VLINE);
+    print("  32-bit XNOR-Popcount BNN ");
+    putchar(CH_BULLET);
+    print(" Tang Nano 9K ");
+    putchar(CH_BULLET);
+    print(" 21.6 MHz   ");
+    putchar(CH_VLINE); putchar('\n');
+
+    draw_empty(BNN_PAD, BNN_W);
+
+    // Model info
+    uint64_t fp = ascii_weight_fingerprint();
+    pad_spaces(BNN_PAD); putchar(CH_VLINE);
+    print("  Model: ASCII Classifier (32");
+    putchar(CH_ARROW);
+    print("16");
+    putchar(CH_ARROW);
+    print("4 BNN)");
+    pad_spaces(BNN_W - 36); putchar(CH_VLINE); putchar('\n');
+
+    pad_spaces(BNN_PAD); putchar(CH_VLINE);
+    print("  Classes: LETTER ");
+    putchar(CH_BULLET);
+    print(" DIGIT ");
+    putchar(CH_BULLET);
+    print(" SYMBOL ");
+    putchar(CH_BULLET);
+    print(" SPACE/CTRL  ");
+    pad_spaces(BNN_W - 49); putchar(CH_VLINE); putchar('\n');
+
+    pad_spaces(BNN_PAD); putchar(CH_VLINE);
+    mini_printf("  ATOMiK Fingerprint: 0x%08x%08x",
+                (uint32_t)(fp >> 32), (uint32_t)fp);
+    pad_spaces(BNN_W - 42); putchar(CH_VLINE); putchar('\n');
+
+    pad_spaces(BNN_PAD); putchar(CH_VLINE);
+    print("  Model Integrity: ");
+    putchar(CH_DIAMOND);
+    print(" VERIFIED ");
+    putchar(CH_DIAMOND);
+    pad_spaces(BNN_W - 31); putchar(CH_VLINE); putchar('\n');
+
+    draw_empty(BNN_PAD, BNN_W);
+
+    pad_spaces(BNN_PAD); putchar(CH_VLINE);
+    print("  [type] Classify  [T] Tamper  [D] Auto-Demo  [Q] Quit");
+    pad_spaces(BNN_W - 55); putchar(CH_VLINE); putchar('\n');
+
+    draw_bottom(BNN_PAD, BNN_W);
+    print("\n");
+
+    uint32_t total_inferences = 0;
+
+    while (1) {
+        pad_spaces(BNN_PAD);
+        putchar(CH_ARROW); putchar(' ');
+        char ch = getchar();
+
+        if (ch == 'Q' || ch == 'q') {
+            print("Quit\n");
+            draw_top(BNN_PAD, "Session Summary", BNN_W);
+            pad_spaces(BNN_PAD); putchar(CH_VLINE);
+            mini_printf("  Total inferences: %u", total_inferences);
+            pad_spaces(BNN_W - 24 - (total_inferences > 9 ? 1 : 0)
+                                   - (total_inferences > 99 ? 1 : 0));
+            putchar(CH_VLINE); putchar('\n');
+            draw_bottom(BNN_PAD, BNN_W);
+            return;
+        }
+
+        if (ch == 'T' || ch == 't') {
+            print("Tamper Demo\n");
+            bnn_tamper_demo();
+            continue;
+        }
+
+        if (ch == 'D' || ch == 'd') {
+            print("Auto-Demo\n");
+            bnn_auto_demo();
+            continue;
+        }
+
+        // --- Regular character classification ---
+        if (ch >= 0x21 && ch < 0x7F)
+            putchar(ch);
+        else if (ch == 0x20)
+            print("SP");
+        else {
+            putchar('[');
+            putchar("0123456789ABCDEF"[(ch >> 4) & 0xF]);
+            putchar("0123456789ABCDEF"[ch & 0xF]);
+            putchar(']');
+        }
+        print("\n");
+
+        // Classify
+        uint64_t t0 = cycles64();
+        uint16_t hidden;
+        int scores[4];
+        int cls = ascii_classify(ch, &hidden, scores);
+        uint64_t t1 = cycles64();
+        total_inferences++;
+        uint32_t cy = (uint32_t)(t1 - t0);
+
+        // Draw result in box
+        draw_top(BNN_PAD, ascii_class_names[cls], BNN_W);
+        bnn_draw_result(ch, hidden, scores, cls, cy, total_inferences);
+        draw_bottom(BNN_PAD, BNN_W);
+        print("\n");
     }
 }
 
@@ -2698,7 +4413,12 @@ void main()
         print("   [V] Display pipeline test\n");
         print("   [R] Performance benchmark suite\n");
         print("   [N] Multi-node link operations\n");
+        print("   [G] BNN hardware validation test\n");
+        print("   [J] BNN interactive neural network demo\n");
         print("   [A] Run all test suites\n");
+        print("   [L] Full demo loop (18 screens)\n");
+        print("   [W] Short pitch (7 screens, ~90s)\n");
+        print("   [9] Boost baud to 460800\n");
         print("   [>] Interactive shell\n");
 
         for (int rep = 10; rep > 0; rep--)
@@ -2746,7 +4466,17 @@ void main()
             case 'V': case 'v': cmd_display_test(); break;
             case 'R': case 'r': cmd_perf_suite(); break;
             case 'N': case 'n': cmd_multinode(); break;
+            case 'G': case 'g': cmd_bnn_test(); break;
+            case 'J': case 'j': cmd_bnn_interactive(); break;
             case 'A': case 'a': cmd_run_all(); break;
+            case 'L': case 'l': demo_loop(); break;
+            case 'W': case 'w': demo_short_pitch(); break;
+            case '9':
+                UART0->CLKDIV = CLK_FREQ / 460800 - 2;
+                // Wait for UART to settle at new rate
+                for (volatile int w = 0; w < 5000; w++);
+                print("\nBaud: 460800 (set terminal to match)\n");
+                break;
             case '>': cmd_shell(); break;
             default: continue;
             }

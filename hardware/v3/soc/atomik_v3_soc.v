@@ -21,6 +21,7 @@
 //   0x83000000  UART (115200)
 //   0xC0000000  Display Pipeline MMIO (delta color LUT, scanline buffer)
 //   0xC0000100  Link UART (inter-board, ~2 Mbaud)
+//   0xC0000200  BNN Accelerator (32→16→4 binary neural network)
 //
 // BSRAM budget: 4 regfile + 2 ATOMiK + 4 BROM + 4 SRAM = 14/26 (54%)
 // =============================================================================
@@ -233,25 +234,33 @@ PicoMem_Mux_1_4 u_bus_mux (
 );
 
 // =========================================================================
-// S3 sub-mux: addr[8] splits display MMIO vs link UART
+// S3 sub-mux: addr[9:8] splits display MMIO, link UART, BNN accelerator
 //   0xC000_0000 - 0xC000_00FF → Display MMIO (via CDC to pixel domain)
 //   0xC000_0100 - 0xC000_01FF → Link UART (CPU domain, no CDC)
+//   0xC000_0200 - 0xC000_02FF → BNN Accelerator (CPU domain, no CDC)
 // =========================================================================
-wire s3_sel_link = wbp_addr[8];  // 1 = link UART, 0 = display
+wire [1:0] s3_sel = wbp_addr[9:8];
 
-// Display path (addr[8]==0)
-wire        disp_cpu_valid = wbp_valid & ~s3_sel_link;
+// Display path (addr[9:8]==00)
+wire        disp_cpu_valid = wbp_valid & (s3_sel == 2'b00);
 wire        disp_cpu_ready;
 wire [31:0] disp_cpu_rdata;
 
-// Link UART path (addr[8]==1)
-wire        link_valid = wbp_valid & s3_sel_link;
+// Link UART path (addr[9:8]==01)
+wire        link_valid = wbp_valid & (s3_sel == 2'b01);
 wire        link_ready;
 wire [31:0] link_rdata;
 
+// BNN Accelerator path (addr[9:8]==10)
+wire        bnn_valid = wbp_valid & (s3_sel == 2'b10);
+wire        bnn_ready;
+wire [31:0] bnn_rdata;
+
 // Mux ready/rdata back to bus
-assign wbp_ready = s3_sel_link ? link_ready : disp_cpu_ready;
-assign wbp_rdata = s3_sel_link ? link_rdata : disp_cpu_rdata;
+assign wbp_ready = (s3_sel == 2'b10) ? bnn_ready  :
+                   (s3_sel == 2'b01) ? link_ready  : disp_cpu_ready;
+assign wbp_rdata = (s3_sel == 2'b10) ? bnn_rdata  :
+                   (s3_sel == 2'b01) ? link_rdata  : disp_cpu_rdata;
 
 // CDC bridge pixel-side signals (clk_pixel domain)
 wire        disp_cdc_valid;
@@ -298,6 +307,21 @@ PicoMem_UART u_link_uart (
     .mem_s_rdata(link_rdata),
     .ser_rx     (link_rx),
     .ser_tx     (link_tx)
+);
+
+// =========================================================================
+// BNN Accelerator (Binary Neural Network inference, CPU domain)
+// 32→16→4 topology, XNOR-popcount, ~40 cycle inference
+// =========================================================================
+atomik_bnn_accel u_bnn (
+    .clk        (clk_p),
+    .rst_n      (sys_resetn),
+    .mmio_valid (bnn_valid),
+    .mmio_ready (bnn_ready),
+    .mmio_addr  (wbp_addr),
+    .mmio_wdata (wbp_wdata),
+    .mmio_wstrb (wbp_wstrb),
+    .mmio_rdata (bnn_rdata)
 );
 
 // =========================================================================
