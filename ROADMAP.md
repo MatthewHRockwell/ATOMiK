@@ -1,9 +1,24 @@
 # ATOMiK — Roadmap & Execution Plan
 
-**Document Version:** 2.5
-**Date:** March 14, 2026
+**Document Version:** 3.0
+**Date:** April 8, 2026
 **Author:** Matt Rockwell + Claude (Planning Partner)
-**Status:** ACTIVE — v2 Production SoC deployed, v3.1.0 production deployed (HD 1280x720 HDMI, benchmarked + parallel banks validated), Zynq port: 444 MHz ceiling (N=1), 69.7 Gops/s (N=512), N=1024 sweep in progress
+**Status:** ACTIVE — Zynq Linux platform validated, libatomik 3-backend runtime, workload demo captured
+
+### Current Milestone (April 2026)
+- **Zynq Linux**: VexRiscvSMP @ 100 MHz, Linux 6.9, ATOMiK validated from userspace (16/16 PASS)
+- **CFU Adapter**: 9/9 PASS from Linux userspace, 20/20 Verilator, 10-14% overhead vs direct CSR
+- **libatomik**: C runtime with 3 backends (AXI, CSR, Adapter), 33/33 mock tests
+- **Workload Demo**: Multi-buffer change detection — 15x to 4,657x speedup on live hardware
+- **State Monitor Demo**: 7/7 correct, up to 211x speedup (64KB no-change case)
+- **Formal**: 108 Lean4 theorems (all compile)
+- **Tag**: `zynq-adapter-v1` (cc9307e) — frozen baseline with artifact manifest
+
+### Previous Milestones
+- v2 Production SoC on Tang Nano 9K ($13.50) — all tests PASS
+- v3.1.0 HD 1280x720 HDMI on Tang Nano 9K — 88% CLS utilization
+- Zynq ceiling: 444 MHz (N=1), 69.7 Gops/s (N=512)
+- Multi-node delta streaming: dual-SoC convergence in Verilator
 
 ---
 
