@@ -14,7 +14,7 @@ ATOMiK solves this at the hardware level:
 - **State reconstruction, not storage**: `current_state = initial_state XOR accumulator` — states are never stored, only reconstructed
 - **Order-independent**: XOR commutativity means multiple sensors/actuators can feed state deltas in any order; the result is identical
 - **Deterministic latency**: Every operation completes in exactly the same number of cycles — no timing side channels
-- **Mathematically proven**: 92 Lean4 theorems verify the delta-state algebra properties
+- **Mathematically proven**: 108 Lean4 theorems verify the delta-state algebra properties
 
 ## Architecture
 
@@ -40,7 +40,7 @@ Physical World
 | Change detection speedup | 76-80% faster than software memcmp |
 | Memory traffic reduction | 7,670x to 916,000x |
 | Throughput (16-bank) | 1,056 Mops/s (hardware-validated) |
-| Mathematical proofs | 92 Lean4 theorems |
+| Mathematical proofs | 108 Lean4 theorems |
 | FPGA cost | $13.50 (Tang Nano 9K) |
 | Deterministic latency | stdev <= 0.5 cycles |
 
@@ -75,7 +75,7 @@ This is the same architecture that would run in a physical AI system — the dis
 - **ATOMiK Core**: Single-bank, 32-bit XOR accumulator @ 21.6 MHz
 - **HDMI**: Dual-PLL architecture (CPU @ 21.6 MHz, pixel @ 25.2 MHz)
 - **SDK**: Python pipeline with code generation for C, Python, Rust, JavaScript, Verilog
-- **Proofs**: 92 Lean4 theorems (commutativity, associativity, identity, self-inverse)
+- **Proofs**: 108 Lean4 theorems (commutativity, associativity, identity, self-inverse)
 
 ## Repository
 

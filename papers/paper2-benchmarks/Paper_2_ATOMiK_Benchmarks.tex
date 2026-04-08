@@ -93,7 +93,7 @@
 % ABSTRACT
 % ============================================================================
 \begin{abstract}
-Delta-state algebra was recently formalized and verified in the Lean4 proof assistant, establishing the theoretical foundations for computation based on composable state differences rather than persistent state. While 92 theorems proved the mathematical properties of this approach---including closure, commutativity, and Turing completeness---the practical performance implications remained empirical questions.
+Delta-state algebra was recently formalized and verified in the Lean4 proof assistant, establishing the theoretical foundations for computation based on composable state differences rather than persistent state. While 108 theorems proved the mathematical properties of this approach---including closure, commutativity, and Turing completeness---the practical performance implications remained empirical questions.
 
 We present a comprehensive validation of delta-state computation through two methodologies: (1)~software benchmarks comparing \atomik{} against traditional state-centric architectures across 360 measurements spanning 9 workloads, and (2)~FPGA hardware implementation validating single-cycle operation and algebraic properties in silicon. Results demonstrate 95--100\% memory traffic reduction across all workloads, with write-heavy operations achieving 22--55\% execution time improvements. Critically, hardware implementation eliminates software-observed reconstruction overhead, achieving uniform single-cycle latency (10.6~ns @ 94.5~MHz) for all operations---LOAD, ACCUMULATE, and READ. The commutative property enables 85\% parallel efficiency, impossible in traditional architectures. All algebraic properties from the formal proofs are validated in silicon (10/10 hardware tests passing on Gowin GW1NR-9 FPGA). Production deployment as a PicoRV32 SoC accelerator (February 2026) demonstrates zero timing violations, clean clock domain crossing, and 5/5 integration test suites passing on deployed hardware with persistent flash.
 
@@ -183,7 +183,7 @@ Deltas compose via bitwise XOR: $\delta_1 \dcompose \delta_2 = \delta_1 \oplus_{
 
 \begin{theorem}[Abelian Group~\cite{paper1}]
 \label{thm:abelian}
-The structure $(\Delta, \dcompose, \dzero)$ forms an Abelian group, proven via 92 theorems in Lean4 with zero \texttt{sorry} statements.
+The structure $(\Delta, \dcompose, \dzero)$ forms an Abelian group, proven via 108 theorems in Lean4 with zero \texttt{sorry} statements.
 \end{theorem}
 
 \paragraph{Performance Implications.} The algebraic properties predict specific performance characteristics, summarized in \Cref{tab:properties}.
@@ -817,7 +817,7 @@ We presented comprehensive empirical validation of delta-state algebra through s
     \item \textbf{Production deployment}: SoC integration with PicoRV32 RISC-V achieves zero timing violations (0~TNS), clean dual-clock operation (81~MHz \atomik{}, 25.2~MHz CPU), and 5/5 integration test suites passing on deployed hardware with persistent flash (February 2026).
 \end{enumerate}
 
-\paragraph{Significance.} This work demonstrates delta-state computation's transition from mathematical formalization to production-ready hardware. The combination of formal verification (92 Lean4 theorems), comprehensive benchmarking (360 measurements), hardware validation (10/10 tests), and production deployment (5/5 integration suites) establishes \atomik{} as a validated architecture for memory-efficient state management in silicon.
+\paragraph{Significance.} This work demonstrates delta-state computation's transition from mathematical formalization to production-ready hardware. The combination of formal verification (108 Lean4 theorems), comprehensive benchmarking (360 measurements), hardware validation (10/10 tests), and production deployment (5/5 integration suites) establishes \atomik{} as a validated architecture for memory-efficient state management in silicon.
 
 \paragraph{Future Work.} ASIC implementation, wider data paths (128/256-bit), multi-bank parallel scaling (4--16 banks), real-world application integration (HFT, video processing, databases), and expanded SDK ecosystem.
 

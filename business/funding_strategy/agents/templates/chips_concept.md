@@ -27,7 +27,7 @@ The XOR-based delta accumulation model achieves:
 - **Single-cycle operation** — no carry propagation, pure LUT-based computation
 - **95-100% memory traffic reduction** — only deltas move, not full state
 - **Linear throughput scaling** — proven to 16 parallel banks, extendable to 64+
-- **Formal correctness guarantees** — 92 Lean4 proofs, zero `sorry` statements
+- **Formal correctness guarantees** — 108 Lean4 proofs, zero `sorry` statements
 
 ### Current Technology Readiness
 

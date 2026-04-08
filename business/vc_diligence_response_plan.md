@@ -58,13 +58,13 @@ Needs clarity on what XOR actually works with. Is this just parity checking? Wha
 
 ### What We Can Answer NOW
 
-**XOR operates on raw bits — it is data-type agnostic.** This is the core insight that 92 Lean4 theorems formalize.
+**XOR operates on raw bits — it is data-type agnostic.** This is the core insight that 108 Lean4 theorems formalize.
 
 The operation is: `current_state = initial_state ⊕ accumulator`, where accumulator = XOR of all deltas. This works on ANY fixed-width data: integers, floats (IEEE 754 bit patterns), packed structs, encryption keys, pixel buffers.
 
 **This is NOT parity.** Parity reduces N bits to 1 bit (lossy). ATOMiK's XOR accumulation preserves the full bit-width (lossless). The accumulator is 64 bits wide — it captures the *exact* cumulative difference, not a summary.
 
-**Already proven (92 Lean4 theorems):**
+**Already proven (108 Lean4 theorems):**
 - Commutativity: order of delta application doesn't matter
 - Associativity: grouping doesn't matter → enables parallel bank merge
 - Self-inverse: `x ⊕ x = 0` → any delta can be undone by re-applying it
@@ -88,7 +88,7 @@ The SDK accepts JSON schemas defining state structures. The code generator (`sof
 | **New demo screen: Data Type Agnostic** | 3 days | MEDIUM | Show same delta operation on int, float, packed struct — identical hardware path (Verilator sim) |
 
 ### Thursday Talking Point
-> "XOR is a bitwise operation — it's data-type agnostic. It works on any fixed-width data: integers, floats, packed structs. This isn't parity — parity collapses N bits to 1 bit. Our accumulator preserves the full 64-bit width. The SDK handles typed access — developers define a JSON schema and get a library in 5 languages. They never touch XOR. The 92 Lean4 proofs establish that this operation forms a complete algebraic group, which is what enables parallel processing, instant undo, and lock-free accumulation."
+> "XOR is a bitwise operation — it's data-type agnostic. It works on any fixed-width data: integers, floats, packed structs. This isn't parity — parity collapses N bits to 1 bit. Our accumulator preserves the full 64-bit width. The SDK handles typed access — developers define a JSON schema and get a library in 5 languages. They never touch XOR. The 108 Lean4 proofs establish that this operation forms a complete algebraic group, which is what enables parallel processing, instant undo, and lock-free accumulation."
 
 ---
 
@@ -102,7 +102,7 @@ Single founder with no named advisors or hire candidates creates key-person risk
 **Mitigation already built into the architecture:**
 
 1. **Nothing depends on tribal knowledge.** Every deliverable is machine-verified or reproducible:
-   - 92 Lean4 proofs: machine-checked, zero `sorry` axioms
+   - 108 Lean4 proofs: machine-checked, zero `sorry` axioms
    - RTL: synthesizable Verilog, validated on 2 FPGA families (Gowin + Xilinx)
    - SDK: code-generated from schemas, 353 automated tests
    - Papers: 3 manuscripts ready for peer review

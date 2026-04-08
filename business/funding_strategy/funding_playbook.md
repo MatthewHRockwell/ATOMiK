@@ -48,7 +48,7 @@ Delaware C-Corp is required for:
 | Relevance | **HIGH** — Army topic "Open Source, High Assurance Hardware and Software Co-Design" directly matches FPGA + formal verification. DARPA PROVERS (formal methods) and SSITH (hardware security) are aligned. |
 | Status | Paused pending reauthorization. Monitor dodsbirsttr.mil. |
 
-**ATOMiK pitch angle:** Formally verified hardware for assured state management at the tactical edge. 92 Lean4 proofs guarantee correctness properties (commutativity, idempotence, self-inverse) that eliminate classes of hardware bugs. Single-cycle operation at ~20mW enables deployment on resource-constrained platforms.
+**ATOMiK pitch angle:** Formally verified hardware for assured state management at the tactical edge. 108 Lean4 proofs guarantee correctness properties (commutativity, idempotence, self-inverse) that eliminate classes of hardware bugs. Single-cycle operation at ~20mW enables deployment on resource-constrained platforms.
 
 ### 3. DOE SBIR Phase I
 
@@ -161,7 +161,7 @@ Delaware C-Corp is required for:
 | Requirements | Application with IC/chip design details, technology node, TAM/SAM/SOM analysis |
 | Timeline | Next cohort deadline TBD (Jan 2026 deadline passed). Apply at siliconcatalyst.com/application |
 
-**ATOMiK pitch angle:** Formally verified XOR accumulator IP targeting ASIC integration. 92 Lean4 proofs, working FPGA prototype on Tang Nano 9K, 7% LUT utilization (single bank). Seeking EDA tool access and fab partner introductions to move from FPGA to ASIC.
+**ATOMiK pitch angle:** Formally verified XOR accumulator IP targeting ASIC integration. 108 Lean4 proofs, working FPGA prototype on Tang Nano 9K, 7% LUT utilization (single bank). Seeking EDA tool access and fab partner introductions to move from FPGA to ASIC.
 
 ### 10. Alchemist Accelerator
 
@@ -230,7 +230,7 @@ Delaware C-Corp is required for:
 | Relevance | **HIGH** — Formal verification + hardware security + edge computing = intelligence community fit. 750+ investments. |
 | Engagement | IQT scouts startups — no public application. Engage through iqt.org or get introduced via Silicon Catalyst, HAX, or defense-tech conferences. |
 
-**ATOMiK pitch angle:** Formally verified hardware for assured state management in contested environments. Self-inverse property enables instant rollback (no checkpoints). Commutative merge enables lock-free multi-sensor fusion at the tactical edge. 92 Lean4 proofs — not tested, proven.
+**ATOMiK pitch angle:** Formally verified hardware for assured state management in contested environments. Self-inverse property enables instant rollback (no checkpoints). Commutative merge enables lock-free multi-sensor fusion at the tactical edge. 108 Lean4 proofs — not tested, proven.
 
 ### 15. Shield Capital
 
@@ -349,7 +349,7 @@ IQT and defense VCs don't have standard application processes. Best paths:
 | DoD SBIR | High-assurance hardware for edge computing in contested environments — formally verified state management for sensor fusion |
 | DOE SBIR | Energy-efficient computing primitive — 95–100% memory traffic reduction, ~20mW power on $13.50 FPGA |
 | CHIPS Act | American semiconductor IP — area-efficient (7% LUT) formally verified compute block for next-gen chip designs |
-| NASA SBIR | Radiation-tolerant state management with flight-system-grade formal verification (92 Lean4 proofs) |
+| NASA SBIR | Radiation-tolerant state management with flight-system-grade formal verification (108 Lean4 proofs) |
 | NVIDIA Inception | State management accelerator for AI inference pipelines — reducing memory bandwidth in model serving |
 | CDL | Science-based venture — new computing primitive grounded in delta-state algebra, not incremental improvement |
 | Silicon Catalyst | FPGA-proven IP block ready for ASIC integration — seeking EDA access and fab partner introductions |

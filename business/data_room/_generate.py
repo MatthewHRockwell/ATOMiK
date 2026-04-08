@@ -204,7 +204,7 @@ def generate_ip_assignment(config: dict) -> None:
 WHEREAS, Assignor has developed certain intellectual property relating to
 the ATOMiK delta-state computing architecture, including but not limited to:
 
-1. Mathematical foundations and formal proofs (92 Lean4 theorems)
+1. Mathematical foundations and formal proofs (108 Lean4 theorems)
 2. Hardware description language (Verilog) implementations
 3. Software development kit (5-language code generators)
 4. Research papers and technical documentation
@@ -308,7 +308,7 @@ def generate_proofs_inventory() -> None:
 
 ## Overview
 
-ATOMiK's mathematical foundations are verified by **92 theorems** in
+ATOMiK's mathematical foundations are verified by **108 theorems** in
 Lean4, covering the complete delta-state algebra.
 
 ## Proof Categories
@@ -328,7 +328,7 @@ Lean4, covering the complete delta-state algebra.
 
 ```bash
 cd math/proofs && lake build
-# All 92 theorems verified, 0 sorry statements
+# All 108 theorems verified, 0 sorry statements
 ```
 
 ## Key Theorems

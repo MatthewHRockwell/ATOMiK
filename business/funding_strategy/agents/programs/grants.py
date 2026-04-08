@@ -208,7 +208,7 @@ class ChipsAct(BaseApplication):
                 f"{config.company.name} has developed a formally verified hardware "
                 f"architecture for delta-state computing that achieves 1 billion "
                 f"operations per second on a $10 FPGA at 7% LUT utilization. "
-                f"The architecture is backed by 92 Lean4 formal proofs and a "
+                f"The architecture is backed by 108 Lean4 formal proofs and a "
                 f"5-language SDK.\n\n"
                 f"We believe this technology is directly relevant to CHIPS Act "
                 f"objectives for advancing domestic semiconductor IP.\n\n"

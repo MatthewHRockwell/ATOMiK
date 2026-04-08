@@ -6,7 +6,7 @@ Hi team,
 
 DCVC's focus on computational approaches to hard problems is exactly what ATOMiK is. I've built a hardware architecture that reduces state reconstruction from O(N) event replay to O(1) — a single XOR operation in 10.6 nanoseconds.
 
-The insight: delta-state accumulation using XOR is commutative, associative, and self-inverse. These aren't assumptions — they're formally proven (92 theorems in Lean4). That means lock-free parallelism by construction, free undo/rollback, and linear throughput scaling.
+The insight: delta-state accumulation using XOR is commutative, associative, and self-inverse. These aren't assumptions — they're formally proven (108 theorems in Lean4). That means lock-free parallelism by construction, free undo/rollback, and linear throughput scaling.
 
 Current results:
 - 1,056 Mops/s on a $13.50 FPGA (16 parallel banks)

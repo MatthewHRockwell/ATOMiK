@@ -71,13 +71,13 @@ ATOMiK's delta-state primitives can serve as a hardware acceleration layer withi
 
 ### 4. Research Collaboration
 
-Our formal verification methodology (92 Lean4 proofs for a hardware primitive) represents a novel approach to hardware correctness that NVIDIA Research may find relevant as chip complexity increases and formal methods gain traction in industry.
+Our formal verification methodology (108 Lean4 proofs for a hardware primitive) represents a novel approach to hardware correctness that NVIDIA Research may find relevant as chip complexity increases and formal methods gain traction in industry.
 
 ## Team
 
 **Matthew H. Rockwell — Founder & CEO**
 
-Mechanical engineer turned semiconductor architect. Built the complete ATOMiK stack solo in 6 months: mathematical formalization (92 Lean4 proofs), hardware design (SystemVerilog RTL, production SoC with custom RV64I CPU), 5-language SDK (353 tests), patent application, and 2 published academic papers. Total development cost: $225.
+Mechanical engineer turned semiconductor architect. Built the complete ATOMiK stack solo in 6 months: mathematical formalization (108 Lean4 proofs), hardware design (SystemVerilog RTL, production SoC with custom RV64I CPU), 5-language SDK (353 tests), patent application, and 2 published academic papers. Total development cost: $225.
 
 Currently raising a $3–4M seed round to hire a verification engineer and applications engineer, complete ASIC preparation, and sign first commercial IP licenses.
 

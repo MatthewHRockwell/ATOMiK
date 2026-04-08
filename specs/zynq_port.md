@@ -582,7 +582,7 @@ The following are explicitly out of scope for this port:
 
 - **No Tang Nano 9K replacement**: The Gowin platform continues in parallel. The Zynq port is an additional platform for scaling experiments and Linux integration, not a replacement. Both platforms share the same ATOMiK RTL core.
 
-- **No ATOMiK algebra changes**: The delta-state algebra (XOR accumulator, state reconstruction, SWAP) is unchanged. All 92 Lean4 theorems apply to both platforms. The reconstruction equation remains `current_state = initial_state XOR accumulator`.
+- **No ATOMiK algebra changes**: The delta-state algebra (XOR accumulator, state reconstruction, SWAP) is unchanged. All 108 Lean4 theorems apply to both platforms. The reconstruction equation remains `current_state = initial_state XOR accumulator`.
 
 - **No custom kernel module**: UIO provides sufficient access for all ATOMiK operations. A custom kernel driver would add maintenance burden without measurable benefit for the current use case. If interrupt-driven operation becomes necessary, UIO's built-in interrupt support is used first.
 

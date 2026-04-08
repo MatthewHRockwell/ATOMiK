@@ -213,7 +213,7 @@ For Enterprise customers ready to upgrade:
 ### "Why not just use XOR ourselves?"
 
 The algebra is simple. The value is in:
-1. **Proven correctness** — 92 Lean4 theorems. No other state management library has formal proofs.
+1. **Proven correctness** — 108 Lean4 theorems. No other state management library has formal proofs.
 2. **Battle-tested implementation** — Hardware-validated on 3 FPGA platforms, 417+ tests across software and hardware.
 3. **Upgrade path** — When software performance isn't enough, upgrade to FPGA (100x) or ASIC (1000x) with the same API.
 4. **Ecosystem** — Multi-language code generation, integration guides, professional support.
@@ -226,7 +226,7 @@ The algebra is simple. The value is in:
 | State reconstruction | O(1) — ref ^ acc | O(N) — replay N events |
 | Storage growth | Constant (24 bytes) | Linear (all events) |
 | Ordering requirement | None (commutative) | Total order required |
-| Formal proofs | 92 Lean4 theorems | None |
+| Formal proofs | 108 Lean4 theorems | None |
 
 ### vs. CRDTs (Automerge, Yjs)
 
@@ -247,7 +247,7 @@ The algebra is simple. The value is in:
 | Low initial adoption | Free tier generates demand; target specific verticals with clear ROI |
 | Price sensitivity | $99/month is 1-2 engineering hours; ROI is immediate for bandwidth savings |
 | Competition builds similar | First-mover + formal proofs + hardware integration are deep moats |
-| Patent challenge | 92 Lean4 theorems document novelty; architecture patent covers implementation |
+| Patent challenge | 108 Lean4 theorems document novelty; architecture patent covers implementation |
 
 ---
 

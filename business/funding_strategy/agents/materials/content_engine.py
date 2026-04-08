@@ -37,7 +37,7 @@ _PITCH_ANGLES: dict[str, str] = {
     ),
     "dod_sbir": (
         "Formally verified hardware for assured state management at the "
-        "tactical edge. 92 Lean4 proofs guarantee correctness properties "
+        "tactical edge. 108 Lean4 proofs guarantee correctness properties "
         "(commutativity, idempotence, self-inverse) that eliminate classes "
         "of hardware bugs. Single-cycle operation at ~20 mW."
     ),
@@ -221,7 +221,7 @@ class ContentEngine:
         return (
             "Patent Pending: Architecture and execution model under IP "
             "protection.\n"
-            "Formal Verification: 92 Lean4 proofs — machine-verified.\n"
+            "Formal Verification: 108 Lean4 proofs — machine-verified.\n"
             "Hardware Validated: Real FPGA silicon, not simulation.\n"
             "Full Stack: Math proofs + RTL + SDK + agentic pipeline.\n"
             "Linear Scaling: Proven to 16x, extends to 64x+."
@@ -238,7 +238,7 @@ class ContentEngine:
             parts.append(bio)
         parts.append(
             "Solo technical founder who built the full ATOMiK stack — "
-            "from 92 Lean4 formal proofs to FPGA synthesis to a "
+            "from 108 Lean4 formal proofs to FPGA synthesis to a "
             "5-language SDK — for $225 total development cost."
         )
         return " ".join(parts)

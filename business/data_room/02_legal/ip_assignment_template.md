@@ -14,7 +14,7 @@
 WHEREAS, Assignor has developed certain intellectual property relating to
 the ATOMiK delta-state computing architecture, including but not limited to:
 
-1. Mathematical foundations and formal proofs (92 Lean4 theorems)
+1. Mathematical foundations and formal proofs (108 Lean4 theorems)
 2. Hardware description language (Verilog) implementations
 3. Software development kit (5-language code generators)
 4. Research papers and technical documentation

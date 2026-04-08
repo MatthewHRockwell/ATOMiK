@@ -30,7 +30,7 @@ ATOMiK SDK is a **multi-language code generation toolkit** for delta-state compu
 
 **Key Benefits**:
 - ✅ Write once, deploy everywhere (Python, Rust, C, Verilog, JavaScript)
-- ✅ Mathematically proven correctness (92 Lean4 theorems)
+- ✅ Mathematically proven correctness (108 Lean4 theorems)
 - ✅ Hardware-validated performance (10/10 tests passing on FPGA)
 - ✅ Automatic namespace generation from schema metadata
 

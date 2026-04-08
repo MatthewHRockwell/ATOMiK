@@ -43,7 +43,7 @@ Where v2 proved that delta-state acceleration works on an FPGA, v3 asks: what do
 | SoC LUT4 | 3,838 (44%) | ~3,100 (36%) |
 | Datapath width | 32-bit | 64-bit (parameterizable) |
 
-The algebra is unchanged. All 92 Lean4 theorems apply without modification. The reconstruction equation remains:
+The algebra is unchanged. All 108 Lean4 theorems apply without modification. The reconstruction equation remains:
 
 ```
 current_state = initial_state ⊕ accumulator
@@ -99,7 +99,7 @@ In v3, the CPU has native ATOMiK instructions. A delta injection is a single ins
 ### 3.3 What Stays
 
 - The algebra: Abelian group under XOR composition (commutative, associative, self-inverse, identity)
-- The formal model: 92 Lean4 theorems in `math/proofs/ATOMiK/`
+- The formal model: 108 Lean4 theorems in `math/proofs/ATOMiK/`
 - The reconstruction equation: `current_state = initial_state ⊕ accumulator`
 - The target device: GW1NR-LV9QN88PC6/I5 (Tang Nano 9K)
 
@@ -646,7 +646,7 @@ v2 remains the deployed, validated, production proof-of-concept. It runs on real
 v3 is the architectural optimization target. It builds on v2's validated algebra, formal proofs, and benchmark methodology. Specifically:
 
 - **v2 hardware tests and benchmarks remain valid** as baseline comparisons for v3
-- **v2's 92 Lean4 theorems apply without modification** to v3 (same algebra, same reconstruction equation)
+- **v2's 108 Lean4 theorems apply without modification** to v3 (same algebra, same reconstruction equation)
 - **v2's production SoC can continue operating** while v3 is developed — they target the same FPGA and can share the toolchain
 - **v2's firmware methodology** (bare-metal C, SPI XIP, UART test harness) transfers directly to v3 with the new instruction set
 
@@ -771,7 +771,7 @@ This aligns with the architecture: as parallelism increases, the clock budget sh
 │ Custom ISA       │ None            │ custom-0..3      │
 │                  │ generic MMIO    │ ATOMIK.* ops     │
 ├──────────────────┼──────────────────┼──────────────────┤
-│ Delta-State      │ 92 Lean4 thms   │ Same algebra     │
+│ Delta-State      │ 108 Lean4 thms   │ Same algebra     │
 │ Algebra          │ Verified        │ (unchanged)      │
 ├──────────────────┼──────────────────┼──────────────────┤
 │ Production       │ Deployed        │ Proposed         │
@@ -849,7 +849,7 @@ This aligns with the architecture: as parallelism increases, the clock budget sh
 | File | Description | Relevance to v3 |
 |------|-------------|-----------------|
 | `specs/rtl_architecture.md` | v2 RTL spec | Format reference, v2 baseline |
-| `specs/formal_model.md` | Formal algebra (92 theorems) | Unchanged, v3 builds on same math |
+| `specs/formal_model.md` | Formal algebra (108 theorems) | Unchanged, v3 builds on same math |
 | `hardware/rtl/atomik_core_v2.v` | Current core implementation | v3 replaces control interface |
 | `hardware/rtl/atomik_delta_acc.v` | Current accumulator | v3 removes register-based initial_state |
 | `hardware/rtl/atomik_state_rec.v` | Current reconstructor | v3 feeds from BSRAM instead of registers |

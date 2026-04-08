@@ -19,7 +19,7 @@
 **Visual:** Diagram showing traditional state tracking (full memory copies, software checksums) vs ATOMiK (XOR accumulator, delta reconstruction)
 
 **Narration:**
-"Traditional state verification copies entire memory buffers and runs software checksums. It's slow, it's variable-latency, and it leaks timing information. ATOMiK takes a completely different approach — state is never stored, only reconstructed. Current state equals initial state XOR'd with a running accumulator of deltas. Order doesn't matter. Latency is deterministic. And we've proven the math — 92 theorems in Lean4."
+"Traditional state verification copies entire memory buffers and runs software checksums. It's slow, it's variable-latency, and it leaks timing information. ATOMiK takes a completely different approach — state is never stored, only reconstructed. Current state equals initial state XOR'd with a running accumulator of deltas. Order doesn't matter. Latency is deterministic. And we've proven the math — 108 theorems in Lean4."
 
 ---
 
@@ -83,7 +83,7 @@ Sensors/Cameras → [Cosmos Reason 2] → "State X changed"
 **Visual:** Results table, repo URL, board shot
 
 **Narration:**
-"To summarize: ATOMiK runs on a thirteen dollar fifty FPGA. It provides 76 to 80 percent faster change detection than software. Memory traffic reduction up to 916,000x. Deterministic latency with no timing side channels. 92 Lean4 theorems proving the math. A custom RV64I CPU with ATOMiK fused directly into the instruction set. And a complete SDK generating verified code in five languages."
+"To summarize: ATOMiK runs on a thirteen dollar fifty FPGA. It provides 76 to 80 percent faster change detection than software. Memory traffic reduction up to 916,000x. Deterministic latency with no timing side channels. 108 Lean4 theorems proving the math. A custom RV64I CPU with ATOMiK fused directly into the instruction set. And a complete SDK generating verified code in five languages."
 
 **Show:** GitHub repo URL: `github.com/MatthewHRockwell/ATOMiK`
 

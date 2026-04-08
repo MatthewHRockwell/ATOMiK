@@ -595,7 +595,7 @@ ATOMiK/
 │   └── fs/
 ├── ide/                         # NEW: ATOMiK IDE
 ├── automation/                  # NEW: Executive automation pipelines
-├── math/proofs/                 # Lean4 formal proofs (existing, 92 theorems)
+├── math/proofs/                 # Lean4 formal proofs (existing, 108 theorems)
 ├── software/                    # Python SDK (existing — may be deprioritized)
 ├── demos/                       # Demo system
 ├── business/                    # Investor materials

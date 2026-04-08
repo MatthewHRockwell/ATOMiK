@@ -4,7 +4,7 @@
 
 ## Overview
 
-ATOMiK's mathematical foundations are verified by **92 theorems** in
+ATOMiK's mathematical foundations are verified by **108 theorems** in
 Lean4, covering the complete delta-state algebra.
 
 ## Proof Categories
@@ -24,7 +24,7 @@ Lean4, covering the complete delta-state algebra.
 
 ```bash
 cd math/proofs && lake build
-# All 92 theorems verified, 0 sorry statements
+# All 108 theorems verified, 0 sorry statements
 ```
 
 ## Key Theorems

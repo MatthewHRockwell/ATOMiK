@@ -1046,7 +1046,7 @@ ATOMiK Core v2 implements delta-state computation in hardware with:
 - **Single-cycle accumulation**: XOR has no carry propagation
 - **O(1) state reconstruction**: current_state = initial_state ⊕ accumulator
 - **Eliminates 32% read penalty**: Observed in Phase 2 software benchmarks
-- **Provably correct**: Backed by 92 theorems from Phase 1 Lean4 proofs
+- **Provably correct**: Backed by 108 theorems from Phase 1 Lean4 proofs
 - **Resource efficient**: <2% LUT utilization on target FPGA
 
 ### 9.2 Performance Predictions

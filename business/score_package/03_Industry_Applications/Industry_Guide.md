@@ -148,7 +148,7 @@ Each industry section follows the same format:
 
 **The Problem:** Military and aerospace systems require the highest levels of reliability and formal verification (DO-178C, MIL-STD-882). Current systems are extremely expensive to verify and certify. Multi-sensor data fusion for situational awareness must be both fast and provably correct.
 
-**How ATOMiK Solves It:** 92 Lean4 proofs provide machine-verified guarantees — the gold standard for formal verification. Hardware-accelerated delta processing enables real-time multi-sensor fusion. The architecture's simplicity (single-operation processing) reduces the attack surface for security-critical applications.
+**How ATOMiK Solves It:** 108 Lean4 proofs provide machine-verified guarantees — the gold standard for formal verification. Hardware-accelerated delta processing enables real-time multi-sensor fusion. The architecture's simplicity (single-operation processing) reduces the attack surface for security-critical applications.
 
 **Example Use Case:** A naval combat system fuses data from radar, sonar, satellite, and ESM (electronic surveillance measures). Each sensor produces deltas to the tactical picture. ATOMiK merges all feeds in hardware with provable correctness, providing a consistent real-time operating picture to the command center. The formal proofs satisfy DO-178C Level A certification requirements.
 

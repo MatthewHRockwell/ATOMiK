@@ -57,7 +57,7 @@ N parallel XOR accumulator banks with a binary merge tree achieve linear through
 ## Competitive Moat
 
 - **Patent Pending**: Architecture and execution model under IP protection
-- **Formal Verification**: 92 Lean4 proofs — machine-verified, not hand-tested
+- **Formal Verification**: 108 Lean4 proofs — machine-verified, not hand-tested
 - **Hardware Validated**: Real FPGA silicon, not just simulation
 - **Full Stack**: Math proofs + RTL + SDK + agentic pipeline — 6 phases complete
 - **Linear Scaling**: Proven to 16x, extends to 64x+ with larger devices

@@ -126,7 +126,7 @@ def scene_title():
     centered_text(draw, 590, "Matthew Rockwell", FONT_BODY_SM, DIM)
 
     # Bottom: board price
-    centered_text(draw, 750, "$13.50 FPGA  |  92 Lean4 Proofs  |  RV64I + ATOMiK ISA", FONT_BODY_SM, DIM)
+    centered_text(draw, 750, "$13.50 FPGA  |  108 Lean4 Proofs  |  RV64I + ATOMiK ISA", FONT_BODY_SM, DIM)
 
     fade_in(img, 20)
     hold(img, 6)
@@ -164,7 +164,7 @@ def scene_problem():
         "XOR accumulator (deterministic latency)",
         "No timing side channels",
         "O(1) change detection",
-        "Mathematically proven (92 theorems)",
+        "Mathematically proven (108 theorems)",
     ]
     for i, s in enumerate(solutions):
         y = 210 + i * 48
@@ -192,7 +192,7 @@ def scene_problem():
         draw.text((x, y + 42), desc, font=FONT_SMALL, fill=GRAY)
 
     # Bottom: Lean4
-    centered_text(draw, 790, "All properties formally verified: 92 theorems in Lean4", FONT_BODY_SM, DIM)
+    centered_text(draw, 790, "All properties formally verified: 108 theorems in Lean4", FONT_BODY_SM, DIM)
 
     return img
 
@@ -444,7 +444,7 @@ def scene_math():
     draw = ImageDraw.Draw(img)
 
     centered_text(draw, 30, "Mathematical Foundation", FONT_HEADING, WHITE)
-    centered_text(draw, 90, "92 Lean4 Theorems  \u2014  Delta-State Algebra", FONT_BODY_SM, DIM)
+    centered_text(draw, 90, "108 Lean4 Theorems  \u2014  Delta-State Algebra", FONT_BODY_SM, DIM)
 
     # Abelian Group properties
     draw.text((100, 180), "XOR forms an Abelian Group over bit-vectors:", font=FONT_BODY, fill=WHITE)
@@ -578,7 +578,7 @@ def scene_closing():
         "$13.50 FPGA with mathematically-proven state verification",
         "76-80% faster change detection than software",
         "Deterministic latency — no timing side channels",
-        "92 Lean4 theorems — verified delta-state algebra",
+        "108 Lean4 theorems — verified delta-state algebra",
         "Custom RV64I CPU with ATOMiK fused instructions",
         "Open source: hardware, firmware, SDK, proofs",
     ]

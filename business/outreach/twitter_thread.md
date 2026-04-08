@@ -32,7 +32,7 @@ XOR gives you properties that are wild for hardware:
 These aren't assumptions. They're proven.
 
 ## Tweet 5 (Formal Verification)
-92 theorems. Formally verified in Lean4. Machine-checked, not hand-tested.
+108 theorems. Formally verified in Lean4. Machine-checked, not hand-tested.
 
 Commutativity. Idempotence. Self-inverse. Convergence. Merge correctness. Linear scaling bounds.
 

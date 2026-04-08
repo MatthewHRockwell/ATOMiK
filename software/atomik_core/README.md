@@ -161,7 +161,7 @@ Every algebraic property is proven in Lean4 — not tested, proven:
 - **Self-inverse**: `accum(d); accum(d) == identity`
 - **Identity**: `accum(0) == identity`
 
-92 theorems total. [See proofs →](https://github.com/MatthewHRockwell/ATOMiK/tree/main/math/proofs)
+108 theorems total. [See proofs →](https://github.com/MatthewHRockwell/ATOMiK/tree/main/math/proofs)
 
 ## C Library
 

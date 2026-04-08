@@ -5,7 +5,7 @@ does one billion operations per second on a ten-dollar FPGA —
 for two hundred and twenty-five dollars total.
 
 ATOMiK uses XOR delta-state accumulation, formally verified with
-92 Lean4 proofs and validated on hardware. We're targeting
+108 Lean4 proofs and validated on hardware. We're targeting
 semiconductor IP licensing in the six hundred billion dollar market.
 
 I'd love to tell you more.

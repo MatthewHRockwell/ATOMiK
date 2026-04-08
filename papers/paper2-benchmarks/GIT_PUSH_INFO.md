@@ -171,7 +171,7 @@ a running accumulator, achieving O(1) state reconstruction.
 
 ### Companion Paper
 Paper 1: "Delta-State Algebra: A Formally Verified Foundation for 
-Transient State Computation" (92 Lean4 theorems)
+Transient State Computation" (108 Lean4 theorems)
 ```
 
 ---

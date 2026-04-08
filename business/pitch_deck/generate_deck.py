@@ -851,7 +851,7 @@ add_textbox(slide, Inches(0.8), Inches(1.2), Inches(6), Inches(0.4),
 comp_data = [
     ["Dimension", "ATOMiK", "Event\nSourcing", "CRDTs", "GPU", "Near-\nMemory"],
     ["Reconstruction", "O(1)/cycle", "O(N) replay", "O(N) merge", "Batch", "O(1) local"],
-    ["Formal Proofs", "92 Lean4", "None", "Manual", "None", "None"],
+    ["Formal Proofs", "108 Lean4", "None", "Manual", "None", "None"],
     ["Undo/Reversal", "Free", "Log replay", "N/A", "N/A", "N/A"],
     ["Parallelism", "Linear", "Limited", "Eventual", "SIMT", "Ctrl-bound"],
     ["Power", "~20 mW", "50\u2013200W", "50\u2013200W", "300\u2013700W", "10\u201350W"],
@@ -899,7 +899,7 @@ section_line(slide, Inches(1.4))
 
 # ── Completed phases (timeline) ──
 phases_done = [
-    ("Phase 1", "Math\nFormalization", "92 Lean4\nproofs", PURPLE),
+    ("Phase 1", "Math\nFormalization", "108 Lean4\nproofs", PURPLE),
     ("Phase 2", "SCORE\nBenchmarks", "95\u2013100%\nmem reduction", BLUE),
     ("Phase 3", "Hardware\nSynthesis", "94.5 MHz\n80/80 tests", TEAL),
     ("Phase 4", "SDK\nGeneration", "5 languages\n353 tests", GREEN),

@@ -13,7 +13,7 @@ entire state vectors, we accumulate only what changed using XOR.
 This eliminates carry propagation, enables lock-free parallelism,
 and provides instant undo — all in a single clock cycle.
 
-We proved it works with 92 formal theorems in Lean4, then validated
+We proved it works with 108 formal theorems in Lean4, then validated
 it on real FPGA hardware with eighty out of eighty tests passing.
 
 ## Why It Matters (20s)

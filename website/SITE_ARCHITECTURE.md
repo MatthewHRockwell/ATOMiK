@@ -188,9 +188,9 @@ Each follows a template (SiFive pattern):
 #### `/about` — Company & Mission (ARM/SiFive pattern)
 - Mission statement (expanded from landing page)
 - The invention story — from mathematical insight to silicon
-- Key proof points: 92 theorems, 417+ tests, 3 FPGA platforms, 69.7 Gops/s
+- Key proof points: 108 theorems, 417+ tests, 3 FPGA platforms, 69.7 Gops/s
 - Technology timeline:
-  - 2025: Mathematical formalization (92 Lean4 theorems)
+  - 2025: Mathematical formalization (108 Lean4 theorems)
   - 2025: Software SDK (5 languages, 353 tests)
   - 2025: FPGA v1 — PicoRV32 + ATOMiK on Tang Nano 9K
   - 2025: FPGA v2 — Custom RV64I CPU with ATOMiK ISA

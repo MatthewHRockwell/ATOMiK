@@ -55,7 +55,7 @@ Since XOR forms an abelian group:
 - **Self-inverse**: applying a delta twice cancels it → undo is free, no snapshot stack
 - **O(1) reconstruction**: `current = reference ^ accumulator` → no replay
 
-This sounds too simple to work, which is why I proved it in Lean4 — 92 theorems covering the complete algebraic structure.
+This sounds too simple to work, which is why I proved it in Lean4 — 108 theorems covering the complete algebraic structure.
 
 **Measured results (Python, zero dependencies):**
 - Network: 80KB of deltas vs 655MB of full copies (64KB state, 10K updates)
@@ -98,7 +98,7 @@ assert ctx.read() == 0xDEADBEEF
 
 Zero dependencies, Python 3.9+, fully typed (py.typed marker), 50 tests. Also ships as a single-header C99 library.
 
-The math behind it is formally verified — 92 Lean4 theorems, not just tests.
+The math behind it is formally verified — 108 Lean4 theorems, not just tests.
 
 ```
 pip install atomik-core
@@ -117,7 +117,7 @@ pip install atomik-core
 
 I've been working on ATOMiK — a delta-state algebra where state is reconstructed (reference ^ accumulator) rather than stored. The algebra forms an abelian group under XOR, which gives you commutativity (no ordering), self-inverse (free undo), and O(1) reconstruction for free.
 
-Published `atomik-core` to PyPI today. Zero deps, Python 3.9+, fully typed. 92 Lean4 formal proofs for the algebraic properties. Also available as a header-only C99 library.
+Published `atomik-core` to PyPI today. Zero deps, Python 3.9+, fully typed. 108 Lean4 formal proofs for the algebraic properties. Also available as a header-only C99 library.
 
 The practical upshot: distributed nodes converge without consensus protocols, rollback needs 24 bytes regardless of history depth, and incremental change detection is O(1) per update instead of O(n) rehash.
 
@@ -160,7 +160,7 @@ Same algebra runs on Python → C → FPGA → custom RISC-V ISA.
 **Tweet 4:**
 The math isn't tested — it's proven.
 
-92 Lean4 theorems covering commutativity, associativity, identity, and self-inverse.
+108 Lean4 theorems covering commutativity, associativity, identity, and self-inverse.
 
 If the proofs compile, the algebra is correct. Period.
 

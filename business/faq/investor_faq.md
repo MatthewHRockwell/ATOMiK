@@ -29,7 +29,7 @@ Application-specific logic (parsing, decision-making, I/O) runs alongside, feedi
 
 CRDTs (Conflict-free Replicated Data Types) also enable distributed merge without coordination. Key differences:
 - **Hardware acceleration**: ATOMiK runs at silicon speed (10.6 ns per operation). CRDTs are software-only.
-- **Formal verification**: 92 Lean4 proofs vs. correctness arguments in academic papers.
+- **Formal verification**: 108 Lean4 proofs vs. correctness arguments in academic papers.
 - **Generality**: CRDTs require designing specific merge functions per data type. ATOMiK's XOR algebra is universal for any 64-bit state.
 - **Performance**: CRDTs have variable merge cost. ATOMiK merge is always single-cycle.
 
@@ -65,7 +65,7 @@ Patent application filed covering:
 2. The execution model (round-robin distribution + binary merge tree)
 3. The schema-driven code generation pipeline
 
-The 92 Lean4 proofs provide additional protection — they document the mathematical novelty and prior art establishment.
+The 108 Lean4 proofs provide additional protection — they document the mathematical novelty and prior art establishment.
 
 ### "What's the revenue model?"
 
@@ -86,7 +86,7 @@ Three tiers:
 
 Low, because:
 1. **Patent protection** on the architecture
-2. **Formal proofs** create a "proof moat" — replicating 92 Lean4 theorems requires significant mathematical expertise
+2. **Formal proofs** create a "proof moat" — replicating 108 Lean4 theorems requires significant mathematical expertise
 3. **Full-stack integration** (proofs + RTL + SDK + pipeline) is hard to replicate piecemeal
 4. **First-mover** on hardware-validated delta-state computation
 

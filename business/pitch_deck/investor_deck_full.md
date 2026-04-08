@@ -304,7 +304,7 @@ ATOMiK target vs ARM vs Lattice vs fabless semiconductor average.
 | Dimension | ATOMiK | Event Sourcing | CRDTs | GPU Accelerator | Near-Memory Compute |
 |-----------|--------|---------------|-------|----------------|-------------------|
 | **State reconstruction** | O(1) per cycle | O(N) replay | O(N) merge | Batch-oriented | O(1) local read |
-| **Formal guarantees** | 92 Lean4 proofs | None | Convergence proofs (manual) | None | None |
+| **Formal guarantees** | 108 Lean4 proofs | None | Convergence proofs (manual) | None | None |
 | **Undo/reversal** | Free (self-inverse) | Log replay | Not native | Not native | Not native |
 | **Parallel scaling** | Linear, lock-free | Limited (event ordering) | Eventual (network-bound) | Warp-level | Memory-controller-bound |
 | **Power** | ~20 mW (FPGA) | Server-class (50-200W) | Server-class | 300-700W | 10-50W |
@@ -346,7 +346,7 @@ valuation markers on a log-scale axis.
 
 | Phase | Status | Key Deliverable |
 |-------|:------:|-----------------|
-| Mathematical formalization | **Complete** | 92 Lean4 proofs, Turing completeness |
+| Mathematical formalization | **Complete** | 108 Lean4 proofs, Turing completeness |
 | SCORE benchmarks | **Complete** | 95-100% memory reduction, +22-58% speedup |
 | Hardware synthesis (Tang Nano 9K) | **Complete** | 94.5 MHz, 7% LUT, 80/80 tests |
 | SDK code generation (5 languages) | **Complete** | 353 tests, schema-driven pipeline |
@@ -1007,7 +1007,7 @@ ATOMiK's advantage is largest.
 |--------|-------------|
 | Latency determinism | ≤2-cycle jitter (hardware measured) |
 | Timing side channels | None — no caches, no speculation |
-| Safety-critical viable | Formally verified (92 Lean4 proofs) |
+| Safety-critical viable | Formally verified (108 Lean4 proofs) |
 | Undo/rollback | Free (self-inverse: δ ⊕ δ = 0) |
 
 **Pain point**: Deterministic latency and no timing side channels are relevant
@@ -1255,7 +1255,7 @@ Unit economics table. ARM comparison callout. Pricing benchmark panel.
 - **Continuation patents** planned for parallel scaling innovations
 
 ### 2. Formal Verification Barrier
-- 92 Lean4 proofs are a **multi-month engineering effort** to replicate
+- 108 Lean4 proofs are a **multi-month engineering effort** to replicate
 - Competitors must either match the proof standard or accept unverified
   correctness — a hard sell to safety-critical customers
 - The proof base grows with each new theorem, increasing the barrier over time
@@ -1349,7 +1349,7 @@ business template.
 
 | Phase | Deliverable | Key Result |
 |-------|------------|-----------|
-| Phase 1: Math | 92 Lean4 proofs | Abelian group + Turing completeness |
+| Phase 1: Math | 108 Lean4 proofs | Abelian group + Turing completeness |
 | Phase 2: Benchmarks | 360 measurements, 9 workloads | 95-100% memory reduction, +22-58% speedup |
 | Phase 3: Hardware | Tang Nano 9K synthesis | 94.5 MHz, 7% LUT, 80/80 UART tests |
 | Phase 4: SDK | 5-language code generation | 353 tests, schema-driven pipeline |
@@ -1675,7 +1675,7 @@ seed funds both product work and outreach.
 
 | Document | Location / Status | Description |
 |----------|------------------|-------------|
-| Lean4 proof source | `math/proofs/ATOMiK/*.lean` | 92 theorems, 8 files, 0 sorry |
+| Lean4 proof source | `math/proofs/ATOMiK/*.lean` | 108 theorems, 8 files, 0 sorry |
 | Proof verification report | `math/validation/PROOF_VERIFICATION_REPORT.md` | Independent verification |
 | RTL source (Verilog) | `hardware/rtl/atomik_*.v` | Delta accumulator, state reconstructor, core, top |
 | Parallel accumulator RTL | `hardware/rtl/atomik_parallel_acc.v` | N-bank parallel scaling |

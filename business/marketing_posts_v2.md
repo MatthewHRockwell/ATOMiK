@@ -48,7 +48,7 @@ Four operations: LOAD, ACCUM, READ, SWAP.
 
 XOR gives you commutativity for free — deltas arrive in any order, result is identical. No locks. No consensus. No vector clocks.
 
-92 Lean4 theorems prove it works.
+108 Lean4 theorems prove it works.
 
 **Post 3 (The proof):**
 We put it on a $13.50 FPGA.
@@ -93,7 +93,7 @@ The report will show you waste you didn't know existed → https://atomik.tech
 
 I've been building ATOMiK for the past year. It started with a question: what if state management was an algebra instead of a data structure?
 
-The core idea: instead of storing state and copying it, you store a reference point and XOR deltas into an accumulator. `current_state = reference ⊕ accumulator`. Four operations (LOAD, ACCUM, READ, SWAP), formally proven correct with 92 Lean4 theorems.
+The core idea: instead of storing state and copying it, you store a reference point and XOR deltas into an accumulator. `current_state = reference ⊕ accumulator`. Four operations (LOAD, ACCUM, READ, SWAP), formally proven correct with 108 Lean4 theorems.
 
 XOR over fixed-width integers forms an Abelian group — commutative, associative, self-inverse, identity. Deltas can arrive from any producer, in any order, and the result is identical. No ordering constraints, no consensus protocol, no conflict resolution.
 

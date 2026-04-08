@@ -24,7 +24,7 @@
   - Verify: only valid result files remain in results/
 
 - [x] **1.4** Locate and verify Lean4 theorem count (108, all compile)
-  - Memory/docs claim "92 Lean4 theorems" — but `grep theorem` found 0
+  - Memory/docs claim "108 Lean4 theorems" — but `grep theorem` found 0
   - Find actual proof files, count real theorems/lemmas
   - If count is wrong, correct it in: MEMORY.md, WORKLOAD_PROOF.md, YC_DEMO_SUMMARY.md, any other docs
   - Verify: claimed count matches actual count in repo

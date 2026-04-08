@@ -32,7 +32,7 @@ This is not a cache optimization or a compression scheme. It is a different exec
 - **Tiny footprint** — 287 LUT on Xilinx Zynq (0.54% of device), 1.8 mW. Embeds alongside existing customer logic with negligible resource cost.
 - **Vendor-portable** — same RTL synthesizes on Xilinx and Gowin with zero changes. Lattice and Intel are straightforward targets.
 
-The mathematical foundation is formally proven: 92 theorems in Lean4 establish that XOR accumulation over arbitrary bit vectors forms an Abelian group. The proofs are machine-checked with zero unproven axioms. This is not "we tested a lot of cases" — the properties hold for all possible inputs by construction.
+The mathematical foundation is formally proven: 108 theorems in Lean4 establish that XOR accumulation over arbitrary bit vectors forms an Abelian group. The proofs are machine-checked with zero unproven axioms. This is not "we tested a lot of cases" — the properties hold for all possible inputs by construction.
 
 The convergence of inexpensive FPGA platforms, formal verification tooling, and schema-driven code generation makes this architecture commercially viable today in a way it was not even five years ago.
 
@@ -44,7 +44,7 @@ ATOMiK's advantage depends on the read/write ratio. It wins on write-heavy workl
 
 Three barriers kept this design space unexplored:
 
-1. **XOR accumulation looks trivial until you formalize it.** The individual operation is simple. The insight that XOR over fixed-width vectors forms a complete algebraic group — with commutativity enabling lock-free parallel accumulation, self-inverse enabling instant rollback, and identity enabling zero-cost initialization — requires mathematical formalization that the embedded systems community has not pursued. The 92 Lean4 proofs are not an academic exercise; they establish properties that make the hardware architecture correct by construction.
+1. **XOR accumulation looks trivial until you formalize it.** The individual operation is simple. The insight that XOR over fixed-width vectors forms a complete algebraic group — with commutativity enabling lock-free parallel accumulation, self-inverse enabling instant rollback, and identity enabling zero-cost initialization — requires mathematical formalization that the embedded systems community has not pursued. The 108 Lean4 proofs are not an academic exercise; they establish properties that make the hardware architecture correct by construction.
 
 2. **FPGA accessibility was too limited.** Until recently, deploying custom IP cores required expensive dev boards, proprietary toolchains, and months of integration work. The maturation of low-cost SoC platforms (Zynq, Lattice Nexus) and open-source FPGA workflows means a novel IP core can now be evaluated in a customer's real design environment for <$200 in hardware. This was not practical a decade ago.
 
@@ -221,7 +221,7 @@ Limitations: fixed-width operands only (variable-length data segmented by SDK), 
 - Raw benchmark CSV data (1,164 rows across 4 datasets)
 - Synthesis logs and resource reports (Gowin and Vivado)
 - Hardware test results (80/80 parallel bank sweep, 9/9 ATOMiK instruction tests)
-- Lean4 proof source files (92 theorems, machine-verifiable)
+- Lean4 proof source files (108 theorems, machine-verifiable)
 - SDK test reports (353 tests, 5 languages)
 - Academic manuscripts (3, LaTeX source and PDF)
 - Zynq synthesis artifacts and build scripts

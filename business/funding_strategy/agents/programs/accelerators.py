@@ -35,7 +35,7 @@ class SiliconCatalyst(BaseApplication):
     url = "https://siliconcatalyst.com/application"
     pitch_angle = (
         "Formally verified XOR accumulator IP targeting ASIC integration. "
-        "92 Lean4 proofs, working FPGA prototype, 7% LUT utilization."
+        "108 Lean4 proofs, working FPGA prototype, 7% LUT utilization."
     )
 
     def check_prerequisites(self, config: FundingConfig) -> tuple[bool, list[str]]:
@@ -71,7 +71,7 @@ class SiliconCatalyst(BaseApplication):
                 ),
                 "Team": engine.get_team_description(),
                 "Formal Verification": (
-                    "92 Lean4 proofs — closure, commutativity, associativity, "
+                    "108 Lean4 proofs — closure, commutativity, associativity, "
                     "identity, self-inverse. Zero sorry statements."
                 ),
                 "What do you need from Silicon Catalyst?": (
@@ -279,7 +279,7 @@ class YCombinator(BaseApplication):
                 "How long have the founders known each other?": "Solo founder",
                 "Please tell us about the time you most successfully hacked some system": (
                     "Built a complete formally verified hardware architecture — "
-                    "92 Lean4 proofs, FPGA prototype, and 5-language SDK — for "
+                    "108 Lean4 proofs, FPGA prototype, and 5-language SDK — for "
                     "$225 total development cost. That's a 4-million-to-one ratio "
                     "of performance ($1B ops/s) to cost."
                 ),

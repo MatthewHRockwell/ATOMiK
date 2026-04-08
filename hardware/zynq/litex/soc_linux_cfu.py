@@ -24,6 +24,8 @@ from litex.soc.integration.builder import *
 from litex.soc.cores.cpu import zynq7000
 from litex.soc.interconnect import wishbone
 
+from migen.genlib.misc import WaitTimer
+
 # CRG ------------------------------------------------------------------------------------
 
 class _CRG(LiteXModule):
@@ -32,6 +34,55 @@ class _CRG(LiteXModule):
         self.cd_sys = ClockDomain()
         self.comb += ClockSignal("sys").eq(ClockSignal("ps7"))
         self.comb += ResetSignal("sys").eq(ResetSignal("ps7") | self.rst)
+
+# CLINT + PLIC wrappers ------------------------------------------------------------------
+
+class CLINTWrapper(LiteXModule):
+    """Wraps litex_clint.v as a Wishbone slave."""
+    def __init__(self, platform, clint_v):
+        self.bus = bus = wishbone.Interface(data_width=32, address_width=32, addressing="word")
+        self.timer_irq = Signal()
+        self.soft_irq  = Signal()
+
+        platform.add_source(clint_v)
+        self.specials += Instance("litex_clint",
+            i_clk               = ClockSignal("sys"),
+            i_rst               = ResetSignal("sys"),
+            i_adr               = bus.adr[:14],
+            i_dat_w             = bus.dat_w,
+            o_dat_r             = bus.dat_r,
+            i_we                = bus.we,
+            i_cyc               = bus.cyc,
+            i_stb               = bus.stb,
+            o_ack               = bus.ack,
+            o_timer_interrupt   = self.timer_irq,
+            o_software_interrupt = self.soft_irq,
+        )
+
+class PLICWrapper(LiteXModule):
+    """Wraps litex_plic.v as a Wishbone slave."""
+    def __init__(self, platform, plic_v, num_sources=32):
+        self.bus = bus = wishbone.Interface(data_width=32, address_width=32, addressing="word")
+        self.irq_sources = Signal(num_sources)
+        self.meip = Signal()
+        self.seip = Signal()
+
+        platform.add_source(plic_v)
+        self.specials += Instance("litex_plic",
+            p_NUM_SOURCES        = num_sources,
+            i_clk                = ClockSignal("sys"),
+            i_rst                = ResetSignal("sys"),
+            i_adr                = bus.adr[:22],
+            i_dat_w              = bus.dat_w,
+            o_dat_r              = bus.dat_r,
+            i_we                 = bus.we,
+            i_cyc                = bus.cyc,
+            i_stb                = bus.stb,
+            o_ack                = bus.ack,
+            i_irq_sources        = self.irq_sources,
+            o_meip               = self.meip,
+            o_seip               = self.seip,
+        )
 
 # BaseSoC ---------------------------------------------------------------------------------
 
@@ -78,10 +129,27 @@ class BaseSoC(SoCCore):
         # Wire CFU adapter if provided
         if cfu_verilog:
             self.cpu.add_cfu(cfu_verilog)
-            # Tie off rsp_payload_status (not in LiteX's add_cfu bus layout)
-            # Vivado defaults unconnected inputs to 0 (= OK), so this is safe.
-            # For explicit tie-off, uncomment:
-            # self.cpu.cpu_params["i_CfuPlugin_bus_rsp_payload_status"] = 0
+
+        # CLINT (timer + software interrupts) -----------------------------------------
+        clint_v = os.path.join(zynq_dir, "rtl", "litex_clint.v")
+        self.clint = CLINTWrapper(platform, clint_v)
+        self.bus.add_slave("clint", self.clint.bus,
+            region=SoCRegion(origin=0xf0010000, size=0x10000, cached=False))
+
+        # PLIC (external interrupts) --------------------------------------------------
+        plic_v = os.path.join(zynq_dir, "rtl", "litex_plic.v")
+        self.plic = PLICWrapper(platform, plic_v, num_sources=32)
+        self.bus.add_slave("plic", self.plic.bus,
+            region=SoCRegion(origin=0xf0c00000, size=0x400000, cached=False))
+
+        # Wire UART interrupt to PLIC source 1
+        self.comb += self.plic.irq_sources[1].eq(self.uart.ev.rx.trigger)
+
+        # Wire CLINT/PLIC outputs to CPU interrupt inputs
+        self.cpu.cpu_params["i_timerInterrupt"]    = self.clint.timer_irq
+        self.cpu.cpu_params["i_softwareInterrupt"] = self.clint.soft_irq
+        self.cpu.cpu_params["i_externalInterrupt"]  = self.plic.meip
+        self.cpu.cpu_params["i_externalInterruptS"] = self.plic.seip
 
 def main():
     parser = argparse.ArgumentParser(description="ATOMiK LiteX SoC (VexRiscv Linux+CFU)")

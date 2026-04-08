@@ -102,7 +102,7 @@
 ### Onboarding Advantage
 Every artifact is documented and reproducible:
 - RTL: `make` builds and synthesizes from source
-- Proofs: `lake build` checks all 92 Lean4 theorems
+- Proofs: `lake build` checks all 108 Lean4 theorems
 - SDK: `pytest` runs 353 tests across 5 languages
 - Hardware: Flash scripts deploy to FPGA in <60 seconds
 - Papers: 3 manuscripts document the full architecture

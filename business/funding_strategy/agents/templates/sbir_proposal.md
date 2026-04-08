@@ -33,7 +33,7 @@ hardware.
 **Key innovation:** Rather than the traditional Load-Modify-Store cycle,
 {{ company.name }} accumulates state changes (deltas) via single-cycle XOR
 operations, yielding mathematical properties — commutativity, associativity,
-self-inverse — that are proven correct through 92 Lean4 formal proofs.
+self-inverse — that are proven correct through 108 Lean4 formal proofs.
 
 **Intellectual merit:** This work advances the state of the art in formally
 verified hardware design by demonstrating that non-trivial computing primitives
@@ -104,7 +104,7 @@ and the merge tree combines bank outputs to produce a unified state.
 
 ### 3.3 Formal Verification
 
-All algebraic properties are machine-verified through 92 Lean4 proofs with zero
+All algebraic properties are machine-verified through 108 Lean4 proofs with zero
 `sorry` statements. This provides guarantees that no amount of testing can
 deliver:
 
@@ -161,7 +161,7 @@ deliver:
 {{ team_description }}
 
 **Qualifications:**
-- Designed and implemented the complete {{ company.name }} stack: 92 Lean4
+- Designed and implemented the complete {{ company.name }} stack: 108 Lean4
   formal proofs, Verilog RTL, FPGA synthesis, and 5-language SDK
 - Demonstrated extreme capital efficiency: $225 total development cost for a
   working hardware prototype

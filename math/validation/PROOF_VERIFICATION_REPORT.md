@@ -40,7 +40,7 @@ Build completed successfully.
 | `ATOMiK.Equivalence` | ✅ Pass | 20 | 0 | Equivalence proofs |
 | `ATOMiK.TuringComplete` | ✅ Pass | 15 | 0 | Turing completeness |
 
-**Total**: 8 modules, ~92 theorems, 0 sorry statements
+**Total**: 8 modules, ~108 theorems, 0 sorry statements
 
 ---
 

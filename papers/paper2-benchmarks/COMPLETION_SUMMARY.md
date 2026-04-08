@@ -125,7 +125,7 @@ Commutativity enables:
 - Lock-free accumulation
 
 ### 5. Theory to Silicon ✅
-- 92 Lean4 theorems → validated in FPGA hardware
+- 108 Lean4 theorems → validated in FPGA hardware
 - All algebraic properties verified (10/10 tests)
 - Single-cycle operation confirmed at 94.5 MHz
 

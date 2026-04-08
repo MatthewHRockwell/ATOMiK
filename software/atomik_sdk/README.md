@@ -19,7 +19,7 @@ The ATOMiK SDK is a schema-driven code generation framework that produces delta-
 - ✅ **Hardware Integration**: Verilog RTL matching FPGA architecture
 - ✅ **Namespace Consistency**: Automatic cross-language mapping
 - ✅ **Comprehensive Testing**: 100% pass rate across all generators
-- ✅ **Mathematical Guarantees**: Based on proven XOR algebra (92 Lean4 theorems)
+- ✅ **Mathematical Guarantees**: Based on proven XOR algebra (108 Lean4 theorems)
 
 ## Quick Start
 
@@ -325,7 +325,7 @@ All tests passing (87/87):
 
 The ATOMiK SDK is based on formally verified delta algebra with:
 
-- **92 Lean4 theorems** proven (Phase 1)
+- **108 Lean4 theorems** proven (Phase 1)
 - **XOR-based operations** with mathematical guarantees:
   - Commutativity: `A ⊕ B = B ⊕ A`
   - Associativity: `(A ⊕ B) ⊕ C = A ⊕ (B ⊕ C)`
@@ -393,7 +393,7 @@ Apache License 2.0 - See LICENSE file for details
 ## Acknowledgments
 
 Built on:
-- Phase 1: Mathematical foundations (92 Lean4 theorems)
+- Phase 1: Mathematical foundations (108 Lean4 theorems)
 - Phase 2: Performance validation (360 measurements)
 - Phase 3: Hardware synthesis (Tang Nano 9K FPGA)
 

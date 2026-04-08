@@ -10,7 +10,7 @@ ATOMiK's software value proposition:
   1. Bandwidth reduction:   Send 8-byte deltas, not full state copies
   2. Memory reduction:      O(1) state tracking, not O(N) history
   3. Order independence:    No distributed consensus needed
-  4. Formal correctness:    92 Lean4 theorems (unique in industry)
+  4. Formal correctness:    108 Lean4 theorems (unique in industry)
   5. Hardware upgrade path: Move to FPGA for 100-1000x when needed
 """
 
@@ -290,7 +290,7 @@ def main():
   2. MEMORY:       O(1) state tracking vs O(N) snapshot history
   3. CONVERGENCE:  No ordering required — no consensus protocol needed
   4. INCREMENTAL:  O(1) field-level change detection vs O(n) full rescan
-  5. CORRECTNESS:  All properties formally proven (92 Lean4 theorems)
+  5. CORRECTNESS:  All properties formally proven (108 Lean4 theorems)
   6. UPGRADE PATH: Software → C library → FPGA hardware (100-1000x)
 
   ATOMiK is not a faster memcmp. It's a fundamentally different

@@ -80,7 +80,7 @@ ATOMiK:       State_n = S0 XOR d1 XOR d2 XOR ... XOR dn   // single operation
 
 # Mathematical Foundation
 
-**92 theorems formally proven in Lean4** — the same proof system used by mathematicians for the Fields Medal.
+**108 theorems formally proven in Lean4** — the same proof system used by mathematicians for the Fields Medal.
 
 | Property | Formula | Implication |
 |----------|---------|-------------|
@@ -228,7 +228,7 @@ JSON Schema --> ATOMiK Generator --> Python + Rust + C + JavaScript + Verilog
 | Advantage | Detail |
 |-----------|--------|
 | **Patent pending** | Architecture + execution model under protection |
-| **Formal proofs** | 92 Lean4 theorems — competitors can't "hand-wave" correctness |
+| **Formal proofs** | 108 Lean4 theorems — competitors can't "hand-wave" correctness |
 | **Hardware validated** | Real FPGA silicon, not just simulation or theory |
 | **6 phases complete** | Full stack: math, hardware, SDK, pipeline, parallel scaling |
 | **Schema-driven** | New domains require only a JSON schema, not new code |

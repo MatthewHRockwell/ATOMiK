@@ -1,4 +1,4 @@
-"""Tests for AtomikContext — mirrors the 92 Lean4 theorems."""
+"""Tests for AtomikContext — mirrors the 108 Lean4 theorems."""
 
 from atomik_core import AtomikContext
 

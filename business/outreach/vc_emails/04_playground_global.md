@@ -9,7 +9,7 @@ Playground's focus on systems-level innovation and hardware is why I wanted to r
 ATOMiK is a delta-state computation architecture. Instead of copying full state on every update, it accumulates XOR deltas and reconstructs in a single cycle. The result is a hardware IP block that does 1,056 Mops/s on a $13.50 FPGA with 7% LUT utilization.
 
 What I've built (solo, for $225):
-- 92 Lean4 formal proofs (machine-verified correctness)
+- 108 Lean4 formal proofs (machine-verified correctness)
 - Production SoC on Tang Nano 9K with custom RV64I CPU
 - 5-language SDK with 353 passing tests
 - Patent pending architecture

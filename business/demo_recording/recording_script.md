@@ -70,7 +70,7 @@ Same as highlight reel opening. Establish the "1 billion ops on $13.50" hook.
 
 **Visual**: Slide 5 (Mathematical Foundation) + Lean4 proof snippets.
 
-**Voiceover**: "This isn't just engineering intuition. We have 92 theorems formally verified in Lean4 — the same proof system used for the Fields Medal. Closure, associativity, commutativity, identity, self-inverse. These properties guarantee that the algebra works regardless of execution order, parallelism, or scale."
+**Voiceover**: "This isn't just engineering intuition. We have 108 theorems formally verified in Lean4 — the same proof system used for the Fields Medal. Closure, associativity, commutativity, identity, self-inverse. These properties guarantee that the algebra works regardless of execution order, parallelism, or scale."
 
 ### 3:30–5:00 — Live Demo: Acts 1-2
 

@@ -8,7 +8,7 @@ Pure-software implementation of the ATOMiK instruction set:
 
 Zero dependencies. Works on any Python 3.9+ interpreter.
 
-Backed by 92 Lean4 theorems proving:
+Backed by 108 Lean4 theorems proving:
   - Commutativity:  accum(a); accum(b) == accum(b); accum(a)
   - Associativity:  (a ^ b) ^ c == a ^ (b ^ c)
   - Self-inverse:   accum(d); accum(d) == identity

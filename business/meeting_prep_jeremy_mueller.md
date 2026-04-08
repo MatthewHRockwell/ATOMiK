@@ -83,7 +83,7 @@ He reached out to YOU — that's a warm signal. He saw something worth schedulin
 | Memory traffic reduction | 120x–30,720x |
 | FPGA resource usage | 287 LUT (0.54% of Zynq) |
 | Power | 1.8 mW |
-| Formal proofs | 92 Lean4 theorems |
+| Formal proofs | 108 Lean4 theorems |
 | SDK tests | 353 passing, 5 languages |
 | Peak throughput | 1,056 Mops/s (16 banks) |
 | Total build cost | $225 |

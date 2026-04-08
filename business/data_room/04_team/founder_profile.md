@@ -8,7 +8,7 @@
 
 ### Background
 
-Software and hardware engineer who built the complete ATOMiK stack — from 92 Lean4 formal proofs to FPGA synthesis to a 5-language SDK — for $225 total development cost, demonstrating exceptional technical range and capital efficiency.
+Software and hardware engineer who built the complete ATOMiK stack — from 108 Lean4 formal proofs to FPGA synthesis to a 5-language SDK — for $225 total development cost, demonstrating exceptional technical range and capital efficiency.
 
 ### Key Achievements with ATOMiK
 

@@ -14,7 +14,7 @@
 |-----------|--------|---------|
 | **Approach** | Algebraic primitive (delta-state IP block) | Universal reconfigurable processor |
 | **Working Silicon** | ✅ Production on Tang Nano 9K | ❌ Pre-silicon (as of early 2026) |
-| **Formal Verification** | 92 Lean4 machine-verified proofs | None published |
+| **Formal Verification** | 108 Lean4 machine-verified proofs | None published |
 | **Business Model** | IP licensing (ARM-style) | Chip manufacturing |
 | **Capital Required** | Low (IP licensing, no fab) | Very high ($50M+ for tape-out) |
 | **Integration** | Drop-in co-processor alongside ANY CPU | Replace entire processor |

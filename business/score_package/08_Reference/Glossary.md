@@ -47,7 +47,7 @@ A mathematical argument verified by a computer program, not a human. Unlike test
 A software tool that mathematically proves statements are true — like a calculator for logic. Lean4 checks every step of a proof automatically, ensuring no errors. It's used by mathematicians, software engineers, and now ATOMiK to verify correctness.
 
 **Theorem**
-A mathematical statement that has been proven true. Each of ATOMiK's 92 theorems states a specific property (like "XOR is commutative") and includes a complete proof verified by Lean4.
+A mathematical statement that has been proven true. Each of ATOMiK's 108 theorems states a specific property (like "XOR is commutative") and includes a complete proof verified by Lean4.
 
 ---
 

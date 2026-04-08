@@ -40,7 +40,7 @@ ATOMiK eliminates all three. XOR accumulation is single-cycle (no carry chains, 
 
 | Metric | Value |
 |--------|-------|
-| Mathematical proofs | 92 theorems, Lean4 machine-verified |
+| Mathematical proofs | 108 theorems, Lean4 machine-verified |
 | Core size | **287 LUTs** (single delta-state bank) |
 | Power | **1.8 mW** |
 | Throughput | **1,056 Mops/s** (16 parallel banks) |
@@ -77,7 +77,7 @@ HAX is the right accelerator for ATOMiK because this is a **hardware IP to silic
 
 ## What makes this defensible?
 
-1. **92 Lean4 proofs**: Machine-verified mathematical properties. Takes years of specialized expertise in both formal methods and hardware design to replicate. No competitor has anything close.
+1. **108 Lean4 proofs**: Machine-verified mathematical properties. Takes years of specialized expertise in both formal methods and hardware design to replicate. No competitor has anything close.
 2. **Patent pending**: Architecture and execution model protected.
 3. **Full-stack ownership**: Math → RTL → SoC → SDK. Competitors would need to rebuild the entire vertical.
 4. **Working silicon**: Not simulation — real FPGA hardware passing real tests at 1,056 Mops/s.
@@ -98,7 +98,7 @@ HAX is the right accelerator for ATOMiK because this is a **hardware IP to silic
 
 **Matthew H. Rockwell — Founder & CEO**
 
-Mechanical engineer turned semiconductor architect. Built the complete ATOMiK stack solo in 6 months: 92 Lean4 formal proofs, SystemVerilog RTL, production SoC with custom RV64I CPU, 5-language SDK (353 tests), patent application, and 2 published papers. $225 total development cost.
+Mechanical engineer turned semiconductor architect. Built the complete ATOMiK stack solo in 6 months: 108 Lean4 formal proofs, SystemVerilog RTL, production SoC with custom RV64I CPU, 5-language SDK (353 tests), patent application, and 2 published papers. $225 total development cost.
 
 **On being solo**: The hardest part — proving novel math correct and translating it to silicon — is done. Seed funding hires a verification engineer and an applications engineer. I'm not trying to do everything forever; I did everything *first* to prove it works.
 

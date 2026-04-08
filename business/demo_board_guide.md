@@ -200,7 +200,7 @@ RV64I CPU • Tang Nano 9K • $13.50
 ║  → Mathematical Foundation                                    ║
 ║    • Abelian group: commutative, associative                  ║
 ║    • Self-inverse: any delta cancels itself                   ║
-║    • 92 theorems formally proven in Lean4                     ║
+║    • 108 theorems formally proven in Lean4                     ║
 ║                                                               ║
 ║  → Scalability                                                ║
 ║    • Lock-free parallel accumulation                          ║
@@ -213,7 +213,7 @@ RV64I CPU • Tang Nano 9K • $13.50
 
 - **Security is architectural, not algorithmic.** ATOMiK doesn't use encryption or hashing to protect data — it uses the algebraic properties of XOR. Because every operation takes exactly the same number of cycles regardless of data content, there is no timing information to leak. Because there is no cache, there are no cache-based side channels. Because there is no speculative execution, there are no Spectre-class vulnerabilities. These are not mitigations — they are architectural impossibilities.
 
-- **Mathematical foundation.** The Abelian group properties (commutativity, associativity, self-inverse, identity, closure) are not claims — they are machine-verified proofs. 92 theorems proven in Lean4 (the same proof assistant used for Fields Medal mathematics) with zero unproven assumptions ("sorry" statements).
+- **Mathematical foundation.** The Abelian group properties (commutativity, associativity, self-inverse, identity, closure) are not claims — they are machine-verified proofs. 108 theorems proven in Lean4 (the same proof assistant used for Fields Medal mathematics) with zero unproven assumptions ("sorry" statements).
 
 - **Scaling.** The 1,056 Mops/s figure comes from 16 parallel XOR banks running at 66 MHz on this same $13.50 FPGA family. The scaling is perfectly linear: 16 banks = 16x throughput. The LUT (logic cell) cost grows sub-linearly: 3.7x more logic for 16x more throughput.
 
@@ -341,7 +341,7 @@ A: No. Every number is computed live by the hardware on each loop iteration. The
 **Q: Why does it say "Provisionally Patented"?**
 A: A provisional patent application has been filed covering the delta-state XOR accumulation architecture, parallel bank design, binary merge tree, and schema-driven RTL generation. The provisional establishes priority date; a full utility patent filing is planned as part of post-funding IP prosecution.
 
-**Q: What does "92 theorems, 0 sorry" mean?**
+**Q: What does "108 theorems, 0 sorry" mean?**
 A: The mathematical properties of ATOMiK's delta-state algebra are formally verified using Lean4, a proof assistant used in cutting-edge mathematics. "0 sorry" means zero unproven assumptions — every theorem is fully proven from axioms. This is the highest standard of correctness in computer science.
 
 **Q: How does this scale beyond a $13.50 FPGA?**

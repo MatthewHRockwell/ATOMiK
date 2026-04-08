@@ -25,7 +25,7 @@
 **Structure**: Context → Problem → Solution → Results → Significance
 
 **Key Points to Cover**:
-1. Context: Delta-state algebra was formally verified (Paper 1, 92 theorems in Lean4)
+1. Context: Delta-state algebra was formally verified (Paper 1, 108 theorems in Lean4)
 2. Gap: Theoretical properties need empirical performance validation
 3. Contribution: Comprehensive benchmarking (360 measurements) + FPGA hardware validation
 4. Key Results:
@@ -48,7 +48,7 @@
 - Core insight: Represent computation as XOR deltas, not full state
 - Key algebraic properties (Abelian group):
   - Closure, Associativity, Commutativity, Identity, Self-Inverse
-- Paper 1 proved these in Lean4 (92 theorems, 0 sorry)
+- Paper 1 proved these in Lean4 (108 theorems, 0 sorry)
 - These properties have performance implications—but are they realized in practice?
 
 ### 1.3 Research Questions
@@ -515,7 +515,7 @@ atomik_core_v2
 
 ### 8.3 Availability
 
-- **Proofs**: `math/proofs/ATOMiK/*.lean` (92 theorems)
+- **Proofs**: `math/proofs/ATOMiK/*.lean` (108 theorems)
 - **Benchmarks**: `hardware/experiments/benchmarks/` (Python)
 - **RTL**: `hardware/rtl/atomik_*.v` (Verilog)
 - **Data**: `hardware/experiments/data/` (360 measurements)

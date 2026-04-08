@@ -12,7 +12,7 @@ This data room contains due diligence materials for ATOMiK, a delta-state comput
 |---------|-----------|----------|-------------|
 | **Financial** | [01_financial/](01_financial/) | Financial model, revenue model, development cost breakdown | Projections, unit economics, and the ~$225 total development cost history |
 | **Legal** | [02_legal/](02_legal/) | Entity status, IP assignment template, license summary | Rockwell Industries LLC (CA) structure, Apache 2.0 evaluation license terms |
-| **Intellectual Property** | [03_intellectual_property/](03_intellectual_property/) | Patent status, provisional patent PDF, formal proofs inventory, trade secrets | Patent Pending architecture, 92 Lean4 proofs, IP protection strategy |
+| **Intellectual Property** | [03_intellectual_property/](03_intellectual_property/) | Patent status, provisional patent PDF, formal proofs inventory, trade secrets | Patent Pending architecture, 108 Lean4 proofs, IP protection strategy |
 | **Team** | [04_team/](04_team/) | Founder profile, advisory board plan | Solo founder background, post-funding hiring plan, advisory needs |
 | **Technical** | [05_technical/](05_technical/) | XOR data type explainer, memory traffic analysis, ASIC economics | Deep-dive technical documents for engineering due diligence |
 | **Customers** | [05_customers/](05_customers/) | Customer pipeline | Target verticals (HFT, edge AI, streaming), engagement status |
@@ -39,7 +39,7 @@ The following validation artifacts are in the main repository, not this data roo
 
 | Artifact | Location | Description |
 |----------|----------|-------------|
-| Lean4 proofs | `math/proofs/ATOMiK/*.lean` | 92 theorems, 8 files, 0 sorry |
+| Lean4 proofs | `math/proofs/ATOMiK/*.lean` | 108 theorems, 8 files, 0 sorry |
 | v3 SoC RTL | `hardware/v3/` | Custom RV64I + ATOMiK + HDMI (1280×720) |
 | v2 SoC RTL | `hardware/rtl/` | PicoRV32 + ATOMiK accelerator |
 | Hardware tests | `hardware/sim/`, `hardware/v3/sim/` | 80/80 sweep + v3 validation suites |

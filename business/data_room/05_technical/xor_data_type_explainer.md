@@ -21,7 +21,7 @@ XOR (exclusive OR) is a bitwise operation: for each bit position, the output is 
   A XOR B:   1 0 1 0 0 0 1 1
 ```
 
-This operation has four algebraic properties (all 92 Lean4 theorems derive from these):
+This operation has four algebraic properties (all 108 Lean4 theorems derive from these):
 
 | Property | Meaning | Consequence |
 |----------|---------|-------------|
@@ -148,4 +148,4 @@ Being transparent about limitations:
 
 ---
 
-*ATOMiK's type-agnostic property is mathematically guaranteed by the 92 Lean4 theorems: XOR forms an Abelian group over arbitrary bit vectors. The proofs are machine-checked with zero axioms (`sorry`-free).*
+*ATOMiK's type-agnostic property is mathematically guaranteed by the 108 Lean4 theorems: XOR forms an Abelian group over arbitrary bit vectors. The proofs are machine-checked with zero axioms (`sorry`-free).*

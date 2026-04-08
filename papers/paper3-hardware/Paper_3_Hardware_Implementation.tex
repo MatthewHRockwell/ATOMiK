@@ -125,7 +125,7 @@ We further present a multi-language SDK generation framework targeting 5 languag
 
 The gap between formal mathematical foundations and practical hardware implementations remains one of computer architecture's persistent challenges. Formal proofs guarantee correctness of abstract models; hardware synthesis imposes constraints of timing closure, resource budgets, and physical layout. Bridging this gap---ensuring that mathematical guarantees survive the translation to silicon---is both critical and difficult.
 
-In prior work, we established the formal foundations of delta-state computation~\cite{paper1}: 92 theorems verified in Lean4 proving that the structure $(\Delta, \dcompose, \dzero)$ forms an Abelian group under XOR composition, with deterministic transitions, composition equivalence, and Turing completeness. We then demonstrated empirically~\cite{paper2} that these properties yield 95--100\% memory traffic reduction and 22--59\% execution time improvements, with hardware achieving uniform single-cycle latency for all operations.
+In prior work, we established the formal foundations of delta-state computation~\cite{paper1}: 108 theorems verified in Lean4 proving that the structure $(\Delta, \dcompose, \dzero)$ forms an Abelian group under XOR composition, with deterministic transitions, composition equivalence, and Turing completeness. We then demonstrated empirically~\cite{paper2} that these properties yield 95--100\% memory traffic reduction and 22--59\% execution time improvements, with hardware achieving uniform single-cycle latency for all operations.
 
 This paper addresses the question that follows naturally: \emph{How does one translate formally verified algebraic properties into production hardware, and what are the practical implications for architecture, performance, and tooling?}
 
@@ -175,7 +175,7 @@ We briefly recap the algebraic properties established in~\cite{paper1} and the e
 
 \subsection{Delta-State Algebra}
 
-The delta-state algebra $(\Delta, \dcompose, \dzero)$ operates on 64-bit vectors with XOR composition. The following properties, proven via 92 Lean4 theorems with zero \texttt{sorry} statements, directly inform hardware design:
+The delta-state algebra $(\Delta, \dcompose, \dzero)$ operates on 64-bit vectors with XOR composition. The following properties, proven via 108 Lean4 theorems with zero \texttt{sorry} statements, directly inform hardware design:
 
 \begin{table}[!htbp]
 \centering
@@ -864,7 +864,7 @@ A central contribution of this work is the unbroken validation chain from formal
 ]
 
 % Stages
-\node[stage] (proofs)  at (0, 6.5) {Lean4 Proofs\\92 theorems, 0 sorry};
+\node[stage] (proofs)  at (0, 6.5) {Lean4 Proofs\\108 theorems, 0 sorry};
 \node[stage] (python)  at (0, 5.0) {Python Reference\\360 measurements};
 \node[stage] (rtl)     at (0, 3.5) {RTL Simulation\\52 AXI + 20 core tests};
 \node[stage] (synth)   at (0, 2.0) {FPGA Synthesis\\25 configs, 2 platforms};

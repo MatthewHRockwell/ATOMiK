@@ -74,7 +74,7 @@ git clone https://github.com/MatthewHRockwell/ATOMiK.git && cd ATOMiK
 ```bash
 # Clone and verify proofs
 git clone https://github.com/MatthewHRockwell/ATOMiK.git && cd ATOMiK
-cd math/proofs && lake build       # 92 theorems, 0 sorry
+cd math/proofs && lake build       # 108 theorems, 0 sorry
 
 # Install SDK and run demo
 cd ../../software && pip install -e ".[demo]"
@@ -100,7 +100,7 @@ python -m software.demos.state_sync_benchmark
 
 ## For Engineers
 
-- **Formal Proofs**: [`math/proofs/`](math/proofs/) — 92 Lean4 theorems including Turing completeness
+- **Formal Proofs**: [`math/proofs/`](math/proofs/) — 108 Lean4 theorems including Turing completeness
 - **RTL Source**: [`hardware/rtl/`](hardware/rtl/) (v2), [`hardware/v3/`](hardware/v3/) (v3) — Verilog implementations validated on Tang Nano 9K
 - **SDK**: `pip install -e ./software` — schema-driven code generation for Python/Rust/C/JS/Verilog
 - **Hardware Synthesis**: [`docs/HARDWARE_SYNTHESIS.md`](docs/HARDWARE_SYNTHESIS.md) — 25-config sweep
@@ -122,7 +122,7 @@ python -m software.demos.state_sync_benchmark
 ### Production Hardware (v2)
 | Milestone | Description | Status |
 |-----------|-------------|--------|
-| **Mathematical Formalization** | 92 theorems verified in Lean4 | ✅ Complete |
+| **Mathematical Formalization** | 108 theorems verified in Lean4 | ✅ Complete |
 | **SCORE Comparison** | 95-100% memory reduction validated | ✅ Complete |
 | **Hardware Synthesis** | 10/10 hardware tests, 7% LUT @ 94.5 MHz | ✅ Complete |
 | **SDK Generation Pipeline** | 6-stage controller, hardware demos, 5-language output | ✅ Complete |
@@ -191,7 +191,7 @@ ATOMiK's delta operations form an **Abelian group**, formally verified in Lean4:
 | **Identity** | d XOR 0 = d | Zero-delta is no-op (filtering optimization) |
 | **Self-Inverse** | d XOR d = 0 | Instant undo—apply same delta to revert |
 
-**Verification**: 92 theorems proven in Lean4, including Turing completeness via counter machine simulation. See [`math/proofs/`](math/proofs/).
+**Verification**: 108 theorems proven in Lean4, including Turing completeness via counter machine simulation. See [`math/proofs/`](math/proofs/).
 
 ---
 
@@ -408,7 +408,7 @@ ATOMiK/
 │   ├── scripts/              # Hardware validation scripts
 │   ├── constraints/          # Timing and pin constraints
 │   └── experiments/          # Hardware experiments
-├── math/proofs/              # Lean4 formal proofs (92 theorems)
+├── math/proofs/              # Lean4 formal proofs (108 theorems)
 ├── software/                 # Python SDK + pipeline + generators
 │   ├── atomik_sdk/           # SDK package (pip install -e ./software)
 │   └── demos/                # State sync benchmarks
