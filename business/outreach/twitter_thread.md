@@ -1,7 +1,7 @@
 # Twitter/X Thread — ATOMiK Launch
 
 ## Tweet 1 (Hook)
-I built a new computing architecture from scratch. 92 formal proofs. Working FPGA hardware. $225 total cost.
+I built a new computing architecture from scratch. 108 formal proofs. Working FPGA hardware. $225 total cost.
 
 It does 1 billion operations per second on a $13.50 chip.
 
@@ -76,7 +76,7 @@ ATOMiK is becoming a semiconductor IP company.
 
 ARM-style licensing. RTL cores for chip designers. Patent pending.
 
-The moat: 92 formal proofs + working silicon + patent. You can't replicate machine-verified math by throwing money at it. You need years and expertise.
+The moat: 108 formal proofs + working silicon + patent. You can't replicate machine-verified math by throwing money at it. You need years and expertise.
 
 ## Tweet 10 (Ask)
 ATOMiK is open source for evaluation (Apache 2.0).

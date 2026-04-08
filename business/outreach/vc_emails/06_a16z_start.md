@@ -7,7 +7,7 @@ Hi team,
 START is built for technical founders building foundational technology. Here's what I built alone in 6 months for $225:
 
 - A new computing architecture (delta-state XOR accumulation)
-- 92 formally verified proofs in Lean4
+- 108 formally verified proofs in Lean4
 - Working FPGA hardware hitting 1,056 Mops/s on a $13.50 chip
 - A production SoC with custom RV64I CPU + HDMI output
 - SDKs in 5 languages (353 tests passing)

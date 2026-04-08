@@ -178,7 +178,7 @@ At blended 85% gross margins, breakeven requires approximately $1.1-$2.0M in ann
 |--------|----------|-------------|
 | **Performance gain** | Very Strong | 1,000x+ improvement over software approaches; immediate, measurable |
 | **Cost reduction** | Strong | $13.50 hardware vs. $1,000+ alternatives; 95% memory/bandwidth savings |
-| **Risk reduction** | Strong | 92 formal proofs vs. testing-only approaches; especially valuable in regulated industries |
+| **Risk reduction** | Strong | 108 formal proofs vs. testing-only approaches; especially valuable in regulated industries |
 | **SDK integration ease** | Moderate | Code generation in 5 languages reduces integration effort |
 | **Open-source on-ramp** | Moderate | Free SDK tier eliminates procurement friction for evaluation |
 

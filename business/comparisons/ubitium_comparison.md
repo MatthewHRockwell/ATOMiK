@@ -38,7 +38,7 @@ Ubitium must raise $50M+ to tape out a chip, build a supply chain, and compete w
 Ubitium competes with existing processors. ATOMiK complements them. Our TAM includes every chip that manages state — that's the entire semiconductor market. We can license to Ubitium's customers AND to their competitors.
 
 ### 4. Mathematical Moat
-92 formally verified proofs establish that ATOMiK's delta-state algebra is a correct, complete, and sufficient computational primitive. This is a mathematical fact that cannot be disrupted by a better chip design. Ubitium's reconfigurability can be replicated by anyone with enough transistors.
+108 formally verified proofs establish that ATOMiK's delta-state algebra is a correct, complete, and sufficient computational primitive. This is a mathematical fact that cannot be disrupted by a better chip design. Ubitium's reconfigurability can be replicated by anyone with enough transistors.
 
 ### 5. Capital Efficiency
 $225 → 1 Gops/s vs. tens of millions → PowerPoint. ATOMiK has the most extreme capital efficiency story in semiconductor history. This means less dilution, faster time-to-revenue, and a sustainable business even at small scale.

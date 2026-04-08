@@ -23,7 +23,7 @@ As discussed, here's what I'm sending along:
 - [ ] [ADD any additional materials Jeremy specifically requested]
 
 **Quick recap of key numbers:**
-- 92 formal proofs (Lean4, machine-verified, 0 unproven assumptions)
+- 108 formal proofs (Lean4, machine-verified, 0 unproven assumptions)
 - 2 production SoC generations on a $13.50 FPGA
 - 1,056 Mops/s peak throughput, 10.6 ns latency
 - 95–100% memory traffic reduction on validated workloads

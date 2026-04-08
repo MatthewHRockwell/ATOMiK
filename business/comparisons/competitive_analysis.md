@@ -97,7 +97,7 @@
 | Business model | IP licensing (ARM-style) | Chip sales |
 | Power envelope | ~20 mW (FPGA prototype) | Unknown (no silicon data) |
 | Cost to date | ~$225 (AI-augmented) | $3.7M raised |
-| IP protection | Patent pending + 92 formal proofs barrier | Patent applications (claimed) |
+| IP protection | Patent pending + 108 formal proofs barrier | Patent applications (claimed) |
 
 **Key differentiators vs. Ubitium:**
 1. **ATOMiK has working hardware; Ubitium does not** (as of March 2026). Two deployed SoC generations with HDMI output and comprehensive test suites.

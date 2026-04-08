@@ -166,7 +166,7 @@ class VCOutreach(BaseApplication):
                 f"Firm: {firm_info['firm']}\n"
                 f"Thesis match: {firm_info.get('thesis', '')}\n\n"
                 f"{self.pitch_angle}\n\n"
-                f"ATOMiK: 1 Gops/s on $10 FPGA, 92 formal proofs, "
+                f"ATOMiK: 1 Gops/s on $10 FPGA, 108 formal proofs, "
                 f"patent pending, $225 total dev cost.\n\n"
                 f"Contact: {config.founder.name} ({config.founder.email})"
             )

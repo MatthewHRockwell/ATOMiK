@@ -270,7 +270,7 @@ JSON Schema --> ATOMiK Generator --> Python + Rust + C + JavaScript + Verilog
 - Team expansion: FPGA engineers, application engineers, sales
 
 ### Milestones Achieved
-- ✅ 92 formal mathematical proofs (Lean4 verified)
+- ✅ 108 formal mathematical proofs (Lean4 verified)
 - ✅ **v3 SoC deployed** — Custom RV64I + 1280×720 HDMI + 8-screen demo (Mar 2026)
 - ✅ **v2 SoC deployed** — PicoRV32 + ATOMiK accelerator (Feb 2026)
 - ✅ 1 Gops/s hardware validation (N=16 parallel banks)

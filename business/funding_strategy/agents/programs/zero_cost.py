@@ -100,7 +100,7 @@ class CDL(BaseApplication):
     url = "https://www.creativedestructionlab.com/"
     pitch_angle = (
         "A new computing primitive — delta-state algebra in silicon. "
-        "Mathematically novel with 92 formal proofs."
+        "Mathematically novel with 108 formal proofs."
     )
 
     def check_prerequisites(self, config: FundingConfig) -> tuple[bool, list[str]]:

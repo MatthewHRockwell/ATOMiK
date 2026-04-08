@@ -1,6 +1,6 @@
 # Lux Capital — Cold Email
 
-**Subject: New computing primitive — 92 formal proofs, working FPGA, $225 total cost**
+**Subject: New computing primitive — 108 formal proofs, working FPGA, $225 total cost**
 
 Hi team,
 

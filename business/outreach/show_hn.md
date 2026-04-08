@@ -2,7 +2,7 @@
 
 ## Title
 
-Show HN: ATOMiK – 1 Gops/s delta-state computation on a $13.50 FPGA, 92 formal proofs
+Show HN: ATOMiK – 1 Gops/s delta-state computation on a $13.50 FPGA, 108 formal proofs
 
 ## Body
 
@@ -17,7 +17,7 @@ I've been building ATOMiK for the past 6 months. It's a hardware-accelerated del
 - Associative → parallel bank architecture → linear throughput scaling
 
 **What I built:**
-- 92 formally verified proofs in Lean4 (not tested — machine-verified)
+- 108 formally verified proofs in Lean4 (not tested — machine-verified)
 - Production SoC on Tang Nano 9K FPGA ($13.50) with custom RV64I CPU + HDMI
 - 1 Gops/s throughput with 16 parallel banks (validated)
 - 80/80 hardware sweep tests + 5/5 integration tests

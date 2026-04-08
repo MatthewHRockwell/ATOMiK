@@ -127,7 +127,7 @@ Custom integration work for enterprises that need ATOMiK adapted to their specif
 
 ### The Moat
 - **Patent pending** — Legal protection for the architecture
-- **92 formal proofs** — Years of mathematical work that competitors would need to replicate
+- **108 formal proofs** — Years of mathematical work that competitors would need to replicate
 - **Full-stack solution** — From math proofs to working silicon to software tools
 - **$13.50 proof point** — Working hardware, not just theory
 

@@ -18,7 +18,7 @@ wastes energy.
 ATOMiK stores only what changed — deltas — using XOR accumulation.
 This gives us single-cycle operations with no carry propagation,
 lock-free parallel execution through commutativity, and instant
-undo through self-inverse. All backed by 92 formal proofs in Lean4.
+undo through self-inverse. All backed by 108 formal proofs in Lean4.
 
 ## Live Demo (60s)
 

@@ -134,7 +134,7 @@ Each industry section follows the same format:
 
 **The Problem:** Patient monitors generate continuous vital sign data that must be processed reliably with zero data loss. Current systems use expensive, certified hardware. Formal verification requirements (FDA, IEC 62304) make software qualification costly and slow.
 
-**How ATOMiK Solves It:** The 92 formal proofs provide a mathematical guarantee of correctness — a strong foundation for regulatory submissions. The $13.50 hardware cost enables deployment in resource-constrained settings (rural clinics, field hospitals). Self-inverse operations mean any data point can be validated by re-applying and checking for null delta.
+**How ATOMiK Solves It:** The 108 formal proofs provide a mathematical guarantee of correctness — a strong foundation for regulatory submissions. The $13.50 hardware cost enables deployment in resource-constrained settings (rural clinics, field hospitals). Self-inverse operations mean any data point can be validated by re-applying and checking for null delta.
 
 **Example Use Case:** A remote patient monitoring system uses ATOMiK chips in bedside monitors. Each vital sign reading (heart rate, blood pressure, oxygen) generates a delta. The chip processes all channels in parallel, flags anomalies in real time, and transmits only significant changes to the nursing station. The formal proofs support the FDA 510(k) submission by demonstrating mathematical correctness.
 

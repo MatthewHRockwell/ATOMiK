@@ -21,7 +21,7 @@ _PITCH_ANGLES: dict[str, str] = {
     "cdl": (
         "A new computing primitive — delta-state algebra in silicon. Not an "
         "incremental improvement to existing architectures but a "
-        "mathematically novel approach with 92 formal proofs. Fits CDL's "
+        "mathematically novel approach with 108 formal proofs. Fits CDL's "
         "mandate to support science-based ventures."
     ),
     "icorps": (
@@ -30,7 +30,7 @@ _PITCH_ANGLES: dict[str, str] = {
         "delta-state hardware IP. 100+ customer discovery interviews."
     ),
     "nsf_sbir": (
-        "Novel semiconductor architecture with 92 formal proofs — advancing "
+        "Novel semiconductor architecture with 108 formal proofs — advancing "
         "the state of the art in verified hardware design. Hardware-"
         "accelerated delta-state algebra with applications in AI inference, "
         "sensor fusion, and secure state management."
@@ -49,7 +49,7 @@ _PITCH_ANGLES: dict[str, str] = {
     ),
     "nasa_sbir": (
         "XOR-based accumulation is inherently radiation-tolerant (single-bit "
-        "upsets are self-correcting via commutative merge). 92 formal proofs "
+        "upsets are self-correcting via commutative merge). 108 formal proofs "
         "provide flight-system-grade assurance without simulation gaps."
     ),
     "chips_act": (
@@ -71,7 +71,7 @@ _PITCH_ANGLES: dict[str, str] = {
     ),
     "hax": (
         "Working hardware on $10 FPGA — not a slide deck, not a simulation. "
-        "1 Gops/s throughput, 92 formal proofs, $225 total development cost. "
+        "1 Gops/s throughput, 108 formal proofs, $225 total development cost. "
         "Ready for HAX's hardware-to-market pipeline."
     ),
     "yc": (
@@ -246,7 +246,7 @@ class ContentEngine:
     def get_traction(self) -> str:
         """Build traction narrative from known deliverables."""
         return (
-            "92 formal proofs (Lean4, zero sorry statements), "
+            "108 formal proofs (Lean4, zero sorry statements), "
             "314 passing tests across 5 SDK languages, "
             "working FPGA prototype on Tang Nano 9K ($10), "
             "80/80 hardware tests passing, "

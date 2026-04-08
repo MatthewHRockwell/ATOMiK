@@ -108,7 +108,7 @@ Same as highlight reel opening. Establish the "1 billion ops on $13.50" hook.
 
 **Visual**: Competitive moat, business model, team, contact.
 
-**Voiceover**: "Patent pending. 92 formal proofs that competitors can't hand-wave. Hardware-validated silicon, not just simulation. A complete platform — math, hardware, SDK, pipeline, 6 phases delivered. We're seeking seed funding to take this from proof-of-concept to product."
+**Voiceover**: "Patent pending. 108 formal proofs that competitors can't hand-wave. Hardware-validated silicon, not just simulation. A complete platform — math, hardware, SDK, pipeline, 6 phases delivered. We're seeking seed funding to take this from proof-of-concept to product."
 
 ---
 

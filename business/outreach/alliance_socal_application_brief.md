@@ -19,7 +19,7 @@ ATOMiK is a hardware IP core that eliminates redundant memory operations in real
 ## Technology — Delta-State Computation
 
 - **Patent Pending** architecture: XOR-based delta accumulation in silicon
-- **92 formal proofs** in Lean4 (0 unproven assumptions) — highest standard of correctness in CS
+- **108 formal proofs** in Lean4 (0 unproven assumptions) — highest standard of correctness in CS
 - **Two production SoC generations** deployed on $13.50 FPGA (Tang Nano 9K)
 - **v3 SoC (March 2026):** Custom 64-bit RISC-V CPU with 1280×720 HDMI output, 8-screen investor demo
 - **1,056 Mops/s** peak throughput (16 parallel banks), 10.6 ns single-cycle latency

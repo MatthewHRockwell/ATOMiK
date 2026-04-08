@@ -86,7 +86,7 @@ class NsfSbir(_SbirBase):
     phase = 2
     url = "https://seedfund.nsf.gov/"
     pitch_angle = (
-        "Novel semiconductor architecture with 92 formal proofs — "
+        "Novel semiconductor architecture with 108 formal proofs — "
         "advancing the state of the art in verified hardware design."
     )
 

@@ -22,14 +22,14 @@
 
 > **Speaker Notes**: ATOMiK is a new computing primitive — a hardware-accelerated
 > delta-state algebra that replaces full-state read-modify-write with single-cycle
-> XOR delta accumulation. We achieve 1 Gops/s on a $13.50 FPGA with 92 formally
+> XOR delta accumulation. We achieve 1 Gops/s on a $13.50 FPGA with 108 formally
 > verified mathematical proofs. We now have two production SoC generations deployed,
 > including a v3 with a custom 64-bit RISC-V CPU and 1280×720 HDMI output running
 > an 8-screen investor demo. This is not an incremental improvement to an existing
 > architecture — it is a fundamentally different way to manage state in silicon.
 
 `[VISUAL]` Title slide with ATOMiK logo. Central KPI: "1,056 Mops/s" in large
-text. Subtitle: "$13.50 device | 10.6 ns latency | 92 formal proofs | 2 production SoCs". Dark
+text. Subtitle: "$13.50 device | 10.6 ns latency | 108 formal proofs | 2 production SoCs". Dark
 background (#1e1e2e) with blue (#89b4fa) and green (#a6e3a1) accents matching
 Marp theme.
 
@@ -477,7 +477,7 @@ delta-state algebra — in hardware.
 
 > **Speaker Notes**: ATOMiK is a new computing primitive. We've built a
 > hardware-accelerated delta-state algebra that achieves 1 Gops/s on a $13.50 FPGA,
-> backed by 92 formally verified proofs and 353 passing tests across 5 languages.
+> backed by 108 formally verified proofs and 353 passing tests across 5 languages.
 > This deck presents the full technical and commercial case.
 
 `[VISUAL]` Full-bleed title slide. ATOMiK logo centered. One-liner vision
@@ -1117,7 +1117,7 @@ schema snippet. Badge: "353/353 tests passing."
 ### Competitive Strategy
 - **Build the standard**: If ATOMiK becomes the standard delta-state primitive,
   switching costs create natural lock-in
-- **Proof moat**: 92 formal proofs create a verification barrier competitors
+- **Proof moat**: 108 formal proofs create a verification barrier competitors
   cannot shortcut
 - **Ecosystem effects**: SDK community + hardware IP + vertical modules create
   compound defensibility

@@ -58,7 +58,7 @@ ATOMiK's power profile (1.8 mW, 287 LUTs) makes it ideal for NVIDIA's edge AI pl
 ATOMiK's parallel bank architecture (16x, 32x, 64x configurations) requires extensive pre-silicon validation. NVIDIA GPUs would accelerate our verification pipeline:
 
 - **CUDA-based formal simulation**: Parallelize state-space exploration across GPU cores for configurations beyond current FPGA capacity
-- **Fuzz testing at scale**: GPU-accelerated property-based testing to complement our 92 formal proofs with empirical coverage over billions of test vectors
+- **Fuzz testing at scale**: GPU-accelerated property-based testing to complement our 108 formal proofs with empirical coverage over billions of test vectors
 - **ASIC sign-off simulation**: Pre-tape-out validation runs that currently take hours on CPU could run in minutes on GPU
 
 ### 3. NVIDIA AI Enterprise Integration

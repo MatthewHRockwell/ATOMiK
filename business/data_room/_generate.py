@@ -121,7 +121,7 @@ def generate_development_cost() -> None:
 
 ## What $225 Produced
 
-- 92 formally verified theorems (Lean4)
+- 108 formally verified theorems (Lean4)
 - Working FPGA implementation (94.5 MHz, 80/80 tests)
 - 5-language SDK with 314 tests
 - 25-configuration synthesis sweep
@@ -291,7 +291,7 @@ def generate_patent_status() -> None:
 
 ## Supporting Evidence
 
-- 92 formal proofs in Lean4 (mathematical correctness)
+- 108 formal proofs in Lean4 (mathematical correctness)
 - Hardware validation on FPGA (silicon correctness)
 - 25-configuration synthesis sweep (scalability)
 - 80/80 hardware tests (reliability)
@@ -399,7 +399,7 @@ def generate_founder_profile(config: dict) -> None:
 
 | Achievement | Evidence |
 |-------------|----------|
-| 92 formal proofs | Lean4 verification, 0 sorry statements |
+| 108 formal proofs | Lean4 verification, 0 sorry statements |
 | Working FPGA hardware | Tang Nano 9K, 80/80 tests, 1 Gops/s |
 | 5-language SDK | Python/Rust/C/JS/Verilog, 314 tests |
 | 2 research papers | Formal verification + benchmarks |

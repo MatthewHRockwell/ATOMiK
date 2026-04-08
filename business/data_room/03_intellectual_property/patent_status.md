@@ -21,7 +21,7 @@
 
 ## Supporting Evidence
 
-- 92 formal proofs in Lean4 (mathematical correctness)
+- 108 formal proofs in Lean4 (mathematical correctness)
 - Hardware validation on FPGA (silicon correctness)
 - 25-configuration synthesis sweep (scalability)
 - 80/80 hardware tests (reliability)

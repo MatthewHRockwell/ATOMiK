@@ -81,7 +81,7 @@ Delaware C-Corp is required for:
 | Relevance | **LOW–MEDIUM** — Radiation-tolerant computing, formal verification for flight systems. Niche but defensible. |
 | Status | Program Year 2026 hub active at sbir.nasa.gov |
 
-**ATOMiK pitch angle:** XOR-based accumulation is inherently radiation-tolerant (single-bit upsets are self-correcting via commutative merge). 92 formal proofs provide flight-system-grade assurance without simulation gaps.
+**ATOMiK pitch angle:** XOR-based accumulation is inherently radiation-tolerant (single-bit upsets are self-correcting via commutative merge). 108 formal proofs provide flight-system-grade assurance without simulation gaps.
 
 ### SBIR/STTR Application Requirements (All Agencies)
 
@@ -98,7 +98,7 @@ Delaware C-Corp is required for:
 - Current/pending support documentation
 
 **ATOMiK's SBIR strengths:**
-- 92 formal proofs = strong "preliminary data" section
+- 108 formal proofs = strong "preliminary data" section
 - Working FPGA hardware = de-risked feasibility
 - 353 tests across 5 languages = engineering maturity
 - $225 total development spend = extreme capital efficiency narrative
@@ -134,7 +134,7 @@ Delaware C-Corp is required for:
 | Requirements | Application with technical description and founder background |
 | Timeline | Apply summer 2026 for 2026/2027 cohort at creativedestructionlab.com |
 
-**ATOMiK pitch angle:** A new computing primitive — delta-state algebra in silicon. Not an incremental improvement to existing architectures but a mathematically novel approach with 92 formal proofs. Fits CDL's mandate to support science-based ventures.
+**ATOMiK pitch angle:** A new computing primitive — delta-state algebra in silicon. Not an incremental improvement to existing architectures but a mathematically novel approach with 108 formal proofs. Fits CDL's mandate to support science-based ventures.
 
 ### 8. NSF I-Corps
 
@@ -181,7 +181,7 @@ Delaware C-Corp is required for:
 | Relevance | **HIGH** — Premier hardware accelerator. 348+ portfolio companies, $2.5B raised, $8.6B cumulative value. Prototyping resources and supply chain support. |
 | Timeline | Rolling applications at hax.co |
 
-**ATOMiK pitch angle:** Working hardware on $13.50 FPGA — not a slide deck, not a simulation. 1 Gops/s throughput, 92 formal proofs, $225 total development cost. Ready for HAX's hardware-to-market pipeline.
+**ATOMiK pitch angle:** Working hardware on $13.50 FPGA — not a slide deck, not a simulation. 1 Gops/s throughput, 108 formal proofs, $225 total development cost. Ready for HAX's hardware-to-market pipeline.
 
 ### 12. Y Combinator
 
@@ -192,7 +192,7 @@ Delaware C-Corp is required for:
 | Requirements | Application at ycombinator.com. Video demo. |
 | Timeline | Batches: Winter (January start) and Summer (June start) |
 
-**ATOMiK pitch angle:** Hardware that works, math that's proven, software that ships. 92 formal proofs, 1 Gops/s on a $13.50 chip, 353 passing tests, $225 total spend. The IP licensing business model scales without manufacturing risk.
+**ATOMiK pitch angle:** Hardware that works, math that's proven, software that ships. 108 formal proofs, 1 Gops/s on a $13.50 chip, 353 passing tests, $225 total spend. The IP licensing business model scales without manufacturing risk.
 
 ### 13. Techstars
 
@@ -213,7 +213,7 @@ Delaware C-Corp is required for:
 
 **ATOMiK's accelerator strengths:**
 - Working silicon on $13.50 FPGA (most applicants have no hardware)
-- 92 formal proofs (unmatched in semiconductor startups)
+- 108 formal proofs (unmatched in semiconductor startups)
 - $225 total development cost (extreme capital efficiency story)
 - 5-language SDK (commercial surface area)
 - Patent pending
@@ -345,7 +345,7 @@ IQT and defense VCs don't have standard application processes. Best paths:
 
 | Audience | Frame ATOMiK As |
 |----------|-----------------|
-| NSF SBIR | Novel semiconductor architecture with 92 formal proofs — advancing the state of the art in verified hardware design |
+| NSF SBIR | Novel semiconductor architecture with 108 formal proofs — advancing the state of the art in verified hardware design |
 | DoD SBIR | High-assurance hardware for edge computing in contested environments — formally verified state management for sensor fusion |
 | DOE SBIR | Energy-efficient computing primitive — 95–100% memory traffic reduction, ~20mW power on $13.50 FPGA |
 | CHIPS Act | American semiconductor IP — area-efficient (7% LUT) formally verified compute block for next-gen chip designs |

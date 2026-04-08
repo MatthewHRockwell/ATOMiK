@@ -94,7 +94,7 @@ python -m software.demos.state_sync_benchmark
 - **Live Demo**: `python -m demos.run_demo --mode simulate --web` (runs at `localhost:8000`)
 - **Benchmark Evidence**: `python -m software.demos.state_sync_benchmark`
 
-**Key metrics**: $225 total development cost | 92 formal proofs | 143/143 hardware tests | 69.7 Gops/s peak | 5-language SDK | 353 tests passing
+**Key metrics**: $225 total development cost | 108 formal proofs | 143/143 hardware tests | 69.7 Gops/s peak | 5-language SDK | 353 tests passing
 
 ---
 

@@ -6,7 +6,7 @@ Hi team,
 
 Khosla backs breakthrough technology that can reshape industries. ATOMiK is a new computing primitive that reduces state management to single-cycle XOR operations — 10.6 nanoseconds, no carry chains, mathematically guaranteed correctness.
 
-Traditional systems copy full state on every update. ATOMiK accumulates deltas. The properties — commutativity, self-inverse, linear scaling — are backed by 92 formal proofs in Lean4. This isn't a benchmarking claim; it's a mathematical fact.
+Traditional systems copy full state on every update. ATOMiK accumulates deltas. The properties — commutativity, self-inverse, linear scaling — are backed by 108 formal proofs in Lean4. This isn't a benchmarking claim; it's a mathematical fact.
 
 What exists today:
 - 1,056 Mops/s on a $13.50 FPGA (production hardware)

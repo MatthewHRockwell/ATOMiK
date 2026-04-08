@@ -2,7 +2,7 @@
 
 ## Profile Description
 
-I'm building ATOMiK — a delta-state computing architecture in silicon. 92 formally verified proofs, working FPGA hardware, and a 5-language SDK. One person, $225 total cost, running at 1 billion operations per second.
+I'm building ATOMiK — a delta-state computing architecture in silicon. 108 formally verified proofs, working FPGA hardware, and a 5-language SDK. One person, $225 total cost, running at 1 billion operations per second.
 
 Your sponsorship directly funds ASIC tape-out research, larger FPGA platforms, and keeping an independent hardware researcher fed while building something that should exist.
 
@@ -51,7 +51,7 @@ You're betting on ATOMiK before the rest of the world catches on. You get:
 - Living expenses for a solo founder (honest truth)
 
 **What's been built so far ($225 total):**
-- 92 formally verified proofs (Lean4)
+- 108 formally verified proofs (Lean4)
 - Production SoC on Tang Nano 9K with custom RV64I CPU + HDMI output
 - 1 Gops/s throughput (16 parallel banks)
 - 80/80 hardware tests, 353 SDK tests across 5 languages

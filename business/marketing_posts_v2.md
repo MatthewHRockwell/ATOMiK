@@ -10,7 +10,7 @@ We built a kernel module that watches every COW fault and TCP send on your Linux
 - 8.7% of TCP sends are duplicate data to the same socket
 - One container is usually responsible for 40%+ of the waste
 
-The math behind it is absurdly simple: `current_state = reference XOR accumulator`. Four operations. 92 formally proven theorems. Not "tested" — proven in Lean4.
+The math behind it is absurdly simple: `current_state = reference XOR accumulator`. Four operations. 108 formally proven theorems. Not "tested" — proven in Lean4.
 
 What started as an equation on a whiteboard became:
 - A Python library (pip install atomik-core, zero dependencies)

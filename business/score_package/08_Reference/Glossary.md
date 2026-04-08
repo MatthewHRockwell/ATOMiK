@@ -156,7 +156,7 @@ The realistic revenue ATOMiK can capture in the near term. Estimated at $500M ov
 ATOMiK has filed patent applications to protect its architecture and methods. "Pending" means the applications are submitted and under review by the patent office. Once granted, patents provide legal exclusivity for 20 years.
 
 **Moat**
-A competitive advantage that's difficult for others to replicate. ATOMiK's moat includes patents, 92 formal proofs (years of mathematical work), working hardware, and a full-stack solution from proofs to silicon to software.
+A competitive advantage that's difficult for others to replicate. ATOMiK's moat includes patents, 108 formal proofs (years of mathematical work), working hardware, and a full-stack solution from proofs to silicon to software.
 
 ---
 

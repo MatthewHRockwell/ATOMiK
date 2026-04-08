@@ -14,7 +14,7 @@ Cross-list Categories:
 - cs.PL (Programming Languages)
 - cs.LO (Logic in Computer Science)
 
-Comments: 12 pages, 2 figures, 92 formally verified theorems in Lean4
+Comments: 12 pages, 2 figures, 108 formally verified theorems in Lean4
 
 MSC-class: 68Q05 (Models of computation)
 

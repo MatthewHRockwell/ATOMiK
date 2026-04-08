@@ -19,7 +19,7 @@ The core insight: if you represent state changes as XOR deltas, you get commutat
 - No consensus protocol: XOR commutativity means all nodes converge regardless of message ordering
 
 **How it's validated:**
-- 92 formal proofs in Lean4 (not tests — proofs)
+- 108 formal proofs in Lean4 (not tests — proofs)
 - 417 tests across Python, C, and hardware
 - Hardware-validated on FPGA: 69.7 Gops/s peak throughput
 - Custom RISC-V CPU with ATOMiK as native ISA extensions
@@ -135,7 +135,7 @@ https://github.com/MatthewHRockwell/ATOMiK
 **Tweet 1:**
 Just shipped atomik-core to PyPI.
 
-4 operations. Zero dependencies. 92 formal proofs in Lean4.
+4 operations. Zero dependencies. 108 formal proofs in Lean4.
 
 State management, reconstructed.
 

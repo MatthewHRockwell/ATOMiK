@@ -9,7 +9,7 @@ Eclipse's thesis on backing deep tech companies that build real things in atoms,
 I built a delta-state computation architecture that replaces full-state updates with XOR-based accumulation. Every operation completes in a single clock cycle with zero carry chains. The result: 1,056 Mops/s on a $13.50 Tang Nano 9K FPGA.
 
 What makes this defensible:
-- 92 formally verified proofs in Lean4 (not tested — proven)
+- 108 formally verified proofs in Lean4 (not tested — proven)
 - Patent pending on the architecture
 - 80/80 hardware tests, 353 SDK tests across 5 languages
 - Built the entire stack — math, RTL, SDK, SoC — solo, for $225 total

@@ -61,7 +61,7 @@ I wrote everything. Every Lean4 proof (92), every line of SystemVerilog RTL, eve
 
 **Production hardware, not a prototype.**
 
-- 92 formal proofs (Lean4, machine-verified)
+- 108 formal proofs (Lean4, machine-verified)
 - Production SoC on Tang Nano 9K FPGA ($13.50) — 287 LUTs, 1.8 mW
 - v3 SoC: custom RV64I CPU + delta-state engine + HDMI output
 - 1,056 Mops/s throughput (16 parallel banks, validated)
@@ -137,7 +137,7 @@ N/A — first application.
 
 ### Anything else you want us to know?
 
-**On being a solo founder:** I know YC prefers teams. Here's my case: I built a semiconductor IP company — 92 formal proofs, working silicon, production SoC, 5-language SDK, patent pending, 2 published papers — for $225 on a consumer laptop. Solo. In 6 months.
+**On being a solo founder:** I know YC prefers teams. Here's my case: I built a semiconductor IP company — 108 formal proofs, working silicon, production SoC, 5-language SDK, patent pending, 2 published papers — for $225 on a consumer laptop. Solo. In 6 months.
 
 That's not a risk factor. That's evidence I can execute at a pace that makes teams jealous. And I'm not trying to stay solo — seed funding goes toward hiring a verification engineer and an applications engineer. The hard part (proving the math and building the first silicon) is done. Now I need people to help scale it.
 

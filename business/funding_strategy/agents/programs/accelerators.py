@@ -172,7 +172,7 @@ class HAXAccelerator(BaseApplication):
     submission_method = SubmissionMethod.BROWSER
     url = "https://hax.co/"
     pitch_angle = (
-        "Working hardware on $10 FPGA — 1 Gops/s, 92 formal proofs, "
+        "Working hardware on $10 FPGA — 1 Gops/s, 108 formal proofs, "
         "$225 total cost."
     )
 

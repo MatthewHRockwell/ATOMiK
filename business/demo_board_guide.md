@@ -283,7 +283,7 @@ RV64I CPU • Tang Nano 9K • $13.50
 ║    IA-7:   Hardware fingerprinting (algebraic group)                 ║
 ║    SC-8:   Tamper detection via fingerprint mismatch                 ║
 ║    SC-12:  Dynamic reference states (moving target)                  ║
-║    SC-13:  92 formally proven theorems (Lean4)                       ║
+║    SC-13:  108 formally proven theorems (Lean4)                       ║
 ║                                                                      ║
 ║  → No Speculation | No Cache | Constant Time | Formally Proven       ║
 ╚══════════════════════════════════════════════════════════════════════╝

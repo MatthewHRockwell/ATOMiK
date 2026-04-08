@@ -18,7 +18,7 @@ Three systematic issues were found and corrected across all emails:
 | # | Target | Subject Line | Notes |
 |---|--------|-------------|-------|
 | 01 | Eclipse Ventures | 1,056 Mops/s on a $13.50 FPGA — formally verified semiconductor IP | Strong. Specific subject, personalized to Eclipse's atoms-not-bits thesis. Fixed ask from $2M → $3-4M. |
-| 02 | Lux Capital | New computing primitive — 92 formal proofs, working FPGA, $225 total cost | Great hook for Lux's "impossible until it works" brand. Clean structure. |
+| 02 | Lux Capital | New computing primitive — 108 formal proofs, working FPGA, $225 total cost | Great hook for Lux's "impossible until it works" brand. Clean structure. |
 | 03 | DCVC | Computational breakthrough — O(1) state reconstruction in hardware | Most technical email — appropriate for DCVC's computational thesis. O(1) vs O(N) framing is strong. |
 | 04 | Playground Global | New hardware primitive — from math proofs to working silicon on $225 | Good systems-level angle. "Reusable compute block, not application-specific accelerator" is the right framing. |
 | 05 | Cantos Ventures | Formally verified semiconductor IP — built solo for $225 | Tight. Good early-stage positioning. |
