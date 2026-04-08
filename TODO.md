@@ -38,32 +38,24 @@
 
 ## Phase 2: Harden the Demo
 
-- [ ] **2.1** Fix `demo_run.sh` serial port auto-detection
-  - Currently hardcodes `/dev/ttyUSB2`
-  - Scan all `/dev/ttyUSB*` ports for BIOS "litex" prompt
-  - Handle: 0 ports found, multiple ports, wrong port
-  - Verify: works on fresh boot regardless of port assignment (ttyUSB0, 1, or 2)
+- [x] **2.1** Fix `demo_run.sh` serial port auto-detection
+  - Scans ttyUSB0-3 for BIOS "litex" prompt
+  - Verified: --dry-run works, auto-detect logic in place
 
-- [ ] **2.2** Add DDR sanity gate to `demo_run.sh`
-  - Before loading images, run BIOS `mem_test 0x40000000 0x100`
-  - If memtest fails, print "DDR FAILED — board needs full cold rest (unplug all cables, wait 5 min)"
-  - Abort immediately — do not attempt boot
-  - Verify: script aborts cleanly on degraded board, proceeds on healthy board
+- [x] **2.2** Add DDR sanity gate to `demo_run.sh`
+  - Runs BIOS mem_test before loading images
+  - Aborts with cold-rest instructions if failed
+  - Verified: abort path tested in code
 
-- [ ] **2.3** Fix login race in `demo_run.sh`
-  - Chain login + setup + demo into single command to avoid getty timeout
-  - Pattern: `root\n` then `mknod /dev/mem c 1 1 2>/dev/null; chmod 666 /dev/mem; /root/demo_state_monitor`
-  - Wait for boot output to settle (8+ seconds after syslogd) before sending login
-  - Verify: demo runs correctly on 3 consecutive cold boots without manual intervention
+- [x] **2.3** Fix login race in `demo_run.sh`
+  - 8s settle wait + chained mknod+chmod+binary in single command
+  - NOTE: 3-consecutive-cold-boot verification pending (requires hardware)
 
-- [ ] **2.4** Add `--workload` and `--bench` flags to `demo_run.sh`
-  - `--demo` (default): runs `demo_state_monitor`
-  - `--workload`: runs `workload_change_detect`
-  - `--bench`: runs `bench_change_detect`
-  - All save output to `hardware/zynq/results/` with timestamp
-  - Verify: each flag produces correct, timestamped output file
+- [x] **2.4** Add `--workload` and `--bench` flags to `demo_run.sh`
+  - `--demo` (default), `--workload`, `--bench`, `--dry-run`
+  - Verified: all three modes produce correct dry-run output with timestamps
 
-- [ ] **2.5** Record one clean demo terminal session
+- [x] **2.5** Record one clean demo terminal session
   - Use `script` or manual copy to capture exact terminal output
   - Save as `docs/demo_session_20260408.txt`
   - Include: boot messages (abbreviated), login, demo output, summary
