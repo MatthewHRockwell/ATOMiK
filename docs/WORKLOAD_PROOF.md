@@ -47,7 +47,7 @@ The hardware is a $13.50 FPGA (Tang Nano 9K for the standalone core) or a Zynq-c
 - **Software**: Linux 6.9.0, BusyBox rootfs, libatomik C runtime
 - **ATOMiK core**: Migen CSR module, 256x64-bit state table, single bank
 - **Adapter path**: CFU adapter validated separately (9/9 PASS, 20/20 Verilator, ~10% overhead vs direct CSR)
-- **Formal**: 92 Lean4 theorems proving the delta-state algebra (commutativity, associativity, self-inverse, identity)
+- **Formal**: 108 Lean4 theorems proving the delta-state algebra (commutativity, associativity, self-inverse, identity)
 
 ## Reproduce
 

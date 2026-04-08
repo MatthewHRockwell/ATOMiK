@@ -182,7 +182,7 @@ Through Phase 1 integration and Phase 2 runtime development, the ATOMiK delta ac
 
 - **Multi-bank hardware is already validated.** The single-bank design in this Phase 2 firmware is a starting point. Phase 6 validated 16-bank parallel operation at 1,056 Mops/s with perfect linear scaling. The bank-aware API (`atomik_load(bank, ...)`) in `atomik.h` was designed for drop-in multi-bank support.
 
-- **Security through dynamic reference states.** ATOMiK's security model is architectural — deterministic latency eliminates timing side channels, the absence of speculative execution removes Spectre/Meltdown attack surface, and the self-inverse property provides information-theoretic reversibility. Dynamic reference states (the `initial_state` register) define the computation frame, making the fingerprint meaningful only to parties who know the reference. This is formally proven in 92 Lean4 theorems and validated on hardware.
+- **Security through dynamic reference states.** ATOMiK's security model is architectural — deterministic latency eliminates timing side channels, the absence of speculative execution removes Spectre/Meltdown attack surface, and the self-inverse property provides information-theoretic reversibility. Dynamic reference states (the `initial_state` register) define the computation frame, making the fingerprint meaningful only to parties who know the reference. This is formally proven in 108 Lean4 theorems and validated on hardware.
 
 - **The accumulator is a shared resource by design.** XOR commutativity means order of accumulation is irrelevant — multiple producers can feed deltas in any order and the result is identical. This is a feature enabling lock-free parallel accumulation, not a serialization bottleneck.
 

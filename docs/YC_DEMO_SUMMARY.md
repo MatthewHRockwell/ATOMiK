@@ -31,14 +31,14 @@ current_state = initial_state ⊕ accumulator
 - **ACCUM**: XOR each write delta into the accumulator (happens at write time)
 - **DETECT**: read one flag — is the accumulator zero? (O(1))
 
-The math is an Abelian group (XOR): commutative, associative, self-inverse. 92 Lean4 theorems prove the algebra. Order of writes doesn't matter. Deltas cancel automatically.
+The math is an Abelian group (XOR): commutative, associative, self-inverse. 108 Lean4 theorems prove the algebra. Order of writes doesn't matter. Deltas cancel automatically.
 
 ## What We've Built
 
 - **Hardware**: ATOMiK core on FPGA ($13.50 Tang Nano 9K standalone, Zynq for Linux)
 - **Runtime**: libatomik C library — `atomik_load()`, `atomik_accum()`, `atomik_read()`
 - **Validation**: 16/16 Linux userspace PASS, 9/9 adapter PASS, 20/20 simulation PASS
-- **Formal proof**: 92 Lean4 theorems on the delta-state algebra
+- **Formal proof**: 108 Lean4 theorems on the delta-state algebra
 
 ## Why Now
 
