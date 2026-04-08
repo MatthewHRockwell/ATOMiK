@@ -8,28 +8,28 @@
 
 ## Phase 1: Lock the Foundation
 
-- [ ] **1.1** Tag `zynq-adapter-v1` at commit cc9307e
+- [x] **1.1** Tag `zynq-adapter-v1` at commit cc9307e
   - `git tag -a zynq-adapter-v1 cc9307e -m "Adapter validated: 9/9 HW, 20/20 sim, workload captured"`
   - Verify: `git show zynq-adapter-v1` shows correct commit
 
-- [ ] **1.2** Create `MANIFEST.md` with exact artifact checksums
+- [x] **1.2** Create `MANIFEST.md` with exact artifact checksums
   - List: bitstream (April 5th + adapter), kernel, rootfs, DTB, OpenSBI, fw_jump
   - Include: file sizes, md5sums, build dates, LiteX commit, Vivado version
   - Include: exact build commands that produced each artifact
   - Verify: every listed file exists and checksum matches
 
-- [ ] **1.3** Delete `hardware/zynq/results/workload_result.txt`
+- [x] **1.3** Delete `hardware/zynq/results/workload_result.txt`
   - This file has invalid adapter column (v255, 255 banks) from wrong bitstream
   - Superseded by `workload_csr_20260408.txt`
   - Verify: only valid result files remain in results/
 
-- [ ] **1.4** Locate and verify Lean4 theorem count
+- [x] **1.4** Locate and verify Lean4 theorem count (108, all compile)
   - Memory/docs claim "92 Lean4 theorems" — but `grep theorem` found 0
   - Find actual proof files, count real theorems/lemmas
   - If count is wrong, correct it in: MEMORY.md, WORKLOAD_PROOF.md, YC_DEMO_SUMMARY.md, any other docs
   - Verify: claimed count matches actual count in repo
 
-- [ ] **1.5** Update `ROADMAP.md`
+- [x] **1.5** Update `ROADMAP.md` (v3.0, April 2026 milestone)
   - Currently says "v2.5, March 2026" — does not reflect Zynq adapter milestone
   - Add: Zynq Linux 16/16 PASS, adapter 9/9 PASS, libatomik 3-backend, workload demo
   - Verify: roadmap accurately reflects current repo state
