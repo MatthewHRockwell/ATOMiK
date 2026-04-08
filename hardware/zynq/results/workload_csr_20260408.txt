@@ -1,0 +1,29 @@
+ATOMiK Multi-Buffer Change Detection Workload
+==============================================
+Git SHA: c7ad5e5
+Date: 2026-04-08
+Bitstream: April 5th proven (hamgeek_rk7020f, VexRiscvSMP linux)
+Backend: CSR (direct) @ 0xF0000000
+
+Environment: VexRiscv SMP @ 100 MHz, 4 KB D-cache, no L2
+Timer: rdtime @ 100 MHz (10 ns resolution)
+
+[CSR (direct)] ATOMiK v2, 1 bank(s) @ 0xF0000000
+
+Workload             | SW (memcmp)  | ATOMiK       | Speedup    | Regions/sec
+---------------------+--------------+--------------+------------+-------------
+8x256B 25%chg        |      18435 cy |       1221 cy |     15.1x |     655201
+8x4096B 25%chg       |    6955438 cy |       1223 cy |   5687.2x |     654129
+32x1024B 10%chg      |     696709 cy |       3225 cy |    216.0x |     992248
+64x1024B 5%chg       |    1392901 cy |       5881 cy |    236.8x |    1088250
+64x4096B 5%chg       |   55125636 cy |      11837 cy |   4657.1x |     540678
+
+Key observations:
+- ATOMiK detection is O(N) in regions, O(1) per region regardless of size
+- Software is O(N * region_size) — dominates at larger regions
+- 8x4096B: 5,687x speedup (7M vs 1.2K cycles)
+- 64x4096B: 4,657x speedup (55M vs 12K cycles)
+- Throughput: 540K-1M regions/sec for ATOMiK detection
+
+Note: Adapter path (0xF0020000) requires adapter SoC bitstream.
+CSR benchmark showed adapter adds ~10-14% overhead (290 vs 262 cy/detect).
