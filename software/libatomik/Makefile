@@ -105,10 +105,12 @@ $(TEST_HW): $(TEST_SRC) $(LIB_A) $(LIB_HDR) | $(BUILD)
 # ==============================================================================
 # Zynq/VexRiscv: all binaries for Linux userspace (static, rv32ima)
 # ==============================================================================
-zynq: $(BENCH) $(WORKLOAD) $(EXAMPLE)
+DEMO    = $(BUILD)/demo_state_monitor
+
+zynq: $(BENCH) $(WORKLOAD) $(EXAMPLE) $(DEMO)
 	@echo ""
 	@echo "Built for Zynq Linux:"
-	@ls -la $(BENCH) $(WORKLOAD) $(EXAMPLE)
+	@ls -la $(BENCH) $(WORKLOAD) $(EXAMPLE) $(DEMO)
 	@echo ""
 	@echo "Copy to rootfs overlay and boot."
 
@@ -119,6 +121,9 @@ $(WORKLOAD): $(ZYNQ_TEST)/workload_change_detect.c $(LIB_SRC) $(LIB_HDR) | $(BUI
 	$(CC) $(CFLAGS) -static -o $@ $< $(LIB_SRC) -I.
 
 $(EXAMPLE): example_atomik.c $(LIB_SRC) $(LIB_HDR) | $(BUILD)
+	$(CC) $(CFLAGS) -static -o $@ $< $(LIB_SRC) -I.
+
+$(DEMO): demo_state_monitor.c $(LIB_SRC) $(LIB_HDR) | $(BUILD)
 	$(CC) $(CFLAGS) -static -o $@ $< $(LIB_SRC) -I.
 
 # ==============================================================================
