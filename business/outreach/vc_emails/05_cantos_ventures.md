@@ -15,7 +15,7 @@ The stack:
 - Production SoC deployed (v3, with HDMI output)
 - One person built everything
 
-I'm building an IP licensing company in the semiconductor space. The formal verification moat is years deep — you can't shortcut 92 machine-verified theorems. Raising a $3-4M seed for ASIC tape-out. Looking for a partner who understands deep tech timelines.
+I'm building an IP licensing company in the semiconductor space. The formal verification moat is years deep — you can't shortcut 108 machine-verified theorems. Raising a $3-4M seed for ASIC tape-out. Looking for a partner who understands deep tech timelines.
 
 Would you have 15 minutes for a call?
 

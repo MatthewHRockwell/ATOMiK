@@ -33,7 +33,7 @@ I've been building ATOMiK for the past 6 months. It's a hardware-accelerated del
 
 The architecture scales linearly — 16 banks on this tiny FPGA already break 1 Gops/s. On larger devices (Zynq, Kintex), 32x and 64x configurations are straightforward.
 
-I'm building this into an IP licensing company (ARM model). The formal verification moat is real — you can't shortcut 92 machine-checked theorems in Lean4.
+I'm building this into an IP licensing company (ARM model). The formal verification moat is real — you can't shortcut 108 machine-checked theorems in Lean4.
 
 Code is on GitHub (Apache 2.0 for evaluation): https://github.com/MatthewHRockwell/ATOMiK
 

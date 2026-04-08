@@ -229,7 +229,7 @@ Dedicated page expanding on landing page pricing section.
 - Chronological listing below
 - Initial articles:
   - "Why XOR? The Mathematics Behind ATOMiK"
-  - "From 92 Proofs to Production Silicon"
+  - "From 108 Proofs to Production Silicon"
   - "Replacing Consensus Protocols with Algebra"
   - "ATOMiK vs Event Sourcing: A Quantitative Comparison"
   - "Building a Custom RISC-V CPU on a $13.50 FPGA"

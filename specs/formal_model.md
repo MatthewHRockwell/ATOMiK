@@ -193,7 +193,7 @@ Proven via counter machine (Minsky machine) simulation in `TuringComplete.lean`.
 | Metric | Value |
 |--------|-------|
 | Total modules | 8 |
-| Total theorems | 92 |
+| Total theorems | 108 |
 | Sorry statements | 0 |
 | Lean version | 4.27.0 |
 | Build status | ✅ Pass |

@@ -62,7 +62,7 @@
 | Time to deploy | Schema-driven generation | Months of RTL design |
 | Utilization | 7-20% LUTs | Often 50-90% |
 | Generality | Any state management task | Single application |
-| Formal guarantees | 92 proofs | Simulation-based testing |
+| Formal guarantees | 108 proofs | Simulation-based testing |
 
 **Key advantage**: Traditional FPGA accelerators require months of custom RTL design per application. ATOMiK provides a reusable, formally verified primitive that applies across many domains. The zero-carry-chain architecture also allows higher clock frequencies and lower LUT utilization than arithmetic-heavy designs.
 

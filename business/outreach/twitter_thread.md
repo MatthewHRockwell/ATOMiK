@@ -52,7 +52,7 @@ Production SoC: v3 with custom RV64I CPU + HDMI output.
 ## Tweet 7 (The Stack)
 One person built the entire stack:
 
-- Lean4 proofs (92)
+- Lean4 proofs (108)
 - SystemVerilog RTL
 - Production SoC
 - Custom RV64I CPU

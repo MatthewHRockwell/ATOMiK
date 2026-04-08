@@ -15,7 +15,7 @@ Why this looks contrarian:
 - The moat is math, not capital
 
 Why it's right:
-- Formal verification can't be shortcut — 92 proofs is years of work
+- Formal verification can't be shortcut — 108 proofs is years of work
 - Patent pending locks the architecture
 - Every state-management system is a potential customer
 

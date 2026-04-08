@@ -17,7 +17,7 @@
 Rockwell Industries builds ATOMiK — formally verified hardware IP cores for delta-state computation. Our technology replaces traditional full-state memory operations with XOR-based delta accumulation, reducing memory traffic by 120x–30,720x while consuming just 287 LUTs and 1.8 mW.
 
 **Key numbers:**
-- 92 machine-verified proofs (Lean4) — the most rigorously proven computing primitive in production
+- 108 machine-verified proofs (Lean4) — the most rigorously proven computing primitive in production
 - 1,056 Mops/s throughput on a $13.50 FPGA (Tang Nano 9K)
 - 80/80 hardware tests, 353 SDK tests across 5 languages
 - Total development cost to date: $225
@@ -93,7 +93,7 @@ Currently raising a $3–4M seed round to hire a verification engineer and appli
 
 | Metric | Value |
 |--------|-------|
-| Formal proofs | 92 (Lean4, machine-verified) |
+| Formal proofs | 108 (Lean4, machine-verified) |
 | Core size | 287 LUTs, 1.8 mW |
 | Throughput | 1,056 Mops/s |
 | Memory traffic reduction | 120x–30,720x |

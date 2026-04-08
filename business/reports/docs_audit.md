@@ -103,7 +103,7 @@ Reviewed all investor-facing documentation for consistency, completeness, and ac
 | Metric | README | One-Pager | Investor Deck | Slides | Status |
 |--------|--------|-----------|---------------|--------|--------|
 | 1,056 Mops/s | ✅ | ✅ | ✅ | ✅ | Consistent |
-| 92 proofs | ✅ | ✅ | ✅ | ✅ | Consistent |
+| 108 proofs | ✅ | ✅ | ✅ | ✅ | Consistent |
 | 80/80 HW tests | ✅ | ✅ | ✅ | ✅ | Consistent |
 | 353 SDK tests | ✅ | ✅ | ✅ | ✅ | Consistent |
 | $225 cost | ✅ | ✅ (added) | ✅ | ✅ | Consistent |

@@ -7,7 +7,7 @@ from pathlib import Path
 PROJECT_METRICS = {
     "throughput_gops": 1.056,
     "hardware_tests": "80/80",
-    "formal_proofs": 92,
+    "formal_proofs": 108,
     "sdk_tests": 314,
     "sdk_languages": 5,
     "device_cost": 10,

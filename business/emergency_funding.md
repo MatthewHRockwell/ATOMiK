@@ -38,7 +38,7 @@
 - **Timeline:** 2-4 weeks (fast decisions)
 - **URL:** https://www.mercatus.org/emergent-ventures
 - **Fit:** "Ambitious project by individual with outsized potential" — this is literally their thesis
-- **Application:** Short (1-2 pages). Emphasize: solo founder, $225 total spend, 92 proofs, working silicon, patent pending.
+- **Application:** Short (1-2 pages). Emphasize: solo founder, $225 total spend, 108 proofs, working silicon, patent pending.
 
 ### 1517 Fund
 - **Amount:** $50K-$200K (pre-seed checks)

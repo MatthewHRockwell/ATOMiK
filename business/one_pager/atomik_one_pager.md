@@ -2,7 +2,7 @@
 
 **1 Billion Operations/Second on a $13.50 Chip**
 
-ATOMiK is a hardware-accelerated delta-state computing architecture that replaces traditional full-state updates with XOR-based delta accumulation. Every operation completes in a single clock cycle (10.6 ns), scales linearly with parallel banks, and is backed by 92 machine-verified mathematical proofs.
+ATOMiK is a hardware-accelerated delta-state computing architecture that replaces traditional full-state updates with XOR-based delta accumulation. Every operation completes in a single clock cycle (10.6 ns), scales linearly with parallel banks, and is backed by 108 machine-verified mathematical proofs.
 
 ---
 
@@ -17,7 +17,7 @@ ATOMiK is a hardware-accelerated delta-state computing architecture that replace
 | v3 Memcpy speedup | **6.4× faster** than software (v2 was 12% slower) |
 | Operation latency | **10.6 ns** (single cycle @ 94.5 MHz standalone) |
 | Memory reduction | **95-100%** (sparse deltas vs. dense state) |
-| Formal proofs | **92** (Lean4 verified, 0 sorry statements) |
+| Formal proofs | **108** (Lean4 verified, 0 sorry statements) |
 | Hardware tests | **80/80** passing (sweep) + v3: 9/9 ATOMiK + 10/10 Phase 2 + 6/6 Display |
 | Timing closure | **0 TNS** across all clock domains (v2 and v3) |
 | LUT utilization | **69%** (v3 SoC) / **44%** (v2 SoC) / 20% (standalone 16-bank) |
@@ -75,7 +75,7 @@ N parallel XOR accumulator banks with a binary merge tree achieve linear through
 
 | Phase | Status |
 |-------|--------|
-| Mathematical Formalization (92 proofs) | ✅ Complete |
+| Mathematical Formalization (108 proofs) | ✅ Complete |
 | Hardware Synthesis (Tang Nano 9K) | ✅ Complete |
 | SDK Code Generation (5 languages) | ✅ Complete |
 | Agentic Pipeline (25 modules, 353 tests) | ✅ Complete |

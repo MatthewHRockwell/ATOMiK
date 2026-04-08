@@ -242,7 +242,7 @@ class YCombinator(BaseApplication):
     url = "https://www.ycombinator.com/apply/"
     pitch_angle = (
         "Hardware that works, math that's proven, software that ships. "
-        "92 proofs, 1 Gops/s, $225 total spend."
+        "108 proofs, 1 Gops/s, $225 total spend."
     )
 
     def check_prerequisites(self, config: FundingConfig) -> tuple[bool, list[str]]:

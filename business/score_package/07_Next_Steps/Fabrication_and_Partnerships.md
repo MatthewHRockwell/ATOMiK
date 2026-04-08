@@ -190,7 +190,7 @@ ATOMiK's delta-state algebra has properties that map naturally to photonic (ligh
 | Value | Description |
 |-------|-------------|
 | **Proven IP** | Working RTL validated on real silicon |
-| **Formal proofs** | 92 machine-verified theorems — unique in the industry |
+| **Formal proofs** | 108 machine-verified theorems — unique in the industry |
 | **Full-stack solution** | Math → hardware → SDK → demo |
 | **Novel architecture** | Delta-state computing is a new paradigm — first-mover advantage |
 | **Patent portfolio** | IP protection for joint products |

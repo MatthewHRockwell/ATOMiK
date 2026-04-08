@@ -4,7 +4,7 @@
 
 Hi team,
 
-Asymmetric's deep tech thesis resonates with what I'm building. ATOMiK is a semiconductor IP company with a moat that's genuinely asymmetric: 92 machine-verified mathematical proofs that take years to replicate, combined with working silicon and a patent pending architecture.
+Asymmetric's deep tech thesis resonates with what I'm building. ATOMiK is a semiconductor IP company with a moat that's genuinely asymmetric: 108 machine-verified mathematical proofs that take years to replicate, combined with working silicon and a patent pending architecture.
 
 The technology: XOR-based delta-state computation that hits 1,056 Mops/s on a $13.50 FPGA. Single-cycle operations, zero carry chains, lock-free parallelism — all formally proven in Lean4, not just tested.
 

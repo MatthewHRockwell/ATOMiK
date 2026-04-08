@@ -42,7 +42,7 @@ He reached out to YOU — that's a warm signal. He saw something worth schedulin
 
 ## Your 2-Minute Pitch (Rehearse This)
 
-> "ATOMiK is a hardware IP core that eliminates redundant memory operations in real-time embedded systems. Instead of reading and writing full state buffers every cycle, it tracks only what changed — using XOR delta accumulation that's formally proven correct with 92 machine-checked theorems.
+> "ATOMiK is a hardware IP core that eliminates redundant memory operations in real-time embedded systems. Instead of reading and writing full state buffers every cycle, it tracks only what changed — using XOR delta accumulation that's formally proven correct with 108 machine-checked theorems.
 >
 > The result: 120x to 30,000x memory traffic reduction on validated workloads, deterministic 2-cycle latency, and it fits in 287 logic cells — less than 1% of a mid-range FPGA.
 >
@@ -66,7 +66,7 @@ He reached out to YOU — that's a warm signal. He saw something worth schedulin
 "Not yet — honest answer. The seed funds both product hardening and the first customer conversations. I have 9 validated workloads with statistical significance, and the SDK makes integration straightforward, but no paying customer today."
 
 ### "What's your competitive advantage?"
-"Three things no one else has: (1) 92 machine-checked proofs — this isn't tested, it's *proven*, (2) working hardware on two FPGA families for $225, and (3) a schema-driven SDK that generates integration code in 5 languages. The math is published. The hardware works. The moat is the formal verification — it would take years to replicate."
+"Three things no one else has: (1) 108 machine-checked proofs — this isn't tested, it's *proven*, (2) working hardware on two FPGA families for $225, and (3) a schema-driven SDK that generates integration code in 5 languages. The math is published. The hardware works. The moat is the formal verification — it would take years to replicate."
 
 ### "Solo founder — isn't that risky?"
 "Yes, and I'm transparent about it. The seed funds the first two hires: an FPGA/ASIC engineer and an applications engineer. The repo is structured for reproducibility — `make` builds hardware, `lake build` checks proofs, `pytest` runs 353 tests. I'm also forming an advisory board targeting semiconductor, HFT, and IP licensing veterans."

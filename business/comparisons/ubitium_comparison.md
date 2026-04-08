@@ -63,6 +63,6 @@ $225 → 1 Gops/s vs. tens of millions → PowerPoint. ATOMiK has the most extre
 
 1. **Working silicon** for $225 — technical risk retired
 2. **IP licensing model** — no manufacturing risk, ARM-proven model
-3. **Formal verification** — 92 proofs create an irreplicable moat
+3. **Formal verification** — 108 proofs create an irreplicable moat
 4. **Universal integration** — works with ANY processor architecture
 5. **Linear scaling** — proven in hardware, extends to any FPGA/ASIC

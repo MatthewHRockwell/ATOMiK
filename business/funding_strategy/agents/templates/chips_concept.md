@@ -64,7 +64,7 @@ All properties machine-verified in Lean4:
    as a co-processor alongside existing architectures.
 3. **Energy efficiency:** 95-100% memory traffic reduction at ~20 mW on a $13.50
    FPGA — orders of magnitude improvement in energy per operation.
-4. **Formal assurance:** 92 machine-verified proofs provide hardware assurance
+4. **Formal assurance:** 108 machine-verified proofs provide hardware assurance
    properties relevant to both commercial and defense applications.
 
 ## 5. Proposed R&D Plan

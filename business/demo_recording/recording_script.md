@@ -38,9 +38,9 @@
 
 ### 2:10–2:40 — Technical Depth
 
-**Visual**: Slides showing 92 proofs, SDK pipeline, architecture diagram.
+**Visual**: Slides showing 108 proofs, SDK pipeline, architecture diagram.
 
-**Voiceover**: "92 mathematical proofs formally verified in Lean4. A schema-driven SDK generating code in 5 languages with 353 automated tests. 80 hardware tests passing. This isn't a prototype — it's a complete, validated computing architecture."
+**Voiceover**: "108 mathematical proofs formally verified in Lean4. A schema-driven SDK generating code in 5 languages with 353 automated tests. 80 hardware tests passing. This isn't a prototype — it's a complete, validated computing architecture."
 
 ### 2:40–3:00 — Call to Action
 

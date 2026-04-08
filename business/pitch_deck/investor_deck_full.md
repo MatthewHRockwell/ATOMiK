@@ -168,7 +168,7 @@ property table below.
 
 | Category | Metric | Value |
 |----------|--------|-------|
-| **Formal verification** | Lean4 theorems proven | 92 (0 sorry statements) |
+| **Formal verification** | Lean4 theorems proven | 108 (0 sorry statements) |
 | **Hardware throughput** | Peak (N=16, 66 MHz) | 1,056 Mops/s |
 | **Hardware latency** | Single operation | 10.6 ns (1 cycle @ 94.5 MHz) |
 | **Hardware tests** | UART validation suite | 80/80 passing |
@@ -436,7 +436,7 @@ exceed $100M (Crunchbase).
 
 ### What Makes This Fundable Now
 
-- **Technical risk is retired**: 92 proofs + working hardware + 353 tests
+- **Technical risk is retired**: 108 proofs + working hardware + 353 tests
 - **Market timing**: $300B+ hyperscaler AI capex cycle in progress
 - **Capital efficiency**: ~$225 total spend to date demonstrates extreme capital efficiency
 - **Clear IP moat**: Patent pending, formal verification barrier
@@ -481,7 +481,7 @@ delta-state algebra — in hardware.
 > This deck presents the full technical and commercial case.
 
 `[VISUAL]` Full-bleed title slide. ATOMiK logo centered. One-liner vision
-statement. Key metrics strip: "1,056 Mops/s | 10.6 ns | 92 proofs | $13.50
+statement. Key metrics strip: "1,056 Mops/s | 10.6 ns | 108 proofs | $13.50
 device." Dark theme (#1e1e2e).
 
 ---
@@ -711,7 +711,7 @@ control.
 
 ## Slide 7 — Mathematical Foundation
 
-# 92 Proofs, Zero Sorry Statements
+# 108 Proofs, Zero Sorry Statements
 
 ### Proof System
 
@@ -730,7 +730,7 @@ machine-checked verification: if a proof compiles, the theorem is true.
 | Turing completeness | 6 | `turing_complete`, `universal_computation` |
 | Closure proofs | 10 | `delta_space_closed`, `composition_closed` |
 | Properties proofs | 23 | All Abelian group properties, uniqueness, cancellation |
-| **Total** | **92** | **0 sorry statements** |
+| **Total** | **108** | **0 sorry statements** |
 
 ### Abelian Group Structure (Proven)
 
@@ -759,7 +759,7 @@ It means:
 
 `[VISUAL]` Proof hierarchy tree showing theorem dependencies. Central node:
 "Abelian Group" with five property branches. Each branch has a green verified
-checkmark. Counter: "92/92 proven, 0 sorry." Lean4 logo.
+checkmark. Counter: "108/108 proven, 0 sorry." Lean4 logo.
 
 ---
 
@@ -941,7 +941,7 @@ primitive" positioning diagram showing ATOMiK as a layer underneath compute.
 
 | Level | Count | What It Validates |
 |-------|:-----:|-------------------|
-| Formal proofs (Lean4) | 92 | Mathematical correctness for ALL inputs |
+| Formal proofs (Lean4) | 108 | Mathematical correctness for ALL inputs |
 | Verilog simulation (iverilog) | 31 | Cycle-accurate hardware behavior |
 | UART hardware tests | 80 | Physical FPGA silicon correctness |
 | SDK unit tests | 353 | Cross-language algebraic property preservation |
@@ -1279,12 +1279,12 @@ Unit economics table. ARM comparison callout. Pricing benchmark panel.
 > The RTL integration creates hardware lock-in. Each layer is independently
 > defensible, and together they create a compounding barrier. Note that the
 > formal verification barrier is unusual in hardware — most FPGA IP vendors
-> rely on simulation testing. Our 92-proof standard is a qualitative
+> rely on simulation testing. Our 108-proof standard is a qualitative
 > differentiator.
 
 `[VISUAL]` Concentric ring diagram: Patent (outer) → Proofs → Ecosystem →
 Architecture (inner). Each ring labeled with key defense mechanism. Timeline
-showing barrier growth over time. Callout: "92 proofs = multi-month replication
+showing barrier growth over time. Callout: "108 proofs = multi-month replication
 effort."
 
 ---
@@ -1298,7 +1298,7 @@ effort."
 | Dimension | ATOMiK | Event Sourcing | CRDTs | GPU Compute | Near-Memory |
 |-----------|:------:|:-----------:|:----:|:----------:|:----------:|
 | State reconstruction | O(1)/cycle | O(N) replay | O(N) merge | Batch | O(1) local |
-| Formal correctness | 92 proofs | None | Manual proofs | None | None |
+| Formal correctness | 108 proofs | None | Manual proofs | None | None |
 | Reversibility | Free | Log replay | Not native | Not native | Not native |
 | Parallel model | Linear, lock-free | Event ordering | Eventual | SIMT warps | Controller-bound |
 | Power envelope | ~20 mW | Server (50-200W) | 300-700W | 300-700W | 10-50W |
@@ -1404,10 +1404,10 @@ Solo technical founder with full-stack execution across:
 | Development cost | $2-5M seed typical for hardware | ~$225 total (AI token costs) |
 | Team size | 5-10 engineers | 1 founder + AI agents |
 | Timeline | 12-18 months to PoC | 7 days from concept to 1 Gops/s hardware |
-| Proof engineering | Months per proof | 92 proofs in single sprint |
+| Proof engineering | Months per proof | 108 proofs in single sprint |
 
 This is not a limitation — it is a **demonstration of the AI-augmented
-development thesis**. If one person with AI tools can produce 92 proofs,
+development thesis**. If one person with AI tools can produce 108 proofs,
 working hardware, and a 5-language SDK, a funded team can move exponentially
 faster.
 
@@ -1462,7 +1462,7 @@ Advisory needs as open seats.
 | **Adoption: Delta-state is a new paradigm** | High | SDK abstracts the model — developers use familiar languages. Schema-driven generation means minimal learning curve. Community-first GTM. |
 | **Tooling: Gowin ecosystem is niche** | Low | Architecture is vendor-agnostic Verilog. Xilinx/Lattice ports are straightforward. Gowin was chosen for cost ($13.50), not lock-in. |
 | **Manufacturing: ASIC tape-out risk** | Medium | ASIC is Phase 3 of GTM, not Phase 1. FPGA deployment is the initial revenue path. ASIC feasibility study de-risks before commitment. |
-| **Competition: Large players could replicate** | Medium | 92 proofs + patent + ecosystem create multi-layer moat. Time-to-replicate is 6-12+ months even for well-resourced teams. First-mover advantage in IP licensing. |
+| **Competition: Large players could replicate** | Medium | 108 proofs + patent + ecosystem create multi-layer moat. Time-to-replicate is 6-12+ months even for well-resourced teams. First-mover advantage in IP licensing. |
 | **Bus factor: Solo founder** | Medium | All work documented, machine-verified, reproducible (`make` builds hardware, `lake build` checks proofs, `pytest` runs SDK tests). Post-funding: 2 hires + advisory board within 60 days. Formal proofs are permanent. |
 | **No customers yet** | High | No customers have been contacted. Seed capital funds outreach. First 3–5 conversations will validate pricing and commercial motion. |
 | **Read-heavy workload penalty** | Low | ATOMiK loses at >50% reads (32% slower at 90% reads). Beachhead markets (sensor fusion, streaming) are write-dominant by nature. SDK documentation will clearly scope applicability. |
@@ -1544,7 +1544,7 @@ stage. Closing: "$225 to 1 Gops/s. Imagine what funded execution looks like."
 
 ### The Three Pillars
 
-1. **Mathematically inevitable**: 92 proofs establish that delta-state XOR algebra
+1. **Mathematically inevitable**: 108 proofs establish that delta-state XOR algebra
    is the optimal structure for parallel state accumulation. This is not opinion —
    it is mathematics.
 
@@ -1604,7 +1604,7 @@ accumulation. Instead of copying full state on every operation, ATOMiK stores
 only the changes (deltas) and reconstructs state in a single clock cycle.
 XOR forms an Abelian group — guaranteeing commutativity (lock-free parallelism),
 self-inverse (instant undo), and associativity (tree-reducible merge). These
-properties are not empirical — they are backed by 92 machine-verified Lean4
+properties are not empirical — they are backed by 108 machine-verified Lean4
 proofs with zero sorry statements.
 
 ### Traction
@@ -1618,7 +1618,7 @@ proofs with zero sorry statements.
 | Operation latency | 10.6 ns (single cycle @ 94.5 MHz) |
 | Memory traffic reduction | 95-100% (up to 30,740x) |
 | Write-heavy speedup | +22% to +58% (p < 0.001) |
-| Formal proofs | 92 (Lean4, 0 sorry statements) |
+| Formal proofs | 108 (Lean4, 0 sorry statements) |
 | Hardware tests | 80/80 sweep + v3: 9/9 + 10/10 + 6/6 |
 | SDK tests | 353 (5 languages) |
 | Total development cost | ~$225 (AI-augmented) |

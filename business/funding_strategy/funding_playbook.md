@@ -37,7 +37,7 @@ Delaware C-Corp is required for:
 | Status | Paused (SBIR reauthorization lapse). Monitor seedfund.nsf.gov. Expected to resume 2026. |
 | Phase II | Up to $1M upon Phase I success |
 
-**ATOMiK pitch angle:** Hardware-accelerated delta-state algebra with 92 machine-verified proofs — a novel computing primitive with applications in AI inference, sensor fusion, and secure state management. Frame under "Semiconductors and Photonics" or "Novel AI Hardware" topics.
+**ATOMiK pitch angle:** Hardware-accelerated delta-state algebra with 108 machine-verified proofs — a novel computing primitive with applications in AI inference, sensor fusion, and secure state management. Frame under "Semiconductors and Photonics" or "Novel AI Hardware" topics.
 
 ### 2. DoD SBIR/STTR
 
@@ -355,7 +355,7 @@ IQT and defense VCs don't have standard application processes. Best paths:
 | Silicon Catalyst | FPGA-proven IP block ready for ASIC integration — seeking EDA access and fab partner introductions |
 | Alchemist | B2B IP licensing play — hardware blocks for chip designers with 5-language SDK for customer integration |
 | HAX | Working hardware, not a slide deck — $225 → 1 Gops/s on $13.50 FPGA, ready for hardware-to-market pipeline |
-| YC | Most capital-efficient hardware startup — 92 proofs, 353 tests, working silicon, $225 total spend |
+| YC | Most capital-efficient hardware startup — 108 proofs, 353 tests, working silicon, $225 total spend |
 | In-Q-Tel | Assured hardware for intelligence community — formally verified, self-inverse (instant rollback), commutative (lock-free merge) |
 | VCs | IP licensing in $600B+ semiconductor market — irreproducible formal verification moat, working silicon, patent pending |
 

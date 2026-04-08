@@ -29,7 +29,7 @@ ATOMiK processes over **1 billion operations per second** on a chip that costs $
 Traditional systems keep full copies of data in memory. ATOMiK reduces memory usage by **95-100%** because it stores only the small changes, not the full data. Less memory means lower hardware costs, lower power consumption, and the ability to run on smaller, cheaper devices.
 
 ### Reliability
-Every claim about ATOMiK's behavior is backed by **92 mathematical proofs** — not tests, not simulations, but formal proofs verified by a computer. This is the same level of rigor used to verify airplane autopilot software and nuclear reactor controls. If the math says it works, it works. Period.
+Every claim about ATOMiK's behavior is backed by **108 mathematical proofs** — not tests, not simulations, but formal proofs verified by a computer. This is the same level of rigor used to verify airplane autopilot software and nuclear reactor controls. If the math says it works, it works. Period.
 
 ### Cost
 The prototype runs on a **$13.50 chip** (a Tang Nano 9K FPGA). Competing approaches require hardware costing hundreds to thousands of dollars to achieve similar performance. This cost advantage opens markets that were previously too expensive to serve.
@@ -68,7 +68,7 @@ The prototype chip ATOMiK runs on — the Tang Nano 9K — costs **$13.50**. Her
 
 ## What Are the Proofs?
 
-ATOMiK includes **92 mathematical proofs** verified by a tool called Lean4. Here's what that means in non-technical terms:
+ATOMiK includes **108 mathematical proofs** verified by a tool called Lean4. Here's what that means in non-technical terms:
 
 **Think of it like this:** Imagine hiring a tireless, perfectly logical auditor to check every single claim you make about your product. Not by testing it — by mathematically proving it must be true in every possible scenario. That's what Lean4 does.
 
@@ -140,7 +140,7 @@ Custom integration work for enterprises that need ATOMiK adapted to their specif
 | What is it? | A chip architecture that processes data changes instead of data copies |
 | How fast? | 1 billion+ operations per second |
 | How cheap? | $13.50 prototype chip |
-| Is it proven? | 92 mathematical proofs + working hardware |
+| Is it proven? | 108 mathematical proofs + working hardware |
 | Who buys it? | Any industry where data changes fast and accuracy matters |
 | How does it make money? | IP licensing, software subscriptions, professional services |
 | What's the market? | $500B+ across finance, IoT, video, gaming, healthcare, defense, and more |

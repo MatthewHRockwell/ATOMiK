@@ -34,7 +34,7 @@ The board cycles through 7 screens automatically. Each screen displays for 6–1
 A T O M i K   v 3
 Delta-State Architecture
 
-92 Theorems • Provisionally Patented
+108 Theorems • Provisionally Patented
 916,000x Memory Traffic Reduction
 
 RV64I CPU • Tang Nano 9K • $13.50
@@ -327,7 +327,7 @@ The 6 onboard LEDs flash in sequence during the boot process as a visual indicat
 | **916,000x** | Memory traffic reduction | Sends only the change, not the full state |
 | **1,056 Mops/s** | Peak throughput (16 banks) | 1 billion operations/second on this chip family |
 | **0 cycles jitter** | Timing invariance | Immune to timing side-channel attacks |
-| **92 proofs** | Lean4 formal verification | Mathematical certainty, not just testing |
+| **108 proofs** | Lean4 formal verification | Mathematical certainty, not just testing |
 | **1.8 mW** | ATOMiK core power | Sub-milliwatt-class compute |
 | **$13.50** | Board cost | This is the entire system |
 

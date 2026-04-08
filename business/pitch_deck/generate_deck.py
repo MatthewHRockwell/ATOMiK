@@ -247,7 +247,7 @@ start_x = Inches(1)
 kpis = [
     ("1,056 Mops/s",  "Peak Throughput (16 banks)",  GREEN),
     ("10.6 ns",        "Single-Op Latency",           BLUE),
-    ("92 Proofs",      "Lean4 Verified, 0 Sorry",     PURPLE),
+    ("108 Proofs",      "Lean4 Verified, 0 Sorry",     PURPLE),
     ("$13.50 Device",  "Tang Nano 9K FPGA",           YELLOW),
 ]
 
@@ -547,7 +547,7 @@ section_line(slide, Inches(1.05))
 kpi_data = [
     ("1,056",     "Mops/s",         "Peak throughput (N=16)",     GREEN),
     ("10.6 ns",   "",               "Single-op latency",          BLUE),
-    ("92",        "proofs",         "Lean4 verified, 0 sorry",    PURPLE),
+    ("108",        "proofs",         "Lean4 verified, 0 sorry",    PURPLE),
     ("80/80",     "",               "Hardware tests passing",     GREEN),
     ("353",       "tests",          "SDK (5 languages)",          TEAL),
     ("95\u2013100%",  "",           "Memory traffic reduction",   YELLOW),
@@ -687,7 +687,7 @@ beachheads = [
      TEAL,
      "Primary beachhead"),
     ("Industrial /\nDefense RT",
-     "\u22642-cycle jitter, no side channels\nFormally verified (92 proofs)\nSafety-critical viable",
+     "\u22642-cycle jitter, no side channels\nFormally verified (108 proofs)\nSafety-critical viable",
      PURPLE,
      "Higher ACV"),
     ("HFT / Low-\nLatency Infra",
@@ -1119,7 +1119,7 @@ add_textbox(slide, panel_x + Inches(0.2), Inches(4.5),
             colour=GREEN)
 
 fundable = [
-    ("\u2713  Technical risk retired", "92 proofs + working silicon + 353 tests"),
+    ("\u2713  Technical risk retired", "108 proofs + working silicon + 353 tests"),
     ("\u2713  Market timing", "$300B+ hyperscaler AI capex cycle in progress"),
     ("\u2713  Capital efficiency", "~$225 total spend \u2192 1 Gops/s hardware"),
     ("\u2713  Clear IP moat", "Patent pending + formal verification barrier"),

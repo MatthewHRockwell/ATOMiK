@@ -81,7 +81,7 @@ ATOMiK's value proposition centers on measurable savings for customers:
 | **Hardware cost** | $13.50 chip vs. $1,000+ specialized hardware | 100x cost reduction for edge deployments |
 | **Bandwidth** | Delta transmission vs. full-state replication | 95% bandwidth reduction |
 | **Engineering time** | SDK code generation vs. manual porting | Weeks per project |
-| **Verification cost** | 92 proofs vs. custom test suites | Months of verification effort |
+| **Verification cost** | 108 proofs vs. custom test suites | Months of verification effort |
 | **Recovery time** | O(1) reconstruction vs. O(N) replay | Seconds vs. hours for large datasets |
 
 ---
@@ -186,7 +186,7 @@ At blended 85% gross margins, breakeven requires approximately $1.1-$2.0M in ann
 
 | Lock-in Factor | Mechanism |
 |---------------|-----------|
-| **Verification investment** | Customers build on ATOMiK's 92 proofs; switching means re-verifying from scratch |
+| **Verification investment** | Customers build on ATOMiK's 108 proofs; switching means re-verifying from scratch |
 | **Schema integration** | Production schemas defined in ATOMiK format; migration requires rewriting |
 | **Hardware deployment** | Physical chips in production systems can't be swapped without re-qualification |
 | **Training investment** | Engineering teams trained on delta-state paradigm |

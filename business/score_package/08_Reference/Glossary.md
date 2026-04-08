@@ -41,7 +41,7 @@ Every change is its own undo. Applying the same change twice cancels it out, ret
 A "do nothing" value. Applying the identity element to any state leaves it unchanged. In ATOMiK, this is a delta of all zeros — it represents "no change."
 
 **Formal Proof**
-A mathematical argument verified by a computer program, not a human. Unlike testing (which checks specific cases), a formal proof guarantees a statement is true in every possible scenario. ATOMiK has 92 of these, covering all core operations.
+A mathematical argument verified by a computer program, not a human. Unlike testing (which checks specific cases), a formal proof guarantees a statement is true in every possible scenario. ATOMiK has 108 of these, covering all core operations.
 
 **Lean4**
 A software tool that mathematically proves statements are true — like a calculator for logic. Lean4 checks every step of a proof automatically, ensuring no errors. It's used by mathematicians, software engineers, and now ATOMiK to verify correctness.

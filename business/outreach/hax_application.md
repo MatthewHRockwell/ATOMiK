@@ -18,7 +18,7 @@
 Formally verified hardware IP cores for delta-state computation — a new computing primitive that replaces full-state updates with XOR-based delta accumulation. One operation, one clock cycle, 287 LUTs, 1.8 mW. We license the RTL to chip designers (ARM-style IP model).
 
 **What's already built:**
-- 92 machine-verified proofs (Lean4)
+- 108 machine-verified proofs (Lean4)
 - Production SoC on Tang Nano 9K FPGA ($13.50)
 - 1,056 Mops/s throughput, 120x–30,720x memory traffic reduction
 - 80/80 hardware tests, 353 SDK tests across 5 languages

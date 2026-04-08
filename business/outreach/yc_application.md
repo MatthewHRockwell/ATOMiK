@@ -22,11 +22,11 @@ Formally verified hardware IP for state compute.
 
 ### What is your company going to make?
 
-Licensable hardware IP cores that replace full-state computation with XOR-based delta accumulation. One operation, one clock cycle, 287 LUTs, 1.8 mW, mathematically proven correct with 92 machine-verified proofs. We license RTL to chip designers — the ARM model applied to state management.
+Licensable hardware IP cores that replace full-state computation with XOR-based delta accumulation. One operation, one clock cycle, 287 LUTs, 1.8 mW, mathematically proven correct with 108 machine-verified proofs. We license RTL to chip designers — the ARM model applied to state management.
 
 ### Why did you pick this idea to work on? Do you have domain expertise in this area? How do you know people need what you're making?
 
-Every computing system — databases, trading engines, IoT sensors, AI inference — copies full state on every update. That's 120x–30,720x more memory traffic than necessary. I formalized an alternative in Lean4 (92 proofs), then built it in silicon on a $13.50 FPGA to prove it works.
+Every computing system — databases, trading engines, IoT sensors, AI inference — copies full state on every update. That's 120x–30,720x more memory traffic than necessary. I formalized an alternative in Lean4 (108 proofs), then built it in silicon on a $13.50 FPGA to prove it works.
 
 Domain expertise: I designed the RTL, proved the math, wrote the SDK, deployed the SoC, and filed the patent. All of it, solo, for $225.
 
@@ -42,7 +42,7 @@ People need this because memory bandwidth is the bottleneck killing edge AI, rea
 **What's new:**
 - O(1) state reconstruction (single XOR, 10.6 ns) — not O(N) replay
 - 120x–30,720x memory traffic reduction vs. full-state approaches
-- 92 machine-verified proofs in Lean4 — not tested, *proven*
+- 108 machine-verified proofs in Lean4 — not tested, *proven*
 - 287 LUTs, 1.8 mW — runs on hardware that costs $13.50
 - 1,056 Mops/s throughput from 16 parallel banks
 - A single reusable primitive that works across all state management domains
@@ -51,7 +51,7 @@ No one has formally verified a hardware computing primitive to this degree and p
 
 ### Who writes code, or does other technical work on your product? Was any of it done by a non-founder?
 
-I wrote everything. Every Lean4 proof (92), every line of SystemVerilog RTL, every line of SDK code, every test. 80/80 hardware tests, 353 SDK tests, 5 languages. No contractors, no co-founder, no AI-generated RTL. Total cost: $225 on a consumer laptop.
+I wrote everything. Every Lean4 proof (108), every line of SystemVerilog RTL, every line of SDK code, every test. 80/80 hardware tests, 353 SDK tests, 5 languages. No contractors, no co-founder, no AI-generated RTL. Total cost: $225 on a consumer laptop.
 
 ### How long have each of you been working on this? How much of that has been full-time?
 
@@ -103,7 +103,7 @@ The timing is right: edge AI is exploding (Jetson, NPUs in every phone, RISC-V c
 
 ### What do you understand about your business that other companies in it just don't get?
 
-Formal verification isn't overhead — it's the product. Other hardware companies test their designs with simulation (and still ship bugs). We prove ours correct with 92 machine-verified theorems. That's a moat that scales with mathematical complexity, not headcount or capital.
+Formal verification isn't overhead — it's the product. Other hardware companies test their designs with simulation (and still ship bugs). We prove ours correct with 108 machine-verified theorems. That's a moat that scales with mathematical complexity, not headcount or capital.
 
 The semiconductor industry is moving toward custom silicon (Apple, Google, Amazon all designing their own chips). Every one of them needs verified IP blocks they can trust. We're building the verified primitive layer — the atoms of state computation.
 

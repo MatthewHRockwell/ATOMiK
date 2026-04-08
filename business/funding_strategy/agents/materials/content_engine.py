@@ -59,7 +59,7 @@ _PITCH_ANGLES: dict[str, str] = {
         "block for next-generation American semiconductor designs."
     ),
     "silicon_catalyst": (
-        "Formally verified XOR accumulator IP targeting ASIC integration. 92 "
+        "Formally verified XOR accumulator IP targeting ASIC integration. 108 "
         "Lean4 proofs, working FPGA prototype on Tang Nano 9K, 7% LUT "
         "utilization (single bank). Seeking EDA tool access and fab partner "
         "introductions to move from FPGA to ASIC."
@@ -155,7 +155,7 @@ class ContentEngine:
                 "Throughput": "1,056 Mops/s (16 parallel banks)",
                 "Operation latency": "10.6 ns (single cycle)",
                 "Memory reduction": "95-100%",
-                "Formal proofs": "92 (Lean4 verified)",
+                "Formal proofs": "108 (Lean4 verified)",
                 "Hardware tests": "80/80 passing",
                 "LUT utilization": "7% (single bank)",
                 "SDK languages": "5 (Python, Rust, C, JavaScript, Verilog)",

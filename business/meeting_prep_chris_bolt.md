@@ -31,7 +31,7 @@
 ### 1. Why this is fundable at seed, not pre-seed
 - Technical risk is retired — working silicon, not a slide deck
 - The $225 spend is real and verifiable (3x $13.50 boards + cables)
-- 92 proofs don't regress — mathematical truth is permanent IP
+- 108 proofs don't regress — mathematical truth is permanent IP
 - The demo board he's holding IS the product (not a prototype of a prototype)
 
 ### 2. The AI-augmented development thesis
@@ -64,7 +64,7 @@
 A: Open to discussion. A priced seed round or a SAFE with a valuation cap both work. For a full-round commitment, a priced round with board seat makes sense — it aligns incentives and gives you governance rights. If you prefer a SAFE for speed, we can do that with a cap in the $16M–$20M range (based on AI seed median pre-money of $17.9M per PitchBook).
 
 **Q: What's your pre-money valuation expectation?**
-A: The deck shows $3M–$4M for 15–25% equity. That implies a range of $12M–$27M pre-money. Given working hardware, 92 proofs, and the AI seed premium (42% over non-AI per PitchBook), a $16M–$20M pre-money is defensible. But I'm more focused on the right partner than maximizing valuation at seed.
+A: The deck shows $3M–$4M for 15–25% equity. That implies a range of $12M–$27M pre-money. Given working hardware, 108 proofs, and the AI seed premium (42% over non-AI per PitchBook), a $16M–$20M pre-money is defensible. But I'm more focused on the right partner than maximizing valuation at seed.
 
 **Q: What's the current cap table?**
 A: 100% founder. No prior investors, no option pool allocated yet. Clean cap table. Post-funding, we'd create a standard 10–15% option pool for team hires.
@@ -78,10 +78,10 @@ A: You're the first serious conversation. If you want to take the full round, th
 ### Technology
 
 **Q: XOR is trivial — what's the real IP here?**
-A: XOR is trivial. The IP is the complete system: the algebraic framework (92 proofs establishing that XOR accumulation is computationally equivalent to traditional state management), the parallel bank architecture (N independent accumulators with combinational merge tree), the synthesis optimization (preventing carry-chain inference, +42% Fmax), and the schema-driven code generation pipeline. No one else has combined formal verification with hardware validation for a delta-state primitive. The patent covers the architecture, not the XOR gate.
+A: XOR is trivial. The IP is the complete system: the algebraic framework (108 proofs establishing that XOR accumulation is computationally equivalent to traditional state management), the parallel bank architecture (N independent accumulators with combinational merge tree), the synthesis optimization (preventing carry-chain inference, +42% Fmax), and the schema-driven code generation pipeline. No one else has combined formal verification with hardware validation for a delta-state primitive. The patent covers the architecture, not the XOR gate.
 
 **Q: Can a big company just copy this?**
-A: They could build an XOR accumulator. They cannot easily replicate: (1) 92 machine-verified proofs — that's months of proof engineering, (2) the full SDK with 5-language code generation, (3) the patent claims, (4) the validation data (80/80 hardware tests, 353 SDK tests, statistical benchmarks). Time-to-replicate is 6–12+ months for a well-resourced team starting from our published work. By then we'll have design wins and continuation patents.
+A: They could build an XOR accumulator. They cannot easily replicate: (1) 108 machine-verified proofs — that's months of proof engineering, (2) the full SDK with 5-language code generation, (3) the patent claims, (4) the validation data (80/80 hardware tests, 353 SDK tests, statistical benchmarks). Time-to-replicate is 6–12+ months for a well-resourced team starting from our published work. By then we'll have design wins and continuation patents.
 
 **Q: How do you know the 916,000x number is real?**
 A: It's measured, not estimated. The benchmark streams a workload through both a conventional store-and-forward path and the ATOMiK delta path, counting bytes moved. The methodology is in the repository — anyone can reproduce it. The 916,000x is the high end (streaming workload); the low end is 7,670x (smaller working set). We report both.
@@ -122,7 +122,7 @@ A: Three paths: (1) Strategic acquisition by FPGA vendor (AMD/Xilinx, Lattice, I
 | Single-op latency | 10.6 ns (1 cycle @ 94.5 MHz) | Gowin STA |
 | Memory traffic reduction | 7,670x to 916,000x | Python benchmarks (PERFORMANCE_COMPARISON.md) |
 | Write-heavy speedup | +22% to +58% (p < 0.001) | Statistical benchmarks, 100 iterations |
-| Formal proofs | 92 (Lean4, 0 sorry) | math/proofs/ |
+| Formal proofs | 108 (Lean4, 0 sorry) | math/proofs/ |
 | Hardware tests | 80/80 parallel bank sweep | UART validation suite |
 | SDK tests | 353 (5 languages) | software/atomik_sdk/ |
 | LUT utilization (N=1) | 579 / 8,640 (7%) | Gowin synthesis |
@@ -143,19 +143,19 @@ A: Three paths: (1) Strategic acquisition by FPGA vendor (AMD/Xilinx, Lattice, I
 ## Objection Handling
 
 ### "It's just one person"
-*Reframe:* "One person with AI tools produced 92 proofs, working silicon, and a 5-language SDK for $225. The question isn't whether I can do more with a team — it's what a 3-person team can do with that same model. The first two hires are budgeted in the raise."
+*Reframe:* "One person with AI tools produced 108 proofs, working silicon, and a 5-language SDK for $225. The question isn't whether I can do more with a team — it's what a 3-person team can do with that same model. The first two hires are budgeted in the raise."
 
 ### "The market doesn't exist yet"
 *Reframe:* "The memory wall is a $300B problem — DARPA, Intel, and every hyperscaler are spending to solve it. ATOMiK doesn't need a new market. It needs design wins in existing markets (HFT, edge AI, streaming) where memory bandwidth is already the bottleneck."
 
 ### "XOR is too simple to be defensible"
-*Reframe:* "ARM's core product is also 'simple' — a processor instruction set. The IP value is in the complete verified architecture, not the gate. Our patent covers the system. Our 92 proofs establish mathematical novelty. Our SDK creates ecosystem lock-in. And our 80/80 hardware validation proves it works in silicon."
+*Reframe:* "ARM's core product is also 'simple' — a processor instruction set. The IP value is in the complete verified architecture, not the gate. Our patent covers the system. Our 108 proofs establish mathematical novelty. Our SDK creates ecosystem lock-in. And our 80/80 hardware validation proves it works in silicon."
 
 ### "You need a co-founder"
 *Reframe:* "I agree that the team needs to grow — that's 15% of the raise. But the right co-founder shows up when there's a funded company with working technology, not the other way around. The demo board in your hand is proof that the solo-plus-AI model works at this stage."
 
 ### "The valuation is too high for seed"
-*Reframe:* "The AI seed median is $17.9M pre-money — 42% premium over non-AI. ATOMiK has working hardware, 92 proofs, and a full SDK. Most AI seeds fund a slide deck and a fine-tuned model. We've retired the technical risk. The remaining risk is commercial — and that's exactly what the seed capital addresses."
+*Reframe:* "The AI seed median is $17.9M pre-money — 42% premium over non-AI. ATOMiK has working hardware, 108 proofs, and a full SDK. Most AI seeds fund a slide deck and a fine-tuned model. We've retired the technical risk. The remaining risk is commercial — and that's exactly what the seed capital addresses."
 
 ### "I'd want to see customers first"
 *Reframe:* "Understood. The seed capital buys us 18 months to land 2 design wins. The Zynq port (already in progress) is the first step — it puts us on a platform that HFT and edge customers actually use. Would you be open to a milestone-based tranche structure? First tranche now for FPGA port and customer outreach, second tranche upon first LOI."

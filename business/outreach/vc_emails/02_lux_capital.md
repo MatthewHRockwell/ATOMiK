@@ -4,7 +4,7 @@
 
 Hi team,
 
-Lux has a track record of backing hard tech that sounds impossible until it works. I built something that fits that pattern: a hardware-accelerated computing architecture that hits 1,056 Mops/s on a $13.50 FPGA, backed by 92 machine-verified mathematical proofs.
+Lux has a track record of backing hard tech that sounds impossible until it works. I built something that fits that pattern: a hardware-accelerated computing architecture that hits 1,056 Mops/s on a $13.50 FPGA, backed by 108 machine-verified mathematical proofs.
 
 ATOMiK replaces traditional full-state computation with XOR-based delta accumulation. Single-cycle operations, zero carry chains, linear scaling — and every correctness property is formally proven in Lean4, not just tested.
 

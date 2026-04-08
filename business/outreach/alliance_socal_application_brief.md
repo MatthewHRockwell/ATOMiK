@@ -10,7 +10,7 @@
 
 ## What We Do
 
-ATOMiK is a hardware IP core that eliminates redundant memory operations in real-time embedded systems. Instead of reading and writing full state buffers every cycle, it tracks only what changed — using XOR delta accumulation that's formally proven correct with 92 machine-verified mathematical theorems.
+ATOMiK is a hardware IP core that eliminates redundant memory operations in real-time embedded systems. Instead of reading and writing full state buffers every cycle, it tracks only what changed — using XOR delta accumulation that's formally proven correct with 108 machine-verified mathematical theorems.
 
 **One line:** ARM-style IP licensing for a new computing primitive that cuts memory traffic by 95–100%.
 
@@ -35,7 +35,7 @@ ATOMiK is a hardware IP core that eliminates redundant memory operations in real
 |--------|-------|
 | Total spend to date | **$225** |
 | Working hardware | **2 production SoCs** on $13.50 dev board |
-| Formal verification | **92 proofs**, 0 sorry statements |
+| Formal verification | **108 proofs**, 0 sorry statements |
 | Published papers | 2 on Zenodo (1 under peer review at Scientific Reports) |
 | Patent status | **Patent Pending** |
 | Entity | Rockwell Industries, LLC (CA, May 2023) — converting to DE C-Corp |
@@ -66,7 +66,7 @@ ATOMiK is a hardware IP core that eliminates redundant memory operations in real
 
 ## Differentiators
 
-- **Formal verification moat:** 92 machine-checked proofs create a multi-month replication barrier — competitors must match this standard or accept unverified claims
+- **Formal verification moat:** 108 machine-checked proofs create a multi-month replication barrier — competitors must match this standard or accept unverified claims
 - **ARM-style IP licensing model:** 90%+ gross margin, no manufacturing costs (ARM achieves 97% on $4B revenue)
 - **$13.50 dev board demo:** Plug in HDMI, watch ATOMiK run — investors can hold the proof in their hand
 - **Extreme capital efficiency:** $225 → working silicon + proofs + SDK + papers. Demonstrates what funded execution will look like

@@ -74,7 +74,7 @@ The ATOMiK CI/CD pipeline was audited and enhanced to provide comprehensive auto
 - Added Code Review workflow badge (links to review.yml)
 
 **Kept (static, accurate):**
-- Proofs (92 verified), Hardware (80/80), SDK (5 languages), Throughput, Cost, License
+- Proofs (108 verified), Hardware (80/80), SDK (5 languages), Throughput, Cost, License
 
 ---
 

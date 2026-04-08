@@ -25,7 +25,7 @@ This data room contains due diligence materials for ATOMiK, a delta-state comput
 | Document | What It Proves |
 |----------|---------------|
 | [Provisional Patent PDF](03_intellectual_property/Provisional%20Patent%200.0.1.pdf) | Architecture is under IP protection |
-| [Formal Proofs Inventory](03_intellectual_property/formal_proofs_inventory.md) | 92 machine-verified theorems, 0 sorry statements |
+| [Formal Proofs Inventory](03_intellectual_property/formal_proofs_inventory.md) | 108 machine-verified theorems, 0 sorry statements |
 | [Development Cost](01_financial/development_cost.md) | ~$225 total spend — extreme capital efficiency |
 | [Revenue Model](01_financial/revenue_model_revised.md) | ARM-style IP licensing projections |
 | [Founder Profile](04_team/founder_profile.md) | Full-stack technical founder |
