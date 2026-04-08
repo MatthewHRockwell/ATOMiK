@@ -60,6 +60,13 @@ extern "C" {
 #define ATOMIK_CSR_STATE_HI       0x20
 #define ATOMIK_CSR_STATUS         0x24
 
+/* --- CFU Adapter Wishbone layout (validated on Zynq, 9/9 PASS) --- */
+#define ATOMIK_ADAPTER_CMD        0x00  /* (W)  funct3 → triggers operation       */
+#define ATOMIK_ADAPTER_RS1        0x04  /* (RW) input 0 (addr, delta_lo/hi)       */
+#define ATOMIK_ADAPTER_RS2        0x08  /* (RW) input 1 (init_lo/hi)              */
+#define ATOMIK_ADAPTER_RD         0x0C  /* (R)  result from last command           */
+#define ATOMIK_ADAPTER_STATUS     0x10  /* (R)  {30'd0, rsp_ok, busy}             */
+
 /* Default to AXI layout for backward compat; CSR layout used by atomik_open_devmem() */
 #define ATOMIK_REG_STATE_LO       ATOMIK_AXI_STATE_LO
 #define ATOMIK_REG_STATE_HI       ATOMIK_AXI_STATE_HI
@@ -80,8 +87,9 @@ extern "C" {
  * ========================================================================= */
 
 typedef enum {
-    ATOMIK_LAYOUT_AXI,  /* AXI4-Lite wrapper (ARM GP0 path) */
-    ATOMIK_LAYOUT_CSR,  /* LiteX Wishbone CSR (VexRiscv path) */
+    ATOMIK_LAYOUT_AXI,      /* AXI4-Lite wrapper (ARM GP0 path)           */
+    ATOMIK_LAYOUT_CSR,      /* LiteX Wishbone CSR (VexRiscv path)         */
+    ATOMIK_LAYOUT_ADAPTER,  /* CFU adapter Wishbone wrapper (CMD protocol) */
 } atomik_layout_t;
 
 typedef struct {

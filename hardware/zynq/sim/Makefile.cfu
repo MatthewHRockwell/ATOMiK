@@ -1,0 +1,65 @@
+# =============================================================================
+# ATOMiK CFU Adapter Wishbone Wrapper — Verilator Testbench Makefile
+#
+# Usage:
+#   make -f Makefile.cfu          # Build and run
+#   make -f Makefile.cfu build    # Build only
+#   make -f Makefile.cfu run      # Run only (must build first)
+#   make -f Makefile.cfu clean    # Remove build artifacts
+# =============================================================================
+
+RTL_DIR   := ../rtl
+SIM_DIR   := .
+BUILD_DIR := obj_cfu
+
+# Verilog sources
+VSRC := $(RTL_DIR)/atomik_cfu_adapter.v \
+        $(RTL_DIR)/atomik_cfu_wishbone.v
+
+# C++ testbench
+TB_CPP := $(SIM_DIR)/tb_cfu_adapter.cpp
+
+# Verilator flags
+VFLAGS := --cc --exe --build \
+          --top-module atomik_cfu_wishbone \
+          -Mdir $(BUILD_DIR) \
+          -Wall \
+          -Wno-UNUSEDSIGNAL \
+          -Wno-UNUSEDPARAM \
+          -Wno-DECLFILENAME
+
+# Binary name
+BIN := $(BUILD_DIR)/Vatomik_cfu_wishbone
+
+.PHONY: all build run clean check-verilator
+
+all: check-verilator build run
+
+check-verilator:
+	@which verilator > /dev/null 2>&1 || \
+		(echo "ERROR: verilator not found in PATH"; exit 1)
+	@echo "Verilator: $$(verilator --version)"
+
+build: check-verilator
+	@echo "--- Building CFU adapter testbench ---"
+	verilator $(VFLAGS) $(VSRC) $(TB_CPP)
+	@echo "--- Build complete ---"
+
+run: $(BIN)
+	@echo ""
+	@echo "--- Running CFU adapter testbench ---"
+	@echo ""
+	@$(BIN) ; EXIT=$$? ; \
+	echo "" ; \
+	if [ $$EXIT -eq 0 ]; then \
+		echo ">>> SIMULATION PASSED <<<" ; \
+	else \
+		echo ">>> SIMULATION FAILED <<<" ; \
+	fi ; \
+	exit $$EXIT
+
+$(BIN): build
+
+clean:
+	rm -rf $(BUILD_DIR)
+	@echo "Cleaned $(BUILD_DIR)"

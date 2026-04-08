@@ -4,7 +4,7 @@
  * Used as a control: proves the VexRiscv Linux+CFU variant boots Linux
  * without any ATOMiK logic. Custom-0 instructions return zero.
  */
-module cfu (
+module Cfu (
     input  wire        clk,
     input  wire        reset,
 

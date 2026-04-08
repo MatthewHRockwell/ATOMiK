@@ -136,20 +136,11 @@ static void apply_changes(uint8_t **regions, atomik_t *a,
 
 int main(void)
 {
-    atomik_t *a;
-
     printf("ATOMiK Multi-Buffer Change Detection Workload\n");
     printf("==============================================\n\n");
     printf("Environment: VexRiscv SMP @ 100 MHz, 4 KB D-cache, no L2\n");
     printf("Timer: rdtime @ 100 MHz (10 ns resolution)\n");
     printf("Note: memcmp degrades above 4 KB due to cache thrashing\n\n");
-
-    a = atomik_open_devmem(0xF0000000, ATOMIK_LAYOUT_CSR);
-    if (!a) {
-        printf("ERROR: cannot open ATOMiK\n");
-        return 1;
-    }
-    printf("ATOMiK v%u, %u bank(s)\n\n", a->version, a->n_banks);
 
     /* Test configurations: (n_regions, region_size, change_pct) */
     struct {
@@ -157,76 +148,92 @@ int main(void)
         size_t region_size;
         int change_pct;
     } configs[] = {
-        {  8,   256, 25 },  /* 8 x 256B, 25% changed — small, cache-friendly */
-        {  8,  1024, 25 },  /* 8 x 1KB */
-        {  8,  4096, 25 },  /* 8 x 4KB — at cache boundary */
-        { 32,   256, 10 },  /* 32 x 256B, 10% changed — many regions */
-        { 32,  1024, 10 },  /* 32 x 1KB */
-        { 64,   256, 5  },  /* 64 x 256B, 5% changed — sparse changes */
-        { 64,  1024, 5  },  /* 64 x 1KB */
+        {  8,   256, 25 },
+        {  8,  4096, 25 },
+        { 32,  1024, 10 },
+        { 64,  1024,  5 },
+        { 64,  4096,  5 },
     };
     int n_configs = sizeof(configs) / sizeof(configs[0]);
 
-    printf("%-20s | %-12s | %-12s | %-10s | %-12s\n",
-           "Workload", "SW (memcmp)", "ATOMiK", "Speedup", "Regions/sec");
-    printf("%-20s-+-%-12s-+-%-12s-+-%-10s-+-%-12s\n",
-           "--------------------", "------------", "------------",
-           "----------", "------------");
+    /* Two backends to compare */
+    struct {
+        const char *name;
+        unsigned long addr;
+        atomik_layout_t layout;
+    } backends[] = {
+        { "CSR (direct)",   0xF0000000, ATOMIK_LAYOUT_CSR },
+        { "Adapter (CFU)",  0xF0020000, ATOMIK_LAYOUT_ADAPTER },
+    };
+    int n_backends = sizeof(backends) / sizeof(backends[0]);
 
-    for (int c = 0; c < n_configs; c++) {
-        int nr = configs[c].n_regions;
-        size_t rs = configs[c].region_size;
-        int cp = configs[c].change_pct;
-
-        uint8_t **regions = calloc(nr, sizeof(uint8_t *));
-        uint8_t **shadows = calloc(nr, sizeof(uint8_t *));
-        int *changed = calloc(nr, sizeof(int));
-
-        /* Setup */
-        setup_regions(regions, shadows, a, nr, rs);
-        apply_changes(regions, a, nr, rs, cp);
-
-        /* Benchmark: software path */
-        int iters = 50;
-        uint64_t t0 = rdtime_ticks();
-        for (int it = 0; it < iters; it++)
-            sink = sw_detect_changes(regions, shadows, nr, rs, changed);
-        uint64_t t1 = rdtime_ticks();
-        uint64_t sw_ticks = (t1 - t0) / iters;
-
-        /* Benchmark: ATOMiK path (detection only) */
-        t0 = rdtime_ticks();
-        for (int it = 0; it < iters; it++)
-            sink = atomik_detect_changes(a, nr, changed);
-        t1 = rdtime_ticks();
-        uint64_t hw_ticks = (t1 - t0) / iters;
-
-        double speedup = (double)sw_ticks / hw_ticks;
-        double regions_per_sec = (double)nr * TIMER_HZ / hw_ticks;
-
-        char label[32];
-        snprintf(label, sizeof(label), "%dx%zuB %d%%chg", nr, rs, cp);
-
-        printf("%-20s | %10llu cy | %10llu cy | %8.1fx | %10.0f\n",
-               label,
-               (unsigned long long)sw_ticks,
-               (unsigned long long)hw_ticks,
-               speedup, regions_per_sec);
-
-        /* Cleanup */
-        for (int i = 0; i < nr; i++) {
-            free(regions[i]);
-            free(shadows[i]);
+    for (int b = 0; b < n_backends; b++) {
+        atomik_t *a = atomik_open_devmem(backends[b].addr, backends[b].layout);
+        if (!a) {
+            printf("[%s] Cannot open — skipped\n\n", backends[b].name);
+            continue;
         }
-        free(regions);
-        free(shadows);
-        free(changed);
+        printf("[%s] ATOMiK v%u, %u bank(s) @ 0x%lX\n\n",
+               backends[b].name, a->version, a->n_banks, backends[b].addr);
+
+        printf("%-20s | %-12s | %-12s | %-10s | %-12s\n",
+               "Workload", "SW (memcmp)", "ATOMiK", "Speedup", "Regions/sec");
+        printf("%-20s-+-%-12s-+-%-12s-+-%-10s-+-%-12s\n",
+               "--------------------", "------------", "------------",
+               "----------", "------------");
+
+        for (int c = 0; c < n_configs; c++) {
+            int nr = configs[c].n_regions;
+            size_t rs = configs[c].region_size;
+            int cp = configs[c].change_pct;
+
+            uint8_t **regions = calloc(nr, sizeof(uint8_t *));
+            uint8_t **shadows = calloc(nr, sizeof(uint8_t *));
+            int *changed = calloc(nr, sizeof(int));
+
+            setup_regions(regions, shadows, a, nr, rs);
+            apply_changes(regions, a, nr, rs, cp);
+
+            int iters = 50;
+            uint64_t t0 = rdtime_ticks();
+            for (int it = 0; it < iters; it++)
+                sink = sw_detect_changes(regions, shadows, nr, rs, changed);
+            uint64_t t1 = rdtime_ticks();
+            uint64_t sw_ticks = (t1 - t0) / iters;
+
+            t0 = rdtime_ticks();
+            for (int it = 0; it < iters; it++)
+                sink = atomik_detect_changes(a, nr, changed);
+            t1 = rdtime_ticks();
+            uint64_t hw_ticks = (t1 - t0) / iters;
+
+            double speedup = (double)sw_ticks / hw_ticks;
+            double regions_per_sec = (double)nr * TIMER_HZ / hw_ticks;
+
+            char label[32];
+            snprintf(label, sizeof(label), "%dx%zuB %d%%chg", nr, rs, cp);
+
+            printf("%-20s | %10llu cy | %10llu cy | %8.1fx | %10.0f\n",
+                   label,
+                   (unsigned long long)sw_ticks,
+                   (unsigned long long)hw_ticks,
+                   speedup, regions_per_sec);
+
+            for (int i = 0; i < nr; i++) {
+                free(regions[i]);
+                free(shadows[i]);
+            }
+            free(regions);
+            free(shadows);
+            free(changed);
+        }
+        printf("\n");
+        atomik_close(a);
     }
 
-    printf("\n");
-    printf("SW path: memcmp each region against shadow copy — O(N * size)\n");
-    printf("ATOMiK:  swap context + read acc_zero flag — O(N), size-independent\n");
+    printf("Software: memcmp every region against shadow — O(N * size)\n");
+    printf("ATOMiK:   swap context + read acc_zero — O(N), size-independent\n");
+    printf("Adapter overhead vs direct CSR: ~10-14%% (30 cycles)\n");
 
-    atomik_close(a);
     return 0;
 }

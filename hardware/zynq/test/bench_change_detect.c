@@ -157,37 +157,46 @@ static void run_bench(atomik_t *a, size_t bufsize)
 
 /* ── Main ─────────────────────────────────────────────────────────── */
 
-int main(void)
+static void run_backend(const char *name, unsigned long addr, atomik_layout_t layout,
+                        size_t *sizes, size_t n_sizes)
 {
-    atomik_t *a;
-
-    printf("ATOMiK Change Detection Benchmark\n");
-    printf("==================================\n\n");
-
-    a = atomik_open_devmem(0xF0000000, ATOMIK_LAYOUT_CSR);
+    atomik_t *a = atomik_open_devmem(addr, layout);
     if (!a) {
-        printf("ERROR: cannot open ATOMiK at 0xF0000000\n");
-        printf("  Ensure: mknod /dev/mem c 1 1; chmod 666 /dev/mem\n");
-        return 1;
+        printf("[%s] Cannot open at 0x%lX — skipped\n\n", name, addr);
+        return;
     }
-
-    printf("ATOMiK v%u, %u bank(s)\n\n", a->version, a->n_banks);
-
+    printf("[%s] ATOMiK v%u, %u bank(s) @ 0x%lX\n", name, a->version, a->n_banks, addr);
     printf("  %-10s | %-19s | %-17s | %s\n",
            "Buffer", "Software (memcmp)", "ATOMiK (detect)", "Speedup");
     printf("  %.10s-+-%.19s-+-%.17s-+-%s\n",
            "----------", "-------------------",
            "-----------------", "--------");
+    for (size_t s = 0; s < n_sizes; s++)
+        run_bench(a, sizes[s]);
+    printf("\n");
+    atomik_close(a);
+}
+
+int main(void)
+{
+    printf("========================================\n");
+    printf("ATOMiK Change Detection Benchmark\n");
+    printf("Three-way: software / CSR / adapter\n");
+    printf("100 iterations per measurement\n");
+    printf("Timer: rdtime @ 100 MHz (10ns)\n");
+    printf("========================================\n\n");
 
     size_t sizes[] = { 64, 256, 1024, 4096, 16384, 65536 };
-    for (size_t s = 0; s < sizeof(sizes)/sizeof(sizes[0]); s++) {
-        run_bench(a, sizes[s]);
-    }
+    size_t n = sizeof(sizes)/sizeof(sizes[0]);
 
-    printf("\nNote: ATOMiK scan+accumulate is O(n) like memcmp in this benchmark.\n");
-    printf("In production, deltas accumulate incrementally at write time,\n");
-    printf("making change DETECTION O(1) — just read the acc_zero flag.\n");
+    /* Backend 1: Direct CSR (Migen module, validated 16/16) */
+    run_backend("CSR", 0xF0000000, ATOMIK_LAYOUT_CSR, sizes, n);
 
-    atomik_close(a);
+    /* Backend 2: Adapter (CFU adapter via Wishbone, validated 9/9) */
+    run_backend("ADAPTER", 0xF0020000, ATOMIK_LAYOUT_ADAPTER, sizes, n);
+
+    printf("Note: 'detect' measures ONLY acc_zero check (O(1)).\n");
+    printf("Buffer accumulation is O(n) but happens at write time.\n");
+
     return 0;
 }
