@@ -77,7 +77,7 @@ $(BUILD)/libatomik.o: $(LIB_SRC) $(LIB_HDR) | $(BUILD)
 	$(CC) $(CFLAGS) -fPIC -c -o $@ $<
 
 $(LIB_SO): $(BUILD)/libatomik.o
-	$(CC) -shared -o $@ $< $(LDFLAGS)
+	$(CC) -shared -Wl,-soname,libatomik.so.1 -o $@ $< $(LDFLAGS)
 
 $(LIB_A): $(BUILD)/libatomik.o
 	$(AR) rcs $@ $<
@@ -143,6 +143,7 @@ install: lib
 	install -m 755 $(LIB_SO) $(DESTDIR)$(PREFIX)/lib/
 	install -m 644 $(LIB_HDR) $(DESTDIR)$(PREFIX)/include/
 	sed 's|@PREFIX@|$(PREFIX)|g' libatomik.pc.in > $(DESTDIR)$(PREFIX)/lib/pkgconfig/libatomik.pc
+	sed 's|@PREFIX@|$(PREFIX)|g; s|@PACKAGE_INIT@||g' ATOMiKConfig.cmake.in > $(DESTDIR)$(PREFIX)/lib/cmake/ATOMiK/ATOMiKConfig.cmake
 	install -m 644 FindATOMiK.cmake $(DESTDIR)$(PREFIX)/lib/cmake/ATOMiK/
 
 # ==============================================================================

@@ -177,8 +177,12 @@ void atomik_accum(atomik_t *a, uint64_t delta);
 uint64_t atomik_read(atomik_t *a);
 
 /*
- * SWAP: Switch to a different context address.
- * The accumulator is preserved across the swap (unlike LOAD which clears it).
+ * SWAP: Promote current state to new reference, switch to address, clear accumulator.
+ * state_table[active_addr] = current_state; active_addr = addr; acc = 0.
+ *
+ * Unlike LOAD (which sets a new initial state), SWAP saves the current
+ * reconstructed state as the new reference. Both LOAD and SWAP clear
+ * the accumulator.
  *
  * @param a     Handle
  * @param addr  Context address to switch to (0-255)
@@ -200,23 +204,22 @@ int atomik_acc_zero(atomik_t *a);
 /*
  * Detect whether a memory region changed since a known reference.
  *
- * Computes an XOR fingerprint of the data, loads the expected fingerprint
- * into the ATOMiK state table, accumulates the current fingerprint, and
- * checks whether they differ. This is the primitive every wedge needs.
+ * Computes an XOR fingerprint of the data, compares with expected_fp
+ * via ATOMiK, and returns whether they differ. Also writes the new
+ * fingerprint to *new_fp so the caller can use it as expected_fp next time.
  *
- * IMPORTANT: This uses and resets address `addr`. After return, the
- * accumulator is clear and the state table at `addr` holds the NEW
- * fingerprint (so the next call detects changes from THIS point).
+ * Trailing bytes (len % 8) are included by padding into a final chunk.
  *
- * @param a     Handle
- * @param addr  Context address (0-255)
- * @param expected_fp  XOR fingerprint of the expected (reference) state
- * @param data  Pointer to current data
- * @param len   Length of data in bytes (will be rounded down to 8-byte chunks)
- * @return      1 if data changed (fingerprint mismatch), 0 if unchanged
+ * @param a           Handle
+ * @param addr        Context address (0-255)
+ * @param expected_fp XOR fingerprint of the expected (reference) state
+ * @param data        Pointer to current data
+ * @param len         Length of data in bytes
+ * @param new_fp      OUT: receives the current fingerprint (pass NULL to ignore)
+ * @return            1 if data changed (fingerprint mismatch), 0 if unchanged
  */
 int atomik_detect_changed(atomik_t *a, uint8_t addr, uint64_t expected_fp,
-                           const void *data, size_t len);
+                           const void *data, size_t len, uint64_t *new_fp);
 
 /*
  * Get the number of parallel accumulator banks.

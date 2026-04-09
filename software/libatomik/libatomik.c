@@ -58,51 +58,88 @@ static void mock_reset(void)
     mock_adapter_delta_lo = 0;
 }
 
+/* Active mock layout — set by atomik_open_devmem */
+static atomik_layout_t mock_active_layout = ATOMIK_LAYOUT_CSR;
+
 static uint64_t mock_current_state(void)
 {
     return mock_state_table[mock_active_addr] ^ mock_accumulator;
 }
 
-static void mock_csr_write(unsigned offset, uint32_t value)
+/*
+ * Register-mapped mock: handles both CSR and AXI layouts.
+ *
+ * Offsets 0x00-0x10 are shared (LOAD_ADDR, LOAD_DATA_LO/HI, ACCUM_LO/HI).
+ * Offsets 0x14+ differ between layouts:
+ *   CSR: SWAP=0x14, CONFIG=0x18, STATE_LO=0x1C, STATE_HI=0x20, STATUS=0x24
+ *   AXI: STATE_LO=0x14, STATE_HI=0x18, STATUS=0x1C, SWAP=0x20, CONFIG=0x24
+ */
+static void mock_regmap_write(unsigned offset, uint32_t value)
 {
+    /* Common registers (both layouts) */
     switch (offset) {
-    case 0x00: mock_load_addr = value & 0xFF; break;
-    case 0x04: mock_load_data_lo = value; break;
+    case 0x00: mock_load_addr = value & 0xFF; return;
+    case 0x04: mock_load_data_lo = value; return;
     case 0x08: { /* LOAD_DATA_HI triggers LOAD */
         uint64_t init = ((uint64_t)value << 32) | mock_load_data_lo;
         mock_active_addr = mock_load_addr;
         mock_state_table[mock_active_addr] = init;
         mock_accumulator = 0;
-        break;
+        return;
     }
-    case 0x0C: mock_accum_lo = value; break;
+    case 0x0C: mock_accum_lo = value; return;
     case 0x10: { /* ACCUM_HI triggers ACCUM */
         uint64_t delta = ((uint64_t)value << 32) | mock_accum_lo;
         mock_accumulator ^= delta;
-        break;
+        return;
     }
-    case 0x14: /* SWAP (CSR layout) */
-        mock_state_table[mock_active_addr] = mock_current_state();
-        mock_accumulator = 0;
-        mock_active_addr = value & 0xFF;
-        break;
-    case 0x18: /* CONFIG */
-        mock_enable = value & 1;
-        if (!mock_enable) mock_accumulator = 0;
-        break;
     default: break;
+    }
+
+    /* Layout-specific SWAP and CONFIG */
+    if (mock_active_layout == ATOMIK_LAYOUT_AXI) {
+        if (offset == ATOMIK_AXI_SWAP_ADDR) {
+            mock_state_table[mock_active_addr] = mock_current_state();
+            mock_accumulator = 0;
+            mock_active_addr = value & 0xFF;
+        } else if (offset == ATOMIK_AXI_CONFIG) {
+            mock_enable = value & 1;
+            if (!mock_enable) mock_accumulator = 0;
+        }
+    } else { /* CSR */
+        if (offset == ATOMIK_CSR_SWAP_ADDR) {
+            mock_state_table[mock_active_addr] = mock_current_state();
+            mock_accumulator = 0;
+            mock_active_addr = value & 0xFF;
+        } else if (offset == ATOMIK_CSR_CONFIG) {
+            mock_enable = value & 1;
+            if (!mock_enable) mock_accumulator = 0;
+        }
     }
 }
 
-static uint32_t mock_csr_read(unsigned offset)
+static uint32_t mock_regmap_read(unsigned offset)
 {
-    switch (offset) {
-    case 0x1C: mock_snapshot = mock_current_state(); return (uint32_t)(mock_snapshot & 0xFFFFFFFF);
-    case 0x20: return (uint32_t)(mock_snapshot >> 32);
-    case 0x24: return (0x02 << 16) | (0x01 << 8) | ((mock_accumulator == 0) ? 1 : 0);
-    case 0x18: return mock_enable;
-    default: return 0;
+    uint32_t status_val = (0x02 << 16) | (0x01 << 8) | ((mock_accumulator == 0) ? 1 : 0);
+
+    if (mock_active_layout == ATOMIK_LAYOUT_AXI) {
+        switch (offset) {
+        case ATOMIK_AXI_STATE_LO: mock_snapshot = mock_current_state(); return (uint32_t)(mock_snapshot & 0xFFFFFFFF);
+        case ATOMIK_AXI_STATE_HI: return (uint32_t)(mock_snapshot >> 32);
+        case ATOMIK_AXI_STATUS: return status_val;
+        case ATOMIK_AXI_CONFIG: return mock_enable;
+        default: return 0;
+        }
+    } else { /* CSR */
+        switch (offset) {
+        case ATOMIK_CSR_STATE_LO: mock_snapshot = mock_current_state(); return (uint32_t)(mock_snapshot & 0xFFFFFFFF);
+        case ATOMIK_CSR_STATE_HI: return (uint32_t)(mock_snapshot >> 32);
+        case ATOMIK_CSR_STATUS: return status_val;
+        case ATOMIK_CSR_CONFIG: return mock_enable;
+        default: return 0;
+        }
     }
+    return 0; /* unreachable */
 }
 
 static void mock_adapter_write(unsigned offset, uint32_t value)
@@ -139,9 +176,6 @@ static uint32_t mock_adapter_read(unsigned offset)
     }
 }
 
-/* Active mock layout — set by atomik_open_devmem */
-static atomik_layout_t mock_active_layout = ATOMIK_LAYOUT_CSR;
-
 static inline void reg_write(volatile uint32_t *regs, unsigned offset,
                               uint32_t value)
 {
@@ -149,7 +183,7 @@ static inline void reg_write(volatile uint32_t *regs, unsigned offset,
     if (mock_active_layout == ATOMIK_LAYOUT_ADAPTER)
         mock_adapter_write(offset, value);
     else
-        mock_csr_write(offset, value);
+        mock_regmap_write(offset, value);
 }
 
 static inline uint32_t reg_read(volatile uint32_t *regs, unsigned offset)
@@ -158,7 +192,7 @@ static inline uint32_t reg_read(volatile uint32_t *regs, unsigned offset)
     if (mock_active_layout == ATOMIK_LAYOUT_ADAPTER)
         return mock_adapter_read(offset);
     else
-        return mock_csr_read(offset);
+        return mock_regmap_read(offset);
 }
 
 static inline void mmio_barrier(volatile uint32_t *regs, unsigned status_off)
@@ -453,17 +487,23 @@ uint8_t atomik_version(atomik_t *a)
 }
 
 int atomik_detect_changed(atomik_t *a, uint8_t addr, uint64_t expected_fp,
-                           const void *data, size_t len)
+                           const void *data, size_t len, uint64_t *new_fp)
 {
     const uint8_t *p = (const uint8_t *)data;
     size_t i;
 
-    /* Compute current fingerprint: XOR of all 8-byte chunks */
+    /* Compute current fingerprint: XOR of all 8-byte chunks + trailing bytes */
     uint64_t current_fp = 0;
     for (i = 0; i + 8 <= len; i += 8) {
         uint64_t chunk;
         memcpy(&chunk, p + i, 8);
         current_fp ^= chunk;
+    }
+    /* Handle trailing 1-7 bytes */
+    if (i < len) {
+        uint64_t tail = 0;
+        memcpy(&tail, p + i, len - i);
+        current_fp ^= tail;
     }
 
     /* Use ATOMiK to compare: LOAD(0), ACCUM(expected), ACCUM(current).
@@ -474,8 +514,9 @@ int atomik_detect_changed(atomik_t *a, uint8_t addr, uint64_t expected_fp,
     atomik_accum(a, current_fp);
     int changed = !atomik_acc_zero(a);
 
-    /* Store current_fp as new reference for next call */
-    atomik_load(a, addr, current_fp);
+    /* Return new fingerprint so caller can use it as expected_fp next time */
+    if (new_fp)
+        *new_fp = current_fp;
 
     return changed;
 }

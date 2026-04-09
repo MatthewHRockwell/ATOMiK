@@ -1,0 +1,18 @@
+@PACKAGE_INIT@
+
+# ATOMiKConfig.cmake — CMake config-mode package for libatomik
+#
+# Usage:
+#   find_package(ATOMiK REQUIRED)
+#   target_link_libraries(myapp ATOMiK::atomik)
+
+if(NOT TARGET ATOMiK::atomik)
+    add_library(ATOMiK::atomik UNKNOWN IMPORTED)
+    set_target_properties(ATOMiK::atomik PROPERTIES
+        IMPORTED_LOCATION "@PREFIX@/lib/libatomik.a"
+        INTERFACE_INCLUDE_DIRECTORIES "@PREFIX@/include"
+    )
+endif()
+
+set(ATOMiK_FOUND TRUE)
+set(ATOMiK_VERSION "1.0.0")

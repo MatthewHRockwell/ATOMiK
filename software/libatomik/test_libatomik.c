@@ -104,8 +104,10 @@ static void mock_handle_write(unsigned offset, uint32_t value)
     }
 
     case REG_SWAP_ADDR:
+        /* SWAP: save current state, switch address, clear accumulator */
+        mock_state_table[mock_active_addr] = mock_current_state();
         mock_active_addr = value & 0xFF;
-        /* Accumulator is preserved across SWAP */
+        mock_accumulator = 0;
         break;
 
     case REG_CONFIG:
@@ -462,9 +464,9 @@ static void test_multi_address(atomik_t *a)
     check64(0x2222222222222222ULL, state, "addr1 preserved after swap");
 }
 
-static void test_swap_preserves_accumulator(atomik_t *a)
+static void test_swap_clears_accumulator(atomik_t *a)
 {
-    printf("\n=== Test: SWAP Preserves Accumulator ===\n");
+    printf("\n=== Test: SWAP Clears Accumulator ===\n");
 
     /* Load two contexts */
     LOAD(a, 0, 0x0000000000001111ULL);
@@ -478,11 +480,17 @@ static void test_swap_preserves_accumulator(atomik_t *a)
     uint64_t state = READ(a);
     check64(0x0000000000001110ULL, state, "addr0: 0x1111^0x0001=0x1110");
 
-    /* Swap to addr 1 — accumulator preserved (0x0001 still in acc) */
+    /* SWAP saves current_state (0x1110) as new ref for addr 0,
+     * switches to addr 1, and CLEARS accumulator */
     SWAP(a, 1);
     state = READ(a);
-    /* addr1 state = 0x2222 ^ 0x0001 = 0x2223 */
-    check64(0x0000000000002223ULL, state, "addr1: 0x2222^0x0001=0x2223 (acc preserved)");
+    /* addr1 state = 0x2222 ^ 0 = 0x2222 (acc was cleared by SWAP) */
+    check64(0x0000000000002222ULL, state, "addr1: 0x2222 (acc cleared by swap)");
+
+    /* Verify addr 0 got its state saved by SWAP */
+    SWAP(a, 0);
+    state = READ(a);
+    check64(0x0000000000001110ULL, state, "addr0: saved as 0x1110 by swap");
 }
 
 static void test_64bit_boundaries(atomik_t *a)
@@ -620,7 +628,7 @@ int main(void)
     test_commutativity(a);
     test_identity(a);
     test_multi_address(a);
-    test_swap_preserves_accumulator(a);
+    test_swap_clears_accumulator(a);
     test_64bit_boundaries(a);
     test_address_boundaries(a);
     test_config_reset(a);
@@ -692,10 +700,10 @@ int main(void)
             uint64_t chunk; memcpy(&chunk, data + i, 8); fp ^= chunk;
         }
 
-        check_int(0, atomik_detect_changed(d, 0, fp, data, 64), "detect unchanged");
+        check_int(0, atomik_detect_changed(d, 0, fp, data, 64, NULL), "detect unchanged");
         data[7] ^= 0xFF;
-        check_int(1, atomik_detect_changed(d, 0, fp, data, 64), "detect 1-byte change");
-        check_int(0, atomik_detect_changed(d, 0, 0, data, 0), "detect empty data");
+        check_int(1, atomik_detect_changed(d, 0, fp, data, 64, NULL), "detect 1-byte change");
+        check_int(0, atomik_detect_changed(d, 0, 0, data, 0, NULL), "detect empty data");
 
         /* 64KB test */
         uint8_t *big = calloc(1, 65536);
@@ -704,9 +712,9 @@ int main(void)
         for (size_t i = 0; i + 8 <= 65536; i += 8) {
             uint64_t chunk; memcpy(&chunk, big + i, 8); big_fp ^= chunk;
         }
-        check_int(0, atomik_detect_changed(d, 1, big_fp, big, 65536), "detect 64KB unchanged");
+        check_int(0, atomik_detect_changed(d, 1, big_fp, big, 65536, NULL), "detect 64KB unchanged");
         big[65535] ^= 0xFF;
-        check_int(1, atomik_detect_changed(d, 1, big_fp, big, 65536), "detect 64KB changed");
+        check_int(1, atomik_detect_changed(d, 1, big_fp, big, 65536, NULL), "detect 64KB changed");
         free(big);
 
         atomik_close(d);
@@ -723,9 +731,86 @@ int main(void)
             uint64_t chunk; memcpy(&chunk, data + i, 8); fp ^= chunk;
         }
 
-        check_int(0, atomik_detect_changed(d, 0, fp, data, 32), "adapter detect unchanged");
+        check_int(0, atomik_detect_changed(d, 0, fp, data, 32, NULL), "adapter detect unchanged");
         data[0] = 0x00;
-        check_int(1, atomik_detect_changed(d, 0, fp, data, 32), "adapter detect changed");
+        check_int(1, atomik_detect_changed(d, 0, fp, data, 32, NULL), "adapter detect changed");
+
+        atomik_close(d);
+    }
+
+    printf("\n=== Test: detect_changed reference advance ===\n");
+    {
+        atomik_t *d = atomik_open_devmem(0xF0000000, ATOMIK_LAYOUT_CSR);
+
+        uint8_t data[16];
+        memset(data, 0xAA, 16);
+        uint64_t fp = 0;
+        for (size_t i = 0; i + 8 <= 16; i += 8) {
+            uint64_t chunk; memcpy(&chunk, data + i, 8); fp ^= chunk;
+        }
+
+        uint64_t new_fp = 0;
+        check_int(0, atomik_detect_changed(d, 0, fp, data, 16, &new_fp), "ref advance: unchanged");
+        check64(fp, new_fp, "ref advance: new_fp == old_fp when unchanged");
+
+        /* Change data */
+        data[0] = 0xBB;
+        check_int(1, atomik_detect_changed(d, 0, fp, data, 16, &new_fp), "ref advance: changed");
+        /* new_fp should differ from old fp */
+        check_int(1, new_fp != fp, "ref advance: new_fp != old_fp after change");
+
+        /* Use new_fp as reference — should detect no change */
+        check_int(0, atomik_detect_changed(d, 0, new_fp, data, 16, NULL), "ref advance: new ref matches");
+
+        atomik_close(d);
+    }
+
+    printf("\n=== Test: detect_changed trailing bytes ===\n");
+    {
+        atomik_t *d = atomik_open_devmem(0xF0000000, ATOMIK_LAYOUT_CSR);
+
+        /* 1 byte */
+        uint8_t one = 0x42;
+        uint64_t fp1 = 0;
+        memcpy(&fp1, &one, 1);
+        check_int(0, atomik_detect_changed(d, 0, fp1, &one, 1, NULL), "1-byte unchanged");
+        one = 0x43;
+        check_int(1, atomik_detect_changed(d, 0, fp1, &one, 1, NULL), "1-byte changed");
+
+        /* 13 bytes (8 + 5 trailing) */
+        uint8_t buf13[13];
+        memset(buf13, 0x55, 13);
+        uint64_t fp13 = 0;
+        {
+            uint64_t chunk; memcpy(&chunk, buf13, 8); fp13 ^= chunk;
+            uint64_t tail = 0; memcpy(&tail, buf13 + 8, 5); fp13 ^= tail;
+        }
+        check_int(0, atomik_detect_changed(d, 1, fp13, buf13, 13, NULL), "13-byte unchanged");
+        buf13[12] = 0x00;
+        check_int(1, atomik_detect_changed(d, 1, fp13, buf13, 13, NULL), "13-byte trailing change");
+
+        atomik_close(d);
+    }
+
+    printf("\n=== Test: Mock devmem open (AXI layout) ===\n");
+    {
+        atomik_t *d = atomik_open_devmem(0x43C00000, ATOMIK_LAYOUT_AXI);
+        check_int(1, d != NULL, "devmem AXI open");
+        check_int(2, d->version, "AXI version = 2");
+        check_int(1, d->n_banks, "AXI banks = 1");
+
+        atomik_load(d, 0, 0x1234567890ABCDEFULL);
+        check64(0x1234567890ABCDEFULL, atomik_read(d), "AXI devmem load/read");
+
+        atomik_accum(d, 0xFFFFFFFFFFFFFFFFULL);
+        check64(0x1234567890ABCDEFULL ^ 0xFFFFFFFFFFFFFFFFULL, atomik_read(d), "AXI devmem accum");
+
+        atomik_accum(d, 0xFFFFFFFFFFFFFFFFULL);
+        check64(0x1234567890ABCDEFULL, atomik_read(d), "AXI devmem self-inverse");
+
+        atomik_swap(d, 0);
+        check64(0x1234567890ABCDEFULL, atomik_read(d), "AXI devmem swap preserves state");
+        check_int(1, atomik_acc_zero(d), "AXI devmem acc_zero after swap");
 
         atomik_close(d);
     }
