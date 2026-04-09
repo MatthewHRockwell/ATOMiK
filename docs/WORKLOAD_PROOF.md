@@ -28,11 +28,13 @@ Measured on live Zynq hardware: VexRiscv SMP at 100 MHz, Linux 6.9, libatomik ru
 
 | Workload | Software (memcmp) | ATOMiK (detect) | Speedup | Overhead vs CSR |
 |----------|------------------:|----------------:|--------:|:---------------:|
+| 8 regions x 256B, 25% changed | 11,616 cy | 1,497 cy | **8x** | +21% |
 | 8 regions x 4KB, 25% changed | 6,901,240 cy | 1,376 cy | **5,015x** | +12% |
+| 32 regions x 1KB, 10% changed | 690,480 cy | 9,725 cy | **71x** | +6% |
 | 64 regions x 1KB, 5% changed | 1,439,432 cy | 6,983 cy | **206x** | +19% |
 | 64 regions x 4KB, 5% changed | 55,292,090 cy | 12,967 cy | **4,264x** | +10% |
 
-Adapter path adds 10-19% overhead vs direct CSR, preserving the O(1) scaling property.
+Adapter path adds 6-21% overhead vs direct CSR, preserving the O(1) scaling property.
 
 ## Why the Speedup Grows
 
