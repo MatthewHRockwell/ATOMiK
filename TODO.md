@@ -175,27 +175,11 @@
 
 ---
 
-## Phase 7: Second Board Validation
+## Phase 7: Second Board Validation — DEFERRED
 
-- [ ] **7.1** Identify and acquire second Zynq board
-  - Or: use Tang Nano 9K with bare-metal libatomik
-  - Document board specs, FPGA part number, differences from primary board
-  - Verify: board is physically available and JTAG-accessible
-
-- [ ] **7.2** Port and build for second target
-  - LiteX platform file (if Zynq) or Gowin project (if Tang Nano 9K)
-  - Build bitstream, verify timing met
-  - Verify: bitstream loads, BIOS responds
-
-- [ ] **7.3** Run same workload on second board
-  - Same demo_state_monitor or workload_change_detect
-  - Capture results
-  - Compare with primary board results
-  - Verify: same correctness, speedup within 2x of primary board (clock speed may differ)
-
-- [ ] **7.4** Write porting guide
-  - Document: what changed, what stayed the same, board-specific quirks
-  - Verify: guide committed, someone could port to a third board from the guide
+Skipped. Single Zynq board is the only active target. Tang Nano 9K has
+production ATOMiK firmware (11/11 PASS) but runs bare-metal, not Linux.
+Revisit when a second Zynq board is available or bare-metal libatomik is needed.
 
 ---
 
