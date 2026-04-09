@@ -113,10 +113,10 @@
   - UNIT = "ticks" on RISC-V (rdtime), "ns" on host (CLOCK_MONOTONIC)
   - Verified: jq parses all output lines
 
-- [ ] **4.3** Run `atomik-watchd` on Zynq hardware
-  - make zynq requires CROSS set and verifies RISC-V output via file check
-  - PENDING: requires cold boot + rootfs injection
-  - No committed hardware artifact exists yet
+- [x] **4.3** Run `atomik-watchd` on Zynq hardware
+  - 10/10 ticks, valid JSON, no mismatches, 3.5x-5.0x speedup
+  - Result: hardware/zynq/results/watchd_20260409.txt
+  - 8 regions x 4KB, 25% mutation, timer=ticks (100 MHz rdtime)
 
 - [x] **4.4** Write one-page brief: "ATOMiK State Watch Service"
   - docs/BRIEF_STATE_WATCH.md — honest about rescan vs production model
