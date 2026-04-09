@@ -1,0 +1,67 @@
+=== WATCHD ===
+/root/atomik-watchd -n 8 -s 4096 -t 5
+atomik-watchd: 8 regions x 4096 bytes, 25% mutation, 5 ticks
+atomik-watchd: ATOMiK v2 @ 0xF0000000 (csr), timer=ticks
+{"tick":1,"n_regions":8,"changed":[2,3],"n_changed":2,"detect_ticks":1254159,"baseline_ticks":6764940,"speedup":5.4}
+{"tick":2,"n_regions":8,"changed":[4,5],"n_changed":2,"detect_ticks":1487835,"baseline_ticks":6109173,"speedup":4.1}
+{"tick":3,"n_regions":8,"changed":[6,7],"n_changed":2,"detect_ticks":1194574,"baseline_ticks":5523736,"speedup":4.6}
+{"tick":4,"n_regions":8,"changed":[0,1],"n_changed":2,"detect_ticks":1197007,"baseline_ticks":5242866,"speedup":4.4}
+{"tick":5,"n_regions":8,"changed":[2,3],"n_changed":2,"detect_ticks":1195182,"baseline_ticks":5591891,"speedup":4.7}
+root@buildroot:~# 
+=== SYNC ===
+/root/atomik-sync
+ATOMiK Incremental Sync Demo
+============================
+
+  16 regions x 4096 bytes = 64 KB tracked state
+  20% mutation per cycle, 8 cycles
+  ATOMiK v2 @ 0xF0000000 (csr)
+
+  Cycle │ Full Sync      │ ATOMiK Sync    │ Saved    │ Synced
+  ──────┼────────────────┼────────────────┼──────────┼───────
+      1 │  65536 B 1081861 ticks │  16384 B 2827400 ticks │  75.0%  │ [4,5,6,7]
+      2 │  65536 B 1373915 ticks │  16384 B 2540844 ticks │  75.0%  │ [8,9,10,11]
+      3 │  65536 B 1081080 ticks │  16384 B 2773762 ticks │  75.0%  │ [12,13,14,15]
+      4 │  65536 B 1437966 ticks │  16384 B 2461145 ticks │  75.0%  │ [0,1,2,3]
+      5 │  65536 B 1080765 ticks │  16384 B 2808616 ticks │  75.0%  │ [4,5,6,7]
+      6 │  65536 B 1081334 ticks │  16384 B 2763043 ticks │  75.0%  │ [8,9,10,11]
+      7 │  65536 B 1083298 ticks │  16384 B 2525123 ticks │  75.0%  │ [12,13,14,15]
+      8 │  65536 B 1080279 ticks │  16384 B 2771503 ticks │  75.0%  │ [0,1,2,3]
+
+  Total: full=524288 B, atomik=131072 B, saved=75.0%
+  Full sync copies all 16 regions every cycle.
+  ATOMiK sync copies only changed regions, skipping the rest.
+root@buildroot:~# 
+=== AGENT ===
+/root/atomik-agent-mem
+ATOMiK Agent Memory State Tracking
+==================================
+
+  Buffers:
+    [0] observation     8192 B
+    [1] action          1024 B
+    [2] reward           256 B
+    [3] model_weights  16384 B
+    [4] hidden_state    4096 B
+  Total tracked state: 29952 B (29 KB)
+  ATOMiK v2 @ 0xF0000000 (csr)
+
+  Tick │ Changed Buffers                          │ Checkpoint Cost
+  ─────┼──────────────────────────────────────────┼────────────────
+     1 │ observation, action, hidden_state      │ 13312 / 29952 B
+     2 │ observation, action, reward, hidden_state │ 13568 / 29952 B
+     3 │ observation, action, hidden_state      │ 13312 / 29952 B
+     4 │ observation, action, reward, model_weights, hidden_state │ 29952 / 29952 B
+     5 │ observation, action, hidden_state      │ 13312 / 29952 B
+     6 │ observation, action, reward, hidden_state │ 13568 / 29952 B
+     7 │ observation, action, hidden_state      │ 13312 / 29952 B
+     8 │ observation, action, reward, model_weights, hidden_state │ 29952 / 29952 B
+
+  Over 8 ticks:
+    Full checkpoint:      239616 B (234 KB)
+    Selective checkpoint: 140288 B (137 KB)
+    Bandwidth saved:      41.5%
+
+  ATOMiK identifies which agent buffers changed, enabling
+  selective checkpoint/logging instead of full state dump.
+root@buildroot:~# 
