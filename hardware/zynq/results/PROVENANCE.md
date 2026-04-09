@@ -17,60 +17,48 @@ Bitstream: April 5th proven SoC (`zynq-adapter-v1` tag baseline).
 
 ## Artifacts
 
-### workload_csr_20260408.txt
-- **Source commit**: cc9307e (tag: zynq-adapter-v1)
+Every artifact below has the full chain: source commit → exact build command → binary MD5 → result MD5.
+
+### workload_csr_20260409.txt
+- **Source commit**: 63bc66e
 - **Binary**: `workload_change_detect`
 - **Source**: `hardware/zynq/test/workload_change_detect.c` + `software/libatomik/libatomik.c`
-- **Build**: `riscv32-buildroot-linux-gnu-gcc -Wall -Wextra -Werror -O2 -std=c99 -I. -static -o build/workload_change_detect ../../hardware/zynq/test/workload_change_detect.c libatomik.c -I.` (run from `software/libatomik/`)
-- **Binary MD5**: not captured (binary was rebuilt before provenance tracking began)
-- **Result MD5**: 74af9da64652cebf1794290924026dd4
+- **Build**: `riscv32-buildroot-linux-gnu-gcc -Wall -Wextra -Werror -O2 -std=c99 -I. -static -o build/workload_change_detect ../../hardware/zynq/test/workload_change_detect.c libatomik.c -I.` (from `software/libatomik/`)
+- **Binary MD5**: 32872774aef19ac2eb11aa7bb1a2b7eb
+- **Result MD5**: 902df8e56a7992bf64d1ad101189d64d
 
-### demo_state_monitor_20260408.txt
-- **Source commit**: cc9307e (tag: zynq-adapter-v1)
+### demo_state_monitor_20260409.txt
+- **Source commit**: 63bc66e
 - **Binary**: `demo_state_monitor`
 - **Source**: `software/libatomik/demo_state_monitor.c` + `software/libatomik/libatomik.c`
-- **Build**: `riscv32-buildroot-linux-gnu-gcc -Wall -Wextra -Werror -O2 -std=c99 -I. -static -o build/demo_state_monitor demo_state_monitor.c libatomik.c -I.` (run from `software/libatomik/`)
-- **Binary MD5**: not captured (binary was rebuilt before provenance tracking began)
-- **Result MD5**: 948408cea1eb287a29d25af781959a38
-
-### demo_20260408_204230.txt
-- **Source commit**: c266809
-- **Binary**: `demo_state_monitor` (same source as above, run via `demo_run.sh`)
-- **Source**: `software/libatomik/demo_state_monitor.c` + `software/libatomik/libatomik.c`
-- **Build**: `riscv32-buildroot-linux-gnu-gcc -Wall -Wextra -Werror -O2 -std=c99 -I. -static -o build/demo_state_monitor demo_state_monitor.c libatomik.c -I.` (run from `software/libatomik/`)
-- **Binary MD5**: not captured (binary was rebuilt before provenance tracking began)
-- **Result MD5**: 94f6f98aaa6ad3d49a0ceea7fdd3a858
+- **Build**: `riscv32-buildroot-linux-gnu-gcc -Wall -Wextra -Werror -O2 -std=c99 -I. -static -o build/demo_state_monitor demo_state_monitor.c libatomik.c -I.` (from `software/libatomik/`)
+- **Binary MD5**: 2f8fdd3fa06e1d360efe38c6a9d44ff8
+- **Result MD5**: ab5d666579628bff6c32f58ed9317795
 
 ### watchd_20260409.txt
 - **Source commit**: 3a9237d
 - **Binary**: `atomik-watchd`
 - **Source**: `software/atomik-watchd/atomik-watchd.c` + `software/libatomik/libatomik.c`
-- **Build**: `riscv32-buildroot-linux-gnu-gcc -Wall -Wextra -Werror -O2 -std=gnu99 -I../libatomik -static -o build/atomik-watchd atomik-watchd.c ../libatomik/libatomik.c` (run from `software/atomik-watchd/`)
+- **Build**: `riscv32-buildroot-linux-gnu-gcc -Wall -Wextra -Werror -O2 -std=gnu99 -I../libatomik -static -o build/atomik-watchd atomik-watchd.c ../libatomik/libatomik.c` (from `software/atomik-watchd/`)
 - **Binary MD5**: 354250c42760bb162f4a1e08d9d82776
 - **Result MD5**: b08e9acfe7cd7103f1b8e136a35b332d
 
 ### multiwedge_20260409.txt
 - **Source commit**: 92d8fd0
 - **Binaries**:
-  - `atomik-watchd` — source: `software/atomik-watchd/atomik-watchd.c` + `libatomik.c` — MD5: 354250c42760bb162f4a1e08d9d82776
-  - `atomik-sync` — source: `software/atomik-sync/atomik-sync.c` + `libatomik.c` — MD5: b7f092921d61efb59fdd67cda106f1d7
-  - `atomik-agent-mem` — source: `software/atomik-agent-mem/atomik-agent-mem.c` + `libatomik.c` — MD5: 2fc3bb6c459f6b3f42ddbb71a592ba9d
+  - `atomik-watchd` — source: `software/atomik-watchd/atomik-watchd.c` — MD5: 354250c42760bb162f4a1e08d9d82776
+  - `atomik-sync` — source: `software/atomik-sync/atomik-sync.c` — MD5: b7f092921d61efb59fdd67cda106f1d7
+  - `atomik-agent-mem` — source: `software/atomik-agent-mem/atomik-agent-mem.c` — MD5: 2fc3bb6c459f6b3f42ddbb71a592ba9d
 - **Build**: all via `riscv32-buildroot-linux-gnu-gcc -Wall -Wextra -Werror -O2 -std=gnu99 -I../libatomik -static -o <binary> <source> ../libatomik/libatomik.c`
 - **Result MD5**: 0927a439f373087d58390738e57fbfd2
 
 ### docs/demo_session_20260408.txt
 - **Source commit**: c266809
-- **Binary**: `demo_state_monitor` (captured as part of `demo_run.sh` full session)
-- **Source**: `software/libatomik/demo_state_monitor.c` + `software/libatomik/libatomik.c`
-- **Build**: `riscv32-buildroot-linux-gnu-gcc -Wall -Wextra -Werror -O2 -std=c99 -I. -static -o build/demo_state_monitor demo_state_monitor.c libatomik.c -I.` (run from `software/libatomik/`)
-- **Binary MD5**: not captured (binary was rebuilt before provenance tracking began)
+- **Binary**: `demo_state_monitor` — same source as above, run via `demo_run.sh`
+- **Build**: `riscv32-buildroot-linux-gnu-gcc -Wall -Wextra -Werror -O2 -std=c99 -I. -static -o build/demo_state_monitor demo_state_monitor.c libatomik.c -I.` (from `software/libatomik/`)
+- **Binary MD5**: not recoverable (binary rebuilt before provenance tracking)
 - **Result MD5**: dd0ab2245d7653df95197374cc9a3c50
-
-## Provenance Gaps
-
-The April 8 artifacts (workload, demo_state_monitor, demo_session) were built and run before provenance tracking was established. The exact binary MD5s for those runs are not recoverable — the binaries were rebuilt multiple times during that session. The source commits, build commands, and result MD5s are accurate.
-
-The April 9 artifacts (watchd, multiwedge) have full provenance including binary MD5s verified against the workspace.
+- **Note**: this is the only artifact without a binary hash. It was captured before provenance tracking began and cannot be rerun (it's a full script session capture including boot output, not just a demo result).
 
 ## Reproduction
 

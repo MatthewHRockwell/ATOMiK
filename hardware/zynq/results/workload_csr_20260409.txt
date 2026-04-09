@@ -1,0 +1,30 @@
+=== WORKLOAD ===
+/root/workload_change_detect
+ATOMiK Multi-Buffer Change Detection Workload
+==============================================
+
+Environment: VexRiscv SMP @ 100 MHz, 4 KB D-cache, no L2
+Timer: rdtime @ 100 MHz (10 ns resolution)
+Note: memcmp degrades above 4 KB due to cache thrashing
+
+[CSR (direct)] ATOMiK v2, 1 bank(s) @ 0xF0000000
+
+Workload             | SW (memcmp)  | ATOMiK       | Speedup    | Regions/sec 
+---------------------+--------------+--------------+------------+-------------
+8x256B 25%chg        |      21073 cy |       1230 cy |     17.1x |     650407
+8x4096B 25%chg       |    6992162 cy |       1222 cy |   5721.9x |     654664
+32x1024B 10%chg      |     702539 cy |       9222 cy |     76.2x |     346996
+64x1024B 5%chg       |    1401263 cy |       5882 cy |    238.2x |    1088065
+64x4096B 5%chg       |   55775347 cy |       5870 cy |   9501.8x |    1090290
+
+[Adapter (CFU)] ATOMiK v255, 255 bank(s) @ 0xF0020000
+
+Workload             | SW (memcmp)  | ATOMiK       | Speedup    | Regions/sec 
+---------------------+--------------+--------------+------------+-------------
+8x256B 25%chg        |      18156 cy |   61837432 cy |      0.0x |         13
+8x4096B 25%chg       |    6982252 cy |   61856896 cy |      0.1x |         13
+32x1024B 10%chg      |     687575 cy |  247357722 cy |      0.0x |         13
+
+=== DEMO STATE MONITOR ===
+/root/demo_state_monitor
+
