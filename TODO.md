@@ -24,15 +24,16 @@
   - Verify: only valid result files remain in results/
 
 - [x] **1.4** Locate and verify Lean4 theorem count (108, all compile)
-  - Memory/docs claim "108 Lean4 theorems" — but `grep theorem` found 0
-  - Find actual proof files, count real theorems/lemmas
-  - If count is wrong, correct it in: MEMORY.md, WORKLOAD_PROOF.md, YC_DEMO_SUMMARY.md, any other docs
-  - Verify: claimed count matches actual count in repo
+  - 108 theorem/lemma declarations across 8 Lean4 files
+  - `lake build` succeeds (10 jobs, 0 errors)
+  - Fixed 92→108 across md/py/tex/html/yaml/yml/ts/h/c/v/tsx/json/js files (5 passes)
+  - Verified: zero source-controlled files have "92" in proof context on same line
 
 - [x] **1.5** Update `ROADMAP.md` (v3.0, April 2026 milestone)
-  - Currently says "v2.5, March 2026" — does not reflect Zynq adapter milestone
-  - Add: Zynq Linux 16/16 PASS, adapter 9/9 PASS, libatomik 3-backend, workload demo
-  - Verify: roadmap accurately reflects current repo state
+  - Header updated: v3.0, April 2026 milestone block
+  - Zynq section (§15) rewritten: board name, VexRiscv SMP architecture,
+    phases 0-3 complete, ARM/AXI/UIO framing removed, "on order" removed
+  - Verified: no section claims board is pending or uses stale architecture
 
 ---
 
@@ -47,19 +48,21 @@
   - Aborts with cold-rest instructions if failed
   - Verified: abort path tested in code
 
-- [x] **2.3** Fix login race in `demo_run.sh`
-  - 8s settle wait + chained mknod+chmod+binary in single command
-  - NOTE: 3-consecutive-cold-boot verification pending (requires hardware)
+- [ ] **2.3** Fix login race in `demo_run.sh`
+  - Code: 8s settle wait + chained mknod+chmod+binary in single command
+  - INCOMPLETE: requires 3 consecutive cold boot hardware verification
+  - Verify: demo runs correctly on 3 consecutive cold boots without manual intervention
 
 - [x] **2.4** Add `--workload` and `--bench` flags to `demo_run.sh`
   - `--demo` (default), `--workload`, `--bench`, `--dry-run`
   - Verified: all three modes produce correct dry-run output with timestamps
 
-- [x] **2.5** Record one clean demo terminal session
-  - Use `script` or manual copy to capture exact terminal output
-  - Save as `docs/demo_session_20260408.txt`
+- [ ] **2.5** Record one clean demo terminal session
+  - Save as `docs/demo_session_YYYYMMDD.txt`
   - Include: boot messages (abbreviated), login, demo output, summary
   - Verify: file is committed, readable, shows the complete demo flow
+  - NOTE: hardware/zynq/results/demo_state_monitor_20260408.txt has the demo OUTPUT
+    but not the full session (boot + login + run). Need a complete capture.
 
 ---
 
