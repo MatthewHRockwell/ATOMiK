@@ -125,9 +125,9 @@ class ATOMiK:
         return (hi << 32) | lo
 
     def swap(self, addr: int):
-        """SWAP: Switch to a different context address.
+        """SWAP: Promote current state to new reference, switch address, clear accumulator.
 
-        The accumulator is preserved across the swap.
+        state_table[active_addr] = current_state; active_addr = addr; acc = 0.
 
         Args:
             addr: Context address to switch to (0-255).
@@ -221,7 +221,10 @@ class _MockATOMiK(ATOMiK):
         return self._snapshot
 
     def swap(self, addr: int):
+        # SWAP: save current state, switch address, clear accumulator
+        self._state_table[self._active_addr] = self._current_state()
         self._active_addr = addr & 0xFF
+        self._accumulator = 0
 
     @property
     def acc_zero(self) -> bool:

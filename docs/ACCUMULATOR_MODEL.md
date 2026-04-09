@@ -52,11 +52,16 @@ if (!atomik_acc_zero(a)) {
 ```c
 // For each region, compute fingerprint and compare
 for (int i = 0; i < N; i++) {
-    int changed = atomik_detect_changed(a, i, expected_fp[i], data[i], size);
-    if (changed) handle_change(i);
+    uint64_t new_fp;
+    int changed = atomik_detect_changed(a, i, expected_fp[i], data[i], size, &new_fp);
+    if (changed) {
+        expected_fp[i] = new_fp;  // advance reference for next check
+        handle_change(i);
+    }
 }
 ```
 Note: `atomik_detect_changed()` uses LOAD internally, so each call clears the accumulator.
+The `new_fp` out-parameter returns the current fingerprint so the caller can advance the reference.
 
 ### Pattern 3: Incremental with Periodic Snapshot (SWAP)
 ```c

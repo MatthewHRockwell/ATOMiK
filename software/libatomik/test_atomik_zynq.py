@@ -178,8 +178,8 @@ def test_multi_address():
     a.close()
 
 
-def test_swap_preserves_accumulator():
-    print("\n=== Test: SWAP Preserves Accumulator ===")
+def test_swap_clears_accumulator():
+    print("\n=== Test: SWAP Clears Accumulator ===")
     a = ATOMiK.mock()
     a.load(0, 0x0000000000001111)
     a.load(1, 0x0000000000002222)
@@ -188,9 +188,16 @@ def test_swap_preserves_accumulator():
     a.accum(0x0000000000000001)
     check64(0x0000000000001110, a.read(), "addr0: 0x1111^0x0001=0x1110")
 
+    # SWAP saves current_state (0x1110) as new ref for addr 0,
+    # switches to addr 1, and CLEARS accumulator
     a.swap(1)
-    check64(0x0000000000002223, a.read(),
-            "addr1: 0x2222^0x0001=0x2223 (acc preserved)")
+    check64(0x0000000000002222, a.read(),
+            "addr1: 0x2222 (acc cleared by swap)")
+
+    # Verify addr 0 got its state saved
+    a.swap(0)
+    check64(0x0000000000001110, a.read(),
+            "addr0: saved as 0x1110 by swap")
     a.close()
 
 
@@ -317,7 +324,7 @@ def main():
     test_commutativity()
     test_identity()
     test_multi_address()
-    test_swap_preserves_accumulator()
+    test_swap_clears_accumulator()
     test_64bit_boundaries()
     test_address_boundaries()
     test_config_reset()

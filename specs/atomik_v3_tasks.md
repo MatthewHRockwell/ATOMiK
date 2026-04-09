@@ -268,7 +268,7 @@ Additionally: `review.yml` (PR ruff check) and `math/proofs/.github/workflows/le
 - [x] Verilator integration test: 11/11 tests via RISC-V assembly (`test_atomik.S`) with `.insn r 0x0B` encoding and tohost pass/fail
 - [x] XOR cancellation verified: `ACCUM(δ); ACCUM(δ)` → acc returns to 0
 - [x] Commutativity verified: `δ₁ ⊕ δ₂ = δ₂ ⊕ δ₁` and `δ₁ ⊕ δ₂ ⊕ δ₃ = δ₃ ⊕ δ₁ ⊕ δ₂`
-- [x] Context switch patterns: SWAP preserves accumulator, LOAD clears it, multi-context state persistence
+- [x] Context switch patterns: SWAP saves current state + clears accumulator, LOAD clears it, multi-context state persistence
 
 ### 2.7 Combined CPU + ATOMiK Synthesis
 - [x] Synthesize full CPU + ATOMiK datapath (no peripherals)
