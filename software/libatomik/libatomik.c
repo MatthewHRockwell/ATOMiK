@@ -480,6 +480,11 @@ int atomik_detect_changed(atomik_t *a, uint8_t addr, uint64_t expected_fp,
     return changed;
 }
 
+const char *atomik_version_string(void)
+{
+    return LIBATOMIK_VERSION_STRING;
+}
+
 void atomik_set_enable(atomik_t *a, int enable)
 {
     if (a->layout == ATOMIK_LAYOUT_ADAPTER)

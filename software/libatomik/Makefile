@@ -51,7 +51,9 @@ BENCH     = $(BUILD)/bench_change_detect
 WORKLOAD  = $(BUILD)/workload_change_detect
 EXAMPLE   = $(BUILD)/example_atomik
 
-.PHONY: all test-mock lib lib-coproc test-hw zynq clean help
+PREFIX ?= /usr/local
+
+.PHONY: all test-mock lib lib-coproc test-hw zynq install clean help
 
 all: test-mock
 
@@ -131,6 +133,17 @@ $(DEMO): demo_state_monitor.c $(LIB_SRC) $(LIB_HDR) | $(BUILD)
 # ==============================================================================
 $(BUILD):
 	mkdir -p $(BUILD)
+
+# ==============================================================================
+# Install
+# ==============================================================================
+install: lib
+	install -d $(DESTDIR)$(PREFIX)/lib $(DESTDIR)$(PREFIX)/include $(DESTDIR)$(PREFIX)/lib/pkgconfig $(DESTDIR)$(PREFIX)/lib/cmake/ATOMiK
+	install -m 644 $(LIB_A) $(DESTDIR)$(PREFIX)/lib/
+	install -m 755 $(LIB_SO) $(DESTDIR)$(PREFIX)/lib/
+	install -m 644 $(LIB_HDR) $(DESTDIR)$(PREFIX)/include/
+	sed 's|@PREFIX@|$(PREFIX)|g' libatomik.pc.in > $(DESTDIR)$(PREFIX)/lib/pkgconfig/libatomik.pc
+	install -m 644 FindATOMiK.cmake $(DESTDIR)$(PREFIX)/lib/cmake/ATOMiK/
 
 # ==============================================================================
 # Clean

@@ -22,6 +22,11 @@
 #ifndef LIBATOMIK_H
 #define LIBATOMIK_H
 
+#define LIBATOMIK_VERSION_MAJOR 1
+#define LIBATOMIK_VERSION_MINOR 0
+#define LIBATOMIK_VERSION_PATCH 0
+#define LIBATOMIK_VERSION_STRING "1.0.0"
+
 #include <stddef.h>
 #include <stdint.h>
 
@@ -245,6 +250,13 @@ void atomik_set_enable(atomik_t *a, int enable);
  * @return   1 if enabled, 0 if disabled
  */
 int atomik_is_enabled(atomik_t *a);
+
+/*
+ * Get the library version string.
+ *
+ * @return  Compile-time version string (e.g., "1.0.0")
+ */
+const char *atomik_version_string(void);
 
 #ifdef __cplusplus
 }
