@@ -185,10 +185,12 @@ Revisit when a second Zynq board is available or bare-metal libatomik is needed.
 
 ## Phase 8: CFU / Native Instruction Path
 
-- [ ] **8.1** Generate VexRiscvSMP with CfuPlugin
-  - Modify SpinalHDL Scala to include CfuPlugin in the SMP cluster
-  - Or: solve single-core CLINT/PLIC for VexRiscv linux+cfu variant
-  - Verify: LiteX SoC generation succeeds, Vivado synthesis passes
+- [ ] **8.1** Generate Linux-bootable CFU SoC
+  - Single-core VexRiscv linux+cfu with custom CLINT + PLIC
+  - Vivado synthesis: PASS (0 errors, WNS +0.119ns @ 100MHz)
+  - REMAINING: need OpenSBI rebuilt for CFU SoC UART address (0xF0001800)
+    or DTS/bootargs adjusted. Current fw_jump69.bin targets SMP UART (0xF0001000).
+  - Bitstream: hardware/zynq/litex-build-cfu/gateware/hamgeek_rk7020f.bit
 
 - [ ] **8.2** Boot Linux on CFU-enabled SMP SoC
   - Load kernel + rootfs + OpenSBI
