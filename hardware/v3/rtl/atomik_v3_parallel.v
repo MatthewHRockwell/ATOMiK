@@ -12,7 +12,7 @@
 //   - Shared BSRAM state table (256x64-bit)
 //   - State reconstruction: current_state = state_table[addr] ^ merged_acc
 //
-// Mathematical Foundation (92 Lean4 theorems):
+// Mathematical Foundation (108 Lean4 theorems):
 //   delta_comm:  d1 ^ d2 = d2 ^ d1         (bank distribution is transparent)
 //   delta_assoc: (d1 ^ d2) ^ d3 = d1 ^ (d2 ^ d3)  (merge order irrelevant)
 //

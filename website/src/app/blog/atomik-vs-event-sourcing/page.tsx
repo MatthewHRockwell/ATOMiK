@@ -148,7 +148,7 @@ state = ctx.read()  # O(1)
                   ["Snapshot overhead", "Periodic compaction needed", "Not needed (state is always current)"],
                   ["Conflict resolution", "Application-specific merge", "Automatic (XOR commutativity)"],
                   ["Audit trail", "Complete (every event)", "Cumulative (current delta only)"],
-                  ["Formal guarantees", "Implementation-dependent", "92 Lean4 theorems"],
+                  ["Formal guarantees", "Implementation-dependent", "108 Lean4 theorems"],
                 ].map(([prop, es, atomik], i) => (
                   <tr key={i} style={{ borderBottom: "1px solid #1e1e2e" }}>
                     <td className="p-4 font-medium" style={{ color: "#e0e0e8" }}>{prop}</td>

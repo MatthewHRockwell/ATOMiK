@@ -96,7 +96,7 @@ const perfComparison = [
   {
     dimension: "Formal guarantees",
     crdt: "SEC (Strong Eventual Consistency)",
-    atomik: "SEC + self-inverse + 92 Lean4 proofs",
+    atomik: "SEC + self-inverse + 108 Lean4 proofs",
   },
   {
     dimension: "Implementation complexity",
@@ -202,7 +202,7 @@ export default function MigrateCrdtPage() {
               </li>
               <li className="flex gap-2">
                 <span style={{ color: "#22c55e" }} className="shrink-0">{"\u2713"}</span>
-                You want formal verification (92 Lean4 proofs vs informal CRDT specs)
+                You want formal verification (108 Lean4 proofs vs informal CRDT specs)
               </li>
             </ul>
           </div>

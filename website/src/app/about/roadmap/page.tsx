@@ -69,7 +69,7 @@ const milestones: Milestone[] = [
     title: "Mathematical Foundation",
     status: "completed",
     bullets: [
-      "92 Lean 4 theorems proving delta-state algebra properties",
+      "108 Lean 4 theorems proving delta-state algebra properties",
       "Abelian group: commutative, associative, self-inverse, identity",
       "Security architecture: no caches, no speculation, deterministic latency",
     ],
@@ -340,7 +340,7 @@ export default function ASICRoadmapPage() {
       {/* ---- Key metrics ---- */}
       <section className="mx-auto max-w-5xl px-6 pb-20">
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-          <MetricCard label="Lean 4 Proofs" value="92" sub="Theorems verified" color={green} />
+          <MetricCard label="Lean 4 Proofs" value="108" sub="Theorems verified" color={green} />
           <MetricCard label="Peak FPGA" value="69.7 Gops/s" sub="Zynq XC7Z020, N=512" color={accent} />
           <MetricCard label="Single Core" value="444 MHz" sub="302 LUT, 446 Mops/s" color={accent2} />
           <MetricCard label="ASIC Target" value=">1 Tops/s" sub=">1 GHz, ~25K gates" color={gold} />

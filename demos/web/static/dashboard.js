@@ -676,7 +676,7 @@ function generateReport() {
         provenance: {
             platform: 'ATOMiK Delta-State Computing',
             version: '1.0',
-            formalProofs: 92,
+            formalProofs: 108,
             hardwarePlatform: 'Tang Nano 9K (Gowin GW1NR-9)',
         },
     };

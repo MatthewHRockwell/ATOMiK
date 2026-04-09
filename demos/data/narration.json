@@ -1,5 +1,5 @@
 {
-  "intro": "Welcome to ATOMiK — delta-state computing in silicon. Today you'll see 1 billion operations per second on a $10 chip, backed by 92 formal proofs. This is the foundation for lock-free distributed computing.",
+  "intro": "Welcome to ATOMiK — delta-state computing in silicon. Today you'll see 1 billion operations per second on a $10 chip, backed by 108 formal proofs. This is the foundation for lock-free distributed computing.",
   "acts": {
     "1": {
       "title": "Basic Delta Algebra",
@@ -57,5 +57,5 @@
       ]
     }
   },
-  "outro": "Delta-state computing in silicon: 92 formal proofs, 1 billion ops/sec, $10 hardware. Mathematically proven, hardware validated, ready for production. The foundation for lock-free distributed computing at scale."
+  "outro": "Delta-state computing in silicon: 108 formal proofs, 1 billion ops/sec, $10 hardware. Mathematically proven, hardware validated, ready for production. The foundation for lock-free distributed computing at scale."
 }

@@ -18,7 +18,7 @@
 //   - 4-stage SWAP pipeline (BRAM output register, READ_LATENCY_B=2)
 //   - State reconstruction: current_state = BRAM[addr] ^ merged_acc
 //
-// Mathematical Foundation (92 Lean4 theorems):
+// Mathematical Foundation (108 Lean4 theorems):
 //   XOR commutativity + associativity guarantee that delta distribution
 //   across banks yields identical results regardless of order.
 //

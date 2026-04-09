@@ -13,7 +13,7 @@ const timelineItems = [
     year: "2025",
     title: "Mathematical Formalization",
     description:
-      "92 Lean4 theorems proving Abelian group properties: commutativity, associativity, self-inverse, identity. The math that makes delta-state algebra work.",
+      "108 Lean4 theorems proving Abelian group properties: commutativity, associativity, self-inverse, identity. The math that makes delta-state algebra work.",
     color: "text-purple-400",
     border: "border-purple-500/40",
     bg: "bg-purple-500/5",
@@ -85,7 +85,7 @@ const timelineItems = [
 
 const proofPoints = [
   {
-    value: "92",
+    value: "108",
     label: "Lean4 Theorems",
     sublabel: "Formally verified",
     gradient: "from-purple-400 to-purple-600",
@@ -172,7 +172,7 @@ export default function AboutPage() {
             </p>
             <p>
               This is not an optimization. It is a new primitive — as fundamental as the
-              transistor or the cache line. The math is proven (92 Lean4 theorems). The hardware
+              transistor or the cache line. The math is proven (108 Lean4 theorems). The hardware
               is built (3 FPGA platforms, 69.7 Gops/s). The software is shipping (
               <code
                 className="text-sm font-mono px-2 py-0.5 rounded"
@@ -204,7 +204,7 @@ export default function AboutPage() {
             {
               step: "01",
               title: "The Math",
-              desc: "Delta-state algebra forms an Abelian group under XOR. 92 theorems formalized and machine-verified in Lean4.",
+              desc: "Delta-state algebra forms an Abelian group under XOR. 108 theorems formalized and machine-verified in Lean4.",
               color: "#8b5cf6",
             },
             {
@@ -351,7 +351,7 @@ export default function AboutPage() {
                 Matt Rockwell is a systems engineer and founder of ATOMiK, with deep expertise
                 in embedded systems, FPGA development, and formal verification. He created the
                 delta-state algebra as a fundamental rethinking of how computers handle state
-                — proving it correct with 92 Lean4 theorems before writing the first line of
+                — proving it correct with 108 Lean4 theorems before writing the first line of
                 production code. ATOMiK grew from a mathematical insight into a
                 hardware-validated computing architecture running on custom RISC-V silicon.
               </p>
@@ -425,7 +425,7 @@ export default function AboutPage() {
               changes, with mathematical guarantees that the approach is correct.
             </p>
             <p>
-              From 92 formal proofs to a custom RISC-V CPU running on a $13.50 FPGA, ATOMiK
+              From 108 formal proofs to a custom RISC-V CPU running on a $13.50 FPGA, ATOMiK
               is the result of building from first principles.
             </p>
           </div>

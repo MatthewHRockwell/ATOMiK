@@ -69,7 +69,7 @@ export default function OGImage() {
             textAlign: "center",
           }}
         >
-          O(1) state reconstruction. 99% less bandwidth. 92 formal proofs.
+          O(1) state reconstruction. 99% less bandwidth. 108 formal proofs.
         </div>
 
         {/* Stats bar */}
@@ -82,7 +82,7 @@ export default function OGImage() {
         >
           {[
             { value: "69.7G", label: "ops/sec" },
-            { value: "92", label: "proofs" },
+            { value: "108", label: "proofs" },
             { value: "218+", label: "tests" },
           ].map((stat) => (
             <div

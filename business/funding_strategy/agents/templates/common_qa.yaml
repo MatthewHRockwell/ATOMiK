@@ -5,12 +5,12 @@ what_does_your_company_do:
     computing. Rather than the traditional Load-Modify-Store cycle, ATOMiK
     accumulates state changes via single-cycle XOR operations, achieving 1
     billion operations per second on a $10 FPGA. The architecture is backed
-    by 92 Lean4 formal proofs and a 5-language SDK.
+    by 108 Lean4 formal proofs and a 5-language SDK.
 
 how_far_along:
   answer: >-
     Working FPGA prototype achieving 1,056 Mops/s (16 parallel banks) on a
-    Tang Nano 9K. 92 formal proofs in Lean4 with zero sorry statements.
+    Tang Nano 9K. 108 formal proofs in Lean4 with zero sorry statements.
     314 passing tests across 5 SDK languages (Python, Rust, C, JavaScript,
     Verilog). 80/80 hardware tests passing. All 6 development phases
     complete. Patent pending. $225 total development cost.
@@ -49,7 +49,7 @@ what_is_the_business_model:
 how_is_this_different:
   answer: >-
     ATOMiK is the only hardware architecture with machine-verified
-    algebraic properties. 92 Lean4 proofs create an irreproducible moat —
+    algebraic properties. 108 Lean4 proofs create an irreproducible moat —
     competitors would need years of mathematical work to replicate. Working
     silicon on $10 FPGA (not simulation), patent pending, and a full-stack
     implementation from math proofs to 5-language SDK.

@@ -68,7 +68,7 @@ const stateSyncRows: string[][] = [
   ],
   [
     "Formal proofs",
-    "92 Lean4 theorems",
+    "108 Lean4 theorems",
     "No formal verification",
     "TLA+ spec (partial)",
     "No formal verification",
@@ -182,7 +182,7 @@ const hwRows: string[][] = [
   ],
   [
     "Formal verification",
-    "92 Lean4 theorems + RTL sim",
+    "108 Lean4 theorems + RTL sim",
     "Numerical verification only",
     "Full verification possible",
   ],
@@ -202,7 +202,7 @@ const useCases = [
   "Applications that need undo/rollback without an event log",
   "Sensor fusion pipelines that merge readings from independent sources",
   "Reducing memory traffic in copy-on-write workloads (containers, VMs)",
-  "Systems requiring formal correctness guarantees (92 Lean4 proofs)",
+  "Systems requiring formal correctness guarantees (108 Lean4 proofs)",
 ];
 
 const antiPatterns = [

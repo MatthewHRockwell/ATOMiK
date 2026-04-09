@@ -12,7 +12,7 @@ const faqCategories = [
     items: [
       {
         q: "What is ATOMiK?",
-        a: "ATOMiK is a delta-state algebra engine that fundamentally departs from Von Neumann architecture. Instead of storing and retrieving state, ATOMiK reconstructs it: current_state = initial_state XOR accumulator. The underlying math forms an Abelian group (commutative, associative, self-inverse, with identity), rigorously proven through 92 Lean4 theorems.",
+        a: "ATOMiK is a delta-state algebra engine that fundamentally departs from Von Neumann architecture. Instead of storing and retrieving state, ATOMiK reconstructs it: current_state = initial_state XOR accumulator. The underlying math forms an Abelian group (commutative, associative, self-inverse, with identity), rigorously proven through 108 Lean4 theorems.",
       },
       {
         q: "What problem does ATOMiK solve?",

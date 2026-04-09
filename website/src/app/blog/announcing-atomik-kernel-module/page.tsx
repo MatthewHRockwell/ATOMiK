@@ -97,7 +97,7 @@ export default function BlogPost() {
           </p>
           <Code>{`current_state = initial_state XOR accumulator`}</Code>
           <p>
-            This is backed by 92 formally proven Lean4 theorems (commutativity, associativity,
+            This is backed by 108 formally proven Lean4 theorems (commutativity, associativity,
             self-inverse, identity) and runs on everything from a Python pip install to custom
             FPGA silicon hitting 69.7 billion operations per second.
           </p>

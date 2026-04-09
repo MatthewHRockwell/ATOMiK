@@ -9,11 +9,11 @@ import HeroMetrics from "@/components/HeroMetrics";
 export const metadata: Metadata = {
   title: "ATOMiK — Stop moving data. Start evolving it.",
   description:
-    "O(1) state reconstruction, 99% less bandwidth, 330,000x less memory. A 4-operation algebra, formally proven with 92 Lean4 theorems. Software + FPGA hardware acceleration.",
+    "O(1) state reconstruction, 99% less bandwidth, 330,000x less memory. A 4-operation algebra, formally proven with 108 Lean4 theorems. Software + FPGA hardware acceleration.",
   openGraph: {
     title: "ATOMiK — Stop moving data. Start evolving it.",
     description:
-      "O(1) state reconstruction. 99% less bandwidth. 330,000x less memory. Formally proven with 92 Lean4 theorems. Software + hardware acceleration.",
+      "O(1) state reconstruction. 99% less bandwidth. 330,000x less memory. Formally proven with 108 Lean4 theorems. Software + hardware acceleration.",
     url: "https://atomik.tech",
     images: [{ url: "https://atomik.tech/og-image.jpg", width: 1200, height: 630 }],
     type: "website",
@@ -22,14 +22,14 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "ATOMiK — Stop moving data. Start evolving it.",
     description:
-      "O(1) state reconstruction. 99% less bandwidth. Formally proven with 92 Lean4 theorems.",
+      "O(1) state reconstruction. 99% less bandwidth. Formally proven with 108 Lean4 theorems.",
     images: ["https://atomik.tech/og-image.jpg"],
   },
 };
 
 const metrics = [
   { value: "O(1)", label: "Change Detection", subtitle: "constant ~262 cycles regardless of buffer size \u2014 hardware-validated on Linux userspace" },
-  { value: "92", label: "Lean4 Formal Proofs" },
+  { value: "108", label: "Lean4 Formal Proofs" },
   { value: "69.7 Gops/s", label: "Peak FPGA Throughput" },
   { value: "1.2M", label: "Regions/sec Monitored", subtitle: "multi-buffer change detection at 64 contexts on Zynq RISC-V Linux" },
 ];
@@ -47,7 +47,7 @@ const features: { tag: string; title: string; desc: string; color: string; bg: s
   { tag: "SCALING", title: "Parallel Scaling", desc: "Sub-linear LUT growth: 3.7x area for 16x throughput. XOR commutativity means lock-free parallel accumulation across banks.", color: "#22d3ee", bg: "rgba(34,211,238,0.12)" },
   { tag: "BANDWIDTH", title: "Delta-Driven Updates", desc: "Send 8-byte deltas instead of full state copies. 64KB state with 10K updates: ATOMiK sends 80KB. Full replication sends 655MB.", color: "#22c55e", bg: "rgba(34,197,94,0.12)" },
   { tag: "SECURITY", title: "Timing-Safe", desc: "No speculative execution, no cache coherency attacks, no data-dependent timing. Security is architectural, not bolted on.", color: "#f59e0b", bg: "rgba(245,158,11,0.12)" },
-  { tag: "CORRECTNESS", title: "Formally Verified", desc: "92 Lean4 theorems prove commutativity, associativity, self-inverse, and identity. Not tested -- proven. Every property holds for all inputs.", color: "#ef4444", bg: "rgba(239,68,68,0.12)" },
+  { tag: "CORRECTNESS", title: "Formally Verified", desc: "108 Lean4 theorems prove commutativity, associativity, self-inverse, and identity. Not tested -- proven. Every property holds for all inputs.", color: "#ef4444", bg: "rgba(239,68,68,0.12)" },
 ];
 
 const comparisons: [string, string, string][] = [
@@ -57,7 +57,7 @@ const comparisons: [string, string, string][] = [
   ["Rollback memory", "8 MB (snapshots)", "24 bytes (always)"],
   ["Change detection", "O(n) full rescan", "O(1) incremental"],
   ["Message ordering", "Required (consensus)", "Any order (XOR commutes)"],
-  ["Correctness", "Tests + hope", "92 Lean4 proofs"],
+  ["Correctness", "Tests + hope", "108 Lean4 proofs"],
 ];
 
 const pricingTiers = [
@@ -100,7 +100,7 @@ const pricingTiers = [
 ];
 
 const investorStats: [string, string][] = [
-  ["92", "Lean4 Proofs"], ["500+", "Tests (SW + HW)"], ["3", "FPGA Platforms"],
+  ["108", "Lean4 Proofs"], ["500+", "Tests (SW + HW)"], ["3", "FPGA Platforms"],
   ["69.7B", "Ops/s Peak"], ["$50B", "Serviceable Market"],
 ];
 
@@ -420,7 +420,7 @@ export default function Home() {
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
             {[
               {
-                value: "92",
+                value: "108",
                 label: "Lean4 Formal Proofs",
                 href: "https://github.com/MatthewHRockwell/ATOMiK/tree/main/math/proofs",
                 icon: "\u2713",

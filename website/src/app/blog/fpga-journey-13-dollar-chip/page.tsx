@@ -6,7 +6,7 @@ import EmailCapture from "@/components/EmailCapture";
 export const metadata: Metadata = {
   title: "From Math to Silicon: 69.7 Gops/s on a $13.50 Chip — ATOMiK Blog",
   description:
-    "How we went from 92 Lean4 theorems to a custom RISC-V CPU with native delta-state instructions, HD HDMI output, and 69.7 billion operations per second on commodity FPGAs.",
+    "How we went from 108 Lean4 theorems to a custom RISC-V CPU with native delta-state instructions, HD HDMI output, and 69.7 billion operations per second on commodity FPGAs.",
 };
 
 function Code({ children }: { children: string }) {
@@ -110,7 +110,7 @@ export default function FPGABlogPost() {
           <p>
             XOR gives you an Abelian group for free — commutative, associative,
             self-inverse, with identity element zero. We proved all of this formally
-            with 92 Lean4 theorems. Not &quot;we tested it&quot; — we <em>proved</em> it.
+            with 108 Lean4 theorems. Not &quot;we tested it&quot; — we <em>proved</em> it.
             The algebra is correct by construction.
           </p>
           <p>
@@ -271,7 +271,7 @@ uint32_t state = *(volatile uint32_t*)ATOMIK_READ;
           </h2>
           <ul className="list-disc pl-6 space-y-2">
             <li>
-              <strong>Start with the math.</strong> The 92 Lean4 proofs caught edge
+              <strong>Start with the math.</strong> The 108 Lean4 proofs caught edge
               cases that testing never would have found. When your algebra is
               provably correct, debugging hardware becomes purely a plumbing exercise.
             </li>

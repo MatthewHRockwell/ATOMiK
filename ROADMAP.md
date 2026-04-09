@@ -722,11 +722,11 @@ The v3 architecture is a ground-up redesign: custom RV64I CPU with ATOMiK custom
 
 ---
 
-## 15. ATOMiK Zynq Port (ALINX AX7020)
+## 15. ATOMiK Zynq Port (HamGeek RK-ZYNQ7020-F)
 
-The Zynq port brings ATOMiK to a Xilinx Zynq-7000 SoC (XC7Z020-2CLG400I). This is a **parallel development track** alongside the Tang Nano 9K v3 SoC. The Zynq provides 6x more LUT (each more capable), 10x more BRAM, 11x more DSP, and dual ARM Cortex-A9 cores running Linux — enabling multi-bank scaling well beyond what the Gowin device supports.
+The Zynq port is the **primary Linux platform** for ATOMiK. A VexRiscv SMP RISC-V soft-core runs Linux 6.9 in the PL fabric with ATOMiK as a Wishbone CSR peripheral. The path is fully validated: 16/16 userspace PASS, 9/9 adapter PASS, workload demo captured.
 
-On the Zynq, ATOMiK operates as an **AXI4-Lite peripheral** in the PL fabric, accessed from Linux userspace via UIO. The ARM Cortex-A9 runs the OS; there is no RV64I CPU port.
+ATOMiK is accessed from Linux userspace via `/dev/mem` + libatomik (3 backends: CSR, Adapter, AXI). The adapter path (CFU bus wrapper) adds ~10-14% overhead vs direct CSR, both O(1).
 
 Full task list: [`specs/zynq_port_tasks.md`](specs/zynq_port_tasks.md)
 Architecture spec: [`specs/zynq_port.md`](specs/zynq_port.md)
@@ -736,14 +736,14 @@ Reference docs: [`docs/reference/xilinx/`](docs/reference/xilinx/)
 
 | Item | Details |
 |------|---------|
-| **Board** | ALINX AX7020 ($195, on order) |
+| **Board** | HamGeek RK-ZYNQ7020-F (CLG484) |
 | **FPGA** | XC7Z020-2CLG400I (industrial grade, -2 speed) |
 | **CPU** | Dual ARM Cortex-A9 @ 667 MHz |
 | **DDR3** | 1 GB (32-bit, on PS) |
 | **PL Resources** | 53,200 LUT6, 106,400 FF, 140 BRAM36, 220 DSP48E1, 4 MMCM |
 | **HDMI** | In/Out |
 | **Ethernet** | Gigabit (PS-side) |
-| **Instruments** | USB-C inline power sensor (on order), thermocouple (on order) |
+| **Instruments** | USB-C inline power sensor, thermocouple |
 
 ### Platform Comparison
 
@@ -775,24 +775,25 @@ Reference docs: [`docs/reference/xilinx/`](docs/reference/xilinx/)
 3. **4-stage SWAP pipeline** — Accounts for BRAM registered read latency. Deterministic, fixed-depth for all operations.
 4. **Aggressive implementation directives** — `ExtraTimingOpt` placement + `AggressiveExplore` routing closed the final 61ps gap.
 
-### Status
+### Status (April 2026)
 
-- **Zynq Phase 0**: Documentation & tooling — **COMPLETE** (13 reference docs, Vivado environment validated)
-- **Zynq Phase 0.5**: Pre-hardware optimization — **COMPLETE** (400 MHz timing-met, 37/37 CDC sim tests, Fmax sweep infrastructure)
-- **Zynq Phase 1**: ATOMiK PL bringup (N=1) — PENDING (board on order, ~March 22)
-- **Zynq Phase 2**: Multi-bank scaling (N=16, 64, 256) — PENDING
-- **Zynq Phase 3**: Display & integration — PENDING
+- **Zynq Phase 0**: Documentation & tooling — **COMPLETE**
+- **Zynq Phase 0.5**: Pre-hardware synthesis — **COMPLETE** (400 MHz timing-met, 37/37 CDC sim)
+- **Zynq Phase 1**: Linux bringup — **COMPLETE** (Linux 6.9, VexRiscv SMP, 16/16 PASS)
+- **Zynq Phase 2**: Adapter validation — **COMPLETE** (9/9 HW, 20/20 Verilator, 10-14% overhead)
+- **Zynq Phase 3**: Workload demo — **COMPLETE** (15x-4,657x, 7/7 correct state monitor)
+- **Zynq Phase 4**: Multi-bank scaling — PENDING
+- **Zynq Phase 5**: CFU native instruction path — PENDING
 
-### Key Design Decisions
+### Architecture
 
-1. **ATOMiK is an accelerator** — ARM PS runs Linux, ATOMiK is an AXI4-Lite peripheral in PL
-2. **32-bit AXI, 64-bit datapath** — LO/HI register pair, HI write triggers operation
-3. **Dual-clock CDC** — 100 MHz AXI domain + parameterized ATOMiK domain (up to 400 MHz) via MMCME2 + toggle-handshake
-4. **Zynq-optimized core** — XPM BRAM (RAMB36E1) with output register, 4-stage SWAP pipeline, deterministic latency
-5. **UIO driver** — mmap registers into userspace, no custom kernel module
-6. **Same benchmark suite** — identical test vectors on Zynq and Gowin for cross-platform comparison
+1. **VexRiscv SMP** runs Linux in PL — ATOMiK is a Wishbone CSR peripheral
+2. **32-bit Wishbone, 64-bit datapath** — LO/HI register pair, HI write triggers operation
+3. **CFU adapter** — Wishbone wrapper around CFU bus, validated at 0xF0020000
+4. **libatomik** — C runtime with 3 backends (CSR, Adapter, AXI), 33/33 mock tests
+5. **`/dev/mem` access** — MMIO fences + dummy STATUS read for Wishbone ordering
+6. **`--cpu-variant=linux` REQUIRED** for VexRiscvSMP builds (see `feedback_litex_build.md`)
 
 ---
 
-*This document is a living roadmap. Update as decisions are made and phases are completed.*
-*Last updated: March 12, 2026*
+*Last updated: April 8, 2026 — tag `zynq-adapter-v1`*

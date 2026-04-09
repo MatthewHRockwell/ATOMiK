@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Security & Compliance — ATOMiK",
     description:
-      "Enterprise security and compliance for delta-state computing. Local data processing, 92 formally verified theorems, GDPR compliant.",
+      "Enterprise security and compliance for delta-state computing. Local data processing, 108 formally verified theorems, GDPR compliant.",
   },
 };
 
@@ -23,7 +23,7 @@ const certifications = [
   },
   {
     name: "Lean4 Formal Proofs",
-    status: "92 Theorems Verified",
+    status: "108 Theorems Verified",
     statusColor: "#8b5cf6",
     description: "Mathematical correctness proven, not assumed",
     icon: "L4",
@@ -74,7 +74,7 @@ const sections = [
     color: "#22c55e",
     items: [
       "The core SDK is licensed under Apache 2.0 — fully auditable by your security team.",
-      "92 Lean4 formal proofs verify the mathematical correctness of delta-state algebra. These are machine-checked, not hand-reviewed.",
+      "108 Lean4 formal proofs verify the mathematical correctness of delta-state algebra. These are machine-checked, not hand-reviewed.",
       "All source code is available on GitHub for independent security review.",
       "No obfuscated binaries. No proprietary black boxes in the critical path.",
     ],
@@ -166,7 +166,7 @@ export default function CompliancePage() {
             <p>
               The mathematical foundation is not assumed — it is{" "}
               <span className="font-semibold text-white">
-                proven in 92 Lean4 theorems
+                proven in 108 Lean4 theorems
               </span>
               , machine-verified to be correct by construction. This is a level of assurance
               that testing alone cannot provide.

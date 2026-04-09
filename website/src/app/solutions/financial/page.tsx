@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   title:
     "Deterministic State for Financial Systems — ATOMiK | Trading State Sync, Real-Time P&L",
   description:
-    "Constant-time state reconstruction for trading systems. Zero timing jitter eliminates side channels. Self-inverse undo for instant trade cancellations. Lock-free multi-venue P&L aggregation backed by 92 formal proofs.",
+    "Constant-time state reconstruction for trading systems. Zero timing jitter eliminates side channels. Self-inverse undo for instant trade cancellations. Lock-free multi-venue P&L aggregation backed by 108 formal proofs.",
   keywords: [
     "deterministic state management",
     "trading system state sync",
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Deterministic State for Financial Systems — ATOMiK",
     description:
-      "O(1) state reconstruction with zero timing jitter. Eliminates side channels, enables instant undo, and provides lock-free multi-venue aggregation. 92 formal proofs.",
+      "O(1) state reconstruction with zero timing jitter. Eliminates side channels, enables instant undo, and provides lock-free multi-venue aggregation. 108 formal proofs.",
     type: "website",
   },
 };
@@ -111,7 +111,7 @@ const metrics = [
     detail: "Sub-0.5 cycle stdev eliminates side channel exploitation",
   },
   {
-    value: "92",
+    value: "108",
     label: "Formal Proofs",
     detail: "Lean4-verified algebraic properties guarantee correctness",
   },
@@ -156,7 +156,7 @@ export default function FinancialSolutionsPage() {
           O(1) state reconstruction with zero timing jitter. ATOMiK&apos;s
           delta-state algebra eliminates timing side channels, enables instant
           trade cancellations via self-inverse undo, and provides lock-free
-          multi-venue aggregation &mdash; all backed by 92 Lean4 formal proofs.
+          multi-venue aggregation &mdash; all backed by 108 Lean4 formal proofs.
         </p>
         <div className="flex flex-wrap justify-center gap-4 mt-10">
           <Link

@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   title:
     "Distributed State Without Consensus — ATOMiK | CRDT Alternative, Lock-Free Convergence",
   description:
-    "Replace Raft, Paxos, CRDTs, and event sourcing with XOR delta-state algebra. Consensus-free state sync with 99% bandwidth reduction, O(1) reconstruction, and 92 formal proofs. The distributed cache without a leader.",
+    "Replace Raft, Paxos, CRDTs, and event sourcing with XOR delta-state algebra. Consensus-free state sync with 99% bandwidth reduction, O(1) reconstruction, and 108 formal proofs. The distributed cache without a leader.",
   keywords: [
     "consensus-free state sync",
     "CRDT alternative",
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Distributed State Without Consensus — ATOMiK",
     description:
-      "Replace consensus protocols, CRDTs, and event sourcing with XOR algebra. 99% bandwidth reduction. O(1) reconstruction. 92 formal proofs.",
+      "Replace consensus protocols, CRDTs, and event sourcing with XOR algebra. 99% bandwidth reduction. O(1) reconstruction. 108 formal proofs.",
     type: "website",
   },
 };
@@ -107,7 +107,7 @@ const comparisonRows = [
   },
   {
     metric: "Formal Proofs",
-    atomik: "92 Lean4 theorems",
+    atomik: "108 Lean4 theorems",
     raft: "TLA+ spec",
     crdt: "Per-type proofs",
     eventsource: "None standard",
@@ -126,7 +126,7 @@ const metrics = [
     detail: "Single XOR operation, not log replay",
   },
   {
-    value: "92",
+    value: "108",
     label: "Formal Proofs",
     detail: "Lean4-verified algebraic properties",
   },
@@ -171,7 +171,7 @@ export default function DistributedSystemsPage() {
           ATOMiK replaces consensus protocols, CRDTs, and event sourcing with
           XOR delta-state algebra. Every node converges to the same state
           without leaders, quorums, or conflict resolution &mdash; mathematically
-          guaranteed by 92 Lean4 proofs.
+          guaranteed by 108 Lean4 proofs.
         </p>
         <div className="flex flex-wrap justify-center gap-4 mt-10">
           <Link

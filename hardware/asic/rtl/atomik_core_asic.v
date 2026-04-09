@@ -21,7 +21,7 @@
 //   Same as atomik_v3_atomik — drop-in replacement for ASIC synthesis.
 //   op_valid + op_code + operands → result_valid + result_data.
 //
-// Proven: 92 Lean4 theorems. Hardware-validated on Gowin + Xilinx.
+// Proven: 108 Lean4 theorems. Hardware-validated on Gowin + Xilinx.
 //
 // ATOMiK Project — March 2026
 // SPDX-License-Identifier: MIT

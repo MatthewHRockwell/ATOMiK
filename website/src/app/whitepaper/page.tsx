@@ -9,7 +9,7 @@ const LOCALSTORAGE_KEY = "atomik_whitepaper_lead";
 const coverageItems = [
   {
     title: "Mathematical Foundations",
-    desc: "Abelian group properties (commutativity, associativity, self-inverse, identity) with 92 formally verified Lean4 theorems.",
+    desc: "Abelian group properties (commutativity, associativity, self-inverse, identity) with 108 formally verified Lean4 theorems.",
     color: "#8b5cf6",
   },
   {
@@ -40,7 +40,7 @@ const coverageItems = [
 ];
 
 const stats = [
-  { value: "92", label: "Lean4 Theorems Proven", color: "#8b5cf6" },
+  { value: "108", label: "Lean4 Theorems Proven", color: "#8b5cf6" },
   { value: "69.7 Gops/s", label: "Peak FPGA Throughput", color: "#4f8fff" },
   { value: "500+", label: "Tests Passing", color: "#22c55e" },
   { value: "916,000x", label: "Memory Traffic Reduction", color: "#d4a843" },
@@ -413,7 +413,7 @@ export default function WhitepaperPage() {
                         </code>.
                       </p>
                       <p>
-                        This paper presents the mathematical foundations (92 formally verified Lean4 theorems),
+                        This paper presents the mathematical foundations (108 formally verified Lean4 theorems),
                         hardware implementation across three FPGA platforms, production benchmarks showing
                         7,670x to 916,000x memory traffic reduction, and the Linux kernel module architecture
                         for transparent integration with existing systems.
@@ -480,7 +480,7 @@ export default function WhitepaperPage() {
                         </div>
                       </div>
                       <p>
-                        All 92 theorems covering these properties and their composition have been formally
+                        All 108 theorems covering these properties and their composition have been formally
                         verified in the Lean4 proof assistant. This is not testing &mdash; it is mathematical
                         proof that the algebra is correct for all possible inputs.
                       </p>
@@ -905,7 +905,7 @@ export default function WhitepaperPage() {
 
               {[
                 {
-                  value: "92",
+                  value: "108",
                   unit: "theorems",
                   desc: "Formally verified in Lean4 proof assistant. Every algebraic property machine-checked.",
                   color: "#8b5cf6",

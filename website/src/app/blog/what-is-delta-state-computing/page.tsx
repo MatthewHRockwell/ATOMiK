@@ -185,7 +185,7 @@ export default function WhatIsDeltaStateComputingPage() {
           <p>
             Delta-state computing is built on an <strong>Abelian group</strong> over
             the XOR operation. This is not marketing language — it is a formal algebraic
-            structure with four properties, each proven in Lean4 with 92 machine-checked
+            structure with four properties, each proven in Lean4 with 108 machine-checked
             theorems:
           </p>
 
@@ -297,7 +297,7 @@ export default function WhatIsDeltaStateComputingPage() {
             Delta-state computing achieves convergence with <em>one operation</em>: XOR.
             There is no type-specific logic. A delta is a bitstring. The merge function
             is always XOR. The metadata is always zero bytes (the accumulator is the
-            metadata). The correctness proof is always the same 92 theorems.
+            metadata). The correctness proof is always the same 108 theorems.
           </p>
 
           <div
@@ -317,7 +317,7 @@ export default function WhatIsDeltaStateComputingPage() {
                   ["Merge function", "Type-specific (per data type)", "Universal (XOR)"],
                   ["Metadata overhead", "O(n) — grows with nodes/ops", "O(1) — 8 bytes fixed"],
                   ["Implementation complexity", "Dozens of CRDT types", "4 operations, 1 type"],
-                  ["Correctness proof", "Per-type proofs required", "92 Lean4 theorems (universal)"],
+                  ["Correctness proof", "Per-type proofs required", "108 Lean4 theorems (universal)"],
                   ["Undo support", "Not built-in (type-dependent)", "Free (self-inverse)"],
                   ["Hardware acceleration", "Impractical (complex merge)", "Native (single XOR gate)"],
                   ["Garbage collection", "Required (tombstones, etc.)", "Not needed"],
@@ -426,7 +426,7 @@ state = reference ^ accumulator  # One XOR, always`}</Code>
                   ["Commutativity", "No (requires transform)", "Yes (by construction)"],
                   ["Central server", "Required", "Not needed"],
                   ["Algorithm complexity", "O(n^2) transform pairs", "O(1) XOR"],
-                  ["Correctness proofs", "Notoriously difficult", "92 machine-checked theorems"],
+                  ["Correctness proofs", "Notoriously difficult", "108 machine-checked theorems"],
                   ["Offline support", "Requires rebasing", "Deltas apply on reconnect"],
                   ["Bandwidth", "Full operation payload", "8 bytes per delta"],
                 ].map(([prop, ot, atomik], i) => (

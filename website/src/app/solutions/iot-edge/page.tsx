@@ -109,7 +109,7 @@ const comparisonRows = [
   },
   {
     metric: "Formal Guarantees",
-    atomik: "92 Lean4 proofs",
+    atomik: "108 Lean4 proofs",
     mqtt: "Delivery QoS only",
     coap: "Delivery semantics",
     custom: "None standard",

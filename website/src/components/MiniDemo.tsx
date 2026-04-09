@@ -126,7 +126,7 @@ export default function MiniDemo() {
 
       {/* Caption */}
       <p className="text-center text-sm mb-8" style={{ color: "#8888a0" }}>
-        Same result regardless of operation order. Proven with 92 theorems.
+        Same result regardless of operation order. Proven with 108 theorems.
       </p>
 
       {/* CTA buttons */}

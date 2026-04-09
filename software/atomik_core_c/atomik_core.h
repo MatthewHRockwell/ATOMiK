@@ -32,7 +32,7 @@
  *   atomik_fp_update(&fp, new_data, len);
  *   if (atomik_fp_changed(&fp)) { ... }
  *
- * Backed by 92 Lean4 theorems. Hardware-validated on Gowin + Xilinx.
+ * Backed by 108 Lean4 theorems. Hardware-validated on Gowin + Xilinx.
  *
  * SPDX-License-Identifier: Apache-2.0
  * ATOMiK Project — 2026

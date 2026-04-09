@@ -6,7 +6,7 @@ import EmailCapture from "@/components/EmailCapture";
 export const metadata: Metadata = {
   title: "CRDT Alternative: Delta-State Algebra — ATOMiK Blog",
   description:
-    "CRDTs are powerful but complex. Delta-state algebra solves the same convergence problem with one operation, zero metadata, and 92 machine-checked proofs. Side-by-side comparison with code.",
+    "CRDTs are powerful but complex. Delta-state algebra solves the same convergence problem with one operation, zero metadata, and 108 machine-checked proofs. Side-by-side comparison with code.",
   keywords: [
     "CRDT alternative",
     "simpler than CRDTs",
@@ -188,7 +188,7 @@ state = ctx.read()         # Reconstruct: reference ^ accumulator`}</Code>
           <p>
             That is the entire API. No type selection. No merge function. No metadata.
             No garbage collection. Convergence is a mathematical property of XOR
-            commutativity, proven in 92 machine-checked Lean4 theorems.
+            commutativity, proven in 108 machine-checked Lean4 theorems.
           </p>
 
           {/* Side-by-side comparison */}
@@ -331,7 +331,7 @@ ctx.accum(0x02)  # Undo node B
                   [
                     "Formal verification",
                     "Per-type proofs (often informal)",
-                    "92 Lean4 theorems (universal)",
+                    "108 Lean4 theorems (universal)",
                   ],
                   [
                     "Hardware acceleration",
@@ -470,7 +470,7 @@ ctx.accum(0x02)  # Undo node B
               scale with node count.
             </li>
             <li>
-              <strong>Formal guarantees matter.</strong> 92 Lean4 theorems cover every
+              <strong>Formal guarantees matter.</strong> 108 Lean4 theorems cover every
               property universally. No per-type analysis, no informal hand-waving.
             </li>
           </ul>

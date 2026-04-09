@@ -8,7 +8,7 @@
  *   SWAP  — Atomic read-and-reset (snapshot + new epoch)
  *
  * All operations are O(1) in time and space.
- * Backed by 92 Lean4 theorems proving commutativity, associativity,
+ * Backed by 108 Lean4 theorems proving commutativity, associativity,
  * self-inverse, and identity.
  *
  * @example

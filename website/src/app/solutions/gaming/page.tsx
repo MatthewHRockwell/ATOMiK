@@ -42,7 +42,7 @@ const painPoints = [
     problem:
       "Floating-point arithmetic is non-deterministic across platforms — different CPUs, compilers, and optimization levels produce different results. Client prediction diverges from the authoritative server. Players see rubberbanding, teleporting, and ghost hits.",
     solution:
-      "XOR is bitwise-exact on every platform. No floating-point rounding, no platform-dependent behavior. Delta accumulation is deterministic by construction — every client and server converges to the identical state, bit for bit. Proven by 92 Lean4 theorems.",
+      "XOR is bitwise-exact on every platform. No floating-point rounding, no platform-dependent behavior. Delta accumulation is deterministic by construction — every client and server converges to the identical state, bit for bit. Proven by 108 Lean4 theorems.",
   },
   {
     label: "Rollback Netcode Complexity",

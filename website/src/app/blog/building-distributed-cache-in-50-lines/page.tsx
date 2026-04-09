@@ -159,7 +159,7 @@ stream.accum(msg.addr, msg.delta)`}</Code>
             <li><strong>8 bytes per update.</strong> Regardless of the value size, the delta is always 8 bytes.</li>
             <li><strong>O(1) everything.</strong> Write, read, and sync are all constant-time.</li>
             <li><strong>Automatic convergence.</strong> All nodes reach the same state regardless of message ordering.</li>
-            <li><strong>Proven correct.</strong> 92 Lean4 theorems guarantee the algebra works.</li>
+            <li><strong>Proven correct.</strong> 108 Lean4 theorems guarantee the algebra works.</li>
           </ul>
 
           <div className="rounded-xl border p-8 mt-8" style={{ background: "#12121a", borderColor: "#1e1e2e" }}>

@@ -1596,7 +1596,7 @@ static void demo_splash(void)
     putchar('\n');
 
     pad_spaces(42);
-    print("92 Theorems ");
+    print("108 Theorems ");
     putchar(CH_BULLET);
     print(" Patented ");
     putchar(CH_BULLET);
@@ -1928,7 +1928,7 @@ static int demo_architecture(void)
     putchar(CH_BULLET);
     print(" Self-inverse ");
     putchar(CH_BULLET);
-    print(" 92 Lean4 theorems");
+    print(" 108 Lean4 theorems");
     pad_spaces(BOX_W - 58);
     putchar(CH_VLINE); putchar('\n');
 
@@ -2589,7 +2589,7 @@ static int demo_security(void)
     putchar(CH_VLINE); putchar('\n');
 
     pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(4);
-    print("SC-13:  92 formally proven theorems (Lean4)");
+    print("SC-13:  108 formally proven theorems (Lean4)");
     pad_spaces(BOX_W - 50);
     putchar(CH_VLINE); putchar('\n');
 
@@ -3498,7 +3498,7 @@ static int demo_competitive(void)
     pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(8);
     print("ATOMiK    ");
     repeat_char(CH_FULL, 20);
-    print("  92 Lean4 theorems (algebraic proof)");
+    print("  108 Lean4 theorems (algebraic proof)");
     pad_spaces(BOX_W - 69);
     putchar(CH_VLINE); putchar('\n');
 
@@ -3635,10 +3635,10 @@ static int demo_summary(void)
     draw_empty(PAD, BOX_W);
     draw_empty(PAD, BOX_W);
 
-    // Hero metric 4: 92 theorems (static — known count)
+    // Hero metric 4: 108 theorems (static — known count)
     pad_spaces(PAD); putchar(CH_VLINE); pad_spaces(8);
     draw_hbar_gradient(92, 92);
-    print("  92 Lean4 theorems");
+    print("  108 Lean4 theorems");
     pad_spaces(BOX_W - 121);
     putchar(CH_VLINE); putchar('\n');
 

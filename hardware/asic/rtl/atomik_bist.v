@@ -6,7 +6,7 @@
 //              Runs at power-on or on-demand. Reports pass/fail via status
 //              registers readable by the test interface.
 //
-// Test Suite (10 tests, derived from 92 Lean4 proofs):
+// Test Suite (10 tests, derived from 108 Lean4 proofs):
 //   T1: LOAD + READ identity      — load(addr, X); read(addr) == X
 //   T2: ACCUM + READ              — load(0, A); accum(B); read == A^B
 //   T3: XOR self-inverse           — accum(X); accum(X); read == original
