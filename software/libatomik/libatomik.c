@@ -452,6 +452,34 @@ uint8_t atomik_version(atomik_t *a)
     return a->version;
 }
 
+int atomik_detect_changed(atomik_t *a, uint8_t addr, uint64_t expected_fp,
+                           const void *data, size_t len)
+{
+    const uint8_t *p = (const uint8_t *)data;
+    size_t i;
+
+    /* Compute current fingerprint: XOR of all 8-byte chunks */
+    uint64_t current_fp = 0;
+    for (i = 0; i + 8 <= len; i += 8) {
+        uint64_t chunk;
+        memcpy(&chunk, p + i, 8);
+        current_fp ^= chunk;
+    }
+
+    /* Use ATOMiK to compare: LOAD(0), ACCUM(expected), ACCUM(current).
+     * If expected == current, acc = expected XOR current = 0 → acc_zero = 1.
+     * If different, acc != 0 → acc_zero = 0. */
+    atomik_load(a, addr, 0);
+    atomik_accum(a, expected_fp);
+    atomik_accum(a, current_fp);
+    int changed = !atomik_acc_zero(a);
+
+    /* Store current_fp as new reference for next call */
+    atomik_load(a, addr, current_fp);
+
+    return changed;
+}
+
 void atomik_set_enable(atomik_t *a, int enable)
 {
     if (a->layout == ATOMIK_LAYOUT_ADAPTER)

@@ -22,6 +22,7 @@
 #ifndef LIBATOMIK_H
 #define LIBATOMIK_H
 
+#include <stddef.h>
 #include <stdint.h>
 
 #ifdef __cplusplus
@@ -190,6 +191,27 @@ void atomik_swap(atomik_t *a, uint8_t addr);
  * @return   1 if accumulator is zero, 0 otherwise
  */
 int atomik_acc_zero(atomik_t *a);
+
+/*
+ * Detect whether a memory region changed since a known reference.
+ *
+ * Computes an XOR fingerprint of the data, loads the expected fingerprint
+ * into the ATOMiK state table, accumulates the current fingerprint, and
+ * checks whether they differ. This is the primitive every wedge needs.
+ *
+ * IMPORTANT: This uses and resets address `addr`. After return, the
+ * accumulator is clear and the state table at `addr` holds the NEW
+ * fingerprint (so the next call detects changes from THIS point).
+ *
+ * @param a     Handle
+ * @param addr  Context address (0-255)
+ * @param expected_fp  XOR fingerprint of the expected (reference) state
+ * @param data  Pointer to current data
+ * @param len   Length of data in bytes (will be rounded down to 8-byte chunks)
+ * @return      1 if data changed (fingerprint mismatch), 0 if unchanged
+ */
+int atomik_detect_changed(atomik_t *a, uint8_t addr, uint64_t expected_fp,
+                           const void *data, size_t len);
 
 /*
  * Get the number of parallel accumulator banks.
