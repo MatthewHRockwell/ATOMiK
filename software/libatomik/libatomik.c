@@ -22,6 +22,153 @@
  * Internal helpers
  * ========================================================================= */
 
+#ifdef ATOMIK_MOCK
+/* ── Mock backend: in-memory state table, no hardware ──────────────────── */
+
+static uint64_t mock_state_table[256];
+static uint64_t mock_accumulator;
+static uint8_t  mock_active_addr;
+static uint64_t mock_snapshot;
+static uint8_t  mock_load_addr;
+static uint32_t mock_load_data_lo;
+static uint32_t mock_accum_lo;
+static uint8_t  mock_enable = 1;
+
+/* Adapter mock state */
+static uint32_t mock_adapter_rs1;
+static uint32_t mock_adapter_rs2;
+static uint32_t mock_adapter_rd;
+static uint32_t mock_adapter_init_lo;
+static uint32_t mock_adapter_delta_lo;
+
+static void mock_reset(void)
+{
+    memset(mock_state_table, 0, sizeof(mock_state_table));
+    mock_accumulator = 0;
+    mock_active_addr = 0;
+    mock_snapshot = 0;
+    mock_load_addr = 0;
+    mock_load_data_lo = 0;
+    mock_accum_lo = 0;
+    mock_enable = 1;
+    mock_adapter_rs1 = 0;
+    mock_adapter_rs2 = 0;
+    mock_adapter_rd = 0;
+    mock_adapter_init_lo = 0;
+    mock_adapter_delta_lo = 0;
+}
+
+static uint64_t mock_current_state(void)
+{
+    return mock_state_table[mock_active_addr] ^ mock_accumulator;
+}
+
+static void mock_csr_write(unsigned offset, uint32_t value)
+{
+    switch (offset) {
+    case 0x00: mock_load_addr = value & 0xFF; break;
+    case 0x04: mock_load_data_lo = value; break;
+    case 0x08: { /* LOAD_DATA_HI triggers LOAD */
+        uint64_t init = ((uint64_t)value << 32) | mock_load_data_lo;
+        mock_active_addr = mock_load_addr;
+        mock_state_table[mock_active_addr] = init;
+        mock_accumulator = 0;
+        break;
+    }
+    case 0x0C: mock_accum_lo = value; break;
+    case 0x10: { /* ACCUM_HI triggers ACCUM */
+        uint64_t delta = ((uint64_t)value << 32) | mock_accum_lo;
+        mock_accumulator ^= delta;
+        break;
+    }
+    case 0x14: /* SWAP (CSR layout) */
+        mock_state_table[mock_active_addr] = mock_current_state();
+        mock_accumulator = 0;
+        mock_active_addr = value & 0xFF;
+        break;
+    case 0x18: /* CONFIG */
+        mock_enable = value & 1;
+        if (!mock_enable) mock_accumulator = 0;
+        break;
+    default: break;
+    }
+}
+
+static uint32_t mock_csr_read(unsigned offset)
+{
+    switch (offset) {
+    case 0x1C: mock_snapshot = mock_current_state(); return (uint32_t)(mock_snapshot & 0xFFFFFFFF);
+    case 0x20: return (uint32_t)(mock_snapshot >> 32);
+    case 0x24: return (0x02 << 16) | (0x01 << 8) | ((mock_accumulator == 0) ? 1 : 0);
+    case 0x18: return mock_enable;
+    default: return 0;
+    }
+}
+
+static void mock_adapter_write(unsigned offset, uint32_t value)
+{
+    switch (offset) {
+    case 0x00: { /* CMD */
+        uint8_t funct3 = value & 7;
+        switch (funct3) {
+        case 0: /* LOAD */ mock_active_addr = mock_adapter_rs1 & 0xFF; mock_adapter_init_lo = mock_adapter_rs2; break;
+        case 4: /* LOAD_HI */ mock_state_table[mock_active_addr] = ((uint64_t)mock_adapter_rs2 << 32) | mock_adapter_init_lo; mock_accumulator = 0; break;
+        case 1: /* ACCUM */ mock_adapter_delta_lo = mock_adapter_rs1; break;
+        case 5: /* ACCUM_HI */ mock_accumulator ^= ((uint64_t)mock_adapter_rs1 << 32) | mock_adapter_delta_lo; break;
+        case 2: /* READ */ mock_adapter_rd = (uint32_t)(mock_current_state() & 0xFFFFFFFF); break;
+        case 6: /* READ_HI */ mock_adapter_rd = (uint32_t)(mock_current_state() >> 32); break;
+        case 3: /* SWAP */ mock_active_addr = mock_adapter_rs1 & 0xFF; mock_state_table[mock_active_addr] = mock_current_state(); mock_accumulator = 0; break;
+        case 7: /* STATUS */ mock_adapter_rd = (0x02 << 16) | (0x01 << 8) | ((mock_accumulator == 0) ? 1 : 0); break;
+        }
+        break;
+    }
+    case 0x04: mock_adapter_rs1 = value; break;
+    case 0x08: mock_adapter_rs2 = value; break;
+    default: break;
+    }
+}
+
+static uint32_t mock_adapter_read(unsigned offset)
+{
+    switch (offset) {
+    case 0x0C: return mock_adapter_rd;
+    case 0x10: return 0x02; /* rsp_ok=1, busy=0 */
+    case 0x04: return mock_adapter_rs1;
+    case 0x08: return mock_adapter_rs2;
+    default: return 0;
+    }
+}
+
+/* Active mock layout — set by atomik_open_devmem */
+static atomik_layout_t mock_active_layout = ATOMIK_LAYOUT_CSR;
+
+static inline void reg_write(volatile uint32_t *regs, unsigned offset,
+                              uint32_t value)
+{
+    (void)regs;
+    if (mock_active_layout == ATOMIK_LAYOUT_ADAPTER)
+        mock_adapter_write(offset, value);
+    else
+        mock_csr_write(offset, value);
+}
+
+static inline uint32_t reg_read(volatile uint32_t *regs, unsigned offset)
+{
+    (void)regs;
+    if (mock_active_layout == ATOMIK_LAYOUT_ADAPTER)
+        return mock_adapter_read(offset);
+    else
+        return mock_csr_read(offset);
+}
+
+static inline void mmio_barrier(volatile uint32_t *regs, unsigned status_off)
+{
+    (void)regs; (void)status_off; /* No-op in mock mode */
+}
+
+#else
+/* ── Real hardware: MMIO register access ───────────────────────────────── */
+
 static inline void reg_write(volatile uint32_t *regs, unsigned offset,
                               uint32_t value)
 {
@@ -33,13 +180,6 @@ static inline uint32_t reg_read(volatile uint32_t *regs, unsigned offset)
     return regs[offset / 4];
 }
 
-/*
- * MMIO ordering barrier: ensures prior CSR writes complete on the Wishbone
- * bus before subsequent reads. Required on VexRiscv SMP — without this,
- * STATE_LO reads after LOAD/ACCUM return stale data.
- *
- * Uses: fence iorw,iorw + dummy STATUS read (bus round-trip).
- */
 static inline void mmio_barrier(volatile uint32_t *regs, unsigned status_off)
 {
 #if defined(__riscv)
@@ -49,6 +189,8 @@ static inline void mmio_barrier(volatile uint32_t *regs, unsigned status_off)
 #endif
     (void)reg_read(regs, status_off);
 }
+
+#endif /* ATOMIK_MOCK */
 
 /* Forward declaration for adapter CMD-based STATUS query */
 static uint32_t adapter_status_word(atomik_t *a);
@@ -125,12 +267,25 @@ atomik_t *atomik_open_devmem(unsigned long phys_addr, atomik_layout_t layout)
 {
     atomik_t *a;
     uint32_t status;
-    unsigned long page_base;
-    unsigned long page_offset;
 
     a = calloc(1, sizeof(*a));
     if (!a)
         return NULL;
+
+#ifdef ATOMIK_MOCK
+    (void)phys_addr;
+    mock_reset();
+    mock_active_layout = layout;
+    a->regs = mmap(NULL, ATOMIK_MMAP_SIZE, PROT_READ | PROT_WRITE,
+                   MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+    if (a->regs == MAP_FAILED) {
+        free(a);
+        return NULL;
+    }
+    a->fd = -1;
+#else
+    unsigned long page_base;
+    unsigned long page_offset;
 
     a->fd = open("/dev/mem", O_RDWR | O_SYNC);
     if (a->fd < 0) {
@@ -150,6 +305,7 @@ atomik_t *atomik_open_devmem(unsigned long phys_addr, atomik_layout_t layout)
         return NULL;
     }
     a->regs = (volatile uint32_t *)((char *)map + page_offset);
+#endif
 
     resolve_layout(a, layout);
 
