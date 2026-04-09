@@ -188,9 +188,14 @@ Revisit when a second Zynq board is available or bare-metal libatomik is needed.
 - [ ] **8.1** Generate Linux-bootable CFU SoC
   - Single-core VexRiscv linux+cfu with custom CLINT + PLIC
   - Vivado synthesis: PASS (0 errors, WNS +0.119ns @ 100MHz)
-  - REMAINING: need OpenSBI rebuilt for CFU SoC UART address (0xF0001800)
-    or DTS/bootargs adjusted. Current fw_jump69.bin targets SMP UART (0xF0001000).
-  - Bitstream: hardware/zynq/litex-build-cfu/gateware/hamgeek_rk7020f.bit
+  - OpenSBI rebuilt with correct UART (0xF0001800) + FW_JUMP_FDT_ADDR
+  - BIOS works: ident "VexRiscv Linux+CFU", DDR OK
+  - BLOCKER: OpenSBI hangs silently after "Liftoff!" — 111 bytes, no console
+  - Diagnosis: CSR layout verified correct, BIOS boot passes a0/a1 via
+    FW_JUMP_FDT_ADDR fallback. OpenSBI sets mtvec=_start_hang before
+    console init — any trap during sbi_hart_init causes silent infinite loop.
+  - Next step: either JTAG-level PC inspection or add hardware diagnostic
+    (LED/GPIO toggle) to narrow the trap source.
 
 - [ ] **8.2** Boot Linux on CFU-enabled SMP SoC
   - Load kernel + rootfs + OpenSBI
