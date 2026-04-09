@@ -14,13 +14,25 @@ This models a real service: an agent, edge node, or runtime monitoring state buf
 
 Measured on live Zynq hardware: VexRiscv SMP at 100 MHz, Linux 6.9, libatomik runtime.
 
-| Workload | Software (memcmp) | ATOMiK (detect) | Speedup | Throughput |
-|----------|------------------:|----------------:|--------:|-----------:|
-| 8 regions x 256B, 25% changed | 18,435 cy | 1,221 cy | **15x** | 655K reg/s |
-| 8 regions x 4KB, 25% changed | 6,955,438 cy | 1,223 cy | **5,687x** | 654K reg/s |
-| 32 regions x 1KB, 10% changed | 696,709 cy | 3,225 cy | **216x** | 992K reg/s |
-| 64 regions x 1KB, 5% changed | 1,392,901 cy | 5,881 cy | **237x** | 1.1M reg/s |
-| 64 regions x 4KB, 5% changed | 55,125,636 cy | 11,837 cy | **4,657x** | 541K reg/s |
+### Direct CSR Path
+
+| Workload | Software (memcmp) | ATOMiK (detect) | Speedup |
+|----------|------------------:|----------------:|--------:|
+| 8 regions x 256B, 25% changed | 20,316 cy | 1,238 cy | **16x** |
+| 8 regions x 4KB, 25% changed | 6,925,319 cy | 1,226 cy | **5,649x** |
+| 32 regions x 1KB, 10% changed | 679,582 cy | 9,200 cy | **74x** |
+| 64 regions x 1KB, 5% changed | 1,373,630 cy | 5,878 cy | **234x** |
+| 64 regions x 4KB, 5% changed | 55,323,599 cy | 11,830 cy | **4,677x** |
+
+### Adapter Path (CFU Wishbone wrapper at 0xF0020000)
+
+| Workload | Software (memcmp) | ATOMiK (detect) | Speedup | Overhead vs CSR |
+|----------|------------------:|----------------:|--------:|:---------------:|
+| 8 regions x 4KB, 25% changed | 6,901,240 cy | 1,376 cy | **5,015x** | +12% |
+| 64 regions x 1KB, 5% changed | 1,439,432 cy | 6,983 cy | **206x** | +19% |
+| 64 regions x 4KB, 5% changed | 55,292,090 cy | 12,967 cy | **4,264x** | +10% |
+
+Adapter path adds 10-19% overhead vs direct CSR, preserving the O(1) scaling property.
 
 ## Why the Speedup Grows
 

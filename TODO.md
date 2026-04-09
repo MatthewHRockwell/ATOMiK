@@ -150,25 +150,25 @@
 
 ## Phase 6: Adapter Workload Capture
 
-- [ ] **6.1** Cold boot adapter SoC bitstream
+- [x] **6.1** Cold boot adapter SoC bitstream
   - Use `litex-build-adapter/gateware/hamgeek_rk7020f.bit`
   - DDR sanity check must pass
   - Boot Linux with demo rootfs
   - Verify: BIOS memtest OK, Linux boots, shell accessible
 
-- [ ] **6.2** Run three-column workload comparison
+- [x] **6.2** Run three-column workload comparison
   - `workload_change_detect` with CSR backend (0xF0000000)
   - `workload_change_detect` with adapter backend (0xF0020000)
   - Software baseline (always included)
   - Capture all three in single output file
   - Verify: all three columns have valid data, adapter overhead is 10-20% vs CSR
 
-- [ ] **6.3** Run `demo_state_monitor` on adapter path
+- [x] **6.3** Run `demo_state_monitor` on adapter path
   - `/root/demo_state_monitor 0xF0020000 adapter`
   - Capture output, verify 7/7 correct
   - Verify: speedup numbers consistent with CSR results (within overhead margin)
 
-- [ ] **6.4** Update proof note with adapter workload data
+- [x] **6.4** Update proof note with adapter workload data
   - Add adapter column to WORKLOAD_PROOF.md table
   - Add sentence: "Adapter path adds X% overhead vs direct CSR, preserving the O(1) scaling."
   - Verify: all numbers in proof note match committed result files
