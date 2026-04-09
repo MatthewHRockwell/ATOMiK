@@ -141,9 +141,10 @@
   - docs/BRIEF_INCREMENTAL_SYNC.md — mock data, clearly labeled
   - docs/BRIEF_AGENT_MEMORY.md — mock data, clearly labeled
 
-- [ ] **5.4** Create unified multi-wedge demo script
-  - Requires all 3 binaries (watchd, sync, agent-mem) in rootfs + cold boot
-  - PENDING: hardware cold cycle needed
+- [x] **5.4** Run all 3 wedge demos on Zynq hardware in single boot
+  - hardware/zynq/results/multiwedge_20260409.txt
+  - Watchd 5/5, Sync 8/8 75% saved, Agent-mem 8/8 41.5% saved
+  - All correct, all in one boot session
 
 ---
 
