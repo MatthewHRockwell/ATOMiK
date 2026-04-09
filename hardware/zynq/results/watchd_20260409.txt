@@ -1,0 +1,15 @@
+mknod /dev/mem c 1 1 2>/dev/null; chmod 666 /dev/mem; /root/at
+omik-watchd -n 8 -s 4096 -t 10
+atomik-watchd: 8 regions x 4096 bytes, 25% mutation, 10 ticks
+atomik-watchd: ATOMiK v2 @ 0xF0000000 (csr), timer=ticks
+{"tick":1,"n_regions":8,"changed":[2,3],"n_changed":2,"detect_ticks":1529621,"baseline_ticks":5882760,"speedup":3.8}
+{"tick":2,"n_regions":8,"changed":[4,5],"n_changed":2,"detect_ticks":1189258,"baseline_ticks":5898646,"speedup":5.0}
+{"tick":3,"n_regions":8,"changed":[6,7],"n_changed":2,"detect_ticks":1478481,"baseline_ticks":5129765,"speedup":3.5}
+{"tick":4,"n_regions":8,"changed":[0,1],"n_changed":2,"detect_ticks":1476163,"baseline_ticks":5214500,"speedup":3.5}
+{"tick":5,"n_regions":8,"changed":[2,3],"n_changed":2,"detect_ticks":1188423,"baseline_ticks":5821980,"speedup":4.9}
+{"tick":6,"n_regions":8,"changed":[4,5],"n_changed":2,"detect_ticks":1188720,"baseline_ticks":5233102,"speedup":4.4}
+{"tick":7,"n_regions":8,"changed":[6,7],"n_changed":2,"detect_ticks":1485040,"baseline_ticks":5230163,"speedup":3.5}
+{"tick":8,"n_regions":8,"changed":[0,1],"n_changed":2,"detect_ticks":1248364,"baseline_ticks":5194223,"speedup":4.2}
+{"tick":9,"n_regions":8,"changed":[2,3],"n_changed":2,"detect_ticks":1246981,"baseline_ticks":5831383,"speedup":4.7}
+{"tick":10,"n_regions":8,"changed":[4,5],"n_changed":2,"detect_ticks":1189835,"baseline_ticks":5263096,"speedup":4.4}
+root@buildroot:~# 
