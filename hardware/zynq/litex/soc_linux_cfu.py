@@ -145,11 +145,15 @@ class BaseSoC(SoCCore):
         # Wire UART interrupt to PLIC source 1
         self.comb += self.plic.irq_sources[1].eq(self.uart.ev.rx.trigger)
 
-        # Wire CLINT/PLIC outputs to CPU interrupt inputs
+        # Wire CLINT outputs to CPU timer/software interrupt inputs
+        # (overrides the defaults set by LiteX VexRiscv core.py)
         self.cpu.cpu_params["i_timerInterrupt"]    = self.clint.timer_irq
         self.cpu.cpu_params["i_softwareInterrupt"] = self.clint.soft_irq
-        self.cpu.cpu_params["i_externalInterrupt"]  = self.plic.meip
-        self.cpu.cpu_params["i_externalInterruptS"] = self.plic.seip
+
+        # Wire PLIC output to CPU external interrupt array
+        # VexRiscv linux+cfu uses externalInterruptArray[31:0], not separate M/S lines
+        self.cpu.interrupt.eq(0)  # clear LiteX default
+        self.comb += self.cpu.interrupt[0].eq(self.plic.meip)
 
 def main():
     parser = argparse.ArgumentParser(description="ATOMiK LiteX SoC (VexRiscv Linux+CFU)")
