@@ -1,0 +1,25 @@
+mknod /dev/mem c 1 1 2>/dev/null; chmod 666 /dev/mem; /root/de
+mo_state_monitor
+ATOMiK State Change Monitor
+===========================
+
+Model: track one region, detect changes at each tick.
+Writes accumulate deltas at write time (O(1) per write).
+Detection: software rescans all bytes; ATOMiK reads one flag.
+
+ATOMiK v2 @ 0xF0000000 (CSR) | VexRiscv SMP 100 MHz
+
+Scenario           │ SW (memcmp)  │ ATOMiK       │ Speedup  │ Correct
+───────────────────┼──────────────┼──────────────┼──────────┼────────
+256B, 1 write      │      27496 cy │      71166 cy │    0.4x │ YES
+1KB, 1 write       │      28279 cy │      26265 cy │    1.1x │ YES
+4KB, 1 write       │      46559 cy │      26577 cy │    1.8x │ YES
+16KB, 1 write      │      84102 cy │      26957 cy │    3.1x │ YES
+64KB, 1 write      │     123254 cy │      26836 cy │    4.6x │ YES
+4KB, no change     │     898110 cy │      28016 cy │   32.1x │ YES
+64KB, no change    │   13813255 cy │      28125 cy │  491.1x │ YES
+
+Key: software cost grows with region size.
+     ATOMiK cost is constant (~260 cycles) regardless of size.
+     Deltas accumulate at write time, not at detection time.
+root@buildroot:~# 

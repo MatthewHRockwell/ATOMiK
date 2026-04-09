@@ -98,41 +98,60 @@ puts PROGRAMMED
 " 2>&1 | grep -q "PROGRAMMED" || { echo "JTAG FAILED"; exit 1; }
 echo "[OK] FPGA programmed"
 
+# Wait for FTDI ports to stabilize AND BIOS serialboot timeout (~15s)
+sleep 15
+
 # ═══════════════════════════════════════════════════════
 # Step 2: Find BIOS serial port + DDR sanity check
 # ═══════════════════════════════════════════════════════
 echo ""
 echo "[2/5] Finding BIOS and checking DDR..."
 SERIAL=$(python3 -c "
-import serial, time, sys, re
-for p in ['/dev/ttyUSB0','/dev/ttyUSB1','/dev/ttyUSB2','/dev/ttyUSB3']:
+import serial, time, sys, re, glob
+
+# Wait for ports to appear
+for attempt in range(10):
+    ports = sorted(glob.glob('/dev/ttyUSB*'))
+    if ports:
+        break
+    time.sleep(1)
+
+print(f'Scanning ports: {ports}', file=sys.stderr)
+
+for p in ports:
     try:
-        ser=serial.Serial(p,115200,timeout=3)
+        ser=serial.Serial(p,115200,timeout=5)
         ser.reset_input_buffer()
-        time.sleep(5)
+        # Wait for BIOS to finish serialboot
+        time.sleep(10)
         ser.write(b'\n')
-        time.sleep(3)
+        time.sleep(5)
         d=ser.read(4096)
         if b'litex' in d:
+            print(f'  BIOS found on {p}', file=sys.stderr)
             # DDR sanity check
             ser.reset_input_buffer()
             for c in 'mem_test 0x40000000 0x100':
                 ser.write(c.encode()); time.sleep(0.02)
             ser.write(b'\n')
-            time.sleep(5)
+            time.sleep(6)
             out=re.sub(r'\x1b\[[0-9;]*m','',ser.read(8192).decode('utf-8','replace'))
             ser.close()
             if 'Memtest OK' in out:
+                print(f'  DDR OK', file=sys.stderr)
                 print(p)
                 sys.exit(0)
             else:
-                print('DDR_FAIL',file=sys.stderr)
+                print(f'  DDR FAILED: {out[-50:]}', file=sys.stderr)
                 sys.exit(2)
+        else:
+            print(f'  {p}: no litex prompt ({len(d)}B)', file=sys.stderr)
         ser.close()
-    except: pass
-print('NO_BIOS',file=sys.stderr)
+    except Exception as e:
+        print(f'  {p}: {e}', file=sys.stderr)
+print('NO_BIOS', file=sys.stderr)
 sys.exit(1)
-" 2>/dev/null) || {
+" 2>&1 | tee /dev/stderr | grep -E "^/dev/ttyUSB") || {
     echo "ERROR: Could not find BIOS or DDR memtest failed."
     echo ""
     echo "If DDR failed: board needs full cold rest."
@@ -195,13 +214,20 @@ def slow(cmd):
     for c in cmd: ser.write(c.encode()); time.sleep(0.02)
     ser.write(b'\n')
 
-# Login — wait for boot to settle, then chain login + setup + run
-time.sleep(8)
+# Wait for login prompt explicitly
+time.sleep(5)
+for attempt in range(30):
+    d = ser.read(4096)
+    if b'login:' in d:
+        break
+    time.sleep(2)
+else:
+    print('TIMEOUT waiting for login prompt'); sys.exit(1)
+
+# Send login + chained command with minimal gap
 slow('root')
 time.sleep(8)
-ser.read(8192)  # flush login banner
-
-# Chain: setup + run in single line to avoid getty timeout
+ser.read(8192)  # flush MOTD
 slow('mknod /dev/mem c 1 1 2>/dev/null; chmod 666 /dev/mem; $BINARY')
 
 # Capture output
