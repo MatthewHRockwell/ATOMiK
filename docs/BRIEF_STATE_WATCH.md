@@ -4,49 +4,51 @@
 
 Any system tracking mutable state — agent memory, edge sensor buffers, config blocks — needs to answer: "did anything change?" The software approach rescans every byte: **O(N x region_size)** per check cycle. As tracked state grows, monitoring becomes the bottleneck.
 
-## Solution
+## What atomik-watchd Does
 
-`atomik-watchd` uses ATOMiK hardware to make change detection **O(1) per region** regardless of region size. Deltas accumulate in hardware at write time. Detection is a single register read per region.
+`atomik-watchd` monitors N memory regions and detects which changed each tick. It compares two approaches side-by-side:
 
-## How It Works
+- **Software**: `memcmp` each region against a shadow copy — O(N x size)
+- **ATOMiK**: recompute XOR fingerprint, compare via hardware `acc_zero` — O(N x size) for fingerprint computation, O(1) for the comparison
 
-```
-Every tick:
-  For each monitored region:
-    ATOMiK: check one hardware flag → changed or not  (O(1))
-    Software: rescan all bytes against shadow copy     (O(size))
-  Emit JSON: which regions changed, detection latency, speedup
-```
+Both methods are measured and reported per tick as JSON.
 
-## Live Hardware Result
+## The Production Model (Not Yet Implemented)
 
-Captured on Zynq XC7Z020 (VexRiscv SMP @ 100 MHz, Linux 6.9):
+In production, deltas accumulate in ATOMiK hardware **at write time** (one `ACCUM` call per write). Detection then becomes a single `acc_zero` check per region — truly O(1) regardless of region size. This daemon demonstrates the detection model with full-rescan fingerprinting; write-time accumulation requires integration into the application's write path.
 
-| Workload | Software | ATOMiK | Speedup |
-|----------|----------|--------|--------:|
-| 8 regions x 4KB, 25% changed | 6,955,438 cy | 1,223 cy | **5,687x** |
-| 64 regions x 4KB, 5% changed | 55,125,636 cy | 11,837 cy | **4,657x** |
-| 64KB region, no change | 13,932,657 cy | 65,846 cy | **212x** |
-
-Software cost grows with region size. ATOMiK cost is constant.
+The earlier standalone benchmark (`bench_change_detect`) measured only the detection cost after pre-accumulated deltas, which is where the O(1) constant-time result comes from.
 
 ## Output Format
 
 One JSON line per tick (pipe to jq, log aggregator, or dashboard):
 ```json
-{"tick":1,"n_regions":8,"changed":[0,2],"n_changed":2,"detect_cy":1234,"baseline_cy":56789,"speedup":46.0}
+{"tick":1,"n_regions":8,"changed":[0,2],"n_changed":2,"detect_ticks":1234,"baseline_ticks":56789,"speedup":46.0}
 ```
+
+Timer units: `ticks` (RISC-V rdtime @ 100 MHz) or `ns` (CLOCK_MONOTONIC on host).
+
+## Related Benchmark Results (Live Zynq Hardware)
+
+The standalone detection benchmark, which measures only the O(1) `acc_zero` check after pre-accumulated deltas, showed:
+
+| Workload | Software | ATOMiK detect | Speedup |
+|----------|----------|--------------|--------:|
+| 8 regions x 4KB | 6,955,438 cy | 1,223 cy | **5,687x** |
+| 64 regions x 4KB | 55,125,636 cy | 11,837 cy | **4,657x** |
+
+These numbers reflect the production model where deltas are accumulated at write time — not the current daemon's full-rescan approach.
 
 ## Use Cases
 
-- **Edge monitoring**: detect sensor/actuator state changes without rescanning
-- **Agent memory**: know which agent state regions changed since last checkpoint
-- **Config tracking**: constant-time tamper detection on tracked memory
+- **Edge monitoring**: detect sensor/actuator state changes
+- **Agent memory**: which agent state regions changed since last checkpoint
+- **Config tracking**: detect modifications to tracked memory regions
 - **Incremental sync**: identify dirty regions for selective transfer
 
 ## Runtime
 
-Built on `libatomik` 1.0 (C, 3 hardware backends). Runs on Linux via `/dev/mem`. No kernel module required. Mock mode for development without hardware.
+Built on `libatomik` 1.0 (C, 3 hardware backends). Mock mode for development: compile with `-DATOMIK_MOCK`.
 
 ```
 atomik-watchd -n 8 -s 4096 -t 10

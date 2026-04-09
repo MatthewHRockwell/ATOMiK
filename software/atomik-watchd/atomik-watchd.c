@@ -1,8 +1,16 @@
 /*
  * atomik-watchd — ATOMiK State Change Detection Service
  *
- * Monitors N memory regions, detects which changed each tick using
- * ATOMiK hardware (O(1) per region) vs software memcmp baseline.
+ * Monitors N memory regions, detects which changed each tick.
+ * Two detection methods compared side-by-side:
+ *   - Software: memcmp against shadow copy — O(N * region_size)
+ *   - ATOMiK:   recompute XOR fingerprint, compare via hardware — O(N * region_size)
+ *               for fingerprint computation, but O(1) for the comparison itself
+ *
+ * In production with write-time delta accumulation, the ATOMiK detection
+ * step becomes O(1) per region. This daemon demonstrates the comparison
+ * model; write-time accumulation requires integration into the write path.
+ *
  * Emits one JSON line per tick for consumption by dashboards, logs,
  * or downstream services.
  *
@@ -11,22 +19,25 @@
  *
  * Options:
  *   -n N        Number of regions (default: 8)
- *   -s SIZE     Region size in bytes (default: 4096)
+ *   -s SIZE     Region size in bytes (default: 4096, min: 1)
  *   -t TICKS    Number of monitoring ticks (default: 10, 0 = infinite)
  *   -c PCT      Percent of regions mutated per tick (default: 25)
  *   -a ADDR     ATOMiK physical address (default: 0xF0000000)
  *   -l LAYOUT   Backend layout: csr, adapter, axi (default: csr)
- *   -m          Mock mode (no hardware, in-memory simulation)
  *   -h          Print help
+ *
+ * Mock mode: compile with -DATOMIK_MOCK (not a runtime flag).
  *
  * Output (one JSON line per tick):
  *   {"tick":1,"n_regions":8,"changed":[0,2],"n_changed":2,
- *    "detect_cy":1234,"baseline_cy":56789,"speedup":46.0}
+ *    "detect_ticks":1234,"baseline_ticks":56789,"speedup":46.0}
+ *
+ * Timer units: RISC-V rdtime ticks (100 MHz = 10 ns each) or
+ * CLOCK_MONOTONIC nanoseconds on non-RISC-V hosts.
  *
  * Build:
- *   gcc -O2 -I../libatomik -o atomik-watchd atomik-watchd.c ../libatomik/libatomik.c
- *   # Mock: add -DATOMIK_MOCK
- *   # Zynq: use riscv32-buildroot-linux-gnu-gcc -static
+ *   gcc -O2 -I../libatomik -DATOMIK_MOCK -o atomik-watchd atomik-watchd.c ../libatomik/libatomik.c
+ *   # Zynq: CROSS=riscv32-buildroot-linux-gnu- make zynq
  *
  * ATOMiK Project — April 2026
  * SPDX-License-Identifier: MIT
@@ -58,19 +69,24 @@ static inline uint64_t rdticks(void)
 #endif
 }
 
+#if defined(__riscv)
+#define TIMER_UNIT "ticks"    /* 100 MHz rdtime ticks */
+#else
+#define TIMER_UNIT "ns"       /* CLOCK_MONOTONIC nanoseconds */
+#endif
+
 /* ── Region state ─────────────────────────────────────────────────── */
 
 typedef struct {
-    uint8_t  *data;       /* current data */
-    uint8_t  *shadow;     /* shadow copy for memcmp baseline */
-    uint64_t  fp;         /* XOR fingerprint (ATOMiK reference) */
+    uint8_t  *data;
+    uint8_t  *shadow;
+    uint64_t  fp;
 } region_t;
 
 static region_t *regions;
 static int n_regions;
 static size_t region_size;
 static int change_pct;
-static volatile int sink;
 
 /* ── Fingerprint helper ───────────────────────────────────────────── */
 
@@ -91,7 +107,7 @@ static uint64_t compute_fp(const uint8_t *data, size_t len)
     return fp;
 }
 
-/* ── Setup ────────────────────────────────────────────────────────── */
+/* ── Setup / teardown ─────────────────────────────────────────────── */
 
 static void setup(void)
 {
@@ -99,8 +115,6 @@ static void setup(void)
     for (int i = 0; i < n_regions; i++) {
         regions[i].data = calloc(1, region_size);
         regions[i].shadow = calloc(1, region_size);
-
-        /* Fill with deterministic pattern */
         for (size_t j = 0; j < region_size; j++)
             regions[i].data[j] = (uint8_t)(i * 37 + j * 13 + 7);
         memcpy(regions[i].shadow, regions[i].data, region_size);
@@ -119,7 +133,7 @@ static void teardown(void)
 
 /* ── Mutate ───────────────────────────────────────────────────────── */
 
-static int mutate(int tick)
+static void mutate(int tick)
 {
     int n_change = (n_regions * change_pct + 99) / 100;
     int start = (tick * n_change) % n_regions;
@@ -128,7 +142,6 @@ static int mutate(int tick)
         size_t pos = (tick * 37 + j * 13) % region_size;
         regions[i].data[pos] ^= 0xFF;
     }
-    return n_change;
 }
 
 /* ── Detect: software baseline ────────────────────────────────────── */
@@ -168,7 +181,7 @@ static int hw_detect(atomik_t *a, int *changed_out)
 /* ── JSON output ──────────────────────────────────────────────────── */
 
 static void emit_json(int tick, int *changed, int n_changed,
-                       uint64_t detect_cy, uint64_t baseline_cy)
+                       uint64_t detect_t, uint64_t baseline_t)
 {
     printf("{\"tick\":%d,\"n_regions\":%d,\"changed\":[", tick, n_regions);
     int first = 1;
@@ -179,11 +192,11 @@ static void emit_json(int tick, int *changed, int n_changed,
             first = 0;
         }
     }
-    printf("],\"n_changed\":%d,\"detect_cy\":%llu,\"baseline_cy\":%llu,\"speedup\":%.1f}\n",
+    printf("],\"n_changed\":%d,\"detect_%s\":%llu,\"baseline_%s\":%llu,\"speedup\":%.1f}\n",
            n_changed,
-           (unsigned long long)detect_cy,
-           (unsigned long long)baseline_cy,
-           baseline_cy > 0 ? (double)baseline_cy / detect_cy : 0.0);
+           TIMER_UNIT, (unsigned long long)detect_t,
+           TIMER_UNIT, (unsigned long long)baseline_t,
+           baseline_t > 0 ? (double)baseline_t / detect_t : 0.0);
     fflush(stdout);
 }
 
@@ -195,14 +208,15 @@ static void usage(const char *prog)
         "atomik-watchd — ATOMiK State Change Detection Service\n"
         "\n"
         "Usage: %s [options]\n"
-        "  -n N       Number of regions (default: 8)\n"
-        "  -s SIZE    Region size in bytes (default: 4096)\n"
+        "  -n N       Number of regions (default: 8, max: 255)\n"
+        "  -s SIZE    Region size in bytes (default: 4096, min: 1)\n"
         "  -t TICKS   Monitoring ticks (default: 10, 0 = infinite)\n"
         "  -c PCT     Percent mutated per tick (default: 25)\n"
         "  -a ADDR    ATOMiK address (default: 0xF0000000)\n"
         "  -l LAYOUT  csr, adapter, axi (default: csr)\n"
-        "  -m         Mock mode (no hardware)\n"
-        "  -h         Help\n", prog);
+        "  -h         Help\n"
+        "\n"
+        "Mock mode: compile with -DATOMIK_MOCK (not a runtime flag).\n", prog);
 }
 
 /* ── Main ─────────────────────────────────────────────────────────── */
@@ -212,16 +226,10 @@ int main(int argc, char **argv)
     unsigned long addr = 0xF0000000;
     atomik_layout_t layout = ATOMIK_LAYOUT_CSR;
     int n_ticks = 10;
-    int mock_mode = 0;
     n_regions = 8;
     region_size = 4096;
     change_pct = 25;
 
-#ifdef ATOMIK_MOCK
-    mock_mode = 1;
-#endif
-
-    /* Parse arguments */
     for (int i = 1; i < argc; i++) {
         if (strcmp(argv[i], "-n") == 0 && i + 1 < argc) n_regions = atoi(argv[++i]);
         else if (strcmp(argv[i], "-s") == 0 && i + 1 < argc) region_size = (size_t)atol(argv[++i]);
@@ -232,70 +240,76 @@ int main(int argc, char **argv)
             i++;
             if (strcmp(argv[i], "adapter") == 0) layout = ATOMIK_LAYOUT_ADAPTER;
             else if (strcmp(argv[i], "axi") == 0) layout = ATOMIK_LAYOUT_AXI;
-            else layout = ATOMIK_LAYOUT_CSR;
+            else if (strcmp(argv[i], "csr") == 0) layout = ATOMIK_LAYOUT_CSR;
+            else { fprintf(stderr, "ERROR: unknown layout '%s' (use csr, adapter, or axi)\n", argv[i]); return 1; }
         }
-        else if (strcmp(argv[i], "-m") == 0) mock_mode = 1;
         else if (strcmp(argv[i], "-h") == 0) { usage(argv[0]); return 0; }
         else { fprintf(stderr, "Unknown option: %s\n", argv[i]); usage(argv[0]); return 1; }
     }
 
-    if (n_regions > 255) { fprintf(stderr, "Max 255 regions\n"); return 1; }
-    if (n_regions < 1) { fprintf(stderr, "Need at least 1 region\n"); return 1; }
-
-    /* Open ATOMiK */
-    atomik_t *a;
-    if (mock_mode) {
-        a = atomik_open_devmem(addr, layout);
-    } else {
-        a = atomik_open_devmem(addr, layout);
+    /* Input validation */
+    if (n_regions < 1 || n_regions > 255) {
+        fprintf(stderr, "ERROR: n_regions must be 1-255 (got %d)\n", n_regions); return 1;
     }
+    if (region_size < 1) {
+        fprintf(stderr, "ERROR: region size must be >= 1 (got %zu)\n", region_size); return 1;
+    }
+    if (change_pct < 0 || change_pct > 100) {
+        fprintf(stderr, "ERROR: change percent must be 0-100 (got %d)\n", change_pct); return 1;
+    }
+
+    atomik_t *a = atomik_open_devmem(addr, layout);
     if (!a) {
         fprintf(stderr, "ERROR: cannot open ATOMiK at 0x%lX\n", addr);
+#ifndef ATOMIK_MOCK
+        fprintf(stderr, "  (rebuild with -DATOMIK_MOCK for mock mode)\n");
+#endif
         return 1;
     }
 
-    /* Header (stderr, not stdout — stdout is JSON only) */
     fprintf(stderr, "atomik-watchd: %d regions x %zu bytes, %d%% mutation, %d ticks\n",
             n_regions, region_size, change_pct, n_ticks);
-    fprintf(stderr, "atomik-watchd: ATOMiK v%u @ 0x%lX (%s)\n",
+    fprintf(stderr, "atomik-watchd: ATOMiK v%u @ 0x%lX (%s), timer=%s\n",
             a->version, addr,
             layout == ATOMIK_LAYOUT_ADAPTER ? "adapter" :
-            layout == ATOMIK_LAYOUT_AXI ? "axi" : "csr");
+            layout == ATOMIK_LAYOUT_AXI ? "axi" : "csr",
+            TIMER_UNIT);
 
     setup();
 
     int *changed_hw = calloc(n_regions, sizeof(int));
     int *changed_sw = calloc(n_regions, sizeof(int));
+    int exit_code = 0;
 
     for (int tick = 1; n_ticks == 0 || tick <= n_ticks; tick++) {
         mutate(tick);
 
-        /* Software baseline */
         uint64_t t0 = rdticks();
         int sw_n = sw_detect(changed_sw);
         uint64_t t1 = rdticks();
-        uint64_t sw_cy = t1 - t0;
+        uint64_t sw_t = t1 - t0;
 
-        /* ATOMiK detect */
         t0 = rdticks();
         int hw_n = hw_detect(a, changed_hw);
         t1 = rdticks();
-        uint64_t hw_cy = t1 - t0;
+        uint64_t hw_t = t1 - t0;
 
-        /* Verify correctness */
+        /* Verify correctness — mismatch is a fatal error */
         int match = (sw_n == hw_n);
         for (int i = 0; i < n_regions && match; i++)
             if (changed_sw[i] != changed_hw[i]) match = 0;
         if (!match) {
-            fprintf(stderr, "ERROR: tick %d MISMATCH (sw=%d hw=%d)\n", tick, sw_n, hw_n);
+            fprintf(stderr, "FATAL: tick %d MISMATCH (sw=%d hw=%d)\n", tick, sw_n, hw_n);
+            exit_code = 1;
+            break;
         }
 
-        emit_json(tick, changed_hw, hw_n, hw_cy, sw_cy);
+        emit_json(tick, changed_hw, hw_n, hw_t, sw_t);
     }
 
     free(changed_hw);
     free(changed_sw);
     teardown();
     atomik_close(a);
-    return 0;
+    return exit_code;
 }
