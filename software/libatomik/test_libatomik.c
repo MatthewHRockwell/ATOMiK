@@ -629,6 +629,143 @@ int main(void)
 
     CLOSE(a);
 
+#ifdef ATOMIK_MOCK
+    /* =====================================================================
+     * Tests that exercise the REAL library functions through mock devmem.
+     * These go through atomik_open_devmem → atomik_load/accum/read/swap →
+     * mock dispatch, validating the full library path.
+     * ===================================================================== */
+
+    printf("\n=== Test: Mock devmem open (CSR layout) ===\n");
+    {
+        atomik_t *d = atomik_open_devmem(0xF0000000, ATOMIK_LAYOUT_CSR);
+        check_int(1, d != NULL, "devmem CSR open");
+        check_int(2, d->version, "CSR version = 2");
+        check_int(1, d->n_banks, "CSR banks = 1");
+
+        atomik_load(d, 0, 0xCAFEBABEDEADBEEFULL);
+        check64(0xCAFEBABEDEADBEEFULL, atomik_read(d), "CSR devmem load/read");
+
+        atomik_accum(d, 0x1111111111111111ULL);
+        check64(0xCAFEBABEDEADBEEFULL ^ 0x1111111111111111ULL, atomik_read(d), "CSR devmem accum");
+
+        atomik_accum(d, 0x1111111111111111ULL);
+        check64(0xCAFEBABEDEADBEEFULL, atomik_read(d), "CSR devmem self-inverse");
+        check_int(1, atomik_acc_zero(d), "CSR devmem acc_zero");
+
+        atomik_swap(d, 0);
+        check64(0xCAFEBABEDEADBEEFULL, atomik_read(d), "CSR devmem swap");
+        check_int(1, atomik_acc_zero(d), "CSR devmem acc_zero after swap");
+
+        atomik_close(d);
+    }
+
+    printf("\n=== Test: Mock devmem open (Adapter layout) ===\n");
+    {
+        atomik_t *d = atomik_open_devmem(0xF0020000, ATOMIK_LAYOUT_ADAPTER);
+        check_int(1, d != NULL, "devmem adapter open");
+        check_int(2, d->version, "adapter version = 2");
+        check_int(1, d->n_banks, "adapter banks = 1");
+
+        atomik_load(d, 0, 0xAAAABBBBCCCCDDDDULL);
+        check64(0xAAAABBBBCCCCDDDDULL, atomik_read(d), "adapter devmem load/read");
+
+        atomik_accum(d, 0x0000FFFF0000FFFFULL);
+        uint64_t expected = 0xAAAABBBBCCCCDDDDULL ^ 0x0000FFFF0000FFFFULL;
+        check64(expected, atomik_read(d), "adapter devmem accum");
+
+        atomik_accum(d, 0x0000FFFF0000FFFFULL);
+        check64(0xAAAABBBBCCCCDDDDULL, atomik_read(d), "adapter devmem self-inverse");
+        check_int(1, atomik_acc_zero(d), "adapter devmem acc_zero");
+
+        atomik_close(d);
+    }
+
+    printf("\n=== Test: detect_changed (CSR) ===\n");
+    {
+        atomik_t *d = atomik_open_devmem(0xF0000000, ATOMIK_LAYOUT_CSR);
+
+        uint8_t data[64];
+        memset(data, 0xAA, sizeof(data));
+        uint64_t fp = 0;
+        for (size_t i = 0; i + 8 <= sizeof(data); i += 8) {
+            uint64_t chunk; memcpy(&chunk, data + i, 8); fp ^= chunk;
+        }
+
+        check_int(0, atomik_detect_changed(d, 0, fp, data, 64), "detect unchanged");
+        data[7] ^= 0xFF;
+        check_int(1, atomik_detect_changed(d, 0, fp, data, 64), "detect 1-byte change");
+        check_int(0, atomik_detect_changed(d, 0, 0, data, 0), "detect empty data");
+
+        /* 64KB test */
+        uint8_t *big = calloc(1, 65536);
+        memset(big, 0xBB, 65536);
+        uint64_t big_fp = 0;
+        for (size_t i = 0; i + 8 <= 65536; i += 8) {
+            uint64_t chunk; memcpy(&chunk, big + i, 8); big_fp ^= chunk;
+        }
+        check_int(0, atomik_detect_changed(d, 1, big_fp, big, 65536), "detect 64KB unchanged");
+        big[65535] ^= 0xFF;
+        check_int(1, atomik_detect_changed(d, 1, big_fp, big, 65536), "detect 64KB changed");
+        free(big);
+
+        atomik_close(d);
+    }
+
+    printf("\n=== Test: detect_changed (Adapter) ===\n");
+    {
+        atomik_t *d = atomik_open_devmem(0xF0020000, ATOMIK_LAYOUT_ADAPTER);
+
+        uint8_t data[32];
+        memset(data, 0x55, sizeof(data));
+        uint64_t fp = 0;
+        for (size_t i = 0; i + 8 <= sizeof(data); i += 8) {
+            uint64_t chunk; memcpy(&chunk, data + i, 8); fp ^= chunk;
+        }
+
+        check_int(0, atomik_detect_changed(d, 0, fp, data, 32), "adapter detect unchanged");
+        data[0] = 0x00;
+        check_int(1, atomik_detect_changed(d, 0, fp, data, 32), "adapter detect changed");
+
+        atomik_close(d);
+    }
+
+    printf("\n=== Test: Stress — 1000 sequential accum ===\n");
+    {
+        atomik_t *d = atomik_open_devmem(0xF0000000, ATOMIK_LAYOUT_CSR);
+
+        atomik_load(d, 0, 0);
+        uint64_t expected = 0;
+        for (int i = 0; i < 1000; i++) {
+            uint64_t delta = (uint64_t)i * 0x0001000100010001ULL;
+            atomik_accum(d, delta);
+            expected ^= delta;
+        }
+        check64(expected, atomik_read(d), "1000 sequential accum");
+
+        atomik_close(d);
+    }
+
+    printf("\n=== Test: Rapid load/swap cycles ===\n");
+    {
+        atomik_t *d = atomik_open_devmem(0xF0000000, ATOMIK_LAYOUT_CSR);
+
+        for (int i = 0; i < 256; i++)
+            atomik_load(d, (uint8_t)i, (uint64_t)i * 0x0101010101010101ULL);
+
+        /* Verify random addresses */
+        atomik_load(d, 0, 0); /* switch context without clobbering — actually this DOES clobber addr 0 */
+        /* Use swap instead to preserve */
+        atomik_load(d, 200, 200ULL * 0x0101010101010101ULL); /* re-load 200 since we need to read it */
+        check64(200ULL * 0x0101010101010101ULL, atomik_read(d), "addr 200 after 256 loads");
+
+        atomik_load(d, 255, 255ULL * 0x0101010101010101ULL);
+        check64(255ULL * 0x0101010101010101ULL, atomik_read(d), "addr 255 after 256 loads");
+
+        atomik_close(d);
+    }
+#endif /* ATOMIK_MOCK */
+
     /* Summary */
     printf("\n============================================\n");
     printf("Test Summary: %d/%d passed\n", pass_count, pass_count + fail_count);

@@ -63,8 +63,8 @@ test-mock: $(TEST_MOCK)
 	@echo "=== Running mock tests ==="
 	@./$(TEST_MOCK)
 
-$(TEST_MOCK): $(TEST_SRC) $(LIB_HDR) | $(BUILD)
-	$(CC) $(CFLAGS) -DATOMIK_MOCK -o $@ $<
+$(TEST_MOCK): $(TEST_SRC) $(LIB_SRC) $(LIB_HDR) | $(BUILD)
+	$(CC) $(CFLAGS) -DATOMIK_MOCK -o $@ $(TEST_SRC) $(LIB_SRC)
 
 # ==============================================================================
 # Shared library (for ARM target)
