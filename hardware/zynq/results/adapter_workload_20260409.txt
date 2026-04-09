@@ -1,0 +1,58 @@
+=== WORKLOAD (CSR + ADAPTER) ===
+/root/workload_change_detect
+ATOMiK Multi-Buffer Change Detection Workload
+==============================================
+
+Environment: VexRiscv SMP @ 100 MHz, 4 KB D-cache, no L2
+Timer: rdtime @ 100 MHz (10 ns resolution)
+Note: memcmp degrades above 4 KB due to cache thrashing
+
+[CSR (direct)] ATOMiK v2, 1 bank(s) @ 0xF0000000
+
+Workload             | SW (memcmp)  | ATOMiK       | Speedup    | Regions/sec 
+---------------------+--------------+--------------+------------+-------------
+8x256B 25%chg        |      20316 cy |       1238 cy |     16.4x |     646204
+8x4096B 25%chg       |    6925319 cy |       1226 cy |   5648.7x |     652529
+32x1024B 10%chg      |     679582 cy |       9200 cy |     73.9x |     347826
+64x1024B 5%chg       |    1373630 cy |       5878 cy |    233.7x |    1088806
+64x4096B 5%chg       |   55323599 cy |      11830 cy |   4676.6x |     540997
+
+[Adapter (CFU)] ATOMiK v2, 1 bank(s) @ 0xF0020000
+
+Workload             | SW (memcmp)  | ATOMiK       | Speedup    | Regions/sec 
+---------------------+--------------+--------------+------------+-------------
+8x256B 25%chg        |      11616 cy |       1497 cy |      7.8x |     534402
+8x4096B 25%chg       |    6901240 cy |       1376 cy |   5015.4x |     581395
+32x1024B 10%chg      |     690480 cy |       9725 cy |     71.0x |     329049
+64x1024B 5%chg       |    1439432 cy |       6983 cy |    206.1x |     916512
+64x4096B 5%chg       |   55292090 cy |      12967 cy |   4264.1x |     493561
+
+Software: memcmp every region against shadow — O(N * size)
+ATOMiK:   swap context + read acc_zero — O(N), size-independent
+Adapter overhead vs direct CSR: ~10-14% (30 cycles)
+root@buildroot:~# 
+=== DEMO STATE MONITOR (ADAPTER) ===
+/root/demo_state_monitor 0xF0020000 adapter
+ATOMiK State Change Monitor
+===========================
+
+Model: track one region, detect changes at each tick.
+Writes accumulate deltas at write time (O(1) per write).
+Detection: software rescans all bytes; ATOMiK reads one flag.
+
+ATOMiK v2 @ 0xF0020000 (adapter) | VexRiscv SMP 100 MHz
+
+Scenario           │ SW (memcmp)  │ ATOMiK       │ Speedup  │ Correct
+───────────────────┼──────────────┼──────────────┼──────────┼────────
+256B, 1 write      │      64346 cy │      25951 cy │    2.5x │ YES
+1KB, 1 write       │      30135 cy │      64196 cy │    0.5x │ YES
+4KB, 1 write       │      83982 cy │      26995 cy │    3.1x │ YES
+16KB, 1 write      │     179484 cy │      27765 cy │    6.5x │ YES
+64KB, 1 write      │      48206 cy │      64980 cy │    0.7x │ YES
+4KB, no change     │     946911 cy │      65317 cy │   14.5x │ YES
+64KB, no change    │   13888441 cy │      28644 cy │  484.9x │ YES
+
+Key: software cost grows with region size.
+     ATOMiK cost is constant (~260 cycles) regardless of size.
+     Deltas accumulate at write time, not at detection time.
+root@buildroot:~# 

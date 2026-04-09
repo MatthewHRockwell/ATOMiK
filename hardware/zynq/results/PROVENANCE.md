@@ -70,3 +70,13 @@ cd ../atomik-sync && riscv32-buildroot-linux-gnu-gcc -Wall -Wextra -Werror -O2 -
 cd ../atomik-agent-mem && riscv32-buildroot-linux-gnu-gcc -Wall -Wextra -Werror -O2 -std=gnu99 -I../libatomik -static -o atomik-agent-mem atomik-agent-mem.c ../libatomik/libatomik.c
 # Inject all into rootfs, cold boot, run
 ```
+
+### adapter_workload_20260409.txt
+- **Source commit**: 071a358
+- **Bitstream**: adapter SoC (`litex-build-adapter/gateware/hamgeek_rk7020f.bit`, MD5: e6e8436b031d8f64fab24bc4a5fa9621)
+- **Binaries**:
+  - `workload_change_detect` MD5: 32872774aef19ac2eb11aa7bb1a2b7eb
+  - `demo_state_monitor` MD5: 2f8fdd3fa06e1d360efe38c6a9d44ff8
+- **Build**: same as workload_csr_20260409.txt and demo_state_monitor_20260409.txt entries above
+- **Result MD5**: 0544d2c1c24cd12b38294a28ff5fcd6f
+- **Content**: three-column workload (CSR + adapter + SW) + demo_state_monitor on adapter path (7/7 YES)
