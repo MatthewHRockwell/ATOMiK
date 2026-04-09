@@ -102,23 +102,26 @@
 ## Phase 4: State Change Detection Service
 
 - [x] **4.1** Build `atomik-watchd` daemon skeleton
-  - 301 lines, configurable via CLI flags (-n, -s, -t, -c, -a, -l, -m)
-  - Uses atomik_detect_changed() with new_fp reference advancing
-  - Verified: compiles -Wall -Werror, mock mode 5 ticks, edge cases
+  - 290 lines, configurable via CLI flags (-n, -s, -t, -c, -a, -l)
+  - Mock mode: compile-time only (-DATOMIK_MOCK), not runtime flag
+  - Input validation: -s 0, -n 0/256, -c >100, -l bogus all exit 1
+  - Mismatch between sw/hw detection is fatal (exit nonzero)
+  - Verified: compiles -Wall -Werror, mock 5 ticks, 6 edge cases rejected
 
 - [x] **4.2** Add JSON output to `atomik-watchd`
-  - JSONL: {"tick","n_regions","changed":[],"n_changed","detect_cy","baseline_cy","speedup"}
-  - Verified: jq parses all output lines, fields correct
+  - JSONL: {"tick","n_regions","changed":[],"n_changed","detect_UNIT","baseline_UNIT","speedup"}
+  - UNIT = "ticks" on RISC-V (rdtime), "ns" on host (CLOCK_MONOTONIC)
+  - Verified: jq parses all output lines
 
 - [ ] **4.3** Run `atomik-watchd` on Zynq hardware
-  - Cross-compiled for rv32ima (ELF 32-bit, static)
+  - make zynq requires CROSS set and verifies RISC-V output via file check
   - PENDING: requires cold boot + rootfs injection
-  - Verify: 10 ticks, JSON valid, speedup consistent with benchmark
+  - No committed hardware artifact exists yet
 
 - [x] **4.4** Write one-page brief: "ATOMiK State Watch Service"
-  - docs/BRIEF_STATE_WATCH.md (53 lines)
-  - Uses real captured Zynq data, no overclaims
-  - NOTE: uses workload benchmark data since 4.3 hardware capture is pending
+  - docs/BRIEF_STATE_WATCH.md — honest about rescan vs production model
+  - Benchmark data labeled as "Related Benchmark Results" from standalone test
+  - Does not claim watchd-specific hardware results
 
 ---
 
