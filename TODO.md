@@ -196,8 +196,12 @@ Revisit when a second Zynq board is available or bare-metal libatomik is needed.
   - PS7 init required: must use xsdb program_zynq_proper.tcl (not Vivado)
 
 - [ ] **8.2** Boot Linux on CFU SoC
-  - Load kernel + DTB + rootfs via SFL serial boot
-  - Verify: full boot to login prompt
+  - OpenSBI boots OK, jumps to kernel at 0x40000000 in S-mode
+  - BLOCKER: kernel crashes immediately (no earlycon output, CPU resets to BIOS)
+  - Tried: CONFIG_LITEX_VEXRISCV_INTC=n, CONFIG_SMP=n — same crash
+  - Kernel rebuilt at Image69_cfu (7.8MB), SFL uploader working (0 CRC retries)
+  - Next: add DDR breadcrumb to kernel head.S entry, or JTAG PC capture
+    to determine if the crash is in mret, first kernel instruction, or CSR access
 
 - [ ] **8.3** Execute native ATOMiK instruction from Linux userspace
   - Write test binary using `.insn r 0x0B` custom instruction encoding
