@@ -201,7 +201,7 @@ to VexRiscvSMP cluster (future). The ATOMiK adapter MMIO path (validated
 
 ## Phase 9: 64-bit RISC-V + Display Boot
 
-- [ ] **9.1** Evaluate NaxRiscv (SpinalHDL 64-bit RISC-V) on XC7Z020
+- [x] **9.1** NaxRiscv RV64 SoC synthesized — 24,744 LUT (46.5%), WNS +1.412ns
   - Check: does it fit? (53K LUT budget, need ~20K for ATOMiK N=1)
   - Alternative: RV32 SMP SoC as stepping stone, 64-bit on larger FPGA or ASIC
   - Required: Linux 6.x kernel built for RV64, buildroot rootfs
