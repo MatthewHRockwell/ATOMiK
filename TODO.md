@@ -196,12 +196,14 @@ Revisit when a second Zynq board is available or bare-metal libatomik is needed.
   - PS7 init required: must use xsdb program_zynq_proper.tcl (not Vivado)
 
 - [ ] **8.2** Boot Linux on CFU SoC
-  - OpenSBI boots OK, jumps to kernel at 0x40000000 in S-mode
-  - BLOCKER: kernel crashes immediately (no earlycon output, CPU resets to BIOS)
-  - Tried: CONFIG_LITEX_VEXRISCV_INTC=n, CONFIG_SMP=n — same crash
-  - Kernel rebuilt at Image69_cfu (7.8MB), SFL uploader working (0 CRC retries)
-  - Next: add DDR breadcrumb to kernel head.S entry, or JTAG PC capture
-    to determine if the crash is in mret, first kernel instruction, or CSR access
+  - OpenSBI S-mode transition VERIFIED — test program at 0x40000000 executes
+  - Additional OpenSBI fixes: medeleg/mideleg bare reads → csr_read_allowed
+  - S-mode DDR writes work from test program (marker 0xBEEF0001 confirmed via JTAG)
+  - BLOCKER: Linux 6.9 kernel crashes in S-mode (no earlycon, CPU resets)
+    - CONFIG_SMP=n, CONFIG_LITEX_VEXRISCV_INTC=n already applied
+    - Kernel's first 4 instructions execute OK (csrw sie/sip are S-mode)
+    - Crash likely in setup_vm (satp write) or early page table setup
+  - Next: binary-search kernel head.S with DDR breadcrumbs to find crash point
 
 - [ ] **8.3** Execute native ATOMiK instruction from Linux userspace
   - Write test binary using `.insn r 0x0B` custom instruction encoding
