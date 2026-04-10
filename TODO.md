@@ -185,21 +185,19 @@ Revisit when a second Zynq board is available or bare-metal libatomik is needed.
 
 ## Phase 8: CFU / Native Instruction Path
 
-- [ ] **8.1** Generate Linux-bootable CFU SoC
+- [x] **8.1** Generate Linux-bootable CFU SoC
   - Single-core VexRiscv linux+cfu with custom CLINT + PLIC
   - Vivado synthesis: PASS (0 errors, WNS +0.119ns @ 100MHz)
-  - OpenSBI rebuilt with correct UART (0xF0001800) + FW_JUMP_FDT_ADDR
-  - BIOS works: ident "VexRiscv Linux+CFU", DDR OK
-  - BLOCKER: OpenSBI hangs silently after "Liftoff!" — 111 bytes, no console
-  - Diagnosis: CSR layout verified correct, BIOS boot passes a0/a1 via
-    FW_JUMP_FDT_ADDR fallback. OpenSBI sets mtvec=_start_hang before
-    console init — any trap during sbi_hart_init causes silent infinite loop.
-  - Next step: either JTAG-level PC inspection or add hardware diagnostic
-    (LED/GPIO toggle) to narrow the trap source.
+  - **OpenSBI banner achieved** — full init, CLINT/PLIC/UART working
+  - Fixes required (in buildroot OpenSBI, not committed to ATOMiK repo):
+    1. Skip misa CSR reads in fw_base.S (VexRiscv doesn't implement misa)
+    2. Use csr_read_allowed() for misa in riscv_asm.c + platform ISA callbacks
+    3. hart_count=8→1, FW_JUMP_ADDR=kernel address (0x40000000)
+  - PS7 init required: must use xsdb program_zynq_proper.tcl (not Vivado)
 
-- [ ] **8.2** Boot Linux on CFU-enabled SMP SoC
-  - Load kernel + rootfs + OpenSBI
-  - Verify: full boot to login prompt, same kernel/rootfs as other tests
+- [ ] **8.2** Boot Linux on CFU SoC
+  - Load kernel + DTB + rootfs via SFL serial boot
+  - Verify: full boot to login prompt
 
 - [ ] **8.3** Execute native ATOMiK instruction from Linux userspace
   - Write test binary using `.insn r 0x0B` custom instruction encoding
