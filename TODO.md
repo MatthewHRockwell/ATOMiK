@@ -183,45 +183,41 @@ Revisit when a second Zynq board is available or bare-metal libatomik is needed.
 
 ---
 
-## Phase 8: CFU / Native Instruction Path
+## Phase 8: CFU / Native Instruction Path — PIVOTED
 
-- [x] **8.1** Generate Linux-bootable CFU SoC
-  - Single-core VexRiscv linux+cfu with custom CLINT + PLIC
-  - Vivado synthesis: PASS (0 errors, WNS +0.119ns @ 100MHz)
-  - **OpenSBI banner achieved** — full init, CLINT/PLIC/UART working
-  - Fixes required (in buildroot OpenSBI, not committed to ATOMiK repo):
-    1. Skip misa CSR reads in fw_base.S (VexRiscv doesn't implement misa)
-    2. Use csr_read_allowed() for misa in riscv_asm.c + platform ISA callbacks
-    3. hart_count=8→1, FW_JUMP_ADDR=kernel address (0x40000000)
-  - PS7 init required: must use xsdb program_zynq_proper.tcl (not Vivado)
+**Result:** VexRiscv linux+cfu single-core variant has broken MMU (csrw satp
+hangs). OpenSBI boots fully with 5 patches (misa, medeleg, hart_count,
+FW_JUMP_ADDR, delegation_dump). S-mode transition verified. But the kernel
+cannot enable virtual memory — the MMU hardware is non-functional in this
+SpinalHDL variant.
 
-- [ ] **8.2** Boot Linux on CFU SoC
-  - OpenSBI S-mode transition VERIFIED — test program at 0x40000000 executes
-  - Additional OpenSBI fixes: medeleg/mideleg bare reads → csr_read_allowed
-  - S-mode DDR writes work from test program (marker 0xBEEF0001 confirmed via JTAG)
-  - BLOCKER: kernel hangs in relocate_enable_mmu (sfence.vma or csrw satp)
-    - DDR breadcrumbs: 0xA0-0xAA pass (all of head.S up to setup_vm)
-    - 0xAB (before relocate_enable_mmu) is the LAST breadcrumb reached
-    - Kernel Image load offset = 4MB (header says 0x400000), now loaded at 0x40400000
-    - With correct offset: CPU hangs (no reset). With wrong offset (0x40000000): CPU resets.
-    - CONFIG_SMP=n, CONFIG_LITEX_VEXRISCV_INTC=n applied
-  - CONFIRMED: VexRiscv linux+cfu MMU is broken — csrw satp hangs CPU
-    - Identity-mapped trampoline page table verified correct via JTAG
-    - Minimal S-mode MMU test program also hangs on csrw satp
-    - This CPU variant cannot enable virtual memory from S-mode
-    - PIVOT: use SMP VexRiscv (working MMU) + add CFU via SpinalHDL
-    - Page tables from setup_vm may be incorrect for VexRiscv Sv32 MMU
-    - Or satp_mode encoding is wrong
+**Diagnosis method:** DDR breadcrumbs at 0x5FF00000+ read via ARM JTAG after
+each boot. Binary-searched from OpenSBI init through kernel head.S
+relocate_enable_mmu, pinpointed to the exact `csrw satp` instruction.
 
-- [ ] **8.3** Execute native ATOMiK instruction from Linux userspace
-  - Write test binary using `.insn r 0x0B` custom instruction encoding
-  - Run LOAD/ACCUM/READ/SWAP via native instructions
-  - Verify: 9/9 PASS matching adapter and CSR results
+**Pivot:** Native CFU instructions require SpinalHDL work to add CfuPlugin
+to VexRiscvSMP cluster (future). The ATOMiK adapter MMIO path (validated
+9/9 PASS at 0xF0020000) works on the SMP SoC and is the functional path.
 
-- [ ] **8.4** Measure native instruction latency
-  - Compare: native CFU cycle count vs adapter (~290 cy) vs CSR (~262 cy)
-  - Expected: native should be <10 cycles per operation
-  - Verify: latency data captured and committed
+## Phase 9: 64-bit RISC-V + Display Boot
+
+- [ ] **9.1** Evaluate NaxRiscv (SpinalHDL 64-bit RISC-V) on XC7Z020
+  - Check: does it fit? (53K LUT budget, need ~20K for ATOMiK N=1)
+  - Alternative: RV32 SMP SoC as stepping stone, 64-bit on larger FPGA or ASIC
+  - Required: Linux 6.x kernel built for RV64, buildroot rootfs
+
+- [ ] **9.2** HDMI framebuffer on SMP SoC
+  - Add LiteVideo or custom framebuffer IP to the SMP SoC
+  - ATOMiK boot splash (atoms, not penguins) via fbdev or DRM
+  - Required: Zynq PL HDMI output pins, pixel clock PLL
+
+- [ ] **9.3** ATOMiK adapter integration test on SMP SoC (re-validate)
+  - Full workload_change_detect from Linux with adapter + display
+  - Verify: same results as Phase 6 (5 configs, 6-21% overhead)
+
+- [ ] **9.4** Ubuntu rootfs
+  - Build Ubuntu base for RISC-V (debootstrap or pre-built)
+  - Requires 64-bit CPU and sufficient DDR (512MB available)
 
 - [ ] **8.5** Run workload on native instruction path
   - Same workload_change_detect, but using CFU instructions
