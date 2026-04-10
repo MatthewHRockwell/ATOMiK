@@ -205,7 +205,9 @@ Revisit when a second Zynq board is available or bare-metal libatomik is needed.
     - Kernel Image load offset = 4MB (header says 0x400000), now loaded at 0x40400000
     - With correct offset: CPU hangs (no reset). With wrong offset (0x40000000): CPU resets.
     - CONFIG_SMP=n, CONFIG_LITEX_VEXRISCV_INTC=n applied
-  - Next: instrument inside relocate_enable_mmu (sfence.vma vs csrw satp)
+  - PINPOINTED: csrw satp hangs (sfence.vma passes at 0xB5, satp write at 0xB6 never reached)
+    - Page tables from setup_vm may be incorrect for VexRiscv Sv32 MMU
+    - Or satp_mode encoding is wrong
 
 - [ ] **8.3** Execute native ATOMiK instruction from Linux userspace
   - Write test binary using `.insn r 0x0B` custom instruction encoding
