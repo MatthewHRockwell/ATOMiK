@@ -199,11 +199,13 @@ Revisit when a second Zynq board is available or bare-metal libatomik is needed.
   - OpenSBI S-mode transition VERIFIED — test program at 0x40000000 executes
   - Additional OpenSBI fixes: medeleg/mideleg bare reads → csr_read_allowed
   - S-mode DDR writes work from test program (marker 0xBEEF0001 confirmed via JTAG)
-  - BLOCKER: Linux 6.9 kernel crashes in S-mode (no earlycon, CPU resets)
-    - CONFIG_SMP=n, CONFIG_LITEX_VEXRISCV_INTC=n already applied
-    - Kernel's first 4 instructions execute OK (csrw sie/sip are S-mode)
-    - Crash likely in setup_vm (satp write) or early page table setup
-  - Next: binary-search kernel head.S with DDR breadcrumbs to find crash point
+  - BLOCKER: kernel hangs in relocate_enable_mmu (sfence.vma or csrw satp)
+    - DDR breadcrumbs: 0xA0-0xAA pass (all of head.S up to setup_vm)
+    - 0xAB (before relocate_enable_mmu) is the LAST breadcrumb reached
+    - Kernel Image load offset = 4MB (header says 0x400000), now loaded at 0x40400000
+    - With correct offset: CPU hangs (no reset). With wrong offset (0x40000000): CPU resets.
+    - CONFIG_SMP=n, CONFIG_LITEX_VEXRISCV_INTC=n applied
+  - Next: instrument inside relocate_enable_mmu (sfence.vma vs csrw satp)
 
 - [ ] **8.3** Execute native ATOMiK instruction from Linux userspace
   - Write test binary using `.insn r 0x0B` custom instruction encoding
