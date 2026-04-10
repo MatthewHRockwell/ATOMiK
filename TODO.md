@@ -205,7 +205,11 @@ Revisit when a second Zynq board is available or bare-metal libatomik is needed.
     - Kernel Image load offset = 4MB (header says 0x400000), now loaded at 0x40400000
     - With correct offset: CPU hangs (no reset). With wrong offset (0x40000000): CPU resets.
     - CONFIG_SMP=n, CONFIG_LITEX_VEXRISCV_INTC=n applied
-  - PINPOINTED: csrw satp hangs (sfence.vma passes at 0xB5, satp write at 0xB6 never reached)
+  - CONFIRMED: VexRiscv linux+cfu MMU is broken — csrw satp hangs CPU
+    - Identity-mapped trampoline page table verified correct via JTAG
+    - Minimal S-mode MMU test program also hangs on csrw satp
+    - This CPU variant cannot enable virtual memory from S-mode
+    - PIVOT: use SMP VexRiscv (working MMU) + add CFU via SpinalHDL
     - Page tables from setup_vm may be incorrect for VexRiscv Sv32 MMU
     - Or satp_mode encoding is wrong
 
