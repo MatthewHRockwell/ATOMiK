@@ -22,6 +22,8 @@ from litex.soc.integration.soc import SoCRegion
 from litex.soc.cores.cpu import zynq7000
 from litex.soc.interconnect import wishbone
 from litex.soc.cores.cpu.naxriscv.core import NaxRiscv
+from litex.soc.cores.video import VideoS7HDMIPHY
+from litex.soc.cores.clock import S7MMCM
 
 # Configure NaxRiscv for RV64 before SoC instantiation
 NaxRiscv.xlen                 = 64
@@ -44,7 +46,8 @@ class _CRG(LiteXModule):
 # BaseSoC ---------------------------------------------------------------------------------
 
 class BaseSoC(SoCCore):
-    def __init__(self, sys_clk_freq=100e6, with_atomik_adapter=True, **kwargs):
+    def __init__(self, sys_clk_freq=100e6, with_atomik_adapter=True,
+                 with_video_framebuffer=False, **kwargs):
         platform = hamgeek_rk7020f.Platform()
         self.crg = _CRG(platform, sys_clk_freq)
 
@@ -99,15 +102,47 @@ class BaseSoC(SoCCore):
             self.bus.add_slave("atomik_adapter", adapter_bus,
                 region=SoCRegion(origin=0xf0020000, size=0x20, cached=False))
 
+        # HDMI Video Framebuffer
+        if with_video_framebuffer:
+            # Video clock domains from MMCM (driven by PS7 100 MHz FCLK)
+            self.cd_hdmi   = ClockDomain()
+            self.cd_hdmi5x = ClockDomain()
+
+            self.video_pll = video_pll = S7MMCM(speedgrade=-2)
+            self.comb += video_pll.reset.eq(ResetSignal("sys"))
+            video_pll.register_clkin(ClockSignal("sys"), sys_clk_freq)
+            # 800x600@60Hz: pixel clock = 40 MHz, 5x = 200 MHz
+            video_pll.create_clkout(self.cd_hdmi,   40e6)
+            video_pll.create_clkout(self.cd_hdmi5x, 200e6)
+
+            # HDMI PHY
+            self.videophy = VideoS7HDMIPHY(platform.request("hdmi_out"),
+                                           clock_domain="hdmi")
+
+            # HDMI output enable (active high)
+            hdmi_oen = platform.request("hdmi_oen")
+            self.comb += hdmi_oen.eq(1)
+
+            # Video terminal (text console over HDMI — no DMA needed)
+            self.add_video_terminal(phy=self.videophy,
+                                    timings="800x600@60Hz",
+                                    clock_domain="hdmi")
+
 def main():
     from litex.build.parser import LiteXArgumentParser
 
     parser = LiteXArgumentParser(platform=hamgeek_rk7020f.Platform,
         description="ATOMiK NaxRiscv RV64 SoC on HamGeek RK-ZYNQ7020-F")
     parser.add_target_argument("--sys-clk-freq", default=100e6, type=float)
+    parser.add_target_argument("--with-video-framebuffer", action="store_true",
+                               help="Enable HDMI framebuffer output")
     args = parser.parse_args()
 
-    soc = BaseSoC(sys_clk_freq=args.sys_clk_freq, **parser.soc_argdict)
+    soc = BaseSoC(
+        sys_clk_freq=args.sys_clk_freq,
+        with_video_framebuffer=args.with_video_framebuffer,
+        **parser.soc_argdict,
+    )
     builder = Builder(soc, **parser.builder_argdict)
     if args.build:
         builder.build(**parser.toolchain_argdict)
