@@ -128,6 +128,9 @@ class BaseSoC(SoCCore):
                                     timings="640x480@60Hz",
                                     clock_domain="hdmi")
 
+            # False path constraints: sys ↔ hdmi clock domains are independent
+            platform.add_false_path_constraints(self.crg.cd_sys.clk, self.cd_hdmi.clk)
+
 def main():
     from litex.build.parser import LiteXArgumentParser
 
