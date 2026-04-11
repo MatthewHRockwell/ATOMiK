@@ -111,9 +111,9 @@ class BaseSoC(SoCCore):
             self.video_pll = video_pll = S7MMCM(speedgrade=-2)
             self.comb += video_pll.reset.eq(ResetSignal("sys"))
             video_pll.register_clkin(ClockSignal("sys"), sys_clk_freq)
-            # 800x600@60Hz: pixel clock = 40 MHz, 5x = 200 MHz
-            video_pll.create_clkout(self.cd_hdmi,   40e6)
-            video_pll.create_clkout(self.cd_hdmi5x, 200e6)
+            # 640x480@60Hz: pixel clock = 25.175 MHz, 5x ≈ 125.875 MHz
+            video_pll.create_clkout(self.cd_hdmi,   25.175e6)
+            video_pll.create_clkout(self.cd_hdmi5x, 5*25.175e6)
 
             # HDMI PHY
             self.videophy = VideoS7HDMIPHY(platform.request("hdmi_out"),
@@ -125,7 +125,7 @@ class BaseSoC(SoCCore):
 
             # Video terminal (text console over HDMI — no DMA needed)
             self.add_video_terminal(phy=self.videophy,
-                                    timings="800x600@60Hz",
+                                    timings="640x480@60Hz",
                                     clock_domain="hdmi")
 
 def main():

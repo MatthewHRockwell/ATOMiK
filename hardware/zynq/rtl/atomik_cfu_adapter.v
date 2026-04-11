@@ -140,9 +140,9 @@ module atomik_cfu_adapter #(
                     end
 
                     F_SWAP: begin
-                        /* SWAP: new reference = current_state, clear accumulator */
+                        /* SWAP: commit current_state at OLD addr, switch to NEW addr */
+                        state_table[current_addr] <= current_state;
                         current_addr <= cmd_inputs_0[ADDR_WIDTH-1:0];
-                        state_table[cmd_inputs_0[ADDR_WIDTH-1:0]] <= current_state;
                         accumulator <= {DATA_WIDTH{1'b0}};
                         rsp_outputs_0 <= current_state[31:0];
                     end
