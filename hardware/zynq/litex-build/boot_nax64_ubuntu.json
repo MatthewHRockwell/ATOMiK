@@ -1,0 +1,6 @@
+{
+    "Image_nax64":        "0x40000000",
+    "ubuntu_rv64.cpio.gz": "0x42000000",
+    "linux_nax64.dtb":    "0x40ef0000",
+    "fw_jump_nax64.bin":  "0x40f00000"
+}

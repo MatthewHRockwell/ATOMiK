@@ -1,0 +1,122 @@
+/dts-v1/;
+
+/ {
+	compatible = "litex,hamgeek_rk7020f\0litex,soc";
+	model = "hamgeek_rk7020f-nax64";
+	#address-cells = <0x01>;
+	#size-cells = <0x01>;
+
+	chosen {
+		stdout-path = "serial0:115200n8";
+		bootargs = "console=liteuart0 earlycon=liteuart,0xf0001000 rdinit=/init";
+		linux,initrd-start = <0x42000000>;
+		linux,initrd-end   = <0x43dc9675>;
+	};
+
+	clocks {
+		cpu_clk: clock-100000000 {
+			compatible = "fixed-clock";
+			#clock-cells = <0x00>;
+			clock-frequency = <100000000>;
+		};
+	};
+
+	cpus {
+		#address-cells = <0x01>;
+		#size-cells = <0x00>;
+		timebase-frequency = <100000000>;
+
+		cpu@0 {
+			device_type = "cpu";
+			compatible = "riscv";
+			riscv,isa = "rv64imafdc";
+			riscv,isa-base = "rv64i";
+			riscv,isa-extensions = "i\0m\0a\0f\0d\0c";
+			mmu-type = "riscv,sv39";
+			reg = <0x00>;
+			clock-frequency = <100000000>;
+			status = "okay";
+			i-cache-size = <0x4000>;
+			i-cache-sets = <0x40>;
+			i-cache-block-size = <0x40>;
+			d-cache-size = <0x4000>;
+			d-cache-sets = <0x40>;
+			d-cache-block-size = <0x40>;
+			next-level-cache = <&l2_cache>;
+
+			cpu0_intc: interrupt-controller {
+				#address-cells = <0x00>;
+				#interrupt-cells = <0x01>;
+				interrupt-controller;
+				compatible = "riscv,cpu-intc";
+			};
+		};
+
+		l2_cache: l2-cache {
+			compatible = "cache";
+			cache-level = <0x02>;
+			cache-size = <0x8000>;
+			cache-sets = <0x40>;
+			cache-unified;
+		};
+	};
+
+	memory@40000000 {
+		device_type = "memory";
+		reg = <0x40000000 0x20000000>;
+	};
+
+	reserved-memory {
+		#address-cells = <0x01>;
+		#size-cells = <0x01>;
+		ranges;
+		/* OpenSBI adds its own mmode_resv regions at runtime */
+	};
+
+	soc {
+		#address-cells = <0x01>;
+		#size-cells = <0x01>;
+		compatible = "simple-bus";
+		interrupt-parent = <&plic0>;
+		ranges;
+
+		soc_controller@f0000000 {
+			compatible = "litex,soc-controller";
+			reg = <0xf0000000 0x0c>;
+			status = "okay";
+		};
+
+		clint0: clint@f0010000 {
+			compatible = "riscv,clint0";
+			interrupts-extended = <&cpu0_intc 3 &cpu0_intc 7>;
+			reg = <0xf0010000 0x10000>;
+		};
+
+		plic0: interrupt-controller@f0c00000 {
+			compatible = "sifive,fu540-c000-plic\0sifive,plic-1.0.0";
+			reg = <0xf0c00000 0x400000>;
+			#address-cells = <0x00>;
+			#interrupt-cells = <0x01>;
+			interrupt-controller;
+			interrupts-extended = <&cpu0_intc 11 &cpu0_intc 9>;
+			riscv,ndev = <0x20>;
+		};
+
+		serial0: serial@f0001000 {
+			compatible = "litex,liteuart";
+			reg = <0xf0001000 0x100>;
+			interrupts = <0x01>;
+			status = "okay";
+		};
+
+		atomik_adapter@f0020000 {
+			compatible = "atomik,delta-adapter-v1";
+			reg = <0xf0020000 0x20>;
+			status = "okay";
+		};
+	};
+
+	aliases {
+		serial0 = &serial0;
+	};
+};

@@ -26,6 +26,8 @@ from litex.soc.cores.video import VideoS7HDMIPHY
 from litex.soc.cores.clock import S7MMCM
 
 # Configure NaxRiscv for RV64 before SoC instantiation
+# NOTE: with_fpu and with_rvc MUST be passed via CLI (--with-fpu --with-rvc)
+# because LiteXArgumentParser.parse_args() overrides class-level settings.
 NaxRiscv.xlen                 = 64
 NaxRiscv.data_width           = 64
 NaxRiscv.gcc_triple           = ("riscv64-unknown-elf", "riscv64-linux-gnu", "riscv64-unknown-linux-gnu")

@@ -1,0 +1,39 @@
+#!/bin/bash
+# ATOMiK Ubuntu 24.04 initramfs init — minimal bring-up for RV64 NaxRiscv
+export PATH=/usr/sbin:/usr/bin:/sbin:/bin
+export HOME=/root
+export TERM=vt100
+
+mount -t proc  proc  /proc
+mount -t sysfs sysfs /sys
+mount -t devtmpfs devtmpfs /dev 2>/dev/null || {
+    mkdir -p /dev
+    mount -t devtmpfs devtmpfs /dev
+}
+mkdir -p /dev/pts /dev/shm
+mount -t devpts devpts /dev/pts 2>/dev/null
+mount -t tmpfs  tmpfs  /dev/shm 2>/dev/null
+mount -t tmpfs  tmpfs  /run     2>/dev/null
+mount -t tmpfs  tmpfs  /tmp     2>/dev/null
+
+hostname atomik-rv64 2>/dev/null
+
+cat > /etc/resolv.conf <<'EOF'
+nameserver 1.1.1.1
+nameserver 8.8.8.8
+EOF
+
+echo ""
+echo "=========================================="
+echo " ATOMiK | Ubuntu 24.04 on RV64 NaxRiscv"
+echo " Board: ALINX AX7020 (XC7Z020-CLG484)"
+echo "=========================================="
+echo ""
+
+# Wait for LiteUART device node, then launch shell with proper TTY
+TTY=/dev/ttyLXU0
+if [ ! -e "$TTY" ]; then
+    TTY=/dev/console
+fi
+
+exec setsid /bin/bash -i <> "$TTY" 1>&0 2>&1
