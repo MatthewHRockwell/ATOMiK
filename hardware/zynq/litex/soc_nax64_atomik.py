@@ -121,10 +121,6 @@ class BaseSoC(SoCCore):
             self.videophy = VideoS7HDMIPHY(platform.request("hdmi_out"),
                                            clock_domain="hdmi")
 
-            # HDMI output enable (active low for most HDMI transmitter ICs)
-            hdmi_oen = platform.request("hdmi_oen")
-            self.comb += hdmi_oen.eq(0)
-
             # Video terminal (text console over HDMI — no DMA needed)
             self.add_video_terminal(phy=self.videophy,
                                     timings="640x480@60Hz",
