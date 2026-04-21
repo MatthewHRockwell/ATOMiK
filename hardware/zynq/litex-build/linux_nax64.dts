@@ -7,10 +7,30 @@
 	#size-cells = <0x01>;
 
 	chosen {
-		stdout-path = "serial0:115200n8";
-		bootargs = "console=liteuart0 earlycon=liteuart,0xf0001000 rdinit=/init";
+		#address-cells = <0x01>;
+		#size-cells = <0x01>;
+		ranges;
+		stdout-path = "serial0:921600n8";
+		bootargs = "console=tty0 console=liteuart0 earlycon=liteuart,0xf0001000 rdinit=/init";
 		linux,initrd-start = <0x42000000>;
-		linux,initrd-end   = <0x43dc9675>;
+		linux,initrd-end   = <0x43e5a0f4>;
+
+		/* Phase 9.3: simple-framebuffer for fbcon on HDMI.
+		 * Address 0x48000000 = FB base in NaxRiscv address space.
+		 * 640×480 @ 32bpp, stride = 640 * 4 = 2560. Format: x8r8g8b8.
+		 * fb_test enables VTG + DMA CSRs before kernel uses FB, but
+		 * simplefb expects the FB already scanning — so init script
+		 * or BIOS must enable VTG+DMA before kernel probes simplefb.
+		 */
+		framebuffer0: framebuffer@48000000 {
+			compatible = "simple-framebuffer";
+			reg = <0x48000000 0x7e9000>;
+			width = <1920>;
+			height = <1080>;
+			stride = <7680>;
+			format = "x8r8g8b8";
+			status = "okay";
+		};
 	};
 
 	clocks {
@@ -71,6 +91,14 @@
 		#size-cells = <0x01>;
 		ranges;
 		/* OpenSBI adds its own mmode_resv regions at runtime */
+
+		/* Phase 9.2/9.3: reserve the HDMI framebuffer region so the
+		 * kernel doesn't allocate it for other purposes.
+		 * NOTE: no-map removed — it prevented simplefb from mapping
+		 * the region, so fbcon couldn't write pixels. */
+		framebuffer_reserved: framebuffer@48000000 {
+			reg = <0x48000000 0x7e9000>;
+		};
 	};
 
 	soc {

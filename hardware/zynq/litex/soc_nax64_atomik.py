@@ -22,8 +22,20 @@ from litex.soc.integration.soc import SoCRegion
 from litex.soc.cores.cpu import zynq7000
 from litex.soc.interconnect import wishbone
 from litex.soc.cores.cpu.naxriscv.core import NaxRiscv
-from litex.soc.cores.video import VideoS7HDMIPHY
+from litex.soc.cores.video import VideoS7HDMIPHY, VideoTimingGenerator
 from litex.soc.cores.clock import S7MMCM
+
+# Phase 9.2 framebuffer (see wb_framebuffer.py) — Wishbone-master DMA
+# equivalent of LiteX's VideoFrameBuffer, for SoCs without LiteDRAM.
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from wb_framebuffer import WishboneVideoFrameBuffer
+
+# Phase 9.2: framebuffer lives 128 MiB into main_ram, well clear of kernel
+# (0x40000000-0x408xxxxx), trampoline (0x40A00000), DTB (0x40EF0000),
+# OpenSBI (0x40F00000), and initramfs (0x42000000-0x43E00000).
+FRAMEBUFFER_BASE = 0x48000000
+FRAMEBUFFER_HRES = 1920
+FRAMEBUFFER_VRES = 1080
 
 # Configure NaxRiscv for RV64 before SoC instantiation
 # NOTE: with_fpu and with_rvc MUST be passed via CLI (--with-fpu --with-rvc)
@@ -49,7 +61,10 @@ class _CRG(LiteXModule):
 
 class BaseSoC(SoCCore):
     def __init__(self, sys_clk_freq=100e6, with_atomik_adapter=True,
-                 with_video_framebuffer=False, **kwargs):
+                 with_video_framebuffer=False,
+                 with_video_phy_only=False,
+                 with_video_framebuffer_hp=False,
+                 **kwargs):
         platform = hamgeek_rk7020f.Platform()
         self.crg = _CRG(platform, sys_clk_freq)
 
@@ -104,7 +119,142 @@ class BaseSoC(SoCCore):
             self.bus.add_slave("atomik_adapter", adapter_bus,
                 region=SoCRegion(origin=0xf0020000, size=0x20, cached=False))
 
-        # HDMI Video Framebuffer
+        # ------------------------------------------------------------------
+        # Phase 9.2 "cheap confirmation" variant: --with-video-phy-only
+        #
+        # Enables MMCM + HDMI PHY + VTG exactly like the FB build, but SKIPS
+        # the framebuffer DMA and its wishbone master on the SoC bus. The
+        # VTG's sync signals drive the PHY directly with r/g/b tied low
+        # (blank black frame). This isolates the "added bus master / arbiter"
+        # variable from all other HDMI-side changes — if Linux boots in this
+        # config, the shared-bus arbiter is confirmed as the v5 hang cause.
+        # ------------------------------------------------------------------
+        if with_video_phy_only:
+            self.cd_hdmi   = ClockDomain()
+            self.cd_hdmi5x = ClockDomain()
+            self.video_pll = video_pll = S7MMCM(speedgrade=-2)
+            self.comb += video_pll.reset.eq(ResetSignal("sys"))
+            video_pll.register_clkin(ClockSignal("sys"), sys_clk_freq)
+            video_pll.create_clkout(self.cd_hdmi,   25.175e6)
+            video_pll.create_clkout(self.cd_hdmi5x, 5*25.175e6)
+
+            self.videophy = VideoS7HDMIPHY(platform.request("hdmi_out"),
+                                           clock_domain="hdmi")
+
+            video_vtg = VideoTimingGenerator(default_video_timings="640x480@60Hz")
+            video_vtg = ClockDomainsRenamer("hdmi")(video_vtg)
+            self.add_module(name="video_vtg", module=video_vtg)
+
+            # Connect VTG → PHY via stream.connect(), auto-mapping shared
+            # fields (valid, ready, last, de, hsync, vsync). PHY's r/g/b
+            # default to 0 (black) since VTG doesn't produce pixel data.
+            self.comb += video_vtg.source.connect(self.videophy.sink,
+                keep={"valid", "ready", "last", "de", "hsync", "vsync"})
+
+            # Same XDC pre-placement false-path fix as the FB variant.
+            platform.toolchain.pre_placement_commands.add(
+                "set_clock_groups -asynchronous "
+                "-group [get_clocks clk_fpga_0] "
+                "-group [get_clocks {{{{clkout0 clkout1}}}}]"
+            )
+            # Intentionally no bus.add_master call. No wishbone arbiter.
+
+        # ------------------------------------------------------------------
+        # Phase 9.2 Path B: DDR-backed framebuffer via AXI HP0
+        #
+        # Confirmed necessary 2026-04-15: phy-only boots fine, but adding a
+        # second wishbone bus master (Path A) inserts an Arbiter that breaks
+        # CSR access → kernel hangs at LiteX SoC Controller driver probe.
+        #
+        # Path B avoids the SoC bus entirely:
+        #   FB DMA → private wishbone → Wishbone2AXI → S_AXI_HP0 → PS DDR
+        # NaxRiscv stays single-master on the SoC bus. No arbiter inserted.
+        #
+        # FB base: PS DDR 0x08100000 (= NaxRiscv 0x48000000 via GP0 remapper).
+        # Linux userspace writes via /dev/mem at 0x48000000 (NaxRiscv view);
+        # FB hardware reads via HP0 at 0x08100000 (PS DDR physical).
+        # ------------------------------------------------------------------
+        if with_video_framebuffer_hp:
+            from litex.soc.interconnect import axi
+
+            # HDMI clock domains + PHY (same as phy-only and Path A)
+            self.cd_hdmi   = ClockDomain()
+            self.cd_hdmi5x = ClockDomain()
+            self.video_pll = video_pll = S7MMCM(speedgrade=-2)
+            self.comb += video_pll.reset.eq(ResetSignal("sys"))
+            video_pll.register_clkin(ClockSignal("sys"), sys_clk_freq)
+            # 1920x1080@30Hz: pixel clock = 74.25 MHz (same as 720p@60 — proven),
+            # 5x serializer = 371.25 MHz (proven safe for OSERDES2 -2).
+            # Uses standard 1080p total timing (2200×1125) at half refresh.
+            video_pll.create_clkout(self.cd_hdmi,   74.25e6)
+            video_pll.create_clkout(self.cd_hdmi5x, 5*74.25e6)
+
+            self.videophy = VideoS7HDMIPHY(platform.request("hdmi_out"),
+                                           clock_domain="hdmi")
+
+            # Custom 1080p@30Hz timing: standard 1080p pixel layout but at
+            # 74.25 MHz pixel clock → 74.25e6 / (2200*1125) = 30 Hz.
+            _1080p30_timings = {
+                "pix_clk"       : 74.25e6,
+                "h_active"      : 1920,
+                "h_blanking"    : 280,
+                "h_sync_offset" : 88,
+                "h_sync_width"  : 44,
+                "v_active"      : 1080,
+                "v_blanking"    : 45,
+                "v_sync_offset" : 4,
+                "v_sync_width"  : 5,
+            }
+            video_vtg = VideoTimingGenerator(default_video_timings=_1080p30_timings)
+            video_vtg = ClockDomainsRenamer("hdmi")(video_vtg)
+            self.add_module(name="video_framebuffer_vtg", module=video_vtg)
+
+            # PS AXI HP0 slave
+            # 64-bit HP for higher bandwidth (2 pixels per beat)
+            axi_hp0 = ps.add_axi_hp_slave(clock_domain="sys", data_width=64)
+
+            FRAMEBUFFER_BASE_PS = 0x08100000
+
+            # Pipelined AXI reader — drives HP0 AR/R directly, no wishbone.
+            self.video_framebuffer = WishboneVideoFrameBuffer(
+                axi            = axi_hp0,
+                hres           = FRAMEBUFFER_HRES,
+                vres           = FRAMEBUFFER_VRES,
+                base           = FRAMEBUFFER_BASE_PS,
+                clock_domain   = "hdmi",
+                default_enable = 0,
+            )
+
+            # VTG → FB → PHY
+            self.comb += video_vtg.source.connect(self.video_framebuffer.vtg_sink)
+            self.comb += self.video_framebuffer.source.connect(self.videophy.sink)
+
+            # XDC false-path fix (pre-placement injection)
+            platform.toolchain.pre_placement_commands.add(
+                "set_clock_groups -asynchronous "
+                "-group [get_clocks clk_fpga_0] "
+                "-group [get_clocks {{{{clkout0 clkout1}}}}]"
+            )
+
+        # HDMI Video Framebuffer — Phase 9.2 experimental path (PATH A, BROKEN)
+        #
+        # STATUS (2026-04-15): `--with-video-framebuffer` is OPT-IN and
+        # currently broken for boot: adding the FB as a second wishbone bus
+        # master causes Linux to hang after `riscv-plic ... mapped 32
+        # interrupts`, just before the LiteX SoC Controller driver's first
+        # CSR access at 0xF0000000. Timing is CLEAN (sys_clk WNS +0.291 ns
+        # after the XDC fix, see below). The strongest remaining suspect is
+        # the shared-bus master / arbitration path: inserting a second
+        # master makes LiteX wrap the interconnect with wishbone.Arbiter,
+        # and that is the change most correlated with the new hang.
+        #
+        # Do NOT ship this config as the default until either:
+        #   (a) the FB moves to a dedicated AXI HP master (Plan C / Path B),
+        #       bypassing the SoC wishbone entirely, or
+        #   (b) the bus arbiter behaviour is root-caused.
+        #
+        # Known-good baseline = the non-FB bitstream. See
+        # `hardware/zynq/ps_loader/PHASE_9_1_MILESTONE.md`.
         if with_video_framebuffer:
             # Video clock domains from MMCM (driven by PS7 100 MHz FCLK)
             self.cd_hdmi   = ClockDomain()
@@ -121,13 +271,78 @@ class BaseSoC(SoCCore):
             self.videophy = VideoS7HDMIPHY(platform.request("hdmi_out"),
                                            clock_domain="hdmi")
 
-            # Video terminal (text console over HDMI — no DMA needed)
-            self.add_video_terminal(phy=self.videophy,
-                                    timings="640x480@60Hz",
-                                    clock_domain="hdmi")
+            # Phase 9.2: DDR-backed framebuffer. Replaces add_video_terminal.
+            #
+            # VTG (in hdmi clock domain) generates the 640x480@60Hz timing.
+            # WishboneVideoFrameBuffer DMA-reads pixels from main_ram via a
+            # wishbone master attached to the SoC bus, crosses sys→hdmi, and
+            # streams {hsync,vsync,de,r,g,b} into the HDMI PHY sink.
+            #
+            # Framebuffer memory: 640 * 480 * 4 = 1,228,800 bytes at
+            # NaxRiscv 0x48000000 (PS DDR 0x08100000 via GP0 remapper).
+            # LiteX BIOS (main.c) expects the VTG to be registered as
+            # `video_framebuffer_vtg` so it can poke the enable CSR by that
+            # name. We match that convention.
+            video_vtg = VideoTimingGenerator(default_video_timings="640x480@60Hz")
+            video_vtg = ClockDomainsRenamer("hdmi")(video_vtg)
+            self.add_module(name="video_framebuffer_vtg", module=video_vtg)
 
-            # False path constraints: sys ↔ hdmi clock domains are independent
-            platform.add_false_path_constraints(self.crg.cd_sys.clk, self.cd_hdmi.clk)
+            # Wishbone master interface the framebuffer drives. 32-bit data /
+            # 32-bit address matches our main_ram bus.
+            fb_bus = wishbone.Interface(data_width=32, address_width=32)
+            self.bus.add_master(name="video_fb", master=fb_bus)
+
+            # fifo_depth 256 (1 KiB @ 32 bits) keeps LUT pressure modest so
+            # timing closes at 100 MHz sys_clk. At 37 MB/s pixel rate that
+            # covers ~27 µs of bus stalls — plenty for short GP0 arbitration
+            # bubbles. default_enable=0 so the DMA master stays silent until
+            # Linux explicitly enables it (avoids BIOS/kernel boot contention).
+            self.video_framebuffer = WishboneVideoFrameBuffer(
+                bus            = fb_bus,
+                hres           = FRAMEBUFFER_HRES,
+                vres           = FRAMEBUFFER_VRES,
+                base           = FRAMEBUFFER_BASE,
+                fifo_depth     = 256,
+                clock_domain   = "hdmi",
+                default_enable = 0,
+            )
+
+            # VTG → FB → PHY
+            self.comb += video_vtg.source.connect(self.video_framebuffer.vtg_sink)
+            self.comb += self.video_framebuffer.source.connect(self.videophy.sink)
+
+            # NOTE: don't add `VIDEO_FRAMEBUFFER_*` constants — LiteX's CSR
+            # generator already emits `video_framebuffer_base_read()` etc.
+            # in csr.h from the module's CSRs, and duplicate constants would
+            # clash (soc.h vs csr.h). The CSRs carry the same info at runtime.
+
+            # False-path constraints between sys and hdmi clock domains.
+            #
+            # Putting set_clock_groups in the main XDC doesn't work on this
+            # Zynq build: LiteX marks that XDC as PROCESSING_ORDER EARLY so
+            # IO LOC/IOSTANDARD constraints apply pre-synthesis — but that
+            # also forces the clock-group constraint to evaluate before the
+            # Zynq IP generates `clk_fpga_0` or the MMCM elaborates its
+            # output clocks, so every `get_clocks` lookup finds an empty set
+            # and Vivado emits CRITICAL WARNING 12-4739. Result: the
+            # constraint is silently ignored and the sys↔hdmi cross-domain
+            # paths stay reported as synchronous timing violations.
+            #
+            # Fix: inject the set_clock_groups via the Vivado `pre_placement`
+            # hook, which runs after synthesis + opt, at which point the
+            # generated clocks exist.
+            # Actual post-synth clock names (from synth timing report):
+            #   clk_fpga_0            -> Zynq PS FCLK0 (sys, 100 MHz)
+            #   clkout0               -> HDMI pixel (25.175 MHz)
+            #   clkout1               -> HDMI 5x serializer (125.875 MHz)
+            # Brace-escape is 4× because this string is format()'d once
+            # by LiteX (unescapes {{..}} to {..}) then passed as TCL code,
+            # which requires a single brace pair.
+            platform.toolchain.pre_placement_commands.add(
+                "set_clock_groups -asynchronous "
+                "-group [get_clocks clk_fpga_0] "
+                "-group [get_clocks {{{{clkout0 clkout1}}}}]"
+            )
 
 def main():
     from litex.build.parser import LiteXArgumentParser
@@ -137,11 +352,19 @@ def main():
     parser.add_target_argument("--sys-clk-freq", default=100e6, type=float)
     parser.add_target_argument("--with-video-framebuffer", action="store_true",
                                help="Enable HDMI framebuffer output")
+    parser.add_target_argument("--with-video-phy-only", action="store_true",
+                               help="Enable HDMI PLL/PHY/VTG but skip the FB bus master "
+                                    "(cheap confirmation build for arbiter hypothesis)")
+    parser.add_target_argument("--with-video-framebuffer-hp", action="store_true",
+                               help="Enable HDMI framebuffer via AXI HP0 (Path B — "
+                                    "dedicated DMA master, no SoC bus arbiter)")
     args = parser.parse_args()
 
     soc = BaseSoC(
         sys_clk_freq=args.sys_clk_freq,
         with_video_framebuffer=args.with_video_framebuffer,
+        with_video_phy_only=args.with_video_phy_only,
+        with_video_framebuffer_hp=args.with_video_framebuffer_hp,
         **parser.soc_argdict,
     )
     builder = Builder(soc, **parser.builder_argdict)
