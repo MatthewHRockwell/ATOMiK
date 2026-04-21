@@ -68,6 +68,17 @@ static uint32_t *fb;
 static volatile uint32_t *adapter;
 static int memfd;
 
+/* L2 cache flush via eviction pressure.
+ * NaxRiscv has no Zicbom (cbo.flush/cbo.clean), so we force dirty cache
+ * line writeback by writing a scratch buffer larger than the L2 (32 KB).
+ * Sequential writes to 128 KB of scratch evict all dirty FB lines to DDR. */
+static volatile uint8_t flush_scratch[128 * 1024] __attribute__((aligned(64)));
+static void flush_l2_to_ddr(void) {
+    for (int i = 0; i < (int)sizeof(flush_scratch); i += 64)
+        flush_scratch[i] = 0;
+    asm volatile("fence iorw,iorw");
+}
+
 /* ── Framebuffer primitives ──────────────────────────────────────────── */
 static inline void fb_pixel(int x, int y, uint32_t c) {
     if (x >= 0 && x < FB_HRES && y >= 0 && y < FB_VRES)
@@ -320,7 +331,10 @@ static void draw_title(void) {
 }
 
 /* ── Demo sequence ───────────────────────────────────────────────────── */
-static void demo_pause(int ms) { usleep(ms * 1000); }
+static void demo_pause(int ms) {
+    flush_l2_to_ddr();  /* force dirty FB lines to DDR before DMA scans */
+    usleep(ms * 1000);
+}
 
 static void run_demo(void) {
     uint64_t initial, current;
