@@ -80,3 +80,73 @@ cd ../atomik-agent-mem && riscv32-buildroot-linux-gnu-gcc -Wall -Wextra -Werror 
 - **Build**: same as workload_csr_20260409.txt and demo_state_monitor_20260409.txt entries above
 - **Result MD5**: 0544d2c1c24cd12b38294a28ff5fcd6f
 - **Content**: three-column workload (CSR + adapter + SW) + demo_state_monitor on adapter path (7/7 YES)
+
+---
+
+## Phase 9 Display Artifacts (April 2026)
+
+Phase 9 upgraded from VexRiscv SMP (RV32) to NaxRiscv (RV64GC) and added dual-display output.
+Full proof note: [`PHASE_9_PROOF.md`](PHASE_9_PROOF.md)
+
+### Build Environment (Phase 9)
+
+| Component | Version |
+|-----------|---------|
+| Cross-compiler | riscv64-linux-gnu-gcc 13.3.0 (Ubuntu 24.04) |
+| Vivado | v2025.2 |
+| NaxRiscv netlist | NaxRiscvLitex_3c064e59e555b5c0eeae3421918289b5 |
+| Linux kernel | 6.9.0 (rv64imafdc) |
+| OpenSBI | fw_jump (rv64, litex-hub fork) |
+| Rootfs | Ubuntu 24.04 (riscv64, LP64D) |
+
+### Bitstream
+
+- **Source commit**: 9f4eff2
+- **SoC definition**: `hardware/zynq/litex/soc_nax64_atomik.py` — MD5: 5e35f9aaba52285a08f22b2575ef8b97
+- **Build**: `python3 soc_nax64_atomik.py --build --uart-baudrate=921600 --output-dir=../litex-build-nax64 --with-video-framebuffer-hp`
+- **Bitstream MD5**: ea016e0fa510c07009ebfbdab83c755e
+- **Timing**: WNS +0.196 ns, TNS 0.000
+
+### Boot Files
+
+| File | MD5 | Size | Origin |
+|------|-----|------|--------|
+| Image_nax64 | 8b2ee067d9230b4b8707bc7541c8969c | 8,231,096 | buildroot (rv64imafdc) |
+| linux_nax64.dtb | e5f44e2b8e5aa545bb43099aa97ed2f2 | 2,759 | dtc from linux_nax64.dts |
+| fw_jump_nax64.bin | 6f3a60d78a03cc82574805e440c1a21d | 133,632 | buildroot OpenSBI |
+| ubuntu_rv64.cpio.gz | d0329cabba7ec64ccfe0dcd184dcb6d6 | 33,932,917 | debootstrap riscv64 |
+| trampoline.bin | d8ecb4cef45f784942321cd5226b10fa | 36 | make -C ps_loader trampoline |
+
+### Display Programs
+
+All built from source at commit 9f4eff2. Cross-compiler: `riscv64-linux-gnu-gcc`.
+
+#### fb_test (Phase 9.2 — HDMI framebuffer)
+- **Source**: `ps_loader/fb_test.c` — MD5: 2016f301b8a9780ec8ac763f02ce2547
+- **Build**: `riscv64-linux-gnu-gcc -O2 -static fb_test.c -o fb_test`
+- **Result**: 1920x1080@30Hz solid color fills on Dell 3440x1440 ultrawide
+
+#### atomik_hdmi_viz (Phase 9.4 — ATOMiK visualization)
+- **Source**: `ps_loader/atomik_hdmi_viz.c` — MD5: af27c535991d6c418f57866c2cf037c5
+- **Build**: `riscv64-linux-gnu-gcc -O2 -static atomik_hdmi_viz.c -o atomik_hdmi_viz`
+- **Result**: live delta-state operations rendered on HDMI framebuffer
+
+#### atomik_splash (Phase 9.5 — HDMI splash)
+- **Source**: `ps_loader/atomik_splash.c` — MD5: 8077496788f4ab1c151735630cd6ba61
+- **Build**: `riscv64-linux-gnu-gcc -O2 -static atomik_splash.c -o atomik_splash`
+- **Result**: ATOMiK branded splash on 1080p HDMI
+
+#### lcd_tiny (Phase 9.6 — SPI LCD splash)
+- **Source**: `ps_loader/lcd_tiny.c` — MD5: b363efb00aa57633adfd0d9c04d43dd6
+- **Build**: `riscv64-linux-gnu-gcc -Os -nostdlib -static -fno-builtin -o lcd_tiny lcd_tiny.c && riscv64-linux-gnu-strip lcd_tiny`
+- **Binary MD5**: 7d07c5c2e243b90157ab0e8f41f4e214
+- **Binary size**: 2,400 bytes
+- **Result**: ATOMiK splash on ST7789V 320x172 LCD (dark background + blue accent bars)
+- **LCD pins**: SDA=U19, SCL=V18, DC=W13, CS=AA13, RST=AA18, LED=Y13 (Bank 33, from RK schematic)
+
+### JTAG Boot (Phase 9.1)
+
+- **Source**: `ps_loader/jtag_boot.py` (committed at 58c3bb7)
+- **Trampoline**: `ps_loader/trampoline.S` (committed at 58c3bb7)
+- **Result**: 95-102s from xsdb connect to root shell (measured across 4+ runs)
+- **Reproduction**: `BITSTREAM=../litex-build-nax64/gateware/hamgeek_rk7020f.bit python3 jtag_boot.py`
