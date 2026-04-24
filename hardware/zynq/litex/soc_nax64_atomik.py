@@ -44,6 +44,9 @@ NaxRiscv.xlen                 = 64
 NaxRiscv.data_width           = 64
 NaxRiscv.gcc_triple           = ("riscv64-unknown-elf", "riscv64-linux-gnu", "riscv64-unknown-linux-gnu")
 NaxRiscv.linker_output_format = "elf64-littleriscv"
+NaxRiscv.no_netlist_cache     = False
+NaxRiscv.with_fpu             = True
+NaxRiscv.with_rvc             = True
 # Reduce L2 cache to save LUTs on the XC7Z020
 NaxRiscv.l2_bytes             = 32 * 1024  # 32KB (default 128KB too large)
 NaxRiscv.l2_ways              = 4
@@ -68,8 +71,8 @@ class BaseSoC(SoCCore):
         platform = hamgeek_rk7020f.Platform()
         self.crg = _CRG(platform, sys_clk_freq)
 
-        # cpu_type comes from kwargs (set via --cpu-type or parser default)
-        kwargs.setdefault("cpu_type", "naxriscv")
+        # Force NaxRiscv — parser default is VexRiscv, setdefault won't override.
+        kwargs["cpu_type"] = "naxriscv"
         SoCCore.__init__(self, platform, sys_clk_freq,
             ident       = "ATOMiK NaxRiscv RV64 SoC on HamGeek RK-ZYNQ7020-F",
             **kwargs,
@@ -94,6 +97,25 @@ class BaseSoC(SoCCore):
             src_regions=[main_ram_region], dst_regions=[axi_gp0_region],
         )
         self.bus.add_slave("main_ram", remap_module, main_ram_region)
+
+        # LCD ST7789V 320x172 — GPIO bitbang SPI
+        # Pins confirmed from RK-ZYNQ7020-F Schematics.pdf page 5, Bank 33.
+        # V19 (PHY2_RXCTL) was the JTAG crash culprit, NOT these LCD pins.
+        # Names prefixed "z" so they sort AFTER uart/timer/video in CSR space,
+        # preserving the baseline CSR layout that OpenSBI was compiled against.
+        from litex.soc.cores.gpio import GPIOOut
+        lcd_mosi = platform.request("lcd_mosi")
+        lcd_clk  = platform.request("lcd_clk")
+        lcd_dc   = platform.request("lcd_dc")
+        lcd_cs   = platform.request("lcd_cs")
+        lcd_rst  = platform.request("lcd_rst")
+        lcd_led  = platform.request("lcd_led")
+        self.submodules.zlcd_mosi = GPIOOut(lcd_mosi)
+        self.submodules.zlcd_clk  = GPIOOut(lcd_clk)
+        self.submodules.zlcd_dc   = GPIOOut(lcd_dc)
+        self.submodules.zlcd_cs   = GPIOOut(lcd_cs)
+        self.submodules.zlcd_rst  = GPIOOut(lcd_rst)
+        self.submodules.zlcd_led  = GPIOOut(lcd_led)
 
         # ATOMiK CFU Adapter (Wishbone-mapped)
         if with_atomik_adapter:
@@ -155,7 +177,7 @@ class BaseSoC(SoCCore):
             platform.toolchain.pre_placement_commands.add(
                 "set_clock_groups -asynchronous "
                 "-group [get_clocks clk_fpga_0] "
-                "-group [get_clocks {{{{clkout0 clkout1}}}}]"
+                "-group [get_clocks -include_generated_clocks -of_objects [get_pins -hierarchical -filter {{NAME =~ */MMCME2_ADV/CLKOUT*}}]]"
             )
             # Intentionally no bus.add_master call. No wishbone arbiter.
 
@@ -229,7 +251,7 @@ class BaseSoC(SoCCore):
             self.comb += video_vtg.source.connect(self.video_framebuffer.vtg_sink)
             self.comb += self.video_framebuffer.source.connect(self.videophy.sink)
 
-            # XDC false-path fix (pre-placement injection)
+            # False-path between sys (clk_fpga_0) and hdmi (clkout0/1) domains
             platform.toolchain.pre_placement_commands.add(
                 "set_clock_groups -asynchronous "
                 "-group [get_clocks clk_fpga_0] "
@@ -341,7 +363,7 @@ class BaseSoC(SoCCore):
             platform.toolchain.pre_placement_commands.add(
                 "set_clock_groups -asynchronous "
                 "-group [get_clocks clk_fpga_0] "
-                "-group [get_clocks {{{{clkout0 clkout1}}}}]"
+                "-group [get_clocks -include_generated_clocks -of_objects [get_pins -hierarchical -filter {{NAME =~ */MMCME2_ADV/CLKOUT*}}]]"
             )
 
 def main():
@@ -359,6 +381,22 @@ def main():
                                help="Enable HDMI framebuffer via AXI HP0 (Path B — "
                                     "dedicated DMA master, no SoC bus arbiter)")
     args = parser.parse_args()
+
+    # Force NaxRiscv config AFTER parse_args (which resets class attrs).
+    # All attributes that NaxRiscv.args() normally sets must be replicated
+    # here because the parser doesn't register NaxRiscv's args (it defaults
+    # to VexRiscv until kwargs["cpu_type"] overrides in BaseSoC.__init__).
+    NaxRiscv.xlen                 = 64
+    NaxRiscv.data_width           = 64
+    NaxRiscv.no_netlist_cache     = True   # force regen — FPU/RVC not in cache hash
+    NaxRiscv.update_repo          = "no"  # don't git pull NaxRiscv repo
+    NaxRiscv.with_fpu             = True
+    NaxRiscv.with_rvc             = True
+    NaxRiscv.jtag_tap             = False
+    NaxRiscv.jtag_instruction     = False
+    NaxRiscv.with_dma             = False
+    NaxRiscv.l2_bytes             = 32 * 1024
+    NaxRiscv.l2_ways              = 4
 
     soc = BaseSoC(
         sys_clk_freq=args.sys_clk_freq,
