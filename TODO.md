@@ -199,30 +199,36 @@ relocate_enable_mmu, pinpointed to the exact `csrw satp` instruction.
 to VexRiscvSMP cluster (future). The ATOMiK adapter MMIO path (validated
 9/9 PASS at 0xF0020000) works on the SMP SoC and is the functional path.
 
-## Phase 9: 64-bit RISC-V + Display Boot
+## Phase 9: 64-bit RISC-V + Display Boot — **COMPLETE** (April 12-24, 2026)
 
-- [x] **9.1** NaxRiscv RV64 SoC synthesized — 24,744 LUT (46.5%), WNS +1.412ns
-  - Check: does it fit? (53K LUT budget, need ~20K for ATOMiK N=1)
-  - Alternative: RV32 SMP SoC as stepping stone, 64-bit on larger FPGA or ASIC
-  - Required: Linux 6.x kernel built for RV64, buildroot rootfs
+- [x] **9.0** NaxRiscv RV64GC SoC — Ubuntu 24.04 first boot (Apr 12)
+  - RV64GC with FPU, RVC, Sv39 MMU on XC7Z020 (63.3% LUT)
+  - Ubuntu 24.04 LP64D hardfloat, root shell via UART at 921600
 
-- [ ] **9.2** HDMI framebuffer on SMP SoC
-  - Add LiteVideo or custom framebuffer IP to the SMP SoC
-  - ATOMiK boot splash (atoms, not penguins) via fbdev or DRM
-  - Required: Zynq PL HDMI output pins, pixel clock PLL
+- [x] **9.1** JTAG-direct DDR boot — 95s to root prompt (Apr 15)
+  - Single xsdb session: ps7_init → fpga → dow → boot
+  - 28x faster than SFL (44 min → 95 sec)
+  - L2 flush trampoline for DDR coherency after JTAG dow
 
-- [ ] **9.3** ATOMiK adapter integration test on SMP SoC (re-validate)
-  - Full workload_change_detect from Linux with adapter + display
-  - Verify: same results as Phase 6 (5 configs, 6-21% overhead)
+- [x] **9.2** HDMI framebuffer — 1920x1080@30Hz (Apr 16)
+  - AXI HP0 dedicated DMA path (no bus arbiter contention)
+  - L2 eviction flush for cache coherency
+  - Dell 3440x1440 ultrawide confirmed
 
-- [ ] **9.4** Ubuntu rootfs
-  - Build Ubuntu base for RISC-V (debootstrap or pre-built)
-  - Requires 64-bit CPU and sufficient DDR (512MB available)
+- [x] **9.3** HDMI console text — fbcon via simplefb (Apr 18)
+  - 240x67 character console on 1080p HDMI
+  - Kernel messages + login shell visible on monitor
 
-- [ ] **8.5** Run workload on native instruction path
-  - Same workload_change_detect, but using CFU instructions
-  - Capture three-way: software / CSR / native
-  - Verify: results committed, native path shows clear latency advantage
+- [x] **9.4** ATOMiK live visualization on HDMI (Apr 18)
+  - Delta-state operations rendered in real-time on framebuffer
+
+- [x] **9.5** ATOMiK boot splash on HDMI (Apr 18)
+  - Dark blue background + ATOMiK blue accent bars
+
+- [x] **9.6** SPI LCD splash — ST7789V 320x172 (Apr 24)
+  - All 6 pins confirmed from RK-ZYNQ7020-F schematic: SDA=U19, SCL=V18, DC=W13, CS=AA13, RST=AA18, LED=Y13
+  - V19 (PHY2_RXCTL) was the JTAG crash culprit, NOT LCD_DC
+  - lcd_tiny.c: 2,400-byte no-libc splash program
 
 ---
 

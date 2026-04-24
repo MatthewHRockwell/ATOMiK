@@ -1,24 +1,25 @@
 # ATOMiK — Roadmap & Execution Plan
 
-**Document Version:** 3.0
-**Date:** April 8, 2026
+**Document Version:** 4.0
+**Date:** April 24, 2026
 **Author:** Matt Rockwell + Claude (Planning Partner)
-**Status:** ACTIVE — Zynq Linux platform validated, libatomik 3-backend runtime, workload demo captured
+**Status:** ACTIVE — Phase 9 COMPLETE, dual-display NaxRiscv RV64 SoC, entering demo productization
 
-### Current Milestone (April 2026)
-- **Zynq Linux**: VexRiscvSMP @ 100 MHz, Linux 6.9, ATOMiK validated from userspace (16/16 PASS)
-- **CFU Adapter**: 9/9 PASS from Linux userspace, 20/20 Verilator, 10-14% overhead vs direct CSR
-- **libatomik**: C runtime with 3 backends (AXI, CSR, Adapter), 33/33 mock tests
-- **Workload Demo**: Multi-buffer change detection — 15x to 4,657x speedup on live hardware
-- **State Monitor Demo**: 7/7 correct, up to 211x speedup (64KB no-change case)
+### Current Milestone (April 24, 2026)
+- **Zynq SoC**: NaxRiscv RV64GC @ 100 MHz, Ubuntu 24.04, ATOMiK adapter validated
+- **Dual Display**: 1920x1080 HDMI + 320x172 SPI LCD (ST7789V), both hardware-confirmed
+- **JTAG Boot**: 95s full Linux boot (28x faster than SFL)
+- **HDMI Framebuffer**: AXI HP0 DMA path, fbcon text, ATOMiK visualization + splash
+- **LCD Splash**: GPIO bitbang SPI, all 6 pins confirmed from RK-ZYNQ7020-F schematic
 - **Formal**: 108 Lean4 theorems (all compile)
-- **Tag**: `zynq-adapter-v1` (cc9307e) — frozen baseline with artifact manifest
+- **SDK**: 353/353 tests passing
 
 ### Previous Milestones
-- v2 Production SoC on Tang Nano 9K ($13.50) — all tests PASS
+- `zynq-adapter-v1` (cc9307e): VexRiscvSMP Linux, 16/16 PASS, 9/9 adapter, workload demo
 - v3.1.0 HD 1280x720 HDMI on Tang Nano 9K — 88% CLS utilization
 - Zynq ceiling: 444 MHz (N=1), 69.7 Gops/s (N=512)
 - Multi-node delta streaming: dual-SoC convergence in Verilator
+- v2 Production SoC on Tang Nano 9K ($13.50) — all tests PASS
 
 ---
 
@@ -724,7 +725,7 @@ The v3 architecture is a ground-up redesign: custom RV64I CPU with ATOMiK custom
 
 ## 15. ATOMiK Zynq Port (HamGeek RK-ZYNQ7020-F)
 
-The Zynq port is the **primary Linux platform** for ATOMiK. A VexRiscv SMP RISC-V soft-core runs Linux 6.9 in the PL fabric with ATOMiK as a Wishbone CSR peripheral. The path is fully validated: 16/16 userspace PASS, 9/9 adapter PASS, workload demo captured.
+The Zynq port is the **primary Linux platform** for ATOMiK. A NaxRiscv RV64GC soft-core runs Ubuntu 24.04 in the PL fabric with ATOMiK as a Wishbone CSR peripheral and dual-display output (1080p HDMI + 320x172 SPI LCD).
 
 ATOMiK is accessed from Linux userspace via `/dev/mem` + libatomik (3 backends: CSR, Adapter, AXI). The adapter path (CFU bus wrapper) adds ~10-14% overhead vs direct CSR, both O(1).
 
@@ -737,7 +738,7 @@ Reference docs: [`docs/reference/xilinx/`](docs/reference/xilinx/)
 | Item | Details |
 |------|---------|
 | **Board** | HamGeek RK-ZYNQ7020-F (CLG484) |
-| **FPGA** | XC7Z020-2CLG400I (industrial grade, -2 speed) |
+| **FPGA** | XC7Z020-2CLG484I (industrial grade, -2 speed) |
 | **CPU** | Dual ARM Cortex-A9 @ 667 MHz |
 | **DDR3** | 1 GB (32-bit, on PS) |
 | **PL Resources** | 53,200 LUT6, 106,400 FF, 140 BRAM36, 220 DSP48E1, 4 MMCM |
@@ -775,7 +776,7 @@ Reference docs: [`docs/reference/xilinx/`](docs/reference/xilinx/)
 3. **4-stage SWAP pipeline** — Accounts for BRAM registered read latency. Deterministic, fixed-depth for all operations.
 4. **Aggressive implementation directives** — `ExtraTimingOpt` placement + `AggressiveExplore` routing closed the final 61ps gap.
 
-### Status (April 2026)
+### Status (April 24, 2026)
 
 - **Zynq Phase 0**: Documentation & tooling — **COMPLETE**
 - **Zynq Phase 0.5**: Pre-hardware synthesis — **COMPLETE** (400 MHz timing-met, 37/37 CDC sim)
@@ -785,15 +786,32 @@ Reference docs: [`docs/reference/xilinx/`](docs/reference/xilinx/)
 - **Zynq Phase 4**: Multi-bank scaling — PENDING
 - **Zynq Phase 5**: CFU native instruction path — PENDING
 
+#### Phase 9: NaxRiscv RV64 + Display — **COMPLETE** (April 12-24, 2026)
+
+Upgraded from VexRiscv SMP (RV32) to NaxRiscv (RV64GC) with FPU, compressed instructions, Sv39 MMU, and Ubuntu 24.04. Added dual-display output.
+
+| Sub-phase | Description | Date | Status |
+|-----------|-------------|------|--------|
+| 9.1 | JTAG-direct DDR boot (95s, 28x faster than SFL) | Apr 15 | **DONE** |
+| 9.2 | HDMI framebuffer via AXI HP0 (1920x1080@30Hz) | Apr 16 | **DONE** |
+| 9.3 | HDMI console text via simplefb/fbcon | Apr 18 | **DONE** |
+| 9.4 | ATOMiK live visualization on HDMI | Apr 18 | **DONE** |
+| 9.5 | ATOMiK boot splash on HDMI | Apr 18 | **DONE** |
+| 9.6 | SPI LCD splash (ST7789V, all 6 pins confirmed) | Apr 24 | **DONE** |
+
+Key files: `hardware/zynq/ps_loader/` (boot + display programs), `hardware/zynq/litex/soc_nax64_atomik.py` (SoC definition)
+
 ### Architecture
 
-1. **VexRiscv SMP** runs Linux in PL — ATOMiK is a Wishbone CSR peripheral
+1. **NaxRiscv RV64GC** runs Ubuntu 24.04 in PL — ATOMiK is a Wishbone CSR peripheral
 2. **32-bit Wishbone, 64-bit datapath** — LO/HI register pair, HI write triggers operation
 3. **CFU adapter** — Wishbone wrapper around CFU bus, validated at 0xF0020000
-4. **libatomik** — C runtime with 3 backends (CSR, Adapter, AXI), 33/33 mock tests
-5. **`/dev/mem` access** — MMIO fences + dummy STATUS read for Wishbone ordering
-6. **`--cpu-variant=linux` REQUIRED** for VexRiscvSMP builds (see `feedback_litex_build.md`)
+4. **AXI HP0 framebuffer** — Dedicated DDR DMA for 1080p HDMI, no bus arbiter contention
+5. **GPIO bitbang SPI** — 6 CSR registers for ST7789V LCD (SDA, SCL, DC, CS, RST, LED)
+6. **L2 cache eviction flush** — 128 KB scratch write for DDR coherency (no Zicbom on NaxRiscv)
+7. **libatomik** — C runtime with 3 backends (CSR, Adapter, AXI), 33/33 mock tests
+8. **`/dev/mem` access** — MMIO fences + dummy STATUS read for Wishbone ordering
 
 ---
 
-*Last updated: April 8, 2026 — tag `zynq-adapter-v1`*
+*Last updated: April 24, 2026 — Phase 9 complete*
