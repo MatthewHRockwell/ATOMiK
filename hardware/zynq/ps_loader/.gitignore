@@ -1,0 +1,14 @@
+# Compiled binaries (rebuild from source)
+fb_test
+atomik_splash
+atomik_hdmi_viz
+lcd_splash
+lcd_tiny
+lcd_cs_scan
+lcd_pin_scan
+devmem
+build/
+*.o
+*.elf
+*.bin
+*.map
