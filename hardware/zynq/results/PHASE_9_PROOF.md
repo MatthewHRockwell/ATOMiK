@@ -79,10 +79,9 @@ ATOMIK_ADAPTER_BASE         = 0xF0020000
 
 **Claim:** 95-second boot from power-on to root shell (28x faster than SFL).
 
-**Evidence:**
-- xsdb session output shows `[xsdb] done in 97.6 s` to `101.9 s` across multiple runs
-- All runs show zero "Invalid context" errors (JTAG clean)
-- BIOS prompt appears, `boot 0x40a00000` triggers Liftoff, kernel boots to login
+**Evidence (committed raw artifacts):**
+- [`jtag_boot_log_20260424.txt`](jtag_boot_log_20260424.txt) — raw xsdb session: `[xsdb] done in 100.0 s`, zero errors
+- [`boot_console_20260424.txt`](boot_console_20260424.txt) — full UART capture: Liftoff → OpenSBI → kernel → login prompt
 
 **Reproduction:**
 ```bash
@@ -102,10 +101,10 @@ BITSTREAM=../litex-build-nax64/gateware/hamgeek_rk7020f.bit python3 jtag_boot.py
 
 **Claim:** 1920x1080@30Hz framebuffer via AXI HP0 on Dell 3440x1440 ultrawide.
 
-**Evidence:**
-- Kernel log: `simple-framebuffer 48000000.framebuffer: format=x8r8g8b8, mode=1920x1080x32`
-- Solid color fills (red, green, blue, white) all render correctly
-- fb_test program confirmed on hardware
+**Evidence (committed raw artifacts):**
+- [`boot_console_20260424.txt`](boot_console_20260424.txt) — kernel log line: `simple-framebuffer 48000000.framebuffer: format=x8r8g8b8, mode=1920x1080x32, linelength=7680`
+- [`dmesg_phase9_20260424.txt`](dmesg_phase9_20260424.txt) — filtered dmesg confirming `fb0: simplefb registered!`
+- Solid color fills (red, green, blue, white) confirmed on hardware via fb_test
 
 **Build:**
 ```bash
@@ -123,10 +122,10 @@ riscv64-linux-gnu-gcc -O2 -static fb_test.c -o fb_test
 
 **Claim:** Readable 240x67 character console on HDMI via simplefb/fbcon.
 
-**Evidence:**
-- Kernel log: `Console: switching to colour frame buffer device 240x67`
-- Kernel messages, login prompt, and shell commands visible on HDMI monitor
-- DTS `simple-framebuffer` node at 0x48000000 with `x8r8g8b8` format
+**Evidence (committed raw artifacts):**
+- [`boot_console_20260424.txt`](boot_console_20260424.txt) — kernel log line: `Console: switching to colour frame buffer device 240x67`
+- [`dmesg_phase9_20260424.txt`](dmesg_phase9_20260424.txt) — confirms console switch and ttyLXU0 registration
+- Kernel messages, login prompt, and shell commands visible on HDMI monitor (live observation)
 
 ---
 
@@ -135,9 +134,9 @@ riscv64-linux-gnu-gcc -O2 -static fb_test.c -o fb_test
 **Claim:** Delta-state operations rendered in real-time on HDMI framebuffer.
 
 **Evidence:**
-- atomik_hdmi_viz.c maps ATOMiK adapter at 0xF0020000 and framebuffer at 0x48000000
+- Source committed: `ps_loader/atomik_hdmi_viz.c` maps ATOMiK adapter at 0xF0020000 and framebuffer at 0x48000000
 - Performs load/accumulate/read/swap operations and renders state as colored blocks
-- Confirmed on hardware with visual output on Dell monitor
+- Confirmed on hardware with visual output on Dell monitor (live observation, no committed run log)
 
 **Build:**
 ```bash
@@ -151,8 +150,8 @@ riscv64-linux-gnu-gcc -O2 -static atomik_hdmi_viz.c -o atomik_hdmi_viz
 **Claim:** ATOMiK branded splash screen on 1080p HDMI.
 
 **Evidence:**
-- Dark blue background with ATOMiK blue accent bars renders on monitor
-- Runs from userspace after Linux boot
+- Source committed: `ps_loader/atomik_splash.c`
+- Dark blue background with ATOMiK blue accent bars renders on monitor (live observation, no committed run log)
 
 **Build:**
 ```bash
@@ -165,11 +164,11 @@ riscv64-linux-gnu-gcc -O2 -static atomik_splash.c -o atomik_splash
 
 **Claim:** ST7789V 320x172 LCD displaying ATOMiK splash, all 6 pins confirmed.
 
-**Evidence:**
-- devmem SPI bitbang: Sleep Out (0x11) + Display ON (0x29) → fuzzy pixels visible (confirms connectivity)
-- lcd_tiny program: full init + color fill → ATOMiK splash displayed
-- UART log shows: `LED on / Reset / Init / Fill / Bars / DONE`
-- Zero JTAG errors across 4 boot cycles with LCD pins active
+**Evidence (committed raw artifacts):**
+- [`lcd_run_20260424.txt`](lcd_run_20260424.txt) — raw UART capture: `LED on / Reset / Init / Fill / Bars / DONE / EXIT=0`
+- [`jtag_boot_log_20260424.txt`](jtag_boot_log_20260424.txt) — zero "Invalid context" errors with LCD pins active
+- devmem SPI bitbang (pre-lcd_tiny): Sleep Out + Display ON → fuzzy pixels visible (live observation)
+- lcd_tiny program: full init + color fill → ATOMiK splash displayed on LCD (live observation)
 
 **Pin mapping (from RK-ZYNQ7020-F Schematics.pdf page 5, Bank 33):**
 

@@ -1,0 +1,24 @@
+attempting to launch hw_server
+
+****** Xilinx hw_server v2025.2
+  **** Build date : Oct 28 2025 at 16:07:00
+    ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+    ** Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
+
+INFO: hw_server application started
+INFO: Use Ctrl-C to exit hw_server application
+
+INFO: To connect to this hw_server instance use url: TCP:127.0.0.1:3121
+
+-- ps7_init --
+-- fpga -file ../litex-build-nax64/gateware/hamgeek_rk7020f.bit --
+-- dow -data Image_nax64 → PS 0x00100000 (NaxRiscv 0x40000000, 8,231,096 bytes) --
+-- dow -data linux_nax64.dtb → PS 0x00ff0000 (NaxRiscv 0x40ef0000, 2,759 bytes) --
+-- dow -data fw_jump_nax64.bin → PS 0x01000000 (NaxRiscv 0x40f00000, 133,632 bytes) --
+-- dow -data ubuntu_rv64.cpio.gz → PS 0x02100000 (NaxRiscv 0x42000000, 33,932,917 bytes) --
+-- dow -data trampoline → PS 0x00b00000 (NaxRiscv 0x40a00000, 36 bytes) --
+-- DDR loaded; releasing CPU --
+exit
+[xsdb] starting unified session …
+[xsdb] done in 100.0 s
+--no-boot set; type `boot 0x40f00000` on the LiteX BIOS prompt.

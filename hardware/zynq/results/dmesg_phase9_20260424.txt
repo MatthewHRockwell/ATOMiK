@@ -1,0 +1,24 @@
+# dmesg extract — 2026-04-24 11:13:23
+# Board: RK-ZYNQ7020-F, bitstream: litex-build-nax64
+# Filter: framebuffer|fb0|simplefb|Console|liteuart|ttyLXU|OpenSBI|Linux version
+
+dmesg | grep -E "framebuffer|fb0|simplefb|Console|liteuart|tttyLXU|OpenSBI|Linux version"
+[?2004l[    0.000000] [01;31m[KLinux version[m[K 6.9.0 (mattrock@Jarvis) (riscv64-buildroot-linux-gnu-gcc.br_real (Buildroot 2023.02.5) 11.4.0, GNU ld (GNU Binutils) 2.38) #2 Sun Apr 12 06:36:36 PDT 2026
+[    0.000000] earlycon: [01;31m[Kliteuart[m[K0 at MMIO 0x00000000f0001000 (options '')
+[    0.000000] printk: legacy bootconsole [[01;31m[Kliteuart[m[K0] enabled
+[    0.000000] OF: reserved mem: 0x0000000048000000..0x00000000487e8fff (8100 KiB) map non-reusable [01;31m[Kframebuffer[m[K@48000000
+[    0.000000] Kernel command line: console=tty0 console=[01;31m[Kliteuart[m[K0 earlycon=[01;31m[Kliteuart[m[K,0xf0001000 rdinit=/init
+[    0.007029] [01;31m[KConsole[m[K: colour dummy device 80x25
+[    2.198838] simple-[01;31m[Kframebuffer[m[K 48000000.[01;31m[Kframebuffer[m[K: [01;31m[Ksimplefb[m[K: cannot reserve video memory at [mem 0x48000000-0x487e8fff]
+[    2.206157] simple-[01;31m[Kframebuffer[m[K 48000000.[01;31m[Kframebuffer[m[K: [01;31m[Kframebuffer[m[K at 0x48000000, 0x7e9000 bytes
+[    2.208989] simple-[01;31m[Kframebuffer[m[K 48000000.[01;31m[Kframebuffer[m[K: format=x8r8g8b8, mode=1920x1080x32, linelength=7680
+[    3.361113] [01;31m[KConsole[m[K: switching to colour frame buffer device 240x67
+[    6.381436] simple-[01;31m[Kframebuffer[m[K 48000000.[01;31m[Kframebuffer[m[K: [01;31m[Kfb0[m[K: [01;31m[Ksimplefb[m[K registered!
+[   20.038694] f0001000.serial: [01;31m[KttyLXU[m[K0 at MMIO 0x0 (irq = 1, base_baud = 0) is a [01;31m[Kliteuart[m[K
+[   20.055904] printk: legacy console [[01;31m[Kliteuart[m[K0] enabled
+[   20.064384] printk: legacy bootconsole [[01;31m[Kliteuart[m[K0] disabled
+[?2004hroot@atomik-rv64:/# 
+# uname -a
+uname -a
+[?2004lLinux atomik-rv64 6.9.0 #2 Sun Apr 12 06:36:36 PDT 2026 riscv64 riscv64 riscv64 GNU/Linux
+[?2004hroot@atomik-rv64:/# 

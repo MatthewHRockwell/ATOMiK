@@ -1,0 +1,13 @@
+# LCD run capture — 2026-04-24 11:12:00
+# Board: RK-ZYNQ7020-F, binary: /tmp/lcd_tiny (2400 bytes)
+# Command: /tmp/lcd_tiny
+
+/tmp/lcd_tiny; echo EXIT=$?
+[?2004lLED on
+Reset
+Init
+Fill
+Bars
+DONE
+EXIT=0
+[?2004hroot@atomik-rv64:/# 
