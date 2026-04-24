@@ -35,8 +35,8 @@
 #define REG_STAT  0x10
 
 /* ── VTG / DMA CSRs ─────────────────────────────────────────────────── */
-#define CSR_FB_DMA_ENABLE   0xF0002004UL
-#define CSR_FB_VTG_ENABLE   0xF0002800UL
+#define CSR_FB_DMA_ENABLE   0xF0004804UL
+#define CSR_FB_VTG_ENABLE   0xF0005000UL
 #define CSR_PAGE_BASE       0xF0000000UL
 #define CSR_PAGE_SIZE       0x00100000UL
 

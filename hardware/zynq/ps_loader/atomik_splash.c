@@ -26,8 +26,8 @@
 #define FB_BPP      4
 #define FB_SIZE     (FB_HRES * FB_VRES * FB_BPP)
 
-#define CSR_FB_DMA_ENABLE   0xF0002004UL
-#define CSR_FB_VTG_ENABLE   0xF0002800UL
+#define CSR_FB_DMA_ENABLE   0xF0004804UL
+#define CSR_FB_VTG_ENABLE   0xF0005000UL
 
 /* Colors */
 #define COL_BG       0x00080C14   /* very dark navy */

@@ -38,9 +38,9 @@
 #define FB_SIZE     (FB_HRES * FB_VRES * FB_BPP)
 
 /* LiteX CSR addresses (from csr.csv of the fb bitstream) */
-#define CSR_FB_DMA_BASE     0xF0002000UL    /* 32-bit: base address */
-#define CSR_FB_DMA_ENABLE   0xF0002004UL    /* 1: enable fetch */
-#define CSR_FB_VTG_ENABLE   0xF0002800UL    /* 1: enable video timing generator */
+#define CSR_FB_DMA_BASE     0xF0004800UL    /* 32-bit: base address */
+#define CSR_FB_DMA_ENABLE   0xF0004804UL    /* 1: enable fetch */
+#define CSR_FB_VTG_ENABLE   0xF0005000UL    /* 1: enable video timing generator */
 /* CSR page is one 4 KiB region starting at 0xF0000000 */
 #define CSR_PAGE_BASE       0xF0000000UL
 #define CSR_PAGE_SIZE       0x00100000UL

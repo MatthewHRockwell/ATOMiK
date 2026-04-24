@@ -13,7 +13,7 @@
 		stdout-path = "serial0:921600n8";
 		bootargs = "console=tty0 console=liteuart0 earlycon=liteuart,0xf0001000 rdinit=/init";
 		linux,initrd-start = <0x42000000>;
-		linux,initrd-end   = <0x43e5a0f4>;
+		linux,initrd-end   = <0x4405c675>;
 
 		/* Phase 9.3: simple-framebuffer for fbcon on HDMI.
 		 * Address 0x48000000 = FB base in NaxRiscv address space.
