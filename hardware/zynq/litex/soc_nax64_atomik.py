@@ -112,13 +112,8 @@ class BaseSoC(SoCCore):
         )
         self.bus.add_slave("ps_iop", remap_iop, iop_src)
 
-        # USB interrupt proxy: 1kHz periodic timer → PLIC input 2
-        # The PS USB interrupt doesn't reach the NaxRiscv PLIC,
-        # so we create a periodic PL interrupt that triggers the
-        # USB driver's IRQ handler, which polls USBSTS.
-        from litex.soc.cores.timer import Timer
-        self.submodules.usb_poll = Timer()
-        self.irq.add("usb_poll", use_loc_if_exists=True)
+        # USB interrupt proxy: PARKED — need to solve interrupt routing
+        # before USB host will enumerate devices. See ChatGPT guidance.
 
         # LCD ST7789V 320x172 — GPIO bitbang SPI
         # Pins confirmed from RK-ZYNQ7020-F Schematics.pdf page 5, Bank 33.

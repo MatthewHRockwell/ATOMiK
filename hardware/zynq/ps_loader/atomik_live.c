@@ -501,10 +501,13 @@ static void detect_all(void) {
 
     /* Emit change event to stdout for laptop bridge */
     int changed = 0;
-    for (int i = 0; i < N_BUF; i++) if (buf_changed[i]) changed++;
+    int mask = 0;
+    for (int i = 0; i < N_BUF; i++) {
+        if (buf_changed[i]) { changed++; mask |= (1 << i); }
+    }
     float pct = sw_scanned > 0 ?
         100.0f * (sw_scanned - hw_touched) / sw_scanned : 0;
-    printf("##EVENT:%d:%d:%.1f\n", total_cycles, changed, pct);
+    printf("##EVENT:%d:%d:%.1f:%02X\n", total_cycles, changed, pct, mask);
     fflush(stdout);
 }
 
@@ -543,6 +546,9 @@ int main(void) {
     if (adapter == MAP_FAILED) { perror("mmap adapter"); return 1; }
 
     printf("Enabling HDMI...\n");
+    /* Do NOT write DMA_BASE — the SoC configures it at synthesis time
+     * with the PS DDR physical address (0x08100000 via HP0). Writing
+     * the NaxRiscv virtual address (0x48000000) here would break DMA. */
     csr_wr(CSR_FB_VTG_EN, 1);
     csr_wr(CSR_FB_DMA_EN, 1);
     printf("Initializing LCD...\n");
@@ -552,7 +558,18 @@ int main(void) {
     reset_all();
     log_event("ATOMiK Live System started.");
     log_event("8 state buffers initialized.");
-    log_event("Hardware adapter at 0xF0020000 ready.");
+
+    /* Run initial demo cycle so dashboard isn't all zeros */
+    modify_buffer(0);
+    modify_buffer(2);
+    modify_buffer(5);
+    detect_all();
+    log_event("Modified agent.ctx, session.st, replica.0");
+    modify_buffer(1);
+    modify_buffer(4);
+    detect_all();
+    log_event("Modified model.wt, cache.hot");
+    log_event("Press 1-8 to modify buffers.");
 
     /* Set terminal to raw mode for key input */
     term_raw();

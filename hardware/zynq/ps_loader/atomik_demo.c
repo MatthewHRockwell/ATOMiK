@@ -34,7 +34,7 @@
 #define FB_BPP      4
 #define FB_SIZE     (FB_HRES * FB_VRES * FB_BPP)
 
-/* ── CSR addresses (CORRECT for April 24 bitstream with zlcd_ prefix) ── */
+/* ── CSR addresses (matches Phase 9.6 layout + GP1 IOP) ── */
 #define CSR_BASE            0xF0000000UL
 #define CSR_SIZE            0x00100000UL
 #define CSR_FB_DMA_BASE     0xF0002000UL
