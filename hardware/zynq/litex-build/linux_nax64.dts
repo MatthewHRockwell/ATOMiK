@@ -142,6 +142,17 @@
 			reg = <0xf0020000 0x20>;
 			status = "okay";
 		};
+
+		/* PS USB0 via GP1 AXI slave — NaxRiscv 0x80000000 maps to PS 0xE0000000
+		 * ChipIdea CI13xxx dual-role controller at PS 0xE0002000 = NaxRiscv 0x80002000
+		 * Interrupt: PLIC input 2 (usb_poll timer in PL, not real PS IRQ) */
+		usb0: usb@80002000 {
+			compatible = "xlnx,zynq-usb-2.20.a", "chipidea,usb2";
+			reg = <0x80002000 0x1000>;
+			interrupts = <0x03>;
+			dr_mode = "host";
+			status = "okay";
+		};
 	};
 
 	aliases {

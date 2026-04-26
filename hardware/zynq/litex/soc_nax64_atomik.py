@@ -83,10 +83,11 @@ class BaseSoC(SoCCore):
         ps.set_ps7(name="Zynq", config=platform.ps7_config)
         axi_gp0 = ps.add_axi_gp_slave(clock_domain="sys")
 
-        axi_gp0_region  = SoCRegion(origin=0x100000, size=0x2000_0000)
+        # DDR region: NaxRiscv 0x40000000 → PS DDR 0x00100000
+        axi_gp0_ddr_dst = SoCRegion(origin=0x100000, size=0x2000_0000)
         main_ram_region = SoCRegion(
             origin=self.cpu.mem_map["main_ram"],
-            size=axi_gp0_region.size,
+            size=axi_gp0_ddr_dst.size,
             mode="rwx",
         )
 
@@ -94,9 +95,30 @@ class BaseSoC(SoCCore):
         remap_module = wishbone.Interface(data_width=32, address_width=32)
         self.submodules += wishbone.Remapper(
             master=remap_module, slave=wb,
-            src_regions=[main_ram_region], dst_regions=[axi_gp0_region],
+            src_regions=[main_ram_region], dst_regions=[axi_gp0_ddr_dst],
         )
         self.bus.add_slave("main_ram", remap_module, main_ram_region)
+
+        # PS I/O Peripherals via GP1: NaxRiscv 0x80000000 → PS IOP 0xE0000000
+        # Exposes PS USB0, GEM0, SDIO, GPIO to NaxRiscv Linux
+        axi_gp1 = ps.add_axi_gp_slave(clock_domain="sys")
+        wb_iop = self.bus.add_adapter("axi_gp1", axi_gp1, direction="s2m")
+        iop_dst = SoCRegion(origin=0xE000_0000, size=0x0030_0000)
+        iop_src = SoCRegion(origin=0x8000_0000, size=0x0030_0000, mode="rw", cached=False)
+        remap_iop = wishbone.Interface(data_width=32, address_width=32)
+        self.submodules += wishbone.Remapper(
+            master=remap_iop, slave=wb_iop,
+            src_regions=[iop_src], dst_regions=[iop_dst],
+        )
+        self.bus.add_slave("ps_iop", remap_iop, iop_src)
+
+        # USB interrupt proxy: 1kHz periodic timer → PLIC input 2
+        # The PS USB interrupt doesn't reach the NaxRiscv PLIC,
+        # so we create a periodic PL interrupt that triggers the
+        # USB driver's IRQ handler, which polls USBSTS.
+        from litex.soc.cores.timer import Timer
+        self.submodules.usb_poll = Timer()
+        self.irq.add("usb_poll", use_loc_if_exists=True)
 
         # LCD ST7789V 320x172 — GPIO bitbang SPI
         # Pins confirmed from RK-ZYNQ7020-F Schematics.pdf page 5, Bank 33.
