@@ -119,161 +119,271 @@ def uart_reader(port, baud, loop):
             time.sleep(1)
 
 
-HTML_PAGE = """<!DOCTYPE html>
+HTML_PAGE = r"""<!DOCTYPE html>
 <html>
 <head>
 <meta charset="utf-8">
-<title>ATOMiK Replica</title>
+<title>ATOMiK Control Plane</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body {
-    background: #08111A; color: #F3F7FB;
-    font-family: 'Courier New', monospace;
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    min-height: 100vh;
-}
-.header {
-    display: flex; align-items: center; gap: 20px;
-    margin-bottom: 40px;
-}
-.header h1 { color: #1EC8FF; font-size: 36px; }
-.badge {
-    background: #1EC8FF; color: #08111A;
-    padding: 8px 20px; border-radius: 4px;
-    font-weight: bold; font-size: 14px;
-}
-.title { color: #9AA8B5; font-size: 18px; margin-bottom: 30px; }
-.buffers {
-    display: grid; grid-template-columns: repeat(4, 1fr);
-    gap: 12px; margin-bottom: 40px;
-}
-.buf {
-    width: 140px; height: 80px;
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    border-radius: 6px; transition: background 0.3s;
-}
-.buf.clean { background: #2A3644; }
-.buf.changed { background: #1EC8FF; }
-.buf .label { font-size: 12px; color: #9AA8B5; }
-.buf.changed .label { color: #08111A; }
-.buf .status { font-size: 16px; font-weight: bold; margin-top: 4px; }
-.buf.changed .status { color: #08111A; }
-.metrics {
-    display: flex; gap: 40px; margin-bottom: 40px;
-}
-.metric {
-    text-align: center;
-}
-.metric .value {
-    font-size: 48px; font-weight: bold;
-    color: #39D98A;
-}
-.metric .label {
-    font-size: 14px; color: #9AA8B5;
-    margin-top: 8px;
-}
-.controls {
-    color: #9AA8B5; font-size: 14px;
-    margin-top: 20px;
-}
-.controls kbd {
-    background: #2A3644; padding: 2px 8px;
-    border-radius: 3px; color: #F3F7FB;
-}
-.footer {
-    margin-top: 40px; color: #2A3644;
-    font-size: 12px;
-}
+body { background: #08111A; color: #F3F7FB; font-family: 'SF Mono','Fira Code','Courier New',monospace; font-size: 13px; }
+
+.layout { display: grid; grid-template-columns: 280px 1fr 300px; grid-template-rows: 56px 1fr 32px; height: 100vh; gap: 1px; background: #141E2B; }
+
+/* Top bar */
+.topbar { grid-column: 1/-1; background: #0B1520; display: flex; align-items: center; padding: 0 24px; gap: 16px; }
+.topbar .logo { color: #1EC8FF; font-size: 18px; font-weight: bold; letter-spacing: 1px; }
+.topbar .sep { color: #2A3644; }
+.topbar .title { color: #9AA8B5; font-size: 14px; }
+.topbar .right { margin-left: auto; display: flex; gap: 12px; align-items: center; }
+.pill { padding: 4px 14px; border-radius: 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; }
+.pill.green { background: #39D98A; color: #08111A; }
+.pill.blue { background: #1EC8FF; color: #08111A; }
+.pill.red { background: #FF4444; color: #FFF; }
+.pill.gray { background: #2A3644; color: #9AA8B5; }
+
+/* Left panel: state map */
+.left { background: #0B1520; padding: 16px; overflow-y: auto; }
+.panel-title { color: #9AA8B5; font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 12px; }
+.buf-row { display: flex; align-items: center; padding: 10px 12px; margin-bottom: 4px; border-radius: 4px; transition: all 0.3s; }
+.buf-row.clean { background: #0F1B28; }
+.buf-row.changed { background: #0D2A3D; border-left: 3px solid #1EC8FF; }
+.buf-row .name { flex: 1; color: #F3F7FB; font-size: 13px; }
+.buf-row .size { color: #9AA8B5; font-size: 11px; width: 50px; text-align: right; }
+.buf-row .delta { font-size: 11px; width: 70px; text-align: right; margin-left: 8px; }
+.buf-row.clean .delta { color: #2A3644; }
+.buf-row.changed .delta { color: #1EC8FF; }
+.buf-row .dot { width: 8px; height: 8px; border-radius: 50%; margin-right: 10px; }
+.buf-row.clean .dot { background: #2A3644; }
+.buf-row.changed .dot { background: #1EC8FF; box-shadow: 0 0 8px #1EC8FF40; }
+
+/* Center: delta flow */
+.center { background: #0B1520; padding: 24px; display: flex; flex-direction: column; }
+.center .hero { display: flex; gap: 24px; margin-bottom: 24px; }
+.card { background: #0F1B28; border-radius: 6px; padding: 20px; flex: 1; }
+.card .card-label { color: #9AA8B5; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+.card .card-value { font-size: 36px; font-weight: bold; }
+.card .card-unit { color: #9AA8B5; font-size: 13px; margin-top: 4px; }
+.green { color: #39D98A; }
+.blue { color: #1EC8FF; }
+.orange { color: #FF8A3D; }
+.dim { color: #9AA8B5; }
+
+.flow-title { color: #9AA8B5; font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; margin: 16px 0 8px; }
+.flow-bar { display: flex; height: 32px; border-radius: 4px; overflow: hidden; margin-bottom: 8px; }
+.flow-bar .sw { background: #FF8A3D; transition: width 0.5s; }
+.flow-bar .hw { background: #1EC8FF; transition: width 0.5s; }
+.flow-bar .avoided { background: #0F1B28; flex: 1; }
+.flow-legend { display: flex; gap: 20px; font-size: 11px; color: #9AA8B5; margin-bottom: 16px; }
+.flow-legend span::before { content: ''; display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: middle; }
+.flow-legend .l-sw::before { background: #FF8A3D; }
+.flow-legend .l-hw::before { background: #1EC8FF; }
+.flow-legend .l-av::before { background: #39D98A; }
+
+/* Event log */
+.log { flex: 1; overflow-y: auto; margin-top: 12px; }
+.log-entry { padding: 4px 0; border-bottom: 1px solid #141E2B; font-size: 12px; color: #9AA8B5; }
+.log-entry.recent { color: #F3F7FB; }
+.log-entry .ts { color: #2A3644; margin-right: 8px; }
+
+/* Right panel: economics */
+.right-panel { background: #0B1520; padding: 16px; }
+.econ-card { background: #0F1B28; border-radius: 6px; padding: 16px; margin-bottom: 8px; }
+.econ-card .val { font-size: 28px; font-weight: bold; margin: 4px 0; }
+.econ-card .lbl { font-size: 11px; color: #9AA8B5; text-transform: uppercase; letter-spacing: 1px; }
+.econ-card .sub { font-size: 11px; color: #2A3644; margin-top: 4px; }
+
+.info-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #141E2B; }
+.info-row .k { color: #9AA8B5; font-size: 11px; }
+.info-row .v { color: #F3F7FB; font-size: 11px; }
+
+/* Bottom bar */
+.bottombar { grid-column: 1/-1; background: #0B1520; display: flex; align-items: center; padding: 0 24px; gap: 16px; font-size: 11px; color: #2A3644; }
+.bottombar kbd { background: #141E2B; padding: 1px 6px; border-radius: 2px; color: #9AA8B5; }
+
 </style>
 </head>
 <body>
-<div class="header">
-    <h1>ATOMiK</h1>
-    <div class="badge">REPLICA</div>
-    <div class="badge" id="live" style="background:#2A3644;color:#9AA8B5">CONNECTING...</div>
-</div>
-<div class="title">Remote endpoint — receiving only changed state</div>
-<div class="buffers" id="buffers"></div>
-<div class="metrics">
-    <div class="metric">
-        <div class="value" id="pct">--</div>
-        <div class="label">data avoided</div>
-    </div>
-    <div class="metric">
-        <div class="value" id="changed">--</div>
-        <div class="label">synced this cycle</div>
-    </div>
-    <div class="metric">
-        <div class="value" id="cycle">--</div>
-        <div class="label">total cycles</div>
+<div class="layout">
+
+<!-- Top bar -->
+<div class="topbar">
+    <span class="logo">ATOMiK</span>
+    <span class="sep">|</span>
+    <span class="title">Control Plane</span>
+    <div class="right">
+        <span class="pill gray" id="status">CONNECTING</span>
+        <span class="pill blue">EDGE-01</span>
     </div>
 </div>
-<div class="controls">
-    Press <kbd>1</kbd>-<kbd>8</kbd> to modify buffers &nbsp;
-    <kbd>a</kbd> all &nbsp;
-    <kbd>r</kbd> reset
+
+<!-- Left: State Map -->
+<div class="left">
+    <div class="panel-title">State Map</div>
+    <div id="buffers"></div>
 </div>
-<div class="footer">
-    Only changed state crosses the wire. Unchanged buffers stay dark.
+
+<!-- Center: Delta Flow -->
+<div class="center">
+    <div class="hero">
+        <div class="card">
+            <div class="card-label">Data Avoided</div>
+            <div class="card-value green" id="pct">--</div>
+            <div class="card-unit">of total state scanned</div>
+        </div>
+        <div class="card">
+            <div class="card-label">Synced This Cycle</div>
+            <div class="card-value blue" id="synced">--</div>
+            <div class="card-unit">of 8 buffers</div>
+        </div>
+        <div class="card">
+            <div class="card-label">Total Cycles</div>
+            <div class="card-value" id="cycles" style="color:#F3F7FB">--</div>
+            <div class="card-unit">detection passes</div>
+        </div>
+    </div>
+
+    <div class="flow-title">Delta Propagation</div>
+    <div class="flow-bar">
+        <div class="sw" id="sw-bar" style="width:100%"></div>
+        <div class="hw" id="hw-bar" style="width:0%"></div>
+        <div class="avoided"></div>
+    </div>
+    <div class="flow-legend">
+        <span class="l-sw">Software path</span>
+        <span class="l-hw">ATOMiK path</span>
+        <span class="l-av">Avoided</span>
+    </div>
+
+    <div class="flow-title">Event Log</div>
+    <div class="log" id="log"></div>
+</div>
+
+<!-- Right: Economics -->
+<div class="right-panel">
+    <div class="panel-title">Economics</div>
+    <div class="econ-card">
+        <div class="lbl">Compute Avoided</div>
+        <div class="val green" id="compute">--</div>
+        <div class="sub">less energy per cycle</div>
+    </div>
+    <div class="econ-card">
+        <div class="lbl">Projected Savings</div>
+        <div class="val green" id="savings">--</div>
+        <div class="sub">at 1,000 servers / year</div>
+    </div>
+
+    <div class="panel-title" style="margin-top:16px">System</div>
+    <div class="info-row"><span class="k">Node</span><span class="v">edge-01</span></div>
+    <div class="info-row"><span class="k">Replica</span><span class="v">control-plane</span></div>
+    <div class="info-row"><span class="k">Link</span><span class="v" id="link">UART 921600</span></div>
+    <div class="info-row"><span class="k">Board</span><span class="v">Zynq-7020</span></div>
+    <div class="info-row"><span class="k">CPU</span><span class="v">NaxRiscv RV64GC</span></div>
+    <div class="info-row"><span class="k">Clock</span><span class="v">100 MHz</span></div>
+    <div class="info-row"><span class="k">Build</span><span class="v" id="build">e974995</span></div>
+</div>
+
+<!-- Bottom bar -->
+<div class="bottombar">
+    <span>Press <kbd>1</kbd>-<kbd>8</kbd> to modify buffers</span>
+    <span><kbd>a</kbd> all</span>
+    <span><kbd>r</kbd> reset</span>
+    <span style="margin-left:auto">Only changed state crosses the wire</span>
+</div>
+
 </div>
 
 <script>
 const N = 8;
 const names = ['agent.ctx','model.wt','session.st','config.db',
                'cache.hot','replica.0','txn.log','sensor.buf'];
+const sizes = ['4 KB','4 KB','4 KB','4 KB','4 KB','4 KB','4 KB','4 KB'];
 
-// Create buffer elements
 const grid = document.getElementById('buffers');
 for (let i = 0; i < N; i++) {
     const div = document.createElement('div');
-    div.className = 'buf clean';
+    div.className = 'buf-row clean';
     div.id = `buf${i}`;
-    div.innerHTML = `<div class="label">${names[i]}</div>
-                     <div class="status">SKIP</div>`;
+    div.innerHTML = `<div class="dot"></div>
+                     <div class="name">${names[i]}</div>
+                     <div class="size">${sizes[i]}</div>
+                     <div class="delta">—</div>`;
     grid.appendChild(div);
 }
+
+const logEl = document.getElementById('log');
+let logEntries = [];
+function addLog(msg) {
+    const now = new Date();
+    const ts = now.toTimeString().slice(0,8);
+    logEntries.push({ts, msg});
+    if (logEntries.length > 50) logEntries.shift();
+    logEl.innerHTML = logEntries.map((e,i) =>
+        `<div class="log-entry ${i === logEntries.length-1 ? 'recent' : ''}">` +
+        `<span class="ts">${e.ts}</span>${e.msg}</div>`
+    ).reverse().join('');
+}
+
+addLog('Control plane initialized');
 
 let ws;
 function connect() {
     ws = new WebSocket('ws://localhost:8766');
     ws.onopen = () => {
-        document.getElementById('live').style.background = '#39D98A';
-        document.getElementById('live').style.color = '#08111A';
-        document.getElementById('live').textContent = 'LIVE';
+        const s = document.getElementById('status');
+        s.className = 'pill green'; s.textContent = 'LIVE';
+        addLog('Connected to edge-01');
     };
     ws.onclose = () => {
-        document.getElementById('live').style.background = '#FF4444';
-        document.getElementById('live').textContent = 'DISCONNECTED';
+        const s = document.getElementById('status');
+        s.className = 'pill red'; s.textContent = 'DISCONNECTED';
+        addLog('Connection lost — reconnecting...');
         setTimeout(connect, 2000);
     };
     ws.onmessage = (e) => {
         const d = JSON.parse(e.data);
         if (d.type === 'event' || d.type === 'state') {
-            document.getElementById('pct').textContent = Math.round(d.pct_avoided) + '%';
-            document.getElementById('changed').textContent = d.changed + ' of 8';
-            document.getElementById('cycle').textContent = d.cycle;
+            const pct = Math.round(d.pct_avoided);
+            document.getElementById('pct').textContent = pct + '%';
+            document.getElementById('synced').textContent = d.changed + ' of 8';
+            document.getElementById('cycles').textContent = d.cycle;
+            document.getElementById('compute').textContent = pct + '%';
+            document.getElementById('savings').textContent = '$' + Math.round(pct * 0.5) + 'K';
 
-            // Update each buffer based on the change mask
+            // Flow bars
+            const hwPct = 100 - pct;
+            document.getElementById('sw-bar').style.width = '100%';
+            document.getElementById('hw-bar').style.width = hwPct + '%';
+
+            // Buffer states
+            let changedNames = [];
             for (let i = 0; i < N; i++) {
                 const el = document.getElementById(`buf${i}`);
                 if (d.buffers && d.buffers[i]) {
-                    el.className = 'buf changed';
-                    el.querySelector('.status').textContent = 'SYNCED';
+                    el.className = 'buf-row changed';
+                    el.querySelector('.delta').textContent = 'SYNCED';
+                    el.querySelector('.delta').style.color = '#1EC8FF';
+                    changedNames.push(names[i]);
                 } else {
-                    el.className = 'buf clean';
-                    el.querySelector('.status').textContent = 'SKIP';
+                    el.className = 'buf-row clean';
+                    el.querySelector('.delta').textContent = '—';
+                    el.querySelector('.delta').style.color = '#2A3644';
                 }
+            }
+
+            if (d.type === 'event' && d.changed > 0) {
+                addLog(`Delta applied: ${changedNames.join(', ')} (${pct}% avoided)`);
             }
         }
     };
 }
 
-// Forward keyboard to board
 document.addEventListener('keydown', (e) => {
     if ('12345678arq'.includes(e.key) && ws && ws.readyState === 1) {
         ws.send(JSON.stringify({type: 'key', key: e.key}));
+        if (e.key >= '1' && e.key <= '8') addLog(`Injected change: ${names[parseInt(e.key)-1]}`);
+        else if (e.key === 'a') addLog('Injected change: ALL buffers');
+        else if (e.key === 'r') addLog('System reset');
     }
 });
 

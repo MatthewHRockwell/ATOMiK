@@ -252,136 +252,12 @@ static int key_ready(void) {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
- *  INTERACTIVE DASHBOARD
+ *  CINEMATIC HERO DISPLAY — the investor sees this on HDMI
  * ═══════════════════════════════════════════════════════════════════════ */
 
-/* Layout constants */
-#define M         96    /* margin */
-#define TITLE_Y   32
-#define STATE_Y   112
-#define GAUGE_X   1200
-#define GAUGE_Y   112
-#define GAUGE_W   120
-#define GAUGE_H   400
-#define COST_Y    560
-#define CMD_Y     800
-#define FLOW_Y    720
+#define M 96
 
-/* Draw a vertical gauge */
-static void draw_gauge(int x, int y, int w, int h, float frac,
-                       uint32_t fill, uint32_t empty, const char *label) {
-    rect(x, y, w, h, empty);
-    int fh = (int)(frac * h);
-    if (fh > h) fh = h;
-    rect(x, y + h - fh, w, fh, fill);
-    /* border */
-    rect(x, y, w, 1, C_DIM); rect(x, y+h-1, w, 1, C_DIM);
-    rect(x, y, 1, h, C_DIM); rect(x+w-1, y, 1, h, C_DIM);
-    /* label */
-    int ll = strlen(label);
-    text(x + (w - ll*CW)/2, y + h + 8, label, C_DIM, C_BG);
-}
-
-/* Draw state buffer list */
-static void draw_buffers(void) {
-    int x = M, y = STATE_Y + 48;
-    char buf[60];
-
-    text2x(M, STATE_Y, "State Buffers", C_TEXT, C_BG);
-    text(M, STATE_Y + 36, "Press 1-8 to modify  |  a = all  |  r = reset", C_DIM, C_BG);
-
-    for (int i = 0; i < N_BUF; i++) {
-        int bx = x, by = y + i * 72;
-        uint32_t bg = buf_changed[i] ? C_BLUE : C_GRAY;
-        uint32_t border = buf_changed[i] ? C_BLUE : C_GRAY;
-
-        /* Buffer card */
-        rect(bx, by, 1040, 60, bg);
-
-        /* Number key hint */
-        snprintf(buf, sizeof(buf), "[%d]", i+1);
-        text(bx + 12, by + 8, buf, C_WHITE, bg);
-
-        /* Name */
-        text2x(bx + 56, by + 6, buf_names[i], C_WHITE, bg);
-
-        /* Status */
-        const char *status = buf_changed[i] ? "MODIFIED" : "CLEAN";
-        uint32_t sc = buf_changed[i] ? C_WHITE : C_DIM;
-        text(bx + 56, by + 40, status, sc, bg);
-
-        /* Change count */
-        snprintf(buf, sizeof(buf), "%d changes", buf_change_count[i]);
-        text(bx + 240, by + 40, buf, C_DIM, bg);
-
-        /* Fingerprint */
-        uint64_t f = fp(buffers[i], BUF_SIZE);
-        snprintf(buf, sizeof(buf), "fp:%016llX", (unsigned long long)f);
-        text(bx + 500, by + 40, buf, C_DIM, bg);
-    }
-}
-
-/* Draw energy/compute gauges */
-static void draw_gauges(void) {
-    int gx = GAUGE_X;
-
-    text2x(gx, STATE_Y, "Compute Cost", C_TEXT, C_BG);
-
-    /* SW gauge: always 100% (scans everything) */
-    float sw_frac = 1.0f;
-    draw_gauge(gx, GAUGE_Y + 48, GAUGE_W, GAUGE_H, sw_frac,
-               C_ORANGE, C_DKORANGE, "Software");
-
-    /* ATOMiK gauge: proportional to changed buffers */
-    int changed = 0;
-    for (int i = 0; i < N_BUF; i++) if (buf_changed[i]) changed++;
-    float hw_frac = (float)changed / N_BUF;
-    draw_gauge(gx + 180, GAUGE_Y + 48, GAUGE_W, GAUGE_H, hw_frac,
-               C_BLUE, C_GRAY, "ATOMiK");
-
-    /* Labels between gauges */
-    char buf[40];
-    text(gx + GAUGE_W + 20, GAUGE_Y + 48 + GAUGE_H/2 - 40,
-         "scans", C_ORANGE, C_BG);
-    text(gx + GAUGE_W + 20, GAUGE_Y + 48 + GAUGE_H/2 - 20,
-         "all 8", C_ORANGE, C_BG);
-    snprintf(buf, sizeof(buf), "%d of 8", changed);
-    text(gx + GAUGE_W + 20, GAUGE_Y + 48 + GAUGE_H/2 + 20,
-         "touches", C_BLUE, C_BG);
-    text(gx + GAUGE_W + 20, GAUGE_Y + 48 + GAUGE_H/2 + 40,
-         buf, C_BLUE, C_BG);
-
-    /* Savings */
-    float pct = sw_scanned > 0 ?
-        100.0f * (sw_scanned - hw_touched) / sw_scanned : 0;
-    snprintf(buf, sizeof(buf), "%.0f%%", pct);
-    text3x(gx + 60, GAUGE_Y + 48 + GAUGE_H + 48, buf, C_GREEN, C_BG);
-    text(gx + 20, GAUGE_Y + 48 + GAUGE_H + 104, "less compute", C_GREEN, C_BG);
-    text(gx + 20, GAUGE_Y + 48 + GAUGE_H + 120, "less energy", C_GREEN, C_BG);
-    text(gx + 20, GAUGE_Y + 48 + GAUGE_H + 136, "less cost", C_GREEN, C_BG);
-}
-
-/* Draw cost projector */
-static void draw_cost(void) {
-    char buf[80];
-    float pct = sw_scanned > 0 ?
-        100.0f * (sw_scanned - hw_touched) / sw_scanned : 0;
-
-    rect(M, COST_Y, 1040, 100, C_PANEL);
-    text2x(M + 20, COST_Y + 8, "At Scale", C_TEXT, C_PANEL);
-
-    /* Assume $50/server/year for state management compute */
-    float savings_per_server = 50.0f * pct / 100.0f;
-    snprintf(buf, sizeof(buf), "1,000 servers: $%.0fK/year saved",
-             savings_per_server * 1000 / 1000);
-    text(M + 20, COST_Y + 48, buf, C_GREEN, C_PANEL);
-
-    snprintf(buf, sizeof(buf), "%.0f%% less compute per sync cycle  |  %d checks run",
-             pct, total_cycles);
-    text(M + 20, COST_Y + 72, buf, C_DIM, C_PANEL);
-}
-
-/* Draw command history / event log */
+/* Event log */
 static char event_log[8][60];
 static int event_count;
 
@@ -397,39 +273,107 @@ static void log_event(const char *msg) {
     }
 }
 
-static void draw_log(void) {
-    rect(M, CMD_Y, 1040, 150, C_BG);
-    text(M, CMD_Y, "Event Log", C_DIM, C_BG);
-    for (int i = 0; i < event_count && i < 8; i++) {
-        uint32_t c = (i == event_count - 1) ? C_TEXT : C_DIM;
-        text(M + 16, CMD_Y + 20 + i * 16, event_log[i], c, C_BG);
-    }
-}
-
-/* Full dashboard redraw */
+/* Full hero display redraw */
 static void draw_dashboard(void) {
     memset(fb, 0, FB_SIZE);
+    char buf[80];
 
-    /* Title bar */
-    rect(0, 0, FB_HRES, TITLE_Y + 48, C_PANEL);
-    text2x(M, TITLE_Y, "ATOMiK", C_BLUE, C_PANEL);
-    text(M + 12*CW + 16, TITLE_Y + 16, "State Engine", C_TEXT, C_PANEL);
-    rect(1540, TITLE_Y + 4, 280, 40, C_BLUE);
-    text(1556, TITLE_Y + 12, "LIVE ON HARDWARE", C_PANEL, C_BLUE);
+    int changed = 0;
+    for (int i = 0; i < N_BUF; i++) if (buf_changed[i]) changed++;
+    float pct = sw_scanned > 0 ?
+        100.0f * (sw_scanned - hw_touched) / sw_scanned : 0;
 
-    /* System info */
-    text(600, TITLE_Y + 4, "NaxRiscv RV64GC | 100 MHz | Zynq-7020 | Ubuntu 24.04", C_DIM, C_PANEL);
-    text(600, TITLE_Y + 24, "Know what changed. Move only what matters.", C_BLUE, C_PANEL);
+    /* ── Top bar ─────────────────────────────────────────────────── */
+    rect(0, 0, FB_HRES, 64, C_PANEL);
+    text2x(M, 16, "ATOMiK", C_BLUE, C_PANEL);
+    rect(1568, 8, 256, 48, C_BLUE);
+    text(1584, 24, "LIVE ON HARDWARE", C_PANEL, C_BLUE);
 
-    draw_buffers();
-    draw_gauges();
-    draw_cost();
-    draw_log();
+    /* ── SOFTWARE vs ATOMiK — the hero comparison ────────────────── */
+    int box_w = 176, box_h = 100, gap = 20;
+    int total_w = N_BUF * (box_w + gap) - gap;
+    int x0 = (FB_HRES - total_w) / 2;
 
-    /* Bottom bar */
-    rect(0, FB_VRES - 32, FB_HRES, 32, C_PANEL);
-    text(M, FB_VRES - 24, "[1-8] modify buffer  [a] all  [r] reset  [p] presentation  [q] quit",
-         C_DIM, C_PANEL);
+    /* Software row — all boxes lit orange */
+    text2x(M, 96, "SOFTWARE", C_ORANGE, C_BG);
+    text(M + 200, 108, "rescans all state every cycle", C_DIM, C_BG);
+    for (int i = 0; i < N_BUF; i++) {
+        int bx = x0 + i * (box_w + gap);
+        rect(bx, 148, box_w, box_h, C_ORANGE);
+        text(bx + 8, 156, buf_names[i], C_WHITE, C_ORANGE);
+        text2x(bx + (box_w - 4*CW*2)/2, 180, "SCAN", C_WHITE, C_ORANGE);
+    }
+
+    /* ATOMiK row — only changed boxes blue, rest dark */
+    int ay = 280;
+    text2x(M, ay - 16, "ATOMiK", C_BLUE, C_BG);
+    text(M + 160, ay - 4, "acts only on meaningful change", C_DIM, C_BG);
+    for (int i = 0; i < N_BUF; i++) {
+        int bx = x0 + i * (box_w + gap);
+        if (buf_changed[i]) {
+            rect(bx, ay + 16, box_w, box_h, C_BLUE);
+            text(bx + 8, ay + 24, buf_names[i], C_WHITE, C_BLUE);
+            text2x(bx + (box_w - 4*CW*2)/2, ay + 48, "SYNC", C_WHITE, C_BLUE);
+        } else {
+            rect(bx, ay + 16, box_w, box_h, 0x00141418);
+            text(bx + 8, ay + 24, buf_names[i], 0x00303030, 0x00141418);
+            text2x(bx + (box_w - 4*CW*2)/2, ay + 48, "SKIP", 0x00303030, 0x00141418);
+        }
+    }
+
+    /* ── Hero numbers — center of screen ─────────────────────────── */
+    int ny = 440;
+    rect(0, ny, FB_HRES, 200, C_PANEL);
+
+    /* Data avoided — the headline */
+    snprintf(buf, sizeof(buf), "%.0f%%", pct);
+    text3x(M + 40, ny + 20, buf, C_GREEN, C_PANEL);
+    text2x(M + 40, ny + 72, "less compute", C_GREEN, C_PANEL);
+    text(M + 40, ny + 110, "less energy. less cost.", C_GREEN, C_PANEL);
+
+    /* Synced count */
+    snprintf(buf, sizeof(buf), "%d of 8", changed);
+    text3x(600, ny + 20, buf, C_BLUE, C_PANEL);
+    text2x(600, ny + 72, "buffers synced", C_BLUE, C_PANEL);
+
+    /* Cost projection */
+    float savings = pct * 0.5f;
+    snprintf(buf, sizeof(buf), "$%.0fK", savings);
+    text3x(1050, ny + 20, buf, C_GREEN, C_PANEL);
+    text2x(1050, ny + 72, "saved / year", C_GREEN, C_PANEL);
+    text(1050, ny + 110, "at 1,000 servers", C_DIM, C_PANEL);
+
+    /* Flow bar */
+    int fy = ny + 150;
+    int bar_w = FB_HRES - 2*M - 400;
+    int bar_x = M + 200;
+    text(M + 40, fy + 4, "Software", C_ORANGE, C_PANEL);
+    rect(bar_x, fy, bar_w, 18, C_ORANGE);
+    text(M + 40, fy + 24, "ATOMiK", C_BLUE, C_PANEL);
+    int hw_w = (int)((100.0f - pct) / 100.0f * bar_w);
+    if (hw_w < 4) hw_w = 4;
+    rect(bar_x, fy + 24, hw_w, 18, C_BLUE);
+    rect(bar_x + hw_w, fy + 24, bar_w - hw_w, 18, 0x00141418);
+
+    /* ── Bottom: adoption message + subtle log ───────────────────── */
+    int by = 680;
+    textc(by, "Same C. Standard GCC. ATOMiK hardware acceleration.", C_DIM, C_BG);
+    textc(by + 24, "No new language. No new religion.", C_DIM, C_BG);
+
+    /* Recent events — very subtle */
+    int ly = 760;
+    text(M, ly, "Recent:", C_GRAY, C_BG);
+    for (int i = 0; i < event_count && i < 4; i++) {
+        int idx = event_count - 1 - i;
+        if (idx >= 0)
+            text(M + 80 + i * 400, ly, event_log[idx],
+                 i == 0 ? C_DIM : C_GRAY, C_BG);
+    }
+
+    /* Memory anchor at very bottom */
+    rect(0, FB_VRES - 80, FB_HRES, 80, C_PANEL);
+    textc(FB_VRES - 60, "ATOMiK removes wasted rediscovery of change.", C_TEXT, C_PANEL);
+    textc(FB_VRES - 36, "Licensable compute IP for state-heavy systems.", C_BLUE, C_PANEL);
 }
 
 /* Update LCD replica */
