@@ -391,7 +391,7 @@ static void bintxt(int x, int y, uint64_t val, uint32_t on, uint32_t off, uint32
     }
 }
 
-/* Random 64-bit value for demo visualization */
+/* Random 64-bit for demo viz */
 static uint64_t demo_rng = 0xDEADBEEFCAFEBABEULL;
 static uint64_t rand64(void) {
     demo_rng ^= demo_rng << 13;
@@ -399,17 +399,49 @@ static uint64_t rand64(void) {
     demo_rng ^= demo_rng << 17;
     return demo_rng;
 }
-
-/* Stored values for the live algebra display */
 static uint64_t viz_initial, viz_delta, viz_current;
-
 static void refresh_viz(void) {
     viz_initial = rand64();
-    viz_delta = rand64() & 0x0F0F0F0F0F0F0F0FULL; /* sparse delta — some bits change */
+    viz_delta = rand64() & 0x0F0F0F0F0F0F0F0FULL;
     viz_current = viz_initial ^ viz_delta;
 }
 
-/* Draw dynamic content — head-to-head live comparison */
+/* ── Execution lane: vertical activity column ────────────────────── */
+static void exec_lane(int x, int y, int w, int h, const char *name,
+                      int active, int is_last, uint32_t act_col, uint32_t idle_col,
+                      int change_count) {
+    /* Background */
+    uint32_t bg = active ? (is_last ? 0x0030A0E0 : act_col) : idle_col;
+    rect(x, y, w, h, bg);
+
+    /* Name at top */
+    uint32_t tc = active ? C_WHITE : SKIP_TEXT;
+    text(x + 2, y + 4, name, tc, bg);
+
+    /* Activity bar — fills proportional to change_count (max 20) */
+    if (active) {
+        int bar_h = h - 40;
+        int fill_h = change_count > 20 ? bar_h : change_count * bar_h / 20;
+        if (fill_h < 4) fill_h = 4;
+        /* Empty portion */
+        rect(x + 4, y + 20, w - 8, bar_h - fill_h, 0x00081018);
+        /* Filled portion — brighter for more activity */
+        uint32_t fill_col = is_last ? 0x0040C0FF : act_col;
+        rect(x + 4, y + 20 + bar_h - fill_h, w - 8, fill_h, fill_col);
+    } else {
+        /* Idle — dim empty bar */
+        rect(x + 4, y + 20, w - 8, h - 40, 0x00101418);
+    }
+
+    /* Count at bottom */
+    if (active && change_count > 0) {
+        char buf[8];
+        snprintf(buf, sizeof(buf), "x%d", change_count);
+        text(x + 2, y + h - 16, buf, C_BG, bg);
+    }
+}
+
+/* Draw dynamic content — flagship head-to-head with execution lanes */
 static void draw_content(void) {
     char buf[80];
 
@@ -424,140 +456,132 @@ static void draw_content(void) {
              total_cycles, total_changes, measured_speedup);
     text(720, 40, buf, C_DIM, C_PANEL);
 
-    /* ═══════════════════════════════════════════════════════════════
-     * HEAD-TO-HEAD: Left = Software, Right = ATOMiK
-     * ═══════════════════════════════════════════════════════════════ */
     int mid = FB_HRES / 2;
     int vy = 108;
     int half_w = mid - M - 16;
+    int lane_w = half_w / N_BUF - 2;
+    int lane_h = 180;
 
-    /* Clear comparison area */
-    rect(0, vy, FB_HRES, 350, C_BG);
+    /* Clear working area */
+    rect(0, vy, FB_HRES, 520, C_BG);
 
-    /* ── LEFT: SOFTWARE ──────────────────────────────────────────── */
+    /* ═══════════════════════════════════════════════════════════════
+     * LEFT: SOFTWARE — all lanes always active
+     * ═══════════════════════════════════════════════════════════════ */
     text2x(M, vy, "SOFTWARE", C_ORANGE, C_BG);
-    text(M, vy + 34, "scans every byte to find changes", C_DIM, C_BG);
+    text(M + 200, vy + 12, "all lanes active, every cycle", C_DIM, C_BG);
 
-    /* Buffer strip — all orange, compact */
-    int sw_bw = half_w / N_BUF - 4;
     for (int i = 0; i < N_BUF; i++) {
-        int bx = M + i * (sw_bw + 4);
-        rect(bx, vy + 56, sw_bw, 32, C_ORANGE);
-        text(bx + 2, vy + 60, buf_names[i], C_WHITE, C_ORANGE);
-        text(bx + 2, vy + 76, "SCAN", C_WHITE, C_ORANGE);
+        int lx = M + i * (lane_w + 2);
+        /* SW: always active, always orange */
+        exec_lane(lx, vy + 40, lane_w, lane_h, buf_names[i],
+                  1, 0, C_ORANGE, SKIP_COL, 20); /* always max activity */
     }
 
     /* SW volume */
-    snprintf(buf, sizeof(buf), "Scanned: %llu KB", (unsigned long long)(sw_scanned / 1024));
-    text2x(M, vy + 100, buf, C_ORANGE, C_BG);
-    rect(M, vy + 136, half_w, 14, C_ORANGE);
-    text(M + half_w + 8, vy + 136, "100%", C_ORANGE, C_BG);
+    int vy2 = vy + 40 + lane_h + 8;
+    snprintf(buf, sizeof(buf), "Scanned: %llu KB  (100%%)",
+             (unsigned long long)(sw_scanned / 1024));
+    text(M, vy2, buf, C_ORANGE, C_BG);
+    rect(M, vy2 + 18, half_w, 10, C_ORANGE);
 
     /* ── CENTER DIVIDER ──────────────────────────────────────────── */
-    rect(mid - 2, vy, 4, 350, C_GRAY);
+    rect(mid - 2, vy, 4, 520, C_GRAY);
 
-    /* ── RIGHT: ATOMiK ───────────────────────────────────────────── */
+    /* ═══════════════════════════════════════════════════════════════
+     * RIGHT: ATOMiK — only active lanes lit
+     * ═══════════════════════════════════════════════════════════════ */
     int rx = mid + 16;
     text2x(rx, vy, "ATOMiK", C_BLUE, C_BG);
-    text(rx, vy + 34, "tracks deltas in hardware", C_DIM, C_BG);
+    text(rx + 160, vy + 12, "workload-shaped execution", C_DIM, C_BG);
 
-    /* Buffer strip — only changed lit */
-    int hw_bw = half_w / N_BUF - 4;
     for (int i = 0; i < N_BUF; i++) {
-        int bx = rx + i * (hw_bw + 4);
-        int is_last = (i == last_modified);
-        if (buf_changed[i]) {
-            uint32_t bg = is_last ? 0x0030A0E0 : C_BLUE;
-            rect(bx, vy + 56, hw_bw, 32, bg);
-            text(bx + 2, vy + 60, buf_names[i], C_WHITE, bg);
-            snprintf(buf, sizeof(buf), "x%d", buf_change_count[i]);
-            text(bx + 2, vy + 76, buf, C_BG, bg);
-        } else {
-            rect(bx, vy + 56, hw_bw, 32, SKIP_COL);
-            text(bx + 2, vy + 60, buf_names[i], SKIP_TEXT, SKIP_COL);
-        }
+        int lx = rx + i * (lane_w + 2);
+        exec_lane(lx, vy + 40, lane_w, lane_h, buf_names[i],
+                  buf_changed[i], (i == last_modified),
+                  C_BLUE, SKIP_COL, buf_change_count[i]);
     }
 
     /* ATOMiK volume */
-    snprintf(buf, sizeof(buf), "Touched: %llu KB", (unsigned long long)(hw_touched / 1024));
-    text2x(rx, vy + 100, buf, C_BLUE, C_BG);
+    snprintf(buf, sizeof(buf), "Touched: %llu KB  (%.0f%%)",
+             (unsigned long long)(hw_touched / 1024), 100.0f - pct);
+    text(rx, vy2, buf, C_BLUE, C_BG);
     int atk_w = (int)((100.0f - pct) / 100.0f * half_w);
     if (atk_w < 4 && hw_touched > 0) atk_w = 4;
-    rect(rx, vy + 136, atk_w, 14, C_BLUE);
-    rect(rx + atk_w, vy + 136, half_w - atk_w, 14, 0x00141418);
-    snprintf(buf, sizeof(buf), "%.0f%%", 100.0f - pct);
-    text(rx + half_w + 8, vy + 136, buf, C_BLUE, C_BG);
-
-    /* ── LIVE BINARY ALGEBRA ─────────────────────────────────────── */
-    int dy = vy + 164;
-    text(rx, dy, "initial", C_BLUE, C_BG);
-    bintxt(rx, dy + 16, viz_initial, C_BLUE, 0x00203040, C_BG);
-
-    text(rx + 100, dy + 50, "XOR", 0x00FFCC00, C_BG);
-
-    text(rx + 140, dy, "delta", 0x00FFCC00, C_BG);
-    bintxt(rx + 140, dy + 16, viz_delta, 0x00FFCC00, 0x00302010, C_BG);
-
-    text(rx + 240, dy + 50, "=", C_GREEN, C_BG);
-
-    text(rx + 270, dy, "current", C_GREEN, C_BG);
-    bintxt(rx + 270, dy + 16, viz_current, C_GREEN, 0x00103020, C_BG);
-
-    text(rx, dy + 116, "current = initial XOR accumulator", C_GREEN, C_BG);
-    if (last_modified >= 0) {
-        snprintf(buf, sizeof(buf), "[%s]", buf_names[last_modified]);
-        text(rx + 280, dy + 116, buf, C_DIM, C_BG);
-    }
-
-    /* Hex values */
-    snprintf(buf, sizeof(buf), "%016llX", (unsigned long long)viz_initial);
-    text(rx, dy + 134, buf, C_DIM, C_BG);
-    snprintf(buf, sizeof(buf), "%016llX", (unsigned long long)viz_delta);
-    text(rx + 140, dy + 134, buf, C_DIM, C_BG);
-    snprintf(buf, sizeof(buf), "%016llX", (unsigned long long)viz_current);
-    text(rx + 270, dy + 134, buf, C_DIM, C_BG);
+    rect(rx, vy2 + 18, atk_w, 10, C_BLUE);
+    rect(rx + atk_w, vy2 + 18, half_w - atk_w, 10, 0x00141418);
 
     /* ═══════════════════════════════════════════════════════════════
-     * METRICS PANEL
+     * LIVE BINARY ALGEBRA — below the lanes
      * ═══════════════════════════════════════════════════════════════ */
-    _ny = vy + 360;
-    rect(0, _ny, FB_HRES, 120, C_PANEL);
+    int dy = vy2 + 40;
+    /* Show on the ATOMiK (right) side */
+    text(rx, dy, "initial", C_BLUE, C_BG);
+    bintxt(rx, dy + 14, viz_initial, C_BLUE, 0x00203040, C_BG);
 
-    snprintf(buf, sizeof(buf), "%.0f%%", pct);
-    text3x(M, _ny + 8, buf, C_GREEN, C_PANEL);
-    text(M, _ny + 56, "less compute / energy / cost", C_GREEN, C_PANEL);
+    text(rx + 96, dy + 48, "XOR", 0x00FFCC00, C_BG);
 
-    snprintf(buf, sizeof(buf), "%d of 8 synced", changed);
-    text2x(380, _ny + 8, buf, C_BLUE, C_PANEL);
+    text(rx + 130, dy, "delta", 0x00FFCC00, C_BG);
+    bintxt(rx + 130, dy + 14, viz_delta, 0x00FFCC00, 0x00302010, C_BG);
 
+    text(rx + 226, dy + 48, "=", C_GREEN, C_BG);
+
+    text(rx + 256, dy, "current", C_GREEN, C_BG);
+    bintxt(rx + 256, dy + 14, viz_current, C_GREEN, 0x00103020, C_BG);
+
+    /* Formula + hex */
+    text(rx, dy + 112, "current = initial XOR accumulator", C_GREEN, C_BG);
+    if (last_modified >= 0) {
+        snprintf(buf, sizeof(buf), "[%s]", buf_names[last_modified]);
+        text(rx + 272, dy + 112, buf, C_DIM, C_BG);
+    }
+    snprintf(buf, sizeof(buf), "%016llX  ^  %016llX  =  %016llX",
+             (unsigned long long)viz_initial,
+             (unsigned long long)viz_delta,
+             (unsigned long long)viz_current);
+    text(rx, dy + 130, buf, C_DIM, C_BG);
+
+    /* SW side explanation below lanes */
+    text(M, dy, "Software must scan every byte of every", C_DIM, C_BG);
+    text(M, dy + 18, "buffer to discover what changed.", C_DIM, C_BG);
+    text(M, dy + 48, "Cost grows linearly with state size.", C_ORANGE, C_BG);
+    text(M, dy + 68, "Most of the work is wasted.", C_ORANGE, C_BG);
+
+    /* ═══════════════════════════════════════════════════════════════
+     * METRICS — compact bottom panel
+     * ═══════════════════════════════════════════════════════════════ */
+    _ny = dy + 152;
+    rect(0, _ny, FB_HRES, 96, C_PANEL);
+
+    /* Savings % */
+    snprintf(buf, sizeof(buf), "%.0f%% less compute", pct);
+    text3x(M, _ny + 4, buf, C_GREEN, C_PANEL);
+
+    /* Synced + cost + speedup — single line */
     float sav_1k = pct * 50.0f * 1000.0f / 100.0f / 1000.0f;
     if (sav_1k < 1.0f && pct > 0) sav_1k = 1.0f;
     float sav_global = pct * 50.0f * 50e6f / 100.0f / 1e9f;
-    snprintf(buf, sizeof(buf), "$%.0fK/yr (1K)  |  $%.1fB/yr (50M global)",
-             sav_1k, sav_global);
-    text(380, _ny + 48, buf, C_GREEN, C_PANEL);
+    snprintf(buf, sizeof(buf), "%d/8 synced  |  $%.0fK/yr (1K servers)  |  $%.1fB/yr global TAM  |  %.0fx faster query",
+             changed, sav_1k, sav_global, measured_speedup);
+    text(M, _ny + 56, buf, C_DIM, C_PANEL);
 
-    snprintf(buf, sizeof(buf), "%.0fx faster query (4KB median)", measured_speedup);
-    text(380, _ny + 68, buf, 0x00FFCC00, C_PANEL);
-
-    /* Flow bar */
-    int fy = _ny + 92;
-    int bar_w = FB_HRES - 2*M - 200;
-    int bar_x = M + 40;
+    /* Flow bars */
+    int fy = _ny + 76;
+    int bar_w = (FB_HRES - 2*M - 120) / 2;
     text(M, fy, "SW", C_ORANGE, C_PANEL);
-    rect(bar_x, fy, bar_w, 10, C_ORANGE);
-    text(M, fy + 12, "HW", C_BLUE, C_PANEL);
+    rect(M + 28, fy, bar_w, 8, C_ORANGE);
+    text(M + 36 + bar_w, fy, "HW", C_BLUE, C_PANEL);
     int hw_w = (int)((100.0f - pct) / 100.0f * bar_w);
     if (hw_w < 4) hw_w = 4;
-    rect(bar_x, fy + 12, hw_w, 10, C_BLUE);
-    rect(bar_x + hw_w, fy + 12, bar_w - hw_w, 10, 0x00141418);
+    rect(M + 64 + bar_w, fy, hw_w, 8, C_BLUE);
+    rect(M + 64 + bar_w + hw_w, fy, bar_w - hw_w, 8, 0x00141418);
 
     /* ── History + events ────────────────────────────────────────── */
-    int hy = _ny + 128;
-    draw_history(M, hy, FB_HRES/2 - M - 8, 48);
+    int hy = _ny + 104;
+    draw_history(M, hy, FB_HRES/2 - M - 8, 44);
 
-    rect(FB_HRES/2 + 8, hy, FB_HRES/2 - M - 8, 48, C_BG);
-    for (int i = 0; i < event_count && i < 3; i++) {
+    rect(FB_HRES/2 + 8, hy, FB_HRES/2 - M - 8, 44, C_BG);
+    for (int i = 0; i < event_count && i < 2; i++) {
         int idx = event_count - 1 - i;
         if (idx >= 0)
             text(FB_HRES/2 + 16, hy + 2 + i * 16, event_log[idx],
@@ -567,57 +591,40 @@ static void draw_content(void) {
 /* Adoption forecast slide */
 static void draw_adoption(void) {
     rect(0, 96, FB_HRES, FB_VRES - 96 - 48, C_BG);
-
     text3x(M, 120, "Adoption Forecast", C_TEXT, C_BG);
-
-    /* Year-by-year table */
     int ty = 200;
-    int col_yr = M, col_adopt = M + 160, col_rev = M + 480, col_tam = M + 800, col_cum = M + 1120;
-
+    int col_yr = M, col_adopt = M+160, col_rev = M+480, col_tam = M+800, col_cum = M+1120;
     text2x(col_yr, ty, "Year", C_DIM, C_BG);
     text2x(col_adopt, ty, "Adoption", C_DIM, C_BG);
     text2x(col_rev, ty, "Rev/Server", C_DIM, C_BG);
     text2x(col_tam, ty, "TAM Captured", C_DIM, C_BG);
     text2x(col_cum, ty, "Cumulative", C_DIM, C_BG);
-    rect(M, ty + 36, FB_HRES - 2*M, 1, C_GRAY);
-
-    /* Projections — conservative ramp */
-    static const struct { int yr; const char *adopt; const char *rev; const char *tam; const char *cum; uint32_t col; } rows[] = {
-        { 2027, "1K servers",    "$50/srv",  "$50K",    "$50K",    C_DIM },
-        { 2028, "10K servers",   "$45/srv",  "$450K",   "$500K",   C_DIM },
-        { 2029, "100K servers",  "$40/srv",  "$4M",     "$4.5M",   C_BLUE },
-        { 2030, "500K servers",  "$35/srv",  "$17.5M",  "$22M",    C_BLUE },
-        { 2031, "2M servers",    "$30/srv",  "$60M",    "$82M",    C_GREEN },
-        { 2032, "5M servers",    "$25/srv",  "$125M",   "$207M",   C_GREEN },
-        { 2033, "10M servers",   "$20/srv",  "$200M",   "$407M",   C_GREEN },
+    rect(M, ty+36, FB_HRES-2*M, 1, C_GRAY);
+    static const struct { int yr; const char *a,*r,*t,*c; uint32_t col; } rows[] = {
+        {2027,"1K servers","$50/srv","$50K","$50K",C_DIM},
+        {2028,"10K servers","$45/srv","$450K","$500K",C_DIM},
+        {2029,"100K servers","$40/srv","$4M","$4.5M",C_BLUE},
+        {2030,"500K servers","$35/srv","$17.5M","$22M",C_BLUE},
+        {2031,"2M servers","$30/srv","$60M","$82M",C_GREEN},
+        {2032,"5M servers","$25/srv","$125M","$207M",C_GREEN},
+        {2033,"10M servers","$20/srv","$200M","$407M",C_GREEN},
     };
-
+    float tam_v[] = {0.05f,0.45f,4.0f,17.5f,60.0f,125.0f,200.0f};
     for (int i = 0; i < 7; i++) {
-        int ry = ty + 48 + i * 40;
-        char yrbuf[8];
-        snprintf(yrbuf, sizeof(yrbuf), "%d", rows[i].yr);
-        text2x(col_yr, ry, yrbuf, C_TEXT, C_BG);
-        text(col_adopt, ry + 8, rows[i].adopt, rows[i].col, C_BG);
-        text(col_rev, ry + 8, rows[i].rev, rows[i].col, C_BG);
-        text(col_tam, ry + 8, rows[i].tam, rows[i].col, C_BG);
-        text(col_cum, ry + 8, rows[i].cum, rows[i].col, C_BG);
-
-        /* Visual bar for TAM captured */
-        int bar_max = 300;
-        float tam_vals[] = {0.05f, 0.45f, 4.0f, 17.5f, 60.0f, 125.0f, 200.0f};
-        int bw = (int)(tam_vals[i] / 200.0f * bar_max);
-        if (bw < 2) bw = 2;
-        rect(col_cum + 100, ry + 8, bw, 12, rows[i].col);
+        int ry = ty+48+i*40;
+        char yb[8]; snprintf(yb,sizeof(yb),"%d",rows[i].yr);
+        text2x(col_yr,ry,yb,C_TEXT,C_BG);
+        text(col_adopt,ry+8,rows[i].a,rows[i].col,C_BG);
+        text(col_rev,ry+8,rows[i].r,rows[i].col,C_BG);
+        text(col_tam,ry+8,rows[i].t,rows[i].col,C_BG);
+        text(col_cum,ry+8,rows[i].c,rows[i].col,C_BG);
+        int bw=(int)(tam_v[i]/200.0f*300); if(bw<2) bw=2;
+        rect(col_cum+100,ry+8,bw,12,rows[i].col);
     }
-
-    /* Bottom summary */
-    text2x(M, ty + 48 + 7*40 + 20, "Total addressable: $1.7B/yr (50M state-heavy servers)", C_GREEN, C_BG);
-    text(M, ty + 48 + 7*40 + 56, "Conservative 20% penetration by 2033 = $407M cumulative", C_DIM, C_BG);
-    text(M, ty + 48 + 7*40 + 76, "Press any key to return", C_GRAY, C_BG);
-
+    text2x(M,ty+48+7*40+20,"Total: $1.7B/yr (50M state-heavy servers)",C_GREEN,C_BG);
+    text(M,ty+48+7*40+56,"Conservative 20% penetration by 2033 = $407M cumulative",C_DIM,C_BG);
+    text(M,ty+48+7*40+76,"Press any key to return",C_GRAY,C_BG);
     flush_l2();
-
-    /* Wait for any key */
     while (!key_ready()) usleep(50000);
     char ch; read(0, &ch, 1);
 }

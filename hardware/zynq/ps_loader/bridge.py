@@ -62,7 +62,7 @@ async def ws_handler(websocket):
             data = json.loads(message)
             if data.get("type") == "key" and ser:
                 key = data.get("key", "")
-                if key in "12345678arq":
+                if key in "12345678arqbcdfv":
                     ser.write(key.encode())
                     ser.flush()
                     print(f"[ws→uart] key: {key}")
@@ -418,7 +418,7 @@ function connect() {
 }
 
 document.addEventListener('keydown', (e) => {
-    if ('12345678arq'.includes(e.key) && ws && ws.readyState === 1) {
+    if ('12345678arqbcdfv'.includes(e.key) && ws && ws.readyState === 1) {
         ws.send(JSON.stringify({type: 'key', key: e.key}));
         if (e.key >= '1' && e.key <= '8') addLog(`Injected change: ${names[parseInt(e.key)-1]}`);
         else if (e.key === 'a') addLog('Injected change: ALL buffers');
