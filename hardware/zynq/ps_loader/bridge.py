@@ -106,6 +106,11 @@ def uart_reader(port, baud, loop):
                         if len(parts) >= 5:
                             mask = int(parts[4], 16)
                             state["buffers"] = [(mask >> i) & 1 for i in range(8)]
+                        if len(parts) >= 6:
+                            state["speedup"] = float(parts[5])
+                        if len(parts) >= 8:
+                            state["sw_kb"] = int(parts[6])
+                            state["hw_kb"] = int(parts[7])
                         state["total_changes"] += state["changed"]
                         state["last_event"] = text
                         # Broadcast to browsers
@@ -273,7 +278,18 @@ body { background: #08111A; color: #F3F7FB; font-family: 'SF Mono','Fira Code','
         <div class="sub">at 1,000 servers / year</div>
     </div>
 
-    <div class="panel-title" style="margin-top:16px">System</div>
+    <div class="econ-card">
+        <div class="lbl">Query Speedup</div>
+        <div class="val blue" id="speedup">--</div>
+        <div class="sub">vs software byte scan</div>
+    </div>
+
+    <div class="panel-title" style="margin-top:8px">Data Volume</div>
+    <div class="info-row"><span class="k">SW Scanned</span><span class="v" id="sw-kb">--</span></div>
+    <div class="info-row"><span class="k">ATOMiK Touched</span><span class="v" id="hw-kb">--</span></div>
+    <div class="info-row"><span class="k">Avoided</span><span class="v green" id="bytes-avoided">--</span></div>
+
+    <div class="panel-title" style="margin-top:8px">System</div>
     <div class="info-row"><span class="k">Node</span><span class="v">edge-01</span></div>
     <div class="info-row"><span class="k">Replica</span><span class="v">control-plane</span></div>
     <div class="info-row"><span class="k">Link</span><span class="v" id="link">UART 921600</span></div>
@@ -348,7 +364,23 @@ function connect() {
             document.getElementById('synced').textContent = d.changed + ' of 8';
             document.getElementById('cycles').textContent = d.cycle;
             document.getElementById('compute').textContent = pct + '%';
-            document.getElementById('savings').textContent = '$' + Math.round(pct * 0.5) + 'K';
+            const sav = Math.round(pct * 50 * 1000 / 100 / 1000);
+            document.getElementById('savings').textContent = '$' + (sav < 1 && pct > 0 ? 1 : sav) + 'K';
+
+            // Update bytes counters if available
+            if (d.sw_kb !== undefined) {
+                const avoided_kb = d.sw_kb - d.hw_kb;
+                const byEl = document.getElementById('bytes-avoided');
+                if (byEl) byEl.textContent = avoided_kb + ' KB';
+                const swEl = document.getElementById('sw-kb');
+                if (swEl) swEl.textContent = d.sw_kb + ' KB';
+                const hwEl = document.getElementById('hw-kb');
+                if (hwEl) hwEl.textContent = d.hw_kb + ' KB';
+            }
+            if (d.speedup && d.speedup > 1) {
+                const spEl = document.getElementById('speedup');
+                if (spEl) spEl.textContent = '~' + Math.round(d.speedup) + 'x';
+            }
 
             // Flow bars
             const hwPct = 100 - pct;

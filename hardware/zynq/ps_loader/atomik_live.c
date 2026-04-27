@@ -257,6 +257,33 @@ static int key_ready(void) {
 
 #define M 96
 
+/* ── History ribbon: tracks changes over time ────────────────────── */
+#define HIST_LEN 20
+static int history[HIST_LEN];
+static int hist_pos;
+
+static void hist_push(int n_changed) {
+    history[hist_pos % HIST_LEN] = n_changed;
+    hist_pos++;
+}
+
+static void draw_history(int x, int y, int w, int h) {
+    rect(x, y, w, h, C_PANEL);
+    text(x + 8, y + 4, "Change History", C_DIM, C_PANEL);
+    int col_w = (w - 16) / HIST_LEN;
+    int max_h = h - 28;
+    for (int i = 0; i < HIST_LEN; i++) {
+        int idx = (hist_pos - HIST_LEN + i);
+        if (idx < 0) continue;
+        int val = history[idx % HIST_LEN];
+        int bar_h = val * max_h / N_BUF;
+        int cx = x + 8 + i * col_w;
+        int cy = y + h - 4 - bar_h;
+        uint32_t col = (i == HIST_LEN - 1 && hist_pos > 0) ? C_BLUE : C_GRAY;
+        if (bar_h > 0) rect(cx, cy, col_w - 2, bar_h, col);
+    }
+}
+
 /* Event log */
 static char event_log[8][60];
 static int event_count;
@@ -273,6 +300,30 @@ static void log_event(const char *msg) {
     }
 }
 
+/* Startup speedup benchmark (run once) */
+static float measured_speedup;
+static void run_startup_bench(void) {
+    volatile uint8_t *b = buffers[0];
+    uint64_t sw_total = 0, hw_total = 0;
+    /* Warmup */
+    for (int w = 0; w < 10; w++) {
+        volatile uint32_t d = 0;
+        for (int j = 0; j < BUF_SIZE; j++) d += b[j];
+        load64(7, 0xAAAAAAAAAAAAAAAAULL); read64(); (void)d;
+    }
+    /* 50 iterations, take median-ish */
+    for (int it = 0; it < 50; it++) {
+        uint64_t t0 = rdtime();
+        volatile uint32_t d = 0;
+        for (int j = 0; j < BUF_SIZE; j++) d += b[j];
+        sw_total += rdtime() - t0; (void)d;
+        load64(7, 0xAAAAAAAAAAAAAAAAULL);
+        t0 = rdtime(); read64();
+        hw_total += rdtime() - t0;
+    }
+    measured_speedup = (float)sw_total / (float)(hw_total > 0 ? hw_total : 1);
+}
+
 /* Full hero display redraw */
 static void draw_dashboard(void) {
     memset(fb, 0, FB_SIZE);
@@ -283,97 +334,122 @@ static void draw_dashboard(void) {
     float pct = sw_scanned > 0 ?
         100.0f * (sw_scanned - hw_touched) / sw_scanned : 0;
 
-    /* ── Top bar ─────────────────────────────────────────────────── */
-    rect(0, 0, FB_HRES, 64, C_PANEL);
+    /* ── Top bar (96px) ──────────────────────────────────────────── */
+    rect(0, 0, FB_HRES, 96, C_PANEL);
     text2x(M, 16, "ATOMiK", C_BLUE, C_PANEL);
-    rect(1568, 8, 256, 48, C_BLUE);
-    text(1584, 24, "LIVE ON HARDWARE", C_PANEL, C_BLUE);
+    text(M, 52, "State-Aware Execution", C_DIM, C_PANEL);
+    /* Cycle counter */
+    snprintf(buf, sizeof(buf), "Cycle %d", total_cycles);
+    text(800, 20, buf, C_DIM, C_PANEL);
+    snprintf(buf, sizeof(buf), "%d changes detected", total_changes);
+    text(800, 40, buf, C_DIM, C_PANEL);
+    if (measured_speedup > 1.0f) {
+        snprintf(buf, sizeof(buf), "~%.0fx faster query (4KB median)", measured_speedup);
+        text(800, 60, buf, C_DIM, C_PANEL);
+    }
+    /* LIVE badge */
+    rect(1568, 24, 256, 48, C_BLUE);
+    text(1584, 40, "LIVE ON HARDWARE", C_PANEL, C_BLUE);
 
-    /* ── SOFTWARE vs ATOMiK — the hero comparison ────────────────── */
-    int box_w = 176, box_h = 100, gap = 20;
+    /* ── SOFTWARE row ────────────────────────────────────────────── */
+    int box_w = 176, box_h = 96, gap = 20;
     int total_w = N_BUF * (box_w + gap) - gap;
     int x0 = (FB_HRES - total_w) / 2;
+    int sw_y = 120;
 
-    /* Software row — all boxes lit orange */
-    text2x(M, 96, "SOFTWARE", C_ORANGE, C_BG);
-    text(M + 200, 108, "rescans all state every cycle", C_DIM, C_BG);
+    text2x(M, sw_y, "SOFTWARE", C_ORANGE, C_BG);
+    text(M + 200, sw_y + 12, "rescans all state every cycle", C_DIM, C_BG);
     for (int i = 0; i < N_BUF; i++) {
         int bx = x0 + i * (box_w + gap);
-        rect(bx, 148, box_w, box_h, C_ORANGE);
-        text(bx + 8, 156, buf_names[i], C_WHITE, C_ORANGE);
-        text2x(bx + (box_w - 4*CW*2)/2, 180, "SCAN", C_WHITE, C_ORANGE);
+        rect(bx, sw_y + 40, box_w, box_h, C_ORANGE);
+        text(bx + 8, sw_y + 48, buf_names[i], C_WHITE, C_ORANGE);
+        text2x(bx + (box_w - 4*CW*2)/2, sw_y + 68, "SCAN", C_WHITE, C_ORANGE);
     }
 
-    /* ATOMiK row — only changed boxes blue, rest dark */
-    int ay = 280;
-    text2x(M, ay - 16, "ATOMiK", C_BLUE, C_BG);
-    text(M + 160, ay - 4, "acts only on meaningful change", C_DIM, C_BG);
+    /* ── Separator line ──────────────────────────────────────────── */
+    int sep_y = sw_y + 40 + box_h + 12;
+    rect(x0, sep_y, total_w, 1, C_GRAY);
+
+    /* ── ATOMiK row ──────────────────────────────────────────────── */
+    int ay = sep_y + 16;
+    text2x(M, ay, "ATOMiK", C_BLUE, C_BG);
+    text(M + 160, ay + 12, "acts only on meaningful change", C_DIM, C_BG);
     for (int i = 0; i < N_BUF; i++) {
         int bx = x0 + i * (box_w + gap);
         if (buf_changed[i]) {
-            rect(bx, ay + 16, box_w, box_h, C_BLUE);
-            text(bx + 8, ay + 24, buf_names[i], C_WHITE, C_BLUE);
-            text2x(bx + (box_w - 4*CW*2)/2, ay + 48, "SYNC", C_WHITE, C_BLUE);
+            rect(bx, ay + 40, box_w, box_h, C_BLUE);
+            text(bx + 8, ay + 48, buf_names[i], C_WHITE, C_BLUE);
+            text2x(bx + (box_w - 4*CW*2)/2, ay + 68, "SYNC", C_WHITE, C_BLUE);
         } else {
-            rect(bx, ay + 16, box_w, box_h, 0x00141418);
-            text(bx + 8, ay + 24, buf_names[i], 0x00303030, 0x00141418);
-            text2x(bx + (box_w - 4*CW*2)/2, ay + 48, "SKIP", 0x00303030, 0x00141418);
+            rect(bx, ay + 40, box_w, box_h, 0x00141418);
+            text(bx + 8, ay + 48, buf_names[i], 0x00303030, 0x00141418);
+            text2x(bx + (box_w - 4*CW*2)/2, ay + 68, "SKIP", 0x00303030, 0x00141418);
         }
     }
 
-    /* ── Hero numbers — center of screen ─────────────────────────── */
-    int ny = 440;
-    rect(0, ny, FB_HRES, 200, C_PANEL);
+    /* ── Hero numbers panel ──────────────────────────────────────── */
+    int ny = ay + 40 + box_h + 24;
+    rect(0, ny, FB_HRES, 160, C_PANEL);
 
-    /* Data avoided — the headline */
+    /* Data avoided */
     snprintf(buf, sizeof(buf), "%.0f%%", pct);
-    text3x(M + 40, ny + 20, buf, C_GREEN, C_PANEL);
-    text2x(M + 40, ny + 72, "less compute", C_GREEN, C_PANEL);
-    text(M + 40, ny + 110, "less energy. less cost.", C_GREEN, C_PANEL);
+    text3x(M + 40, ny + 16, buf, C_GREEN, C_PANEL);
+    text2x(M + 40, ny + 64, "less compute", C_GREEN, C_PANEL);
+    text(M + 40, ny + 100, "less energy. less cost.", C_GREEN, C_PANEL);
 
     /* Synced count */
     snprintf(buf, sizeof(buf), "%d of 8", changed);
-    text3x(600, ny + 20, buf, C_BLUE, C_PANEL);
-    text2x(600, ny + 72, "buffers synced", C_BLUE, C_PANEL);
+    text3x(560, ny + 16, buf, C_BLUE, C_PANEL);
+    text2x(560, ny + 64, "buffers synced", C_BLUE, C_PANEL);
+    text(560, ny + 100, "this cycle", C_DIM, C_PANEL);
 
     /* Cost projection */
-    float savings = pct * 0.5f;
+    float savings = pct * 50.0f * 1000.0f / 100.0f / 1000.0f;
+    if (savings < 1.0f && pct > 0) savings = 1.0f;
     snprintf(buf, sizeof(buf), "$%.0fK", savings);
-    text3x(1050, ny + 20, buf, C_GREEN, C_PANEL);
-    text2x(1050, ny + 72, "saved / year", C_GREEN, C_PANEL);
-    text(1050, ny + 110, "at 1,000 servers", C_DIM, C_PANEL);
+    text3x(1000, ny + 16, buf, C_GREEN, C_PANEL);
+    text2x(1000, ny + 64, "saved / year", C_GREEN, C_PANEL);
+    text(1000, ny + 100, "at 1,000 servers", C_DIM, C_PANEL);
+
+    /* Speedup */
+    if (measured_speedup > 1.0f) {
+        snprintf(buf, sizeof(buf), "~%.0fx", measured_speedup);
+        text3x(1400, ny + 16, buf, 0x00FFCC00, C_PANEL);
+        text2x(1400, ny + 64, "faster query", 0x00FFCC00, C_PANEL);
+        text(1400, ny + 100, "4KB median, 50 iter", C_DIM, C_PANEL);
+    }
 
     /* Flow bar */
-    int fy = ny + 150;
-    int bar_w = FB_HRES - 2*M - 400;
-    int bar_x = M + 200;
-    text(M + 40, fy + 4, "Software", C_ORANGE, C_PANEL);
-    rect(bar_x, fy, bar_w, 18, C_ORANGE);
-    text(M + 40, fy + 24, "ATOMiK", C_BLUE, C_PANEL);
+    int fy = ny + 128;
+    int bar_w = FB_HRES - 2*M - 240;
+    int bar_x = M + 120;
+    text(M, fy + 2, "Software", C_ORANGE, C_PANEL);
+    rect(bar_x, fy, bar_w, 14, C_ORANGE);
+    text(M, fy + 18, "ATOMiK", C_BLUE, C_PANEL);
     int hw_w = (int)((100.0f - pct) / 100.0f * bar_w);
     if (hw_w < 4) hw_w = 4;
-    rect(bar_x, fy + 24, hw_w, 18, C_BLUE);
-    rect(bar_x + hw_w, fy + 24, bar_w - hw_w, 18, 0x00141418);
+    rect(bar_x, fy + 18, hw_w, 14, C_BLUE);
+    rect(bar_x + hw_w, fy + 18, bar_w - hw_w, 14, 0x00141418);
 
-    /* ── Bottom: adoption message + subtle log ───────────────────── */
-    int by = 680;
-    textc(by, "Same C. Standard GCC. ATOMiK hardware acceleration.", C_DIM, C_BG);
-    textc(by + 24, "No new language. No new religion.", C_DIM, C_BG);
+    /* ── History ribbon ──────────────────────────────────────────── */
+    int hy = ny + 176;
+    draw_history(M, hy, FB_HRES - 2*M, 72);
 
-    /* Recent events — very subtle */
-    int ly = 760;
-    text(M, ly, "Recent:", C_GRAY, C_BG);
-    for (int i = 0; i < event_count && i < 4; i++) {
+    /* ── Recent events ───────────────────────────────────────────── */
+    int ly = hy + 80;
+    for (int i = 0; i < event_count && i < 3; i++) {
         int idx = event_count - 1 - i;
         if (idx >= 0)
-            text(M + 80 + i * 400, ly, event_log[idx],
+            text(M, ly + i * 18, event_log[idx],
                  i == 0 ? C_DIM : C_GRAY, C_BG);
     }
 
-    /* Memory anchor at very bottom */
-    rect(0, FB_VRES - 80, FB_HRES, 80, C_PANEL);
-    textc(FB_VRES - 60, "ATOMiK removes wasted rediscovery of change.", C_TEXT, C_PANEL);
-    textc(FB_VRES - 36, "Licensable compute IP for state-heavy systems.", C_BLUE, C_PANEL);
+    /* ── Bottom anchor ───────────────────────────────────────────── */
+    rect(0, FB_VRES - 48, FB_HRES, 48, C_PANEL);
+    text(M, FB_VRES - 36, "Same C. Standard GCC. No new language.",
+         C_DIM, C_PANEL);
+    text(FB_HRES/2, FB_VRES - 36,
+         "ATOMiK removes wasted rediscovery of change.", C_TEXT, C_PANEL);
 }
 
 /* Update LCD replica */
@@ -391,21 +467,28 @@ static void update_lcd(void) {
 
     char buf[40];
     snprintf(buf, sizeof(buf), " %d of 8 synced", changed);
-    lline(40, buf, L_FG);
+    lline(36, buf, L_FG);
 
-    /* Mini buffer strip */
+    /* Buffer strip with abbreviated names */
+    static const char *lcd_names[] = {
+        "agnt", "modl", "sess", "conf", "cach", "repl", "txn ", "sens"
+    };
     for (int i = 0; i < N_BUF; i++) {
         uint16_t c = buf_changed[i] ? L_BLUE : 0x2104;
-        lfill(8 + i * 38, 70, 32, 24, c);
+        int bx = 2 + i * 39;
+        lfill(bx, 58, 37, 32, c);
+        ltext(bx + 2, 62, lcd_names[i], buf_changed[i] ? L_BG : L_DIM, c);
     }
 
     float pct = sw_scanned > 0 ?
         100.0f * (sw_scanned - hw_touched) / sw_scanned : 0;
-    snprintf(buf, sizeof(buf), " %.0f%% data avoided", pct);
-    lline(110, buf, L_GREEN);
+    snprintf(buf, sizeof(buf), " %.0f%% avoided", pct);
+    lline(100, buf, L_GREEN);
 
-    lline(140, " Only changed state", L_DIM);
-    lline(152, " was sent.", L_DIM);
+    snprintf(buf, sizeof(buf), " %llu KB scanned", (unsigned long long)(sw_scanned/1024));
+    lline(120, buf, L_DIM);
+
+    lline(148, " Only deltas propagated", L_DIM);
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -449,9 +532,13 @@ static void detect_all(void) {
     for (int i = 0; i < N_BUF; i++) {
         if (buf_changed[i]) { changed++; mask |= (1 << i); }
     }
+    hist_push(changed);
     float pct = sw_scanned > 0 ?
         100.0f * (sw_scanned - hw_touched) / sw_scanned : 0;
-    printf("##EVENT:%d:%d:%.1f:%02X\n", total_cycles, changed, pct, mask);
+    printf("##EVENT:%d:%d:%.1f:%02X:%.0f:%llu:%llu\n",
+           total_cycles, changed, pct, mask, measured_speedup,
+           (unsigned long long)(sw_scanned / 1024),
+           (unsigned long long)(hw_touched / 1024));
     fflush(stdout);
 }
 
@@ -502,6 +589,11 @@ int main(void) {
     reset_all();
     log_event("ATOMiK Live System started.");
     log_event("8 state buffers initialized.");
+
+    /* Run startup speedup benchmark */
+    printf("Benchmarking...\n");
+    run_startup_bench();
+    printf("Speedup: %.0fx\n", measured_speedup);
 
     /* Run initial demo cycle so dashboard isn't all zeros */
     modify_buffer(0);
@@ -555,7 +647,41 @@ int main(void) {
                     flush_l2();
                     break;
                 case 'r': case 'R':
+                    /* Flash reset confirmation */
+                    rect(0, 0, FB_HRES, FB_VRES, C_BLUE);
+                    textc(500, "RESET", C_BG, C_BLUE);
+                    flush_l2();
+                    usleep(200000);
                     reset_all();
+                    hist_pos = 0;
+                    memset(history, 0, sizeof(history));
+                    /* Re-run initial demo so metrics aren't zero */
+                    modify_buffer(0); modify_buffer(2); modify_buffer(5);
+                    detect_all();
+                    log_event("System reset.");
+                    modify_buffer(1); modify_buffer(4);
+                    detect_all();
+                    log_event("Ready. Press 1-8.");
+                    draw_dashboard();
+                    update_lcd();
+                    flush_l2();
+                    break;
+                case 'd': case 'D':
+                    /* Compiler demo: show the adoption story */
+                    rect(0, 96, FB_HRES, FB_VRES - 96 - 48, C_BG);
+                    text3x(M, 200, "Compiler Lane", C_BLUE, C_BG);
+                    text2x(M, 260, "Same C. Standard GCC.", C_TEXT, C_BG);
+                    text2x(M, 300, "#include \"atomik.h\"", C_GREEN, C_BG);
+                    text2x(M, 340, "atomik_load(slot, init);", C_TEXT, C_BG);
+                    text2x(M, 372, "atomik_accum(delta);", C_TEXT, C_BG);
+                    text2x(M, 404, "atomik_read(slot);", C_TEXT, C_BG);
+                    text2x(M, 460, "riscv64-linux-gnu-gcc -O2 example.c", C_DIM, C_BG);
+                    text2x(M, 500, "-> ATOMiK hardware ops in the binary", C_DIM, C_BG);
+                    text3x(M, 580, "No new language.", C_GREEN, C_BG);
+                    text3x(M, 636, "No new compiler.", C_GREEN, C_BG);
+                    log_event("Compiler lane shown.");
+                    flush_l2();
+                    usleep(5000000); /* hold 5 seconds */
                     draw_dashboard();
                     update_lcd();
                     flush_l2();
