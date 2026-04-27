@@ -344,7 +344,7 @@ static void draw_dashboard(void) {
     snprintf(buf, sizeof(buf), "%d changes detected", total_changes);
     text(800, 40, buf, C_DIM, C_PANEL);
     if (measured_speedup > 1.0f) {
-        snprintf(buf, sizeof(buf), "~%.0fx faster query (4KB median)", measured_speedup);
+        snprintf(buf, sizeof(buf), "%.0fx faster query (4KB median)", measured_speedup);
         text(800, 60, buf, C_DIM, C_PANEL);
     }
     /* LIVE badge */
@@ -403,17 +403,20 @@ static void draw_dashboard(void) {
     text2x(560, ny + 64, "buffers synced", C_BLUE, C_PANEL);
     text(560, ny + 100, "this cycle", C_DIM, C_PANEL);
 
-    /* Cost projection */
-    float savings = pct * 50.0f * 1000.0f / 100.0f / 1000.0f;
-    if (savings < 1.0f && pct > 0) savings = 1.0f;
-    snprintf(buf, sizeof(buf), "$%.0fK", savings);
-    text3x(1000, ny + 16, buf, C_GREEN, C_PANEL);
-    text2x(1000, ny + 64, "saved / year", C_GREEN, C_PANEL);
-    text(1000, ny + 100, "at 1,000 servers", C_DIM, C_PANEL);
+    /* Cost projection — both scales */
+    float sav_1k = pct * 50.0f * 1000.0f / 100.0f / 1000.0f; /* $K at 1K servers */
+    if (sav_1k < 1.0f && pct > 0) sav_1k = 1.0f;
+    float sav_global = pct * 50.0f * 50e6f / 100.0f / 1e9f;  /* $B at 50M servers */
+    snprintf(buf, sizeof(buf), "$%.0fK", sav_1k);
+    text3x(960, ny + 8, buf, C_GREEN, C_PANEL);
+    text(960, ny + 60, "at 1,000 servers/yr", C_DIM, C_PANEL);
+    snprintf(buf, sizeof(buf), "$%.1fB", sav_global);
+    text3x(960, ny + 80, buf, C_GREEN, C_PANEL);
+    text(960, ny + 132, "global TAM (50M servers)", C_DIM, C_PANEL);
 
     /* Speedup */
     if (measured_speedup > 1.0f) {
-        snprintf(buf, sizeof(buf), "~%.0fx", measured_speedup);
+        snprintf(buf, sizeof(buf), "%.0fx", measured_speedup);
         text3x(1400, ny + 16, buf, 0x00FFCC00, C_PANEL);
         text2x(1400, ny + 64, "faster query", 0x00FFCC00, C_PANEL);
         text(1400, ny + 100, "4KB median, 50 iter", C_DIM, C_PANEL);

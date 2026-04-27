@@ -273,9 +273,14 @@ body { background: #08111A; color: #F3F7FB; font-family: 'SF Mono','Fira Code','
         <div class="sub">less energy per cycle</div>
     </div>
     <div class="econ-card">
-        <div class="lbl">Projected Savings</div>
+        <div class="lbl">At 1,000 Servers</div>
         <div class="val green" id="savings">--</div>
-        <div class="sub">at 1,000 servers / year</div>
+        <div class="sub">saved per year</div>
+    </div>
+    <div class="econ-card">
+        <div class="lbl">Global TAM (50M Servers)</div>
+        <div class="val green" id="savings-global">--</div>
+        <div class="sub">total addressable market</div>
     </div>
 
     <div class="econ-card">
@@ -365,7 +370,9 @@ function connect() {
             document.getElementById('cycles').textContent = d.cycle;
             document.getElementById('compute').textContent = pct + '%';
             const sav = Math.round(pct * 50 * 1000 / 100 / 1000);
-            document.getElementById('savings').textContent = '$' + (sav < 1 && pct > 0 ? 1 : sav) + 'K';
+            document.getElementById('savings').textContent = '$' + (sav < 1 && pct > 0 ? 1 : sav) + 'K/yr';
+            const savGlobal = (pct * 50 * 50e6 / 100 / 1e9).toFixed(1);
+            document.getElementById('savings-global').textContent = '$' + savGlobal + 'B/yr';
 
             // Update bytes counters if available
             if (d.sw_kb !== undefined) {
