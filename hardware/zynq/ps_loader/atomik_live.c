@@ -1468,6 +1468,140 @@ static void draw_benchmark_race(void) {
     char ch; read(0, &ch, 1);
 }
 
+/* TCO Calculator — full-screen overlay showing savings at server scale */
+static void draw_tco_calculator(void) {
+    char buf[120];
+
+    /* Compute live pct_avoided */
+    float pct = sw_scanned > 0 ?
+        100.0f * (sw_scanned - hw_touched) / sw_scanned : 0;
+
+    /* Clear screen */
+    rect(0, 0, FB_HRES, FB_VRES, C_BG);
+
+    /* Title panel */
+    panel(0, TOP_Y, FB_HRES, 80, C_PANEL, C_GREEN);
+    text3x(M, TOP_Y + 12, "TCO CALCULATOR", C_GREEN, C_PANEL);
+    text2x(M + 420, TOP_Y + 20, "Based on live hardware measurement this session", C_DIM, C_PANEL);
+
+    /* Live measurement callout */
+    int ly = TOP_Y + 100;
+    panel(M, ly, FB_HRES - 2*M, 56, C_PANEL, C_BLUE);
+    snprintf(buf, sizeof(buf), "Current session: %.0f%% compute eliminated", pct);
+    text2x(M + 20, ly + 8, buf, C_GREEN, C_PANEL);
+    text(M + 20, ly + 38, "(measured on this board)", C_DIM, C_PANEL);
+
+    /* Table header */
+    int ty = ly + 76;
+    int col_srv = M;
+    int col_cost = M + 320;
+    int col_sav = M + 640;
+    int col_net = M + 960;
+    int col_bar = M + 1260;
+    int bar_max_w = FB_HRES - M - col_bar - 20;
+
+    rect(col_srv, ty, FB_HRES - 2*M, 2, C_GRAY);
+    text2x(col_srv, ty + 8, "Servers", C_DIM, C_BG);
+    text2x(col_cost, ty + 8, "Annual Energy", C_DIM, C_BG);
+    text2x(col_sav, ty + 8, "ATOMiK Savings", C_DIM, C_BG);
+    text2x(col_net, ty + 8, "Net Saved", C_DIM, C_BG);
+    rect(col_srv, ty + 40, FB_HRES - 2*M, 1, C_GRAY);
+
+    /* Table rows */
+    static const struct { int servers; const char *srv_label; float annual_cost; } scales[] = {
+        {       100, "100",            5000.0f },
+        {      1000, "1,000",         50000.0f },
+        {     10000, "10,000",       500000.0f },
+        {    100000, "100,000",     5000000.0f },
+        {   1000000, "1,000,000",  50000000.0f },
+        {  50000000, "50,000,000", 2500000000.0f },
+    };
+    int n_rows = 6;
+    int row_h = 64;
+    float max_savings = 0;
+
+    /* Pre-compute max savings for bar scaling */
+    for (int i = 0; i < n_rows; i++) {
+        float sav = scales[i].servers * 50.0f * pct / 100.0f;
+        if (sav > max_savings) max_savings = sav;
+    }
+
+    /* Color gradient for rows — dimmer at small scale, brighter at large */
+    uint32_t row_colors[] = { C_DIM, C_DIM, C_BLUE, C_BLUE, C_GREEN, C_GREEN };
+    uint32_t bar_colors[] = {
+        RGB(0x10,0x60,0x80), RGB(0x14,0x80,0xA0), RGB(0x1E,0xC8,0xFF),
+        RGB(0x20,0xA0,0x60), RGB(0x39,0xD9,0x8A), RGB(0x50,0xFF,0xA0),
+    };
+
+    for (int i = 0; i < n_rows; i++) {
+        int ry = ty + 48 + i * row_h;
+        float savings = scales[i].servers * 50.0f * pct / 100.0f;
+
+        /* Servers column */
+        text2x(col_srv, ry + 8, scales[i].srv_label, C_WHITE, C_BG);
+
+        /* Annual energy cost */
+        if (scales[i].annual_cost >= 1e9f)
+            snprintf(buf, sizeof(buf), "$%.1fB", scales[i].annual_cost / 1e9f);
+        else if (scales[i].annual_cost >= 1e6f)
+            snprintf(buf, sizeof(buf), "$%.0fM", scales[i].annual_cost / 1e6f);
+        else if (scales[i].annual_cost >= 1e3f)
+            snprintf(buf, sizeof(buf), "$%dK", (int)(scales[i].annual_cost / 1e3f));
+        else
+            snprintf(buf, sizeof(buf), "$%.0f", scales[i].annual_cost);
+        text(col_cost, ry + 14, buf, row_colors[i], C_BG);
+
+        /* ATOMiK savings */
+        if (savings >= 1e9f)
+            snprintf(buf, sizeof(buf), "$%.1fB", savings / 1e9f);
+        else if (savings >= 1e6f)
+            snprintf(buf, sizeof(buf), "$%.1fM", savings / 1e6f);
+        else if (savings >= 1e3f)
+            snprintf(buf, sizeof(buf), "$%dK", (int)(savings / 1e3f + 0.5f));
+        else
+            snprintf(buf, sizeof(buf), "$%.0f", savings);
+        text2x(col_sav, ry + 8, buf, row_colors[i], C_BG);
+
+        /* Net saved (same as savings — no license cost modeled here) */
+        if (savings >= 1e9f)
+            snprintf(buf, sizeof(buf), "$%.1fB", savings / 1e9f);
+        else if (savings >= 1e6f)
+            snprintf(buf, sizeof(buf), "$%.1fM", savings / 1e6f);
+        else if (savings >= 1e3f)
+            snprintf(buf, sizeof(buf), "$%dK", (int)(savings / 1e3f + 0.5f));
+        else
+            snprintf(buf, sizeof(buf), "$%.0f", savings);
+        text2x(col_net, ry + 8, buf, row_colors[i], C_BG);
+
+        /* Proportional bar */
+        int bw = 0;
+        if (max_savings > 0)
+            bw = (int)(savings / max_savings * bar_max_w);
+        if (bw < 4 && savings > 0) bw = 4;
+        if (bw > bar_max_w) bw = bar_max_w;
+        rect(col_bar, ry + 6, bw, 28, bar_colors[i]);
+
+        /* Thin separator */
+        rect(col_srv, ry + row_h - 2, FB_HRES - 2*M, 1, RGB(0x14,0x1E,0x28));
+    }
+
+    /* Bottom text */
+    int bot = ty + 48 + n_rows * row_h + 20;
+    snprintf(buf, sizeof(buf),
+        "All savings derived from live measurement: %.0f%% compute eliminated. "
+        "Not projected -- measured NOW on this hardware.", pct);
+    text(M, bot, buf, C_GREEN, C_BG);
+
+    text(M, bot + 30, "Formula: servers x $50/yr x pct_avoided/100", C_DIM, C_BG);
+
+    text(M, bot + 70, "Press any key to return", C_GRAY, C_BG);
+    flush_l2();
+
+    /* Wait for keypress */
+    while (!key_ready()) usleep(50000);
+    char tch; read(0, &tch, 1);
+}
+
 /* Full dashboard (chrome + content) — used on init and reset */
 static void draw_dashboard(void) {
     draw_chrome();
@@ -1880,6 +2014,12 @@ int main(void) {
                     update_lcd();
                     flush_l2();
                     break;
+                case 'T':
+                    draw_tco_calculator();
+                    draw_dashboard();
+                    update_lcd();
+                    flush_l2();
+                    break;
                 case 'W':
                     /* Cycle through workload profiles — reconfigures virtual processors */
                     workload_profile = (workload_profile + 1) % 5;
@@ -1952,6 +2092,7 @@ int main(void) {
                     text2x(M, hy+=40, "[d]", C_TEXT, C_BG); text(M+120, hy+8, "Compiler lane — GCC + atomik.h = hardware", C_DIM, C_BG);
                     text2x(M, hy+=40, "[f]", C_TEXT, C_BG); text(M+120, hy+8, "Adoption forecast — year-by-year TAM", C_DIM, C_BG);
                     text2x(M, hy+=40, "[s]", C_TEXT, C_BG); text(M+120, hy+8, "Session summary — aggregate proof", C_DIM, C_BG);
+                    text2x(M, hy+=40, "[T]", C_TEXT, C_BG); text(M+120, hy+8, "TCO calculator — savings at server scale", C_DIM, C_BG);
                     text2x(M, hy+=40, "[r]", C_TEXT, C_BG); text(M+120, hy+8, "Reset all state + counters", C_DIM, C_BG);
                     text2x(M, hy+=40, "[h]", C_TEXT, C_BG); text(M+120, hy+8, "This help screen", C_DIM, C_BG);
                     text(M, hy+60, "Press any key to return", C_GRAY, C_BG);
