@@ -349,10 +349,10 @@ static void hist_push(int n_changed) {
 }
 
 static void draw_history(int x, int y, int w, int h) {
-    rect(x, y, w, h, C_PANEL);
-    text(x + 8, y + 4, "Change History", C_DIM, C_PANEL);
+    rect(x, y, w, h, RGB(0x12,0x20,0x2E));
+    text(x + 8, y + 4, "Change History", C_DIM, RGB(0x12,0x20,0x2E));
     int col_w = (w - 16) / HIST_LEN;
-    int max_h = h - 28;
+    int max_h = h - 20;
     for (int i = 0; i < HIST_LEN; i++) {
         int idx = (hist_pos - HIST_LEN + i);
         if (idx < 0) continue;
@@ -751,9 +751,12 @@ static void draw_content(void) {
         int is_active = buf_changed[i] || slot_active[i];
         /* Use vproc-specific color for the lane */
         uint32_t lane_col = vproc_colors[vp];
-        exec_lane(lx, LANE_TOP, lane_w, LANE_H, vproc_names[vp],
+        exec_lane(lx, LANE_TOP, lane_w, LANE_H, buf_names[i],
                   is_active, (i == last_modified),
                   lane_col, SKIP_COL, buf_change_count[i], i, 0);
+        /* Vproc type indicator below lane */
+        rect(lx, LANE_TOP + LANE_H + 2, lane_w, 14, vproc_colors[vp]);
+        text(lx + 2, LANE_TOP + LANE_H + 2, vproc_names[vp], C_WHITE, vproc_colors[vp]);
     }
 
     snprintf(buf, sizeof(buf), "Touched: %llu KB (%.0f%%)",
@@ -912,15 +915,16 @@ static void draw_content(void) {
     draw_history(M, HIST_Y, FB_HRES/2 - M - 8, HIST_H);
 
     rect(FB_HRES/2 + 8, HIST_Y, FB_HRES/2 - M - 8, HIST_H, C_BG);
-    for (int i = 0; i < event_count && i < 2; i++) {
+    for (int i = 0; i < event_count && i < 3; i++) {
         int idx = event_count - 1 - i;
         if (idx >= 0)
-            text(FB_HRES/2 + 16, HIST_Y + 4 + i * 18, event_log[idx],
-                 i == 0 ? C_DIM : C_GRAY, C_BG);
+            text(FB_HRES/2 + 16, HIST_Y + 4 + i * 16, event_log[idx],
+                 i == 0 ? C_TEXT : C_DIM, C_BG);
     }
 
     /* Key legend */
-    text(M, KEY_Y, "[1-8]=buffers  Backspace=undo  B=benchmark  G=burst  R=reset  Q=quit  H=help", C_GRAY, C_BG);
+    text(M, KEY_Y, "[1-8]=buffers  Backspace=undo  R=reset  Q=quit  H=help", C_GRAY, C_BG);
+    text(M, KEY_Y + 16, "B=benchmark  G=burst  P=presentation  W=workload profiles", C_GRAY, C_BG);
 }
 /* Adoption forecast slide */
 static void draw_adoption(void) {
@@ -1602,6 +1606,396 @@ static void draw_tco_calculator(void) {
     char tch; read(0, &tch, 1);
 }
 
+/* ── Dollar-Per-Second Race (Shift+D) ──────────────────────────────── */
+static void draw_dollar_race(void) {
+    char buf[120];
+    uint32_t C_GOLD = RGB(0xFF,0xCC,0x00);
+
+    /* Compute live pct_avoided */
+    float pct = sw_scanned > 0 ?
+        100.0f * (sw_scanned - hw_touched) / sw_scanned : 85.0f;
+    if (pct < 1.0f) pct = 85.0f; /* fallback if no ops yet */
+
+    /* SW cost rate: $50/srv/yr * 1000 servers / seconds_per_year */
+    /* = 50000 / (365.25 * 86400) = ~0.001585 $/sec */
+    float sw_rate = 50.0f * 1000.0f / (365.25f * 86400.0f);
+    float atk_rate = sw_rate * (1.0f - pct / 100.0f);
+
+    /* Clear + title */
+    rect(0, 0, FB_HRES, FB_VRES, C_BG);
+    panel(0, TOP_Y, FB_HRES, 80, C_PANEL, C_GOLD);
+    text3x(M, TOP_Y + 12, "COST RACE", C_GOLD, C_PANEL);
+    text2x(M + 300, TOP_Y + 20, "1,000 servers  |  $50/srv/year energy", C_DIM, C_PANEL);
+
+    /* Column headers */
+    int col_sw = M;
+    int col_diff = FB_HRES / 2 - 180;
+    int col_atk = FB_HRES - M - 400;
+
+    text2x(col_sw, TOP_Y + 100, "SOFTWARE COST", C_ORANGE, C_BG);
+    text(col_sw, TOP_Y + 134, "Full-scan every cycle", C_DIM, C_BG);
+
+    text2x(col_diff, TOP_Y + 100, "DIFFERENCE", C_GREEN, C_BG);
+    text(col_diff, TOP_Y + 134, "ATOMiK savings", C_DIM, C_BG);
+
+    text2x(col_atk, TOP_Y + 100, "ATOMiK COST", C_BLUE, C_BG);
+    text(col_atk, TOP_Y + 134, "Only changed state", C_DIM, C_BG);
+
+    /* Counter area backgrounds */
+    int ctr_y = TOP_Y + 160;
+    int ctr_h = 120;
+    panel(col_sw, ctr_y, 400, ctr_h, C_DKORANGE, C_ORANGE);
+    panel(col_diff, ctr_y, 360, ctr_h, C_DKGREEN, C_GREEN);
+    panel(col_atk, ctr_y, 400, ctr_h, C_BLUE_DK, C_BLUE);
+
+    /* Gap bar area */
+    int bar_y = ctr_y + ctr_h + 40;
+    text(M, bar_y - 16, "Savings gap (wider = more money saved):", C_DIM, C_BG);
+    int bar_w_max = FB_HRES - 2 * M;
+
+    /* Bottom info panel */
+    int info_y = bar_y + 80;
+    panel(0, info_y, FB_HRES, 36, C_PANEL, C_GOLD);
+    text(M, info_y + 10, "Auto-running 10 seconds  |  Press Q to stop early",
+         C_DIM, C_PANEL);
+
+    flush_l2();
+
+    /* Auto-run loop */
+    uint64_t t_start = rdtime();
+    float sw_total = 0.0f, atk_total = 0.0f;
+    int running_race = 1;
+
+    while (running_race) {
+        uint64_t now = rdtime();
+        float elapsed = (float)(now - t_start) / 100000000.0f; /* 100MHz timer */
+
+        sw_total = sw_rate * elapsed;
+        atk_total = atk_rate * elapsed;
+        float diff = sw_total - atk_total;
+
+        /* Update SW counter */
+        rect(col_sw + 8, ctr_y + 20, 380, 80, C_DKORANGE);
+        snprintf(buf, sizeof(buf), "$%.4f", sw_total);
+        text3x(col_sw + 16, ctr_y + 30, buf, C_ORANGE, C_DKORANGE);
+        snprintf(buf, sizeof(buf), "%.4f $/sec", sw_rate);
+        text(col_sw + 16, ctr_y + 82, buf, C_DIM, C_DKORANGE);
+
+        /* Update ATOMiK counter */
+        rect(col_atk + 8, ctr_y + 20, 380, 80, C_BLUE_DK);
+        snprintf(buf, sizeof(buf), "$%.4f", atk_total);
+        text3x(col_atk + 16, ctr_y + 30, buf, C_BLUE, C_BLUE_DK);
+        snprintf(buf, sizeof(buf), "%.4f $/sec", atk_rate);
+        text(col_atk + 16, ctr_y + 82, buf, C_DIM, C_BLUE_DK);
+
+        /* Update DIFFERENCE counter */
+        rect(col_diff + 8, ctr_y + 20, 340, 80, C_DKGREEN);
+        snprintf(buf, sizeof(buf), "$%.4f", diff);
+        text3x(col_diff + 16, ctr_y + 30, buf, C_GREEN, C_DKGREEN);
+        snprintf(buf, sizeof(buf), "saved so far");
+        text(col_diff + 16, ctr_y + 82, buf, C_DIM, C_DKGREEN);
+
+        /* Gap bar — proportional to difference fraction */
+        float gap_frac = sw_total > 0 ? diff / sw_total : 0;
+        int bar_w = (int)(gap_frac * bar_w_max);
+        if (bar_w < 4 && diff > 0) bar_w = 4;
+        if (bar_w > bar_w_max) bar_w = bar_w_max;
+        rect(M, bar_y, bar_w_max, 40, RGB(0x14,0x1E,0x28));
+        if (bar_w > 0) {
+            rect(M, bar_y, bar_w, 40, C_GREEN);
+            /* Percentage label inside bar */
+            snprintf(buf, sizeof(buf), "%.0f%% saved", pct);
+            if (bar_w > 120)
+                text(M + bar_w / 2 - 40, bar_y + 12, buf, C_BG, C_GREEN);
+        }
+
+        flush_l2();
+
+        /* Check for keypress or 10 second timeout */
+        if (elapsed >= 10.0f) {
+            running_race = 0;
+        } else if (key_ready()) {
+            char rch;
+            if (read(0, &rch, 1) == 1) {
+                if (rch == 'Q' || rch == 'q' || rch == 27) {
+                    running_race = 0;
+                }
+                /* Handle ~ commands */
+                if (rch == '~') {
+                    char cmdbuf[512] = {0}; int ci = 0;
+                    int got_eol = 0;
+                    for (int attempt = 0; attempt < 200 && !got_eol; attempt++) {
+                        fd_set fs; struct timeval tv = {0, 50000};
+                        FD_ZERO(&fs); FD_SET(0, &fs);
+                        if (select(1, &fs, NULL, NULL, &tv) > 0) {
+                            char tmp[256]; int n = read(0, tmp, sizeof(tmp));
+                            for (int j = 0; j < n && ci < 510; j++) {
+                                if (tmp[j]=='\n'||tmp[j]=='\r') {got_eol=1;break;}
+                                cmdbuf[ci++] = tmp[j];
+                            }
+                        } else if (ci > 0) break;
+                    }
+                    if (ci > 0) {
+                        cmd_running = 1;
+                        printf("##RSP:CMD:%s\n", cmdbuf);
+                        FILE *pp = popen(cmdbuf, "r");
+                        if (pp) {
+                            char line[256];
+                            while (fgets(line, sizeof(line), pp)) {
+                                int len = strlen(line);
+                                if (len>0 && line[len-1]=='\n') line[len-1]=0;
+                                printf("##RSP:%s\n", line);
+                            }
+                            printf("##RSP:EXIT:%d\n", WEXITSTATUS(pclose(pp)));
+                        } else printf("##RSP:ERROR:popen failed\n");
+                        printf("##RSP:END\n"); fflush(stdout);
+                        cmd_running = 0;
+                    }
+                }
+            }
+        }
+
+        usleep(100000); /* 100ms between updates */
+    }
+
+    /* Final summary */
+    float final_diff = sw_total - atk_total;
+    rect(0, info_y, FB_HRES, FB_VRES - info_y, C_BG);
+    panel(0, info_y, FB_HRES, 120, C_PANEL, C_GREEN);
+    snprintf(buf, sizeof(buf),
+        "ATOMiK saves $%.4f per 10 seconds at 1,000 servers", final_diff);
+    text2x(M, info_y + 12, buf, C_GREEN, C_PANEL);
+    snprintf(buf, sizeof(buf),
+        "Annualized: $%.0fK/yr  |  %.0f%% compute eliminated",
+        final_diff * 6.0f * 60.0f * 24.0f * 365.25f / 1000.0f, pct);
+    text2x(M, info_y + 48, buf, C_GOLD, C_PANEL);
+    text(M, info_y + 88, "Press any key to return", C_GRAY, C_PANEL);
+    flush_l2();
+
+    /* Wait for keypress */
+    while (!key_ready()) usleep(50000);
+    char dch; read(0, &dch, 1);
+
+    log_event("Cost race complete.");
+    { char lbuf[60];
+      snprintf(lbuf, sizeof(lbuf), "Race: $%.4f saved in 10s @ 1K srv", final_diff);
+      log_event(lbuf);
+    }
+}
+
+/* ── Latency Scope (Shift+L) ──────────────────────────────────────── */
+static void draw_latency_scope(void) {
+    char buf[120];
+
+    #define SCOPE_ROUNDS 20
+
+    uint64_t sw_times[SCOPE_ROUNDS];
+    uint64_t hw_times[SCOPE_ROUNDS];
+    uint64_t sw_sum = 0, hw_sum = 0;
+    uint64_t max_time = 1; /* avoid div-by-zero */
+
+    /* Clear + title */
+    rect(0, 0, FB_HRES, FB_VRES, C_BG);
+    panel(0, TOP_Y, FB_HRES, 80, C_PANEL, C_BLUE);
+    text3x(M, TOP_Y + 12, "LATENCY SCOPE", C_BLUE, C_PANEL);
+    text2x(M + 420, TOP_Y + 20, "Oscilloscope-style timing traces", C_DIM, C_PANEL);
+    text(M, TOP_Y + 60, "Measuring...", C_DIM, C_PANEL);
+    flush_l2();
+
+    /* Run measurements */
+    /* Ensure shadows are current for memcmp baseline */
+    for (int i = 0; i < N_BUF; i++)
+        memcpy(shadows[i], buffers[i], BUF_SIZE);
+
+    /* Warmup */
+    for (int w = 0; w < 5; w++) {
+        for (int i = 0; i < N_BUF; i++) {
+            volatile int d = memcmp(buffers[i], shadows[i], BUF_SIZE);
+            (void)d;
+            load64(i, fp(buffers[i], BUF_SIZE));
+            accum64(0);
+            read64();
+        }
+    }
+
+    for (int r = 0; r < SCOPE_ROUNDS; r++) {
+        /* Mutate a few buffers so there's something to detect */
+        int mutate = (r * 3 + 1) % N_BUF;
+        buffers[mutate][(r * 97) % BUF_SIZE] ^= 0x55;
+
+        /* SW: memcmp all 8 buffers */
+        uint64_t t0 = rdtime();
+        for (int i = 0; i < N_BUF; i++) {
+            volatile int d = memcmp(buffers[i], shadows[i], BUF_SIZE);
+            (void)d;
+        }
+        uint64_t t1 = rdtime();
+        sw_times[r] = t1 - t0;
+        sw_sum += sw_times[r];
+
+        /* ATOMiK: fp + load64 + accum64 + read64 for all 8 */
+        t0 = rdtime();
+        for (int i = 0; i < N_BUF; i++) {
+            uint64_t f = fp(buffers[i], BUF_SIZE);
+            load64(i, f);
+            accum64(f ^ fp(shadows[i], BUF_SIZE));
+            read64();
+        }
+        t1 = rdtime();
+        hw_times[r] = t1 - t0;
+        hw_sum += hw_times[r];
+
+        /* Update shadow for next round */
+        memcpy(shadows[mutate], buffers[mutate], BUF_SIZE);
+
+        /* Track max */
+        if (sw_times[r] > max_time) max_time = sw_times[r];
+        if (hw_times[r] > max_time) max_time = hw_times[r];
+    }
+
+    /* ── Draw the scope ───────────────────────────────────────────── */
+    rect(M, TOP_Y + 56, 400, 20, C_PANEL); /* clear "Measuring..." */
+    text(M, TOP_Y + 60, "Measurement complete", C_GREEN, C_PANEL);
+
+    /* Trace areas */
+    int trace_x = M + 60;
+    int trace_w = FB_HRES - 2 * M - 80;
+    int trace_h = 240;
+    int sw_trace_y = TOP_Y + 100;
+    int hw_trace_y = sw_trace_y + trace_h + 60;
+
+    /* Labels */
+    text2x(M, sw_trace_y, "SW", C_ORANGE, C_BG);
+    text2x(M, hw_trace_y, "HW", C_BLUE, C_BG);
+
+    /* Trace backgrounds (dark scope screen) */
+    uint32_t scope_bg = RGB(0x08,0x0C,0x10);
+    rect(trace_x, sw_trace_y, trace_w, trace_h, scope_bg);
+    rect(trace_x, hw_trace_y, trace_w, trace_h, scope_bg);
+
+    /* Horizontal gridlines (4 divisions) */
+    for (int g = 1; g < 4; g++) {
+        int gy = sw_trace_y + g * trace_h / 4;
+        for (int gx = trace_x; gx < trace_x + trace_w; gx += 8)
+            px(gx, gy, RGB(0x20,0x28,0x30));
+        gy = hw_trace_y + g * trace_h / 4;
+        for (int gx = trace_x; gx < trace_x + trace_w; gx += 8)
+            px(gx, gy, RGB(0x20,0x28,0x30));
+    }
+
+    /* Vertical gridlines every 5 rounds */
+    int col_w = trace_w / SCOPE_ROUNDS;
+    for (int g = 5; g < SCOPE_ROUNDS; g += 5) {
+        int gx = trace_x + g * col_w;
+        for (int gy = sw_trace_y; gy < sw_trace_y + trace_h; gy += 4)
+            px(gx, gy, RGB(0x20,0x28,0x30));
+        for (int gy = hw_trace_y; gy < hw_trace_y + trace_h; gy += 4)
+            px(gx, gy, RGB(0x20,0x28,0x30));
+        /* Round label */
+        snprintf(buf, sizeof(buf), "%d", g);
+        text(gx - 4, sw_trace_y + trace_h + 2, buf, C_DIM, C_BG);
+    }
+
+    /* Draw spikes — same vertical scale for both */
+    for (int r = 0; r < SCOPE_ROUNDS; r++) {
+        int cx = trace_x + r * col_w + col_w / 2;
+        int spike_w = col_w - 6;
+        if (spike_w < 4) spike_w = 4;
+
+        /* SW spike (orange) */
+        int sw_h = (int)((float)sw_times[r] / (float)max_time * (trace_h - 8));
+        if (sw_h < 2) sw_h = 2;
+        int sw_top = sw_trace_y + trace_h - 4 - sw_h;
+        rect(cx - spike_w/2, sw_top, spike_w, sw_h, C_ORANGE);
+        /* Bright tip */
+        rect(cx - spike_w/2, sw_top, spike_w, 2, C_WHITE);
+
+        /* HW spike (blue) */
+        int hw_h = (int)((float)hw_times[r] / (float)max_time * (trace_h - 8));
+        if (hw_h < 2) hw_h = 2;
+        int hw_top = hw_trace_y + trace_h - 4 - hw_h;
+        rect(cx - spike_w/2, hw_top, spike_w, hw_h, C_BLUE);
+        /* Bright tip */
+        rect(cx - spike_w/2, hw_top, spike_w, 2, C_WHITE);
+    }
+
+    /* Baseline */
+    rect(trace_x, sw_trace_y + trace_h - 4, trace_w, 1, C_ORANGE);
+    rect(trace_x, hw_trace_y + trace_h - 4, trace_w, 1, C_BLUE);
+
+    /* Results panel */
+    int res_y = hw_trace_y + trace_h + 40;
+    uint64_t sw_avg = sw_sum / SCOPE_ROUNDS;
+    uint64_t hw_avg = hw_sum / SCOPE_ROUNDS;
+    float ratio = (float)sw_avg / (float)(hw_avg > 0 ? hw_avg : 1);
+
+    panel(0, res_y, FB_HRES, 100, C_PANEL, C_GREEN);
+    snprintf(buf, sizeof(buf),
+        "Software: avg %llu cycles  |  ATOMiK: avg %llu cycles  |  %.0fx faster",
+        (unsigned long long)sw_avg, (unsigned long long)hw_avg, ratio);
+    text2x(M, res_y + 12, buf, C_TEXT, C_PANEL);
+    snprintf(buf, sizeof(buf),
+        "%d rounds x %d buffers x %d bytes  |  Same scale on both traces",
+        SCOPE_ROUNDS, N_BUF, BUF_SIZE);
+    text(M, res_y + 52, buf, C_DIM, C_PANEL);
+    text(M, res_y + 76, "Press any key to return", C_GRAY, C_PANEL);
+
+    flush_l2();
+
+    /* Wait for keypress with ~ command handler */
+    int scope_wait = 1;
+    while (scope_wait) {
+        if (key_ready()) {
+            char sch;
+            if (read(0, &sch, 1) == 1) {
+                if (sch == '~') {
+                    char cmdbuf[512] = {0}; int ci = 0;
+                    int got_eol = 0;
+                    for (int attempt = 0; attempt < 200 && !got_eol; attempt++) {
+                        fd_set fs; struct timeval tv = {0, 50000};
+                        FD_ZERO(&fs); FD_SET(0, &fs);
+                        if (select(1, &fs, NULL, NULL, &tv) > 0) {
+                            char tmp[256]; int n = read(0, tmp, sizeof(tmp));
+                            for (int j = 0; j < n && ci < 510; j++) {
+                                if (tmp[j]=='\n'||tmp[j]=='\r') {got_eol=1;break;}
+                                cmdbuf[ci++] = tmp[j];
+                            }
+                        } else if (ci > 0) break;
+                    }
+                    if (ci > 0) {
+                        cmd_running = 1;
+                        printf("##RSP:CMD:%s\n", cmdbuf);
+                        FILE *pp = popen(cmdbuf, "r");
+                        if (pp) {
+                            char line[256];
+                            while (fgets(line, sizeof(line), pp)) {
+                                int len = strlen(line);
+                                if (len>0 && line[len-1]=='\n') line[len-1]=0;
+                                printf("##RSP:%s\n", line);
+                            }
+                            printf("##RSP:EXIT:%d\n", WEXITSTATUS(pclose(pp)));
+                        } else printf("##RSP:ERROR:popen failed\n");
+                        printf("##RSP:END\n"); fflush(stdout);
+                        cmd_running = 0;
+                    }
+                } else {
+                    scope_wait = 0;
+                }
+            }
+        }
+        usleep(50000);
+    }
+
+    log_event("Latency scope complete.");
+    { char lbuf[60];
+      snprintf(lbuf, sizeof(lbuf), "Scope: SW %llu / HW %llu = %.0fx",
+               (unsigned long long)sw_avg, (unsigned long long)hw_avg, ratio);
+      log_event(lbuf);
+    }
+
+    #undef SCOPE_ROUNDS
+}
+
 /* Full dashboard (chrome + content) — used on init and reset */
 static void draw_dashboard(void) {
     draw_chrome();
@@ -1981,21 +2375,7 @@ int main(void) {
                     break;
                 }
                 case 'D':
-                    /* Compiler demo: show the adoption story */
-                    rect(0, 96, FB_HRES, FB_VRES - 96 - 48, C_BG);
-                    text3x(M, 200, "Compiler Lane", C_BLUE, C_BG);
-                    text2x(M, 260, "Same C. Standard GCC.", C_TEXT, C_BG);
-                    text2x(M, 300, "#include \"atomik.h\"", C_GREEN, C_BG);
-                    text2x(M, 340, "atomik_load(slot, init);", C_TEXT, C_BG);
-                    text2x(M, 372, "atomik_accum(delta);", C_TEXT, C_BG);
-                    text2x(M, 404, "atomik_read(slot);", C_TEXT, C_BG);
-                    text2x(M, 460, "riscv64-linux-gnu-gcc -O2 example.c", C_DIM, C_BG);
-                    text2x(M, 500, "-> ATOMiK hardware ops in the binary", C_DIM, C_BG);
-                    text3x(M, 580, "No new language.", C_GREEN, C_BG);
-                    text3x(M, 636, "No new compiler.", C_GREEN, C_BG);
-                    log_event("Compiler lane shown.");
-                    flush_l2();
-                    usleep(5000000); /* hold 5 seconds */
+                    draw_dollar_race();
                     draw_dashboard();
                     update_lcd();
                     flush_l2();
@@ -2016,6 +2396,12 @@ int main(void) {
                     break;
                 case 'T':
                     draw_tco_calculator();
+                    draw_dashboard();
+                    update_lcd();
+                    flush_l2();
+                    break;
+                case 'L':
+                    draw_latency_scope();
                     draw_dashboard();
                     update_lcd();
                     flush_l2();
@@ -2089,7 +2475,8 @@ int main(void) {
                     text2x(M, hy+=40, "[c]", C_TEXT, C_BG); text(M+120, hy+8, "Inject corruption + auto-detect tamper", C_DIM, C_BG);
                     text2x(M, hy+=40, "[v]", C_TEXT, C_BG); text(M+120, hy+8, "Verify integrity of all buffers", C_DIM, C_BG);
                     text2x(M, hy+=40, "[w]", C_TEXT, C_BG); text(M+120, hy+8, "Cycle workload profiles (Agent/Cache/Full/Idle)", C_DIM, C_BG);
-                    text2x(M, hy+=40, "[d]", C_TEXT, C_BG); text(M+120, hy+8, "Compiler lane — GCC + atomik.h = hardware", C_DIM, C_BG);
+                    text2x(M, hy+=40, "[D]", C_TEXT, C_BG); text(M+120, hy+8, "Cost race — dollar counters racing in real-time", C_DIM, C_BG);
+                    text2x(M, hy+=40, "[L]", C_TEXT, C_BG); text(M+120, hy+8, "Latency scope — oscilloscope timing traces", C_DIM, C_BG);
                     text2x(M, hy+=40, "[f]", C_TEXT, C_BG); text(M+120, hy+8, "Adoption forecast — year-by-year TAM", C_DIM, C_BG);
                     text2x(M, hy+=40, "[s]", C_TEXT, C_BG); text(M+120, hy+8, "Session summary — aggregate proof", C_DIM, C_BG);
                     text2x(M, hy+=40, "[T]", C_TEXT, C_BG); text(M+120, hy+8, "TCO calculator — savings at server scale", C_DIM, C_BG);
