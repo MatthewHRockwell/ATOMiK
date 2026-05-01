@@ -37,7 +37,7 @@ PS7_INIT    = f"{ZYNQ_DIR}/scripts/ps7_init_rk7020f.tcl"
 # test builds cannot silently become the default.
 BITSTREAM   = os.environ.get(
     "BITSTREAM",
-    f"{ZYNQ_DIR}/litex-build-nax64-patched/gateware/hamgeek_rk7020f.bit",
+    f"{ZYNQ_DIR}/litex-build-nax64/gateware/hamgeek_rk7020f.bit",
 )
 XSDB        = "/opt/Xilinx/2025.2/Vivado/bin/xsdb"
 

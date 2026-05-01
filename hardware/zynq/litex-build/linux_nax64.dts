@@ -151,7 +151,7 @@
 			reg = <0x80002000 0x1000>;
 			interrupts = <0x03>;
 			dr_mode = "host";
-			status = "okay";
+			status = "disabled";  /* Causes kernel panic — PS USB IRQ not routed to NaxRiscv PLIC */
 		};
 	};
 

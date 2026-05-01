@@ -48,6 +48,8 @@ state = {
     "last_event": "",
 }
 clients = set()
+# Command response queue: UART reader collects ##RSP: lines here
+cmd_response = {"lines": [], "complete": False, "lock": threading.Lock()}
 
 
 async def ws_handler(websocket):
@@ -57,15 +59,54 @@ async def ws_handler(websocket):
     try:
         # Send current state immediately
         await websocket.send(json.dumps({"type": "state", **state}))
-        # Listen for keyboard commands from browser
+        # Listen for keyboard commands and remote exec from browser/Claude
         async for message in websocket:
             data = json.loads(message)
             if data.get("type") == "key" and ser:
                 key = data.get("key", "")
-                if key in "12345678arqbcdfv":
+                if len(key) == 1 and (32 <= ord(key) < 127 or ord(key) == 127 or ord(key) == 8):
                     ser.write(key.encode())
                     ser.flush()
-                    print(f"[ws→uart] key: {key}")
+                    print(f"[ws→uart] key: {repr(key)}")
+            elif data.get("type") == "exec" and ser:
+                # Remote command execution: send ~command to board
+                cmd = data.get("cmd", "")
+                if cmd:
+                    with cmd_response["lock"]:
+                        cmd_response["lines"] = []
+                        cmd_response["complete"] = False
+                    ser.write(f"~{cmd}\n".encode())
+                    ser.flush()
+                    print(f"[ws→uart] exec: {cmd}")
+                    # Wait for response (up to 30s)
+                    deadline = time.time() + 30
+                    while time.time() < deadline:
+                        await asyncio.sleep(0.1)
+                        with cmd_response["lock"]:
+                            if cmd_response["complete"]:
+                                result = "\n".join(cmd_response["lines"])
+                                await websocket.send(json.dumps({
+                                    "type": "exec_result",
+                                    "cmd": cmd,
+                                    "output": result,
+                                }))
+                                break
+                    else:
+                        await websocket.send(json.dumps({
+                            "type": "exec_result",
+                            "cmd": cmd,
+                            "output": "(timeout)",
+                        }))
+            elif data.get("type") == "chat":
+                # Chat message from Claude → broadcast to all browsers
+                msg = json.dumps({
+                    "type": "chat",
+                    "sender": data.get("sender", "Board Claude"),
+                    "text": data.get("text", ""),
+                    "ts": time.strftime("%H:%M:%S"),
+                })
+                await asyncio.gather(*(c.send(msg) for c in clients))
+                print(f"[chat] {data.get('sender','?')}: {data.get('text','')[:60]}")
     except websockets.exceptions.ConnectionClosed:
         pass
     finally:
@@ -97,7 +138,22 @@ def uart_reader(port, baud, loop):
             while b"\n" in buf:
                 line, buf = buf.split(b"\n", 1)
                 text = line.decode(errors="replace").strip()
-                if text.startswith("##EVENT:"):
+                if text.startswith("##RSP:"):
+                    tag = text[6:]
+                    if tag == "END":
+                        with cmd_response["lock"]:
+                            cmd_response["complete"] = True
+                    elif tag.startswith("CMD:") or tag.startswith("EXIT:"):
+                        pass  # metadata, skip
+                    elif tag.startswith("ERROR:"):
+                        with cmd_response["lock"]:
+                            cmd_response["lines"].append(tag)
+                            cmd_response["complete"] = True
+                    else:
+                        with cmd_response["lock"]:
+                            cmd_response["lines"].append(tag)
+                    print(f"[rsp] {tag}")
+                elif text.startswith("##EVENT:"):
                     parts = text.split(":")
                     if len(parts) >= 4:
                         state["cycle"] = int(parts[1])
@@ -119,6 +175,40 @@ def uart_reader(port, baud, loop):
                         print(f"[event] cycle={state['cycle']} "
                               f"changed={state['changed']} "
                               f"avoided={state['pct_avoided']:.0f}%")
+
+                        # ── Claude auto-narration ──────────────────────
+                        narration = None
+                        ch = state["changed"]
+                        pct = state["pct_avoided"]
+                        cyc = state["cycle"]
+                        if cyc == 1:
+                            narration = "First detection cycle complete. ATOMiK hardware is live."
+                        elif ch == 0:
+                            if cyc % 10 == 0:
+                                narration = f"Cycle {cyc}: all buffers stable. ATOMiK cost: zero."
+                        elif ch == 1:
+                            names = ['agent.ctx','model.wt','session.st','config.db',
+                                     'cache.hot','replica.0','txn.log','sensor.buf']
+                            bufs = state.get("buffers", [])
+                            changed_name = "unknown"
+                            for bi, bv in enumerate(bufs):
+                                if bv and bi < len(names):
+                                    changed_name = names[bi]
+                                    break
+                            narration = f"Single change in {changed_name}. {7} buffers skipped — {pct:.0f}% compute saved."
+                        elif ch <= 3:
+                            narration = f"{ch} buffers changed. ATOMiK skipped {8-ch}, saving {pct:.0f}% bandwidth."
+                        elif ch >= 7:
+                            if cyc % 5 == 0:
+                                narration = f"Heavy workload: {ch}/8 changed. Even at full load, ATOMiK detection is {state.get('speedup',0):.0f}x faster."
+                        if narration and cyc > 1:
+                            chat_msg = json.dumps({
+                                "type": "chat",
+                                "sender": "Board Claude",
+                                "text": narration,
+                                "ts": time.strftime("%H:%M:%S"),
+                            })
+                            asyncio.run_coroutine_threadsafe(broadcast(chat_msg), loop)
         except Exception as e:
             print(f"[uart] Error: {e}")
             time.sleep(1)
@@ -128,12 +218,13 @@ HTML_PAGE = r"""<!DOCTYPE html>
 <html>
 <head>
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ATOMiK Control Plane</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { background: #08111A; color: #F3F7FB; font-family: 'SF Mono','Fira Code','Courier New',monospace; font-size: 13px; }
 
-.layout { display: grid; grid-template-columns: 280px 1fr 300px; grid-template-rows: 56px 1fr 32px; height: 100vh; gap: 1px; background: #141E2B; }
+.layout { display: grid; grid-template-columns: 240px 1fr 280px 280px; grid-template-rows: 56px 1fr 32px; height: 100vh; gap: 1px; background: #141E2B; }
 
 /* Top bar */
 .topbar { grid-column: 1/-1; background: #0B1520; display: flex; align-items: center; padding: 0 24px; gap: 16px; }
@@ -192,11 +283,27 @@ body { background: #08111A; color: #F3F7FB; font-family: 'SF Mono','Fira Code','
 .log-entry .ts { color: #2A3644; margin-right: 8px; }
 
 /* Right panel: economics */
-.right-panel { background: #0B1520; padding: 16px; }
-.econ-card { background: #0F1B28; border-radius: 6px; padding: 16px; margin-bottom: 8px; }
-.econ-card .val { font-size: 28px; font-weight: bold; margin: 4px 0; }
+.right-panel { background: #0B1520; padding: 16px; overflow-y: auto; }
+.econ-card { background: #0F1B28; border-radius: 6px; padding: 12px; margin-bottom: 6px; }
+.econ-card .val { font-size: 24px; font-weight: bold; margin: 2px 0; }
 .econ-card .lbl { font-size: 11px; color: #9AA8B5; text-transform: uppercase; letter-spacing: 1px; }
-.econ-card .sub { font-size: 11px; color: #2A3644; margin-top: 4px; }
+.econ-card .sub { font-size: 11px; color: #2A3644; margin-top: 2px; }
+
+/* Chat panel: Board Claude */
+.chat-panel { background: #0B1520; padding: 12px; display: flex; flex-direction: column; }
+.chat-header { color: #1EC8FF; font-size: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+.chat-header .dot { width: 8px; height: 8px; border-radius: 50%; background: #39D98A; box-shadow: 0 0 6px #39D98A80; animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+.chat-messages { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; }
+.chat-msg { background: #0F1B28; border-radius: 6px; padding: 8px 10px; font-size: 12px; line-height: 1.4; border-left: 2px solid #1EC8FF; }
+.chat-msg .sender { color: #1EC8FF; font-size: 10px; font-weight: bold; text-transform: uppercase; margin-bottom: 2px; }
+.chat-msg .text { color: #D0D8E0; }
+.chat-msg .time { color: #2A3644; font-size: 10px; float: right; }
+.chat-msg.system { border-left-color: #39D98A; }
+.chat-msg.system .sender { color: #39D98A; }
+.chat-input { margin-top: 8px; display: flex; gap: 4px; }
+.chat-input input { flex: 1; background: #141E2B; border: 1px solid #2A3644; border-radius: 4px; padding: 6px 8px; color: #F3F7FB; font-family: inherit; font-size: 12px; outline: none; }
+.chat-input input:focus { border-color: #1EC8FF; }
 
 .info-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #141E2B; }
 .info-row .k { color: #9AA8B5; font-size: 11px; }
@@ -205,6 +312,30 @@ body { background: #08111A; color: #F3F7FB; font-family: 'SF Mono','Fira Code','
 /* Bottom bar */
 .bottombar { grid-column: 1/-1; background: #0B1520; display: flex; align-items: center; padding: 0 24px; gap: 16px; font-size: 11px; color: #2A3644; }
 .bottombar kbd { background: #141E2B; padding: 1px 6px; border-radius: 2px; color: #9AA8B5; }
+
+/* Mobile responsive */
+@media (max-width: 800px) {
+    .layout { grid-template-columns: 1fr; grid-template-rows: auto; }
+    .left { display: none; }
+    .right-panel { display: none; }
+    .center { width: 100%; }
+    .chat-panel { width: 100%; }
+    .topbar { flex-wrap: wrap; }
+}
+
+/* Touch panel */
+.touch-panel { margin-top: 16px; }
+.touch-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 12px; }
+.touch-cell { background: #0F1B28; border: 2px solid #2A3644; border-radius: 8px; padding: 16px 8px; text-align: center; cursor: pointer; transition: all 0.2s; user-select: none; -webkit-user-select: none; }
+.touch-cell:active { transform: scale(0.95); background: #1EC8FF; border-color: #1EC8FF; }
+.touch-cell .tname { color: #F3F7FB; font-size: 13px; font-weight: bold; }
+.touch-cell .tstatus { color: #2A3644; font-size: 11px; margin-top: 4px; }
+.touch-cell.changed { border-color: #1EC8FF; background: #0D2A3D; }
+.touch-cell.changed .tstatus { color: #1EC8FF; }
+.touch-actions { display: flex; gap: 8px; }
+.touch-btn { flex: 1; padding: 14px; border: none; border-radius: 6px; font-family: inherit; font-size: 14px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
+.touch-btn.burst { background: #FF8A3D; color: #08111A; }
+.touch-btn.reset { background: #FF4444; color: #FFF; }
 
 </style>
 </head>
@@ -262,6 +393,15 @@ body { background: #08111A; color: #F3F7FB; font-family: 'SF Mono','Fira Code','
 
     <div class="flow-title">Event Log</div>
     <div class="log" id="log"></div>
+
+    <div class="touch-panel">
+        <div class="panel-title">Touch Control</div>
+        <div class="touch-grid" id="touch-grid"></div>
+        <div class="touch-actions">
+            <button class="touch-btn burst" onclick="sendKey('B')">BURST</button>
+            <button class="touch-btn reset" onclick="sendKey('R')">RESET</button>
+        </div>
+    </div>
 </div>
 
 <!-- Right: Economics -->
@@ -304,12 +444,18 @@ body { background: #08111A; color: #F3F7FB; font-family: 'SF Mono','Fira Code','
     <div class="info-row"><span class="k">Build</span><span class="v" id="build">e974995</span></div>
 </div>
 
+<!-- Chat: Board Claude -->
+<div class="chat-panel">
+    <div class="chat-header"><div class="dot"></div>Board Claude</div>
+    <div class="chat-messages" id="chat"></div>
+</div>
+
 <!-- Bottom bar -->
-<div class="bottombar">
-    <span>Press <kbd>1</kbd>-<kbd>8</kbd> to modify buffers</span>
-    <span><kbd>a</kbd> all</span>
-    <span><kbd>r</kbd> reset</span>
-    <span style="margin-left:auto">Only changed state crosses the wire</span>
+<div class="bottombar" style="grid-column: 1/-1;">
+    <span>Type letters for delta viz</span>
+    <span><kbd>Shift+W</kbd> vproc profile</span>
+    <span><kbd>Shift+R</kbd> reset</span>
+    <span style="margin-left:auto">ATOMiK: Only meaningful changes cross the wire</span>
 </div>
 
 </div>
@@ -346,6 +492,26 @@ function addLog(msg) {
 }
 
 addLog('Control plane initialized');
+
+// Touch grid
+const touchGrid = document.getElementById('touch-grid');
+if (touchGrid) {
+    for (let i = 0; i < 8; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'touch-cell';
+        cell.id = 'tcell' + i;
+        cell.innerHTML = '<div class="tname">' + names[i] + '</div><div class="tstatus">clean</div>';
+        cell.addEventListener('click', () => sendKey(String(i + 1)));
+        cell.addEventListener('touchstart', (e) => { e.preventDefault(); sendKey(String(i + 1)); }, {passive: false});
+        touchGrid.appendChild(cell);
+    }
+}
+function sendKey(k) {
+    if (ws && ws.readyState === 1) {
+        ws.send(JSON.stringify({type: 'key', key: k}));
+        addLog('Touched: ' + k);
+    }
+}
 
 let ws;
 function connect() {
@@ -410,19 +576,56 @@ function connect() {
                 }
             }
 
+            // Update touch cells
+            for (let i = 0; i < 8; i++) {
+                const tc = document.getElementById('tcell' + i);
+                if (tc) {
+                    if (d.buffers && d.buffers[i]) {
+                        tc.className = 'touch-cell changed';
+                        tc.querySelector('.tstatus').textContent = 'SYNCED';
+                    } else {
+                        tc.className = 'touch-cell';
+                        tc.querySelector('.tstatus').textContent = 'clean';
+                    }
+                }
+            }
+
             if (d.type === 'event' && d.changed > 0) {
                 addLog(`Delta applied: ${changedNames.join(', ')} (${pct}% avoided)`);
             }
         }
+        /* Chat messages from Board Claude */
+        if (d.type === 'chat') {
+            addChat(d.sender || 'Board Claude', d.text || '', d.ts || '');
+        }
     };
 }
 
+/* Chat system */
+const chatEl = document.getElementById('chat');
+function addChat(sender, text, ts) {
+    const cls = sender.includes('System') ? 'system' : '';
+    const div = document.createElement('div');
+    div.className = 'chat-msg ' + cls;
+    div.innerHTML = `<span class="time">${ts}</span><div class="sender">${sender}</div><div class="text">${text}</div>`;
+    chatEl.appendChild(div);
+    chatEl.scrollTop = chatEl.scrollHeight;
+    /* Keep max 50 messages */
+    while (chatEl.children.length > 50) chatEl.removeChild(chatEl.firstChild);
+}
+
 document.addEventListener('keydown', (e) => {
-    if ('12345678arqbcdfv'.includes(e.key) && ws && ws.readyState === 1) {
+    if (!ws || ws.readyState !== 1) return;
+    if (e.key === 'Backspace') {
+        e.preventDefault();
+        ws.send(JSON.stringify({type: 'key', key: '<'}));
+        addLog('Backspace: delta rolled back');
+    } else if (e.key.length === 1) {
         ws.send(JSON.stringify({type: 'key', key: e.key}));
         if (e.key >= '1' && e.key <= '8') addLog(`Injected change: ${names[parseInt(e.key)-1]}`);
         else if (e.key === 'a') addLog('Injected change: ALL buffers');
         else if (e.key === 'r') addLog('System reset');
+        else addLog(`Typed: '${e.key}'`);
     }
 });
 
