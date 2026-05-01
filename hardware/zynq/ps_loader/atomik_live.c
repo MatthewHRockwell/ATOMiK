@@ -13,7 +13,7 @@
  *
  * Controls:
  *   1-8    Modify state buffer 1-8
- *   a      Modify all buffers
+ *   a      Adversarial audit (expose state, try to break it)
  *   r      Reset all buffers
  *   p      Run scripted presentation (47s)
  *   q      Quit
@@ -1616,16 +1616,18 @@ static void draw_dollar_race(void) {
         100.0f * (sw_scanned - hw_touched) / sw_scanned : 85.0f;
     if (pct < 1.0f) pct = 85.0f; /* fallback if no ops yet */
 
-    /* SW cost rate: $50/srv/yr * 1000 servers / seconds_per_year */
-    /* = 50000 / (365.25 * 86400) = ~0.001585 $/sec */
-    float sw_rate = 50.0f * 1000.0f / (365.25f * 86400.0f);
+    /* SW cost rate: $50/srv/yr * 1000 servers / seconds_per_year
+     * Accelerated 100,000x so 10s demo = ~11.5 days of server time.
+     * Makes the dollar amounts visceral. */
+    float accel = 100000.0f;
+    float sw_rate = 50.0f * 1000.0f / (365.25f * 86400.0f) * accel;
     float atk_rate = sw_rate * (1.0f - pct / 100.0f);
 
     /* Clear + title */
     rect(0, 0, FB_HRES, FB_VRES, C_BG);
     panel(0, TOP_Y, FB_HRES, 80, C_PANEL, C_GOLD);
     text3x(M, TOP_Y + 12, "COST RACE", C_GOLD, C_PANEL);
-    text2x(M + 300, TOP_Y + 20, "1,000 servers  |  $50/srv/year energy", C_DIM, C_PANEL);
+    text2x(M + 300, TOP_Y + 20, "1,000 servers  |  $50/srv/yr  |  100,000x time", C_DIM, C_PANEL);
 
     /* Column headers */
     int col_sw = M;
@@ -1678,14 +1680,14 @@ static void draw_dollar_race(void) {
         rect(col_sw + 8, ctr_y + 20, 380, 80, C_DKORANGE);
         snprintf(buf, sizeof(buf), "$%.4f", sw_total);
         text3x(col_sw + 16, ctr_y + 30, buf, C_ORANGE, C_DKORANGE);
-        snprintf(buf, sizeof(buf), "%.4f $/sec", sw_rate);
+        snprintf(buf, sizeof(buf), "$%.0f/hr (accelerated)", sw_rate * 3600.0f / accel);
         text(col_sw + 16, ctr_y + 82, buf, C_DIM, C_DKORANGE);
 
         /* Update ATOMiK counter */
         rect(col_atk + 8, ctr_y + 20, 380, 80, C_BLUE_DK);
         snprintf(buf, sizeof(buf), "$%.4f", atk_total);
         text3x(col_atk + 16, ctr_y + 30, buf, C_BLUE, C_BLUE_DK);
-        snprintf(buf, sizeof(buf), "%.4f $/sec", atk_rate);
+        snprintf(buf, sizeof(buf), "$%.0f/hr (accelerated)", atk_rate * 3600.0f / accel);
         text(col_atk + 16, ctr_y + 82, buf, C_DIM, C_BLUE_DK);
 
         /* Update DIFFERENCE counter */
@@ -1997,6 +1999,259 @@ static void draw_latency_scope(void) {
 }
 
 /* Full dashboard (chrome + content) — used on init and reset */
+/* ═══════════════════════════════════════════════════════════════════════
+ *  ADVERSARIAL AUDIT — expose all internal state, invite investor to break it
+ * ═══════════════════════════════════════════════════════════════════════ */
+
+static void draw_adversarial_audit(void) {
+    char buf[120];
+
+    /* ── Layout constants ───────────────────────────────────────────── */
+    #define AA_TOP      30
+    #define AA_HDR_H    80
+    #define AA_TBL_Y    (AA_TOP + AA_HDR_H + 20)
+    #define AA_ROW_H    36
+    #define AA_REG_Y    (AA_TBL_Y + N_BUF * AA_ROW_H + 24)
+    #define AA_HELP_Y   (AA_REG_Y + 80)
+
+    /* ── Full clear + header ────────────────────────────────────────── */
+    rect(0, 0, FB_HRES, FB_VRES, C_BG);
+    panel(0, AA_TOP, FB_HRES, AA_HDR_H, C_PANEL, C_RED);
+    text3x(M, AA_TOP + 8, "ADVERSARIAL AUDIT", C_RED, C_PANEL);
+    text(M, AA_TOP + 56, "All internal state exposed. Try to break it.", C_DIM, C_PANEL);
+
+    /* LIVE badge */
+    rect(FB_HRES - M - 200, AA_TOP + 16, 180, 44, C_RED);
+    text2x(FB_HRES - M - 190, AA_TOP + 24, "AUDIT", C_WHITE, C_RED);
+
+    /* ── Column headers ─────────────────────────────────────────────── */
+    int col_name = M;
+    int col_cur  = M + 140;
+    int col_shad = M + 380;
+    int col_stat = M + 620;
+    int hdr_y = AA_TBL_Y - 20;
+    text(col_name, hdr_y, "BUFFER", C_DIM, C_BG);
+    text(col_cur,  hdr_y, "CURRENT FINGERPRINT", C_DIM, C_BG);
+    text(col_shad, hdr_y, "SHADOW FINGERPRINT", C_DIM, C_BG);
+    text(col_stat, hdr_y, "STATUS", C_DIM, C_BG);
+    rect(M, hdr_y + 16, FB_HRES - 2*M, 1, C_GRAY);
+
+    /* ── Draw the 8 buffer rows (initial state — all should match) ── */
+    int tampered[N_BUF];
+    memset(tampered, 0, sizeof(tampered));
+    uint64_t detect_times[N_BUF];
+    memset(detect_times, 0, sizeof(detect_times));
+
+    /* Helper macro: draw one row */
+    #define AA_DRAW_ROW(i) do { \
+        int ry = AA_TBL_Y + (i) * AA_ROW_H; \
+        uint64_t cfp = fp(buffers[(i)], BUF_SIZE); \
+        uint64_t sfp = fp(shadows[(i)], BUF_SIZE); \
+        int match = (cfp == sfp); \
+        /* Clear row */ \
+        rect(M, ry, FB_HRES - 2*M, AA_ROW_H - 2, C_BG); \
+        /* Tampered flash: red background */ \
+        if (tampered[(i)]) \
+            rect(M, ry, FB_HRES - 2*M, AA_ROW_H - 2, RGB(0x40,0x08,0x08)); \
+        /* Name */ \
+        snprintf(buf, sizeof(buf), "%d. %s", (i)+1, buf_names[(i)]); \
+        text(col_name, ry + 10, buf, C_TEXT, tampered[(i)] ? RGB(0x40,0x08,0x08) : C_BG); \
+        /* Current FP */ \
+        snprintf(buf, sizeof(buf), "%016llX", (unsigned long long)cfp); \
+        text(col_cur, ry + 10, buf, C_BLUE, tampered[(i)] ? RGB(0x40,0x08,0x08) : C_BG); \
+        /* Shadow FP */ \
+        snprintf(buf, sizeof(buf), "%016llX", (unsigned long long)sfp); \
+        text(col_shad, ry + 10, buf, C_ORANGE, tampered[(i)] ? RGB(0x40,0x08,0x08) : C_BG); \
+        /* Status */ \
+        if (match) { \
+            text(col_stat, ry + 10, "MATCH", C_GREEN, tampered[(i)] ? RGB(0x40,0x08,0x08) : C_BG); \
+        } else { \
+            text(col_stat, ry + 10, "MISMATCH", C_RED, tampered[(i)] ? RGB(0x40,0x08,0x08) : C_BG); \
+            if (tampered[(i)] && detect_times[(i)] > 0) { \
+                uint64_t ns = detect_times[(i)] * 10; \
+                snprintf(buf, sizeof(buf), "TAMPERED -- DETECTED IN %lu CYCLES (%luns)", \
+                         (unsigned long)detect_times[(i)], (unsigned long)ns); \
+                text(col_stat + 80, ry + 10, buf, C_RED, RGB(0x40,0x08,0x08)); \
+            } \
+        } \
+    } while(0)
+
+    for (int i = 0; i < N_BUF; i++) {
+        AA_DRAW_ROW(i);
+    }
+
+    /* ── ATOMiK adapter register state ──────────────────────────────── */
+    rect(M, AA_REG_Y, FB_HRES - 2*M, 60, C_PANEL);
+    rect(M, AA_REG_Y, FB_HRES - 2*M, 2, C_BLUE);
+    text(M + 8, AA_REG_Y + 8, "ATOMiK Adapter Registers:", C_DIM, C_PANEL);
+
+    #define AA_DRAW_REGS() do { \
+        uint32_t r_cmd = adapter[0]; \
+        uint32_t r_rs1 = adapter[1]; \
+        uint32_t r_rs2 = adapter[2]; \
+        uint32_t r_rd  = adapter[3]; \
+        snprintf(buf, sizeof(buf), \
+                 "CMD=%08X  RS1=%08X  RS2=%08X  RD=%08X", \
+                 r_cmd, r_rs1, r_rs2, r_rd); \
+        rect(M + 8, AA_REG_Y + 28, FB_HRES - 2*M - 16, 20, C_PANEL); \
+        text(M + 8, AA_REG_Y + 30, buf, C_BLUE, C_PANEL); \
+    } while(0)
+
+    AA_DRAW_REGS();
+
+    /* ── Help line ──────────────────────────────────────────────────── */
+    text(M, AA_HELP_Y, "Press 1-8 to corrupt a buffer, V to verify all, R to reset, Q to quit",
+         C_GRAY, C_BG);
+    text(M, AA_HELP_Y + 20, "~ prefix for screenshot commands", C_GRAY, C_BG);
+
+    flush_l2();
+
+    /* ── Interactive loop ───────────────────────────────────────────── */
+    int audit_running = 1;
+    while (audit_running) {
+        if (key_ready()) {
+            char ach;
+            if (read(0, &ach, 1) != 1) continue;
+
+            /* ~ command handler for screenshots */
+            if (ach == '~') {
+                char cmdbuf[512] = {0};
+                int ci = 0;
+                int got_eol = 0;
+                for (int attempt = 0; attempt < 200 && !got_eol; attempt++) {
+                    fd_set fs; struct timeval tv = {0, 50000};
+                    FD_ZERO(&fs); FD_SET(0, &fs);
+                    if (select(1, &fs, NULL, NULL, &tv) > 0) {
+                        char tmp[256];
+                        int n = read(0, tmp, sizeof(tmp));
+                        for (int j = 0; j < n && ci < 510; j++) {
+                            if (tmp[j] == '\n' || tmp[j] == '\r') { got_eol = 1; break; }
+                            cmdbuf[ci++] = tmp[j];
+                        }
+                    } else if (ci > 0) break;
+                }
+                cmdbuf[ci] = 0;
+                if (ci > 0) {
+                    printf("##RSP:CMD:%s\n", cmdbuf);
+                    FILE *pp = popen(cmdbuf, "r");
+                    if (pp) {
+                        char line[256];
+                        while (fgets(line, sizeof(line), pp)) {
+                            int len = strlen(line);
+                            if (len > 0 && line[len-1] == '\n') line[len-1] = 0;
+                            printf("##RSP:%s\n", line);
+                        }
+                        int rc = pclose(pp);
+                        printf("##RSP:EXIT:%d\n", WEXITSTATUS(rc));
+                    } else {
+                        printf("##RSP:ERROR:popen failed\n");
+                    }
+                    printf("##RSP:END\n");
+                    fflush(stdout);
+                }
+                continue;
+            }
+
+            if (ach >= '1' && ach <= '8') {
+                /* Corrupt buffer N by flipping one random byte */
+                int idx = ach - '1';
+                int pos = rdtime() % BUF_SIZE;
+                buffers[idx][pos] ^= 0xFF;
+                tampered[idx] = 1;
+
+                /* Immediately run detection on ALL buffers, time each */
+                for (int i = 0; i < N_BUF; i++) {
+                    uint64_t t0 = rdtime();
+                    uint64_t cfp = fp(buffers[i], BUF_SIZE);
+                    uint64_t sfp = fp(shadows[i], BUF_SIZE);
+                    uint64_t t1 = rdtime();
+                    if (cfp != sfp) {
+                        detect_times[i] = t1 - t0;
+                        tampered[i] = 1;
+                    }
+                }
+
+                /* Redraw only changed rows + registers */
+                for (int i = 0; i < N_BUF; i++) {
+                    AA_DRAW_ROW(i);
+                }
+                AA_DRAW_REGS();
+                flush_l2();
+
+            } else if (ach == 'V' || ach == 'v') {
+                /* Verify all 8, show timing */
+                uint64_t total_t0 = rdtime();
+                for (int i = 0; i < N_BUF; i++) {
+                    uint64_t t0 = rdtime();
+                    uint64_t cfp = fp(buffers[i], BUF_SIZE);
+                    uint64_t sfp = fp(shadows[i], BUF_SIZE);
+                    uint64_t t1 = rdtime();
+                    if (cfp != sfp) {
+                        tampered[i] = 1;
+                        detect_times[i] = t1 - t0;
+                    } else {
+                        tampered[i] = 0;
+                        detect_times[i] = t1 - t0;
+                    }
+                }
+                uint64_t total_cycles_v = rdtime() - total_t0;
+                uint64_t total_ns = total_cycles_v * 10;
+
+                /* Redraw all rows */
+                for (int i = 0; i < N_BUF; i++) {
+                    AA_DRAW_ROW(i);
+                }
+                AA_DRAW_REGS();
+
+                /* Show total timing below help */
+                rect(M, AA_HELP_Y + 44, FB_HRES - 2*M, 20, C_BG);
+                snprintf(buf, sizeof(buf), "Verified all 8 buffers in %llu cycles (%lluns at 100MHz)",
+                         (unsigned long long)total_cycles_v, (unsigned long long)total_ns);
+                text(M, AA_HELP_Y + 44, buf, C_GREEN, C_BG);
+                flush_l2();
+
+            } else if (ach == 'R' || ach == 'r') {
+                /* Reset: restore all buffers from shadows, clear tamper state */
+                for (int i = 0; i < N_BUF; i++) {
+                    memcpy(buffers[i], shadows[i], BUF_SIZE);
+                    tampered[i] = 0;
+                    detect_times[i] = 0;
+                }
+                /* Redraw all rows */
+                for (int i = 0; i < N_BUF; i++) {
+                    AA_DRAW_ROW(i);
+                }
+                AA_DRAW_REGS();
+
+                /* Clear timing line */
+                rect(M, AA_HELP_Y + 44, FB_HRES - 2*M, 20, C_BG);
+                text(M, AA_HELP_Y + 44, "All buffers restored. All GREEN.", C_GREEN, C_BG);
+                flush_l2();
+
+            } else if (ach == 'Q' || ach == 'q') {
+                audit_running = 0;
+            }
+        }
+        usleep(50000); /* 20 Hz poll */
+    }
+
+    /* Restore corrupted buffers from shadows before returning */
+    for (int i = 0; i < N_BUF; i++) {
+        if (tampered[i]) {
+            memcpy(buffers[i], shadows[i], BUF_SIZE);
+        }
+    }
+
+    #undef AA_DRAW_ROW
+    #undef AA_DRAW_REGS
+    #undef AA_TOP
+    #undef AA_HDR_H
+    #undef AA_TBL_Y
+    #undef AA_ROW_H
+    #undef AA_REG_Y
+    #undef AA_HELP_Y
+}
+
 static void draw_dashboard(void) {
     draw_chrome();
     draw_content();
@@ -2294,13 +2549,8 @@ int main(void) {
                     break;
                 }
                 case 'A':
-                    last_modified = -1;
-                    for (int i = 0; i < N_BUF; i++) modify_buffer(i);
-                    detect_all();
-                    log_event("Modified ALL buffers.");
-                    refresh_viz(); draw_content();
-                    update_lcd();
-                    flush_l2();
+                    draw_adversarial_audit();
+                    draw_dashboard(); update_lcd(); flush_l2();
                     break;
                 case 'R':
                     /* Flash reset confirmation */
@@ -2469,7 +2719,7 @@ int main(void) {
                     text3x(M, 120, "ATOMiK Controls", C_BLUE, C_BG);
                     int hy = 200;
                     text2x(M, hy, "[1-8]", C_TEXT, C_BG); text(M+120, hy+8, "Modify specific state buffer", C_DIM, C_BG);
-                    text2x(M, hy+=40, "[a]", C_TEXT, C_BG); text(M+120, hy+8, "Modify ALL buffers (worst case)", C_DIM, C_BG);
+                    text2x(M, hy+=40, "[a]", C_TEXT, C_BG); text(M+120, hy+8, "Adversarial audit -- expose state, try to break it", C_DIM, C_BG);
                     text2x(M, hy+=40, "[b]", C_TEXT, C_BG); text(M+120, hy+8, "Benchmark race -- memcmp vs ATOMiK (full-screen)", C_DIM, C_BG);
                     text2x(M, hy+=40, "[g]", C_TEXT, C_BG); text(M+120, hy+8, "Burst mode -- 3 seconds of rapid changes", C_DIM, C_BG);
                     text2x(M, hy+=40, "[c]", C_TEXT, C_BG); text(M+120, hy+8, "Inject corruption + auto-detect tamper", C_DIM, C_BG);
