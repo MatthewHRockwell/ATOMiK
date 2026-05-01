@@ -3,10 +3,10 @@
 import { AnimatedCounter } from "./AnimatedCounter";
 
 const metrics: { value: string; label: string; subtitle?: string; suffix?: string; color: string }[] = [
-  { value: "99.9%", label: "Bandwidth Reduction", subtitle: "via delta compression \u2014 only 8-byte deltas transmitted instead of full state", color: "#22c55e" },
+  { value: "400-1100x", label: "Detection Speedup", subtitle: "hardware-measured state change detection vs software byte scan on Zynq RV64GC", color: "#22c55e" },
+  { value: "2.5", label: "M ops/s Hardware", suffix: " Mops/s", subtitle: "measured on NaxRiscv RV64GC @ 100MHz with 8-slot ATOMiK adapter", color: "#4f8fff" },
+  { value: "74%", label: "Bandwidth Saved", subtitle: "average across AI inference workload \u2014 skip unchanged model layers entirely", color: "#22d3ee" },
   { value: "108", label: "Lean4 Formal Proofs", color: "#8b5cf6" },
-  { value: "69.7", label: "Gops/s Peak (FPGA)", suffix: " Gops/s", color: "#4f8fff" },
-  { value: "5", label: "M ops/s (Python)", suffix: "M+", color: "#22d3ee" },
 ];
 
 export default function HeroMetrics() {

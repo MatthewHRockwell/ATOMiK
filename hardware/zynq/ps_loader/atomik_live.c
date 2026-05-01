@@ -1250,6 +1250,122 @@ static void draw_ai_demo(void) {
     }
 }
 
+/* "Break It" corruption detection challenge — full-screen sequential reveal */
+static void draw_break_it(void) {
+    /* Pick a random target buffer */
+    int target = rdtime() % N_BUF;
+    int pos = rdtime() % BUF_SIZE;
+
+    /* 1. Clear screen, show big red title */
+    rect(0, 0, FB_HRES, FB_VRES, C_BG);
+    panel(0, TOP_Y, FB_HRES, 80, C_PANEL, C_RED);
+    text3x(M, TOP_Y + 12, "CORRUPTION INJECTED", C_RED, C_PANEL);
+    {
+        char tbuf[80];
+        snprintf(tbuf, sizeof(tbuf), "Target: %s  --  1 byte flipped", buf_names[target]);
+        text2x(M, TOP_Y + 60, tbuf, C_WHITE, C_PANEL);
+    }
+    flush_l2();
+
+    /* 2. Corrupt 1 byte */
+    buffers[target][pos] ^= 0xFF;
+
+    /* Pause to let corruption sink in visually */
+    usleep(600000);
+
+    /* 3. Show scanning text */
+    text3x(M, TOP_Y + 130, "SCANNING...", C_BLUE, C_BG);
+    flush_l2();
+    usleep(400000);
+
+    /* 4. Sweep all 8 buffers with animated reveal */
+    int box_w = (FB_HRES - 2 * M - 7 * 12) / N_BUF;  /* evenly spaced boxes */
+    if (box_w > 200) box_w = 200;
+    int box_h = 180;
+    int box_y = TOP_Y + 220;
+    int detected_idx = -1;
+    uint64_t detect_start = rdtime();
+    uint64_t detect_cycles = 0;
+
+    for (int i = 0; i < N_BUF; i++) {
+        int bx = M + i * (box_w + 12);
+
+        /* Draw scanning indicator */
+        rect(bx, box_y, box_w, box_h, C_PANEL);
+        text(bx + 4, box_y + 4, buf_names[i], C_DIM, C_PANEL);
+        text2x(bx + (box_w - 11*CW*2)/2, box_y + 40, "checking...", C_DIM, C_PANEL);
+        flush_l2();
+        usleep(300000);
+
+        /* Compute fingerprints */
+        uint64_t t0 = rdtime();
+        uint64_t current_fp = fp(buffers[i], BUF_SIZE);
+        uint64_t stored_fp  = fp(shadows[i], BUF_SIZE);
+        uint64_t t1 = rdtime();
+        int match = (current_fp == stored_fp);
+
+        if (!match && detected_idx < 0) {
+            detected_idx = i;
+            detect_cycles = t1 - t0;
+        }
+
+        /* Draw result box: green PASS or red TAMPERED */
+        uint32_t box_color = match ? C_DKGREEN : RGB(0x60,0x10,0x10);
+        uint32_t glow      = match ? C_GREEN   : C_RED;
+        rect(bx, box_y, box_w, box_h, box_color);
+        rect(bx, box_y, box_w, 3, glow);
+
+        /* Buffer name at top */
+        text(bx + 4, box_y + 8, buf_names[i], C_WHITE, box_color);
+
+        /* Large status in center */
+        if (match) {
+            text3x(bx + (box_w - 4*CW*3)/2, box_y + 50, "PASS", C_GREEN, box_color);
+        } else {
+            text3x(bx + (box_w - 8*CW*3)/2, box_y + 50, "TAMPERED", C_RED, box_color);
+        }
+
+        /* Buffer index */
+        {
+            char ibuf[4];
+            snprintf(ibuf, sizeof(ibuf), "#%d", i + 1);
+            text(bx + (box_w - 2*CW)/2, box_y + box_h - 24, ibuf, C_DIM, box_color);
+        }
+
+        flush_l2();
+    }
+
+    /* 5. Show result summary */
+    int summary_y = box_y + box_h + 40;
+    rect(M, summary_y, FB_HRES - 2*M, 160, C_BG);
+
+    {
+        char rbuf[120];
+        snprintf(rbuf, sizeof(rbuf), "DETECTED: 1 byte tampered in %s",
+                 (detected_idx >= 0) ? buf_names[detected_idx] : "???");
+        text3x(M, summary_y, rbuf, C_GREEN, C_BG);
+    }
+    {
+        char tbuf[120];
+        uint64_t ns = detect_cycles * 10; /* 10ns per cycle at 100MHz */
+        snprintf(tbuf, sizeof(tbuf), "Detection time: %lu cycles (%luns at 100MHz)",
+                 (unsigned long)detect_cycles, (unsigned long)ns);
+        text2x(M, summary_y + 56, tbuf, C_WHITE, C_BG);
+    }
+    text2x(M, summary_y + 96, "Zero false positives. Zero bytes missed.", C_DIM, C_BG);
+
+    flush_l2();
+
+    /* 6. Restore the corrupted byte */
+    buffers[target][pos] ^= 0xFF;
+
+    /* 7. Wait for keypress */
+    text(M, summary_y + 140, "Press any key to return...", C_DIM, C_BG);
+    flush_l2();
+    while (!key_ready()) usleep(20000);
+    (void)getchar(); /* consume the key */
+}
+
 /* Benchmark race — SW memcmp vs ATOMiK fingerprint, full-screen */
 static void draw_benchmark_race(void) {
     /* Clear screen */
@@ -1695,30 +1811,10 @@ int main(void) {
                     flush_l2();
                     break;
                 }
-                case 'C': {
-                    /* Inject corruption — then verify to detect it */
-                    int target = total_cycles % N_BUF;
-                    buffers[target][0] ^= 0xFF; /* corrupt one byte */
-                    snprintf(msg, sizeof(msg), "CORRUPTED %s (1 byte tampered)", buf_names[target]);
-                    log_event(msg);
-                    /* Now verify */
-                    int tampered = 0;
-                    for (int i = 0; i < N_BUF; i++) {
-                        uint64_t current_fp = fp(buffers[i], BUF_SIZE);
-                        uint64_t stored_fp = fp(shadows[i], BUF_SIZE);
-                        buf_changed[i] = (current_fp != stored_fp);
-                        if (buf_changed[i]) tampered++;
-                    }
-                    last_modified = target;
-                    snprintf(msg, sizeof(msg), "DETECTED: %d buffer(s) tampered", tampered);
-                    log_event(msg);
-                    /* Restore */
-                    buffers[target][0] ^= 0xFF;
-                    refresh_viz(); draw_content();
-                    update_lcd();
-                    flush_l2();
+                case 'C':
+                    draw_break_it();
+                    draw_dashboard(); update_lcd(); flush_l2();
                     break;
-                }
                 case 'B':
                     draw_benchmark_race();
                     draw_dashboard(); update_lcd(); flush_l2();

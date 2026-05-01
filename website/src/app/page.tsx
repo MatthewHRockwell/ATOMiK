@@ -28,10 +28,10 @@ export const metadata: Metadata = {
 };
 
 const metrics = [
-  { value: "O(1)", label: "Change Detection", subtitle: "constant ~262 cycles regardless of buffer size \u2014 hardware-validated on Linux userspace" },
+  { value: "400-1100x", label: "Detection Speedup", subtitle: "hardware-measured state change detection vs software byte scan on NaxRiscv RV64GC" },
   { value: "108", label: "Lean4 Formal Proofs" },
-  { value: "69.7 Gops/s", label: "Peak FPGA Throughput" },
-  { value: "1.2M", label: "Regions/sec Monitored", subtitle: "multi-buffer change detection at 64 contexts on Zynq RISC-V Linux" },
+  { value: "2.5 Mops/s", label: "Hardware Throughput", subtitle: "8-slot ATOMiK adapter on Zynq-7020 @ 100 MHz, 40 cycles per operation" },
+  { value: "74%", label: "Bandwidth Saved", subtitle: "average across AI training/inference workload on real hardware" },
 ];
 
 const ops = [
@@ -43,7 +43,7 @@ const ops = [
 
 const features: { tag: string; title: string; desc: string; color: string; bg: string }[] = [
   { tag: "LATENCY", title: "Deterministic Latency", desc: "Every operation is constant-time. No data-dependent branching, no variable-length scans. Timing side channels eliminated by design.", color: "#4f8fff", bg: "rgba(79,143,255,0.12)" },
-  { tag: "HARDWARE", title: "Hardware Acceleration", desc: "Same API from Python to FPGA. 5M ops/s in Python, 500M in C, 69.7B on Xilinx Zynq with 512 parallel banks. No code changes.", color: "#a855f7", bg: "rgba(168,85,247,0.12)" },
+  { tag: "HARDWARE", title: "Hardware Acceleration", desc: "Same API from Python to FPGA. 2.5M ops/s on a 64-bit RISC-V running Ubuntu 24.04. 400-1100x detection speedup. 8 virtual processor slots, dynamically reconfigurable at runtime.", color: "#a855f7", bg: "rgba(168,85,247,0.12)" },
   { tag: "SCALING", title: "Parallel Scaling", desc: "Sub-linear LUT growth: 3.7x area for 16x throughput. XOR commutativity means lock-free parallel accumulation across banks.", color: "#22d3ee", bg: "rgba(34,211,238,0.12)" },
   { tag: "BANDWIDTH", title: "Delta-Driven Updates", desc: "Send 8-byte deltas instead of full state copies. 64KB state with 10K updates: ATOMiK sends 80KB. Full replication sends 655MB.", color: "#22c55e", bg: "rgba(34,197,94,0.12)" },
   { tag: "SECURITY", title: "Timing-Safe", desc: "No speculative execution, no cache coherency attacks, no data-dependent timing. Security is architectural, not bolted on.", color: "#f59e0b", bg: "rgba(245,158,11,0.12)" },
@@ -101,7 +101,7 @@ const pricingTiers = [
 
 const investorStats: [string, string][] = [
   ["108", "Lean4 Proofs"], ["500+", "Tests (SW + HW)"], ["3", "FPGA Platforms"],
-  ["69.7B", "Ops/s Peak"], ["$50B", "Serviceable Market"],
+  ["2.5M", "Ops/s (Hardware)"], ["$1.7B", "TAM (50M Servers)"],
 ];
 
 export default function Home() {
@@ -410,6 +410,130 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ===== Live Hardware Demo ===== */}
+      <section className="px-6 py-20" style={{ borderTop: "1px solid #1e1e2e" }}>
+        <div className="max-w-5xl mx-auto">
+          <h2 className="text-3xl font-bold text-center tracking-tight mb-3">Live Hardware Demo</h2>
+          <p className="text-center text-lg mb-12" style={{ color: "#8888a0" }}>
+            Running on a 64-bit RISC-V CPU with Ubuntu 24.04 &mdash; on real FPGA hardware.
+          </p>
+          <div className="grid md:grid-cols-3 gap-5">
+            {[
+              {
+                title: "1080p HDMI Dashboard",
+                desc: "1920x1080 framebuffer-rendered dashboard showing 8 ATOMiK virtual processor lanes, real-time metrics, delta-state algebra visualization, and cost savings ticker. Interactive keyboard control with live hardware operations.",
+                tag: "DISPLAY",
+                color: "#4f8fff",
+              },
+              {
+                title: "AI Training/Inference Demo",
+                desc: "Auto-running workload with 8 model layers. ATOMiK detects unchanged layers and skips redundant syncs, saving 50-75% bandwidth per epoch. Every operation runs on real hardware via MMIO.",
+                tag: "WORKLOAD",
+                color: "#a855f7",
+              },
+              {
+                title: "Dynamic Virtual Processors",
+                desc: "6 processor types (DETECT, VERIFY, SYNC, ACCUM, WATCH, IDLE) dynamically assigned to 8 hardware slots. 5 workload presets cycle at runtime with 36-597us reconfiguration latency.",
+                tag: "RUNTIME",
+                color: "#22d3ee",
+              },
+            ].map((item) => (
+              <div
+                key={item.title}
+                className="rounded-xl p-7 transition-all hover:-translate-y-1 hover:border-[#4f8fff]"
+                style={{ background: "#12121a", border: "1px solid #1e1e2e" }}
+              >
+                <span
+                  className="inline-block text-[11px] font-semibold tracking-wide px-2.5 py-1 rounded mb-4"
+                  style={{ background: `${item.color}1a`, color: item.color }}
+                >
+                  {item.tag}
+                </span>
+                <h3 className="text-lg font-bold mb-2" style={{ color: "#e0e0e8" }}>{item.title}</h3>
+                <p className="text-sm leading-relaxed" style={{ color: "#8888a0" }}>{item.desc}</p>
+              </div>
+            ))}
+          </div>
+          <div className="mt-8 grid md:grid-cols-4 gap-4">
+            {[
+              { value: "NaxRiscv RV64GC", label: "64-bit RISC-V @ 100 MHz" },
+              { value: "Ubuntu 24.04", label: "Full Linux userspace" },
+              { value: "1920x1080", label: "HDMI + SPI LCD outputs" },
+              { value: "$34K/yr", label: "Savings at 1,000 servers" },
+            ].map((stat) => (
+              <div
+                key={stat.label}
+                className="rounded-xl px-4 py-4 text-center"
+                style={{ background: "rgba(255,255,255,0.03)", border: "1px solid #1e1e2e" }}
+              >
+                <div className="text-lg font-bold font-mono" style={{ color: "#22c55e" }}>{stat.value}</div>
+                <div className="text-[11px] mt-1" style={{ color: "#8888a0" }}>{stat.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ===== AI-Native Development ===== */}
+      <section className="px-6 py-20" style={{ borderTop: "1px solid #1e1e2e" }}>
+        <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-12 items-center">
+          <div>
+            <span
+              className="inline-block text-[11px] font-semibold tracking-wide px-2.5 py-1 rounded mb-4"
+              style={{ background: "rgba(168,85,247,0.15)", color: "#a855f7" }}
+            >
+              AI-NATIVE DEVELOPMENT
+            </span>
+            <h2 className="text-3xl font-bold tracking-tight mb-4">
+              Built by Claude.<br />Running on hardware.
+            </h2>
+            <p className="text-lg mb-6" style={{ color: "#8888a0" }}>
+              ATOMiK uses a two-tier Claude integration: a laptop-side operator that
+              cross-compiles C code, transfers binaries over UART, and deploys to the FPGA board &mdash;
+              plus a board-side command executor embedded in the demo firmware itself.
+              13 out of 13 board commands pass. Claude can compile, deploy, run, and screenshot the results.
+            </p>
+            <div className="flex flex-wrap gap-4 text-sm" style={{ color: "#8888a0" }}>
+              {[
+                "Cross-compile and deploy",
+                "Shell access while demo runs",
+                "Framebuffer screenshots",
+                "Browser control plane",
+              ].map((t) => (
+                <span key={t} className="flex items-center gap-1.5">
+                  <span style={{ color: "#a855f7" }}>{"\u2713"}</span> {t}
+                </span>
+              ))}
+            </div>
+          </div>
+          <div className="space-y-4">
+            {[
+              { step: "1", title: "Claude compiles C on laptop", desc: "riscv64-linux-gnu-gcc cross-compilation with ATOMiK header" },
+              { step: "2", title: "Binary transferred over UART", desc: "gzip + base64 encoding, 2ms char pacing at 921600 baud" },
+              { step: "3", title: "Runs on NaxRiscv RV64GC", desc: "Real hardware execution on Ubuntu 24.04, results streamed back" },
+              { step: "4", title: "Claude sees the display", desc: "Framebuffer screenshot pipeline captures what the HDMI monitor shows" },
+            ].map((item) => (
+              <div
+                key={item.step}
+                className="rounded-xl p-5 flex gap-4 items-start"
+                style={{ background: "#12121a", border: "1px solid #1e1e2e" }}
+              >
+                <div
+                  className="w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold shrink-0"
+                  style={{ background: "rgba(168,85,247,0.15)", color: "#a855f7" }}
+                >
+                  {item.step}
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold mb-0.5" style={{ color: "#e0e0e8" }}>{item.title}</h4>
+                  <p className="text-xs" style={{ color: "#8888a0" }}>{item.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ===== Proven Technology ===== */}
       <section className="px-6 py-16" style={{ borderTop: "1px solid #1e1e2e" }}>
         <div className="max-w-5xl mx-auto">
@@ -434,18 +558,18 @@ export default function Home() {
                 color: "#a855f7",
               },
               {
-                value: "218+",
-                label: "Automated Tests",
-                href: "https://github.com/MatthewHRockwell/ATOMiK/actions",
-                icon: "\u25CF",
-                color: "#4f8fff",
-              },
-              {
-                value: "69.7",
-                label: "Gops/s Hardware Verified",
+                value: "1100x",
+                label: "Detection Speedup",
                 href: "https://github.com/MatthewHRockwell/ATOMiK",
                 icon: "\u26A1",
                 color: "#22d3ee",
+              },
+              {
+                value: "2.5M",
+                label: "Ops/s on RV64GC",
+                href: "https://github.com/MatthewHRockwell/ATOMiK",
+                icon: "\u25CF",
+                color: "#4f8fff",
               },
               {
                 value: "Apache 2.0",
