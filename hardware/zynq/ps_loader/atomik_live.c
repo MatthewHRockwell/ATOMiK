@@ -195,6 +195,10 @@ static void apply_vproc_preset(int preset) {
         slot_vproc[i] = vproc_presets[preset][i];
 }
 
+/* ── Forward declarations ──────────────────────────────────────────── */
+static void modify_buffer(int idx);
+static void detect_all(void);
+
 /* ── L2 flush ───────────────────────────────────────────────────────── */
 static volatile uint8_t flush_scratch[128*1024] __attribute__((aligned(64)));
 static void flush_l2(void) {
@@ -927,7 +931,7 @@ static void draw_content(void) {
 
     /* Key legend */
     text(M, KEY_Y, "[1-8]=buffers  Backspace=undo  R=reset  Q=quit  H=help", C_GRAY, C_BG);
-    text(M, KEY_Y + 16, "B=benchmark  G=burst  X=compiler  W=workload  H=help", C_GRAY, C_BG);
+    text(M, KEY_Y + 16, "B=benchmark  G=storm  E=freeze  X=compiler  W=workload  H=help", C_GRAY, C_BG);
 }
 /* Adoption forecast slide */
 static void draw_adoption(void) {
@@ -2001,6 +2005,266 @@ static void draw_latency_scope(void) {
     #undef SCOPE_ROUNDS
 }
 
+/* ═══════════════════════════════════════════════════════════════════════
+ *  STATE STORM — theatrical split-screen showing SW waste vs ATOMiK sparsity
+ *  Replaces burst mode. Triggered by Shift+G.
+ * ═══════════════════════════════════════════════════════════════════════ */
+static void draw_state_storm(void) {
+    char buf[120];
+
+    /* Clear + title */
+    rect(0, 0, FB_HRES, FB_VRES, C_BG);
+    panel(0, TOP_Y, FB_HRES, 80, C_PANEL, C_ORANGE);
+    text3x(M, TOP_Y + 12, "STATE STORM", C_ORANGE, C_PANEL);
+    text(M + 340, TOP_Y + 28, "Watch software drown while ATOMiK stays sparse",
+         C_DIM, C_PANEL);
+    flush_l2();
+
+    /* Layout */
+    int mid = FB_HRES / 2;
+    int half_w = mid - M - 8;
+    int lane_w = half_w / N_BUF - 2;
+    int lane_h = 320;
+    int label_y = TOP_Y + 100;
+    int lane_top = label_y + 40;
+    int counter_y = lane_top + lane_h + 20;
+    int stats_y = counter_y + 60;
+
+    /* Column headers */
+    text2x(M, label_y, "SOFTWARE", C_ORANGE, C_BG);
+    text(M + 200, label_y + 12, "scans ALL state every cycle", C_DIM, C_BG);
+    rect(mid - 1, label_y, 2, lane_h + 40, C_GRAY);
+    int rx = mid + 8;
+    text2x(rx, label_y, "ATOMiK", C_BLUE, C_BG);
+    text(rx + 160, label_y + 12, "touches ONLY what changed", C_DIM, C_BG);
+
+    flush_l2();
+
+    /* Storm loop: 5 seconds, ~100 iterations at 50ms each */
+    uint64_t storm_start = rdtime();
+    uint64_t storm_end = storm_start + 500000000ULL; /* 5s at 100MHz */
+    uint32_t rng = rdtime() & 0xFFFFFFFF;
+    int storm_changes = 0;
+    uint64_t storm_sw_kb = 0;
+    uint64_t storm_hw_kb = 0;
+    int total_skipped = 0;
+    int iteration = 0;
+
+    while (rdtime() < storm_end) {
+        /* Mutate 2-6 random buffers */
+        rng = rng * 1103515245 + 12345;
+        int n_mut = 2 + (rng >> 16) % 5;
+        for (int m = 0; m < n_mut; m++) {
+            rng = rng * 1103515245 + 12345;
+            int idx = rng % N_BUF;
+            modify_buffer(idx);
+        }
+
+        /* Detect */
+        detect_all();
+        storm_changes += n_mut;
+
+        /* Count changed vs skipped this iteration */
+        int changed_now = 0;
+        for (int i = 0; i < N_BUF; i++)
+            if (buf_changed[i]) changed_now++;
+        int skipped_now = N_BUF - changed_now;
+        total_skipped += skipped_now;
+
+        /* Track KB */
+        storm_sw_kb = sw_scanned / 1024;
+        storm_hw_kb = hw_touched / 1024;
+
+        /* LEFT side: ALL 8 lanes filled orange (SW scans everything) */
+        for (int i = 0; i < N_BUF; i++) {
+            int lx = M + i * (lane_w + 2);
+            rect(lx, lane_top, lane_w, lane_h, C_ORANGE);
+            text(lx + 2, lane_top + 2, buf_names[i], C_BG, C_ORANGE);
+        }
+
+        /* RIGHT side: only CHANGED lanes blue, unchanged dark */
+        for (int i = 0; i < N_BUF; i++) {
+            int lx = rx + i * (lane_w + 2);
+            if (buf_changed[i]) {
+                rect(lx, lane_top, lane_w, lane_h, C_BLUE);
+                text(lx + 2, lane_top + 2, buf_names[i], C_BG, C_BLUE);
+            } else {
+                rect(lx, lane_top, lane_w, lane_h, RGB(0x08,0x0C,0x10));
+                text(lx + 2, lane_top + 2, buf_names[i], RGB(0x30,0x38,0x40),
+                     RGB(0x08,0x0C,0x10));
+            }
+        }
+
+        /* Giant center counter: BUFFERS SKIPPED */
+        {
+            rect(mid - 200, counter_y, 400, 48, C_BG);
+            snprintf(buf, sizeof(buf), "%d BUFFERS SKIPPED", total_skipped);
+            int tw = strlen(buf) * CW * 2;
+            text2x(mid - tw / 2, counter_y + 4, buf, C_GREEN, C_BG);
+        }
+
+        /* Running totals */
+        rect(M, stats_y, FB_HRES - 2*M, 32, C_BG);
+        snprintf(buf, sizeof(buf), "SW scanned: %lluKB",
+                 (unsigned long long)storm_sw_kb);
+        text2x(M, stats_y, buf, C_ORANGE, C_BG);
+        snprintf(buf, sizeof(buf), "ATOMiK touched: %lluKB",
+                 (unsigned long long)storm_hw_kb);
+        text2x(rx, stats_y, buf, C_BLUE, C_BG);
+
+        flush_l2();
+        iteration++;
+
+        /* Check for early exit */
+        if (key_ready()) {
+            char sch;
+            if (read(0, &sch, 1) == 1) {
+                if (sch == 'Q' || sch == 'q' || sch == 27) break;
+            }
+        }
+
+        usleep(50000); /* 50ms per iteration */
+    }
+
+    /* Freeze with final stats */
+    float pct = storm_sw_kb > 0 ?
+        100.0f * (storm_sw_kb - storm_hw_kb) / storm_sw_kb : 0;
+
+    rect(0, counter_y - 20, FB_HRES, FB_VRES - counter_y + 20, C_BG);
+    panel(0, counter_y - 20, FB_HRES, 260, C_PANEL, C_GREEN);
+
+    snprintf(buf, sizeof(buf), "Storm complete: %d changes in 5 seconds",
+             storm_changes);
+    text2x(M, counter_y, buf, C_TEXT, C_PANEL);
+
+    text2x(M, counter_y + 40, "Software scanned every byte, every time.",
+           C_ORANGE, C_PANEL);
+    text2x(M, counter_y + 76, "ATOMiK touched only what changed.",
+           C_BLUE, C_PANEL);
+
+    /* Giant percentage */
+    snprintf(buf, sizeof(buf), "%.0f%% WORK AVOIDED", pct);
+    {
+        int tw = strlen(buf) * CW * 3;
+        text3x(mid - tw / 2, counter_y + 120, buf, C_GREEN, C_PANEL);
+    }
+
+    snprintf(buf, sizeof(buf), "SW: %lluKB  |  ATOMiK: %lluKB  |  %d iterations",
+             (unsigned long long)storm_sw_kb,
+             (unsigned long long)storm_hw_kb, iteration);
+    text(M, counter_y + 180, buf, C_DIM, C_PANEL);
+
+    text(M, counter_y + 210, "Press any key to return", C_GRAY, C_PANEL);
+    flush_l2();
+
+    /* Wait for keypress */
+    while (!key_ready()) usleep(50000);
+    char sch; read(0, &sch, 1);
+
+    log_event("State storm complete.");
+    { char lbuf[60];
+      snprintf(lbuf, sizeof(lbuf), "Storm: %d changes, %.0f%% avoided",
+               storm_changes, pct);
+      log_event(lbuf);
+    }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+ *  FREEZE FRAME — clean closing screen with three proof cards
+ *  Triggered by Shift+E ("End").
+ * ═══════════════════════════════════════════════════════════════════════ */
+static void draw_freeze_frame(void) {
+    char buf[120];
+
+    /* Compute live pct_avoided */
+    float pct = sw_scanned > 0 ?
+        100.0f * (sw_scanned - hw_touched) / sw_scanned : 0;
+
+    /* Clear to dark */
+    rect(0, 0, FB_HRES, FB_VRES, C_BG);
+
+    /* Card dimensions */
+    int card_w = 1400;
+    int card_h = 140;
+    int card_x = (FB_HRES - card_w) / 2;
+
+    /* Card 1 (y=200): Blue border — LIVE HARDWARE */
+    {
+        int cy = 200;
+        outlined(card_x, cy, card_w, card_h, C_PANEL, C_BLUE);
+        rect(card_x, cy, card_w, 3, C_BLUE);
+        rect(card_x, cy + card_h - 1, card_w, 1, C_BLUE);
+        {
+            const char *title = "LIVE HARDWARE";
+            int tw = strlen(title) * CW * 3;
+            text3x(card_x + (card_w - tw) / 2, cy + 16, title, C_BLUE, C_PANEL);
+        }
+        {
+            const char *sub = "NaxRiscv RV64GC @ 100MHz | Ubuntu 24.04 | Zynq-7020";
+            int sw = strlen(sub) * CW;
+            text(card_x + (card_w - sw) / 2, cy + 80, sub, C_DIM, C_PANEL);
+        }
+    }
+
+    /* Card 2 (y=400): Green border — ONLY DELTAS MOVED */
+    {
+        int cy = 400;
+        outlined(card_x, cy, card_w, card_h, C_PANEL, C_GREEN);
+        rect(card_x, cy, card_w, 3, C_GREEN);
+        rect(card_x, cy + card_h - 1, card_w, 1, C_GREEN);
+        {
+            const char *title = "ONLY DELTAS MOVED";
+            int tw = strlen(title) * CW * 3;
+            text3x(card_x + (card_w - tw) / 2, cy + 16, title, C_GREEN, C_PANEL);
+        }
+        snprintf(buf, sizeof(buf),
+                 "%.0f%% compute eliminated this session (measured, not projected)",
+                 pct);
+        {
+            int sw = strlen(buf) * CW;
+            text(card_x + (card_w - sw) / 2, cy + 80, buf, C_DIM, C_PANEL);
+        }
+    }
+
+    /* Card 3 (y=600): Orange border — STANDARD C PATH */
+    {
+        int cy = 600;
+        outlined(card_x, cy, card_w, card_h, C_PANEL, C_ORANGE);
+        rect(card_x, cy, card_w, 3, C_ORANGE);
+        rect(card_x, cy + card_h - 1, card_w, 1, C_ORANGE);
+        {
+            const char *title = "STANDARD C PATH";
+            int tw = strlen(title) * CW * 3;
+            text3x(card_x + (card_w - tw) / 2, cy + 16, title, C_ORANGE, C_PANEL);
+        }
+        {
+            const char *sub = "#include atomik.h | riscv64-linux-gnu-gcc -O2 | runs on this board";
+            int sw = strlen(sub) * CW;
+            text(card_x + (card_w - sw) / 2, cy + 80, sub, C_DIM, C_PANEL);
+        }
+    }
+
+    /* Bottom (y=850) */
+    {
+        const char *tagline = "The board is the proof. The product is the IP.";
+        int tw = strlen(tagline) * CW * 2;
+        text2x((FB_HRES - tw) / 2, 850, tagline, C_TEXT, C_BG);
+    }
+    {
+        const char *logo = "ATOMiK";
+        int tw = strlen(logo) * CW * 3;
+        text3x((FB_HRES - tw) / 2, 900, logo, C_BLUE, C_BG);
+    }
+
+    flush_l2();
+
+    /* Wait for keypress */
+    while (!key_ready()) usleep(50000);
+    char fch; read(0, &fch, 1);
+
+    log_event("Freeze frame shown.");
+}
+
 /* Full dashboard (chrome + content) — used on init and reset */
 /* ═══════════════════════════════════════════════════════════════════════
  *  ADVERSARIAL AUDIT — expose all internal state, invite investor to break it
@@ -2649,38 +2913,19 @@ int main(void) {
                     draw_benchmark_race();
                     draw_dashboard(); update_lcd(); flush_l2();
                     break;
-                case 'G': {
-                    /* Burst mode — rapid random changes for 3 seconds */
-                    log_event("BURST: 3 seconds of rapid changes...");
-                    refresh_viz(); draw_content(); flush_l2();
-                    uint32_t rng = rdtime() & 0xFFFFFFFF;
-                    uint64_t end = rdtime() + 300000000ULL; /* 3 sec at 100MHz */
-                    int burst_count = 0;
-                    while (rdtime() < end) {
-                        rng = rng * 1103515245 + 12345;
-                        int idx = (rng >> 16) % N_BUF;
-                        last_modified = idx;
-                        modify_buffer(idx);
-                        detect_all();
-                        burst_count++;
-                        if (burst_count % 5 == 0) {
-                            refresh_viz(); draw_content();
-                            update_lcd();
-                            flush_l2();
-                        }
-                    }
-                    snprintf(msg, sizeof(msg), "BURST complete: %d changes in 3s", burst_count);
-                    log_event(msg);
-                    refresh_viz(); draw_content();
-                    update_lcd();
-                    flush_l2();
+                case 'G':
+                    draw_state_storm();
+                    draw_dashboard(); update_lcd(); flush_l2();
                     break;
-                }
                 case 'D':
                     draw_dollar_race();
                     draw_dashboard();
                     update_lcd();
                     flush_l2();
+                    break;
+                case 'E':
+                    draw_freeze_frame();
+                    draw_dashboard(); update_lcd(); flush_l2();
                     break;
                 case 'F':
                     draw_adoption();
@@ -2821,11 +3066,12 @@ int main(void) {
                     text2x(M, hy, "[1-8]", C_TEXT, C_BG); text(M+120, hy+8, "Modify specific state buffer", C_DIM, C_BG);
                     text2x(M, hy+=40, "[a]", C_TEXT, C_BG); text(M+120, hy+8, "Adversarial audit -- expose state, try to break it", C_DIM, C_BG);
                     text2x(M, hy+=40, "[b]", C_TEXT, C_BG); text(M+120, hy+8, "Benchmark race -- memcmp vs ATOMiK (full-screen)", C_DIM, C_BG);
-                    text2x(M, hy+=40, "[g]", C_TEXT, C_BG); text(M+120, hy+8, "Burst mode -- 3 seconds of rapid changes", C_DIM, C_BG);
+                    text2x(M, hy+=40, "[G]", C_TEXT, C_BG); text(M+120, hy+8, "State storm -- SW drowns while ATOMiK stays sparse", C_DIM, C_BG);
                     text2x(M, hy+=40, "[c]", C_TEXT, C_BG); text(M+120, hy+8, "Inject corruption + auto-detect tamper", C_DIM, C_BG);
                     text2x(M, hy+=40, "[v]", C_TEXT, C_BG); text(M+120, hy+8, "Verify integrity of all buffers", C_DIM, C_BG);
                     text2x(M, hy+=40, "[w]", C_TEXT, C_BG); text(M+120, hy+8, "Cycle workload profiles (Agent/Cache/Full/Idle)", C_DIM, C_BG);
                     text2x(M, hy+=40, "[D]", C_TEXT, C_BG); text(M+120, hy+8, "Cost race — dollar counters racing in real-time", C_DIM, C_BG);
+                    text2x(M, hy+=40, "[E]", C_TEXT, C_BG); text(M+120, hy+8, "Freeze frame — closing proof screen for investors", C_DIM, C_BG);
                     text2x(M, hy+=40, "[L]", C_TEXT, C_BG); text(M+120, hy+8, "Latency scope — oscilloscope timing traces", C_DIM, C_BG);
                     text2x(M, hy+=40, "[f]", C_TEXT, C_BG); text(M+120, hy+8, "Adoption forecast — year-by-year TAM", C_DIM, C_BG);
                     text2x(M, hy+=40, "[s]", C_TEXT, C_BG); text(M+120, hy+8, "Session summary — aggregate proof", C_DIM, C_BG);
