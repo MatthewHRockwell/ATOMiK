@@ -112,8 +112,12 @@ class BaseSoC(SoCCore):
         )
         self.bus.add_slave("ps_iop", remap_iop, iop_src)
 
-        # USB interrupt proxy: PARKED — need to solve interrupt routing
-        # before USB host will enumerate devices. See ChatGPT guidance.
+        # USB0 interrupt from PS to NaxRiscv PLIC
+        # PS7 IRQ_P2F_USB0 output mirrors the USB0 interrupt to PL fabric.
+        # Wire it to PLIC input 3 (input 1 = liteuart).
+        usb0_irq = ps.get_irq_p2f_usb0()
+        self.irq.add("usb0", use_loc_if_exists=True)
+        self.comb += self.cpu.interrupt[3].eq(usb0_irq)
 
         # LCD ST7789V 320x172 — GPIO bitbang SPI
         # Pins confirmed from RK-ZYNQ7020-F Schematics.pdf page 5, Bank 33.

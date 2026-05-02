@@ -144,14 +144,16 @@
 		};
 
 		/* PS USB0 via GP1 AXI slave — NaxRiscv 0x80000000 maps to PS 0xE0000000
-		 * ChipIdea CI13xxx dual-role controller at PS 0xE0002000 = NaxRiscv 0x80002000
-		 * Interrupt: PLIC input 2 (usb_poll timer in PL, not real PS IRQ) */
+		 * ChipIdea CI13xxx at PS 0xE0002000 = NaxRiscv 0x80002000
+		 * Interrupt: PLIC input 3, routed via IRQ_P2F_USB0 (PS→PL fabric) */
 		usb0: usb@80002000 {
-			compatible = "xlnx,zynq-usb-2.20.a", "chipidea,usb2";
+			compatible = "chipidea,usb2";
 			reg = <0x80002000 0x1000>;
 			interrupts = <0x03>;
+			interrupt-parent = <&plic0>;
 			dr_mode = "host";
-			status = "disabled";  /* Causes kernel panic — PS USB IRQ not routed to NaxRiscv PLIC */
+			phy_type = "ulpi";
+			status = "okay";
 		};
 	};
 
