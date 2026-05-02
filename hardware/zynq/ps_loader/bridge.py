@@ -398,7 +398,7 @@ body { background: #08111A; color: #F3F7FB; font-family: 'SF Mono','Fira Code','
         <div class="panel-title">Touch Control</div>
         <div class="touch-grid" id="touch-grid"></div>
         <div class="touch-actions">
-            <button class="touch-btn burst" onclick="sendKey('B')">BURST</button>
+            <button class="touch-btn burst" onclick="sendKey('G')">BURST</button>
             <button class="touch-btn reset" onclick="sendKey('R')">RESET</button>
         </div>
     </div>
@@ -453,8 +453,9 @@ body { background: #08111A; color: #F3F7FB; font-family: 'SF Mono','Fira Code','
 <!-- Bottom bar -->
 <div class="bottombar" style="grid-column: 1/-1;">
     <span>Type letters for delta viz</span>
-    <span><kbd>Shift+W</kbd> vproc profile</span>
-    <span><kbd>Shift+R</kbd> reset</span>
+    <span><kbd>Shift+W</kbd> workload</span>
+    <span><kbd>Shift+B</kbd> benchmark</span>
+    <span><kbd>Shift+C</kbd> break it</span>
     <span style="margin-left:auto">ATOMiK: Only meaningful changes cross the wire</span>
 </div>
 
@@ -623,8 +624,7 @@ document.addEventListener('keydown', (e) => {
     } else if (e.key.length === 1) {
         ws.send(JSON.stringify({type: 'key', key: e.key}));
         if (e.key >= '1' && e.key <= '8') addLog(`Injected change: ${names[parseInt(e.key)-1]}`);
-        else if (e.key === 'a') addLog('Injected change: ALL buffers');
-        else if (e.key === 'r') addLog('System reset');
+        else if (e.key === 'R') addLog('System reset');
         else addLog(`Typed: '${e.key}'`);
     }
 });

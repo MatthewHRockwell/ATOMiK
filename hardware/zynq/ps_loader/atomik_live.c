@@ -124,6 +124,9 @@ static const char *buf_names[] = {
 /* Scan sweep animation position (0-7 = which lane is being "scanned") */
 static int scan_pos;
 
+/* Attract mode: idle screen shown before first interaction */
+static int attract_mode = 1;
+
 /* Workload profile presets */
 static int workload_profile; /* 0=manual, 1=agent, 2=cache, 3=full, 4=idle */
 static const char *profile_names[] = {
@@ -924,7 +927,7 @@ static void draw_content(void) {
 
     /* Key legend */
     text(M, KEY_Y, "[1-8]=buffers  Backspace=undo  R=reset  Q=quit  H=help", C_GRAY, C_BG);
-    text(M, KEY_Y + 16, "B=benchmark  G=burst  P=presentation  W=workload profiles", C_GRAY, C_BG);
+    text(M, KEY_Y + 16, "B=benchmark  G=burst  X=compiler  W=workload  H=help", C_GRAY, C_BG);
 }
 /* Adoption forecast slide */
 static void draw_adoption(void) {
@@ -2252,6 +2255,47 @@ static void draw_adversarial_audit(void) {
     #undef AA_HELP_Y
 }
 
+static void draw_attract(void) {
+    rect(0, 0, FB_HRES, FB_VRES, C_BG);
+
+    /* Giant centered ATOMiK logo */
+    text3x(FB_HRES/2 - 108, 300, "ATOMiK", C_BLUE, C_BG);
+
+    /* Subtitle */
+    text2x(FB_HRES/2 - 240, 380, "State-Aware Execution Engine", C_DIM, C_BG);
+
+    /* Pulsing prompt */
+    text2x(FB_HRES/2 - 160, 500, "Press any buffer (1-8)", C_WHITE, C_BG);
+    text(FB_HRES/2 - 200, 550, "to see ATOMiK detect meaningful change in hardware", C_DIM, C_BG);
+
+    /* Bottom proof chips */
+    int cy = 750;
+    /* Chip 1 */
+    rect(FB_HRES/2 - 500, cy, 300, 60, C_PANEL);
+    rect(FB_HRES/2 - 500, cy, 300, 2, C_BLUE);
+    text2x(FB_HRES/2 - 488, cy + 12, "Live Hardware", C_BLUE, C_PANEL);
+    text(FB_HRES/2 - 488, cy + 40, "NaxRiscv RV64GC @ 100MHz", C_DIM, C_PANEL);
+
+    /* Chip 2 */
+    rect(FB_HRES/2 - 150, cy, 300, 60, C_PANEL);
+    rect(FB_HRES/2 - 150, cy, 300, 2, C_GREEN);
+    text2x(FB_HRES/2 - 138, cy + 12, "Only Deltas Move", C_GREEN, C_PANEL);
+    text(FB_HRES/2 - 138, cy + 40, "Unchanged state = zero cost", C_DIM, C_PANEL);
+
+    /* Chip 3 */
+    rect(FB_HRES/2 + 200, cy, 300, 60, C_PANEL);
+    rect(FB_HRES/2 + 200, cy, 300, 2, C_ORANGE);
+    text2x(FB_HRES/2 + 212, cy + 12, "Standard C Path", C_ORANGE, C_PANEL);
+    text(FB_HRES/2 + 212, cy + 40, "Same GCC. No new language.", C_DIM, C_PANEL);
+
+    /* Speedup from benchmark */
+    char buf[40];
+    snprintf(buf, sizeof(buf), "%.0fx faster detection", measured_speedup);
+    text2x(FB_HRES/2 - 160, 650, buf, RGB(0xFF,0xCC,0x00), C_BG);
+
+    flush_l2();
+}
+
 static void draw_dashboard(void) {
     draw_chrome();
     draw_content();
@@ -2441,9 +2485,9 @@ int main(void) {
     /* Set terminal to raw mode for key input */
     term_raw();
 
-    /* Initial draw */
+    /* Initial draw — attract screen first, dashboard after first keypress */
     refresh_viz();
-    draw_dashboard();
+    draw_attract();
     update_lcd();
     flush_l2();
 
@@ -2506,6 +2550,14 @@ int main(void) {
                         cmd_running = 0;
                     }
                     goto key_done;
+                }
+
+                /* Attract mode: first 1-8 keypress transitions to dashboard */
+                if (attract_mode && ch >= '1' && ch <= '8') {
+                    attract_mode = 0;
+                    draw_dashboard();
+                    flush_l2();
+                    /* fall through to process the key normally */
                 }
 
                 /* Backspace/DEL — handle before switch (avoids signed char issues) */
@@ -2656,6 +2708,54 @@ int main(void) {
                     update_lcd();
                     flush_l2();
                     break;
+                case 'X': {
+                    /* Compiler lane: standard C + GCC + ATOMiK */
+                    rect(0, 0, FB_HRES, FB_VRES, C_BG);
+                    panel(0, TOP_Y, FB_HRES, 80, C_PANEL, C_GREEN);
+                    text3x(M, TOP_Y + 12, "COMPILER LANE", C_GREEN, C_PANEL);
+                    text2x(M + 400, TOP_Y + 20, "Standard C. Standard GCC. ATOMiK hardware.", C_DIM, C_PANEL);
+
+                    /* Show the actual code */
+                    int cy = TOP_Y + 120;
+                    text2x(M, cy, "#include \"atomik.h\"", C_GREEN, C_BG);
+                    cy += 50;
+                    text2x(M, cy, "// Load initial state into hardware slot", C_DIM, C_BG);
+                    cy += 36;
+                    text2x(M, cy, "atomik_load(slot, fingerprint);", C_WHITE, C_BG);
+                    cy += 50;
+                    text2x(M, cy, "// Accumulate delta (XOR)", C_DIM, C_BG);
+                    cy += 36;
+                    text2x(M, cy, "atomik_accum(new_fp ^ old_fp);", C_WHITE, C_BG);
+                    cy += 50;
+                    text2x(M, cy, "// Read result — changed or not?", C_DIM, C_BG);
+                    cy += 36;
+                    text2x(M, cy, "if (atomik_read() != old_fp)", C_WHITE, C_BG);
+                    cy += 36;
+                    text2x(M, cy, "    sync_this_buffer();", C_BLUE, C_BG);
+
+                    cy += 80;
+                    rect(M, cy, FB_HRES - 2*M, 2, C_ORANGE);
+                    cy += 20;
+                    text2x(M, cy, "Build command:", C_DIM, C_BG);
+                    cy += 36;
+                    text2x(M, cy, "riscv64-linux-gnu-gcc -O2 -o demo demo.c", C_ORANGE, C_BG);
+                    cy += 50;
+                    text2x(M, cy, "-> ATOMiK ops compile to standard RISC-V instructions", C_DIM, C_BG);
+                    cy += 36;
+                    text2x(M, cy, "-> Runs on this board. Right now. No special toolchain.", C_GREEN, C_BG);
+
+                    cy += 60;
+                    text3x(M, cy, "No new language.", C_GREEN, C_BG);
+                    text3x(M + 500, cy, "No new compiler.", C_GREEN, C_BG);
+
+                    text(M, FB_VRES - 60, "Press any key to return", C_GRAY, C_BG);
+                    log_event("Compiler lane shown.");
+                    flush_l2();
+                    while (!key_ready()) usleep(50000);
+                    { char xch; read(0, &xch, 1); }
+                    draw_dashboard(); update_lcd(); flush_l2();
+                    break;
+                }
                 case 'W':
                     /* Cycle through workload profiles — reconfigures virtual processors */
                     workload_profile = (workload_profile + 1) % 5;
@@ -2730,6 +2830,7 @@ int main(void) {
                     text2x(M, hy+=40, "[f]", C_TEXT, C_BG); text(M+120, hy+8, "Adoption forecast — year-by-year TAM", C_DIM, C_BG);
                     text2x(M, hy+=40, "[s]", C_TEXT, C_BG); text(M+120, hy+8, "Session summary — aggregate proof", C_DIM, C_BG);
                     text2x(M, hy+=40, "[T]", C_TEXT, C_BG); text(M+120, hy+8, "TCO calculator — savings at server scale", C_DIM, C_BG);
+                    text2x(M, hy+=40, "[X]", C_TEXT, C_BG); text(M+120, hy+8, "Compiler lane — standard C execution path", C_DIM, C_BG);
                     text2x(M, hy+=40, "[r]", C_TEXT, C_BG); text(M+120, hy+8, "Reset all state + counters", C_DIM, C_BG);
                     text2x(M, hy+=40, "[h]", C_TEXT, C_BG); text(M+120, hy+8, "This help screen", C_DIM, C_BG);
                     text(M, hy+60, "Press any key to return", C_GRAY, C_BG);
@@ -2761,7 +2862,7 @@ int main(void) {
         usleep(50000); /* 20 Hz poll */
 
         /* ── Idle animation: auto-mutate + detect every 2s ──── */
-        {
+        if (!attract_mode) {
             static uint64_t last_anim = 0;
             static uint32_t idle_rng = 0x12345678;
             uint64_t now = rdtime();

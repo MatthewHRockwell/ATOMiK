@@ -9,7 +9,7 @@
 "I'm going to trigger the same live workload two ways, directly on this board. First, the normal software path."
 
 **25s–40s**
-"Watch the red side. Configuration, model state, session data, cache, replica state — software rescans and reprocesses far more than it actually needs. You see it on the hero display, you see it on the endpoint surfaces, and you see it in the power trace."
+"Watch the orange side. Configuration, model state, session data, cache, replica state — software rescans and reprocesses far more than it actually needs. You see it on the hero display, you see it on the endpoint surfaces, and you see it in the power trace."
 
 **40s–56s**
 "Now the same workload through ATOMiK."
