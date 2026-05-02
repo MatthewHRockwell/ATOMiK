@@ -30,7 +30,7 @@ import time
 
 ZYNQ_DIR    = "/home/mattrock/Projects/ATOMiK/hardware/zynq"
 LITEX_BUILD = f"{ZYNQ_DIR}/litex-build"
-PS7_INIT    = f"{ZYNQ_DIR}/scripts/ps7_init_rk7020f.tcl"
+PS7_INIT    = f"{ZYNQ_DIR}/litex/build/hamgeek_rk7020f/gateware/hamgeek_rk7020f.gen/sources_1/ip/Zynq/ps7_init.tcl"
 # Default: pinned known-good baseline (PHASE_9_1_MILESTONE.md). Override via
 # `BITSTREAM=...` env var when testing a different build (e.g. FB experiment
 # at litex-build-nax64-fb) so the proven baseline stays authoritative and
