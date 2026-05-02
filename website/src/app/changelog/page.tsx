@@ -18,6 +18,23 @@ type Release = {
 const releases: Release[] = [
   {
     version: "",
+    title: "Phase 10: Investor Demo System",
+    date: "2026-04-28",
+    category: "hardware",
+    items: [
+      "15+ interactive demo screens with attract mode, State Storm, Break It challenge, Dollar-Per-Second Race",
+      "90-second scripted investor demo with Claude auto-narration (demo_claude_drive.py)",
+      "Freeze Frame closing with three proof cards: 456x benchmark, hardware validation, formal verification",
+      "State Storm visualization: software drowns in O(n) scans while ATOMiK stays sparse at O(1)",
+      "Dollar-Per-Second Race: real-time cost counters at 100K acceleration, ATOMiK vs traditional",
+      "Two-tier Claude integration: laptop-side operator + board-side command executor (13/13 commands pass)",
+      "Slide sync (slide_sync.py + slide_advance.sh) for PowerPoint presentation coordination",
+      "Framebuffer screenshot capture (board_selfie.py) for proof artifacts",
+      "Browser control plane with live metrics streaming",
+    ],
+  },
+  {
+    version: "",
     title: "Multi-Buffer Change Detection Benchmark",
     date: "2026-04-06",
     category: "hardware",

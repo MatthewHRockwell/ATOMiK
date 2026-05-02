@@ -101,7 +101,7 @@ const pricingTiers = [
 
 const investorStats: [string, string][] = [
   ["108", "Lean4 Proofs"], ["500+", "Tests (SW + HW)"], ["3", "FPGA Platforms"],
-  ["2.5M", "Ops/s (Hardware)"], ["$1.7B", "TAM (50M Servers)"],
+  ["2.5M", "Ops/s (Hardware)"], ["456x", "Latest Benchmark"],
 ];
 
 export default function Home() {
@@ -414,27 +414,30 @@ export default function Home() {
       <section className="px-6 py-20" style={{ borderTop: "1px solid #1e1e2e" }}>
         <div className="max-w-5xl mx-auto">
           <h2 className="text-3xl font-bold text-center tracking-tight mb-3">Live Hardware Demo</h2>
-          <p className="text-center text-lg mb-12" style={{ color: "#8888a0" }}>
-            Running on a 64-bit RISC-V CPU with Ubuntu 24.04 &mdash; on real FPGA hardware.
+          <p className="text-center text-lg mb-4" style={{ color: "#8888a0" }}>
+            15+ interactive screens running on a 64-bit RISC-V CPU with Ubuntu 24.04 &mdash; on real FPGA hardware.
+          </p>
+          <p className="text-center text-sm mb-12" style={{ color: "#555570" }}>
+            90-second scripted investor demo with Claude auto-narration, or free-roam interactive mode.
           </p>
           <div className="grid md:grid-cols-3 gap-5">
             {[
               {
-                title: "1080p HDMI Dashboard",
-                desc: "1920x1080 framebuffer-rendered dashboard showing 8 ATOMiK virtual processor lanes, real-time metrics, delta-state algebra visualization, and cost savings ticker. Interactive keyboard control with live hardware operations.",
-                tag: "DISPLAY",
+                title: "Attract Mode + State Storm",
+                desc: "Clean \"Press any buffer\" opening transitions into State Storm: software drowns in O(n) scans while ATOMiK stays sparse with O(1) detection. Visual proof that scales don't lie.",
+                tag: "ATTRACT",
                 color: "#4f8fff",
               },
               {
-                title: "AI Training/Inference Demo",
-                desc: "Auto-running workload with 8 model layers. ATOMiK detects unchanged layers and skips redundant syncs, saving 50-75% bandwidth per epoch. Every operation runs on real hardware via MMIO.",
-                tag: "WORKLOAD",
+                title: "Break It + Dollar Race",
+                desc: "Adversarial corruption challenge: inject errors and watch ATOMiK catch every one. Dollar-Per-Second Race shows real-time cost counters -- traditional vs ATOMiK -- racing at 100K acceleration.",
+                tag: "CHALLENGE",
                 color: "#a855f7",
               },
               {
-                title: "Dynamic Virtual Processors",
-                desc: "6 processor types (DETECT, VERIFY, SYNC, ACCUM, WATCH, IDLE) dynamically assigned to 8 hardware slots. 5 workload presets cycle at runtime with 36-597us reconfiguration latency.",
-                tag: "RUNTIME",
+                title: "Freeze Frame Proof Cards",
+                desc: "90-second scripted demo closes with three proof cards: 456x benchmark result, hardware validation badge, and formal verification certificate. Every number traced to hardware.",
+                tag: "PROOF",
                 color: "#22d3ee",
               },
             ].map((item) => (
@@ -454,11 +457,49 @@ export default function Home() {
               </div>
             ))}
           </div>
-          <div className="mt-8 grid md:grid-cols-4 gap-4">
+          <div className="grid md:grid-cols-3 gap-5 mt-5">
+            {[
+              {
+                title: "1080p HDMI Dashboard",
+                desc: "1920x1080 framebuffer with 8 ATOMiK virtual processor lanes, real-time metrics, delta-state algebra visualization, and cost savings ticker. Interactive keyboard control drives live hardware operations.",
+                tag: "DISPLAY",
+                color: "#22c55e",
+              },
+              {
+                title: "AI Training/Inference Demo",
+                desc: "Auto-running workload with 8 model layers. ATOMiK detects unchanged layers and skips redundant syncs, saving 50-75% bandwidth per epoch. Every operation runs on real hardware via MMIO.",
+                tag: "WORKLOAD",
+                color: "#f59e0b",
+              },
+              {
+                title: "Dynamic Virtual Processors",
+                desc: "6 processor types (DETECT, VERIFY, SYNC, ACCUM, WATCH, IDLE) dynamically assigned to 8 hardware slots. 5 workload presets cycle at runtime with 36-597us reconfiguration latency.",
+                tag: "RUNTIME",
+                color: "#ef4444",
+              },
+            ].map((item) => (
+              <div
+                key={item.title}
+                className="rounded-xl p-7 transition-all hover:-translate-y-1 hover:border-[#4f8fff]"
+                style={{ background: "#12121a", border: "1px solid #1e1e2e" }}
+              >
+                <span
+                  className="inline-block text-[11px] font-semibold tracking-wide px-2.5 py-1 rounded mb-4"
+                  style={{ background: `${item.color}1a`, color: item.color }}
+                >
+                  {item.tag}
+                </span>
+                <h3 className="text-lg font-bold mb-2" style={{ color: "#e0e0e8" }}>{item.title}</h3>
+                <p className="text-sm leading-relaxed" style={{ color: "#8888a0" }}>{item.desc}</p>
+              </div>
+            ))}
+          </div>
+          <div className="mt-8 grid md:grid-cols-5 gap-4">
             {[
               { value: "NaxRiscv RV64GC", label: "64-bit RISC-V @ 100 MHz" },
               { value: "Ubuntu 24.04", label: "Full Linux userspace" },
               { value: "1920x1080", label: "HDMI + SPI LCD outputs" },
+              { value: "15+", label: "Demo screens" },
               { value: "$34K/yr", label: "Savings at 1,000 servers" },
             ].map((stat) => (
               <div
@@ -491,14 +532,16 @@ export default function Home() {
               ATOMiK uses a two-tier Claude integration: a laptop-side operator that
               cross-compiles C code, transfers binaries over UART, and deploys to the FPGA board &mdash;
               plus a board-side command executor embedded in the demo firmware itself.
-              13 out of 13 board commands pass. Claude can compile, deploy, run, and screenshot the results.
+              The 90-second scripted investor demo runs entirely from <code style={{ color: "#22d3ee" }}>demo_claude_drive.py</code>,
+              with Claude auto-narrating each screen transition, advancing slides, and capturing
+              framebuffer screenshots as proof artifacts. 13/13 board commands pass.
             </p>
             <div className="flex flex-wrap gap-4 text-sm" style={{ color: "#8888a0" }}>
               {[
                 "Cross-compile and deploy",
-                "Shell access while demo runs",
+                "90s scripted demo driver",
                 "Framebuffer screenshots",
-                "Browser control plane",
+                "Slide sync + narration",
               ].map((t) => (
                 <span key={t} className="flex items-center gap-1.5">
                   <span style={{ color: "#a855f7" }}>{"\u2713"}</span> {t}
@@ -511,7 +554,7 @@ export default function Home() {
               { step: "1", title: "Claude compiles C on laptop", desc: "riscv64-linux-gnu-gcc cross-compilation with ATOMiK header" },
               { step: "2", title: "Binary transferred over UART", desc: "gzip + base64 encoding, 2ms char pacing at 921600 baud" },
               { step: "3", title: "Runs on NaxRiscv RV64GC", desc: "Real hardware execution on Ubuntu 24.04, results streamed back" },
-              { step: "4", title: "Claude sees the display", desc: "Framebuffer screenshot pipeline captures what the HDMI monitor shows" },
+              { step: "4", title: "90s demo with auto-narration", desc: "demo_claude_drive.py sequences 15+ screens, syncs slides, captures proof screenshots" },
             ].map((item) => (
               <div
                 key={item.step}
