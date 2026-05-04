@@ -25,6 +25,9 @@
 #include <stdio.h>
 #include <string.h>
 
+#define DOC_STATE_PATH  "/tmp/atomik_os_document.state"
+#define DOC_STATE_MAGIC 0xA01D0CE7u  /* "ATOMiK doc v1" */
+
 #define DOC_HISTORY_LINES 32
 #define DOC_LINE_MAX      160
 #define DOC_INPUT_MAX     200
@@ -35,6 +38,35 @@ static char       s_history[DOC_HISTORY_LINES][DOC_LINE_MAX];
 static int        s_n_history = 0;
 static char       s_input[DOC_INPUT_MAX];
 static int        s_input_len = 0;
+
+/* Persist the entire edge_app_t (primitive + accent + name + fields) so
+ * a configured Document survives reboots. We do NOT persist the chat
+ * history — that's session-local. The user's MORPHED state is the
+ * artifact worth saving. */
+static void doc_save_state(void) {
+    FILE *f = fopen(DOC_STATE_PATH, "wb");
+    if (!f) return;
+    uint32_t magic = DOC_STATE_MAGIC;
+    fwrite(&magic, sizeof magic, 1, f);
+    fwrite(&s_doc, sizeof s_doc, 1, f);
+    fclose(f);
+}
+
+static int doc_load_state(void) {
+    FILE *f = fopen(DOC_STATE_PATH, "rb");
+    if (!f) return 0;
+    uint32_t magic = 0;
+    if (fread(&magic, sizeof magic, 1, f) != 1 || magic != DOC_STATE_MAGIC) {
+        fclose(f);
+        return 0;
+    }
+    if (fread(&s_doc, sizeof s_doc, 1, f) != 1) {
+        fclose(f);
+        return 0;
+    }
+    fclose(f);
+    return 1;
+}
 
 /* Push a line into the chat history ring (newest at the end). */
 static void hist_push(const char *prefix, const char *line) {
@@ -51,6 +83,15 @@ static void hist_push(const char *prefix, const char *line) {
 static void doc_lazy_init(void) {
     if (s_doc_init) return;
     s_doc_init = 1;
+
+    /* Try to restore prior state first. The whole point of the Document
+     * model is that the user's morphs accumulate over time — closing and
+     * reopening should not wipe them. */
+    if (doc_load_state()) {
+        hist_push("agent> ", "restored prior session.");
+        return;
+    }
+
     eapp_init(&s_doc, "Document",
               "type a command on the right -> the document morphs",
               PRIM_LIST, ATOMIK_ACCENT);
@@ -68,6 +109,7 @@ static void doc_lazy_init(void) {
                  "primitive=list  -  fields=3  -  delta-streamed");
 
     hist_push("agent> ", "ready. say what you want to see.");
+    doc_save_state();
 }
 
 /* Strip leading/trailing whitespace and outer quotes if present. */
@@ -206,6 +248,18 @@ static void apply_command(const char *raw_line) {
         hist_push("agent> ", "set header \"...\"  /  set body \"...\"");
         hist_push("agent> ", "clear list  /  add \"item\"");
         hist_push("agent> ", "load <calendar|tasks|code|brief|chat>");
+        hist_push("agent> ", "save  /  reset");
+        return;
+    }
+    if (ieq(cmd, "save")) {
+        doc_save_state();
+        hist_push("agent> ", "state persisted to disk.");
+        return;
+    }
+    if (ieq(cmd, "reset")) {
+        s_doc_init = 0;
+        doc_lazy_init();        /* will rebuild defaults if no save exists */
+        hist_push("agent> ", "reset to default state.");
         return;
     }
     if (ieq(cmd, "set")) {
@@ -257,6 +311,14 @@ static void apply_command(const char *raw_line) {
     hist_push("agent> ", "I didn't catch that. try 'help'.");
 }
 
+/* Auto-save after every apply_command — every keystroke trip into the
+ * Document is a delta and we don't want to lose any. The file is small
+ * (~bytes) so this is cheap. */
+static void apply_and_persist(const char *line) {
+    apply_command(line);
+    doc_save_state();
+}
+
 void document_open(void) { doc_lazy_init(); }
 
 void document_handle_key(int key) {
@@ -264,7 +326,7 @@ void document_handle_key(int key) {
     if (key == '\n' || key == '\r') {
         if (s_input_len > 0) {
             s_input[s_input_len] = 0;
-            apply_command(s_input);
+            apply_and_persist(s_input);
             s_input_len = 0;
             s_input[0]  = 0;
         }
