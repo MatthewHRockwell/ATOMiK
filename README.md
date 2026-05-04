@@ -1,5 +1,13 @@
 # ATOMiK Architecture
 
+> **Now hosting [ATOMiK OS](atomik_os/) — the first delta-state desktop.**
+> One window. Type *"load calendar"* — it becomes a calendar. Type
+> *"load tasks"* — same window, now a task list. Apps are field-delta
+> streams over a shared compiled UI frame, not native binaries. The
+> desktop itself is the canonical ATOMiK workload.
+>
+> [→ Quick tour](atomik_os/README.md) · [Architecture](atomik_os/docs/ARCHITECTURE.md) · [TODO](atomik_os/docs/TODO.md) · [Token-pay business model](atomik_os/docs/BUSINESS_MODEL.md)
+
 [![CI/CD](https://github.com/MatthewHRockwell/ATOMiK/actions/workflows/atomik-ci.yml/badge.svg)](https://github.com/MatthewHRockwell/ATOMiK/actions/workflows/atomik-ci.yml)
 [![Code Review](https://github.com/MatthewHRockwell/ATOMiK/actions/workflows/review.yml/badge.svg)](https://github.com/MatthewHRockwell/ATOMiK/actions/workflows/review.yml)
 ![Proofs](https://img.shields.io/badge/formal_proofs-108_verified-blue)
@@ -8,6 +16,16 @@
 ![Throughput](https://img.shields.io/badge/throughput-69.7_Gops%2Fs-red)
 ![Cost](https://img.shields.io/badge/dev_cost-%24225-yellow)
 ![License](https://img.shields.io/badge/license-Apache_2.0-blue)
+
+## ATOMiK OS — at a glance
+
+| | |
+|---|---|
+| **What** | A desktop operating system where every app is a manifest + a stream of typed field deltas, rendered through one shared compiled UI frame. |
+| **Why** | Apps stream as bytes, not pixels. Compile once, render anywhere. The OS itself = the canonical ATOMiK delta-state workload. |
+| **Status** | v0.10 shipped: Document app with chat-driven UI morphing. Open Document, type *"load calendar"*, watch the same window become a calendar. Then type *"load tasks"* — it becomes a task list. Source: [`atomik_os/`](atomik_os/). Roadmap: [`atomik_os/docs/TODO.md`](atomik_os/docs/TODO.md). |
+| **Hardware** | AX7020 (Xilinx Zynq XC7Z020) reference. NaxRiscv RV64GC soft CPU @ 100 MHz on PL. 1080p@30 HDMI via AXI HP0. Ships toward a planned ATOMiK laptop build. |
+| **Pricing** | Pay per token, not per month. Local primitives are free; cloud LLM calls are metered with a visible cost preview before commit. See [BUSINESS_MODEL.md](atomik_os/docs/BUSINESS_MODEL.md). |
 
 **Delta-State Computation — 69.7 Gops/s on FPGA, 5M ops/s in pure Python. Formally proven.**
 
