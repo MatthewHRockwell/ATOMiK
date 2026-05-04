@@ -104,12 +104,39 @@ def parse_deltas(path):
     return app
 
 
-def render_tk(app, root=None):
+def push_command_to_board(text):
+    """Inject a chat command back onto the board so the laptop edit
+    propagates upstream. Same channel atomik_ai.py / atomik_speech.py
+    use: shell on the board appends to /tmp/aos_keys, atomik_os
+    reads it as if the user typed at the chat panel."""
+    try:
+        import serial
+    except ImportError:
+        return False
+    try:
+        s = serial.Serial("/dev/ttyUSB2", 115200, timeout=0.5)
+    except Exception:
+        return False
+    s.reset_input_buffer()
+    def slow(line, per=0.0008):
+        for c in line:
+            s.write(c.encode() if isinstance(c, str) else bytes([c]))
+            time.sleep(per)
+        s.flush()
+    slow("\n"); time.sleep(0.3); s.read(8192)
+    safe = text.replace("'", "'\\''")
+    slow(f"printf '%s' '{safe}\\n' >> /tmp/aos_keys\n")
+    time.sleep(0.3)
+    s.close()
+    return True
+
+
+def render_tk(app, root=None, allow_edit=False):
     import tkinter as tk
     if root is None: root = tk.Tk()
     root.title(f"ATOMiK Document — {app.name or 'untitled'}")
     root.configure(bg="#0e121c")
-    root.geometry("960x600")
+    root.geometry("960x680")
 
     for w in root.winfo_children(): w.destroy()
 
@@ -173,9 +200,38 @@ def render_tk(app, root=None):
                      padx=14, pady=8,
                      font=("Helvetica", 11)).pack(anchor=anchor, padx=12)
 
+    if allow_edit:
+        # Bidirectional sync: a single-line entry that pushes the typed
+        # command back onto the board over UART. Same chat grammar the
+        # on-board Document accepts. Edits propagate upstream.
+        edit_frame = tk.Frame(root, bg="#1a2232", height=44)
+        edit_frame.pack(side="bottom", fill="x")
+        tk.Label(edit_frame, text="laptop -> board >",
+                 fg=app.accent, bg="#1a2232",
+                 font=("Helvetica", 11, "bold")).pack(side="left", padx=12, pady=8)
+        entry = tk.Entry(edit_frame, bg="#0e121c", fg="#f2f5fa",
+                         insertbackground=app.accent, relief="flat",
+                         font=("Helvetica", 11))
+        entry.pack(side="left", fill="x", expand=True, padx=(0, 12), pady=6)
+        status_var = tk.StringVar(value="")
+        status_lbl = tk.Label(edit_frame, textvariable=status_var,
+                              fg="#a8b2c4", bg="#1a2232",
+                              font=("Helvetica", 9))
+        status_lbl.pack(side="right", padx=12)
+        def on_submit(_evt=None):
+            text = entry.get().strip()
+            if not text: return
+            ok = push_command_to_board(text)
+            status_var.set("sent" if ok else "failed")
+            entry.delete(0, "end")
+            root.after(1500, lambda: status_var.set(""))
+        entry.bind("<Return>", on_submit)
+        entry.focus_set()
+
     foot = tk.Label(root,
                     text=f"streamed-by-delta  -  primitive: {PRIM_NAMES[app.primitive]}"
-                         f"  -  fields: {len(app.fields)}  -  source: invariant frame",
+                         f"  -  fields: {len(app.fields)}  -  source: invariant frame"
+                         + ("  -  edit enabled" if allow_edit else ""),
                     fg="#a8b2c4", bg="#0e121c",
                     font=("Helvetica", 9))
     foot.pack(side="bottom", pady=8)
@@ -191,6 +247,10 @@ def main():
     ap.add_argument("--dump", action="store_true",
                     help="Parse and print the resulting EdgeApp state. "
                          "No Tk display — useful for headless verification.")
+    ap.add_argument("--edit", action="store_true",
+                    help="Enable bidirectional sync: a chat-input box "
+                         "at the bottom of the window pushes typed "
+                         "commands back to the board over UART.")
     args = ap.parse_args()
 
     if args.dump:
@@ -218,7 +278,7 @@ def main():
             app = parse_deltas(args.path)
         except Exception as e:
             sys.exit(f"parse error: {e}")
-        root = render_tk(app)
+        root = render_tk(app, allow_edit=args.edit)
         root.mainloop()
         return
 
@@ -231,7 +291,7 @@ def main():
             if m != last_mtime[0]:
                 last_mtime[0] = m
                 app = parse_deltas(args.path)
-                render_tk(app, root)
+                render_tk(app, root, allow_edit=args.edit)
         except Exception as e:
             print(f"[view] {e}", file=sys.stderr, flush=True)
         root.after(500, tick)
