@@ -74,8 +74,12 @@ def main():
     # Disable fbcon binding so atomik_os owns the framebuffer cleanly
     cmd(s, "echo 0 > /sys/class/vtconsole/vtcon1/bind 2>/dev/null; true")
     # Run detached. atomik_os reads stdin (UART) for keys, writes /dev/fb0.
-    cmd(s, f"nohup {REMOTE} > /tmp/aos.out 2> /tmp/aos.err < /dev/null &")
-    cmd(s, "sleep 2; pgrep atomik_os")
+    # Launch detached. Bash rejects `cmd &; echo marker`, so send the
+    # background launch on its own line, then a separate marker round-trip.
+    slow(s, f"nohup {REMOTE} > /tmp/aos.out 2> /tmp/aos.err < /dev/null &\n")
+    time.sleep(0.6)
+    s.read(8192)
+    cmd(s, "sleep 2; pgrep atomik_os && echo OS_RUNNING || echo OS_NOT_RUNNING")
     cmd(s, "cat /tmp/aos.err 2>/dev/null | head -20")
     cmd(s, "cat /tmp/aos.out 2>/dev/null | head -20")
     print("[deploy] check the HDMI monitor.")

@@ -57,6 +57,34 @@ void dock_draw(int hover_index);
 int  dock_hit_test(int mouse_x, int mouse_y);  /* returns icon index or -1 */
 int  dock_count(void);
 
+/* wm.c — window manager */
+typedef struct window window_t;
+typedef void (*win_draw_fn)(window_t *w, int content_x, int content_y,
+                            int content_w, int content_h);
+
+#define WM_MAX_WINDOWS 16
+#define WM_TITLE_H     32
+#define WM_BORDER      1
+
+struct window {
+    int          id;
+    char         title[64];
+    int          x, y, w, h;       /* window outer rect including title bar */
+    int          visible;          /* 1 = drawn, 0 = hidden but kept in stack */
+    int          z;                /* stacking order (higher = front) */
+    win_draw_fn  draw_content;     /* called to render the inside of the window */
+    void        *user;             /* per-window state */
+};
+
+void      wm_init(void);
+window_t *wm_open(const char *title, int x, int y, int w, int h,
+                  win_draw_fn draw_content, void *user);
+void      wm_close(int id);
+window_t *wm_focus(int id);
+window_t *wm_topmost(void);
+void      wm_draw_all(void);
+int       wm_handle_key(int key);   /* returns 1 if key was consumed */
+
 /* input.c */
 typedef enum {
     EV_NONE = 0,
