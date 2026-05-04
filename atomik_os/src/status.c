@@ -71,7 +71,7 @@ void status_draw(void) {
     int spend_uusd = llm_audit_total_uusd();
     char right[200];
     snprintf(right, sizeof right,
-             "wallet $%d.%02d   spent $%d.%03d   cpu %3d%%   %s   v0.13",
+             "wallet $%d.%02d   spent $%d.%03d   cpu %3d%%   %s   v0.16",
              w->balance_uusd / 1000000,
              (w->balance_uusd / 10000) % 100,
              spend_uusd / 1000000,

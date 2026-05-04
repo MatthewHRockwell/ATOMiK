@@ -50,11 +50,14 @@ generates the rest.
 | 5 reference edge apps (Calendar, Tasks, Code, Brief, Chat) | ✅ shipped |
 | **Document app — chat-driven UI morphing (the pitch)** | ✅ shipped (v0.10) |
 | Document persistence | ✅ shipped (v0.10.1) |
-| Field-delta wire format | ⏳ v0.11 |
-| LLM-backed parser + token meter | ⏳ v0.12 |
-| Multi-document workspace | ⏳ v0.13 |
-| Speech input | ⏳ v0.14 |
-| Token wallet UI | ⏳ v0.15 |
+| Field-delta wire format (`delta_log.c`) | ✅ shipped (v0.11) |
+| LLM provider abstraction + `/ai` + token meter | ✅ shipped (v0.12) |
+| Real-LLM relay (`tools/atomik_ai.py`) | ✅ shipped |
+| AdaptiveCards → ATOMiK adapter | ✅ shipped |
+| Multi-document workspace (N independent Documents) | ✅ shipped (v0.13) |
+| Speech-input relay (`tools/atomik_speech.py`) | ✅ shipped (v0.14) |
+| Token wallet (`W` key) — balance, daily cap, audit ledger | ✅ shipped (v0.15) |
+| Shareable manifests (`/export`, `/import`) | ✅ shipped (v0.16) |
 | Cross-device sync | ⏳ v1.0 |
 
 Full roadmap: [`docs/TODO.md`](docs/TODO.md).
@@ -65,7 +68,8 @@ Full roadmap: [`docs/TODO.md`](docs/TODO.md).
 
 | Key | Opens |
 |-----|-------|
-| `D` | **Document** — universal chat-driven UI |
+| `D` | **Document** — universal chat-driven UI. Press D more than once to open multiple independent Documents (cascade-tiled). |
+| `W` | Wallet — balance, daily cap, lifetime spend, audit ledger |
 | `A` | About |
 | `M` | Monitor (live ATOMiK adapter slots) |
 | `T` | Terminal (`/bin/sh` over forkpty) |
@@ -87,6 +91,9 @@ set accent cyan
 set header "Inbox"
 add "buy milk"
 clear list
+/ai show me a feed of GitHub PRs assigned to me
+/export /tmp/my_calendar.deltas
+/import /tmp/some_other.deltas
 help
 save
 reset
@@ -94,6 +101,19 @@ reset
 
 Every command is a field-delta on the underlying `edge_app_t`
 accumulator. Documents are persisted between launches.
+
+## Laptop-side helpers
+
+The on-board OS has no internet and no microphone. Two laptop-side
+relay scripts make real LLM and speech work without modifying the
+board:
+
+| Script | Use |
+|--------|-----|
+| `tools/atomik_ai.py "show me a calendar"` | Fires a real Claude call, gets back a script of ATOMiK field-delta commands, pipes them through the UART into the on-board Document's chat FIFO. The Document morphs as if you'd typed each command. Reports tokens-in / tokens-out / cost in uUSD. |
+| `tools/atomik_speech.py --record 5 "..."` | Captures 5 sec of mic audio, transcribes via OpenAI Whisper, hands the transcript to `atomik_ai.py`. Speak naturally, watch the Document morph. |
+| `tools/atomik_speech.py --text "..."` | Skip the mic; use existing OS-native dictation (Mac speak-to-type, etc.) and paste the result. |
+| `adapters/adaptivecards_to_atomik.py in.json out.deltas` | Compile any Microsoft AdaptiveCards JSON into our wire format. The Document `/import`s the result. Demonstrates the schema-interop pitch — render someone else's generative-UI output for a memcpy's worth of compute. |
 
 ---
 
