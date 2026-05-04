@@ -36,12 +36,18 @@ static action_t      s_prev_action                 = ACT_NONE;
 
 static const char *NAMES[ACT_MAX] = {
     [ACT_NONE]         = "none",
-    [ACT_OPEN_ABOUT]   = "Open About",
-    [ACT_OPEN_MONITOR] = "Open Monitor",
-    [ACT_CLOSE_WINDOW] = "Close window",
-    [ACT_CYCLE_FOCUS]  = "Cycle focus",
-    [ACT_DOCK_HOVER]   = "Hover dock",
-    [ACT_QUIT]         = "Quit",
+    [ACT_OPEN_ABOUT]    = "Open About",
+    [ACT_OPEN_MONITOR]  = "Open Monitor",
+    [ACT_OPEN_TERMINAL] = "Open Terminal",
+    [ACT_OPEN_FILES]    = "Open Files",
+    [ACT_OPEN_NOTES]    = "Open Notes",
+    [ACT_OPEN_CALENDAR] = "Open Calendar",
+    [ACT_OPEN_TASKS]    = "Open Tasks",
+    [ACT_OPEN_CODE]     = "Open Code",
+    [ACT_CLOSE_WINDOW]  = "Close window",
+    [ACT_CYCLE_FOCUS]   = "Cycle focus",
+    [ACT_DOCK_HOVER]    = "Hover dock",
+    [ACT_QUIT]          = "Quit",
 };
 
 /* Compact on-disk format: a v1 magic header + clock + count[] + last[] +

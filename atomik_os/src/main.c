@@ -73,6 +73,41 @@ static void open_notes(void) {
     notify_post("Notes opened");
 }
 
+/* Edge-app windows. NO per-app open code beyond a wm_open() — all three
+ * share eapp_draw(). The rendering, layout, theming come from the
+ * invariant frame. */
+static int s_cal_id = 0, s_task_id = 0, s_code_id = 0;
+static void open_calendar(void) {
+    if (s_cal_id) { wm_focus(s_cal_id); return; }
+    int ww = 1080, wh = 620;
+    int wx = (FB_W - ww) / 2;
+    int wy = (FB_H - wh) / 2 - 60;
+    window_t *w = wm_open("Calendar (edge app)", wx, wy, ww, wh,
+                          edge_calendar_draw, NULL);
+    if (w) s_cal_id = w->id;
+    notify_post("Calendar streamed");
+}
+static void open_tasks(void) {
+    if (s_task_id) { wm_focus(s_task_id); return; }
+    int ww = 720, wh = 600;
+    int wx = (FB_W - ww) / 2 - 100;
+    int wy = (FB_H - wh) / 2 - 30;
+    window_t *w = wm_open("Tasks (edge app)", wx, wy, ww, wh,
+                          edge_tasks_draw, NULL);
+    if (w) s_task_id = w->id;
+    notify_post("Tasks streamed");
+}
+static void open_code(void) {
+    if (s_code_id) { wm_focus(s_code_id); return; }
+    int ww = 880, wh = 580;
+    int wx = (FB_W - ww) / 2 + 60;
+    int wy = (FB_H - wh) / 2 + 20;
+    window_t *w = wm_open("Code (edge app)", wx, wy, ww, wh,
+                          edge_code_draw, NULL);
+    if (w) s_code_id = w->id;
+    notify_post("Code streamed");
+}
+
 int main(int argc, char **argv) {
     (void)argc; (void)argv;
 
@@ -157,6 +192,18 @@ int main(int argc, char **argv) {
             } else if (!dirty && (ev.key == 'n' || ev.key == 'N')) {
                 open_notes();
                 agent_log(ACT_OPEN_NOTES);
+                dirty = 1;
+            } else if (!dirty && (ev.key == 'c' || ev.key == 'C')) {
+                open_calendar();
+                agent_log(ACT_OPEN_CALENDAR);
+                dirty = 1;
+            } else if (!dirty && (ev.key == 'k' || ev.key == 'K')) {
+                open_tasks();
+                agent_log(ACT_OPEN_TASKS);
+                dirty = 1;
+            } else if (!dirty && (ev.key == 'g' || ev.key == 'G')) {
+                open_code();
+                agent_log(ACT_OPEN_CODE);
                 dirty = 1;
             } else if (!dirty && ev.key >= '1' && ev.key < '1' + dock_count()) {
                 /* Number key launches whatever app is currently in that

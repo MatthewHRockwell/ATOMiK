@@ -69,6 +69,9 @@ typedef enum {
     ACT_OPEN_TERMINAL,
     ACT_OPEN_FILES,
     ACT_OPEN_NOTES,
+    ACT_OPEN_CALENDAR,
+    ACT_OPEN_TASKS,
+    ACT_OPEN_CODE,
     ACT_CLOSE_WINDOW,
     ACT_CYCLE_FOCUS,
     ACT_DOCK_HOVER,
@@ -161,6 +164,84 @@ void notify_draw(void);
 
 /* status.c — top status bar (clock, CPU, prediction surface) */
 void status_draw(void);
+
+/* ============================================================
+ * INVARIANT FRAME + FIELD-DELTA RUNTIME (v0.9)
+ *
+ * Every app's UI = invariant_frame XOR accumulated_field_deltas.
+ * Apps ship as a manifest + a stream of typed field deltas, not as C
+ * code. Mirrors the ATOMiK delta-state algebra at the application layer.
+ * ============================================================ */
+
+/* The five primitive views every app composes from. The invariant frame
+ * supplies a renderer for each — apps just specify which one to use and
+ * stream typed field deltas into it. */
+typedef enum {
+    PRIM_LIST = 0,    /* vertical list of textual rows                    */
+    PRIM_CARD,        /* big single-record view (title + body + meta)     */
+    PRIM_GRID,        /* calendar/album-style grid of cells               */
+    PRIM_FEED,        /* timeline / activity stream                       */
+    PRIM_CONVO,       /* chat-style alternating bubbles                   */
+    PRIM_MAX,
+} primitive_t;
+
+/* A single typed field. Apps reference fields by id; the runtime maps id
+ * to a slot in the app's field table. */
+typedef enum {
+    FT_NONE = 0,
+    FT_STR,
+    FT_INT,
+    FT_LIST,         /* array of strings, length in v.list_n */
+    FT_COLOR,
+} field_type_t;
+
+#define FIELD_LIST_MAX  32
+#define FIELD_STR_MAX   128
+
+typedef struct {
+    field_type_t type;
+    char         str[FIELD_STR_MAX];
+    int          i;
+    char         list[FIELD_LIST_MAX][FIELD_STR_MAX];
+    int          list_n;
+    pixel_t      color;
+} field_value_t;
+
+#define EAPP_MAX_FIELDS 16
+#define EAPP_NAME_MAX   48
+
+/* Edge-app instance — pairs a manifest (primitive choice + field schema)
+ * with the live accumulated field state. Sending a "delta" means writing
+ * eapp_set_field(); the local renderer recomputes from there. */
+typedef struct edge_app {
+    char          name[EAPP_NAME_MAX];
+    char          subtitle[EAPP_NAME_MAX];
+    primitive_t   primitive;
+    pixel_t       accent;
+    field_value_t fields[EAPP_MAX_FIELDS];
+    int           field_count;
+} edge_app_t;
+
+/* eapp.c */
+void        eapp_init(edge_app_t *a, const char *name, const char *subtitle,
+                      primitive_t prim, pixel_t accent);
+int         eapp_add_field(edge_app_t *a, field_type_t t);
+void        eapp_set_str(edge_app_t *a, int field_id, const char *s);
+void        eapp_set_int(edge_app_t *a, int field_id, int v);
+void        eapp_set_color(edge_app_t *a, int field_id, pixel_t c);
+void        eapp_clear_list(edge_app_t *a, int field_id);
+void        eapp_list_append(edge_app_t *a, int field_id, const char *s);
+const char *eapp_primitive_name(primitive_t p);
+
+/* eapp_render.c — the invariant-frame renderer. Draws the universal
+ * window-content surface for any edge app, picking the right primitive
+ * and pulling field values out of the app's accumulator. */
+void eapp_draw(window_t *w, edge_app_t *a, int x, int y, int wd, int ht);
+
+/* edge_demo.c — three reference edge apps shipped as data only */
+void edge_calendar_draw(window_t *w, int x, int y, int wd, int ht);
+void edge_tasks_draw(window_t *w, int x, int y, int wd, int ht);
+void edge_code_draw(window_t *w, int x, int y, int wd, int ht);
 
 /* anim.c — minimal animation runtime.
  * Returns monotonic milliseconds for use in tween functions, plus a few

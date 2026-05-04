@@ -51,8 +51,8 @@ void status_draw(void) {
 
     /* Left: app keys hint */
     const char *hint =
-        "[A]bout  [M]onitor  [T]erminal  [F]iles  [N]otes   "
-        "[Tab]cycle  [Esc]close  [Q]uit";
+        "[A]bout [M]on [T]erm [F]iles [N]otes  -  edge: [C]al [K]Tasks [G]Code  -  "
+        "[Tab][Esc][Q]";
     draw_text(20, 12, hint, 1, ATOMIK_FG_DIM);
 
     /* Center: agent prediction */
@@ -68,7 +68,7 @@ void status_draw(void) {
     char up[64];
     format_uptime(up, sizeof up);
     char right[128];
-    snprintf(right, sizeof right, "cpu %3d%%   %s   ATOMiK OS v0.8", s_cpu_pct, up);
+    snprintf(right, sizeof right, "cpu %3d%%   %s   ATOMiK OS v0.9", s_cpu_pct, up);
     int rw = text_width(right, 1);
     draw_text(FB_W - rw - 20, 12, right, 1, ATOMIK_FG);
 }
