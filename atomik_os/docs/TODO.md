@@ -53,76 +53,75 @@
 
 ---
 
-## In flight
+### Field-delta wire format
+- [x] **v0.11** — versioned binary encoding (DELT magic + opcodes:
+      SET_PRIMITIVE / SET_FIELD_STR / LIST_APPEND / LIST_CLEAR /
+      SET_ACCENT / SET_NAME / SET_SUBTITLE / RESET) (`e1cc680`)
+- [x] Replaces full-struct fwrite with `delta_snapshot_to_file` (`e1cc680`)
 
-- [ ] **v0.10.1 deploy + visual confirm** — currently streaming the
-      v0.9 binary; redeploy head-of-main once user is ready
+### Real LLM provider abstraction + token meter
+- [x] **v0.12** — `llm.c` provider registry, cost preview, audit log,
+      stub backend with intent matching (`94bf226`)
+- [x] **v0.12.1** — lifetime spend in status bar (`d4d7d17`)
+- [x] **v0.12.2** — richer stub intent matching (`eec020e`)
+- [x] `tools/atomik_ai.py` — laptop-side real-Claude relay over UART
+      (`dad1616`)
+
+### Multi-document workspace
+- [x] **v0.13** — N independent Document instances, cascade-tiled,
+      each with own state file (`5997ef3`)
+
+### Speech input
+- [x] **v0.14** — `tools/atomik_speech.py`: laptop mic →
+      Whisper → atomik_ai.py → board (`2d0c761`)
+
+### Token wallet
+- [x] **v0.15** — `wallet.c`: balance, daily cap, audit-log ledger,
+      Wallet app on `W` key, balance in status bar (`123da8d`)
+
+### Shareable manifests
+- [x] **v0.16** — `/export <path>` and `/import <path>` chat commands
+      using delta-log wire format (`84a2431`)
+
+### Schema interop
+- [x] `adapters/adaptivecards_to_atomik.py` — AdaptiveCards JSON →
+      ATOMiK delta-log (`7c1f491`)
+- [x] `adapters/atomik_to_adaptivecards.py` — reverse: delta-log →
+      AdaptiveCards JSON (`8945a24`); ATOMiK OS is now a two-way bridge
+- [x] `docs/SCHEMA_SURVEY.md` — comparative scan, AdaptiveCards adopted
+      as public interop format (`496037a`)
+
+### v1.0 cross-device sync
+- [x] `tools/atomik_view.py` — laptop-side Tk renderer of delta-log
+      wire format (`78b7605`, `cd66ba1`)
+- [x] `tools/atomik_pull.py` — board → laptop deltas bridge
+      (`a193707`)
+- [x] `atomik_view.py --edit` — laptop → board edits via UART
+      injection. Bidirectional sync feature complete (`e36033c`)
 
 ---
 
-## Next sprint (v0.11–v0.13) — agentic primitives
+## Pending / strategic
 
-- [ ] **v0.11 — Field-delta wire format**
-    - [ ] Define versioned binary encoding for an `edge_app_t` snapshot
-    - [ ] Define an *incremental* delta encoding (op-codes:
-          `SET_PRIMITIVE`, `SET_FIELD_STR`, `LIST_APPEND`, `LIST_CLEAR`,
-          `SET_ACCENT`, `RESET`)
-    - [ ] Replace the current full-struct serialization in
-          `document.c` with the new delta log
-    - [ ] Stream-over-UART path: pipe a delta stream from a host tool
-          → board, watch the Document update live
-    - [ ] Crash-recovery: replay the delta log on startup
-- [ ] **v0.12 — Real LLM as the parser**
-    - [ ] AI provider abstraction: pluggable backends (Anthropic,
-          OpenAI, local). Each backend = (auth, base URL, model name,
-          token-cost map)
-    - [ ] One reference backend wired to a real API on the laptop side
-          (the board still has no internet — laptop bridge proxies)
-    - [ ] Token-meter: every request shows tokens-in / tokens-out and a
-          running cost estimate
-    - [ ] Same input → output contract as the v0.10 hand-rolled
-          parser, so swapping is invisible to the rest of the OS
-- [ ] **v0.13 — Multi-document workspace**
-    - [ ] N concurrent Document instances; each has independent state
-    - [ ] Side-by-side layout, save/load named documents
-    - [ ] Quick-switch palette: type a doc name to focus
+- [ ] **One design-partner conversation before public launch** — Vercel
+      v0, Thesys, Anthropic Applied, or AdaptiveCards team. Validate
+      the "we render your generated UI cheaply" pitch.
+- [ ] **App distribution channel** — manifest registry, "install via
+      URL" UX inside Files / Document.
+- [ ] **First real cloud service** — Google Calendar OAuth wired
+      through atomik_ai.py.
+- [ ] **On-device LLM option** — for full offline operation. Probably
+      a tiny intent-classifier model rather than a full LLM.
+- [ ] **Bootable image for the ATOMiK laptop build** — bundle
+      atomik_os + Linux + bridge into one shipping image.
 
-## Schema interop / partnership track (parallel to OS sprints)
+## Quality / polish
 
-- [ ] **Survey existing manifest schemas** — AdaptiveCards, Thesys, Vercel
-      v0 output shape, Anthropic Artifacts, OpenAI structured outputs.
-      Document coverage of our 5 primitives in each.
-- [ ] **Pick the alignment target** — most likely AdaptiveCards (mature)
-      or Thesys (LLM-native). Decision goes in
-      `docs/ARCHITECTURE.md` §9.
-- [ ] **Ship `adapters/from_adaptivecards.c`** — first reference adapter.
-      Ingests JSON, emits `delta_emit_*` calls into an `edge_app_t`.
-- [ ] **One design-partner conversation before v1.0 locks** — Vercel v0,
-      Thesys, or Anthropic Applied. Even an exploratory chat informs
-      whether our manifest schema should be theirs.
-
-## Sprint after (v0.14–v0.16) — input + identity
-
-- [ ] **v0.14 — Speech input**
-    - [ ] Audio capture pipeline (laptop mic for now → bridge.py →
-          UART text → document_handle_key)
-    - [ ] On-device intent classifier stub (no audio on the board yet)
-    - [ ] "Hold-to-talk" indicator in the chat panel
-- [ ] **v0.15 — Per-user identity + token wallet**
-    - [ ] Local user profile: name, default AI provider, token balance
-    - [ ] Per-action cost preview before commit
-    - [ ] Daily / monthly cap with a "review purchases" log
-- [ ] **v0.16 — Shareable manifests**
-    - [ ] Export a configured Document as a tiny shareable file
-    - [ ] Import a manifest into a fresh Document → instant clone
-
-## v1.0 — public-facing
-
-- [ ] Cross-device sync: same accumulator on AX7020 + laptop
-- [ ] App distribution: ship a manifest, not a binary
-- [ ] First real cloud service (Google Calendar via Google API)
-- [ ] On-device LLM option for fully offline operation
-- [ ] Bootable image for the planned ATOMiK laptop build
+- [ ] **Screenshots for README** — capture pipeline has a residual
+      sentinel/encoding bug. Working DSLR-photo path is the fallback
+      until that's fixed.
+- [ ] Document the AdaptiveCards subset we support in
+      `adapters/README.md`
 
 ---
 

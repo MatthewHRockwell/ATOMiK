@@ -58,7 +58,13 @@ generates the rest.
 | Speech-input relay (`tools/atomik_speech.py`) | ✅ shipped (v0.14) |
 | Token wallet (`W` key) — balance, daily cap, audit ledger | ✅ shipped (v0.15) |
 | Shareable manifests (`/export`, `/import`) | ✅ shipped (v0.16) |
-| Cross-device sync | ⏳ v1.0 |
+| Cross-device sync — board↔laptop, both directions | ✅ shipped (v1.0) |
+| AdaptiveCards round-trip (`adapters/`) | ✅ shipped — two-way bridge |
+| `atomik_view.py` — laptop-side delta-log renderer | ✅ shipped |
+| `atomik_pull.py` — board → laptop UART bridge | ✅ shipped |
+| First real cloud service (Google Calendar OAuth) | ⏳ post-v1.0 |
+| On-device LLM option | ⏳ post-v1.0 |
+| Bootable image for ATOMiK laptop | ⏳ post-v1.0 |
 
 Full roadmap: [`docs/TODO.md`](docs/TODO.md).
 
@@ -111,9 +117,28 @@ board:
 | Script | Use |
 |--------|-----|
 | `tools/atomik_ai.py "show me a calendar"` | Fires a real Claude call, gets back a script of ATOMiK field-delta commands, pipes them through the UART into the on-board Document's chat FIFO. The Document morphs as if you'd typed each command. Reports tokens-in / tokens-out / cost in uUSD. |
-| `tools/atomik_speech.py --record 5 "..."` | Captures 5 sec of mic audio, transcribes via OpenAI Whisper, hands the transcript to `atomik_ai.py`. Speak naturally, watch the Document morph. |
+| `tools/atomik_speech.py --record 5` | Captures 5 sec of mic audio, transcribes via OpenAI Whisper, hands the transcript to `atomik_ai.py`. Speak naturally, watch the Document morph. |
 | `tools/atomik_speech.py --text "..."` | Skip the mic; use existing OS-native dictation (Mac speak-to-type, etc.) and paste the result. |
+| `tools/atomik_pull.py --doc 1` | Periodically copies `/tmp/atomik_os_document_<id>.deltas` from the board to the laptop. |
+| `tools/atomik_view.py --watch /tmp/board_doc_1.deltas` | Tk renderer for the delta-log wire format. Same encoding as on-board, different render target. |
+| `tools/atomik_view.py --watch --edit ...` | Adds a chat-input box that pushes typed commands BACK to the board over UART. Bidirectional cross-device sync. |
 | `adapters/adaptivecards_to_atomik.py in.json out.deltas` | Compile any Microsoft AdaptiveCards JSON into our wire format. The Document `/import`s the result. Demonstrates the schema-interop pitch — render someone else's generative-UI output for a memcpy's worth of compute. |
+| `adapters/atomik_to_adaptivecards.py in.deltas card.json` | Reverse direction. Take an on-board Document state, emit AdaptiveCards JSON consumable by Outlook / Teams / browser. ATOMiK OS as a two-way bridge. |
+
+### v1.0 demo: cross-device sync, end to end
+
+```sh
+# On the laptop, terminal A:
+python3 atomik_os/tools/atomik_pull.py --doc 1
+
+# Terminal B:
+python3 atomik_os/tools/atomik_view.py --watch --edit /tmp/board_doc_1.deltas
+```
+
+Open a Document on the board with `D`. Type `load calendar` in either
+the on-board chat panel OR the laptop entry box. Both screens morph
+into a calendar within ~2 seconds. Same wire format, same field-delta
+algebra, two displays, no networking required.
 
 ---
 
