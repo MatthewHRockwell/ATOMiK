@@ -188,7 +188,27 @@ def main():
     ap.add_argument("--watch", action="store_true",
                     help="Re-render whenever the file mtime changes "
                          "(simulates cross-device sync)")
+    ap.add_argument("--dump", action="store_true",
+                    help="Parse and print the resulting EdgeApp state. "
+                         "No Tk display — useful for headless verification.")
     args = ap.parse_args()
+
+    if args.dump:
+        try:
+            app = parse_deltas(args.path)
+        except Exception as e:
+            sys.exit(f"parse error: {e}")
+        print(f"name      : {app.name!r}")
+        print(f"subtitle  : {app.subtitle!r}")
+        print(f"primitive : {PRIM_NAMES[app.primitive]}  ({app.primitive})")
+        print(f"accent    : {app.accent}")
+        for fid, val in sorted(app.fields.items()):
+            if isinstance(val, list):
+                print(f"field[{fid}] : list[{len(val)}]")
+                for it in val: print(f"   - {it!r}")
+            else:
+                print(f"field[{fid}] : {val!r}")
+        return
 
     if not os.path.exists(args.path):
         sys.exit(f"missing {args.path}")
