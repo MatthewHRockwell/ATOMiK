@@ -75,17 +75,21 @@ def push_keys(s, text):
     time.sleep(0.4)   # let the OS process the keys + repaint
 
 def shoot(s, name):
-    """Capture /dev/fb0 with fb2png, gzip + base64-stream back, save.
+    """Snapshot /dev/fb0 directly. Skip the on-board PNG encoder — it's
+    too slow on the 100 MHz soft CPU (5+ min per shot). Instead:
 
-    The on-board PNG is uncompressed (stored deflate) so it's ~6 MB. We
-    gzip it on the board first to ~1 MB, then base64 (~1.4 MB), then
-    pull in 4 KiB block-aligned chunks via `dd bs=4096 skip=N count=K`
-    which is ~4096x faster than the byte-aligned dd we used before. """
+      1. dd /dev/fb0 -> /tmp/fb.raw           (~8 MB BGRX raw, ~5s)
+      2. gzip -1 /tmp/fb.raw                  (~3-4 MB, fast vs gzip -9)
+      3. base64 -> /tmp/fb.b64
+      4. Pull in 32 KiB sentinel-bracketed chunks
+      5. Host-side: gunzip + BGRA->RGB + write PNG via PIL
+    """
     print(f"[cap] shooting {name} ...", flush=True)
-    cmd(s, f"rm -f /tmp/{name}.png /tmp/{name}.png.gz /tmp/{name}.b64")
-    cmd(s, f"/tmp/fb2png /tmp/{name}.png 2>&1 | head -2", t=120)
-    cmd(s, f"gzip -9 /tmp/{name}.png && base64 /tmp/{name}.png.gz > /tmp/{name}.b64",
-        t=300)
+    cmd(s, f"rm -f /tmp/{name}.raw /tmp/{name}.raw.gz /tmp/{name}.b64")
+    cmd(s, f"dd if=/dev/fb0 of=/tmp/{name}.raw bs=1M count=8 2>&1 | tail -1",
+        t=180)
+    cmd(s, f"gzip -1 /tmp/{name}.raw && base64 /tmp/{name}.raw.gz > /tmp/{name}.b64",
+        t=240)
     sz_buf = cmd(s, f"wc -c /tmp/{name}.b64")
     n = 0
     for tok in sz_buf.decode(errors='replace').split():
@@ -128,12 +132,25 @@ def shoot(s, name):
         print(f"  ! decode failed: {e}"); return
     import gzip as gzmod
     try:
-        png = gzmod.decompress(gz)
+        raw = gzmod.decompress(gz)
     except Exception as e:
         print(f"  ! gunzip failed: {e}"); return
-    out_path = os.path.join(OUT, f"{name}.png")
-    with open(out_path, "wb") as f: f.write(png)
-    print(f"  wrote {out_path} ({len(png)} bytes)", flush=True)
+    print(f"  raw fb bytes: {len(raw)}", flush=True)
+
+    W, H   = 1920, 1080
+    expect = W * H * 4
+    if len(raw) < expect:
+        print(f"  ! short raw ({len(raw)} < {expect})"); return
+    raw = raw[:expect]
+    try:
+        from PIL import Image
+        img = Image.frombytes('RGBA', (W, H), raw, 'raw', 'BGRA')
+        img = img.convert('RGB')
+        out_path = os.path.join(OUT, f"{name}.png")
+        img.save(out_path, optimize=True)
+        print(f"  wrote {out_path}", flush=True)
+    except Exception as e:
+        print(f"  ! PIL save failed: {e}"); return
 
 def main():
     ap = argparse.ArgumentParser()
