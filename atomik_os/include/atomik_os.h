@@ -236,6 +236,59 @@ void        eapp_clear_list(edge_app_t *a, int field_id);
 void        eapp_list_append(edge_app_t *a, int field_id, const char *s);
 const char *eapp_primitive_name(primitive_t p);
 
+/* llm.c — pluggable AI-provider abstraction + token meter.
+ *
+ * Every code path that wants AI inference goes through here. The
+ * provider is a struct (name + base URL + model + token-cost map);
+ * routing is a configurable choice; cost preview happens BEFORE the
+ * request fires; audit log captures every spend.
+ *
+ * v0.12 ships a "stub" provider (offline, hand-mapped responses with
+ * realistic token counts) plus the abstraction needed to plug a real
+ * Anthropic / OpenAI / local backend in v1.0.
+ *
+ * The substring "stub" in the response is the user-visible signal that
+ * no real network call happened — never hide an offline answer behind a
+ * cost number. */
+typedef struct {
+    const char *name;
+    const char *base_url;          /* informational only in v0.12 */
+    const char *model;
+    /* Cost in micro-dollars per token (1e-6 USD). */
+    int         cost_in_uusd_per_token;
+    int         cost_out_uusd_per_token;
+    int         is_stub;           /* 1 = offline canned responses */
+} llm_provider_t;
+
+typedef struct {
+    char        text[2048];        /* response text */
+    int         tokens_in;
+    int         tokens_out;
+    int         cost_uusd;          /* total micro-USD this call */
+    int         is_stub;
+    int         ok;
+} llm_response_t;
+
+/* Cost preview without firing the request. token_in_estimate uses
+ * 4-chars-per-token heuristic. */
+int llm_estimate_tokens   (const char *prompt);
+int llm_estimate_cost_uusd(const llm_provider_t *p, int tokens_in,
+                           int tokens_out);
+
+/* Synchronous call. v0.12 returns canned stub responses; v1.0 wires real
+ * HTTP. Always logs to the audit trail. */
+void llm_query(const llm_provider_t *p, const char *prompt, llm_response_t *out);
+
+/* Provider registry helpers. */
+const llm_provider_t *llm_default_provider(void);
+const llm_provider_t *llm_provider_by_name(const char *name);
+int                   llm_provider_count(void);
+const llm_provider_t *llm_provider_at(int idx);
+
+/* Audit log: list of every spend, persisted across runs. */
+void llm_audit_append (const char *prompt, const llm_response_t *r);
+int  llm_audit_total_uusd(void);          /* lifetime cost in micro-USD */
+
 /* delta_log.c — versioned binary wire format for edge-app field deltas.
  *
  * Every mutation an app accumulates is encoded as one opcode + payload.

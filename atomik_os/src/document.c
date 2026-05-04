@@ -257,7 +257,46 @@ static void apply_command(const char *raw_line) {
         hist_push("agent> ", "set header \"...\"  /  set body \"...\"");
         hist_push("agent> ", "clear list  /  add \"item\"");
         hist_push("agent> ", "load <calendar|tasks|code|brief|chat>");
+        hist_push("agent> ", "/ai <prompt>  -- route through AI provider");
         hist_push("agent> ", "save  /  reset");
+        return;
+    }
+    /* /ai prompt — route through llm.c, get back a multi-line script of
+     * field-delta commands, run them in turn. The cost preview is shown
+     * BEFORE the call (currently free since v0.12 ships only the stub
+     * provider). */
+    if (cmd[0] == '/' && ieq(cmd, "/ai")) {
+        const char *prompt = trim(p);
+        const llm_provider_t *prov = llm_default_provider();
+        int est_in   = llm_estimate_tokens(prompt);
+        int est_out  = est_in;   /* assume balanced for preview */
+        int est_cost = llm_estimate_cost_uusd(prov, est_in, est_out);
+        char preview[120];
+        snprintf(preview, sizeof preview,
+                 "estimate: %d in + ~%d out tokens, ~%d.%03d uUSD (%s)",
+                 est_in, est_out, est_cost / 1000, est_cost % 1000,
+                 prov->name);
+        hist_push("agent> ", preview);
+
+        llm_response_t r;
+        llm_query(prov, prompt, &r);
+        char actual[120];
+        snprintf(actual, sizeof actual,
+                 "spent: %d in + %d out, %d.%03d uUSD%s",
+                 r.tokens_in, r.tokens_out,
+                 r.cost_uusd / 1000, r.cost_uusd % 1000,
+                 r.is_stub ? " (stub)" : "");
+        hist_push("agent> ", actual);
+
+        /* Apply the response as a script of commands, one per line. */
+        char *line = r.text;
+        while (line && *line) {
+            char *eol = strchr(line, '\n');
+            if (eol) *eol = 0;
+            if (line[0]) apply_command(line);   /* recurse into the parser */
+            if (!eol) break;
+            line = eol + 1;
+        }
         return;
     }
     if (ieq(cmd, "save")) {
