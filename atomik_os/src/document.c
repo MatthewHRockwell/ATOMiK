@@ -25,6 +25,7 @@
  */
 #include "atomik_os.h"
 #include <ctype.h>
+#include <dirent.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -231,6 +232,7 @@ static void apply_command(doc_state_t *d, const char *raw_line) {
         hist_push(d, "agent> ", "clear list  /  add \"item\"");
         hist_push(d, "agent> ", "load <calendar|tasks|code|brief|chat>");
         hist_push(d, "agent> ", "/ai <prompt>  /  /export <path>  /  /import <path>");
+        hist_push(d, "agent> ", "/store list  /  /store install <name>");
         hist_push(d, "agent> ", "save  /  reset");
         return;
     }
@@ -267,6 +269,59 @@ static void apply_command(doc_state_t *d, const char *raw_line) {
         else       snprintf(buf, sizeof buf, "no ops applied from %s", path);
         hist_push(d, "agent> ", buf);
         doc_save(d);
+        return;
+    }
+    /* /store list  | /store install <name>
+     * The "app store" is just a directory of .deltas files in
+     * /tmp/atomik_apps/. Installing an app = importing one. The whole
+     * "ship a manifest, not a binary" pitch in one chat command. */
+    if (ieq(cmd, "/store") || ieq(cmd, "store")) {
+        char *sub = pop_token(&p);
+        if (!sub || ieq(sub, "list")) {
+            hist_push(d, "agent> ", "/tmp/atomik_apps/ contents:");
+            DIR *dir = opendir("/tmp/atomik_apps");
+            if (!dir) {
+                hist_push(d, "agent> ", "  (directory missing)");
+                hist_push(d, "agent> ", "  mkdir /tmp/atomik_apps from terminal");
+                return;
+            }
+            int found = 0;
+            struct dirent *de;
+            while ((de = readdir(dir))) {
+                size_t L = strlen(de->d_name);
+                if (L < 8 || strcmp(de->d_name + L - 7, ".deltas") != 0) continue;
+                char line[160];
+                snprintf(line, sizeof line, "  %.*s",
+                         (int)(L - 7), de->d_name);
+                hist_push(d, "agent> ", line);
+                found++;
+            }
+            closedir(dir);
+            if (!found) hist_push(d, "agent> ", "  (no .deltas manifests yet)");
+            return;
+        }
+        if (ieq(sub, "install")) {
+            char *name = pop_token(&p);
+            if (!name) {
+                hist_push(d, "agent> ", "install which? try '/store list'");
+                return;
+            }
+            char path[160];
+            snprintf(path, sizeof path, "/tmp/atomik_apps/%s.deltas", name);
+            eapp_init(&d->app, "Document", "installed manifest",
+                      PRIM_LIST, ATOMIK_ACCENT);
+            eapp_add_field(&d->app, FT_STR);
+            eapp_add_field(&d->app, FT_LIST);
+            eapp_add_field(&d->app, FT_STR);
+            int n = delta_replay_file(path, &d->app);
+            char buf[160];
+            if (n > 0) snprintf(buf, sizeof buf, "installed %s (%d ops)", name, n);
+            else       snprintf(buf, sizeof buf, "no manifest at %s", path);
+            hist_push(d, "agent> ", buf);
+            doc_save(d);
+            return;
+        }
+        hist_push(d, "agent> ", "/store list  /  /store install <name>");
         return;
     }
     if (cmd[0] == '/' && ieq(cmd, "/ai")) {
