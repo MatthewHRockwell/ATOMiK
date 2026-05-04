@@ -6,11 +6,14 @@ STRIP     = $(CROSS)strip
 
 CFLAGS    = -O2 -Wall -Wextra -Wno-unused-parameter \
             -ffunction-sections -fdata-sections \
+            -MMD -MP \
             -Iinclude
 LDFLAGS   = -Wl,--gc-sections -lm
 
 SRCS      = $(wildcard src/*.c)
 OBJS      = $(SRCS:.c=.o)
+DEPS      = $(SRCS:.c=.d)
+-include $(DEPS)
 
 BIN       = build/atomik_os
 
@@ -32,7 +35,7 @@ build:
 	mkdir -p build
 
 clean:
-	rm -f src/*.o
+	rm -f src/*.o src/*.d
 	rm -rf build
 
 .PHONY: all clean

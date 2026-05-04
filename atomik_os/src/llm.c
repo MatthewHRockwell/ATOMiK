@@ -17,12 +17,17 @@
 static const llm_provider_t PROVIDERS[] = {
     /* name,                base_url,                       model,                in $/Mtok, out $/Mtok, stub */
     {  "stub",              "(offline)",                    "atomik-stub-v1",     0,           0,           1 },
+    {  "local-intent",      "(on-device)",                  "atomik-trigram-v1",  0,           0,           1 },
     {  "claude-haiku-4.5",  "https://api.anthropic.com/v1", "claude-haiku-4.5",   1,           5,           1 },
     {  "claude-sonnet-4.6", "https://api.anthropic.com/v1", "claude-sonnet-4.6",  3,          15,           1 },
     {  "gpt-4o-mini",       "https://api.openai.com/v1",    "gpt-4o-mini",       0,           1,           1 },
     /* "is_stub" = 1 on all of them in v0.12 because we have no internet
      * on the board. v1.0 flips the relevant ones to 0 and fires real
-     * HTTP. The cost map stays the same. */
+     * HTTP. The cost map stays the same.
+     *
+     * v0.18: 'local-intent' is the on-device Jaccard trigram classifier.
+     * is_stub stays 1 because no network call happens, but the user-
+     * facing label distinguishes it from the canned-keyword stub. */
 };
 #define N_PROVIDERS ((int)(sizeof(PROVIDERS)/sizeof(PROVIDERS[0])))
 
@@ -178,6 +183,141 @@ static void stub_respond(const char *prompt, char *out, size_t cap) {
         "'summarize my day', 'open a chat'.");
 }
 
+/* ---------- v0.18 local-intent classifier ---------- */
+/* Character-trigram bag-of-features with Jaccard similarity. Same logic
+ * as tools/atomik_local_intent.py — proves the v0.18 path is real, all
+ * on-device, no network, no model file. ~5 KB of code + table.
+ *
+ * Each label has a "training" string: a concatenation of example
+ * utterances separated by spaces. At classify time we compute the
+ * trigram set of the prompt and each label's training, pick the
+ * highest Jaccard score above a 5% threshold. */
+
+typedef struct {
+    const char *label;
+    const char *response;   /* command-script emitted on match */
+    const char *training;
+} intent_pattern_t;
+
+static const intent_pattern_t INTENTS[] = {
+    { "load calendar",
+      "load calendar\nset primitive grid\nset accent cyan",
+      "show me a calendar  open calendar  whats on my schedule  "
+      "view this month  calendar of may  schedule view" },
+    { "load tasks",
+      "load tasks\nset primitive list\nset accent green",
+      "show me my tasks  whats on my list  todo list  "
+      "checklist  open tasks  what do i need to do" },
+    { "load code",
+      "load code\nset primitive feed\nset accent pink",
+      "show open prs  review queue  code reviews  "
+      "pull requests  what merges are pending" },
+    { "load brief",
+      "load brief\nset primitive card\nset accent amber",
+      "summarize my day  give me a brief  executive summary  "
+      "daily digest  what should i know" },
+    { "load chat",
+      "load chat\nset primitive convo\nset accent cyan",
+      "open a chat  start a conversation  switch to chat mode  "
+      "talk to the agent" },
+    { "set primitive grid",
+      "set primitive grid",
+      "make it a grid  tabular view  kanban  switch to grid  tile layout" },
+    { "set primitive list",
+      "set primitive list",
+      "list view  make it a list  bullet list  rows" },
+    { "set primitive feed",
+      "set primitive feed",
+      "feed view  timeline  activity stream  make it a feed" },
+    { "set primitive card",
+      "set primitive card",
+      "card view  single card  make it one big card" },
+    { "set primitive convo",
+      "set primitive convo",
+      "conversation view  chat bubbles  talk view" },
+    { "set accent cyan",
+      "set accent cyan",
+      "use cyan  make it blue  blue accent" },
+    { "set accent green",
+      "set accent green",
+      "use green  green accent" },
+    { "set accent amber",
+      "set accent amber",
+      "use amber  yellow accent  warm color" },
+    { "set accent pink",
+      "set accent pink",
+      "use pink  magenta accent  make it pink" },
+    { "clear list",
+      "clear list",
+      "clear the list  wipe items  empty list  delete everything" },
+};
+#define N_INTENTS ((int)(sizeof(INTENTS)/sizeof(INTENTS[0])))
+
+#define MAX_TRIGRAMS 384
+
+static int extract_trigrams(const char *s, uint32_t *out, int cap) {
+    if (!s) return 0;
+    char buf[512];
+    int n = 0;
+    buf[n++] = ' ';
+    for (const char *p = s; *p && n < (int)sizeof(buf)-2; p++) {
+        buf[n++] = (char)tolower((unsigned char)*p);
+    }
+    buf[n++] = ' ';
+    int count = 0;
+    for (int i = 0; i + 3 <= n && count < cap; i++) {
+        unsigned char a = (unsigned char)buf[i];
+        unsigned char b = (unsigned char)buf[i+1];
+        unsigned char c = (unsigned char)buf[i+2];
+        if (a == ' ' && b == ' ' && c == ' ') continue;
+        uint32_t tg = ((uint32_t)a << 16) | ((uint32_t)b << 8) | (uint32_t)c;
+        int dup = 0;
+        for (int j = 0; j < count; j++) if (out[j] == tg) { dup = 1; break; }
+        if (!dup) out[count++] = tg;
+    }
+    return count;
+}
+
+static int jaccard_permille(const uint32_t *a, int na,
+                            const uint32_t *b, int nb) {
+    int inter = 0;
+    for (int i = 0; i < na; i++) {
+        for (int j = 0; j < nb; j++) {
+            if (a[i] == b[j]) { inter++; break; }
+        }
+    }
+    int uni = na + nb - inter;
+    if (uni <= 0) return 0;
+    return (inter * 1000) / uni;
+}
+
+static void local_intent_respond(const char *prompt, char *out, size_t cap) {
+    if (!prompt || !*prompt) {
+        snprintf(out, cap, "(local-intent) need a prompt");
+        return;
+    }
+    uint32_t pt[MAX_TRIGRAMS];
+    int npt = extract_trigrams(prompt, pt, MAX_TRIGRAMS);
+
+    int best_idx   = -1;
+    int best_score = 0;
+    uint32_t lt[MAX_TRIGRAMS];
+    for (int i = 0; i < N_INTENTS; i++) {
+        int nlt = extract_trigrams(INTENTS[i].training, lt, MAX_TRIGRAMS);
+        int s   = jaccard_permille(pt, npt, lt, nlt);
+        if (s > best_score) { best_score = s; best_idx = i; }
+    }
+
+    /* 50/1000 = 0.05 Jaccard threshold, matches the Python prototype. */
+    if (best_idx < 0 || best_score < 50) {
+        snprintf(out, cap,
+            "(local-intent) no confident match -- try 'show me a calendar', "
+            "'switch to tasks', 'use amber accent', 'kanban view'");
+        return;
+    }
+    snprintf(out, cap, "%s", INTENTS[best_idx].response);
+}
+
 void llm_query(const llm_provider_t *p, const char *prompt, llm_response_t *out) {
     if (!out) return;
     memset(out, 0, sizeof *out);
@@ -185,7 +325,11 @@ void llm_query(const llm_provider_t *p, const char *prompt, llm_response_t *out)
     out->is_stub  = p->is_stub;
     out->tokens_in = llm_estimate_tokens(prompt);
     if (p->is_stub) {
-        stub_respond(prompt, out->text, sizeof out->text);
+        if (strcmp(p->name, "local-intent") == 0) {
+            local_intent_respond(prompt, out->text, sizeof out->text);
+        } else {
+            stub_respond(prompt, out->text, sizeof out->text);
+        }
     } else {
         /* v1.0: real HTTP call here. */
         snprintf(out->text, sizeof out->text,
