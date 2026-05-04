@@ -70,48 +70,112 @@ static int contains_word(const char *hay, const char *needle) {
 }
 
 static void stub_respond(const char *prompt, char *out, size_t cap) {
-    /* Pick a plausible canned response based on intent keywords. The
-     * response shape mirrors what an LLM would do for the same prompt. */
-    if (contains_word(prompt, "calendar")) {
+    /* Intent matching: simple keyword OR. The response is a script of
+     * field-delta commands that the Document parser executes. Each
+     * branch shows what an LLM would route given a similar prompt. */
+
+    /* --- shape-shifting via primitive --- */
+    if (contains_word(prompt, "calendar") || contains_word(prompt, "schedule") ||
+        contains_word(prompt, "month") || contains_word(prompt, "week")) {
         snprintf(out, cap,
             "load calendar\n"
             "set primitive grid\n"
             "set accent cyan");
         return;
     }
-    if (contains_word(prompt, "task") || contains_word(prompt, "todo")) {
+    if (contains_word(prompt, "task") || contains_word(prompt, "todo") ||
+        contains_word(prompt, "remind") || contains_word(prompt, "checklist")) {
         snprintf(out, cap,
             "load tasks\n"
             "set primitive list\n"
-            "set accent green");
+            "set accent green\n"
+            "set header \"Today\"");
         return;
     }
     if (contains_word(prompt, "code") || contains_word(prompt, "pr") ||
-        contains_word(prompt, "review")) {
+        contains_word(prompt, "review") || contains_word(prompt, "merge") ||
+        contains_word(prompt, "commit")) {
         snprintf(out, cap,
             "load code\n"
             "set primitive feed\n"
             "set accent pink");
         return;
     }
-    if (contains_word(prompt, "summarize") || contains_word(prompt, "brief")) {
+    if (contains_word(prompt, "summarize") || contains_word(prompt, "brief") ||
+        contains_word(prompt, "summary") || contains_word(prompt, "digest")) {
         snprintf(out, cap,
             "load brief\n"
             "set primitive card\n"
             "set accent amber");
         return;
     }
-    if (contains_word(prompt, "chat") || contains_word(prompt, "talk")) {
+    if (contains_word(prompt, "chat") || contains_word(prompt, "talk") ||
+        contains_word(prompt, "conversation") || contains_word(prompt, "ask")) {
         snprintf(out, cap,
             "load chat\n"
             "set primitive convo\n"
             "set accent cyan");
         return;
     }
+
+    /* --- simple field mutations --- */
+    if (contains_word(prompt, "rename") || contains_word(prompt, "title")) {
+        /* Pull anything inside double-quotes as the new title. */
+        const char *q1 = strchr(prompt, '"');
+        const char *q2 = q1 ? strchr(q1 + 1, '"') : NULL;
+        if (q1 && q2 && q2 > q1 + 1) {
+            char buf[160];
+            snprintf(buf, sizeof buf, "%.*s",
+                     (int)(q2 - q1 - 1), q1 + 1);
+            snprintf(out, cap, "set header \"%s\"", buf);
+            return;
+        }
+    }
+    if (contains_word(prompt, "clear") || contains_word(prompt, "wipe") ||
+        contains_word(prompt, "reset list") || contains_word(prompt, "empty")) {
+        snprintf(out, cap, "clear list");
+        return;
+    }
+    if (contains_word(prompt, "amber")  || contains_word(prompt, "yellow") ||
+        contains_word(prompt, "warm")) {
+        snprintf(out, cap, "set accent amber");
+        return;
+    }
+    if (contains_word(prompt, "pink") || contains_word(prompt, "magenta")) {
+        snprintf(out, cap, "set accent pink");
+        return;
+    }
+    if (contains_word(prompt, "green")) {
+        snprintf(out, cap, "set accent green");
+        return;
+    }
+    if (contains_word(prompt, "cyan") || contains_word(prompt, "blue")) {
+        snprintf(out, cap, "set accent cyan");
+        return;
+    }
+
+    /* --- structural --- */
+    if (contains_word(prompt, "kanban") || contains_word(prompt, "board")) {
+        snprintf(out, cap,
+            "set primitive grid\n"
+            "set accent cyan\n"
+            "set header \"Sprint\"");
+        return;
+    }
+    if (contains_word(prompt, "feed") || contains_word(prompt, "timeline") ||
+        contains_word(prompt, "activity")) {
+        snprintf(out, cap, "set primitive feed");
+        return;
+    }
+    if (contains_word(prompt, "card") || contains_word(prompt, "detail")) {
+        snprintf(out, cap, "set primitive card");
+        return;
+    }
+
     snprintf(out, cap,
-        "(stub) I don't have a canned route for that yet. "
-        "Try 'show calendar', 'show tasks', 'show code review queue', "
-        "'summarize my day', or 'open a chat'.");
+        "(stub) Try: 'show me a calendar', 'switch to tasks', "
+        "'kanban for sprint 14', 'rename to \"Inbox\"', 'use amber accent', "
+        "'summarize my day', 'open a chat'.");
 }
 
 void llm_query(const llm_provider_t *p, const char *prompt, llm_response_t *out) {
