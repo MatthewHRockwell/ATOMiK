@@ -142,6 +142,11 @@ void terminal_pump(void);
 void terminal_send_key(int key);
 void terminal_draw(window_t *w, int x, int y, int wd, int ht);
 
+/* files.c — read-only directory browser */
+void files_open(void);
+void files_handle_key(int key);
+void files_draw(window_t *w, int x, int y, int wd, int ht);
+
 /* input.c */
 typedef enum {
     EV_NONE = 0,

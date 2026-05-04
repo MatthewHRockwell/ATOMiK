@@ -25,7 +25,7 @@ static void redraw_frame(void) {
     draw_text(FB_W - sw - 20, 18, buf, 1, ATOMIK_FG_DIM);
 
     /* Hint footer about keys */
-    const char *hint = "[A] About   [M] Monitor   [T] Terminal   [Tab] cycle   [Esc] close   [Q] quit";
+    const char *hint = "[A] About   [M] Monitor   [T] Terminal   [F] Files   [Tab] cycle   [Esc] close   [Q] quit";
     draw_text(20, 18, hint, 1, ATOMIK_FG_DIM);
 
     /* Agent prediction surface — top-center. */
@@ -64,6 +64,17 @@ static void open_terminal(void) {
     int wy = (FB_H - wh) / 2 + 20;
     window_t *w = wm_open("Terminal", wx, wy, ww, wh, terminal_draw, NULL);
     if (w) s_terminal_id = w->id;
+}
+
+static int s_files_id = 0;
+static void open_files(void) {
+    if (s_files_id) { wm_focus(s_files_id); return; }
+    files_open();
+    int ww = 760, wh = 520;
+    int wx = (FB_W - ww) / 2 + 60;
+    int wy = (FB_H - wh) / 2 - 60;
+    window_t *w = wm_open("Files", wx, wy, ww, wh, files_draw, NULL);
+    if (w) s_files_id = w->id;
 }
 
 int main(int argc, char **argv) {
@@ -105,6 +116,14 @@ int main(int argc, char **argv) {
                     dirty = 1;
                 }
             }
+            /* If files is focused, route navigation keys there. */
+            if (!dirty && s_files_id) {
+                window_t *top = wm_topmost();
+                if (top && top->id == s_files_id) {
+                    files_handle_key(ev.key);
+                    dirty = 1;
+                }
+            }
             /* Global app shortcuts (only reach here if WM didn't consume
              * AND terminal isn't focused). */
             if (!dirty && (ev.key == 'a' || ev.key == 'A')) {
@@ -119,6 +138,10 @@ int main(int argc, char **argv) {
                 open_terminal();
                 agent_log(ACT_OPEN_TERMINAL);
                 dirty = 1;
+            } else if (!dirty && (ev.key == 'f' || ev.key == 'F')) {
+                open_files();
+                agent_log(ACT_OPEN_FILES);
+                dirty = 1;
             } else if (!dirty && ev.key >= '1' && ev.key < '1' + dock_count()) {
                 /* Number key launches whatever app is currently in that
                  * dock slot. The slot meaning shifts as the agent
@@ -129,6 +152,7 @@ int main(int argc, char **argv) {
                 if      (a == ACT_OPEN_ABOUT)    open_about();
                 else if (a == ACT_OPEN_MONITOR)  open_monitor();
                 else if (a == ACT_OPEN_TERMINAL) open_terminal();
+                else if (a == ACT_OPEN_FILES)    open_files();
                 if (a != ACT_NONE) agent_log(a);
                 else               agent_log(ACT_DOCK_HOVER);
                 dirty = 1;
