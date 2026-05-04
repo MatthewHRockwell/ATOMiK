@@ -350,10 +350,25 @@ void edge_code_draw(window_t *w, int x, int y, int wd, int ht);
 void edge_brief_draw(window_t *w, int x, int y, int wd, int ht);
 void edge_chat_draw(window_t *w, int x, int y, int wd, int ht);
 
-/* document.c — universal Document app. Replaces the fixed app list. */
-void document_open(void);
-void document_handle_key(int key);
-void document_draw(window_t *w, int x, int y, int wd, int ht);
+/* document.c — universal Document app. v0.13: multi-instance.
+ *
+ * Each Document window owns a heap-allocated doc_state_t (opaque). The
+ * caller obtains one via document_open_new() and stores it in
+ * window_t.user so document_draw_for / document_handle_key_for can
+ * recover per-window state.
+ *
+ * Legacy single-doc shims preserved for backward compatibility. */
+typedef struct doc_state doc_state_t;
+
+doc_state_t *document_open_new(void);
+void         document_close(doc_state_t *d);
+void         document_handle_key_for(doc_state_t *d, int key);
+void         document_draw_for(window_t *w, int x, int y, int wd, int ht);
+
+/* Legacy singleton API (backed by a process-wide doc_state_t). */
+void         document_open(void);
+void         document_handle_key(int key);
+void         document_draw(window_t *w, int x, int y, int wd, int ht);
 
 /* anim.c — minimal animation runtime.
  * Returns monotonic milliseconds for use in tween functions, plus a few

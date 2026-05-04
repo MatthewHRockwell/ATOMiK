@@ -131,17 +131,44 @@ static void open_chat(void) {
     notify_post("Chat streamed");
 }
 
-/* The Document app — chat-driven UI morphing. The pitch app. */
-static int s_doc_win_id = 0;
+/* The Document app — chat-driven UI morphing. v0.13: every press of D
+ * opens an INDEPENDENT Document instance. Each has its own state file,
+ * its own chat history, its own edge_app_t. The WM tiles them with a
+ * cascading offset so they don't fully overlap. */
+#define MAX_DOCS 6
+static int  s_n_docs = 0;
+static int  s_doc_win_ids[MAX_DOCS];
 static void open_document(void) {
-    if (s_doc_win_id) { wm_focus(s_doc_win_id); return; }
-    document_open();
-    int ww = 1280, wh = 720;
-    int wx = (FB_W - ww) / 2;
-    int wy = (FB_H - wh) / 2 - 30;
-    window_t *w = wm_open("Document", wx, wy, ww, wh, document_draw, NULL);
-    if (w) s_doc_win_id = w->id;
-    notify_post("Document opened -- type to morph");
+    if (s_n_docs >= MAX_DOCS) {
+        notify_post("max documents reached");
+        return;
+    }
+    doc_state_t *d = document_open_new();
+    if (!d) { notify_post("doc alloc failed"); return; }
+    int ww = 1100, wh = 660;
+    int offset = s_n_docs * 40;
+    int wx = (FB_W - ww) / 2 - 80 + offset;
+    int wy = (FB_H - wh) / 2 - 40 + offset;
+    char title[40];
+    snprintf(title, sizeof title, "Document #%d", s_n_docs + 1);
+    window_t *w = wm_open(title, wx, wy, ww, wh, document_draw_for, d);
+    if (w) {
+        s_doc_win_ids[s_n_docs++] = w->id;
+        notify_post("Document opened — type to morph");
+    } else {
+        document_close(d);
+    }
+}
+
+/* Returns the doc_state_t for the currently focused Document window, or
+ * NULL if no Document is focused. */
+static doc_state_t *focused_doc(void) {
+    window_t *top = wm_topmost();
+    if (!top) return NULL;
+    for (int i = 0; i < s_n_docs; i++) {
+        if (top->id == s_doc_win_ids[i]) return (doc_state_t *)top->user;
+    }
+    return NULL;
 }
 
 int main(int argc, char **argv) {
@@ -207,11 +234,12 @@ int main(int argc, char **argv) {
                     dirty = 1;
                 }
             }
-            /* Document app — chat panel takes typed commands. */
-            if (!dirty && s_doc_win_id) {
-                window_t *top = wm_topmost();
-                if (top && top->id == s_doc_win_id) {
-                    document_handle_key(ev.key);
+            /* Document app — chat panel takes typed commands.
+             * v0.13: route to whichever Document window is focused. */
+            if (!dirty) {
+                doc_state_t *d = focused_doc();
+                if (d) {
+                    document_handle_key_for(d, ev.key);
                     dirty = 1;
                 }
             }
