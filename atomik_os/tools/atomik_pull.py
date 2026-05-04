@@ -34,8 +34,10 @@ def slow(s, line, per=0.0008):
 def remote_cmd(s, sh, t=8):
     """Run a shell command on the board, capture its stdout between
     sentinel lines so we can extract the payload cleanly."""
-    START = "<<<APUL_BEGIN>>>"
-    END   = "<<<APUL_END>>>"
+    # Pure ASCII sentinels — '<<<' / '>>>' triggers bash here-string +
+    # redirect parsing and silently eats the line.
+    START = "_APUL_BEGIN_"
+    END   = "_APUL_END_"
     slow(s, f"echo {START}; {sh}; echo {END}\n")
     end = time.time() + t
     buf = bytearray()
