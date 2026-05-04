@@ -179,7 +179,32 @@ to a writable `/var/lib/atomik_os/` mount on real storage.
 
 ---
 
-## 9. Build + deploy
+## 9. Schema interop (partnership strategy)
+
+The `edge_app_t` accumulator is the *internal* representation. The public
+manifest format is intentionally negotiable. ATOMiK OS is positioned as
+the canonical edge renderer for generative-UI output from existing
+players — not as a competing schema. Concrete adapter targets:
+
+- **AdaptiveCards (Microsoft)** — most mature JSON UI schema. Our 5
+  primitives map onto a subset cleanly.
+- **Thesys / GenUI** — most LLM-native gen-UI service.
+- **Vercel v0** — text prompt → React tree (subset reduces to deltas).
+- **Anthropic Artifacts** — structured UI hints from Claude.
+- **OpenAI structured outputs / function-calling UIs** — same shape.
+
+Each adapter is a small file (`adapters/from_<schema>.c`) that walks the
+foreign schema and emits `delta_emit_*()` calls. Internal wire format
+stays ATOMiK-native; ingress side speaks whatever the partner uses.
+
+The pitch is uniform: *"Your model produces UI intent. We render that
+intent on a $200 edge device for a memcpy's worth of compute and a
+few-hundred-bytes-per-update of bandwidth."*
+
+See `~/.claude/.../memory/project_atomik_os_partnerships.md` for the
+target list and outreach plan.
+
+## 10. Build + deploy
 
 ```sh
 # from atomik_os/

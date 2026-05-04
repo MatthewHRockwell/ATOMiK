@@ -150,7 +150,42 @@ of the same model.
 
 ---
 
-## 8. What we're NOT doing
+## 8. Generative-UI partnerships (not competition)
+
+ATOMiK OS does not need to invent the manifest schema. Existing
+generative-UI players (Vercel v0, Thesys, Lovable, GPT Engineer, plus
+schema-only specs like Microsoft AdaptiveCards) already produce UI
+specs from text prompts. Their cost-per-render on a phone or browser
+is dominated by JavaScript evaluation + DOM diffing. **On ATOMiK OS
+that same UI spec is a memcpy.**
+
+The partnership pitch:
+
+> Your model outputs UI intent. Today that intent gets re-rendered as
+> a full React tree on every device. On ATOMiK OS the same intent is a
+> few hundred bytes of typed field deltas applied to a compiled
+> invariant frame, runs on a $200 board, costs zero scan-out compute.
+> You make the intent; we make it cheap to deliver.
+
+We become the canonical edge renderer for their output. Same dynamic
+applies to the parked dynamic-virtual-processor work: someone else
+brings the workload (gen-UI, agent inference, edge ML); we bring the
+substrate that makes it cheap. **Partnership-first, not
+OS-as-monolith.**
+
+For partner-side economics this is symbiotic:
+
+| Their product           | Their cost-to-deliver         | Our render cost   |
+|-------------------------|-------------------------------|-------------------|
+| Vercel v0 generated UI  | ~MB JS shipped + browser eval | ~bytes + memcpy   |
+| Thesys API JSON UI      | full re-render every poll     | apply N deltas    |
+| AdaptiveCards renderer  | 100s of KB JS                 | one C decoder     |
+| Anthropic Artifacts     | rendered in browser           | rendered on edge  |
+
+Token-pay for the *generation* still flows to the partner; ATOMiK OS
+adds the much smaller *render* fee. Both sides win.
+
+## 9. What we're NOT doing
 
 - Not a subscription. The OS itself is a one-time license fee or
   bundled with hardware.

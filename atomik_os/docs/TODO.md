@@ -87,6 +87,20 @@
     - [ ] Side-by-side layout, save/load named documents
     - [ ] Quick-switch palette: type a doc name to focus
 
+## Schema interop / partnership track (parallel to OS sprints)
+
+- [ ] **Survey existing manifest schemas** — AdaptiveCards, Thesys, Vercel
+      v0 output shape, Anthropic Artifacts, OpenAI structured outputs.
+      Document coverage of our 5 primitives in each.
+- [ ] **Pick the alignment target** — most likely AdaptiveCards (mature)
+      or Thesys (LLM-native). Decision goes in
+      `docs/ARCHITECTURE.md` §9.
+- [ ] **Ship `adapters/from_adaptivecards.c`** — first reference adapter.
+      Ingests JSON, emits `delta_emit_*` calls into an `edge_app_t`.
+- [ ] **One design-partner conversation before v1.0 locks** — Vercel v0,
+      Thesys, or Anthropic Applied. Even an exploratory chat informs
+      whether our manifest schema should be theirs.
+
 ## Sprint after (v0.14–v0.16) — input + identity
 
 - [ ] **v0.14 — Speech input**
