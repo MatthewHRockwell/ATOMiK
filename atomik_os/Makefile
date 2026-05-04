@@ -14,7 +14,14 @@ OBJS      = $(SRCS:.c=.o)
 
 BIN       = build/atomik_os
 
-all: $(BIN)
+all: $(BIN) tools
+
+tools: build/fb2png
+
+build/fb2png: tools/fb2png.c | build
+	$(CC) -O2 -Wall -o $@ tools/fb2png.c
+	$(STRIP) $@
+	@ls -la $@
 
 $(BIN): $(OBJS) | build
 	$(CC) $(CFLAGS) $(OBJS) -o $@ $(LDFLAGS)

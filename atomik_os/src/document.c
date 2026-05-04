@@ -25,6 +25,10 @@
 #include <stdio.h>
 #include <string.h>
 
+/* Persistence: v0.11+ uses the field-delta wire format (delta_log.c).
+ * The legacy fwrite-of-struct path stays available as a one-shot
+ * fallback if the delta log is corrupt. */
+#define DOC_DELTA_PATH  "/tmp/atomik_os_document.deltas"
 #define DOC_STATE_PATH  "/tmp/atomik_os_document.state"
 #define DOC_STATE_MAGIC 0xA01D0CE7u  /* "ATOMiK doc v1" */
 
@@ -39,33 +43,38 @@ static int        s_n_history = 0;
 static char       s_input[DOC_INPUT_MAX];
 static int        s_input_len = 0;
 
-/* Persist the entire edge_app_t (primitive + accent + name + fields) so
- * a configured Document survives reboots. We do NOT persist the chat
- * history — that's session-local. The user's MORPHED state is the
- * artifact worth saving. */
+/* Persist the Document via the v0.11 delta wire format. Same encoding
+ * works for streaming (just point delta_log_open() at a pipe / socket).
+ * On replay we start from a fresh edge_app_t skeleton, then apply the
+ * snapshot delta log to reconstruct state. */
 static void doc_save_state(void) {
-    FILE *f = fopen(DOC_STATE_PATH, "wb");
-    if (!f) return;
-    uint32_t magic = DOC_STATE_MAGIC;
-    fwrite(&magic, sizeof magic, 1, f);
-    fwrite(&s_doc, sizeof s_doc, 1, f);
-    fclose(f);
+    delta_snapshot_to_file(DOC_DELTA_PATH, &s_doc);
 }
 
 static int doc_load_state(void) {
+    /* Initialize a clean schema first so delta replay has slots to fill. */
+    eapp_init(&s_doc, "Document",
+              "type a command on the right -> the document morphs",
+              PRIM_LIST, ATOMIK_ACCENT);
+    eapp_add_field(&s_doc, FT_STR);
+    eapp_add_field(&s_doc, FT_LIST);
+    eapp_add_field(&s_doc, FT_STR);
+
+    int n = delta_replay_file(DOC_DELTA_PATH, &s_doc);
+    if (n > 0) return 1;
+
+    /* Fallback: legacy struct dump from v0.10.1. Promote it to deltas on
+     * the next save so the legacy file fades out naturally. */
     FILE *f = fopen(DOC_STATE_PATH, "rb");
     if (!f) return 0;
     uint32_t magic = 0;
-    if (fread(&magic, sizeof magic, 1, f) != 1 || magic != DOC_STATE_MAGIC) {
+    if (fread(&magic, sizeof magic, 1, f) == 1 && magic == DOC_STATE_MAGIC &&
+        fread(&s_doc, sizeof s_doc, 1, f) == 1) {
         fclose(f);
-        return 0;
-    }
-    if (fread(&s_doc, sizeof s_doc, 1, f) != 1) {
-        fclose(f);
-        return 0;
+        return 1;
     }
     fclose(f);
-    return 1;
+    return 0;
 }
 
 /* Push a line into the chat history ring (newest at the end). */

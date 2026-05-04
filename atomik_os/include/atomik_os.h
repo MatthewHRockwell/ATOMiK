@@ -236,6 +236,55 @@ void        eapp_clear_list(edge_app_t *a, int field_id);
 void        eapp_list_append(edge_app_t *a, int field_id, const char *s);
 const char *eapp_primitive_name(primitive_t p);
 
+/* delta_log.c — versioned binary wire format for edge-app field deltas.
+ *
+ * Every mutation an app accumulates is encoded as one opcode + payload.
+ * The same encoding works for:
+ *   - on-disk persistence (one snapshot file)
+ *   - on-disk replay log (append-only)
+ *   - network/UART streaming (write to a pipe instead of a file)
+ *
+ * v0.11 ships only the on-disk encoder/decoder — streaming hookup is
+ * added when we wire networking. */
+typedef enum {
+    OP_NONE          = 0,
+    OP_SET_PRIMITIVE = 1,    /* u8 primitive          */
+    OP_SET_ACCENT    = 2,    /* be32 rgb              */
+    OP_SET_FIELD_STR = 3,    /* u8 id, be16 len, len bytes */
+    OP_LIST_APPEND   = 4,    /* u8 id, be16 len, len bytes */
+    OP_LIST_CLEAR    = 5,    /* u8 id                 */
+    OP_RESET         = 6,    /* (no payload)          */
+    OP_SET_NAME      = 7,    /* be16 len, len bytes   */
+    OP_SET_SUBTITLE  = 8,    /* be16 len, len bytes   */
+} delta_op_t;
+
+#define DELTA_LOG_MAGIC 0x44454C54u   /* "DELT" */
+#define DELTA_LOG_VER   1
+
+/* Open a log for append; writes header on first open. Returns 0 on success. */
+int  delta_log_open(const char *path);
+void delta_log_close(void);
+
+/* Encode operations into the open log (and/or stream sink). */
+int  delta_emit_set_primitive (primitive_t p);
+int  delta_emit_set_accent    (pixel_t accent);
+int  delta_emit_set_field_str (int field_id, const char *s);
+int  delta_emit_list_append   (int field_id, const char *s);
+int  delta_emit_list_clear    (int field_id);
+int  delta_emit_reset         (void);
+int  delta_emit_set_name      (const char *s);
+int  delta_emit_set_subtitle  (const char *s);
+
+/* Replay every op in a file onto the given edge_app_t. Returns count of
+ * ops applied (negative on read error). */
+int  delta_replay_file        (const char *path, edge_app_t *a);
+
+/* Snapshot the current state of an edge_app_t as a complete log file
+ * (RESET + SET_PRIMITIVE + SET_ACCENT + SET_NAME + SET_SUBTITLE +
+ * SET_FIELD_STR / LIST_APPEND for every field). The output is
+ * self-contained — replaying it produces an identical edge_app_t. */
+int  delta_snapshot_to_file   (const char *path, const edge_app_t *a);
+
 /* eapp_render.c — the invariant-frame renderer. Draws the universal
  * window-content surface for any edge app, picking the right primitive
  * and pulling field values out of the app's accumulator. */
