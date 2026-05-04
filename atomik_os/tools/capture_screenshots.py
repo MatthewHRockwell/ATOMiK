@@ -101,10 +101,20 @@ def shoot(s, name):
     n_blocks = (n + BLOCK - 1) // BLOCK
     pos = 0
     while pos < n_blocks:
-        c = cmd(s, f"dd if=/tmp/{name}.b64 bs={BLOCK} skip={pos} count={K} 2>/dev/null",
+        # Sentinel-bracket the dd output so we can extract just the payload.
+        START = f"<<<P{pos:06d}>>>"
+        END   = f"<<<E{pos:06d}>>>"
+        c = cmd(s,
+                f"echo {START}; dd if=/tmp/{name}.b64 bs={BLOCK} skip={pos} count={K} 2>/dev/null; echo {END}",
                 t=60)
         text = c.decode(errors='replace')
-        valid = ''.join(ch for ch in text if ch in
+        # Extract between START and END
+        i0 = text.find(START)
+        i1 = text.find(END, i0 + len(START)) if i0 >= 0 else -1
+        if i0 < 0 or i1 < 0:
+            print(f"  ! sentinel miss at pos={pos}"); break
+        payload = text[i0 + len(START):i1]
+        valid = ''.join(ch for ch in payload if ch in
                         "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=")
         pieces.append(valid)
         pos += K
