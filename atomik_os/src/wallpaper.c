@@ -1,8 +1,23 @@
 /* wallpaper.c — background. Vertical gradient + a subtle radial vignette
- * + a centered ATOMiK wordmark, ATOMiK accent color glow. */
+ * + a centered ATOMiK wordmark, ATOMiK accent color glow.
+ *
+ * The vignette work (per-frame ellipse blending) is too expensive at 100 MHz
+ * to redraw every frame. We render the whole wallpaper ONCE into the back
+ * buffer, then memcpy it to a heap cache. On subsequent frames we memcpy
+ * the cache straight back to the back buffer. wallpaper_invalidate()
+ * forces a re-render when settings change. */
 #include "atomik_os.h"
+#include <stdlib.h>
+#include <string.h>
 
-void wallpaper_draw(void) {
+extern pixel_t *fb_back(void);
+
+static pixel_t *s_cache  = NULL;
+static int      s_cached = 0;
+
+void wallpaper_invalidate(void) { s_cached = 0; }
+
+static void wallpaper_full_render(void) {
     /* Smooth vertical gradient covering the whole screen. */
     draw_gradient_v(0, 0, FB_W, FB_H, ATOMIK_BG_TOP, ATOMIK_BG_BOT);
 
@@ -43,4 +58,25 @@ void wallpaper_draw(void) {
     int tag_scale = 2;
     int tag_w = text_width(tag, tag_scale);
     draw_text((FB_W - tag_w) / 2, ty + th + 24, tag, tag_scale, ATOMIK_ACCENT);
+}
+
+void wallpaper_draw(void) {
+    pixel_t *bb = fb_back();
+    if (!s_cache) {
+        s_cache = aligned_alloc(64, FB_BYTES);
+        if (!s_cache) {
+            /* No cache available — render direct every frame. */
+            wallpaper_full_render();
+            return;
+        }
+    }
+    if (!s_cached) {
+        /* First call (or after invalidate): render into back buffer, then
+         * snapshot to cache. Subsequent frames just memcpy from cache. */
+        wallpaper_full_render();
+        memcpy(s_cache, bb, FB_BYTES);
+        s_cached = 1;
+        return;
+    }
+    memcpy(bb, s_cache, FB_BYTES);
 }
