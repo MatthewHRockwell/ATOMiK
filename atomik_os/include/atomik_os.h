@@ -79,6 +79,7 @@ const char *agent_action_name(action_t a);
 int         agent_count(action_t a);              /* lifetime count */
 double      agent_recency(action_t a);            /* 0..1, 1=most recent */
 double      agent_score(action_t a);              /* freq * recency */
+void        agent_flush(void);                    /* persist now */
 
 /* dock.c */
 void dock_draw(int hover_index);

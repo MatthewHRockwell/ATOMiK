@@ -118,6 +118,7 @@ int main(int argc, char **argv) {
 
     fb_clear(ATOMIK_BG_BOT);
     fb_present();
+    agent_flush();      /* persist user-model on clean exit */
     atomik_close();
     input_close();
     fb_close();
