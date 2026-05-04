@@ -258,7 +258,7 @@ static void apply_command(const char *raw_line) {
         hist_push("agent> ", "clear list  /  add \"item\"");
         hist_push("agent> ", "load <calendar|tasks|code|brief|chat>");
         hist_push("agent> ", "/ai <prompt>  -- route through AI provider");
-        hist_push("agent> ", "save  /  reset");
+        hist_push("agent> ", "save  /  reset  /  /export <path>  /  /import <path>");
         return;
     }
     /* /ai prompt — route through llm.c, get back a multi-line script of
@@ -308,6 +308,40 @@ static void apply_command(const char *raw_line) {
         s_doc_init = 0;
         doc_lazy_init();        /* will rebuild defaults if no save exists */
         hist_push("agent> ", "reset to default state.");
+        return;
+    }
+    /* /export <path>  -- snapshot current Document to a shareable .deltas
+     * file. Receivers point /import at the file and the Document
+     * reconstructs to the same state via the field-delta wire format. */
+    if (ieq(cmd, "/export") || ieq(cmd, "export")) {
+        char *path = trim(p);
+        if (!path || !path[0]) path = "/tmp/doc_export.deltas";
+        int rc = delta_snapshot_to_file(path, &s_doc);
+        char buf[160];
+        snprintf(buf, sizeof buf, "%s exported to %s",
+                 rc == 0 ? "OK" : "FAILED", path);
+        hist_push("agent> ", buf);
+        return;
+    }
+    if (ieq(cmd, "/import") || ieq(cmd, "import")) {
+        char *path = trim(p);
+        if (!path || !path[0]) {
+            hist_push("agent> ", "import what? give a path.");
+            return;
+        }
+        /* Reset to clean schema then replay the foreign delta log. */
+        eapp_init(&s_doc, "Document",
+                  "imported from manifest",
+                  PRIM_LIST, ATOMIK_ACCENT);
+        eapp_add_field(&s_doc, FT_STR);
+        eapp_add_field(&s_doc, FT_LIST);
+        eapp_add_field(&s_doc, FT_STR);
+        int n = delta_replay_file(path, &s_doc);
+        char buf[160];
+        if (n > 0) snprintf(buf, sizeof buf, "imported %d ops from %s", n, path);
+        else       snprintf(buf, sizeof buf, "no ops applied from %s", path);
+        hist_push("agent> ", buf);
+        doc_save_state();
         return;
     }
     if (ieq(cmd, "set")) {
