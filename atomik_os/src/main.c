@@ -185,6 +185,13 @@ static doc_state_t *focused_doc(void) {
 int main(int argc, char **argv) {
     (void)argc; (void)argv;
 
+    /* Stamp the running version to a known path so deploy.py can verify
+     * the binary it just shipped is the one actually executing. Without
+     * this, a stale process pinning /dev/fb0 would silently keep showing
+     * an old build (the bug that motivated this stamp in the first place). */
+    FILE *vf = fopen("/tmp/atomik_os_version", "w");
+    if (vf) { fputs(AOS_VERSION "\n", vf); fclose(vf); }
+
     if (fb_open() < 0) { fprintf(stderr, "fb_open failed\n"); return 1; }
     fb_clear(0);
     fb_present();

@@ -5,6 +5,12 @@
 #include <stdint.h>
 #include <stddef.h>
 
+/* Single source of truth for the version string. Bumped whenever a deploy
+ * carries a user-visible change. About window, status bar, and the
+ * /tmp/atomik_os_version stamp all read from here so the screen output
+ * NEVER lies about which build is running. */
+#define AOS_VERSION "v0.17"
+
 /* Display geometry — locked to 1920x1080 XRGB8888 since simplefb is fixed. */
 #define FB_W       1920
 #define FB_H       1080

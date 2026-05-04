@@ -71,12 +71,12 @@ void status_draw(void) {
     int spend_uusd = llm_audit_total_uusd();
     char right[200];
     snprintf(right, sizeof right,
-             "wallet $%d.%02d   spent $%d.%03d   cpu %3d%%   %s   v0.16",
+             "wallet $%d.%02d   spent $%d.%03d   cpu %3d%%   %s   %s",
              w->balance_uusd / 1000000,
              (w->balance_uusd / 10000) % 100,
              spend_uusd / 1000000,
              (spend_uusd / 1000) % 1000,
-             s_cpu_pct, up);
+             s_cpu_pct, up, AOS_VERSION);
     int rw = text_width(right, 1);
     draw_text(FB_W - rw - 20, 12, right, 1, ATOMIK_FG);
 }
