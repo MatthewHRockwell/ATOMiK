@@ -24,10 +24,12 @@ FB2PNG_REMOTE = "/tmp/fb2png"
 SHOTS_DIR     = os.path.join(HERE, "docs", "screenshots")
 
 _n = [0]
-def slow(s, line, per=0.0008):
-    """Per-char throttled write. The soft-CPU LiteX UART RX FIFO is shallow
-    so bursts of >~32 chars get dropped; throttling per char avoids that.
-    Empirically 0.8 ms/char is reliable at 115200 baud on this board."""
+def slow(s, line, per=0.002):
+    """Per-char throttled write. 2 ms/char is the empirically-reliable
+    rate when atomik_os is running and saturating the soft-CPU with
+    1080p frame composition. Faster rates (0.8-1 ms) cause the kernel
+    UART RX path to drop or duplicate characters mid-line, which then
+    breaks shell parsing in subtle ways (e.g. `2>&1` arriving as `2>&&1`)."""
     for c in line:
         s.write(c.encode() if isinstance(c, str) else bytes([c]))
         time.sleep(per)
@@ -48,27 +50,33 @@ def cmd(s, c, t=20, log=True):
     return bytes(buf)
 
 def cmd_capture(s, c, t=20):
-    """Run a command, return only the stdout between sentinel lines."""
+    """Run a command, return only the stdout between sentinel lines.
+    Uses regex to find the LAST START..END pair, which skips the bash
+    command-line echo (which contains the sentinels as typed text)."""
     _n[0] += 1
     START = f"_DCAP_{_n[0]:04d}_S_"
     END   = f"_DCAP_{_n[0]:04d}_E_"
     slow(s, f"echo {START}; {c}; echo {END}\n")
     end = time.time() + t
     buf = bytearray()
+    # Require a leading newline before END so we don't fire on the
+    # command-line echo of `; echo END\n`.
     while time.time() < end:
         ch = s.read(8192)
         if ch:
             buf.extend(ch)
-            if (END.encode() + b"\n") in buf or (END.encode() + b"\r\n") in buf:
+            if (b"\n" + END.encode()) in buf:
+                # Wait a beat for any trailing payload still in flight.
+                time.sleep(0.1)
+                buf.extend(s.read(8192))
                 break
-    text = re.sub(r'\x1b\[[0-9;?]*[a-zA-Z]', '', buf.decode(errors='replace'))
-    lines = text.splitlines()
-    s_idx = e_idx = -1
-    for i, ln in enumerate(lines):
-        if ln.strip() == START: s_idx = i
-        elif ln.strip() == END and s_idx >= 0: e_idx = i; break
-    if s_idx < 0 or e_idx < 0: return None
-    return '\n'.join(lines[s_idx + 1 : e_idx])
+    text = re.sub(r'\x1b\[[0-9;?]*[a-zA-Z]', '',
+                  buf.decode(errors='replace'))
+    pattern = re.compile(re.escape(START) + r'(.*?)' + re.escape(END),
+                         re.DOTALL)
+    matches = pattern.findall(text)
+    if not matches: return None
+    return matches[-1].strip("\r\n")
 
 def transfer(s, local_path, remote_path, label):
     sz = os.path.getsize(local_path)
@@ -121,8 +129,11 @@ def pull_file(s, remote, label, t_block=60):
     if nb64 == 0:
         print(f"[deploy]  ! pull encode failed"); return None
     print(f"[deploy]  gz+b64: {nb64} chars", flush=True)
+    # 4 KiB per round-trip. Larger chunks (8-16 KiB) are sometimes
+    # missed: the soft-CPU UART writer can't sustain the burst without
+    # gaps that confuse our sentinel matcher. 4K is reliable.
     BLOCK = 1024
-    K     = 16          # 16 KiB per round-trip
+    K     = 4
     pieces = []
     pos    = 0
     n_blocks = (nb64 + BLOCK - 1) // BLOCK
@@ -149,11 +160,23 @@ def pull_file(s, remote, label, t_block=60):
 
 def capture_and_save(s, expected_ver):
     """Run fb2png on the board, pull the PNG back, write it under
-    docs/screenshots/. Returns the local PNG path on success."""
+    docs/screenshots/. Returns the local PNG path on success.
+
+    SIGSTOPs atomik_os during the pull: the 100MHz NaxRiscv saturates
+    its UART driver while compositing 1080p frames, causing serial
+    corruption that breaks chunked transfers. With atomik_os paused,
+    the same chunked pull is reliable. SIGCONT restores it afterwards."""
     os.makedirs(SHOTS_DIR, exist_ok=True)
     print("[deploy] running fb2png on board (~30s)", flush=True)
     cmd(s, f"{FB2PNG_REMOTE} /tmp/aos_shot.png 2>&1 | tail -1", t=60)
+    print("[deploy] pausing atomik_os (SIGSTOP) for clean UART pull",
+          flush=True)
+    cmd(s, "pkill -STOP atomik_os && echo PAUSED || echo NOPROC",
+        t=8, log=False)
     raw_png = pull_file(s, "/tmp/aos_shot.png", "screenshot")
+    print("[deploy] resuming atomik_os (SIGCONT)", flush=True)
+    cmd(s, "pkill -CONT atomik_os && echo RESUMED || echo NOPROC",
+        t=8, log=False)
     if not raw_png:
         print("[deploy]  ! screenshot pull FAILED", flush=True)
         return None
@@ -210,15 +233,23 @@ def main():
     cmd(s, "cat /tmp/aos.err 2>/dev/null | head -20")
     cmd(s, "cat /tmp/aos.out 2>/dev/null | head -20")
 
-    # Version-stamp check.
-    stamp = cmd_capture(s, "cat /tmp/atomik_os_version 2>/dev/null", t=6)
-    stamp = (stamp or "").strip()
+    # Version-stamp check. atomik_os writes /tmp/atomik_os_version inside
+    # main(), but on a 100MHz NaxRiscv the path through fb_open() +
+    # fopen() can take a couple of seconds. Retry for up to 10s.
+    stamp = ""
+    for attempt in range(10):
+        stamp = (cmd_capture(s, "cat /tmp/atomik_os_version 2>/dev/null",
+                             t=6) or "").strip()
+        if stamp:
+            break
+        time.sleep(1)
     if expected:
         if stamp == expected:
             print(f"[deploy] VERSION OK — running {stamp}", flush=True)
         else:
             print(f"[deploy] VERSION MISMATCH — expected {expected!r}, "
-                  f"got {stamp!r}", flush=True)
+                  f"got {stamp!r} (after {attempt+1}s of retries)",
+                  flush=True)
             print("[deploy] something is wrong — STILL not actually running "
                   "the new binary", flush=True)
 
