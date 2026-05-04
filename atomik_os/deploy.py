@@ -9,9 +9,11 @@ import argparse, base64, gzip, os, sys, time
 import serial
 
 PORT, BAUD = "/dev/ttyUSB2", 115200
-LOCAL  = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                      "build", "atomik_os")
+HERE   = os.path.dirname(os.path.abspath(__file__))
+LOCAL  = os.path.join(HERE, "build", "atomik_os")
 REMOTE = "/tmp/atomik_os"
+FB2PNG_LOCAL  = os.path.join(HERE, "build", "fb2png")
+FB2PNG_REMOTE = "/tmp/fb2png"
 
 _n = [0]
 def slow(s, line, per=0.0008):
@@ -37,40 +39,44 @@ def cmd(s, c, t=20, log=True):
             if (b"\n" + m.encode()) in buf: return bytes(buf)
     return bytes(buf)
 
+def transfer(s, local_path, remote_path, label):
+    sz = os.path.getsize(local_path)
+    print(f"[deploy] local {label}: {sz} bytes", flush=True)
+    with open(local_path, "rb") as f: raw = f.read()
+    gz  = gzip.compress(raw, compresslevel=9)
+    b64 = base64.b64encode(gz).decode()
+    print(f"[deploy]  gzipped+b64: {len(b64)} chars (gz={len(gz)} bytes)",
+          flush=True)
+    cmd(s, f"rm -f /tmp/{label}.b64 /tmp/{label}.gz {remote_path}", log=False)
+    CHUNK  = 1024
+    chunks = [b64[i:i+CHUNK] for i in range(0, len(b64), CHUNK)]
+    print(f"[deploy]  sending {len(chunks)} chunks of {CHUNK} chars",
+          flush=True)
+    t0 = time.time()
+    for i, ch in enumerate(chunks):
+        cmd(s, f"printf '%s' '{ch}' >> /tmp/{label}.b64", t=30, log=False)
+        if i % 5 == 0 or i == len(chunks)-1:
+            elapsed = time.time() - t0
+            print(f"   chunk {i+1}/{len(chunks)} ({elapsed:.0f}s)",
+                  flush=True)
+    cmd(s, f"base64 -d /tmp/{label}.b64 > /tmp/{label}.gz")
+    cmd(s, f"gunzip -c /tmp/{label}.gz > {remote_path} && chmod +x {remote_path}")
+    cmd(s, f"stat -c%s {remote_path}")
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--no-launch", action="store_true")
+    ap.add_argument("--no-fb2png", action="store_true",
+                    help="Skip transferring the fb2png screenshot tool")
     args = ap.parse_args()
-
-    sz = os.path.getsize(LOCAL)
-    print(f"[deploy] local atomik_os: {sz} bytes")
-    with open(LOCAL, "rb") as f: raw = f.read()
-    gz = gzip.compress(raw, compresslevel=9)
-    b64 = base64.b64encode(gz).decode()
-    print(f"[deploy] gzipped+b64: {len(b64)} chars (gz={len(gz)} bytes)")
 
     s = serial.Serial(PORT, BAUD, timeout=0.5)
     s.reset_input_buffer()
     slow(s, "\n"); time.sleep(0.4); s.read(8192)
 
-    cmd(s, f"rm -f /tmp/aos.b64 /tmp/aos.gz {REMOTE}", log=False)
-
-    CHUNK = 1024
-    chunks = [b64[i:i+CHUNK] for i in range(0, len(b64), CHUNK)]
-    print(f"[deploy] sending {len(chunks)} chunks of {CHUNK} chars",
-          flush=True)
-    t0 = time.time()
-    for i, ch in enumerate(chunks):
-        cmd(s, f"printf '%s' '{ch}' >> /tmp/aos.b64", t=30, log=False)
-        if i % 5 == 0 or i == len(chunks)-1:
-            elapsed = time.time() - t0
-            print(f"  chunk {i+1}/{len(chunks)} ({elapsed:.0f}s)",
-                  flush=True)
-
-    cmd(s, "wc -c /tmp/aos.b64")
-    cmd(s, "base64 -d /tmp/aos.b64 > /tmp/aos.gz")
-    cmd(s, f"gunzip -c /tmp/aos.gz > {REMOTE} && chmod +x {REMOTE}")
-    cmd(s, f"stat -c%s {REMOTE}")
+    transfer(s, LOCAL, REMOTE, "aos")
+    if (not args.no_fb2png) and os.path.exists(FB2PNG_LOCAL):
+        transfer(s, FB2PNG_LOCAL, FB2PNG_REMOTE, "fb2png")
 
     if args.no_launch:
         print("[deploy] --no-launch set; not starting.")
