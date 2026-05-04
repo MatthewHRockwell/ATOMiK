@@ -82,11 +82,18 @@ def main():
         print("[deploy] --no-launch set; not starting.")
         return
     print("[deploy] launching atomik_os in background")
+    # CRITICAL: kill any existing atomik_os instances before launch.
+    # Without this, multiple processes end up writing to /dev/fb0
+    # concurrently and the OLDEST one keeps winning the compositor
+    # race — so the user sees a stale binary even after a 'successful'
+    # deploy. Wait for the kill to complete before relaunching.
+    cmd(s, "pkill -9 atomik_os 2>/dev/null; sleep 1; "
+          "pgrep atomik_os >/dev/null && echo STILL_RUNNING || echo CLEAN")
     # Disable fbcon binding so atomik_os owns the framebuffer cleanly
     cmd(s, "echo 0 > /sys/class/vtconsole/vtcon1/bind 2>/dev/null; true")
     # Run detached. atomik_os reads stdin (UART) for keys, writes /dev/fb0.
-    # Launch detached. Bash rejects `cmd &; echo marker`, so send the
-    # background launch on its own line, then a separate marker round-trip.
+    # Bash rejects `cmd &; echo marker`, so send the background launch
+    # on its own line, then a separate marker round-trip.
     slow(s, f"nohup {REMOTE} > /tmp/aos.out 2> /tmp/aos.err < /dev/null &\n")
     time.sleep(0.6)
     s.read(8192)
