@@ -1,0 +1,74 @@
+/* atomik_os.h — public types and constants shared across modules. */
+#ifndef ATOMIK_OS_H
+#define ATOMIK_OS_H
+
+#include <stdint.h>
+#include <stddef.h>
+
+/* Display geometry — locked to 1920x1080 XRGB8888 since simplefb is fixed. */
+#define FB_W       1920
+#define FB_H       1080
+#define FB_BPP     4
+#define FB_STRIDE  (FB_W * FB_BPP)
+#define FB_BYTES   (FB_W * FB_H * FB_BPP)
+
+/* XRGB8888 helpers. Pixels stored as 0x00RRGGBB. Macros (not inline funcs)
+ * so they can be used as compile-time-constant global initializers. */
+typedef uint32_t pixel_t;
+#define rgb(r, g, b)        ((pixel_t)(((uint32_t)(r) << 16) | ((uint32_t)(g) << 8) | (uint32_t)(b)))
+#define rgba(r, g, b, a)    ((pixel_t)(((uint32_t)(a) << 24) | ((uint32_t)(r) << 16) | ((uint32_t)(g) << 8) | (uint32_t)(b)))
+
+/* Brand palette — locked so the OS has a coherent identity. */
+#define ATOMIK_BG_TOP       rgb(0x0A, 0x0E, 0x1A)  /* near-black, slight blue */
+#define ATOMIK_BG_BOT       rgb(0x12, 0x18, 0x28)  /* deep navy */
+#define ATOMIK_ACCENT       rgb(0x4F, 0xC3, 0xFF)  /* electric cyan */
+#define ATOMIK_ACCENT_DIM   rgb(0x2A, 0x6E, 0x95)
+#define ATOMIK_FG           rgb(0xF2, 0xF5, 0xFA)
+#define ATOMIK_FG_DIM       rgb(0xA8, 0xB2, 0xC4)
+#define ATOMIK_DOCK_BG      rgba(0x1A, 0x20, 0x30, 0xC0) /* translucent dock */
+#define ATOMIK_DOCK_BORDER  rgb(0x30, 0x3A, 0x52)
+
+/* fb.c — back-buffer compositor. */
+int  fb_open(void);
+void fb_close(void);
+pixel_t *fb_back(void);   /* writeable back buffer (FB_W*FB_H pixels) */
+void fb_present(void);    /* memcpy back buffer to /dev/fb0 mmap */
+void fb_clear(pixel_t color);
+void fb_enable_scanout(int enable);  /* drives the LiteX VTG/DMA CSRs */
+
+/* draw.c — primitives. All operate on the back buffer. */
+void draw_rect(int x, int y, int w, int h, pixel_t color);
+void draw_rect_rounded(int x, int y, int w, int h, int radius, pixel_t color);
+void draw_gradient_v(int x, int y, int w, int h, pixel_t top, pixel_t bot);
+void draw_pixel(int x, int y, pixel_t color);
+void draw_blend_pixel(int x, int y, pixel_t color, uint8_t alpha);
+
+/* font.c — text. */
+int  font_init(void);
+int  text_width(const char *s, int scale);
+int  text_height(int scale);
+void draw_text(int x, int y, const char *s, int scale, pixel_t color);
+
+/* wallpaper.c */
+void wallpaper_draw(void);
+
+/* dock.c */
+void dock_draw(int hover_index);
+int  dock_hit_test(int mouse_x, int mouse_y);  /* returns icon index or -1 */
+int  dock_count(void);
+
+/* input.c */
+typedef enum {
+    EV_NONE = 0,
+    EV_KEY,
+    EV_QUIT,
+} event_kind_t;
+typedef struct {
+    event_kind_t kind;
+    int key;          /* ASCII for now */
+} event_t;
+int  input_open(void);
+void input_close(void);
+event_t input_poll(int timeout_ms);
+
+#endif /* ATOMIK_OS_H */
