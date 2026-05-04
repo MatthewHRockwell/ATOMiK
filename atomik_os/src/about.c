@@ -10,7 +10,7 @@ void about_draw(window_t *w, int x, int y, int wd, int ht) {
     int line_h = text_height(1) + 8;
 
     draw_text(x + 24, line_y, "ATOMiK OS", 3, ATOMIK_FG);            line_y += 48;
-    draw_text(x + 24, line_y, "v0.1 — first floating window", 1, ATOMIK_ACCENT);
+    draw_text(x + 24, line_y, "v0.6 -- WM + agent + apps", 1, ATOMIK_ACCENT);
     line_y += line_h * 2;
 
     const char *lines[] = {

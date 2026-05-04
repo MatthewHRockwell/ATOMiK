@@ -20,7 +20,7 @@ static void redraw_frame(void) {
     dock_draw(s_dock_hover);
 
     char buf[64];
-    snprintf(buf, sizeof buf, "ATOMiK OS v0.1  \xb7  HDMI 1920x1080  \xb7  RV64GC");
+    snprintf(buf, sizeof buf, "ATOMiK OS v0.6  -  HDMI 1920x1080  -  RV64GC");
     int sw = text_width(buf, 1);
     draw_text(FB_W - sw - 20, 18, buf, 1, ATOMIK_FG_DIM);
 

@@ -27,7 +27,7 @@ void monitor_draw(window_t *w, int x, int y, int wd, int ht) {
     draw_rect(x, y, wd, ht, rgb(0x16, 0x1C, 0x2A));
 
     /* Header */
-    draw_text(x + 24, y + 16, "ATOMiK Adapter — Live Slot State",
+    draw_text(x + 24, y + 16, "ATOMiK Adapter -- Live Slot State",
               2, ATOMIK_FG);
     draw_text(x + 24, y + 50,
               "Reading /dev/mem @ 0xF0020000  (8 delta-state accumulators)",
