@@ -64,11 +64,16 @@ void status_draw(void) {
         draw_text((FB_W - tw) / 2, 12, buf, 1, ATOMIK_ACCENT);
     }
 
-    /* Right: cpu + uptime */
+    /* Right: spent + cpu + uptime */
     char up[64];
     format_uptime(up, sizeof up);
-    char right[128];
-    snprintf(right, sizeof right, "cpu %3d%%   %s   ATOMiK OS v0.9", s_cpu_pct, up);
+    int spend_uusd = llm_audit_total_uusd();
+    char right[160];
+    snprintf(right, sizeof right,
+             "spent $%d.%03d   cpu %3d%%   %s   v0.12",
+             spend_uusd / 1000000,
+             (spend_uusd / 1000) % 1000,
+             s_cpu_pct, up);
     int rw = text_width(right, 1);
     draw_text(FB_W - rw - 20, 12, right, 1, ATOMIK_FG);
 }
