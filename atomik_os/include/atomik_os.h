@@ -66,6 +66,8 @@ typedef enum {
     ACT_NONE = 0,
     ACT_OPEN_ABOUT,
     ACT_OPEN_MONITOR,
+    ACT_OPEN_TERMINAL,
+    ACT_OPEN_FILES,
     ACT_CLOSE_WINDOW,
     ACT_CYCLE_FOCUS,
     ACT_DOCK_HOVER,
@@ -131,6 +133,14 @@ window_t *wm_focus(int id);
 window_t *wm_topmost(void);
 void      wm_draw_all(void);
 int       wm_handle_key(int key);   /* returns 1 if key was consumed */
+
+/* terminal.c — pty-backed terminal app. Must be declared AFTER wm.c
+ * because terminal_draw signature uses window_t. */
+int  terminal_start(void);
+void terminal_stop(void);
+void terminal_pump(void);
+void terminal_send_key(int key);
+void terminal_draw(window_t *w, int x, int y, int wd, int ht);
 
 /* input.c */
 typedef enum {

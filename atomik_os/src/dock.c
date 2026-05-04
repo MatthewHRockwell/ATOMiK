@@ -20,12 +20,12 @@ static const struct {
     pixel_t     color;
     action_t    action;     /* which agent action does clicking this icon log? */
 } ICONS[] = {
-    { "About",     rgb(0xA8, 0xB2, 0xC4), ACT_OPEN_ABOUT   },
-    { "Monitor",   rgb(0x6E, 0xC4, 0x6E), ACT_OPEN_MONITOR },
-    { "Terminal",  rgb(0x36, 0x44, 0x60), ACT_NONE         },
-    { "Files",     rgb(0xC9, 0x8C, 0x3C), ACT_NONE         },
-    { "Editor",    rgb(0x4F, 0xC3, 0xFF), ACT_NONE         },
-    { "ATOMiK",    rgb(0xFF, 0x6F, 0x91), ACT_NONE         },
+    { "About",     rgb(0xA8, 0xB2, 0xC4), ACT_OPEN_ABOUT    },
+    { "Monitor",   rgb(0x6E, 0xC4, 0x6E), ACT_OPEN_MONITOR  },
+    { "Terminal",  rgb(0x36, 0x44, 0x60), ACT_OPEN_TERMINAL },
+    { "Files",     rgb(0xC9, 0x8C, 0x3C), ACT_OPEN_FILES    },
+    { "Editor",    rgb(0x4F, 0xC3, 0xFF), ACT_NONE          },
+    { "ATOMiK",    rgb(0xFF, 0x6F, 0x91), ACT_NONE          },
 };
 #define N_ICONS ((int)(sizeof(ICONS) / sizeof(ICONS[0])))
 
