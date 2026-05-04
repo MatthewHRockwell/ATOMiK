@@ -160,6 +160,17 @@ static void open_document(void) {
     }
 }
 
+static int s_wallet_id = 0;
+static void open_wallet(void) {
+    if (s_wallet_id) { wm_focus(s_wallet_id); return; }
+    int ww = 720, wh = 560;
+    int wx = (FB_W - ww) / 2;
+    int wy = (FB_H - wh) / 2;
+    window_t *w = wm_open("Wallet", wx, wy, ww, wh, wallet_draw, NULL);
+    if (w) s_wallet_id = w->id;
+    notify_post("Wallet — token-pay ledger");
+}
+
 /* Returns the doc_state_t for the currently focused Document window, or
  * NULL if no Document is focused. */
 static doc_state_t *focused_doc(void) {
@@ -183,6 +194,7 @@ int main(int argc, char **argv) {
     input_open();
     wm_init();
     agent_init();
+    wallet_init();
     atomik_open();   /* /dev/mem map for the live monitor; non-fatal if it fails */
 
     /* Open the About window automatically so first-launch shows the WM
@@ -288,6 +300,9 @@ int main(int argc, char **argv) {
             } else if (!dirty && (ev.key == 'd' || ev.key == 'D')) {
                 open_document();
                 agent_log(ACT_OPEN_DOCUMENT);
+                dirty = 1;
+            } else if (!dirty && (ev.key == 'w' || ev.key == 'W')) {
+                open_wallet();
                 dirty = 1;
             } else if (!dirty && ev.key >= '1' && ev.key < '1' + dock_count()) {
                 /* Number key launches whatever app is currently in that

@@ -99,6 +99,23 @@ int  dock_count(void);
  * placeholder app (Terminal/Files/Editor not yet implemented). */
 action_t dock_action_for_slot(int slot);
 
+/* wallet.c — local token wallet (data-only declarations; window_t-based
+ * draw signature lives further down, AFTER wm.c declares window_t). */
+typedef struct {
+    int balance_uusd;       /* user-funded balance in micro-USD */
+    int spent_today_uusd;
+    int daily_cap_uusd;     /* 0 = no cap */
+    int last_reset_day;
+} wallet_state_t;
+
+void wallet_init  (void);
+void wallet_save  (void);
+const wallet_state_t *wallet_get(void);
+int  wallet_topup (int uusd);
+int  wallet_charge(int uusd);
+int  wallet_can_afford(int uusd);
+void wallet_set_daily_cap(int uusd);
+
 /* atomik.c — ATOMiK delta-state adapter access via /dev/mem */
 #define ATOMIK_BASE_PS  0xF0020000UL    /* base via PS GP1 → PL */
 #define ATOMIK_N_SLOTS  8
@@ -141,6 +158,9 @@ window_t *wm_focus(int id);
 window_t *wm_topmost(void);
 void      wm_draw_all(void);
 int       wm_handle_key(int key);   /* returns 1 if key was consumed */
+
+/* wallet_draw — declared here, after wm.c, because it uses window_t. */
+void wallet_draw(window_t *w, int x, int y, int wd, int ht);
 
 /* terminal.c — pty-backed terminal app. Must be declared AFTER wm.c
  * because terminal_draw signature uses window_t. */

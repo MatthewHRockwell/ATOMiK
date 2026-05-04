@@ -51,7 +51,7 @@ void status_draw(void) {
 
     /* Left: app keys hint */
     const char *hint =
-        "[D]ocument <- the pitch  -  sys [A][M][T][F][N]  "
+        "[D]oc  [W]allet  -  sys [A][M][T][F][N]  "
         "edge [C][K][G][B][H]  -  [Tab] [Esc] [Q]";
     draw_text(20, 12, hint, 1, ATOMIK_FG_DIM);
 
@@ -64,13 +64,16 @@ void status_draw(void) {
         draw_text((FB_W - tw) / 2, 12, buf, 1, ATOMIK_ACCENT);
     }
 
-    /* Right: spent + cpu + uptime */
+    /* Right: balance + spent + cpu + uptime */
     char up[64];
     format_uptime(up, sizeof up);
+    const wallet_state_t *w = wallet_get();
     int spend_uusd = llm_audit_total_uusd();
-    char right[160];
+    char right[200];
     snprintf(right, sizeof right,
-             "spent $%d.%03d   cpu %3d%%   %s   v0.12",
+             "wallet $%d.%02d   spent $%d.%03d   cpu %3d%%   %s   v0.13",
+             w->balance_uusd / 1000000,
+             (w->balance_uusd / 10000) % 100,
              spend_uusd / 1000000,
              (spend_uusd / 1000) % 1000,
              s_cpu_pct, up);
