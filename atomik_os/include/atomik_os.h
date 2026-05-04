@@ -68,6 +68,7 @@ typedef enum {
     ACT_OPEN_MONITOR,
     ACT_OPEN_TERMINAL,
     ACT_OPEN_FILES,
+    ACT_OPEN_NOTES,
     ACT_CLOSE_WINDOW,
     ACT_CYCLE_FOCUS,
     ACT_DOCK_HOVER,
@@ -147,6 +148,19 @@ void terminal_draw(window_t *w, int x, int y, int wd, int ht);
 void files_open(void);
 void files_handle_key(int key);
 void files_draw(window_t *w, int x, int y, int wd, int ht);
+
+/* notes.c — minimal text editor.
+ * Persists to /tmp/atomik_os_notes.txt. v0.8.1 will move to /var. */
+void notes_open(void);
+void notes_handle_key(int key);
+void notes_draw(window_t *w, int x, int y, int wd, int ht);
+
+/* notify.c — non-blocking toast notifications drawn over the desktop. */
+void notify_post(const char *text);
+void notify_draw(void);
+
+/* status.c — top status bar (clock, CPU, prediction surface) */
+void status_draw(void);
 
 /* anim.c — minimal animation runtime.
  * Returns monotonic milliseconds for use in tween functions, plus a few

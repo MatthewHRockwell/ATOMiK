@@ -24,7 +24,7 @@ static const struct {
     { "Monitor",   rgb(0x6E, 0xC4, 0x6E), ACT_OPEN_MONITOR  },
     { "Terminal",  rgb(0x36, 0x44, 0x60), ACT_OPEN_TERMINAL },
     { "Files",     rgb(0xC9, 0x8C, 0x3C), ACT_OPEN_FILES    },
-    { "Editor",    rgb(0x4F, 0xC3, 0xFF), ACT_NONE          },
+    { "Notes",     rgb(0x4F, 0xC3, 0xFF), ACT_OPEN_NOTES    },
     { "ATOMiK",    rgb(0xFF, 0x6F, 0x91), ACT_NONE          },
 };
 #define N_ICONS ((int)(sizeof(ICONS) / sizeof(ICONS[0])))

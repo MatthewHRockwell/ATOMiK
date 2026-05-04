@@ -15,29 +15,12 @@ void monitor_draw(window_t *w, int x, int y, int wd, int ht);  /* monitor.c */
 /* terminal_draw, terminal_send_key, terminal_start declared in atomik_os.h */
 
 static void redraw_frame(void) {
-    /* Bottom-up: wallpaper, dock, then windows on top. */
+    /* Bottom-up: wallpaper, status bar, dock, windows, notifications. */
     wallpaper_draw();
+    status_draw();
     dock_draw(s_dock_hover);
-
-    char buf[64];
-    snprintf(buf, sizeof buf, "ATOMiK OS v0.6  -  HDMI 1920x1080  -  RV64GC");
-    int sw = text_width(buf, 1);
-    draw_text(FB_W - sw - 20, 18, buf, 1, ATOMIK_FG_DIM);
-
-    /* Hint footer about keys */
-    const char *hint = "[A] About   [M] Monitor   [T] Terminal   [F] Files   [Tab] cycle   [Esc] close   [Q] quit";
-    draw_text(20, 18, hint, 1, ATOMIK_FG_DIM);
-
-    /* Agent prediction surface — top-center. */
-    action_t pred = agent_predict();
-    if (pred != ACT_NONE) {
-        char buf[80];
-        snprintf(buf, sizeof buf, "next likely: %s", agent_action_name(pred));
-        int tw = text_width(buf, 1);
-        draw_text((FB_W - tw) / 2, 18, buf, 1, ATOMIK_ACCENT);
-    }
-
     wm_draw_all();
+    notify_draw();
     fb_present();
 }
 
@@ -75,6 +58,19 @@ static void open_files(void) {
     int wy = (FB_H - wh) / 2 - 60;
     window_t *w = wm_open("Files", wx, wy, ww, wh, files_draw, NULL);
     if (w) s_files_id = w->id;
+    notify_post("Files opened");
+}
+
+static int s_notes_id = 0;
+static void open_notes(void) {
+    if (s_notes_id) { wm_focus(s_notes_id); return; }
+    notes_open();
+    int ww = 700, wh = 540;
+    int wx = (FB_W - ww) / 2 - 80;
+    int wy = (FB_H - wh) / 2 + 40;
+    window_t *w = wm_open("Notes", wx, wy, ww, wh, notes_draw, NULL);
+    if (w) s_notes_id = w->id;
+    notify_post("Notes opened");
 }
 
 int main(int argc, char **argv) {
@@ -132,6 +128,14 @@ int main(int argc, char **argv) {
                     dirty = 1;
                 }
             }
+            /* If notes is focused, all printable keys edit the buffer. */
+            if (!dirty && s_notes_id) {
+                window_t *top = wm_topmost();
+                if (top && top->id == s_notes_id) {
+                    notes_handle_key(ev.key);
+                    dirty = 1;
+                }
+            }
             /* Global app shortcuts (only reach here if WM didn't consume
              * AND terminal isn't focused). */
             if (!dirty && (ev.key == 'a' || ev.key == 'A')) {
@@ -150,6 +154,10 @@ int main(int argc, char **argv) {
                 open_files();
                 agent_log(ACT_OPEN_FILES);
                 dirty = 1;
+            } else if (!dirty && (ev.key == 'n' || ev.key == 'N')) {
+                open_notes();
+                agent_log(ACT_OPEN_NOTES);
+                dirty = 1;
             } else if (!dirty && ev.key >= '1' && ev.key < '1' + dock_count()) {
                 /* Number key launches whatever app is currently in that
                  * dock slot. The slot meaning shifts as the agent
@@ -161,6 +169,7 @@ int main(int argc, char **argv) {
                 else if (a == ACT_OPEN_MONITOR)  open_monitor();
                 else if (a == ACT_OPEN_TERMINAL) open_terminal();
                 else if (a == ACT_OPEN_FILES)    open_files();
+                else if (a == ACT_OPEN_NOTES)    open_notes();
                 if (a != ACT_NONE) agent_log(a);
                 else               agent_log(ACT_DOCK_HOVER);
                 dirty = 1;
