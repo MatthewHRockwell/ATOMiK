@@ -108,6 +108,29 @@ static void open_code(void) {
     notify_post("Code streamed");
 }
 
+static int s_brief_id = 0, s_chat_id = 0;
+static void open_brief(void) {
+    if (s_brief_id) { wm_focus(s_brief_id); return; }
+    int ww = 820, wh = 500;
+    int wx = (FB_W - ww) / 2;
+    int wy = (FB_H - wh) / 2 - 40;
+    window_t *w = wm_open("Brief (edge app)", wx, wy, ww, wh,
+                          edge_brief_draw, NULL);
+    if (w) s_brief_id = w->id;
+    notify_post("Brief streamed");
+}
+
+static void open_chat(void) {
+    if (s_chat_id) { wm_focus(s_chat_id); return; }
+    int ww = 760, wh = 540;
+    int wx = (FB_W - ww) / 2 + 100;
+    int wy = (FB_H - wh) / 2;
+    window_t *w = wm_open("Chat (edge app)", wx, wy, ww, wh,
+                          edge_chat_draw, NULL);
+    if (w) s_chat_id = w->id;
+    notify_post("Chat streamed");
+}
+
 int main(int argc, char **argv) {
     (void)argc; (void)argv;
 
@@ -204,6 +227,14 @@ int main(int argc, char **argv) {
             } else if (!dirty && (ev.key == 'g' || ev.key == 'G')) {
                 open_code();
                 agent_log(ACT_OPEN_CODE);
+                dirty = 1;
+            } else if (!dirty && (ev.key == 'b' || ev.key == 'B')) {
+                open_brief();
+                agent_log(ACT_OPEN_BRIEF);
+                dirty = 1;
+            } else if (!dirty && (ev.key == 'h' || ev.key == 'H')) {
+                open_chat();
+                agent_log(ACT_OPEN_CHAT);
                 dirty = 1;
             } else if (!dirty && ev.key >= '1' && ev.key < '1' + dock_count()) {
                 /* Number key launches whatever app is currently in that

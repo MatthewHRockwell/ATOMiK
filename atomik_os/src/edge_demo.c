@@ -10,6 +10,8 @@
 static edge_app_t s_calendar;
 static edge_app_t s_tasks;
 static edge_app_t s_code;
+static edge_app_t s_brief;
+static edge_app_t s_chat;
 
 static int s_init = 0;
 
@@ -61,12 +63,46 @@ static void demo_code_init(void) {
     eapp_list_append(&s_code, feed, "PR #138  monitor: read live ATOMiK slots");
 }
 
+static void demo_brief_init(void) {
+    eapp_init(&s_brief, "Brief", "AI-summarized day  -  delta-streamed",
+              PRIM_CARD, rgb(0xFF, 0xCB, 0x4A));
+    int title    = eapp_add_field(&s_brief, FT_STR);
+    int subtitle = eapp_add_field(&s_brief, FT_STR);
+    int body     = eapp_add_field(&s_brief, FT_STR);
+    eapp_set_str(&s_brief, title,    "Tuesday, May 6 2026");
+    eapp_set_str(&s_brief, subtitle, "3 events  -  6 tasks  -  5 PRs to review");
+    eapp_set_str(&s_brief, body,
+        "Your morning is mostly free; the sprint sync at 10:00 needs a "
+        "decision on the field-delta encoding format. Bob asked about lunch "
+        "tomorrow. Your top task by recency is shipping invariant-frame v0.9 "
+        "to the board.\n\nThe agent suggests starting with the wire format "
+        "RFC since it unblocks both the cross-device sync and the laptop "
+        "build. You typically focus best 9-11am, so block that window.");
+}
+
+static void demo_chat_init(void) {
+    eapp_init(&s_chat, "Chat", "Agent conversation  -  alternating bubbles",
+              PRIM_CONVO, rgb(0x4F, 0xC3, 0xFF));
+    int title = eapp_add_field(&s_chat, FT_STR);
+    int turns = eapp_add_field(&s_chat, FT_LIST);
+    eapp_set_str(&s_chat, title, "ATOMiK Agent");
+    eapp_list_append(&s_chat, turns, "agent: ready. what would you like to do?");
+    eapp_list_append(&s_chat, turns, "you: schedule lunch with bob 1pm tomorrow");
+    eapp_list_append(&s_chat, turns, "agent: dispatched to Calendar.create_event");
+    eapp_list_append(&s_chat, turns, "you: any open PRs?");
+    eapp_list_append(&s_chat, turns, "agent: 5 -- the highest priority is #142");
+    eapp_list_append(&s_chat, turns, "you: review #142");
+    eapp_list_append(&s_chat, turns, "agent: opened in Code -- ready when you are");
+}
+
 static void demo_init_once(void) {
     if (s_init) return;
     s_init = 1;
     demo_calendar_init();
     demo_tasks_init();
     demo_code_init();
+    demo_brief_init();
+    demo_chat_init();
 }
 
 void edge_calendar_draw(window_t *w, int x, int y, int wd, int ht) {
@@ -82,4 +118,14 @@ void edge_tasks_draw(window_t *w, int x, int y, int wd, int ht) {
 void edge_code_draw(window_t *w, int x, int y, int wd, int ht) {
     demo_init_once();
     eapp_draw(w, &s_code, x, y, wd, ht);
+}
+
+void edge_brief_draw(window_t *w, int x, int y, int wd, int ht) {
+    demo_init_once();
+    eapp_draw(w, &s_brief, x, y, wd, ht);
+}
+
+void edge_chat_draw(window_t *w, int x, int y, int wd, int ht) {
+    demo_init_once();
+    eapp_draw(w, &s_chat, x, y, wd, ht);
 }

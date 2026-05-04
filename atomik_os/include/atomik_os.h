@@ -72,6 +72,8 @@ typedef enum {
     ACT_OPEN_CALENDAR,
     ACT_OPEN_TASKS,
     ACT_OPEN_CODE,
+    ACT_OPEN_BRIEF,
+    ACT_OPEN_CHAT,
     ACT_CLOSE_WINDOW,
     ACT_CYCLE_FOCUS,
     ACT_DOCK_HOVER,
@@ -238,10 +240,12 @@ const char *eapp_primitive_name(primitive_t p);
  * and pulling field values out of the app's accumulator. */
 void eapp_draw(window_t *w, edge_app_t *a, int x, int y, int wd, int ht);
 
-/* edge_demo.c — three reference edge apps shipped as data only */
+/* edge_demo.c — five reference edge apps shipped as data only */
 void edge_calendar_draw(window_t *w, int x, int y, int wd, int ht);
 void edge_tasks_draw(window_t *w, int x, int y, int wd, int ht);
 void edge_code_draw(window_t *w, int x, int y, int wd, int ht);
+void edge_brief_draw(window_t *w, int x, int y, int wd, int ht);
+void edge_chat_draw(window_t *w, int x, int y, int wd, int ht);
 
 /* anim.c — minimal animation runtime.
  * Returns monotonic milliseconds for use in tween functions, plus a few
