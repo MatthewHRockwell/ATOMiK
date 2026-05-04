@@ -1,4 +1,10 @@
-/* dock.c — bottom dock with placeholder app icons. */
+/* dock.c — bottom dock with adaptive ordering.
+ *
+ * v0.3: each icon is bound to an agent action_t. The dock asks the agent
+ * for each icon's score and renders LEFT-TO-RIGHT in DESCENDING score
+ * order, so the user's most-likely-next action floats to the left edge
+ * (closest to the App-launcher key). This is the first user-visible piece
+ * of the agentic-OS direction. */
 #include "atomik_os.h"
 #include <string.h>
 
@@ -12,13 +18,14 @@
 static const struct {
     const char *label;
     pixel_t     color;
+    action_t    action;     /* which agent action does clicking this icon log? */
 } ICONS[] = {
-    { "Terminal",  rgb(0x36, 0x44, 0x60) },
-    { "Files",     rgb(0xC9, 0x8C, 0x3C) },
-    { "Editor",    rgb(0x4F, 0xC3, 0xFF) },
-    { "Monitor",   rgb(0x6E, 0xC4, 0x6E) },
-    { "ATOMiK",    rgb(0xFF, 0x6F, 0x91) },
-    { "About",     rgb(0xA8, 0xB2, 0xC4) },
+    { "About",     rgb(0xA8, 0xB2, 0xC4), ACT_OPEN_ABOUT   },
+    { "Monitor",   rgb(0x6E, 0xC4, 0x6E), ACT_OPEN_MONITOR },
+    { "Terminal",  rgb(0x36, 0x44, 0x60), ACT_NONE         },
+    { "Files",     rgb(0xC9, 0x8C, 0x3C), ACT_NONE         },
+    { "Editor",    rgb(0x4F, 0xC3, 0xFF), ACT_NONE         },
+    { "ATOMiK",    rgb(0xFF, 0x6F, 0x91), ACT_NONE         },
 };
 #define N_ICONS ((int)(sizeof(ICONS) / sizeof(ICONS[0])))
 
@@ -32,6 +39,28 @@ static int dock_x0(void) {
 
 static int dock_y0(void) {
     return FB_H - DOCK_HEIGHT - 16;
+}
+
+/* Compute the icon order based on agent score. Higher score = closer to
+ * the left edge of the dock. Ties broken by original index for stability. */
+static void compute_order(int order[N_ICONS]) {
+    double scores[N_ICONS];
+    for (int i = 0; i < N_ICONS; i++) {
+        order[i]  = i;
+        scores[i] = ICONS[i].action == ACT_NONE ? 0.0
+                                                : agent_score(ICONS[i].action);
+    }
+    /* Insertion sort by descending score (small N). */
+    for (int i = 1; i < N_ICONS; i++) {
+        int    cur_i = order[i];
+        double cur_s = scores[cur_i];
+        int    j     = i - 1;
+        while (j >= 0 && scores[order[j]] < cur_s) {
+            order[j + 1] = order[j];
+            j--;
+        }
+        order[j + 1] = cur_i;
+    }
 }
 
 void dock_draw(int hover_index) {
@@ -48,10 +77,14 @@ void dock_draw(int hover_index) {
     draw_rect_rounded(dx, dy, total_w, 1,             DOCK_RADIUS,
                       ATOMIK_DOCK_BORDER);
 
+    int order[N_ICONS];
+    compute_order(order);
+
     int ix = dx + DOCK_PADDING_X;
     int iy = dy + DOCK_PADDING_Y;
-    for (int i = 0; i < N_ICONS; i++) {
-        int hover = (i == hover_index);
+    for (int slot = 0; slot < N_ICONS; slot++) {
+        int i     = order[slot];
+        int hover = (slot == hover_index);
         int size  = hover ? ICON_SIZE + 8 : ICON_SIZE;
         int off   = (ICON_SIZE - size) / 2;
         draw_rect_rounded(ix + off, iy + off, size, size, 12, ICONS[i].color);
@@ -64,6 +97,17 @@ void dock_draw(int hover_index) {
         draw_text(ix + off + (size - tw) / 2,
                   iy + off + (size - th) / 2,
                   ch, scale, ATOMIK_FG);
+
+        /* If this icon's action is the agent's predicted next, draw a tiny
+         * cyan dot under it to surface the prediction visually. */
+        if (ICONS[i].action != ACT_NONE && agent_predict() == ICONS[i].action) {
+            int dot_x = ix + ICON_SIZE / 2;
+            int dot_y = iy + ICON_SIZE + 4;
+            for (int dy2 = -2; dy2 <= 2; dy2++)
+                for (int dx2 = -2; dx2 <= 2; dx2++)
+                    if (dx2*dx2 + dy2*dy2 <= 4)
+                        draw_pixel(dot_x + dx2, dot_y + dy2, ATOMIK_ACCENT);
+        }
 
         ix += ICON_SIZE + ICON_GAP;
     }

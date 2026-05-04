@@ -27,6 +27,15 @@ static void redraw_frame(void) {
     const char *hint = "[A] About   [M] Monitor   [Tab] cycle   [Esc] close   [Q] quit";
     draw_text(20, 18, hint, 1, ATOMIK_FG_DIM);
 
+    /* Agent prediction surface — top-center. */
+    action_t pred = agent_predict();
+    if (pred != ACT_NONE) {
+        char buf[80];
+        snprintf(buf, sizeof buf, "next likely: %s", agent_action_name(pred));
+        int tw = text_width(buf, 1);
+        draw_text((FB_W - tw) / 2, 18, buf, 1, ATOMIK_ACCENT);
+    }
+
     wm_draw_all();
     fb_present();
 }
@@ -56,6 +65,7 @@ int main(int argc, char **argv) {
     font_init();
     input_open();
     wm_init();
+    agent_init();
     atomik_open();   /* /dev/mem map for the live monitor; non-fatal if it fails */
 
     /* Open the About window automatically so first-launch shows the WM
@@ -71,19 +81,26 @@ int main(int argc, char **argv) {
 
             /* Window manager gets first crack at the key (Tab, Esc, etc). */
             if (wm_handle_key(ev.key)) {
+                /* Agent log: WM-consumed keys count as cycle/close. */
+                if (ev.key == '\t')      agent_log(ACT_CYCLE_FOCUS);
+                else if (ev.key == 0x1B) agent_log(ACT_CLOSE_WINDOW);
                 dirty = 1;
             } else if (ev.key == 'a' || ev.key == 'A') {
                 open_about();
+                agent_log(ACT_OPEN_ABOUT);
                 dirty = 1;
             } else if (ev.key == 'm' || ev.key == 'M') {
                 open_monitor();
+                agent_log(ACT_OPEN_MONITOR);
                 dirty = 1;
             } else if (ev.key >= '1' && ev.key < '1' + dock_count()) {
                 s_dock_hover = ev.key - '1';
+                agent_log(ACT_DOCK_HOVER);
                 dirty = 1;
             } else if (ev.key == ' ') {
                 int n = dock_count();
                 s_dock_hover = (s_dock_hover + 1) % n;
+                agent_log(ACT_DOCK_HOVER);
                 dirty = 1;
             }
 

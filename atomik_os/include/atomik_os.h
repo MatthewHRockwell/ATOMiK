@@ -57,6 +57,34 @@ void dock_draw(int hover_index);
 int  dock_hit_test(int mouse_x, int mouse_y);  /* returns icon index or -1 */
 int  dock_count(void);
 
+/* agent.c — agentic usage logger + adaptive surfacing.
+ *
+ * Every UI event (key press, window open, window close, app launch) is
+ * recorded as a delta in a small ring buffer. The agent layer derives:
+ *   - per-action frequency (how often)
+ *   - per-action recency  (how recently)
+ *   - per-action context  (what's currently focused)
+ * and surfaces a single "predicted next action" hint that the WM/dock can
+ * render. v0.3 is per-process in-memory only; v0.4 will persist to
+ * /var/lib/atomik_os/usage.delta. */
+typedef enum {
+    ACT_NONE = 0,
+    ACT_OPEN_ABOUT,
+    ACT_OPEN_MONITOR,
+    ACT_CLOSE_WINDOW,
+    ACT_CYCLE_FOCUS,
+    ACT_DOCK_HOVER,
+    ACT_QUIT,
+    ACT_MAX,
+} action_t;
+void        agent_init(void);
+void        agent_log(action_t action);
+action_t    agent_predict(void);                  /* most likely next action */
+const char *agent_action_name(action_t a);
+int         agent_count(action_t a);              /* lifetime count */
+double      agent_recency(action_t a);            /* 0..1, 1=most recent */
+double      agent_score(action_t a);              /* freq * recency */
+
 /* atomik.c — ATOMiK delta-state adapter access via /dev/mem */
 #define ATOMIK_BASE_PS  0xF0020000UL    /* base via PS GP1 → PL */
 #define ATOMIK_N_SLOTS  8
