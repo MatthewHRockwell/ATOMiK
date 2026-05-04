@@ -52,11 +52,6 @@ void draw_text(int x, int y, const char *s, int scale, pixel_t color);
 /* wallpaper.c */
 void wallpaper_draw(void);
 
-/* dock.c */
-void dock_draw(int hover_index);
-int  dock_hit_test(int mouse_x, int mouse_y);  /* returns icon index or -1 */
-int  dock_count(void);
-
 /* agent.c — agentic usage logger + adaptive surfacing.
  *
  * Every UI event (key press, window open, window close, app launch) is
@@ -84,6 +79,15 @@ const char *agent_action_name(action_t a);
 int         agent_count(action_t a);              /* lifetime count */
 double      agent_recency(action_t a);            /* 0..1, 1=most recent */
 double      agent_score(action_t a);              /* freq * recency */
+
+/* dock.c */
+void dock_draw(int hover_index);
+int  dock_hit_test(int mouse_x, int mouse_y);  /* returns icon index or -1 */
+int  dock_count(void);
+/* Returns the action_t bound to the icon at visible slot `slot`, taking
+ * into account the current adaptive ordering. ACT_NONE if the slot is a
+ * placeholder app (Terminal/Files/Editor not yet implemented). */
+action_t dock_action_for_slot(int slot);
 
 /* atomik.c — ATOMiK delta-state adapter access via /dev/mem */
 #define ATOMIK_BASE_PS  0xF0020000UL    /* base via PS GP1 → PL */

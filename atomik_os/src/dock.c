@@ -41,6 +41,10 @@ static int dock_y0(void) {
     return FB_H - DOCK_HEIGHT - 16;
 }
 
+/* Cached order from the last dock_draw, so dock_action_for_slot can
+ * resolve a visible-slot index back to an icon without recomputing. */
+static int s_last_order[N_ICONS] = {0,1,2,3,4,5};
+
 /* Compute the icon order based on agent score. Higher score = closer to
  * the left edge of the dock. Ties broken by original index for stability. */
 static void compute_order(int order[N_ICONS]) {
@@ -79,6 +83,7 @@ void dock_draw(int hover_index) {
 
     int order[N_ICONS];
     compute_order(order);
+    memcpy(s_last_order, order, sizeof order);
 
     int ix = dx + DOCK_PADDING_X;
     int iy = dy + DOCK_PADDING_Y;
@@ -111,6 +116,12 @@ void dock_draw(int hover_index) {
 
         ix += ICON_SIZE + ICON_GAP;
     }
+}
+
+action_t dock_action_for_slot(int slot) {
+    if (slot < 0 || slot >= N_ICONS) return ACT_NONE;
+    int icon_index = s_last_order[slot];
+    return ICONS[icon_index].action;
 }
 
 int dock_hit_test(int mouse_x, int mouse_y) {

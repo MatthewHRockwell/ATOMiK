@@ -94,8 +94,16 @@ int main(int argc, char **argv) {
                 agent_log(ACT_OPEN_MONITOR);
                 dirty = 1;
             } else if (ev.key >= '1' && ev.key < '1' + dock_count()) {
-                s_dock_hover = ev.key - '1';
-                agent_log(ACT_DOCK_HOVER);
+                /* Number key launches whatever app is currently in that
+                 * dock slot. The slot meaning shifts as the agent
+                 * reorders icons by predicted relevance. */
+                int slot = ev.key - '1';
+                s_dock_hover = slot;
+                action_t a = dock_action_for_slot(slot);
+                if (a == ACT_OPEN_ABOUT)        open_about();
+                else if (a == ACT_OPEN_MONITOR) open_monitor();
+                if (a != ACT_NONE) agent_log(a);
+                else               agent_log(ACT_DOCK_HOVER);
                 dirty = 1;
             } else if (ev.key == ' ') {
                 int n = dock_count();
