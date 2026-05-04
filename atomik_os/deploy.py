@@ -14,7 +14,10 @@ LOCAL  = os.path.join(os.path.dirname(os.path.abspath(__file__)),
 REMOTE = "/tmp/atomik_os"
 
 _n = [0]
-def slow(s, line, per=0.003):
+def slow(s, line, per=0.0008):
+    """Per-char throttled write. The soft-CPU LiteX UART RX FIFO is shallow
+    so bursts of >~32 chars get dropped; throttling per char avoids that.
+    Empirically 0.8 ms/char is reliable at 115200 baud on this board."""
     for c in line:
         s.write(c.encode() if isinstance(c, str) else bytes([c]))
         time.sleep(per)
@@ -52,15 +55,17 @@ def main():
 
     cmd(s, f"rm -f /tmp/aos.b64 /tmp/aos.gz {REMOTE}", log=False)
 
-    CHUNK = 256
+    CHUNK = 1024
     chunks = [b64[i:i+CHUNK] for i in range(0, len(b64), CHUNK)]
-    print(f"[deploy] sending {len(chunks)} chunks of {CHUNK} chars")
+    print(f"[deploy] sending {len(chunks)} chunks of {CHUNK} chars",
+          flush=True)
     t0 = time.time()
     for i, ch in enumerate(chunks):
-        cmd(s, f"printf '%s' '{ch}' >> /tmp/aos.b64", log=False)
-        if i % 10 == 0 or i == len(chunks)-1:
+        cmd(s, f"printf '%s' '{ch}' >> /tmp/aos.b64", t=30, log=False)
+        if i % 5 == 0 or i == len(chunks)-1:
             elapsed = time.time() - t0
-            print(f"  chunk {i+1}/{len(chunks)} ({elapsed:.0f}s)")
+            print(f"  chunk {i+1}/{len(chunks)} ({elapsed:.0f}s)",
+                  flush=True)
 
     cmd(s, "wc -c /tmp/aos.b64")
     cmd(s, "base64 -d /tmp/aos.b64 > /tmp/aos.gz")
