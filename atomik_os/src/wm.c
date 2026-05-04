@@ -50,9 +50,11 @@ window_t *wm_open(const char *title, int x, int y, int w, int h,
     win->h       = h;
     win->visible = 1;
     win->z       = max_z() + 1;
+    win->opened_at_ms = anim_now_ms();
     win->draw_content = draw_content;
     win->user    = user;
     snprintf(win->title, sizeof win->title, "%s", title ? title : "Window");
+    anim_tick();
     return win;
 }
 
@@ -83,23 +85,35 @@ window_t *wm_topmost(void) {
 }
 
 static void draw_one(const window_t *win, int focused) {
+    /* Open-fade tween: scale the window up subtly during the first ~220ms
+     * so it pops in instead of snapping. */
+    double age = anim_window_age(win->id, win->opened_at_ms);
+    double sc  = anim_ease_out(age);
+    int    inset_w = (int)((1.0 - sc) * (double)win->w * 0.04);
+    int    inset_h = (int)((1.0 - sc) * (double)win->h * 0.04);
+    int    rx = win->x + inset_w;
+    int    ry = win->y + inset_h;
+    int    rw = win->w - 2 * inset_w;
+    int    rh = win->h - 2 * inset_h;
+    if (age < 1.0) anim_tick();   /* keep frame loop alive */
+
     /* Outer shadow (1px offset) */
-    draw_rect_rounded(win->x + 4, win->y + 6, win->w, win->h, 12,
+    draw_rect_rounded(rx + 4, ry + 6, rw, rh, 12,
                       rgb(0x00, 0x00, 0x00));
     /* Body background */
-    draw_rect_rounded(win->x, win->y, win->w, win->h, 12,
+    draw_rect_rounded(rx, ry, rw, rh, 12,
                       rgb(0x16, 0x1C, 0x2A));
     /* Title bar */
     pixel_t title_bg = focused ? ATOMIK_ACCENT_DIM : rgb(0x22, 0x2A, 0x3A);
-    draw_rect_rounded(win->x, win->y, win->w, WM_TITLE_H, 12, title_bg);
+    draw_rect_rounded(rx, ry, rw, WM_TITLE_H, 12, title_bg);
     /* Title text */
-    int ty = win->y + (WM_TITLE_H - text_height(1)) / 2;
-    draw_text(win->x + 12, ty, win->title, 1,
+    int ty = ry + (WM_TITLE_H - text_height(1)) / 2;
+    draw_text(rx + 12, ty, win->title, 1,
               focused ? ATOMIK_FG : ATOMIK_FG_DIM);
     /* Close button (right side of title bar) */
     int cb_size = 16;
-    int cb_x = win->x + win->w - cb_size - 8;
-    int cb_y = win->y + (WM_TITLE_H - cb_size) / 2;
+    int cb_x = rx + rw - cb_size - 8;
+    int cb_y = ry + (WM_TITLE_H - cb_size) / 2;
     draw_rect_rounded(cb_x, cb_y, cb_size, cb_size, 4,
                       rgb(0xFF, 0x6F, 0x91));
     /* X glyph drawn as two small rects */
@@ -107,10 +121,10 @@ static void draw_one(const window_t *win, int focused) {
     draw_rect(cb_x + 7, cb_y + 4, 2, 8, ATOMIK_FG);
 
     /* Content area */
-    int cx = win->x + WM_BORDER;
-    int cy = win->y + WM_TITLE_H;
-    int cw = win->w - 2 * WM_BORDER;
-    int ch = win->h - WM_TITLE_H - WM_BORDER;
+    int cx = rx + WM_BORDER;
+    int cy = ry + WM_TITLE_H;
+    int cw = rw - 2 * WM_BORDER;
+    int ch = rh - WM_TITLE_H - WM_BORDER;
     if (win->draw_content) win->draw_content((window_t *)win, cx, cy, cw, ch);
 }
 

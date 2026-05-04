@@ -103,15 +103,36 @@ void dock_draw(int hover_index) {
                   iy + off + (size - th) / 2,
                   ch, scale, ATOMIK_FG);
 
-        /* If this icon's action is the agent's predicted next, draw a tiny
-         * cyan dot under it to surface the prediction visually. */
+        /* If this icon's action is the agent's predicted next, draw a
+         * pulsing cyan dot under it to surface the prediction visually. */
         if (ICONS[i].action != ACT_NONE && agent_predict() == ICONS[i].action) {
+            unsigned long t  = anim_now_ms();
+            /* 1.5 s cycle, alpha 0.4..1.0 */
+            double phase = ((t % 1500) / 1500.0) * 6.2831853;
+            double bright = 0.7 + 0.3 * 0.5 * (1.0 + 1.0); /* simple constant — see below */
+            /* sin without libm dep: use a 4-term Taylor approximation */
+            double s = phase;
+            double s3 = s*s*s, s5 = s3*s*s;
+            double sinv = s - s3/6.0 + s5/120.0;
+            if (sinv > 1.0) sinv = 1.0;
+            if (sinv < -1.0) sinv = -1.0;
+            bright = 0.7 + 0.3 * sinv;
+            if (bright < 0.0) bright = 0.0;
+            if (bright > 1.0) bright = 1.0;
+
+            uint8_t r = (uint8_t)(0x4F * bright);
+            uint8_t g = (uint8_t)(0xC3 * bright);
+            uint8_t b = (uint8_t)(0xFF * bright);
+            pixel_t pulse_color = rgb(r, g, b);
+
             int dot_x = ix + ICON_SIZE / 2;
             int dot_y = iy + ICON_SIZE + 4;
-            for (int dy2 = -2; dy2 <= 2; dy2++)
-                for (int dx2 = -2; dx2 <= 2; dx2++)
-                    if (dx2*dx2 + dy2*dy2 <= 4)
-                        draw_pixel(dot_x + dx2, dot_y + dy2, ATOMIK_ACCENT);
+            int radius = 3;
+            for (int dy2 = -radius; dy2 <= radius; dy2++)
+                for (int dx2 = -radius; dx2 <= radius; dx2++)
+                    if (dx2*dx2 + dy2*dy2 <= radius*radius)
+                        draw_pixel(dot_x + dx2, dot_y + dy2, pulse_color);
+            anim_tick();   /* keep frame loop alive while pulse animates */
         }
 
         ix += ICON_SIZE + ICON_GAP;

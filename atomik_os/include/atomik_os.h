@@ -116,13 +116,14 @@ typedef void (*win_draw_fn)(window_t *w, int content_x, int content_y,
 #define WM_BORDER      1
 
 struct window {
-    int          id;
-    char         title[64];
-    int          x, y, w, h;       /* window outer rect including title bar */
-    int          visible;          /* 1 = drawn, 0 = hidden but kept in stack */
-    int          z;                /* stacking order (higher = front) */
-    win_draw_fn  draw_content;     /* called to render the inside of the window */
-    void        *user;             /* per-window state */
+    int           id;
+    char          title[64];
+    int           x, y, w, h;        /* window outer rect including title bar */
+    int           visible;           /* 1 = drawn, 0 = hidden but kept in stack */
+    int           z;                 /* stacking order (higher = front) */
+    unsigned long opened_at_ms;      /* anim_now_ms() at wm_open time */
+    win_draw_fn   draw_content;      /* called to render the inside of the window */
+    void         *user;              /* per-window state */
 };
 
 void      wm_init(void);
@@ -146,6 +147,20 @@ void terminal_draw(window_t *w, int x, int y, int wd, int ht);
 void files_open(void);
 void files_handle_key(int key);
 void files_draw(window_t *w, int x, int y, int wd, int ht);
+
+/* anim.c — minimal animation runtime.
+ * Returns monotonic milliseconds for use in tween functions, plus a few
+ * common easing curves. The compositor checks anim_dirty() each frame to
+ * decide whether to schedule another redraw. */
+unsigned long anim_now_ms(void);
+double        anim_ease_out(double t);  /* t in [0,1] */
+double        anim_lerp(double a, double b, double t);
+/* Drive open-window age tracking. Returns 0..1 for the fade-in tween. */
+double        anim_window_age(int win_id, unsigned long opened_at_ms);
+/* Returns 1 if any animation is currently in progress. */
+int           anim_active(void);
+/* Bump the animation tick — called when something visually changes. */
+void          anim_tick(void);
 
 /* input.c */
 typedef enum {

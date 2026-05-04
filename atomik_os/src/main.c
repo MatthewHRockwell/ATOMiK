@@ -97,7 +97,15 @@ int main(int argc, char **argv) {
     redraw_frame();
 
     while (s_running) {
-        event_t ev = input_poll(50);
+        /* Frame-loop: when an animation is active or the terminal is
+         * focused (async pty output), poll fast (16ms = ~60Hz). Otherwise
+         * idle at 100ms to save CPU. */
+        int poll_ms = anim_active() ? 16 : 100;
+        if (s_terminal_id) {
+            window_t *top = wm_topmost();
+            if (top && top->id == s_terminal_id) poll_ms = 16;
+        }
+        event_t ev = input_poll(poll_ms);
         if (ev.kind == EV_QUIT) { s_running = 0; break; }
         if (ev.kind == EV_KEY) {
             int dirty = 0;
@@ -172,6 +180,16 @@ int main(int argc, char **argv) {
             }
 
             if (dirty) redraw_frame();
+        } else {
+            /* No event arrived. Redraw a frame if an animation is in
+             * progress (window fade-in, predicted-icon pulse, etc.) OR if
+             * the terminal is focused and might have new async pty output. */
+            int need_frame = anim_active();
+            if (!need_frame && s_terminal_id) {
+                window_t *top = wm_topmost();
+                if (top && top->id == s_terminal_id) need_frame = 1;
+            }
+            if (need_frame) redraw_frame();
         }
     }
 
