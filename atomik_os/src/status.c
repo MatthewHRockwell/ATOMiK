@@ -51,8 +51,8 @@ void status_draw(void) {
 
     /* Left: app keys hint */
     const char *hint =
-        "sys: [A]bt [M]on [T]rm [F]ile [N]ote  edge: [C]al [K]ask [G]Code "
-        "[B]rief c[H]at  -  [Tab] [Esc] [Q]";
+        "[D]ocument <- the pitch  -  sys [A][M][T][F][N]  "
+        "edge [C][K][G][B][H]  -  [Tab] [Esc] [Q]";
     draw_text(20, 12, hint, 1, ATOMIK_FG_DIM);
 
     /* Center: agent prediction */

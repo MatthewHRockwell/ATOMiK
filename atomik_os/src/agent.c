@@ -46,6 +46,7 @@ static const char *NAMES[ACT_MAX] = {
     [ACT_OPEN_CODE]     = "Open Code",
     [ACT_OPEN_BRIEF]    = "Open Brief",
     [ACT_OPEN_CHAT]     = "Open Chat",
+    [ACT_OPEN_DOCUMENT] = "Open Document",
     [ACT_CLOSE_WINDOW]  = "Close window",
     [ACT_CYCLE_FOCUS]   = "Cycle focus",
     [ACT_DOCK_HOVER]    = "Hover dock",

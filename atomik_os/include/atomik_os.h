@@ -74,6 +74,7 @@ typedef enum {
     ACT_OPEN_CODE,
     ACT_OPEN_BRIEF,
     ACT_OPEN_CHAT,
+    ACT_OPEN_DOCUMENT,
     ACT_CLOSE_WINDOW,
     ACT_CYCLE_FOCUS,
     ACT_DOCK_HOVER,
@@ -246,6 +247,11 @@ void edge_tasks_draw(window_t *w, int x, int y, int wd, int ht);
 void edge_code_draw(window_t *w, int x, int y, int wd, int ht);
 void edge_brief_draw(window_t *w, int x, int y, int wd, int ht);
 void edge_chat_draw(window_t *w, int x, int y, int wd, int ht);
+
+/* document.c — universal Document app. Replaces the fixed app list. */
+void document_open(void);
+void document_handle_key(int key);
+void document_draw(window_t *w, int x, int y, int wd, int ht);
 
 /* anim.c — minimal animation runtime.
  * Returns monotonic milliseconds for use in tween functions, plus a few

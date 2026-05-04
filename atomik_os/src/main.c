@@ -131,6 +131,19 @@ static void open_chat(void) {
     notify_post("Chat streamed");
 }
 
+/* The Document app — chat-driven UI morphing. The pitch app. */
+static int s_doc_win_id = 0;
+static void open_document(void) {
+    if (s_doc_win_id) { wm_focus(s_doc_win_id); return; }
+    document_open();
+    int ww = 1280, wh = 720;
+    int wx = (FB_W - ww) / 2;
+    int wy = (FB_H - wh) / 2 - 30;
+    window_t *w = wm_open("Document", wx, wy, ww, wh, document_draw, NULL);
+    if (w) s_doc_win_id = w->id;
+    notify_post("Document opened -- type to morph");
+}
+
 int main(int argc, char **argv) {
     (void)argc; (void)argv;
 
@@ -194,6 +207,14 @@ int main(int argc, char **argv) {
                     dirty = 1;
                 }
             }
+            /* Document app — chat panel takes typed commands. */
+            if (!dirty && s_doc_win_id) {
+                window_t *top = wm_topmost();
+                if (top && top->id == s_doc_win_id) {
+                    document_handle_key(ev.key);
+                    dirty = 1;
+                }
+            }
             /* Global app shortcuts (only reach here if WM didn't consume
              * AND terminal isn't focused). */
             if (!dirty && (ev.key == 'a' || ev.key == 'A')) {
@@ -235,6 +256,10 @@ int main(int argc, char **argv) {
             } else if (!dirty && (ev.key == 'h' || ev.key == 'H')) {
                 open_chat();
                 agent_log(ACT_OPEN_CHAT);
+                dirty = 1;
+            } else if (!dirty && (ev.key == 'd' || ev.key == 'D')) {
+                open_document();
+                agent_log(ACT_OPEN_DOCUMENT);
                 dirty = 1;
             } else if (!dirty && ev.key >= '1' && ev.key < '1' + dock_count()) {
                 /* Number key launches whatever app is currently in that
