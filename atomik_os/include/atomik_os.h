@@ -57,6 +57,20 @@ void dock_draw(int hover_index);
 int  dock_hit_test(int mouse_x, int mouse_y);  /* returns icon index or -1 */
 int  dock_count(void);
 
+/* atomik.c — ATOMiK delta-state adapter access via /dev/mem */
+#define ATOMIK_BASE_PS  0xF0020000UL    /* base via PS GP1 → PL */
+#define ATOMIK_N_SLOTS  8
+typedef struct {
+    uint32_t cmd;
+    uint32_t rs1;
+    uint32_t rs2;
+    uint32_t rd;
+} atomik_regs_t;
+int  atomik_open(void);
+void atomik_close(void);
+/* Read each slot's accumulator. Fills `out[ATOMIK_N_SLOTS]`. */
+int  atomik_read_slots(uint32_t *out);
+
 /* wm.c — window manager */
 typedef struct window window_t;
 typedef void (*win_draw_fn)(window_t *w, int content_x, int content_y,

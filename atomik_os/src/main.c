@@ -10,7 +10,8 @@
 static int  s_running    = 1;
 static int  s_dock_hover = -1;
 
-void about_draw(window_t *w, int x, int y, int wd, int ht);  /* about.c */
+void about_draw(window_t *w, int x, int y, int wd, int ht);    /* about.c */
+void monitor_draw(window_t *w, int x, int y, int wd, int ht);  /* monitor.c */
 
 static void redraw_frame(void) {
     /* Bottom-up: wallpaper, dock, then windows on top. */
@@ -23,7 +24,7 @@ static void redraw_frame(void) {
     draw_text(FB_W - sw - 20, 18, buf, 1, ATOMIK_FG_DIM);
 
     /* Hint footer about keys */
-    const char *hint = "[A] About   [Tab] cycle   [Esc] close   [Q] quit";
+    const char *hint = "[A] About   [M] Monitor   [Tab] cycle   [Esc] close   [Q] quit";
     draw_text(20, 18, hint, 1, ATOMIK_FG_DIM);
 
     wm_draw_all();
@@ -37,6 +38,13 @@ static void open_about(void) {
     wm_open("About ATOMiK OS", wx, wy, ww, wh, about_draw, NULL);
 }
 
+static void open_monitor(void) {
+    int ww = 980, wh = 660;
+    int wx = (FB_W - ww) / 2 + 40;     /* offset so it doesn't fully cover About */
+    int wy = (FB_H - wh) / 2 - 40;
+    wm_open("ATOMiK Monitor", wx, wy, ww, wh, monitor_draw, NULL);
+}
+
 int main(int argc, char **argv) {
     (void)argc; (void)argv;
 
@@ -48,6 +56,7 @@ int main(int argc, char **argv) {
     font_init();
     input_open();
     wm_init();
+    atomik_open();   /* /dev/mem map for the live monitor; non-fatal if it fails */
 
     /* Open the About window automatically so first-launch shows the WM
      * working without requiring a key press. */
@@ -66,6 +75,9 @@ int main(int argc, char **argv) {
             } else if (ev.key == 'a' || ev.key == 'A') {
                 open_about();
                 dirty = 1;
+            } else if (ev.key == 'm' || ev.key == 'M') {
+                open_monitor();
+                dirty = 1;
             } else if (ev.key >= '1' && ev.key < '1' + dock_count()) {
                 s_dock_hover = ev.key - '1';
                 dirty = 1;
@@ -81,6 +93,7 @@ int main(int argc, char **argv) {
 
     fb_clear(ATOMIK_BG_BOT);
     fb_present();
+    atomik_close();
     input_close();
     fb_close();
     return 0;
