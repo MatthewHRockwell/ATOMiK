@@ -106,12 +106,11 @@ def shoot(s, name):
     pos = 0
     while pos < n_blocks:
         # Sentinel-bracket the dd output so we can extract just the
-        # payload. We search for the LAST occurrence of START and the
-        # LAST occurrence of END before the marker — bash echoes the
-        # command line itself, which contains the sentinels too, so a
-        # naive find() picks up the wrong instance.
-        START = f"<<<P{pos:06d}>>>"
-        END   = f"<<<E{pos:06d}>>>"
+        # payload. CRITICAL: no '<<<' or '>>>' here — bash interprets
+        # those as here-string / redirect operators and silently eats
+        # the sentinel line. Plain ASCII letters + digits + underscores.
+        START = f"_AOSP_BEGIN_{pos:06d}_"
+        END   = f"_AOSP_END_{pos:06d}_"
         c = cmd(s,
                 f"echo {START}; dd if=/tmp/{name}.b64 bs={BLOCK} skip={pos} count={K} 2>/dev/null; echo {END}",
                 t=60)
