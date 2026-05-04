@@ -472,6 +472,10 @@ jobs:
           python -m software.demos.state_sync_benchmark || true
           python demos/web/export/generate_static.py || true
       - name: Deploy to GitHub Pages
+        # gh-pages pushes occasionally hit transient 5xx errors from
+        # GitHub. Don't let that fail an otherwise green build — the docs
+        # site catches up on the next push that actually changed anything.
+        continue-on-error: true
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
