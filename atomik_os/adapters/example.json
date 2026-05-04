@@ -1,0 +1,39 @@
+{
+  "type": "AdaptiveCard",
+  "version": "1.5",
+  "speak": "Today's brief",
+  "style": "emphasis",
+  "body": [
+    {
+      "type": "TextBlock",
+      "size": "ExtraLarge",
+      "weight": "Bolder",
+      "text": "Tuesday, May 6 2026"
+    },
+    {
+      "type": "TextBlock",
+      "wrap": true,
+      "isSubtle": true,
+      "text": "3 events  -  6 tasks  -  5 PRs to review"
+    },
+    {
+      "type": "TextBlock",
+      "text": "Sprint sync at 10:00 needs a decision on the wire format."
+    },
+    {
+      "type": "TextBlock",
+      "text": "Bob asked about lunch tomorrow."
+    },
+    {
+      "type": "TextBlock",
+      "text": "Top task by recency: ship invariant-frame v0.9 to the board."
+    },
+    {
+      "type": "FactSet",
+      "facts": [
+        { "title": "Focus block", "value": "9 - 11 am" },
+        { "title": "Context",     "value": "deep work" }
+      ]
+    }
+  ]
+}
