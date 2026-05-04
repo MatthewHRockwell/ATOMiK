@@ -105,19 +105,31 @@ def shoot(s, name):
     n_blocks = (n + BLOCK - 1) // BLOCK
     pos = 0
     while pos < n_blocks:
-        # Sentinel-bracket the dd output so we can extract just the payload.
+        # Sentinel-bracket the dd output so we can extract just the
+        # payload. We search for the LAST occurrence of START and the
+        # LAST occurrence of END before the marker — bash echoes the
+        # command line itself, which contains the sentinels too, so a
+        # naive find() picks up the wrong instance.
         START = f"<<<P{pos:06d}>>>"
         END   = f"<<<E{pos:06d}>>>"
         c = cmd(s,
                 f"echo {START}; dd if=/tmp/{name}.b64 bs={BLOCK} skip={pos} count={K} 2>/dev/null; echo {END}",
                 t=60)
         text = c.decode(errors='replace')
-        # Extract between START and END
-        i0 = text.find(START)
-        i1 = text.find(END, i0 + len(START)) if i0 >= 0 else -1
-        if i0 < 0 or i1 < 0:
+        # Strip ANSI escape sequences first
+        import re
+        text = re.sub(r'\x1b\[[0-9;?]*[a-zA-Z]', '', text)
+        # Find sentinel ON ITS OWN LINE — that's the echo output, not
+        # the bash command-line echo (which prepends 'echo ' and ';').
+        lines = text.splitlines()
+        s_idx = e_idx = -1
+        for li, ln in enumerate(lines):
+            if ln.strip() == START: s_idx = li
+            elif ln.strip() == END and s_idx >= 0: e_idx = li; break
+        if s_idx < 0 or e_idx < 0:
             print(f"  ! sentinel miss at pos={pos}"); break
-        payload = text[i0 + len(START):i1]
+        payload_lines = lines[s_idx + 1 : e_idx]
+        payload = '\n'.join(payload_lines)
         valid = ''.join(ch for ch in payload if ch in
                         "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=")
         pieces.append(valid)
