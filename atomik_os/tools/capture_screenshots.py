@@ -75,43 +75,52 @@ def push_keys(s, text):
     time.sleep(0.4)   # let the OS process the keys + repaint
 
 def shoot(s, name):
-    """Capture /dev/fb0 with fb2png, base64-stream the file back, save."""
+    """Capture /dev/fb0 with fb2png, gzip + base64-stream back, save.
+
+    The on-board PNG is uncompressed (stored deflate) so it's ~6 MB. We
+    gzip it on the board first to ~1 MB, then base64 (~1.4 MB), then
+    pull in 4 KiB block-aligned chunks via `dd bs=4096 skip=N count=K`
+    which is ~4096x faster than the byte-aligned dd we used before. """
     print(f"[cap] shooting {name} ...", flush=True)
-    cmd(s, f"/tmp/fb2png /tmp/{name}.png 2>&1 | head -2", t=60)
-    cmd(s, f"base64 /tmp/{name}.png > /tmp/{name}.b64", t=60)
+    cmd(s, f"rm -f /tmp/{name}.png /tmp/{name}.png.gz /tmp/{name}.b64")
+    cmd(s, f"/tmp/fb2png /tmp/{name}.png 2>&1 | head -2", t=120)
+    cmd(s, f"gzip -9 /tmp/{name}.png && base64 /tmp/{name}.png.gz > /tmp/{name}.b64",
+        t=300)
     sz_buf = cmd(s, f"wc -c /tmp/{name}.b64")
-    # Parse "<n> /tmp/<name>.b64"
     n = 0
     for tok in sz_buf.decode(errors='replace').split():
         if tok.isdigit():
             n = int(tok); break
     if n == 0:
         print(f"  ! /tmp/{name}.b64 empty"); return
-    print(f"  base64 len = {n}", flush=True)
+    print(f"  gz+b64 len = {n}", flush=True)
 
-    # Pull in chunks. Each `dd skip=$P count=4096` reads 4 KiB of base64.
-    chunks = []
+    BLOCK = 4096
+    K     = 8                       # bytes per dd call ~ 32 KiB
+    pieces = []
+    n_blocks = (n + BLOCK - 1) // BLOCK
     pos = 0
-    chunk = 4096
-    while pos < n:
-        c = cmd(s, f"dd if=/tmp/{name}.b64 bs=1 skip={pos} count={chunk} 2>/dev/null", t=60)
-        # Extract only printable base64 chars between marker boundaries
+    while pos < n_blocks:
+        c = cmd(s, f"dd if=/tmp/{name}.b64 bs={BLOCK} skip={pos} count={K} 2>/dev/null",
+                t=60)
         text = c.decode(errors='replace')
         valid = ''.join(ch for ch in text if ch in
-                        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=\n\r")
-        # Crude window: trim noise (the marker + echo) by taking everything
-        # AFTER the dd command echo and BEFORE the marker.
-        chunks.append(valid)
-        pos += chunk
-    raw_b64 = ''.join(chunks)
-    # Best-effort clean: keep only b64 alphabet
-    b64 = ''.join(ch for ch in raw_b64 if ch in
-                  "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=")
+                        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=")
+        pieces.append(valid)
+        pos += K
+        if pos % 32 == 0:
+            print(f"  pulled {pos*BLOCK}/{n} bytes", flush=True)
+    b64 = ''.join(pieces)
     while len(b64) % 4 != 0: b64 += '='
     try:
-        png = base64.b64decode(b64)
+        gz = base64.b64decode(b64)
     except Exception as e:
         print(f"  ! decode failed: {e}"); return
+    import gzip as gzmod
+    try:
+        png = gzmod.decompress(gz)
+    except Exception as e:
+        print(f"  ! gunzip failed: {e}"); return
     out_path = os.path.join(OUT, f"{name}.png")
     with open(out_path, "wb") as f: f.write(png)
     print(f"  wrote {out_path} ({len(png)} bytes)", flush=True)
