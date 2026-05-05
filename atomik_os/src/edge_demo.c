@@ -144,14 +144,19 @@ static void demo_stocks_init(void) {
     }
 }
 
-void stocks_tick(void) {
+int stocks_tick(void) {
     /* Called from the main frame loop. Once a second-ish, perturb one
      * row's price and re-render that field. The visible result: the
      * compiled chrome stays put, the row text mutates — exactly the
-     * field-delta pitch in motion. */
-    if (s_stocks_field < 0) return;
+     * field-delta pitch in motion.
+     *
+     * Returns 1 if a mutation happened this call (so the main loop
+     * knows to force a redraw); 0 otherwise. Without this the
+     * data updates but the screen never repaints because main.c only
+     * redraws on key events or animation ticks. */
+    if (s_stocks_field < 0) return 0;
     s_stocks_tick++;
-    if ((s_stocks_tick % 10) != 0) return;       /* ~1 Hz at 100ms poll */
+    if ((s_stocks_tick % 10) != 0) return 0;     /* ~1 Hz at 100ms poll */
     int idx = (s_stocks_tick / 10) % N_STOCKS;
     stock_t *t = &s_stocks_data[idx];
     /* Pseudo-random walk: move price by -50..+50 cents, update bp. */
@@ -172,6 +177,7 @@ void stocks_tick(void) {
         format_row(&s_stocks_data[i], row, sizeof row);
         eapp_list_append(&s_stocks, s_stocks_field, row);
     }
+    return 1;
 }
 
 void edge_stocks_draw(window_t *w, int x, int y, int wd, int ht) {

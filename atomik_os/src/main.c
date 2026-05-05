@@ -233,8 +233,10 @@ int main(int argc, char **argv) {
         event_t ev = input_poll(poll_ms);
         /* v0.23: stocks ticker mutates one row's price every ~1 s.
          * Cheap call (no allocation, no I/O) — safe to invoke every
-         * frame; it self-rate-limits via an internal counter. */
-        stocks_tick();
+         * frame; it self-rate-limits via an internal counter. v0.23.1:
+         * returns 1 when it actually changed something so we can
+         * force a repaint. */
+        int stocks_changed = stocks_tick();
         if (ev.kind == EV_QUIT) { s_running = 0; break; }
         if (ev.kind == EV_KEY) {
             int dirty = 0;
@@ -370,6 +372,7 @@ int main(int argc, char **argv) {
                 window_t *top = wm_topmost();
                 if (top && top->id == s_terminal_id) need_frame = 1;
             }
+            if (!need_frame && stocks_changed && s_stocks_id) need_frame = 1;
             if (need_frame) redraw_frame();
         }
     }
