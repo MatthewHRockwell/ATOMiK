@@ -1,0 +1,35 @@
+From: ATOMiK Project
+Subject: [PATCH] usb: phy: allow USB_ULPI on RISC-V
+
+The USB_ULPI driver depends on `ARM || ARM64 || COMPILE_TEST`. The
+generic ULPI PHY driver (`drivers/usb/phy/phy-ulpi.c`) is architecture-
+independent — it only writes to a memory-mapped viewport register on
+the host controller. There's no reason it can't be enabled on RISC-V,
+which is required for ChipIdea-based USB host controllers reached via
+GP1/GP0 AXI masters from soft RV64 cores (e.g. our NaxRiscv on Zynq-7020).
+
+Without this, `compatible = "ulpi-phy"` device-tree nodes have no driver
+to bind, the kernel falls back to `usb-nop-xceiv` semantics, and the
+ULPI viewport never gets the DrvVbusExternal write — so the on-board
+TPS2051 5V switch stays off and every HID enumeration times out at -110.
+
+Apply with:
+    cd hardware/zynq/litex-build/linux-build/litex-linux
+    patch -p1 < ../../scripts/kernel_patches/0001-usb-phy-allow-USB_ULPI-on-RISCV.patch
+
+---
+ drivers/usb/phy/Kconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/usb/phy/Kconfig b/drivers/usb/phy/Kconfig
+--- a/drivers/usb/phy/Kconfig
++++ b/drivers/usb/phy/Kconfig
+@@ -173,7 +173,7 @@ config USB_TEGRA_PHY
+
+ config USB_ULPI
+ 	bool "Generic ULPI Transceiver Driver"
+-	depends on ARM || ARM64 || COMPILE_TEST
++	depends on ARM || ARM64 || RISCV || COMPILE_TEST
+ 	select USB_ULPI_VIEWPORT
+ 	help
+ 	  Enable this to support ULPI connected USB OTG transceivers which
