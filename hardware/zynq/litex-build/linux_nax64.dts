@@ -159,8 +159,35 @@
 			clocks = <&usb_clk>;
 			dr_mode = "host";
 			phy_type = "ulpi";
+			usb-phy = <&usb_phy0>;
+			phys = <&usb_phy0>;
 			status = "okay";
 		};
+	};
+
+	/* Real ULPI PHY node, ported from the ALINX reference USB course
+	 * (alinx_reference/course_s6_linux/18.usb驱动/device_tree/system-user.dtsi).
+	 *
+	 * Replaces the "usb-nop-xceiv" stub which never wrote to the ULPI viewport,
+	 * leaving DrvVbusExternal (ULPI reg 0x0A bit 6) at zero — the on-board
+	 * TPS2051 5V switch stayed off and every HID enumeration timed out at -110.
+	 *
+	 * The kernel ulpi-phy driver reads "view-port" + "drv-vbus" and issues the
+	 * ULPI write at the correct boot phase (after ChipIdea reset, before the
+	 * first SETUP transaction), which the previous xsdb-poke approach never
+	 * managed to time correctly.
+	 *
+	 * "reg" matches our chipidea node at 0x80002000 (PS USB0 reached via the
+	 * GP1 AXI master at 0xE0002000 — see usb0 above). The viewport offset
+	 * 0x0170 is identical to the ALINX reference because it's relative to the
+	 * chipidea base, not absolute. */
+	usb_phy0: usb_phy@0 {
+		compatible = "ulpi-phy";
+		#phy-cells = <0>;
+		reg = <0x80002000 0x1000>;
+		view-port = <0x0170>;
+		drv-vbus;
+		status = "okay";
 	};
 
 	aliases {
