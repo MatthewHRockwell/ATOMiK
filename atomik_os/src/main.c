@@ -160,6 +160,18 @@ static void open_document(void) {
     }
 }
 
+static int s_stocks_id = 0;
+static void open_stocks(void) {
+    if (s_stocks_id) { wm_focus(s_stocks_id); return; }
+    int ww = 760, wh = 540;
+    int wx = (FB_W - ww) / 2 - 60;
+    int wy = (FB_H - wh) / 2 + 40;
+    window_t *w = wm_open("Stocks (live deltas)", wx, wy, ww, wh,
+                          edge_stocks_draw, NULL);
+    if (w) s_stocks_id = w->id;
+    notify_post("Stocks streaming - same chrome, fields move");
+}
+
 static int s_wallet_id = 0;
 static void open_wallet(void) {
     if (s_wallet_id) { wm_focus(s_wallet_id); return; }
@@ -219,6 +231,10 @@ int main(int argc, char **argv) {
             if (top && top->id == s_terminal_id) poll_ms = 16;
         }
         event_t ev = input_poll(poll_ms);
+        /* v0.23: stocks ticker mutates one row's price every ~1 s.
+         * Cheap call (no allocation, no I/O) — safe to invoke every
+         * frame; it self-rate-limits via an internal counter. */
+        stocks_tick();
         if (ev.kind == EV_QUIT) { s_running = 0; break; }
         if (ev.kind == EV_KEY) {
             int dirty = 0;
@@ -310,6 +326,9 @@ int main(int argc, char **argv) {
                 dirty = 1;
             } else if (!dirty && (ev.key == 'w' || ev.key == 'W')) {
                 open_wallet();
+                dirty = 1;
+            } else if (!dirty && (ev.key == 's' || ev.key == 'S')) {
+                open_stocks();
                 dirty = 1;
             } else if (!dirty && ev.key >= '1' && ev.key < '1' + dock_count()) {
                 /* Number key launches whatever app is currently in that

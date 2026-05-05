@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 /* Provider registry. Cost numbers are illustrative and current as of
  * 2026-05; they're shown to the user in the cost preview, not used as
@@ -18,9 +19,9 @@ static const llm_provider_t PROVIDERS[] = {
     /* name,                base_url,                       model,                in $/Mtok, out $/Mtok, stub */
     {  "stub",              "(offline)",                    "atomik-stub-v1",     0,           0,           1 },
     {  "local-intent",      "(on-device)",                  "atomik-trigram-v1",  0,           0,           1 },
-    {  "claude-haiku-4.5",  "https://api.anthropic.com/v1", "claude-haiku-4.5",   1,           5,           1 },
-    {  "claude-sonnet-4.6", "https://api.anthropic.com/v1", "claude-sonnet-4.6",  3,          15,           1 },
-    {  "gpt-4o-mini",       "https://api.openai.com/v1",    "gpt-4o-mini",       0,           1,           1 },
+    {  "claude-haiku-4.5",  "https://api.anthropic.com/v1", "claude-haiku-4.5",   1,           5,           0 },
+    {  "claude-sonnet-4.6", "https://api.anthropic.com/v1", "claude-sonnet-4.6",  3,          15,           0 },
+    {  "gpt-4o-mini",       "https://api.openai.com/v1",    "gpt-4o-mini",       0,           1,           0 },
     /* "is_stub" = 1 on all of them in v0.12 because we have no internet
      * on the board. v1.0 flips the relevant ones to 0 and fires real
      * HTTP. The cost map stays the same.
@@ -346,6 +347,65 @@ static void local_intent_respond(const char *prompt, char *out, size_t cap) {
     snprintf(out, cap, "%s", INTENTS[best_idx].response);
 }
 
+/* v0.21: file-based RPC to a laptop-side relay daemon.
+ *
+ * The board has no network. To make non-stub providers real, atomik_os
+ * writes the prompt to /tmp/aos_llm_request and polls
+ * /tmp/aos_llm_response. tools/atomik_ai_daemon.py runs on the laptop,
+ * watches the UART for these files, calls the actual Anthropic API,
+ * and writes the response back. If the daemon isn't running or the
+ * call times out, the OS falls back to local-intent automatically. */
+#define LLM_REQ_PATH  "/tmp/aos_llm_request"
+#define LLM_RESP_PATH "/tmp/aos_llm_response"
+#define LLM_TIMEOUT_MS 8000
+
+static int external_query(const llm_provider_t *p, const char *prompt,
+                          llm_response_t *out) {
+    /* Write request file: one line "PROVIDER:<name>\n", then prompt. */
+    unlink(LLM_RESP_PATH);
+    FILE *rq = fopen(LLM_REQ_PATH, "w");
+    if (!rq) return 0;
+    fprintf(rq, "PROVIDER:%s\n", p->name);
+    fputs(prompt ? prompt : "", rq);
+    fclose(rq);
+
+    /* Poll for response file. The laptop daemon writes this when it's
+     * received our request and gotten Anthropic's reply. */
+    int waited_ms = 0;
+    while (waited_ms < LLM_TIMEOUT_MS) {
+        FILE *rp = fopen(LLM_RESP_PATH, "r");
+        if (rp) {
+            /* Format: "TIN:NN\nTOUT:NN\nCOST_UUSD:NN\n---\n<text>" */
+            char line[256];
+            int  tin = 0, tout = 0, cost = 0;
+            while (fgets(line, sizeof line, rp)) {
+                if (strncmp(line, "TIN:", 4) == 0)        tin  = atoi(line+4);
+                else if (strncmp(line, "TOUT:", 5) == 0)  tout = atoi(line+5);
+                else if (strncmp(line, "COST_UUSD:", 10) == 0) cost = atoi(line+10);
+                else if (strncmp(line, "---", 3) == 0)    break;
+            }
+            size_t n = 0;
+            while (n < sizeof(out->text) - 1) {
+                int c = fgetc(rp);
+                if (c == EOF) break;
+                out->text[n++] = (char)c;
+            }
+            out->text[n]   = 0;
+            out->tokens_in  = tin;
+            out->tokens_out = tout;
+            out->cost_uusd  = cost;
+            fclose(rp);
+            unlink(LLM_RESP_PATH);
+            unlink(LLM_REQ_PATH);
+            return 1;
+        }
+        usleep(100 * 1000);
+        waited_ms += 100;
+    }
+    /* Timeout — leave request file for diagnostic, fall through to caller. */
+    return 0;
+}
+
 void llm_query(const llm_provider_t *p, const char *prompt, llm_response_t *out) {
     if (!out) return;
     memset(out, 0, sizeof *out);
@@ -359,9 +419,17 @@ void llm_query(const llm_provider_t *p, const char *prompt, llm_response_t *out)
             stub_respond(prompt, out->text, sizeof out->text);
         }
     } else {
-        /* v1.0: real HTTP call here. */
-        snprintf(out->text, sizeof out->text,
-                 "(provider %s not yet wired in this build)", p->name);
+        /* Real provider: call the laptop daemon via file RPC. On
+         * timeout, fall back to local-intent so the user always gets
+         * SOMETHING — never a hang. */
+        if (external_query(p, prompt, out)) {
+            llm_audit_append(prompt, out);
+            out->ok = 1;
+            return;   /* tokens/cost already populated by daemon */
+        }
+        /* Fallback path. */
+        out->is_stub = 1;
+        local_intent_respond(prompt, out->text, sizeof out->text);
     }
     out->tokens_out = llm_estimate_tokens(out->text);
     out->cost_uusd  = llm_estimate_cost_uusd(p, out->tokens_in, out->tokens_out);

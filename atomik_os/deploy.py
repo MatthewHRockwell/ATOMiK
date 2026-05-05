@@ -221,12 +221,22 @@ def main():
     # deploy. Wait for the kill to complete before relaunching.
     cmd(s, "pkill -9 atomik_os 2>/dev/null; sleep 1; "
           "pgrep atomik_os >/dev/null && echo STILL_RUNNING || echo CLEAN")
+    # Tear down any stale fifo writer from a previous --autostart run.
+    cmd(s, "kill -9 $(cat /tmp/aos_fifo_writer.pid 2>/dev/null) 2>/dev/null; "
+          "rm -f /tmp/aos_fifo_writer.pid /tmp/aos_keys", log=False)
     # Wipe stale version stamp so we KNOW the next read is from the new run.
     cmd(s, "rm -f /tmp/atomik_os_version", log=False)
     # Disable fbcon binding so atomik_os owns the framebuffer cleanly
     cmd(s, "echo 0 > /sys/class/vtconsole/vtcon1/bind 2>/dev/null; true")
+    # v0.22 autostart: launch with stdin redirected from a FIFO instead
+    # of /dev/null. atomik_ai_daemon.py and other relays can then inject
+    # keystrokes via `printf ... >> /tmp/aos_keys` without restarting.
+    cmd(s, "mkfifo /tmp/aos_keys 2>/dev/null; "
+          "( while true; do sleep 3600; done ) > /tmp/aos_keys &"
+          " echo $! > /tmp/aos_fifo_writer.pid")
     # Bash rejects `cmd &; echo marker`, so launch on its own line.
-    slow(s, f"nohup {REMOTE} > /tmp/aos.out 2> /tmp/aos.err < /dev/null &\n")
+    slow(s, f"nohup {REMOTE} > /tmp/aos.out 2> /tmp/aos.err "
+            f"< /tmp/aos_keys &\n")
     time.sleep(0.6)
     s.read(8192)
     cmd(s, "sleep 2; pgrep atomik_os && echo OS_RUNNING || echo OS_NOT_RUNNING")

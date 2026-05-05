@@ -9,7 +9,7 @@
  * carries a user-visible change. About window, status bar, and the
  * /tmp/atomik_os_version stamp all read from here so the screen output
  * NEVER lies about which build is running. */
-#define AOS_VERSION "v0.20"
+#define AOS_VERSION "v0.23"
 
 /* Display geometry — locked to 1920x1080 XRGB8888 since simplefb is fixed. */
 #define FB_W       1920
@@ -375,6 +375,8 @@ void edge_tasks_draw(window_t *w, int x, int y, int wd, int ht);
 void edge_code_draw(window_t *w, int x, int y, int wd, int ht);
 void edge_brief_draw(window_t *w, int x, int y, int wd, int ht);
 void edge_chat_draw(window_t *w, int x, int y, int wd, int ht);
+void edge_stocks_draw(window_t *w, int x, int y, int wd, int ht);
+void stocks_tick(void);
 
 /* document.c — universal Document app. v0.13: multi-instance.
  *
