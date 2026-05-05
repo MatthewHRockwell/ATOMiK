@@ -199,57 +199,85 @@ typedef struct {
     const char *training;
 } intent_pattern_t;
 
+/* v0.19c: expanded training utterances per label. See docs/MINILM_EVALUATION.md
+ * for why we expanded the trigram table instead of adopting MiniLM. ~1 KB of
+ * extra static data buys us coverage on common paraphrases that didn't match
+ * the original tight list. */
 static const intent_pattern_t INTENTS[] = {
     { "load calendar",
       "load calendar\nset primitive grid\nset accent cyan",
       "show me a calendar  open calendar  whats on my schedule  "
-      "view this month  calendar of may  schedule view" },
+      "view this month  calendar of may  schedule view  "
+      "give me my agenda  what is coming up  upcoming events  "
+      "calendar view  show appointments  weekly view  monthly view" },
     { "load tasks",
       "load tasks\nset primitive list\nset accent green",
       "show me my tasks  whats on my list  todo list  "
-      "checklist  open tasks  what do i need to do" },
+      "checklist  open tasks  what do i need to do  "
+      "what should i do today  what is on my plate  "
+      "show my todos  pull up my tasks  open my list" },
     { "load code",
       "load code\nset primitive feed\nset accent pink",
       "show open prs  review queue  code reviews  "
-      "pull requests  what merges are pending" },
+      "pull requests  what merges are pending  "
+      "what needs review  show pull requests  show diffs  "
+      "review backlog  whats in flight  open the review queue" },
     { "load brief",
       "load brief\nset primitive card\nset accent amber",
       "summarize my day  give me a brief  executive summary  "
-      "daily digest  what should i know" },
+      "daily digest  what should i know  "
+      "what is the headline  whats important right now  "
+      "give me a summary  one paragraph summary  status report" },
     { "load chat",
       "load chat\nset primitive convo\nset accent cyan",
       "open a chat  start a conversation  switch to chat mode  "
-      "talk to the agent" },
+      "talk to the agent  "
+      "let me chat  i want to chat  start chatting  "
+      "open dialogue  talk mode" },
     { "set primitive grid",
       "set primitive grid",
-      "make it a grid  tabular view  kanban  switch to grid  tile layout" },
+      "make it a grid  tabular view  kanban  switch to grid  "
+      "tile layout  spreadsheet view  matrix view  table view  "
+      "show as a grid  arrange in tiles" },
     { "set primitive list",
       "set primitive list",
-      "list view  make it a list  bullet list  rows" },
+      "list view  make it a list  bullet list  rows  "
+      "show as a list  flat list  vertical list  rows of items  "
+      "make this look like notion" },
     { "set primitive feed",
       "set primitive feed",
-      "feed view  timeline  activity stream  make it a feed" },
+      "feed view  timeline  activity stream  make it a feed  "
+      "show as a feed  scrolling feed  newsfeed view  "
+      "reverse chronological  twitter view" },
     { "set primitive card",
       "set primitive card",
-      "card view  single card  make it one big card" },
+      "card view  single card  make it one big card  "
+      "show as a card  one big block  highlight view  hero view" },
     { "set primitive convo",
       "set primitive convo",
-      "conversation view  chat bubbles  talk view" },
+      "conversation view  chat bubbles  talk view  "
+      "show as messages  threaded view  imessage style  "
+      "discussion view" },
     { "set accent cyan",
       "set accent cyan",
-      "use cyan  make it blue  blue accent" },
+      "use cyan  make it blue  blue accent  "
+      "cool color  ocean blue  electric blue  default accent" },
     { "set accent green",
       "set accent green",
-      "use green  green accent" },
+      "use green  green accent  "
+      "make it green  forest accent  emerald color  fresh color" },
     { "set accent amber",
       "set accent amber",
-      "use amber  yellow accent  warm color" },
+      "use amber  yellow accent  warm color  "
+      "gold accent  honey color  make it warm  sunset color" },
     { "set accent pink",
       "set accent pink",
-      "use pink  magenta accent  make it pink" },
+      "use pink  magenta accent  make it pink  "
+      "hot pink  fuchsia color  vibrant accent  loud color" },
     { "clear list",
       "clear list",
-      "clear the list  wipe items  empty list  delete everything" },
+      "clear the list  wipe items  empty list  delete everything  "
+      "remove all  start over  reset the list  blank slate" },
 };
 #define N_INTENTS ((int)(sizeof(INTENTS)/sizeof(INTENTS[0])))
 

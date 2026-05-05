@@ -41,6 +41,7 @@ typedef struct doc_state {
     int          n_history;
     char         input[DOC_INPUT_MAX];
     int          input_len;
+    char         prov_name[32];                /* selected LLM provider; "" = default */
 } doc_state_t;
 
 static int s_next_doc_id = 1;
@@ -233,6 +234,7 @@ static void apply_command(doc_state_t *d, const char *raw_line) {
         hist_push(d, "agent> ", "load <calendar|tasks|code|brief|chat>");
         hist_push(d, "agent> ", "/ai <prompt>  /  /export <path>  /  /import <path>");
         hist_push(d, "agent> ", "/store list  /  /store install <name>");
+        hist_push(d, "agent> ", "/provider <name>  (e.g. local-intent | claude-haiku-4.5)");
         hist_push(d, "agent> ", "save  /  reset");
         return;
     }
@@ -324,21 +326,68 @@ static void apply_command(doc_state_t *d, const char *raw_line) {
         hist_push(d, "agent> ", "/store list  /  /store install <name>");
         return;
     }
+    if (cmd[0] == '/' && ieq(cmd, "/provider")) {
+        char *name = trim(p);
+        if (!name || !*name) {
+            char buf[160];
+            snprintf(buf, sizeof buf, "current: %s  (try: ",
+                     d->prov_name[0] ? d->prov_name : "(default)");
+            for (int i = 0; i < llm_provider_count(); i++) {
+                const llm_provider_t *pp = llm_provider_at(i);
+                if (!pp) continue;
+                size_t n = strlen(buf);
+                if (n + strlen(pp->name) + 3 < sizeof buf) {
+                    snprintf(buf + n, sizeof(buf) - n, "%s%s",
+                             i ? ", " : "", pp->name);
+                }
+            }
+            size_t n = strlen(buf);
+            if (n + 1 < sizeof buf) buf[n] = ')';
+            hist_push(d, "agent> ", buf);
+            return;
+        }
+        const llm_provider_t *pp = llm_provider_by_name(name);
+        if (!pp) {
+            hist_push(d, "agent> ", "no such provider — try /provider with no args to list");
+            return;
+        }
+        size_t n = strlen(name);
+        if (n >= sizeof d->prov_name) n = sizeof(d->prov_name) - 1;
+        memcpy(d->prov_name, name, n);
+        d->prov_name[n] = 0;
+        char ack[80];
+        snprintf(ack, sizeof ack, "provider set to %s", name);
+        hist_push(d, "agent> ", ack);
+        return;
+    }
     if (cmd[0] == '/' && ieq(cmd, "/ai")) {
         const char *prompt = trim(p);
-        const llm_provider_t *prov = llm_default_provider();
+        const llm_provider_t *prov = NULL;
+        if (d->prov_name[0]) prov = llm_provider_by_name(d->prov_name);
+        if (!prov)           prov = llm_default_provider();
         int est_in   = llm_estimate_tokens(prompt);
         int est_out  = est_in;
         int est_cost = llm_estimate_cost_uusd(prov, est_in, est_out);
-        char preview[120];
+        /* v0.19a: graceful fallback. When the wallet can't cover the
+         * estimated spend, route through the on-device local-intent
+         * classifier instead of bouncing the user. Free, no network,
+         * sub-millisecond. The fallback is transparent: the cost
+         * preview tells the user exactly what's happening. */
+        const wallet_state_t *w = wallet_get();
+        int fell_back = 0;
+        if (est_cost > 0 && w->balance_uusd < est_cost) {
+            const llm_provider_t *li = llm_provider_by_name("local-intent");
+            if (li) { prov = li; est_cost = 0; fell_back = 1; }
+        }
+        char preview[160];
         snprintf(preview, sizeof preview,
-                 "estimate: %d in + ~%d out tokens, ~%d.%03d uUSD (%s)",
+                 "estimate: %d in + ~%d out tokens, ~%d.%03d uUSD (%s)%s",
                  est_in, est_out, est_cost / 1000, est_cost % 1000,
-                 prov->name);
+                 prov->name, fell_back ? " [wallet empty -> on-device]" : "");
         hist_push(d, "agent> ", preview);
         llm_response_t r;
         llm_query(prov, prompt, &r);
-        char actual[120];
+        char actual[160];
         snprintf(actual, sizeof actual,
                  "spent: %d in + %d out, %d.%03d uUSD%s",
                  r.tokens_in, r.tokens_out,

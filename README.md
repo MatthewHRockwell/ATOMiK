@@ -1,12 +1,24 @@
-# ATOMiK Architecture
+# ATOMiK
 
-> **Now hosting [ATOMiK OS](atomik_os/) — the first delta-state desktop.**
-> One window. Type *"load calendar"* — it becomes a calendar. Type
-> *"load tasks"* — same window, now a task list. Apps are field-delta
-> streams over a shared compiled UI frame, not native binaries. The
-> desktop itself is the canonical ATOMiK workload.
->
-> [→ Quick tour](atomik_os/README.md) · [Architecture](atomik_os/docs/ARCHITECTURE.md) · [TODO](atomik_os/docs/TODO.md) · [Token-pay business model](atomik_os/docs/BUSINESS_MODEL.md)
+**An adaptive UI renderer running on a $200 FPGA. 72 KB OS. 100 MHz soft RISC-V. No browser, no React, no GPU.**
+
+![v0.18 running on AX7020](atomik_os/docs/screenshots/deploy_20260504_162651_v0.18.png)
+
+```
+visible_state = invariant_frame ⊕ Σ field_deltas
+```
+
+That formula is the entire UI architecture. Apps stop being native binaries and become streams of typed field deltas over a shared compiled UI frame. A calendar, a kanban, a chat, and a code feed all share the same chrome — only the fields differ. State is reconstructed (not stored), so the same XOR algebra that makes the CPU work makes the UI cheap.
+
+**What's actually running on the board right now:**
+
+- 1080p@30 HDMI desktop with floating window manager and dock
+- Document app — type *"show me a calendar"* and the window morphs in <1 ms via on-device intent classification (no network)
+- Five primitives — `LIST`, `CARD`, `GRID`, `FEED`, `CONVO` — every app is one of these with different field values
+- AdaptiveCards adapter — any AC payload renders verbatim (a working schema-interop story without a single partner conversation)
+- Token-pay LLM provider abstraction with visible cost preview, on-device fallback when the wallet runs dry, audit log of every spend
+
+[Quick tour](atomik_os/README.md) · [Architecture](atomik_os/docs/ARCHITECTURE.md) · [Schema decision](atomik_os/docs/SCHEMA_SURVEY.md) · [Business model](atomik_os/docs/BUSINESS_MODEL.md) · [Outreach packets](atomik_os/docs/outreach/)
 
 [![CI/CD](https://github.com/MatthewHRockwell/ATOMiK/actions/workflows/atomik-ci.yml/badge.svg)](https://github.com/MatthewHRockwell/ATOMiK/actions/workflows/atomik-ci.yml)
 [![Code Review](https://github.com/MatthewHRockwell/ATOMiK/actions/workflows/review.yml/badge.svg)](https://github.com/MatthewHRockwell/ATOMiK/actions/workflows/review.yml)
