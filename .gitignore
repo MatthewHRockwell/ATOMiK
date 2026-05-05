@@ -1,3 +1,11 @@
+# --- Secrets — NEVER commit ---
+.env
+.env.*
+!.env.example
+*.key
+*_secret*
+*.credentials.json
+
 # --- Python Virtual Environments ---
 .venv/
 *.venv

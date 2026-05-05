@@ -89,14 +89,40 @@ def cap(s, sh, t=15):
     m = pat.findall(text)
     return m[-1].strip("\r\n") if m else None
 
+def _load_dotenv():
+    """Load ANTHROPIC_API_KEY from a project-root .env if present.
+    Never logs the key. Lets the daemon run from the repo without
+    requiring a manual `export ANTHROPIC_API_KEY=...` every shell."""
+    here = os.path.dirname(os.path.abspath(__file__))
+    candidates = [
+        os.path.join(here, "..", "..", ".env"),     # /home/.../ATOMiK/.env
+        os.path.join(here, "..", ".env"),           # atomik_os/.env
+        os.path.join(here, ".env"),                 # tools/.env
+    ]
+    for p in candidates:
+        try:
+            with open(p) as f:
+                for raw in f:
+                    line = raw.strip()
+                    if not line or line.startswith("#"): continue
+                    if "=" not in line: continue
+                    k, v = line.split("=", 1)
+                    k, v = k.strip(), v.strip().strip('"').strip("'")
+                    if k and v and k not in os.environ:
+                        os.environ[k] = v
+            return
+        except FileNotFoundError:
+            continue
+
 def call_anthropic(model, prompt):
     try:
         from anthropic import Anthropic
     except ImportError:
         sys.exit("pip install anthropic")
+    _load_dotenv()
     api_key = os.environ.get("ANTHROPIC_API_KEY")
     if not api_key:
-        sys.exit("set ANTHROPIC_API_KEY")
+        sys.exit("set ANTHROPIC_API_KEY (in env or in project-root .env)")
     client = Anthropic(api_key=api_key)
     msg = client.messages.create(
         model=model, max_tokens=512, system=SYSTEM,
