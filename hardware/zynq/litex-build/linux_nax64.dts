@@ -113,6 +113,25 @@
 		interrupt-parent = <&plic0>;
 		ranges;
 
+		/* DMA address translation for PS-side bus masters (USB host,
+		 * GEM, SD, etc.) reaching DDR through the PS DDR controller.
+		 *
+		 * Linux runs in the NaxRiscv physical view: kernel sees DDR
+		 * starting at 0x40000000 (per /proc/iomem). The PS USB DMA
+		 * engine sees the SAME DDR through the PS bus at 0x00100000
+		 * (per jtag_boot.py: kernel image dow'd to PS 0x00100000 =
+		 * NaxRiscv 0x40000000). Without this dma-ranges entry, Linux
+		 * hands chipidea a buffer at NaxRiscv 0x40xxxxxx and the
+		 * controller reads the wrong PS address — descriptor reads
+		 * return garbage which the kernel reports as -110 timeout.
+		 *
+		 * Format: <child_bus_addr  parent_phys_addr  size>
+		 * 0x00100000 (PS DDR offset) ↔ 0x40000000 (NaxRiscv physical)
+		 * Window covers 512 MB, the size of the AX7020's DDR3.
+		 *
+		 * Diagnosis credit: ChatGPT 2026-05-06 (independent review). */
+		dma-ranges = <0x00100000 0x40000000 0x20000000>;
+
 		soc_controller@f0000000 {
 			compatible = "litex,soc-controller";
 			reg = <0xf0000000 0x0c>;
@@ -190,6 +209,15 @@
 			phys = <&usb_phy0>;
 			phy-names = "usb-phy";
 			usb-phy = <&usb_phy0>;
+			/* Treat DMA as coherent so the kernel skips cache
+			 * flush/invalidate that would otherwise require zicbom
+			 * (not in our NaxRiscv ISA: rv64imafdc). Without this,
+			 * descriptor reads return stale CPU-cached data and
+			 * descriptor handshake times out -110.  Will be wrong
+			 * if DMA truly isn't coherent — but the alternative is
+			 * a Vivado bitstream rebuild to add zicbom, which is
+			 * a 30+ minute cycle.  Diagnosis credit: ChatGPT. */
+			dma-coherent;
 			status = "okay";
 		};
 	};
