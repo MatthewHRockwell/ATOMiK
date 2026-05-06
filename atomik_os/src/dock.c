@@ -38,7 +38,10 @@ static int dock_x0(void) {
 }
 
 static int dock_y0(void) {
-    return FB_H - DOCK_HEIGHT - 16;
+    /* visionOS-style floating dock: ATOMIK_DOCK_GAP px from the screen
+     * edge. Smaller gap reads as "floating slab" instead of "edge-pinned
+     * tray".  Was 16 px; v0.25 adopts the design-system default of 8. */
+    return FB_H - DOCK_HEIGHT - ATOMIK_DOCK_GAP;
 }
 
 /* Cached order from the last dock_draw, so dock_action_for_slot can
@@ -104,25 +107,32 @@ void dock_draw(int hover_index) {
                   ch, scale, ATOMIK_FG);
 
         /* If this icon's action is the agent's predicted next, draw a
-         * pulsing cyan dot under it to surface the prediction visually. */
+         * pulsing dot under it.  v0.25: use ATOMIK_SEM_AGENT (violet)
+         * instead of raw cyan — agent prediction is AGENT in the
+         * semantic grammar, not HARDWARE.  The bug the previous version
+         * carried was that prediction-pulse and focus-indicator both
+         * used cyan, making it impossible to read at a glance whether
+         * a glowing element meant "active state" or "agent suggests
+         * this".  Violet for AGENT, cyan stays for HARDWARE/active. */
         if (ICONS[i].action != ACT_NONE && agent_predict() == ICONS[i].action) {
             unsigned long t  = anim_now_ms();
-            /* 1.5 s cycle, alpha 0.4..1.0 */
+            /* 1.5 s cycle, alpha 0.7..1.0.  4-term Taylor sin so we
+             * stay libm-free in the per-pixel hot path. */
             double phase = ((t % 1500) / 1500.0) * 6.2831853;
-            double bright = 0.7 + 0.3 * 0.5 * (1.0 + 1.0); /* simple constant — see below */
-            /* sin without libm dep: use a 4-term Taylor approximation */
             double s = phase;
             double s3 = s*s*s, s5 = s3*s*s;
             double sinv = s - s3/6.0 + s5/120.0;
-            if (sinv > 1.0) sinv = 1.0;
+            if (sinv >  1.0) sinv =  1.0;
             if (sinv < -1.0) sinv = -1.0;
-            bright = 0.7 + 0.3 * sinv;
+            double bright = 0.7 + 0.3 * sinv;
             if (bright < 0.0) bright = 0.0;
             if (bright > 1.0) bright = 1.0;
 
-            uint8_t r = (uint8_t)(0x4F * bright);
-            uint8_t g = (uint8_t)(0xC3 * bright);
-            uint8_t b = (uint8_t)(0xFF * bright);
+            /* Decompose ATOMIK_SEM_AGENT (#9B7EE0) into channels and
+             * scale by `bright` to get the pulse color. */
+            uint8_t r = (uint8_t)(0x9B * bright);
+            uint8_t g = (uint8_t)(0x7E * bright);
+            uint8_t b = (uint8_t)(0xE0 * bright);
             pixel_t pulse_color = rgb(r, g, b);
 
             int dot_x = ix + ICON_SIZE / 2;
