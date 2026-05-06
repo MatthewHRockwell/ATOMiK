@@ -151,42 +151,59 @@
 		/* PS USB0 via GP1 AXI slave — NaxRiscv 0x80000000 maps to PS 0xE0000000
 		 * ChipIdea CI13xxx at PS 0xE0002000 = NaxRiscv 0x80002000
 		 * Interrupt: PLIC input 3, routed via IRQ_P2F_USB0 (PS→PL fabric) */
+		/* Zynq-specific compatible activates ci_hdrc_usb2.c's built-in
+		 * Zynq platform_data which sets CI_HDRC_PHY_VBUS_CONTROL.
+		 * That flag tells chipidea to drive VBUS via the PHY's
+		 * usb_phy_vbus_on() callback, which the otg_ulpi_create()
+		 * factory wires to ulpi_set_vbus() — automatically writing
+		 * ULPI_OTG_CTRL_DRVVBUS_EXT (the bit we tried to write
+		 * manually before, but at the wrong boot phase).
+		 *
+		 * Generic "chipidea,usb2" left us with no Zynq-specific
+		 * platform_data → flag never set → chipidea skipped the
+		 * VBUS write → TPS2051 5V switch stayed off → -110.
+		 *
+		 * Original xilinx-linux uses 2.20a in their zynq-7000.dtsi. */
+		/* Pure-chipidea path: NO usb-phy phandle. With a phy-phandle,
+		 * chipidea calls usb_phy_init() which calls ulpi_init() in
+		 * the phy-ulpi library, which reads ULPI ID registers via
+		 * viewport at probe time — those reads -110 timeout because
+		 * chipidea hasn't run hw_phymode_configure() yet. Removing
+		 * the phandle makes chipidea fall back to its built-in
+		 * _ci_usb_phy_init() which doesn't touch the viewport at
+		 * probe — that path is known good (saw "Found SMSC USB3320"
+		 * + USB hub registered in earlier boots).
+		 *
+		 * DrvVbusExternal=1 is asserted from userspace via devmem in
+		 * /sbin/atomik_boot.sh after chipidea is fully up. */
 		usb0: usb@80002000 {
-			compatible = "chipidea,usb2";
+			compatible = "xlnx,zynq-usb-2.20a", "chipidea,usb2";
 			reg = <0x80002000 0x1000>;
 			interrupts = <0x03>;
 			interrupt-parent = <&plic0>;
 			clocks = <&usb_clk>;
 			dr_mode = "host";
 			phy_type = "ulpi";
-			usb-phy = <&usb_phy0>;
+			/* chipidea reads `phys` (named "usb-phy") to find its phy.
+			 * `usb-phy` is the legacy property — only used as a
+			 * fallback. Without `phys`, chipidea doesn't bind. */
 			phys = <&usb_phy0>;
+			phy-names = "usb-phy";
+			usb-phy = <&usb_phy0>;
 			status = "okay";
 		};
 	};
 
-	/* Real ULPI PHY node, ported from the ALINX reference USB course
-	 * (alinx_reference/course_s6_linux/18.usb驱动/device_tree/system-user.dtsi).
-	 *
-	 * Replaces the "usb-nop-xceiv" stub which never wrote to the ULPI viewport,
-	 * leaving DrvVbusExternal (ULPI reg 0x0A bit 6) at zero — the on-board
-	 * TPS2051 5V switch stayed off and every HID enumeration timed out at -110.
-	 *
-	 * The kernel ulpi-phy driver reads "view-port" + "drv-vbus" and issues the
-	 * ULPI write at the correct boot phase (after ChipIdea reset, before the
-	 * first SETUP transaction), which the previous xsdb-poke approach never
-	 * managed to time correctly.
-	 *
-	 * "reg" matches our chipidea node at 0x80002000 (PS USB0 reached via the
-	 * GP1 AXI master at 0xE0002000 — see usb0 above). The viewport offset
-	 * 0x0170 is identical to the ALINX reference because it's relative to the
-	 * chipidea base, not absolute. */
+	/* ULPI phy: registered via our phy-ulpi-of platform driver but
+	 * WITHOUT drv-vbus flag — drv-vbus made our phy install a
+	 * DrvVbusExternal write into the ulpi_init path which times out
+	 * -110 at chipidea probe (viewport not yet warm). VBUS is now
+	 * driven from userspace at boot via /sbin/atomik_boot.sh. */
 	usb_phy0: usb_phy@0 {
 		compatible = "ulpi-phy";
 		#phy-cells = <0>;
 		reg = <0x80002000 0x1000>;
 		view-port = <0x0170>;
-		drv-vbus;
 		status = "okay";
 	};
 

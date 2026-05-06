@@ -1,0 +1,164 @@
+From: ATOMiK Project
+Subject: [PATCH] usb: phy: register ulpi-phy as a real platform driver
+
+Mainline `drivers/usb/phy/phy-ulpi.c` is a *library* — it exports
+`otg_ulpi_create()`, `ulpi_set_vbus()`, etc., but never calls
+`platform_driver_register()`. So a DT node with
+`compatible = "ulpi-phy"` has no driver to bind, and any chipidea
+controller doing `usb_get_phy_by_phandle(...)` gets NULL back.
+
+Xilinx's vendor `xilinx-linux` tree has a small wrapper that turns
+`ulpi-phy` into a platform driver and reads the `view-port` and
+`drv-vbus` properties. It never made it upstream. This patch ports
+that wrapper so a vanilla mainline tree can use the standard ALINX/
+Xilinx Zynq DT bindings:
+
+    usb_phy0: usb_phy@0 {
+        compatible = "ulpi-phy";
+        #phy-cells = <0>;
+        reg = <0x80002000 0x1000>;
+        view-port = <0x0170>;
+        drv-vbus;
+    };
+
+Combined with `compatible = "xlnx,zynq-usb-2.20a"` on the chipidea
+node (which activates CI_HDRC_PHY_VBUS_CONTROL — already in mainline
+ci_hdrc_usb2.c), this makes chipidea call `usb_phy_vbus_on()` →
+`ulpi_set_vbus()` → write ULPI register 0x0A bit 6
+(DrvVbusExternal=1) at the correct boot phase, turning on the
+TPS2051 5V switch automatically.
+
+Apply with:
+    cd hardware/zynq/litex-build/linux-build/litex-linux
+    patch -p1 < ../../scripts/kernel_patches/0002-usb-phy-ulpi-platform-driver.patch
+
+---
+ drivers/usb/phy/Makefile      |   1 +
+ drivers/usb/phy/phy-ulpi-of.c | 105 ++++++++++++++++++++++++++++++++++
+ 2 files changed, 106 insertions(+)
+ create mode 100644 drivers/usb/phy/phy-ulpi-of.c
+
+diff --git a/drivers/usb/phy/Makefile b/drivers/usb/phy/Makefile
+--- a/drivers/usb/phy/Makefile
++++ b/drivers/usb/phy/Makefile
+@@ -10,6 +10,7 @@ obj-$(CONFIG_USB_GPIO_VBUS)		+= phy-gpio-vbus-usb.o
+ obj-$(CONFIG_NOP_USB_XCEIV)		+= phy-generic.o
+ obj-$(CONFIG_TAHVO_USB)			+= phy-tahvo.o
+ obj-$(CONFIG_USB_ULPI)			+= phy-ulpi.o
++obj-$(CONFIG_USB_ULPI)			+= phy-ulpi-of.o
+ obj-$(CONFIG_USB_ULPI_VIEWPORT)		+= phy-ulpi-viewport.o
+ obj-$(CONFIG_KEYSTONE_USB_PHY)		+= phy-keystone.o
+ obj-$(CONFIG_JZ4770_PHY)		+= phy-jz4770.o
+diff --git a/drivers/usb/phy/phy-ulpi-of.c b/drivers/usb/phy/phy-ulpi-of.c
+new file mode 100644
+--- /dev/null
++++ b/drivers/usb/phy/phy-ulpi-of.c
+@@ -0,0 +1,105 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * phy-ulpi-of.c - DT-driven wrapper around the phy-ulpi.c library.
++ *
++ * Mainline phy-ulpi.c only exposes a C API (otg_ulpi_create, ulpi_set_vbus,
++ * etc.). Vendor trees (xilinx-linux) wrap it as a platform_driver matching
++ * compatible = "ulpi-phy". This file ports that wrapper so mainline can use
++ * the standard ALINX/Xilinx Zynq DT bindings without modification.
++ *
++ * On probe we:
++ *   1. ioremap() the chipidea controller's MMIO so the ULPI viewport
++ *      reads/writes go to the right place,
++ *   2. call otg_ulpi_create() with the DRVVBUS_EXT flag if drv-vbus is set,
++ *   3. point phy->io_priv at "base + view-port" so ulpi_viewport_access_ops
++ *      hits the right register,
++ *   4. usb_add_phy_dev() to register so chipidea's
++ *      of_usb_get_phy_by_phandle() lookup succeeds.
++ */
++
++#include <linux/io.h>
++#include <linux/module.h>
++#include <linux/of.h>
++#include <linux/of_address.h>
++#include <linux/platform_device.h>
++#include <linux/slab.h>
++#include <linux/usb/otg.h>
++#include <linux/usb/ulpi.h>
++
++struct ulpi_of_priv {
++	struct usb_phy	*phy;
++	void __iomem	*viewport;
++};
++
++static int ulpi_of_probe(struct platform_device *pdev)
++{
++	struct device *dev = &pdev->dev;
++	struct device_node *np = dev->of_node;
++	struct ulpi_of_priv *priv;
++	void __iomem *base;
++	struct resource *res;
++	u32 view_port = 0;
++	unsigned int flags = 0;
++	int ret;
++
++	priv = devm_kzalloc(dev, sizeof(*priv), GFP_KERNEL);
++	if (!priv)
++		return -ENOMEM;
++
++	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
++	base = devm_ioremap_resource(dev, res);
++	if (IS_ERR(base))
++		return PTR_ERR(base);
++
++	if (of_property_read_u32(np, "view-port", &view_port))
++		view_port = 0x170;
++
++	if (of_property_read_bool(np, "drv-vbus"))
++		flags |= ULPI_OTG_CTRL_DRVVBUS_EXT;
++
++	priv->viewport = base + view_port;
++
++	priv->phy = otg_ulpi_create(&ulpi_viewport_access_ops, flags);
++	if (!priv->phy) {
++		dev_err(dev, "otg_ulpi_create failed\n");
++		return -ENOMEM;
++	}
++	priv->phy->dev = dev;
++	priv->phy->io_priv = priv->viewport;
++
++	ret = usb_add_phy_dev(priv->phy);
++	if (ret) {
++		dev_err(dev, "usb_add_phy_dev failed: %d\n", ret);
++		return ret;
++	}
++
++	platform_set_drvdata(pdev, priv);
++	dev_info(dev, "ULPI phy registered (view-port=0x%x%s)\n",
++		 view_port,
++		 (flags & ULPI_OTG_CTRL_DRVVBUS_EXT) ? ", drv-vbus" : "");
++	return 0;
++}
++
++static int ulpi_of_remove(struct platform_device *pdev)
++{
++	struct ulpi_of_priv *priv = platform_get_drvdata(pdev);
++
++	usb_remove_phy(priv->phy);
++	return 0;
++}
++
++static const struct of_device_id ulpi_of_match[] = {
++	{ .compatible = "ulpi-phy" },
++	{ },
++};
++MODULE_DEVICE_TABLE(of, ulpi_of_match);
++
++static struct platform_driver ulpi_of_driver = {
++	.probe	= ulpi_of_probe,
++	.remove	= ulpi_of_remove,
++	.driver	= {
++		.name = "ulpi-phy-of",
++		.of_match_table = ulpi_of_match,
++	},
++};
++module_platform_driver(ulpi_of_driver);
++
++MODULE_DESCRIPTION("DT wrapper for the phy-ulpi library");
++MODULE_LICENSE("GPL");
