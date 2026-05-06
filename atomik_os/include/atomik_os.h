@@ -63,6 +63,26 @@ typedef uint32_t pixel_t;
 #define ATOMIK_BORDER_W     1     /* 1 px window border */
 #define ATOMIK_DOCK_GAP     8     /* visionOS-style gap from screen edge */
 
+/* Motion budget — v0.25, ChatGPT design review 2026-05-06.
+ *
+ * Linear's "we removed animations because they cost more attention than
+ * they earned" rule, applied to our delta-frame budget (~10–30 Hz on a
+ * soft-CPU stack). Anything animating >32×32 px at >10 Hz outside the
+ * focused widget is a budget violation.
+ *
+ * ATOMIK_ANIM_WINDOW_OPEN: window-open fade-in (cubic ease-out, 220ms,
+ * scales the whole window's bounding rect from 96% to 100%). Per design
+ * review, default OFF: windows snap open. The animation still works as
+ * a 1-line code change — flip to 1 for marketing screenshots / videos
+ * where the fade is intentional. The OS itself feels snappier without it.
+ *
+ * Other motion that IS in budget and stays on:
+ *   - cursor blink (8×16 invert at 1 Hz)
+ *   - agent activity dot (8×8 at 2 Hz, when LLM dispatch is in flight)
+ *   - notification slide-in (24px right-edge translation, 200ms)
+ *   - focus-flip (instant; no animation by design) */
+#define ATOMIK_ANIM_WINDOW_OPEN 0
+
 /* fb.c — back-buffer compositor. */
 int  fb_open(void);
 void fb_close(void);

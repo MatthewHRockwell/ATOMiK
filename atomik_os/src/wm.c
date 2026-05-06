@@ -86,16 +86,27 @@ window_t *wm_topmost(void) {
 
 static void draw_one(const window_t *win, int focused) {
     /* Open-fade tween: scale the window up subtly during the first ~220ms
-     * so it pops in instead of snapping. */
+     * so it pops in instead of snapping.
+     *
+     * v0.25: gated behind ATOMIK_ANIM_WINDOW_OPEN (default 0 — off).
+     * Linear's motion-restraint rule: an interface that doesn't animate
+     * feels faster than one that does. The fade was costing ~6M pixel
+     * writes per window open (full bounding-rect redraw × 13 frames)
+     * and earned no measurable user-experience win. Snap-open it is. */
+    int rx = win->x, ry = win->y, rw = win->w, rh = win->h;
+#if ATOMIK_ANIM_WINDOW_OPEN
     double age = anim_window_age(win->id, win->opened_at_ms);
     double sc  = anim_ease_out(age);
     int    inset_w = (int)((1.0 - sc) * (double)win->w * 0.04);
     int    inset_h = (int)((1.0 - sc) * (double)win->h * 0.04);
-    int    rx = win->x + inset_w;
-    int    ry = win->y + inset_h;
-    int    rw = win->w - 2 * inset_w;
-    int    rh = win->h - 2 * inset_h;
-    if (age < 1.0) anim_tick();   /* keep frame loop alive */
+    rx = win->x + inset_w;
+    ry = win->y + inset_h;
+    rw = win->w - 2 * inset_w;
+    rh = win->h - 2 * inset_h;
+    if (age < 1.0) anim_tick();
+#else
+    (void)win->id; (void)win->opened_at_ms;
+#endif
 
     /* Outer shadow (1px offset) */
     draw_rect_rounded(rx + 4, ry + 6, rw, rh, 12,
