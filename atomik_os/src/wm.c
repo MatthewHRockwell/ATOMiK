@@ -110,6 +110,15 @@ static void draw_one(const window_t *win, int focused) {
     int ty = ry + (WM_TITLE_H - text_height(1)) / 2;
     draw_text(rx + 12, ty, win->title, 1,
               focused ? ATOMIK_FG : ATOMIK_FG_DIM);
+    /* v0.25 focus indicator: 1-row cyan underline beneath the title bar
+     * of the focused window. Cheap delta — 2 horizontal lines per focus
+     * change. Linear's "don't compete for attention you haven't earned"
+     * rule: blurred windows get nothing, only the focused one signals.
+     * The indicator uses ATOMIK_SEM_HARDWARE because focus = active. */
+    if (focused) {
+        draw_rect(rx + WM_BORDER, ry + WM_TITLE_H,
+                  rw - 2 * WM_BORDER, 1, ATOMIK_SEM_HARDWARE);
+    }
     /* Close button (right side of title bar) */
     int cb_size = 16;
     int cb_x = rx + rw - cb_size - 8;
