@@ -106,8 +106,14 @@ echo "[3/4] re-packing as a single newc cpio (no concatenation)"
 # present exactly once and the archive ends with a single TRAILER!!!.
 # `--reproducible` keeps deterministic timestamps so re-runs produce
 # byte-identical output when nothing has changed.
+#
+# `--owner=+0:+0` FORCES every entry to UID/GID 0 (root) regardless of
+# who owns the extracted files on the laptop.  Without this, running
+# the script as a non-root laptop user produces an archive where
+# /root/atomik_os is owned by UID 1000, which makes mount/devmem/etc
+# fail at runtime even though the shell prompt shows `root@`.
 (cd "$ROOT" && find . -depth -print0 | LANG=C sort -z | \
-    cpio -o -H newc --reproducible --quiet --null) | gzip -9 > "$OUT"
+    cpio -o -H newc --reproducible --owner=+0:+0 --quiet --null) | gzip -9 > "$OUT"
 
 NEW_SIZE=$(stat -c%s "$OUT")
 echo "[4/4] done"
