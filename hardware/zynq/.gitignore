@@ -10,3 +10,11 @@ vivado*.jou
 sweep/tcl/
 sweep/top/
 sweep/xdc/
+
+# Build artifacts under litex-build/ — regenerable from sources
+litex-build/ubuntu_rv64.cpio.gz
+litex-build/Image_nax64
+litex-build/Image_nax64.pre_usb.bak
+litex-build/linux_nax64.pre_usb.dtb.bak
+litex-build/ubuntu_rv64.cpio.gz.preinject
+litex-build/linux-build/
