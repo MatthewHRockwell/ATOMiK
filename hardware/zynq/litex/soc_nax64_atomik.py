@@ -81,6 +81,44 @@ class BaseSoC(SoCCore):
         # PS7 DDR3 via GP slave
         self.ps = ps = zynq7000.Zynq7000(platform=platform, variant="standard")
         ps.set_ps7(name="Zynq", config=platform.ps7_config)
+
+        # Force USB0 MIO config via raw TCL — Vivado's PS7 IP rejects single-shot
+        # dict assignments due to parameter dependency ordering: PCW_USB0_RESET_IO
+        # only sticks if PCW_USB_RESET_ENABLE / PCW_USB_RESET_SELECT are already
+        # set on the IP. Split into THREE sequential set_property calls so the
+        # IP configurator settles dependencies between each batch:
+        #   1. enable USB0 + assign data MIO pins + interrupt routing
+        #   2. set umbrella USB reset config (must come before per-port reset)
+        #   3. assign per-port USB0 reset to MIO 46
+        # Build #6/#7 had everything in one dict and Vivado rejected
+        # PCW_USB0_RESET_IO as `<Select> enabled:false` — meaning the PS7 USB
+        # peripheral never drove MIO46, so the USB3320 PHY never got reset and
+        # the controller's automatic ULPI bring-up sequence (which writes OTG
+        # Control bit 6 = DrvVbusExternal) never ran.
+        # NOTE: double braces {{ }} to escape Python .format()
+        ps.ps7_tcl.append(
+            'set_property -dict [list '
+            'CONFIG.PCW_EN_USB0 {{1}} '
+            'CONFIG.PCW_USB0_PERIPHERAL_ENABLE {{1}} '
+            'CONFIG.PCW_USB0_USB0_IO {{MIO 28 .. 39}} '
+            'CONFIG.PCW_USE_FABRIC_INTERRUPT {{1}} '
+            'CONFIG.PCW_P2F_USB0_INTR {{1}} '
+            '] [get_ips Zynq]'
+        )
+        ps.ps7_tcl.append(
+            'set_property -dict [list '
+            'CONFIG.PCW_USB_RESET_ENABLE {{1}} '
+            'CONFIG.PCW_USB_RESET_POLARITY {{Active Low}} '
+            'CONFIG.PCW_USB_RESET_SELECT {{Share reset pin}} '
+            '] [get_ips Zynq]'
+        )
+        ps.ps7_tcl.append(
+            'set_property -dict [list '
+            'CONFIG.PCW_USB0_RESET_ENABLE {{1}} '
+            'CONFIG.PCW_USB0_RESET_IO {{MIO 46}} '
+            '] [get_ips Zynq]'
+        )
+
         axi_gp0 = ps.add_axi_gp_slave(clock_domain="sys")
 
         # DDR region: NaxRiscv 0x40000000 → PS DDR 0x00100000

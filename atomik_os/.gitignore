@@ -1,2 +1,5 @@
 atomik_os/build/
 src/*.o
+
+# gcc -MMD dependency files
+src/*.d

@@ -30,7 +30,15 @@ import time
 
 ZYNQ_DIR    = "/home/mattrock/Projects/ATOMiK/hardware/zynq"
 LITEX_BUILD = f"{ZYNQ_DIR}/litex-build"
-PS7_INIT    = f"{ZYNQ_DIR}/litex/build/hamgeek_rk7020f/gateware/hamgeek_rk7020f.gen/sources_1/ip/Zynq/ps7_init.tcl"
+PS7_INIT    = f"{ZYNQ_DIR}/scripts/ps7_init_rk7020f.tcl"
+# Hand-tuned ps7_init for RK-ZYNQ7020-F with proper USB Reset routing on
+# MIO46 (L0_SEL=1, MIO_PIN_46=0x1202) so the PS7 USB peripheral drives the
+# USB3320 PHY reset automatically. The LiteX-auto-generated ps7_init at
+# `litex/build/.../sources_1/ip/Zynq/ps7_init.tcl` has MIO_PIN_46=0x1201
+# (GPIO input) because Vivado's PS7 IP rejects PCW_USB0_RESET_IO=MIO46
+# in our config — even though we provide it. With GPIO-input routing the
+# PHY gets neither external reset nor automatic ULPI bring-up, so writes
+# to the ULPI viewport hang because the PHY's CLKOUT never starts.
 # Default: pinned known-good baseline (PHASE_9_1_MILESTONE.md). Override via
 # `BITSTREAM=...` env var when testing a different build (e.g. FB experiment
 # at litex-build-nax64-fb) so the proven baseline stays authoritative and
@@ -106,6 +114,32 @@ def build_xsdb_script() -> str:
         f'(NaxRiscv 0x{TRAMPOLINE_NAX:08x}, {tsz} bytes) --"'
     )
     lines.append(f"dow -data {tpath} 0x{tps:08x}")
+
+    # NOTE: MIO46 GPIO reset of the USB3320 PHY desyncs the controller's ULPI
+    # master and prevents the OTG Control write below from completing
+    # (RUN bit never clears, observed 2026-05-03). The ALINX FSBL's MIO46
+    # toggle works because the PS7 USB peripheral itself drives MIO46 and
+    # then re-initializes the ULPI bus. Doing it externally from xsdb skips
+    # that re-init step. The cleanest fix is to get Vivado to accept
+    # PCW_USB0_RESET_IO=MIO46 in the PS7 IP — currently rejected as
+    # `<Select> enabled:false` despite explicit assignment. Investigate
+    # parameter ordering for build #8.
+
+    # USB clock + PHY init now handled by ps7_init_rk7020f.tcl which routes
+    # MIO46 to USB Reset peripheral (L0_SEL=1). The PS7 USB controller
+    # automatically: (1) toggles MIO46 to reset the USB3320 PHY, (2) runs
+    # ULPI bring-up sequence, (3) writes OTG Control register internally.
+    # No xsdb pokes needed for USB.
+
+    # Optional: dump key USB state for debugging
+    lines.append('puts "-- USB0 state after ps7_init --"')
+    lines.append('puts "  USB0_CLK_CTRL = [format 0x%08x [mrd -value 0xF8000130]]"')
+    lines.append('puts "  MIO_PIN_46    = [format 0x%08x [mrd -value 0xF8000748]]"')
+    lines.append('puts "  USB ID        = [format 0x%08x [mrd -value 0xE0002000]]"')
+    lines.append('puts "  PORTSC        = [format 0x%08x [mrd -value 0xE0002184]]"'
+                 )
+    lines.append('puts "  OTGSC         = [format 0x%08x [mrd -value 0xE00021A4]]"')
+
     lines.append('puts "-- DDR loaded; releasing CPU --"')
     lines.append("con")
     lines.append("disconnect")
