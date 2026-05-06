@@ -9,7 +9,7 @@
  * carries a user-visible change. About window, status bar, and the
  * /tmp/atomik_os_version stamp all read from here so the screen output
  * NEVER lies about which build is running. */
-#define AOS_VERSION "v0.24"
+#define AOS_VERSION "v0.25"
 
 /* Display geometry — locked to 1920x1080 XRGB8888 since simplefb is fixed. */
 #define FB_W       1920
@@ -24,7 +24,16 @@ typedef uint32_t pixel_t;
 #define rgb(r, g, b)        ((pixel_t)(((uint32_t)(r) << 16) | ((uint32_t)(g) << 8) | (uint32_t)(b)))
 #define rgba(r, g, b, a)    ((pixel_t)(((uint32_t)(a) << 24) | ((uint32_t)(r) << 16) | ((uint32_t)(g) << 8) | (uint32_t)(b)))
 
-/* Brand palette — locked so the OS has a coherent identity. */
+/* Brand palette — locked so the OS has a coherent identity.
+ *
+ * Cyan is the ATOMiK identity. We do NOT migrate to Linear-indigo or any
+ * SaaS-template palette: this OS is a new class of computational machine,
+ * not another browser dashboard. Cyan + near-black = engineering-tool /
+ * machine-intelligence aesthetic, intentional and distinct.
+ *
+ * v0.25: cyan is one color in a SEMANTIC palette. Each color means
+ * something specific in the visual grammar of the OS. Apps should pick
+ * tokens by meaning, not by aesthetic fit. */
 #define ATOMIK_BG_TOP       rgb(0x0A, 0x0E, 0x1A)  /* near-black, slight blue */
 #define ATOMIK_BG_BOT       rgb(0x12, 0x18, 0x28)  /* deep navy */
 #define ATOMIK_ACCENT       rgb(0x4F, 0xC3, 0xFF)  /* electric cyan */
@@ -33,6 +42,26 @@ typedef uint32_t pixel_t;
 #define ATOMIK_FG_DIM       rgb(0xA8, 0xB2, 0xC4)
 #define ATOMIK_DOCK_BG      rgba(0x1A, 0x20, 0x30, 0xC0) /* translucent dock */
 #define ATOMIK_DOCK_BORDER  rgb(0x30, 0x3A, 0x52)
+
+/* Semantic tokens (v0.25, ChatGPT design review 2026-05-06). Use these
+ * BY MEANING, not by color preference. Adding a new "looks nice violet"
+ * UI element is a smell — pick the semantic token that matches the state
+ * the element represents. */
+#define ATOMIK_SEM_HARDWARE ATOMIK_ACCENT             /* live ATOMiK / hardware / active */
+#define ATOMIK_SEM_AGENT    rgb(0x9B, 0x7E, 0xE0)     /* agent reasoning / dynamic adapt */
+#define ATOMIK_SEM_SAVINGS  rgb(0x46, 0xA7, 0x58)     /* efficiency wins, cycles saved */
+#define ATOMIK_SEM_WASTE    rgb(0xF2, 0xC9, 0x7D)     /* contention, redundant compute */
+#define ATOMIK_SEM_OVERLOAD rgb(0xE5, 0x48, 0x4D)     /* crash, stale, IRQ storm */
+
+/* Window chrome geometry — v0.25 makes these explicit so the spacing
+ * grid is enforceable. Allowed values for any layout literal in app
+ * code: {4, 8, 12, 16, 24, 32, 48, 64}. Anything else is a smell. */
+#define ATOMIK_GRID_S       4
+#define ATOMIK_GRID_M       8
+#define ATOMIK_GRID_L       16
+#define ATOMIK_TITLEBAR_H   24    /* 1.5 * text-sm = 24 px */
+#define ATOMIK_BORDER_W     1     /* 1 px window border */
+#define ATOMIK_DOCK_GAP     8     /* visionOS-style gap from screen edge */
 
 /* fb.c — back-buffer compositor. */
 int  fb_open(void);
