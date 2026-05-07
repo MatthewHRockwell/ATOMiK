@@ -287,7 +287,8 @@ void fabric_draw(window_t *w, int x, int y, int wd, int ht) {
  * (bar-bottom) + 8 (GRID_M breathing room). */
 #define FABRIC_SHELF_W   480
 #define FABRIC_SHELF_X   (FB_W - FABRIC_SHELF_W - ATOMIK_GRID_L)
-#define FABRIC_SHELF_Y   72
+/* Computed: SAFE_TOP (=48) + bar_h (=32) + GRID_M breathing room (=8) = 88 */
+#define FABRIC_SHELF_Y   (ATOMIK_SAFE_TOP + 32 + ATOMIK_GRID_M)
 #define FABRIC_SHELF_H   620                      /* enough for header + lanes + footer + pills */
 
 int fabric_shelf_x(void) { return FABRIC_SHELF_X; }

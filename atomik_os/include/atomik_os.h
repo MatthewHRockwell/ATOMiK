@@ -20,13 +20,20 @@
 
 /* HDMI safe area — see feedback_hdmi_safe_area.md.
  *
- * The AX7020 → HDMI → monitor pipeline crops the top ~32 px of the
- * framebuffer (verified 2026-05-07 by direct /dev/fb0 pixel readback +
- * user observation of half-cropped magenta diagnostic).  All chrome
- * must respect these inset constants.  Wallpaper ignores them — the
- * cropped wallpaper edge is invisible.  Marker pixels and corner
- * indicators must live INSIDE the safe area or they get clipped. */
-#define ATOMIK_SAFE_TOP    32
+ * The AX7020 → HDMI → monitor pipeline crops the top of the framebuffer
+ * (verified 2026-05-07 by direct /dev/fb0 pixel readback + user
+ * observation of half-cropped magenta diagnostic).  All chrome must
+ * respect these inset constants.  Wallpaper ignores them — the cropped
+ * wallpaper edge is invisible.  Marker pixels and corner indicators
+ * must live INSIDE the safe area or they get clipped.
+ *
+ * v0.31 patch 6: bumped TOP from 32 to 48.  Initial 32 was the
+ * conservative read of "top half of 64-px magenta bar visible";
+ * empirically the user's monitor crops more than that (status-bar
+ * top edge still appeared cut at SAFE_TOP=32).  48 gives a 16-px
+ * margin above the bar so the bar's top doesn't sit right on the
+ * crop boundary. */
+#define ATOMIK_SAFE_TOP    48
 #define ATOMIK_SAFE_BOT    16
 #define ATOMIK_SAFE_LEFT   16
 #define ATOMIK_SAFE_RIGHT  16

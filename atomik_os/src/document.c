@@ -102,6 +102,14 @@ static int doc_load(doc_state_t *d) {
     char path[80];
     doc_path(d->doc_id, path, sizeof path);
     int n = delta_replay_file(path, &d->app);
+    /* v0.31 patch 6: subtitle is metadata, not user content.  Old delta
+     * logs (pre-v0.31) wrote the long instruction sentence as subtitle,
+     * which then replays on top of our "untitled" init.  Force-overwrite
+     * after replay so subtitle reflects the current schema regardless
+     * of what the persisted delta stream says.  Field 1 (the list) and
+     * field 0 (the title) still replay from the log — those are user
+     * content. */
+    snprintf(d->app.subtitle, sizeof d->app.subtitle, "untitled");
     return n > 0 ? 1 : 0;
 }
 
