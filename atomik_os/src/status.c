@@ -129,7 +129,10 @@ void status_draw(void) {
     action_t pred = agent_predict();
     if (pred != ACT_NONE) {
         char buf[80];
-        snprintf(buf, sizeof buf, "▸ %s", agent_action_name(pred));
+        /* ASCII '>>' instead of '▸' (U+25B8): the bitmap font is 8-bit
+         * single-byte and renders multibyte UTF-8 codepoints as '????'
+         * placeholder boxes — user-confirmed 2026-05-07. */
+        snprintf(buf, sizeof buf, ">> %s", agent_action_name(pred));
         int tw = text_width(buf, 1);
         draw_text((FB_W - tw) / 2, ty, buf, 1, ATOMIK_SEM_AGENT);
     }

@@ -168,10 +168,24 @@ void eapp_draw(window_t *w, edge_app_t *a, int x, int y, int wd, int ht) {
     }
 
     /* "Streamed by delta" footer — always present, demonstrating the
-     * invariant frame is what's drawing this. */
+     * invariant frame is what's drawing this.
+     *
+     * v0.31 patch 4: shortened format + hard truncation to the panel
+     * width.  The pre-patch format ("%s - primitive: %s - fields: %d
+     * - delta-state UI") could exceed wd-32 px and the unclipped
+     * draw_text would leak the tail INTO the next panel (Document
+     * chat side, etc.) leaving fragments like "- primitive: list..."
+     * visible at the bottom of an adjacent window.  Truncate first
+     * to ensure the rendered string fits inside wd-32 at scale 1
+     * (8 px/char). */
     char meta[160];
     snprintf(meta, sizeof meta,
-             "%s  -  primitive: %s  -  fields: %d  -  delta-state UI",
+             "%s | %s | %d fields",
              a->subtitle, eapp_primitive_name(a->primitive), a->field_count);
+    int max_chars = (wd - 32) / 8;
+    if (max_chars > 0 && (int)strlen(meta) > max_chars) {
+        meta[max_chars - 3] = meta[max_chars - 2] = meta[max_chars - 1] = '.';
+        meta[max_chars] = 0;
+    }
     draw_text(x + 16, y + ht - 22, meta, 1, ATOMIK_FG_DIM);
 }

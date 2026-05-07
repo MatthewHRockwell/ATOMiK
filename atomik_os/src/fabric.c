@@ -276,14 +276,18 @@ void fabric_draw(window_t *w, int x, int y, int wd, int ht) {
 
 /* Geometry of the system-shelf slot.  Fixed so Resource Fabric always
  * lands in the same place — no centered-overlap with whatever the user
- * just opened.  The shelf occupies the right 480 px column from the
- * top status bar to roughly the dock, leaving the left ~1440 px of a
- * 1920 px screen for normal app windows.  This encodes the v0.31 rule:
- * "opening Resource Fabric never results in Resource Fabric being
- * invisible" (per ChatGPT review 2026-05-06). */
+ * just opened.  The shelf occupies the right 480 px column from below
+ * the status bar to roughly the dock, leaving the left ~1440 px of a
+ * 1920 px screen for normal app windows.
+ *
+ * v0.31 patch 4: Y position bumped from 48 to 72 because the status
+ * bar now extends from y=0 to y=64 (top half in the HDMI safe-area
+ * crop zone, bottom half visible).  At y=48 the Fabric title bar
+ * was tucked under the visible portion of the status bar.  72 = 64
+ * (bar-bottom) + 8 (GRID_M breathing room). */
 #define FABRIC_SHELF_W   480
 #define FABRIC_SHELF_X   (FB_W - FABRIC_SHELF_W - ATOMIK_GRID_L)
-#define FABRIC_SHELF_Y   48                       /* below the 32-px status bar */
+#define FABRIC_SHELF_Y   72
 #define FABRIC_SHELF_H   620                      /* enough for header + lanes + footer + pills */
 
 int fabric_shelf_x(void) { return FABRIC_SHELF_X; }
