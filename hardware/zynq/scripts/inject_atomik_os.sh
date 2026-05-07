@@ -64,11 +64,18 @@ echo "  /root/atomik_os ($(stat -c%s "$ATOMIK_OS_BIN") bytes, md5 $ATOMIK_MD5)"
 mkdir -p "$ROOT/sbin"
 cat > "$ROOT/sbin/atomik_boot.sh" <<'BOOT'
 #!/bin/sh
-# atomik_boot.sh — wake USB VBUS + launch atomik_os.
+# atomik_boot.sh — wake USB VBUS + claim the framebuffer + launch atomik_os.
 # This rootfs has no devtmpfs (task #15 will enable it), so we mknod
 # the device files we need.
 
 sleep 6
+
+# Mount /proc + /sys so atomik_os can read /proc/stat, /proc/uptime,
+# /sys/class/input/, etc.  Buildroot's init may not mount these by default.
+mount | grep -q '^proc'   || mount -t proc  proc  /proc 2>/dev/null
+mount | grep -q '^sysfs'  || mount -t sysfs sysfs /sys  2>/dev/null
+
+# Device nodes (no devtmpfs).
 [ -e /dev/mem ] || mknod /dev/mem c 1 1
 chmod 600 /dev/mem
 mkdir -p /dev/input
@@ -82,12 +89,23 @@ done
 [ -e /dev/fb0 ] || mknod /dev/fb0 c 29 0
 chmod 600 /dev/fb0
 
+# Hand the framebuffer to atomik_os.  Linux fbcon binds to fb0 at boot
+# and renders the kernel TTY (boot logs, login prompt, kernel oops
+# tracebacks) on top of whatever atomik_os draws — which produces a
+# garbage-overlay on HDMI.  Unbinding vtcon1 (the fbcon vtconsole)
+# kicks the kernel back to the colour-dummy device 80x25 (a no-op
+# sink), leaving fb0 owned exclusively by atomik_os.
+[ -e /sys/class/vtconsole/vtcon1/bind ] && \
+    echo 0 > /sys/class/vtconsole/vtcon1/bind 2>/dev/null
+
 # DrvVbusExternal=1 (ULPI OTG_CTRL bit 6) so the on-board TPS2051
 # 5V switch turns on. See project_usb_host_WORKING.md.
 devmem 0x80002170 32 0x600A0040 2>/dev/null || true
 sleep 2
 
-exec /root/atomik_os
+# Launch on /dev/null stdio so atomik_os doesn't fight a TTY for stdin —
+# USB HID input feeds it through /dev/input/event* directly.
+exec /root/atomik_os > /dev/null 2>&1 < /dev/null
 BOOT
 chmod 755 "$ROOT/sbin/atomik_boot.sh"
 
