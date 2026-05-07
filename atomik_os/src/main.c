@@ -6,6 +6,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <sys/file.h>
+#include <unistd.h>
 
 static int  s_running    = 1;
 static int  s_dock_hover = -1;
@@ -15,11 +19,16 @@ void monitor_draw(window_t *w, int x, int y, int wd, int ht);  /* monitor.c */
 /* terminal_draw, terminal_send_key, terminal_start declared in atomik_os.h */
 
 static void redraw_frame(void) {
-    /* Bottom-up: wallpaper, status bar, dock, windows, notifications. */
+    /* v0.31 patch 3 (ChatGPT review 2026-05-07): status_draw() now fires
+     * AFTER wm_draw_all() so the status bar is global chrome layered on
+     * top of every window, not painted underneath them.  Previously, any
+     * window straying into y=0..31 (or any future bug that did) would
+     * silently overdraw the bar.  Defensive z-layer discipline: chrome
+     * always wins. */
     wallpaper_draw();
-    status_draw();
     dock_draw(s_dock_hover);
     wm_draw_all();
+    status_draw();      /* global chrome — drawn after windows */
     notify_draw();
     fb_present();
 }
@@ -46,7 +55,7 @@ static void open_about(void) {
 static int s_monitor_id = 0;
 static void open_monitor(void) {
     if (s_monitor_id) { wm_focus(s_monitor_id); return; }
-    int ww = 880, wh = 620;            /* shrunk from 980x660 to fit workspace */
+    int ww = 980, wh = 660;            /* restored: fits in 1424-px workspace */
     int wx = workspace_cx(ww) + 40;    /* offset so it doesn't fully cover About */
     int wy = (FB_H - wh) / 2 - 40;
     window_t *w = wm_open("ATOMiK Monitor", wx, wy, ww, wh, monitor_draw, NULL);
@@ -94,7 +103,7 @@ static void open_notes(void) {
 static int s_cal_id = 0, s_task_id = 0, s_code_id = 0;
 static void open_calendar(void) {
     if (s_cal_id) { wm_focus(s_cal_id); return; }
-    int ww = 980, wh = 620;            /* shrunk from 1080x620 to fit workspace */
+    int ww = 1080, wh = 620;           /* restored: fits in 1424-px workspace */
     int wx = workspace_cx(ww);
     int wy = (FB_H - wh) / 2 - 60;
     window_t *w = wm_open("Calendar (edge app)", wx, wy, ww, wh,
@@ -160,7 +169,7 @@ static void open_document(void) {
     }
     doc_state_t *d = document_open_new();
     if (!d) { notify_post("doc alloc failed"); return; }
-    int ww = 980, wh = 660;            /* shrunk from 1100x660 to fit workspace */
+    int ww = 1100, wh = 660;           /* restored: fits in 1424-px workspace */
     int offset = s_n_docs * 40;
     int wx = workspace_cx(ww) - 80 + offset;
     int wy = (FB_H - wh) / 2 - 40 + offset;
@@ -212,12 +221,40 @@ static doc_state_t *focused_doc(void) {
 int main(int argc, char **argv) {
     (void)argc; (void)argv;
 
-    /* Stamp the running version to a known path so deploy.py can verify
-     * the binary it just shipped is the one actually executing. Without
-     * this, a stale process pinning /dev/fb0 would silently keep showing
-     * an old build (the bug that motivated this stamp in the first place). */
+    /* v0.31 patch 3 (ChatGPT review 2026-05-07): single-instance lock.
+     *
+     * Multiple atomik_os processes drawing to /dev/fb0 simultaneously
+     * has been a recurring debug nightmare this session — every
+     * "killall -9 atomik_os" iteration that left an orphan running
+     * produced overlay garbage on screen.  Fixing it at the source:
+     * acquire an exclusive flock on /tmp/atomik_os.lock at startup,
+     * exit if a sibling already holds it.  Two atomik_os processes
+     * fighting over the framebuffer is now architecturally impossible. */
+    int lock_fd = open("/tmp/atomik_os.lock", O_CREAT | O_RDWR, 0644);
+    if (lock_fd < 0) {
+        fprintf(stderr, "atomik_os: cannot open lockfile: %s\n",
+                strerror(errno));
+        /* Continue anyway — better to draw than to fail. */
+    } else if (flock(lock_fd, LOCK_EX | LOCK_NB) < 0) {
+        fprintf(stderr, "atomik_os: another instance is running, exiting\n");
+        return 2;
+    } else {
+        /* Hold the lock for the lifetime of this process by leaking the
+         * fd.  Will be released when the kernel reaps us. */
+        char pidbuf[32];
+        int n = snprintf(pidbuf, sizeof pidbuf, "%d\n", (int)getpid());
+        if (write(lock_fd, pidbuf, (size_t)n) < 0) { /* ignore */ }
+    }
+
+    /* Stamp the running version + PID to known paths so the host can
+     * verify the binary it just shipped is the one actually executing.
+     * Without this, a stale process pinning /dev/fb0 would silently keep
+     * showing an old build (the bug that motivated these stamps in the
+     * first place). */
     FILE *vf = fopen("/tmp/atomik_os_version", "w");
     if (vf) { fputs(AOS_VERSION "\n", vf); fclose(vf); }
+    FILE *pf = fopen("/tmp/atomik_os_pid", "w");
+    if (pf) { fprintf(pf, "%d\n", (int)getpid()); fclose(pf); }
 
     if (fb_open() < 0) { fprintf(stderr, "fb_open failed\n"); return 1; }
     fb_clear(0);

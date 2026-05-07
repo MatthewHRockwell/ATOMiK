@@ -6,6 +6,14 @@
 #include "atomik_os.h"
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
+
+/* v0.31 patch 3 diagnostic was 2026-05-07 — confirmed HDMI top-edge
+ * crop of ~32 px.  Diagnostic removed; ATOMIK_SAFE_TOP now encodes the
+ * inset.  Set ATOMIK_DEBUG_STATUS=1 at build time to re-enable. */
+#ifndef ATOMIK_DEBUG_STATUS
+#define ATOMIK_DEBUG_STATUS 0
+#endif
 
 static unsigned long s_last_total = 0;
 static unsigned long s_last_idle  = 0;
@@ -46,12 +54,31 @@ static void format_uptime(char *out, size_t cap) {
 void status_draw(void) {
     update_cpu();
 
-    /* Subtle top bar — height 32 (= 8 * GRID_S, on grid).  Text
-     * vertically centered: y = (32 - text_height(1)) / 2.  v0.25
-     * collapses the prior 36-px bar to grid-compliant 32. */
+    /* Top bar — anchored to the SAFE-AREA top, not screen y=0, because
+     * the HDMI pipeline crops the top ~32 px (see feedback_hdmi_safe_area).
+     * Bar background extends FROM y=0 to bar_y+bar_h so a partial
+     * monitor with less overscan still looks correct (no wallpaper
+     * peeking above the bar), but the visible content (text, dots,
+     * markers) all live in the safe zone. */
     const int bar_h = 32;
-    const int ty    = (bar_h - text_height(1)) / 2;
-    draw_rect(0, 0, FB_W, bar_h, rgba(0x10, 0x14, 0x1E, 0xC0) & 0xFFFFFF);
+    const int bar_y = ATOMIK_SAFE_TOP;          /* visible content top */
+    const int ty    = bar_y + (bar_h - text_height(1)) / 2;
+
+    /* Backdrop fills 0..bar_y+bar_h so any monitor with less overscan
+     * shows a continuous bar, not wallpaper-then-bar. */
+    draw_rect(0, 0,                 FB_W, bar_y + bar_h, rgb(0x1A, 0x22, 0x38));
+    /* Hard cyan-dim separator at the bottom of the bar so even on a
+     * monitor with NO overscan the bar feels distinct from wallpaper. */
+    draw_rect(0, bar_y + bar_h - 1, FB_W, 1,             ATOMIK_ACCENT_DIM);
+
+#if ATOMIK_DEBUG_STATUS
+    /* If re-enabled, draws a magenta sentinel + PID-marker for diagnosis. */
+    draw_rect(0, bar_y, FB_W, bar_h, rgb(0xFF, 0x00, 0xFF));
+    int p = (int)getpid();
+    pixel_t marker = rgb((uint8_t)((p >> 8) & 0xFF),
+                         (uint8_t)(p & 0xFF), 0xFF);
+    draw_rect(FB_W - ATOMIK_SAFE_RIGHT - 8, bar_y, 8, 8, marker);
+#endif
 
     /* Left: ATOMiK identity wordmark (cyan = HARDWARE, the "this is
      * the OS chrome itself" signal in our semantic grammar) followed by
@@ -68,7 +95,7 @@ void status_draw(void) {
      * stays visible on the status bar. */
     int dot_size  = ATOMIK_GRID_M;
     int dot_gap   = ATOMIK_GRID_S;
-    int dot_y     = (bar_h - dot_size) / 2;
+    int dot_y     = bar_y + (bar_h - dot_size) / 2;
     int dots_x    = after_brand;
     const window_t *top = wm_topmost();
     for (int i = 0; i < wm_count(); i++) {

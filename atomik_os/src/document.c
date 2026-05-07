@@ -82,8 +82,9 @@ static void doc_init_default(doc_state_t *d) {
     eapp_list_append(&d->app, 1, "Try: load calendar  /  set primitive feed");
     eapp_list_append(&d->app, 1, "     add \"my new task\"  /  set accent cyan");
     eapp_list_append(&d->app, 1, "     /ai show me my morning  /  help");
-    eapp_set_str(&d->app, 2,
-                 "primitive=list  -  fields=3  -  delta-streamed");
+    /* v0.31 patch 3: shortened from "primitive=list - fields=3 -
+     * delta-streamed" to fit narrower windows without overflowing. */
+    eapp_set_str(&d->app, 2, "primitive=list   3 fields");
     hist_push(d, "agent> ", "ready. say what you want to see.");
 }
 
@@ -506,6 +507,17 @@ void document_draw_for(window_t *w, int x, int y, int wd, int ht) {
         draw_text(x + 16, y + 16, "(empty document)", 1, ATOMIK_FG_DIM);
         return;
     }
+    /* v0.31 patch 3 (ChatGPT review 2026-05-07): clear the FULL window
+     * content area before sub-panels paint over it.  Previously, when
+     * the window resized or moved, stale pixels from the old layout
+     * survived under the new layout — particularly visible at the
+     * bottom of the chat panel where long metadata lines could leak
+     * past the panel edge and persist as fragments ("- primitive:
+     * list..." was the user-reported case).  Full-clear up front, then
+     * each sub-panel paints over its own region, no stale pixels
+     * possible. */
+    draw_rect(x, y, wd, ht, rgb(0x10, 0x16, 0x22));
+
     int chat_w = 360;
     int doc_w  = wd - chat_w - 8;
     int chat_x = x + doc_w + 8;

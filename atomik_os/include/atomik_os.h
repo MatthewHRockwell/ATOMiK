@@ -18,6 +18,19 @@
 #define FB_STRIDE  (FB_W * FB_BPP)
 #define FB_BYTES   (FB_W * FB_H * FB_BPP)
 
+/* HDMI safe area — see feedback_hdmi_safe_area.md.
+ *
+ * The AX7020 → HDMI → monitor pipeline crops the top ~32 px of the
+ * framebuffer (verified 2026-05-07 by direct /dev/fb0 pixel readback +
+ * user observation of half-cropped magenta diagnostic).  All chrome
+ * must respect these inset constants.  Wallpaper ignores them — the
+ * cropped wallpaper edge is invisible.  Marker pixels and corner
+ * indicators must live INSIDE the safe area or they get clipped. */
+#define ATOMIK_SAFE_TOP    32
+#define ATOMIK_SAFE_BOT    16
+#define ATOMIK_SAFE_LEFT   16
+#define ATOMIK_SAFE_RIGHT  16
+
 /* XRGB8888 helpers. Pixels stored as 0x00RRGGBB. Macros (not inline funcs)
  * so they can be used as compile-time-constant global initializers. */
 typedef uint32_t pixel_t;
