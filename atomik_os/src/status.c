@@ -54,22 +54,30 @@ static void format_uptime(char *out, size_t cap) {
 void status_draw(void) {
     update_cpu();
 
-    /* Top bar — anchored to the SAFE-AREA top, not screen y=0, because
-     * the HDMI pipeline crops the top ~32 px (see feedback_hdmi_safe_area).
-     * Bar background extends FROM y=0 to bar_y+bar_h so a partial
-     * monitor with less overscan still looks correct (no wallpaper
-     * peeking above the bar), but the visible content (text, dots,
-     * markers) all live in the safe zone. */
+    /* Top bar — anchored to the SAFE-AREA top, not screen y=0.
+     *
+     * v0.31 patch 5: bar is now exactly bar_h tall starting at SAFE_TOP,
+     * with wallpaper visible above it (y=0..SAFE_TOP).  Text is centered
+     * inside the bar's geometric middle, so on ANY monitor — fully
+     * cropped (32 px), partially cropped, or no-overscan — the bar
+     * looks visually centered around its text.
+     *
+     * Previously the bar extended from y=0 to y=64 with text at y=40,
+     * which appeared bottom-biased on monitors with less than 32 px
+     * of overscan (text 8 px from the bottom edge of a visibly-larger
+     * bar).  User feedback 2026-05-07. */
     const int bar_h = 32;
-    const int bar_y = ATOMIK_SAFE_TOP;          /* visible content top */
+    const int bar_y = ATOMIK_SAFE_TOP;
     const int ty    = bar_y + (bar_h - text_height(1)) / 2;
 
-    /* Backdrop fills 0..bar_y+bar_h so any monitor with less overscan
-     * shows a continuous bar, not wallpaper-then-bar. */
-    draw_rect(0, 0,                 FB_W, bar_y + bar_h, rgb(0x1A, 0x22, 0x38));
-    /* Hard cyan-dim separator at the bottom of the bar so even on a
-     * monitor with NO overscan the bar feels distinct from wallpaper. */
-    draw_rect(0, bar_y + bar_h - 1, FB_W, 1,             ATOMIK_ACCENT_DIM);
+    /* Bar fills only the safe zone — wallpaper covers y=0..SAFE_TOP
+     * (cropped/invisible on this monitor; visible as a thin strip on
+     * monitors with less overscan, but that's fine — wallpaper looks
+     * intentional even at edges). */
+    draw_rect(0, bar_y,             FB_W, bar_h, rgb(0x1A, 0x22, 0x38));
+    /* Hard cyan-dim separator at the bottom of the bar — sharp visual
+     * end of the chrome, start of the desktop. */
+    draw_rect(0, bar_y + bar_h - 1, FB_W, 1,     ATOMIK_ACCENT_DIM);
 
 #if ATOMIK_DEBUG_STATUS
     /* If re-enabled, draws a magenta sentinel + PID-marker for diagnosis. */

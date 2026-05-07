@@ -68,8 +68,13 @@ static void hist_push(doc_state_t *d, const char *prefix, const char *line) {
 }
 
 static void doc_init_default(doc_state_t *d) {
-    eapp_init(&d->app, "Document",
-              "type a command on the right -> the document morphs",
+    /* v0.31 patch 5: short subtitle ("untitled") instead of the prior
+     * 51-char instruction sentence.  The subtitle ends up rendered in
+     * eapp_render's meta footer, where a long subtitle either overflows
+     * the panel or just looks like instruction text mis-placed as
+     * metadata.  Instructions live in field 1 (the list) where they
+     * read as content; metadata lives in subtitle. */
+    eapp_init(&d->app, "Document", "untitled",
               PRIM_LIST, ATOMIK_ACCENT);
     eapp_add_field(&d->app, FT_STR);   /* 0: header  */
     eapp_add_field(&d->app, FT_LIST);  /* 1: items   */
@@ -90,9 +95,7 @@ static void doc_init_default(doc_state_t *d) {
 
 static int doc_load(doc_state_t *d) {
     /* Init clean schema first so delta replay has slots to fill. */
-    eapp_init(&d->app, "Document",
-              "type a command on the right -> the document morphs",
-              PRIM_LIST, ATOMIK_ACCENT);
+    eapp_init(&d->app, "Document", "untitled", PRIM_LIST, ATOMIK_ACCENT);
     eapp_add_field(&d->app, FT_STR);
     eapp_add_field(&d->app, FT_LIST);
     eapp_add_field(&d->app, FT_STR);

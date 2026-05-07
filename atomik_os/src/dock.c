@@ -20,12 +20,17 @@ static const struct {
     pixel_t     color;
     action_t    action;     /* which agent action does clicking this icon log? */
 } ICONS[] = {
+    /* v0.31 patch 5: removed the trailing "ATOMiK" brand chip — its
+     * action was ACT_NONE so clicking did nothing, and visually it
+     * looked like a 6th launcher conflicting with the status bar's
+     * "[A][M][T][F][N]" hint that lists only 5 system keys.  Brand
+     * presence already lives in the status bar wordmark.  User-noted
+     * inconsistency, 2026-05-07. */
     { "About",     rgb(0xA8, 0xB2, 0xC4), ACT_OPEN_ABOUT    },
     { "Monitor",   rgb(0x6E, 0xC4, 0x6E), ACT_OPEN_MONITOR  },
     { "Terminal",  rgb(0x36, 0x44, 0x60), ACT_OPEN_TERMINAL },
     { "Files",     rgb(0xC9, 0x8C, 0x3C), ACT_OPEN_FILES    },
     { "Notes",     rgb(0x4F, 0xC3, 0xFF), ACT_OPEN_NOTES    },
-    { "ATOMiK",    rgb(0xFF, 0x6F, 0x91), ACT_NONE          },
 };
 #define N_ICONS ((int)(sizeof(ICONS) / sizeof(ICONS[0])))
 
@@ -46,7 +51,7 @@ static int dock_y0(void) {
 
 /* Cached order from the last dock_draw, so dock_action_for_slot can
  * resolve a visible-slot index back to an icon without recomputing. */
-static int s_last_order[N_ICONS] = {0,1,2,3,4,5};
+static int s_last_order[N_ICONS] = {0,1,2,3,4};
 
 /* Compute the icon order based on agent score. Higher score = closer to
  * the left edge of the dock. Ties broken by original index for stability. */
