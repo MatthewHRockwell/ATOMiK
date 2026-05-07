@@ -237,6 +237,10 @@ int main(int argc, char **argv) {
          * returns 1 when it actually changed something so we can
          * force a repaint. */
         int stocks_changed = stocks_tick();
+        /* v0.30: tick the Resource Fabric once per frame so its
+         * personality auto-detection re-classifies based on recent
+         * LLM/state activity.  Cheap (no I/O, no allocation). */
+        fabric_tick();
         if (ev.kind == EV_QUIT) { s_running = 0; break; }
         if (ev.kind == EV_KEY) {
             int dirty = 0;
@@ -331,6 +335,12 @@ int main(int argc, char **argv) {
                 dirty = 1;
             } else if (!dirty && (ev.key == 's' || ev.key == 'S')) {
                 open_stocks();
+                dirty = 1;
+            } else if (!dirty && (ev.key == 'r' || ev.key == 'R')) {
+                /* v0.30: Resource Fabric — see fabric.c.  No agent_log
+                 * action yet; will add ACT_OPEN_FABRIC in v0.31 once the
+                 * agent layer learns to predict R alongside D/S/etc. */
+                fabric_open();
                 dirty = 1;
             } else if (!dirty && ev.key >= '1' && ev.key < '1' + dock_count()) {
                 /* Number key launches whatever app is currently in that

@@ -9,7 +9,7 @@
  * carries a user-visible change. About window, status bar, and the
  * /tmp/atomik_os_version stamp all read from here so the screen output
  * NEVER lies about which build is running. */
-#define AOS_VERSION "v0.25"
+#define AOS_VERSION "v0.30"
 
 /* Display geometry — locked to 1920x1080 XRGB8888 since simplefb is fixed. */
 #define FB_W       1920
@@ -185,6 +185,14 @@ void atomik_close(void);
 /* Read each slot's accumulator. Fills `out[ATOMIK_N_SLOTS]`. */
 int  atomik_read_slots(uint32_t *out);
 
+/* fabric.c declarations are below the wm.c block (window_t needed). */
+typedef enum {
+    PERSONALITY_NONE = 0,
+    PERSONALITY_STATE,
+    PERSONALITY_SYNC,
+    PERSONALITY_AGENT,
+} personality_t;
+
 /* wm.c — window manager */
 typedef struct window window_t;
 typedef void (*win_draw_fn)(window_t *w, int content_x, int content_y,
@@ -216,6 +224,33 @@ int       wm_handle_key(int key);   /* returns 1 if key was consumed */
 
 /* wallet_draw — declared here, after wm.c, because it uses window_t. */
 void wallet_draw(window_t *w, int x, int y, int wd, int ht);
+
+/* fabric.c — Resource Fabric panel.  v0.30 differentiator.
+ *
+ * Shows what ATOMiK is doing with its compute resources right now:
+ * which workload-personality is currently active, how the bank/lane
+ * allocation is split, the batch queue depth, and efficiency delta
+ * vs a software baseline.  Three personalities for v0.30:
+ *   STATE  — change detection, dirty-region tracking, cache invalidation
+ *   SYNC   — replica updates, delta propagation, state reconciliation
+ *   AGENT  — agent context tracking, memory compression, LLM dispatch
+ *
+ * Personality auto-detected from real signals: recent LLM dispatch →
+ * AGENT, recent state-delta activity → STATE, default idle → SYNC.
+ *
+ * Architectural-claim discipline (per project_atomik_desk_vision): we
+ * do NOT claim ATOMiK literally morphs silicon into a different
+ * processor.  We claim ATOMiK organizes its execution resources into
+ * workload-specific batching/scheduling personalities; the fabric
+ * labels which one is active.  Hardware stays the same; resource
+ * allocation and operation batching change. */
+void          fabric_open(void);    /* opens / focuses the Resource Fabric window */
+void          fabric_draw(window_t *w, int x, int y, int wd, int ht);
+personality_t fabric_active(void);  /* current detected personality */
+const char   *fabric_personality_name(personality_t p);
+/* Tick the fabric on every frame so detection state has a chance to
+ * reclassify based on recent activity. */
+void          fabric_tick(void);
 
 /* terminal.c — pty-backed terminal app. Must be declared AFTER wm.c
  * because terminal_draw signature uses window_t. */

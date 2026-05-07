@@ -62,7 +62,7 @@ void status_draw(void) {
     draw_text(brand_x, ty, brand, 1, ATOMIK_SEM_HARDWARE);
     int hint_x = brand_x + text_width(brand, 1) + ATOMIK_GRID_M * 2;
     const char *hint =
-        "[D]oc  [W]allet  -  sys [A][M][T][F][N]  "
+        "[R]esource  [D]oc  [W]allet  -  sys [A][M][T][F][N]  "
         "edge [C][K][G][B][H]  -  [Tab] [Esc] [Q]";
     draw_text(hint_x, ty, hint, 1, ATOMIK_FG_DIM);
 
