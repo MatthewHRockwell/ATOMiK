@@ -38,12 +38,9 @@
 
 #define AGENT_HOLD_MS  10000   /* AGENT stays "active" for 10s after last LLM call */
 #define STATE_HOLD_MS  3000    /* STATE stays "active" for 3s after last delta */
+#define SYNC_HOLD_MS   5000    /* SYNC  stays "active" for 5s after last replica event */
 
 static personality_t s_active   = PERSONALITY_SYNC;
-static unsigned long s_last_llm_ms     = 0;
-static unsigned long s_last_delta_ms   = 0;
-static int           s_last_llm_uusd   = 0;
-static int           s_last_delta_seen = 0;
 static int           s_window_id       = -1;
 
 /* Per-lane utilization snapshot, 0..100.  Recomputed each tick from the
@@ -72,15 +69,24 @@ const char *fabric_personality_name(personality_t p) {
 
 personality_t fabric_active(void) { return s_active; }
 
-/* Detect the personality based on which signal fired most recently.
- * AGENT and STATE windows decay; if neither is fresh, fall back to SYNC
- * (the default idle personality — replica/sync work proceeds in the
- * background even when no one is typing or LLM-dispatching). */
+/* v0.31: detect the personality from the workload event bus instead of
+ * polling app-internal state.  Priority order = decay window length
+ * (longer-decay wins) so a fresh LLM dispatch doesn't get instantly
+ * overridden by the next stocks tick.  AGENT > STATE > SYNC.  If
+ * nothing has fired within its window, fall back to SYNC default-idle
+ * (consistent with project_v031_plan.md and ChatGPT's recommended
+ * priority order).
+ *
+ * This is the polling→event-driven flip ChatGPT's review called out as
+ * the deeper architectural issue: Resource Fabric now SUBSCRIBES to
+ * what apps emit instead of GUESSING from random state samples. */
 static personality_t detect(unsigned long now) {
-    if (s_last_llm_ms > 0 && (now - s_last_llm_ms) < AGENT_HOLD_MS)
-        return PERSONALITY_AGENT;
-    if (s_last_delta_ms > 0 && (now - s_last_delta_ms) < STATE_HOLD_MS)
-        return PERSONALITY_STATE;
+    unsigned long t_agent = atomik_event_last_ts(EVT_AGENT_CONTEXT);
+    unsigned long t_state = atomik_event_last_ts(EVT_STATE_DELTA);
+    unsigned long t_sync  = atomik_event_last_ts(EVT_SYNC_REPLICA);
+    if (t_agent > 0 && (now - t_agent) < AGENT_HOLD_MS) return PERSONALITY_AGENT;
+    if (t_state > 0 && (now - t_state) < STATE_HOLD_MS) return PERSONALITY_STATE;
+    if (t_sync  > 0 && (now - t_sync)  < SYNC_HOLD_MS)  return PERSONALITY_SYNC;
     return PERSONALITY_SYNC;
 }
 
@@ -117,33 +123,12 @@ static void update_lanes(unsigned long now) {
 
 void fabric_tick(void) {
     unsigned long now = anim_now_ms();
-
-    /* Sample LLM dispatch: when the lifetime cost in micro-USD changes,
-     * an LLM call just happened.  Wallet/agent cost is the cleanest
-     * available signal without rewriting llm.c to expose an in-flight
-     * flag (which is itself blocked on async dispatch — v0.30+). */
-    int uusd = llm_audit_total_uusd();
-    if (uusd != s_last_llm_uusd) {
-        s_last_llm_ms   = now;
-        s_last_llm_uusd = uusd;
-    }
-
-    /* Sample delta-log activity: agent_log fires on every key/window
-     * event; we treat that as the proxy for state-delta rate without
-     * rewiring the existing loggers.  Future: add delta_count() to
-     * delta_log.c and wire it directly. */
-    extern int agent_total_count(void);   /* may not exist in older builds */
-    int delta_seen = 0;
-    /* Resolve the symbol weakly — if not provided, fall back to anim
-     * tick count as a poor proxy.  Either way, this re-classifies on
-     * activity rather than on calendar time. */
-    delta_seen = (int)(now / 1000);   /* seconds since boot, monotonic */
-    if (delta_seen != s_last_delta_seen) {
-        /* Treat any new "second tick" as latent state activity so SYNC
-         * isn't pinned indefinitely.  Real wire-up = v0.40. */
-        s_last_delta_seen = delta_seen;
-    }
-
+    /* v0.31: detection driven entirely by the workload event bus —
+     * no more polling, no more wallet-spend hacks.  Producers wired:
+     *   - agent_log() emits EVT_STATE_DELTA on every user action
+     *   - llm_query() emits EVT_AGENT_CONTEXT on every dispatch
+     *   - stocks_tick() emits EVT_SYNC_REPLICA on every row mutation
+     * Consumers can subscribe to the same bus without touching producers. */
     s_active = detect(now);
     update_lanes(now);
 }

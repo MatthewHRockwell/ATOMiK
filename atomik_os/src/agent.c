@@ -103,6 +103,10 @@ void agent_log(action_t a) {
     }
     s_prev_action = a;
     if ((s_clock % AGENT_SAVE_EVERY) == 0) agent_save();
+    /* v0.31: every agent action is also a state-delta on the workload
+     * event bus.  Resource Fabric subscribes to this to flip personality
+     * to STATE on user activity.  See atomik_event.c. */
+    atomik_event_emit(EVT_STATE_DELTA, (int)a);
 }
 
 int agent_count(action_t a) {

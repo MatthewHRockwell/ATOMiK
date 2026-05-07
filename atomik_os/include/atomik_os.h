@@ -193,6 +193,39 @@ typedef enum {
     PERSONALITY_AGENT,
 } personality_t;
 
+/* atomik_event.c — workload event bus.  v0.31 patch 2/N.
+ *
+ * Apps emit semantic events; Resource Fabric (and future consumers)
+ * subscribe via atomik_event_last_ts() with priority + decay rules.
+ * This is THE architectural piece per ChatGPT review 2026-05-06 —
+ * turns ATOMiK Desk from polling-based to adaptive event-driven.
+ *
+ * Producers: agent.c (state-delta, agent-context), document.c
+ * (state-delta on buffer change), llm.c (agent-context on dispatch),
+ * eapp_render.c (vis-render on heavy redraw), terminal.c (build-run
+ * when compiler lane lands in v0.40).
+ *
+ * Consumer (today): fabric.c.  Anyone else can read the same bus
+ * without touching producers. */
+typedef enum {
+    EVT_NONE          = 0,
+    EVT_STATE_DELTA   = 1,    /* buffer/field change, document edit, agent_log activity */
+    EVT_SYNC_REPLICA  = 2,    /* replica/cloud-sync activity */
+    EVT_AGENT_CONTEXT = 3,    /* LLM dispatch, agent inference */
+    EVT_VIS_RENDER    = 4,    /* heavy framebuffer redraw / animation */
+    EVT_BUILD_RUN     = 5,    /* compiler lane build-and-run (v0.40+) */
+    EVT_OVERRIDE      = 6,    /* demo-override (P key, not yet wired) */
+} atomik_event_kind_t;
+
+void          atomik_event_emit(atomik_event_kind_t kind, int detail);
+unsigned long atomik_event_last_ts(atomik_event_kind_t kind);
+int           atomik_event_last_detail(atomik_event_kind_t kind);
+unsigned long atomik_event_total(void);
+/* Walk the ring in chronological order.  Returns 1 if idx-th record
+ * exists, 0 if not.  out_* may be NULL. */
+int           atomik_event_iter(int idx, atomik_event_kind_t *out_kind,
+                                unsigned long *out_ts, int *out_detail);
+
 /* wm.c — window manager */
 typedef struct window window_t;
 typedef void (*win_draw_fn)(window_t *w, int content_x, int content_y,

@@ -412,6 +412,12 @@ void llm_query(const llm_provider_t *p, const char *prompt, llm_response_t *out)
     if (!p) p = llm_default_provider();
     out->is_stub  = p->is_stub;
     out->tokens_in = llm_estimate_tokens(prompt);
+    /* v0.31: every LLM dispatch — stub, local-intent, or real provider —
+     * emits an AGENT_CONTEXT event onto the workload bus.  Resource
+     * Fabric subscribes to this to flip personality to AGENT for the
+     * decay window.  See atomik_event.c.  Detail = estimated tokens
+     * in (small int payload). */
+    atomik_event_emit(EVT_AGENT_CONTEXT, out->tokens_in);
     if (p->is_stub) {
         if (strcmp(p->name, "local-intent") == 0) {
             local_intent_respond(prompt, out->text, sizeof out->text);

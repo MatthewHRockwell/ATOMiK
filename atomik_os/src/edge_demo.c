@@ -177,6 +177,11 @@ int stocks_tick(void) {
         format_row(&s_stocks_data[i], row, sizeof row);
         eapp_list_append(&s_stocks, s_stocks_field, row);
     }
+    /* v0.31: stocks tick is our proxy for "replica/cloud-sync activity"
+     * — background data flowing into the OS without user action.  Emits
+     * a SYNC_REPLICA event so Resource Fabric flips its personality to
+     * SYNC for the 5 s decay window.  See atomik_event.c. */
+    atomik_event_emit(EVT_SYNC_REPLICA, idx);
     return 1;
 }
 
