@@ -289,16 +289,36 @@ void fabric_draw(window_t *w, int x, int y, int wd, int ht) {
     }
 }
 
+/* Geometry of the system-shelf slot.  Fixed so Resource Fabric always
+ * lands in the same place — no centered-overlap with whatever the user
+ * just opened.  The shelf occupies the right 480 px column from the
+ * top status bar to roughly the dock, leaving the left ~1440 px of a
+ * 1920 px screen for normal app windows.  This encodes the v0.31 rule:
+ * "opening Resource Fabric never results in Resource Fabric being
+ * invisible" (per ChatGPT review 2026-05-06). */
+#define FABRIC_SHELF_W   480
+#define FABRIC_SHELF_X   (FB_W - FABRIC_SHELF_W - ATOMIK_GRID_L)
+#define FABRIC_SHELF_Y   48                       /* below the 32-px status bar */
+#define FABRIC_SHELF_H   620                      /* enough for header + lanes + footer + pills */
+
+int fabric_shelf_x(void) { return FABRIC_SHELF_X; }
+int fabric_shelf_y(void) { return FABRIC_SHELF_Y; }
+int fabric_shelf_w(void) { return FABRIC_SHELF_W; }
+int fabric_shelf_h(void) { return FABRIC_SHELF_H; }
+
 void fabric_open(void) {
     if (s_window_id >= 0) {
+        /* Already open — raise to top so it's never buried. */
         wm_focus(s_window_id);
         return;
     }
-    /* 720x420, centered-ish.  Sized to fit comfortably alongside other
-     * apps without dominating the screen — Resource Fabric is meant to
-     * be GLANCEABLE chrome, not a full-screen monitor. */
+    /* Pinned right-side system panel.  Always opens at the same slot
+     * regardless of what's already on screen.  Other apps are placed
+     * by main.c::open_*() to avoid this rect (see also wm_open_auto
+     * once that lands later in v0.31). */
     window_t *w = wm_open("Resource Fabric",
-                          (FB_W - 720) / 2, 120, 720, 420,
+                          FABRIC_SHELF_X, FABRIC_SHELF_Y,
+                          FABRIC_SHELF_W, FABRIC_SHELF_H,
                           fabric_draw, NULL);
     if (w) s_window_id = w->id;
 }

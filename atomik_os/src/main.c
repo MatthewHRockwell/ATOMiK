@@ -24,18 +24,33 @@ static void redraw_frame(void) {
     fb_present();
 }
 
+/* v0.31: workspace_w returns the left-of-shelf width — the column
+ * where normal app windows live.  Resource Fabric occupies the right
+ * shelf as a pinned system panel; other apps center themselves
+ * horizontally INSIDE the workspace so they don't overlap the shelf
+ * even when Fabric isn't open yet.  This encodes the layout
+ * convention: left = workspace, right = system shelf. */
+static int workspace_w(void) { return fabric_shelf_x() - ATOMIK_GRID_L; }
+static int workspace_cx(int ww) { return (workspace_w() - ww) / 2; }
+
+static int s_about_id = 0;
 static void open_about(void) {
+    if (s_about_id) { wm_focus(s_about_id); return; }
     int ww = 720, wh = 540;
-    int wx = (FB_W - ww) / 2;
+    int wx = workspace_cx(ww);
     int wy = (FB_H - wh) / 2 - 80;
-    wm_open("About ATOMiK OS", wx, wy, ww, wh, about_draw, NULL);
+    window_t *w = wm_open("About ATOMiK OS", wx, wy, ww, wh, about_draw, NULL);
+    if (w) s_about_id = w->id;
 }
 
+static int s_monitor_id = 0;
 static void open_monitor(void) {
-    int ww = 980, wh = 660;
-    int wx = (FB_W - ww) / 2 + 40;     /* offset so it doesn't fully cover About */
+    if (s_monitor_id) { wm_focus(s_monitor_id); return; }
+    int ww = 880, wh = 620;            /* shrunk from 980x660 to fit workspace */
+    int wx = workspace_cx(ww) + 40;    /* offset so it doesn't fully cover About */
     int wy = (FB_H - wh) / 2 - 40;
-    wm_open("ATOMiK Monitor", wx, wy, ww, wh, monitor_draw, NULL);
+    window_t *w = wm_open("ATOMiK Monitor", wx, wy, ww, wh, monitor_draw, NULL);
+    if (w) s_monitor_id = w->id;
 }
 
 static int s_terminal_id = 0;
@@ -43,7 +58,7 @@ static void open_terminal(void) {
     if (s_terminal_id) { wm_focus(s_terminal_id); return; }
     if (terminal_start() < 0) return;
     int ww = 880, wh = 560;
-    int wx = (FB_W - ww) / 2 - 40;
+    int wx = workspace_cx(ww) - 40;
     int wy = (FB_H - wh) / 2 + 20;
     window_t *w = wm_open("Terminal", wx, wy, ww, wh, terminal_draw, NULL);
     if (w) s_terminal_id = w->id;
@@ -54,7 +69,7 @@ static void open_files(void) {
     if (s_files_id) { wm_focus(s_files_id); return; }
     files_open();
     int ww = 760, wh = 520;
-    int wx = (FB_W - ww) / 2 + 60;
+    int wx = workspace_cx(ww) + 60;
     int wy = (FB_H - wh) / 2 - 60;
     window_t *w = wm_open("Files", wx, wy, ww, wh, files_draw, NULL);
     if (w) s_files_id = w->id;
@@ -66,7 +81,7 @@ static void open_notes(void) {
     if (s_notes_id) { wm_focus(s_notes_id); return; }
     notes_open();
     int ww = 700, wh = 540;
-    int wx = (FB_W - ww) / 2 - 80;
+    int wx = workspace_cx(ww) - 80;
     int wy = (FB_H - wh) / 2 + 40;
     window_t *w = wm_open("Notes", wx, wy, ww, wh, notes_draw, NULL);
     if (w) s_notes_id = w->id;
@@ -79,8 +94,8 @@ static void open_notes(void) {
 static int s_cal_id = 0, s_task_id = 0, s_code_id = 0;
 static void open_calendar(void) {
     if (s_cal_id) { wm_focus(s_cal_id); return; }
-    int ww = 1080, wh = 620;
-    int wx = (FB_W - ww) / 2;
+    int ww = 980, wh = 620;            /* shrunk from 1080x620 to fit workspace */
+    int wx = workspace_cx(ww);
     int wy = (FB_H - wh) / 2 - 60;
     window_t *w = wm_open("Calendar (edge app)", wx, wy, ww, wh,
                           edge_calendar_draw, NULL);
@@ -90,7 +105,7 @@ static void open_calendar(void) {
 static void open_tasks(void) {
     if (s_task_id) { wm_focus(s_task_id); return; }
     int ww = 720, wh = 600;
-    int wx = (FB_W - ww) / 2 - 100;
+    int wx = workspace_cx(ww) - 100;
     int wy = (FB_H - wh) / 2 - 30;
     window_t *w = wm_open("Tasks (edge app)", wx, wy, ww, wh,
                           edge_tasks_draw, NULL);
@@ -100,7 +115,7 @@ static void open_tasks(void) {
 static void open_code(void) {
     if (s_code_id) { wm_focus(s_code_id); return; }
     int ww = 880, wh = 580;
-    int wx = (FB_W - ww) / 2 + 60;
+    int wx = workspace_cx(ww) + 60;
     int wy = (FB_H - wh) / 2 + 20;
     window_t *w = wm_open("Code (edge app)", wx, wy, ww, wh,
                           edge_code_draw, NULL);
@@ -112,7 +127,7 @@ static int s_brief_id = 0, s_chat_id = 0;
 static void open_brief(void) {
     if (s_brief_id) { wm_focus(s_brief_id); return; }
     int ww = 820, wh = 500;
-    int wx = (FB_W - ww) / 2;
+    int wx = workspace_cx(ww);
     int wy = (FB_H - wh) / 2 - 40;
     window_t *w = wm_open("Brief (edge app)", wx, wy, ww, wh,
                           edge_brief_draw, NULL);
@@ -123,7 +138,7 @@ static void open_brief(void) {
 static void open_chat(void) {
     if (s_chat_id) { wm_focus(s_chat_id); return; }
     int ww = 760, wh = 540;
-    int wx = (FB_W - ww) / 2 + 100;
+    int wx = workspace_cx(ww) + 100;
     int wy = (FB_H - wh) / 2;
     window_t *w = wm_open("Chat (edge app)", wx, wy, ww, wh,
                           edge_chat_draw, NULL);
@@ -145,9 +160,9 @@ static void open_document(void) {
     }
     doc_state_t *d = document_open_new();
     if (!d) { notify_post("doc alloc failed"); return; }
-    int ww = 1100, wh = 660;
+    int ww = 980, wh = 660;            /* shrunk from 1100x660 to fit workspace */
     int offset = s_n_docs * 40;
-    int wx = (FB_W - ww) / 2 - 80 + offset;
+    int wx = workspace_cx(ww) - 80 + offset;
     int wy = (FB_H - wh) / 2 - 40 + offset;
     char title[40];
     snprintf(title, sizeof title, "Document #%d", s_n_docs + 1);
@@ -164,7 +179,7 @@ static int s_stocks_id = 0;
 static void open_stocks(void) {
     if (s_stocks_id) { wm_focus(s_stocks_id); return; }
     int ww = 760, wh = 540;
-    int wx = (FB_W - ww) / 2 - 60;
+    int wx = workspace_cx(ww) - 60;
     int wy = (FB_H - wh) / 2 + 40;
     window_t *w = wm_open("Stocks (live deltas)", wx, wy, ww, wh,
                           edge_stocks_draw, NULL);
@@ -176,7 +191,7 @@ static int s_wallet_id = 0;
 static void open_wallet(void) {
     if (s_wallet_id) { wm_focus(s_wallet_id); return; }
     int ww = 720, wh = 560;
-    int wx = (FB_W - ww) / 2;
+    int wx = workspace_cx(ww);
     int wy = (FB_H - wh) / 2;
     window_t *w = wm_open("Wallet", wx, wy, ww, wh, wallet_draw, NULL);
     if (w) s_wallet_id = w->id;

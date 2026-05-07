@@ -167,6 +167,13 @@ void wm_draw_all(void) {
     }
 }
 
+/* v0.31: enumeration getters for the status-bar window-strip. */
+int wm_count(void) { return s_count; }
+const window_t *wm_get(int idx) {
+    if (idx < 0 || idx >= s_count) return NULL;
+    return &s_windows[idx];
+}
+
 int wm_handle_key(int key) {
     if (s_count == 0) return 0;
     if (key == 0x1B /* Esc */) {

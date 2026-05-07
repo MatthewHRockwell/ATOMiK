@@ -9,7 +9,7 @@
  * carries a user-visible change. About window, status bar, and the
  * /tmp/atomik_os_version stamp all read from here so the screen output
  * NEVER lies about which build is running. */
-#define AOS_VERSION "v0.30"
+#define AOS_VERSION "v0.31"
 
 /* Display geometry — locked to 1920x1080 XRGB8888 since simplefb is fixed. */
 #define FB_W       1920
@@ -222,6 +222,14 @@ window_t *wm_topmost(void);
 void      wm_draw_all(void);
 int       wm_handle_key(int key);   /* returns 1 if key was consumed */
 
+/* v0.31: enumeration so the status bar can render a per-window dot
+ * strip showing every open window (focused = bright cyan, buried =
+ * dim cyan).  Solves the "I opened R but it's buried under D" gap
+ * surfaced by the v0.30 demo — buried windows now have a visible
+ * affordance even when fully covered. */
+int             wm_count(void);
+const window_t *wm_get(int idx);    /* NULL if idx out of range */
+
 /* wallet_draw — declared here, after wm.c, because it uses window_t. */
 void wallet_draw(window_t *w, int x, int y, int wd, int ht);
 
@@ -251,6 +259,13 @@ const char   *fabric_personality_name(personality_t p);
 /* Tick the fabric on every frame so detection state has a chance to
  * reclassify based on recent activity. */
 void          fabric_tick(void);
+/* Geometry of the pinned right-side shelf.  Other apps' open_*()
+ * functions read these to place themselves in the LEFT workspace
+ * (avoiding the shelf rect) instead of fully overlapping it. */
+int           fabric_shelf_x(void);
+int           fabric_shelf_y(void);
+int           fabric_shelf_w(void);
+int           fabric_shelf_h(void);
 
 /* terminal.c — pty-backed terminal app. Must be declared AFTER wm.c
  * because terminal_draw signature uses window_t. */

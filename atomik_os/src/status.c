@@ -55,12 +55,40 @@ void status_draw(void) {
 
     /* Left: ATOMiK identity wordmark (cyan = HARDWARE, the "this is
      * the OS chrome itself" signal in our semantic grammar) followed by
-     * key hints in dim foreground.  Separating the wordmark with grid-S
-     * gives the bar a visible "branded" anchor instead of hint-soup. */
+     * the v0.31 window-strip and then key hints in dim foreground. */
     const char *brand = "ATOMiK";
     int brand_x = ATOMIK_GRID_L;
     draw_text(brand_x, ty, brand, 1, ATOMIK_SEM_HARDWARE);
-    int hint_x = brand_x + text_width(brand, 1) + ATOMIK_GRID_M * 2;
+    int after_brand = brand_x + text_width(brand, 1) + ATOMIK_GRID_M * 2;
+
+    /* v0.31 window-strip: one dot per open window, focused window
+     * gets a bright cyan filled square, buried windows get a dim
+     * outlined square.  Solves "I opened R but it's hidden under
+     * Document" — even when a window is fully covered, its dot
+     * stays visible on the status bar. */
+    int dot_size  = ATOMIK_GRID_M;
+    int dot_gap   = ATOMIK_GRID_S;
+    int dot_y     = (bar_h - dot_size) / 2;
+    int dots_x    = after_brand;
+    const window_t *top = wm_topmost();
+    for (int i = 0; i < wm_count(); i++) {
+        const window_t *w = wm_get(i);
+        if (!w || !w->visible) continue;
+        int focused = (top && w->id == top->id);
+        if (focused) {
+            draw_rect(dots_x, dot_y, dot_size, dot_size, ATOMIK_SEM_HARDWARE);
+        } else {
+            /* Hollow rect for buried windows — outline only. */
+            draw_rect(dots_x,            dot_y,                  dot_size, 1,        ATOMIK_DOCK_BORDER);
+            draw_rect(dots_x,            dot_y + dot_size - 1,   dot_size, 1,        ATOMIK_DOCK_BORDER);
+            draw_rect(dots_x,            dot_y,                  1,        dot_size, ATOMIK_DOCK_BORDER);
+            draw_rect(dots_x + dot_size - 1, dot_y,              1,        dot_size, ATOMIK_DOCK_BORDER);
+        }
+        dots_x += dot_size + dot_gap;
+    }
+    /* Spacer before hints so the strip + hints don't run together. */
+    int hint_x = (wm_count() > 0) ? dots_x + ATOMIK_GRID_M * 2 : after_brand;
+
     const char *hint =
         "[R]esource  [D]oc  [W]allet  -  sys [A][M][T][F][N]  "
         "edge [C][K][G][B][H]  -  [Tab] [Esc] [Q]";
