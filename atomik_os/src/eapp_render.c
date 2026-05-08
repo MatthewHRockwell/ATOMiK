@@ -38,10 +38,14 @@ static void render_list(edge_app_t *a, int x, int y, int wd, int ht) {
             draw_text(x + 24, y + 60 + draw_n * row_h, more, 1, ATOMIK_FG_DIM);
         }
     }
-    /* Footer */
-    if (a->field_count > 2 && a->fields[2].type == FT_STR) {
-        draw_text(x + 16, y + ht - 24, a->fields[2].str, 1, ATOMIK_FG_DIM);
-    }
+    /* Footer (field 2) — REMOVED in v0.31 patch 7.  Vestigial: this
+     * predated the unified eapp_draw meta footer below.  Both drew at
+     * y+ht-24 and y+ht-22 respectively (2-px gap), overlapping
+     * horizontally, producing the user-reported "jumbled text at the
+     * bottom of Document" bug.  The eapp_draw meta footer covers the
+     * same role.  Apps that have stale field 2 strings still keep them
+     * in their schema (so old delta logs replay clean) — they just
+     * don't render here. */
 }
 
 /* PRIM_CARD: 0 = title, 1 = subtitle, 2 = body */
