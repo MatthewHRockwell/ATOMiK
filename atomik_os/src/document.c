@@ -502,10 +502,17 @@ void document_handle_key_for(doc_state_t *d, int key) {
         if (d->input_len > 0) {
             d->input_len--;
             d->input[d->input_len] = 0;
+            /* v0.32: backspace is a buffer mutation → STATE delta on bus. */
+            atomik_event_emit(EVT_STATE_DELTA, d->doc_id);
         }
         return;
     }
     if (key >= 32 && key < 127 && d->input_len < DOC_INPUT_MAX - 1) {
+        /* v0.32: every printable character into the chat is a buffer
+         * mutation — emits STATE_DELTA so Resource Fabric flips its
+         * personality to STATE for the 3 s decay window.  Visible "type
+         * → personality flip" demo moment per project_v031_plan.md. */
+        atomik_event_emit(EVT_STATE_DELTA, d->doc_id);
         d->input[d->input_len++] = (char)key;
         d->input[d->input_len]   = 0;
     }

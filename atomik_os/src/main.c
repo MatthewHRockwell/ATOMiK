@@ -325,9 +325,17 @@ int main(int argc, char **argv) {
             }
             /* (2) SYSTEM-SHELF KEYS — always-on launchers.  R = Resource
              * Fabric, which is the system-shelf differentiator.  Catches
-             * R even while a text-input app is focused. */
+             * R even while a text-input app is focused.  P = Resource
+             * Fabric personality cycle override (v0.32 demo control —
+             * always-on for presenter convenience).  Both bypass focused
+             * apps because they ARE chrome. */
             else if (ev.key == 'r' || ev.key == 'R') {
                 fabric_open();
+                dirty = 1;
+            }
+            else if (ev.key == 'p' || ev.key == 'P') {
+                fabric_cycle_override();
+                fabric_open();        /* surface the panel so the change is visible */
                 dirty = 1;
             }
             /* (3) FOCUSED-APP KEYS — terminal/files/notes/document */

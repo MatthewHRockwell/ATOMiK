@@ -9,7 +9,7 @@
  * carries a user-visible change. About window, status bar, and the
  * /tmp/atomik_os_version stamp all read from here so the screen output
  * NEVER lies about which build is running. */
-#define AOS_VERSION "v0.31"
+#define AOS_VERSION "v0.32"
 
 /* Display geometry — locked to 1920x1080 XRGB8888 since simplefb is fixed. */
 #define FB_W       1920
@@ -312,6 +312,14 @@ const char   *fabric_personality_name(personality_t p);
 /* Tick the fabric on every frame so detection state has a chance to
  * reclassify based on recent activity. */
 void          fabric_tick(void);
+
+/* v0.32: presenter-override controls.  Demo backup so a workload
+ * can be forced for a pitch even without LLM dispatch / activity.
+ * Override decays after FABRIC_OVERRIDE_HOLD_MS so a forgotten
+ * override doesn't permanently lie about system state. */
+void          fabric_cycle_override(void);   /* AUTO → STATE → SYNC → AGENT → AUTO */
+int           fabric_override_active(void);  /* 1 if manual override engaged */
+personality_t fabric_override_personality(void);
 /* Geometry of the pinned right-side shelf.  Other apps' open_*()
  * functions read these to place themselves in the LEFT workspace
  * (avoiding the shelf rect) instead of fully overlapping it. */

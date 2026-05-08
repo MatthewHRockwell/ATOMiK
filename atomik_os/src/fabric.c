@@ -36,12 +36,22 @@
  * to live atomik_read_slots() in v0.40, this can scale to N_SLOTS. */
 #define FABRIC_N_LANES 3
 
-#define AGENT_HOLD_MS  10000   /* AGENT stays "active" for 10s after last LLM call */
-#define STATE_HOLD_MS  3000    /* STATE stays "active" for 3s after last delta */
-#define SYNC_HOLD_MS   5000    /* SYNC  stays "active" for 5s after last replica event */
+#define AGENT_HOLD_MS    10000   /* AGENT stays "active" for 10s after last LLM call */
+#define STATE_HOLD_MS    3000    /* STATE stays "active" for 3s after last delta */
+#define SYNC_HOLD_MS     5000    /* SYNC  stays "active" for 5s after last replica event */
+/* v0.32: manual override decay.  30s gives a presenter time to talk
+ * about each personality during a demo without the override silently
+ * expiring mid-sentence, but short enough that a forgotten override
+ * doesn't permanently mis-represent the system. */
+#define FABRIC_OVERRIDE_HOLD_MS  30000
 
-static personality_t s_active   = PERSONALITY_SYNC;
-static int           s_window_id       = -1;
+static personality_t s_active           = PERSONALITY_SYNC;
+static int           s_window_id        = -1;
+/* v0.32: presenter override state.  s_override_p == PERSONALITY_NONE
+ * means "AUTO" (no override active).  Set via fabric_cycle_override();
+ * decays after FABRIC_OVERRIDE_HOLD_MS unless cycled again. */
+static personality_t s_override_p       = PERSONALITY_NONE;
+static unsigned long s_override_set_ms  = 0;
 
 /* Per-lane utilization snapshot, 0..100.  Recomputed each tick from the
  * detected personality so the visualization shows lanes "leaning" toward
@@ -73,14 +83,26 @@ personality_t fabric_active(void) { return s_active; }
  * polling app-internal state.  Priority order = decay window length
  * (longer-decay wins) so a fresh LLM dispatch doesn't get instantly
  * overridden by the next stocks tick.  AGENT > STATE > SYNC.  If
- * nothing has fired within its window, fall back to SYNC default-idle
- * (consistent with project_v031_plan.md and ChatGPT's recommended
- * priority order).
+ * nothing has fired within its window, fall back to SYNC default-idle.
  *
- * This is the polling→event-driven flip ChatGPT's review called out as
- * the deeper architectural issue: Resource Fabric now SUBSCRIBES to
- * what apps emit instead of GUESSING from random state samples. */
+ * v0.32: presenter override beats auto-detection while it's fresh.
+ * The override carries a decay so a forgotten override doesn't lie
+ * indefinitely.  When override decays, we silently fall back to auto-
+ * detection — no jarring transition needed because the auto path
+ * generally produces the same answer the override was forcing.
+ *
+ * Architectural framing (per project_v031_plan.md): the user-visible
+ * story is "ATOMiK organizes resources around the workload class".
+ * The override is a presenter shim, NOT the primary mechanism — that's
+ * why the rendering shows "MANUAL:" prefix when override is active. */
 static personality_t detect(unsigned long now) {
+    if (s_override_p != PERSONALITY_NONE &&
+        (now - s_override_set_ms) < FABRIC_OVERRIDE_HOLD_MS) {
+        return s_override_p;
+    }
+    /* Override decayed — clear it so subsequent reads don't re-arm. */
+    if (s_override_p != PERSONALITY_NONE) s_override_p = PERSONALITY_NONE;
+
     unsigned long t_agent = atomik_event_last_ts(EVT_AGENT_CONTEXT);
     unsigned long t_state = atomik_event_last_ts(EVT_STATE_DELTA);
     unsigned long t_sync  = atomik_event_last_ts(EVT_SYNC_REPLICA);
@@ -89,6 +111,29 @@ static personality_t detect(unsigned long now) {
     if (t_sync  > 0 && (now - t_sync)  < SYNC_HOLD_MS)  return PERSONALITY_SYNC;
     return PERSONALITY_SYNC;
 }
+
+void fabric_cycle_override(void) {
+    /* AUTO → STATE → SYNC → AGENT → AUTO.  Each press advances; pressing
+     * P during an active override resets the decay clock so a presenter
+     * can hold a personality across a long talking point.  Emits an
+     * EVT_OVERRIDE event onto the bus so future subscribers can react. */
+    switch (s_override_p) {
+    case PERSONALITY_NONE:  s_override_p = PERSONALITY_STATE; break;
+    case PERSONALITY_STATE: s_override_p = PERSONALITY_SYNC;  break;
+    case PERSONALITY_SYNC:  s_override_p = PERSONALITY_AGENT; break;
+    case PERSONALITY_AGENT: s_override_p = PERSONALITY_NONE;  break;
+    }
+    s_override_set_ms = anim_now_ms();
+    atomik_event_emit(EVT_OVERRIDE, (int)s_override_p);
+}
+
+int fabric_override_active(void) {
+    if (s_override_p == PERSONALITY_NONE) return 0;
+    unsigned long now = anim_now_ms();
+    return (now - s_override_set_ms) < FABRIC_OVERRIDE_HOLD_MS;
+}
+
+personality_t fabric_override_personality(void) { return s_override_p; }
 
 /* Update per-lane utilization based on active personality.  Lane 0
  * (cyan) leans high when STATE is active (raw hardware compute);
@@ -167,8 +212,19 @@ void fabric_draw(window_t *w, int x, int y, int wd, int ht) {
     case PERSONALITY_SYNC:  badge_color = ATOMIK_SEM_SAVINGS;  break;
     default:                badge_color = ATOMIK_FG_DIM;       break;
     }
-    char badge[16];
-    snprintf(badge, sizeof badge, "[ %s ]", fabric_personality_name(s_active));
+    /* v0.32: prefix badge with "MANUAL:" when presenter override is
+     * active so the audience (and the presenter) always know whether
+     * the personality came from real workload signals or from the
+     * override key.  Honest demo discipline: never present a forced
+     * personality as if it were auto-detected. */
+    char badge[32];
+    if (fabric_override_active()) {
+        snprintf(badge, sizeof badge, "[ MANUAL: %s ]",
+                 fabric_personality_name(s_active));
+    } else {
+        snprintf(badge, sizeof badge, "[ AUTO: %s ]",
+                 fabric_personality_name(s_active));
+    }
     int bw = text_width(badge, 1);
     draw_text(x + wd - bw - ATOMIK_GRID_L, y + ATOMIK_GRID_M + 4,
               badge, 1, badge_color);

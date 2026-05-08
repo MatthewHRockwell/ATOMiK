@@ -124,11 +124,12 @@ void status_draw(void) {
     /* Spacer before hints so the strip + hints don't run together. */
     int hint_x = (wm_count() > 0) ? dots_x + ATOMIK_GRID_M * 2 : after_brand;
 
-    /* v0.31 patch 8: hint reflects the global input router.
-     * R = system shelf (always-on), Tab/Esc/Ctrl-W = WM keys (always
-     * win), letter launchers fire only on bare desktop. */
+    /* v0.31 patch 8 + v0.32: hint reflects the global input router.
+     * R = Resource Fabric (always-on system shelf).  P = personality
+     * override (always-on demo control).  Tab/Esc/Ctrl-W = WM keys.
+     * Letter launchers fire only on bare desktop. */
     const char *hint =
-        "[R]es always   [Tab]/[Esc]/[^W]   "
+        "[R]es [P]ers   [Tab]/[Esc]/[^W]   "
         "[D] [W] [S] | [A] [M] [T] [F] [N] | [C] [K] [G] [B] [H]";
     draw_text(hint_x, ty, hint, 1, ATOMIK_FG_DIM);
 
