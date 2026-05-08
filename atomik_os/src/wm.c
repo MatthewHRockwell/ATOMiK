@@ -176,7 +176,11 @@ const window_t *wm_get(int idx) {
 
 int wm_handle_key(int key) {
     if (s_count == 0) return 0;
-    if (key == 0x1B /* Esc */) {
+    /* Esc OR Ctrl-W (= 0x17) — close the focused window.  Ctrl-W is
+     * added in v0.31 patch 8 because Esc gets trapped by some apps
+     * for "cancel input" semantics; Ctrl-W is the universal "close
+     * focused window" shortcut every desktop OS recognizes. */
+    if (key == 0x1B || key == 0x17) {
         window_t *t = wm_topmost();
         if (t) wm_close(t->id);
         return 1;

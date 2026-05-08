@@ -297,13 +297,40 @@ int main(int argc, char **argv) {
         if (ev.kind == EV_KEY) {
             int dirty = 0;
 
-            /* Window manager gets first crack at WM keys (Tab, Esc). */
+            /* v0.31 patch 8 — Global Input Router.  Order matters and
+             * is now explicit (per ChatGPT review 2026-05-06):
+             *
+             *   1. SYSTEM HOTKEYS  (Tab, Esc, Ctrl-W, future Shift-Tab)
+             *      — always win, regardless of focused app.  Implemented
+             *      by wm_handle_key().
+             *   2. SYSTEM-SHELF KEYS  (R for Resource Fabric)
+             *      — always-on launchers for the system-shelf surfaces.
+             *      Press R from anywhere → Resource Fabric raises.
+             *   3. FOCUSED-APP KEYS  (terminal, files, notes, document)
+             *      — when one of these owns the focused window, all
+             *      remaining keys feed it as text input.  This is why
+             *      A/M/T/F/etc letter launchers DON'T fire while you're
+             *      typing in Document — same convention as every desktop
+             *      OS where letter launchers require a modifier.
+             *   4. APP LAUNCHERS  (A, M, T, F, N, C, K, G, B, H, D, W,
+             *      S, digits, space) — only reach here if no app holds
+             *      focus.  Letter pressed on bare desktop → app opens.
+             */
+
+            /* (1) SYSTEM HOTKEYS */
             if (wm_handle_key(ev.key)) {
                 if (ev.key == '\t')      agent_log(ACT_CYCLE_FOCUS);
                 else if (ev.key == 0x1B) agent_log(ACT_CLOSE_WINDOW);
                 dirty = 1;
             }
-            /* If terminal is focused, all other keys feed the pty. */
+            /* (2) SYSTEM-SHELF KEYS — always-on launchers.  R = Resource
+             * Fabric, which is the system-shelf differentiator.  Catches
+             * R even while a text-input app is focused. */
+            else if (ev.key == 'r' || ev.key == 'R') {
+                fabric_open();
+                dirty = 1;
+            }
+            /* (3) FOCUSED-APP KEYS — terminal/files/notes/document */
             else if (s_terminal_id) {
                 window_t *top = wm_topmost();
                 if (top && top->id == s_terminal_id) {
@@ -311,7 +338,6 @@ int main(int argc, char **argv) {
                     dirty = 1;
                 }
             }
-            /* If files is focused, route navigation keys there. */
             if (!dirty && s_files_id) {
                 window_t *top = wm_topmost();
                 if (top && top->id == s_files_id) {
@@ -319,7 +345,6 @@ int main(int argc, char **argv) {
                     dirty = 1;
                 }
             }
-            /* If notes is focused, all printable keys edit the buffer. */
             if (!dirty && s_notes_id) {
                 window_t *top = wm_topmost();
                 if (top && top->id == s_notes_id) {
@@ -327,8 +352,6 @@ int main(int argc, char **argv) {
                     dirty = 1;
                 }
             }
-            /* Document app — chat panel takes typed commands.
-             * v0.13: route to whichever Document window is focused. */
             if (!dirty) {
                 doc_state_t *d = focused_doc();
                 if (d) {
@@ -336,8 +359,7 @@ int main(int argc, char **argv) {
                     dirty = 1;
                 }
             }
-            /* Global app shortcuts (only reach here if WM didn't consume
-             * AND terminal isn't focused). */
+            /* (4) APP LAUNCHERS — only when no focused app claimed the key. */
             if (!dirty && (ev.key == 'a' || ev.key == 'A')) {
                 open_about();
                 agent_log(ACT_OPEN_ABOUT);
@@ -387,12 +409,6 @@ int main(int argc, char **argv) {
                 dirty = 1;
             } else if (!dirty && (ev.key == 's' || ev.key == 'S')) {
                 open_stocks();
-                dirty = 1;
-            } else if (!dirty && (ev.key == 'r' || ev.key == 'R')) {
-                /* v0.30: Resource Fabric — see fabric.c.  No agent_log
-                 * action yet; will add ACT_OPEN_FABRIC in v0.31 once the
-                 * agent layer learns to predict R alongside D/S/etc. */
-                fabric_open();
                 dirty = 1;
             } else if (!dirty && ev.key >= '1' && ev.key < '1' + dock_count()) {
                 /* Number key launches whatever app is currently in that

@@ -28,6 +28,7 @@ static int            s_have_old   = 0;
 static int            s_kbd_fd[MAX_KBDS];
 static int            s_n_kbd      = 0;
 static int            s_shift_held = 0;
+static int            s_ctrl_held  = 0;    /* v0.31 patch 8: Ctrl-W close support */
 
 /* Linux keycode → ASCII. Sparse table; unmapped codes return 0.
  * Numbers, letters, and the most common punctuation/control. */
@@ -141,9 +142,28 @@ event_t input_poll(int timeout_ms) {
             s_shift_held = (ie.value != 0);
             continue;
         }
+        /* v0.31 patch 8: track Ctrl so we can emit 0x17 (Ctrl-W) when
+         * the user presses Ctrl+W to close the focused window — Esc
+         * backup per ChatGPT's plan.  Convention: Ctrl+letter → ASCII
+         * 0x01..0x1A (control codes), matching what a UART terminal
+         * would emit.  wm_handle_key() reads 0x17 and treats it like
+         * Esc on the focused window. */
+        if (ie.code == KEY_LEFTCTRL || ie.code == KEY_RIGHTCTRL) {
+            s_ctrl_held = (ie.value != 0);
+            continue;
+        }
         if (ie.value == 0) continue;          /* release: ignore */
         char c = keycode_to_ascii(ie.code, s_shift_held);
         if (!c) continue;                     /* unmapped key */
+        /* Ctrl + letter → control code (Ctrl+W = 0x17, Ctrl+C = 0x03,
+         * etc.).  Standard terminal convention; lets the rest of
+         * atomik_os stay agnostic to whether the source is UART or
+         * USB-HID. */
+        if (s_ctrl_held && c >= 'a' && c <= 'z') {
+            c = (char)(c - 'a' + 1);
+        } else if (s_ctrl_held && c >= 'A' && c <= 'Z') {
+            c = (char)(c - 'A' + 1);
+        }
         if (c == 'q' || c == 'Q' || c == 0x03) {
             ev.kind = EV_QUIT;
         } else {
