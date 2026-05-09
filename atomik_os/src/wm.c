@@ -84,15 +84,38 @@ window_t *wm_topmost(void) {
     return top;
 }
 
+/* v0.34-C unified card chrome.
+ *
+ * Every ATOMiK Desk window reads as a coherent card: same body tone,
+ * same title-bar treatment, same border, same focus indicator
+ * placement.  Apps that previously fought the WM-level background
+ * with their own draw_rect on first paint can now trust the WM
+ * to provide a clean canvas at WM_CARD_BG.
+ *
+ * The v0.30 chrome had a drop-shadow rect that read as "Web 2.0"
+ * (offset black box behind the card).  v0.34-C replaces it with a
+ * thin 1-px border outline in DOCK_BORDER tone — reads as "premium
+ * lab instrument" rather than "browser pop-up", matching the
+ * visual north star.
+ *
+ * Close button: red square → small dim dot.  Per ChatGPT's design
+ * discipline rule, decorative chrome that doesn't communicate state
+ * (and the close button has no state — it's always close) should
+ * recede.  The button still hit-tests; just less visually loud.
+ *
+ * Tones are exported so app draw_content callbacks can match the
+ * WM-level card body without hard-coding hex literals everywhere. */
+
+/* Canonical card background — slightly lighter than the wallpaper so
+ * windows visually rise off the desktop without needing a shadow. */
+#define WM_CARD_BG       rgb(0x12, 0x18, 0x26)
+/* Title bar tones — focused gets a subtle indigo wash; idle gets a
+ * flatter dim band. */
+#define WM_TITLE_BG_FOC  rgb(0x1A, 0x24, 0x3A)
+#define WM_TITLE_BG_IDLE rgb(0x16, 0x1C, 0x2A)
+#define WM_BORDER_COL    rgb(0x2E, 0x36, 0x48)
+
 static void draw_one(const window_t *win, int focused) {
-    /* Open-fade tween: scale the window up subtly during the first ~220ms
-     * so it pops in instead of snapping.
-     *
-     * v0.25: gated behind ATOMIK_ANIM_WINDOW_OPEN (default 0 — off).
-     * Linear's motion-restraint rule: an interface that doesn't animate
-     * feels faster than one that does. The fade was costing ~6M pixel
-     * writes per window open (full bounding-rect redraw × 13 frames)
-     * and earned no measurable user-experience win. Snap-open it is. */
     int rx = win->x, ry = win->y, rw = win->w, rh = win->h;
 #if ATOMIK_ANIM_WINDOW_OPEN
     double age = anim_window_age(win->id, win->opened_at_ms);
@@ -108,45 +131,65 @@ static void draw_one(const window_t *win, int focused) {
     (void)win->id; (void)win->opened_at_ms;
 #endif
 
-    /* Outer shadow (1px offset) */
-    draw_rect_rounded(rx + 4, ry + 6, rw, rh, 12,
-                      rgb(0x00, 0x00, 0x00));
-    /* Body background */
-    draw_rect_rounded(rx, ry, rw, rh, 12,
-                      rgb(0x16, 0x1C, 0x2A));
-    /* Title bar */
-    pixel_t title_bg = focused ? ATOMIK_ACCENT_DIM : rgb(0x22, 0x2A, 0x3A);
+    /* Card body — single rounded fill at the canonical card tone. */
+    draw_rect_rounded(rx, ry, rw, rh, 12, WM_CARD_BG);
+
+    /* 1-px border outline — replaces the drop-shadow.  Drawn as four
+     * thin rects rather than a rounded outline so the corners look
+     * crisp without anti-aliasing. */
+    draw_rect(rx + 12,           ry,                rw - 24, 1,       WM_BORDER_COL);
+    draw_rect(rx + 12,           ry + rh - 1,       rw - 24, 1,       WM_BORDER_COL);
+    draw_rect(rx,                ry + 12,           1,       rh - 24, WM_BORDER_COL);
+    draw_rect(rx + rw - 1,       ry + 12,           1,       rh - 24, WM_BORDER_COL);
+
+    /* Title bar — flat tone differentiated by focus.  Same rounded
+     * radius as the card body so the top corners read continuously. */
+    pixel_t title_bg = focused ? WM_TITLE_BG_FOC : WM_TITLE_BG_IDLE;
     draw_rect_rounded(rx, ry, rw, WM_TITLE_H, 12, title_bg);
-    /* Title text */
+
+    /* Title text — full FG when focused, dim when idle.  Left-padded
+     * 16 px so it has visual breathing room from the card edge. */
     int ty = ry + (WM_TITLE_H - text_height(1)) / 2;
-    draw_text(rx + 12, ty, win->title, 1,
+    draw_text(rx + 16, ty, win->title, 1,
               focused ? ATOMIK_FG : ATOMIK_FG_DIM);
-    /* v0.25 focus indicator: 1-row cyan underline beneath the title bar
-     * of the focused window. Cheap delta — 2 horizontal lines per focus
-     * change. Linear's "don't compete for attention you haven't earned"
-     * rule: blurred windows get nothing, only the focused one signals.
-     * The indicator uses ATOMIK_SEM_HARDWARE because focus = active. */
+
+    /* Focus indicator: 1-row cyan underline beneath the title bar of
+     * the focused window.  Linear's "don't compete for attention you
+     * haven't earned" rule — blurred windows get nothing, focused gets
+     * the cyan signal in our semantic grammar. */
     if (focused) {
         draw_rect(rx + WM_BORDER, ry + WM_TITLE_H,
                   rw - 2 * WM_BORDER, 1, ATOMIK_SEM_HARDWARE);
     }
-    /* Close button (right side of title bar) */
-    int cb_size = 16;
-    int cb_x = rx + rw - cb_size - 8;
-    int cb_y = ry + (WM_TITLE_H - cb_size) / 2;
-    draw_rect_rounded(cb_x, cb_y, cb_size, cb_size, 4,
-                      rgb(0xFF, 0x6F, 0x91));
-    /* X glyph drawn as two small rects */
-    draw_rect(cb_x + 4, cb_y + 7, 8, 2, ATOMIK_FG);
-    draw_rect(cb_x + 7, cb_y + 4, 2, 8, ATOMIK_FG);
 
-    /* Content area */
+    /* Close affordance — small overload-red dot at the top-right.
+     * Was a red square with X glyph; v0.34-C dims it to a 10-px circle
+     * approximation so it doesn't dominate the title bar.  Hit-test
+     * still works (we don't have mouse yet anyway; close happens via
+     * Esc / Ctrl-W global hotkeys). */
+    int cb_size = 10;
+    int cb_x = rx + rw - cb_size - 14;
+    int cb_y = ry + (WM_TITLE_H - cb_size) / 2;
+    draw_rect_rounded(cb_x, cb_y, cb_size, cb_size, 5,
+                      focused ? ATOMIK_SEM_OVERLOAD
+                              : rgb(0x55, 0x35, 0x42));
+
+    /* Content area — call the app's draw callback with a clean
+     * rectangle.  Apps SHOULD trust WM_CARD_BG; older apps that
+     * paint their own background tone will keep working but their
+     * inner color may not perfectly match the rest of the chrome
+     * until they're refactored to use wm_card_bg(). */
     int cx = rx + WM_BORDER;
     int cy = ry + WM_TITLE_H;
     int cw = rw - 2 * WM_BORDER;
     int ch = rh - WM_TITLE_H - WM_BORDER;
     if (win->draw_content) win->draw_content((window_t *)win, cx, cy, cw, ch);
 }
+
+/* Public accessor: apps that need to fill their content background
+ * should match the WM-level card tone for visual continuity. */
+pixel_t wm_card_bg(void) { return WM_CARD_BG; }
+pixel_t wm_card_border(void) { return WM_BORDER_COL; }
 
 void wm_draw_all(void) {
     /* Painter's algorithm: sort by z then draw bottom-to-top. */

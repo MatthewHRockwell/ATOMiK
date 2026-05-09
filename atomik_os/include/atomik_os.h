@@ -9,7 +9,7 @@
  * carries a user-visible change. About window, status bar, and the
  * /tmp/atomik_os_version stamp all read from here so the screen output
  * NEVER lies about which build is running. */
-#define AOS_VERSION "v0.34-B"
+#define AOS_VERSION "v0.34-C"
 
 /* Display geometry — locked to 1920x1080 XRGB8888 since simplefb is fixed. */
 #define FB_W       1920
@@ -432,6 +432,11 @@ int       wm_handle_key(int key);   /* returns 1 if key was consumed */
  * affordance even when fully covered. */
 int             wm_count(void);
 const window_t *wm_get(int idx);    /* NULL if idx out of range */
+
+/* v0.34-C: canonical card colors so app draw_content callbacks match
+ * the WM-level chrome tone instead of hard-coding hex literals. */
+pixel_t wm_card_bg(void);
+pixel_t wm_card_border(void);
 
 /* wallet_draw — declared here, after wm.c, because it uses window_t. */
 void wallet_draw(window_t *w, int x, int y, int wd, int ht);
