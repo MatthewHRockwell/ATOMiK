@@ -88,23 +88,117 @@ void status_draw(void) {
     draw_rect(FB_W - ATOMIK_SAFE_RIGHT - 8, bar_y, 8, 8, marker);
 #endif
 
-    /* Left: ATOMiK identity wordmark (cyan = HARDWARE, the "this is
-     * the OS chrome itself" signal in our semantic grammar) followed by
-     * the v0.31 window-strip and then key hints in dim foreground. */
+    /* === LEFT SEGMENT (v0.34-B Pulse Bar) ===
+     *
+     * Reading order: identity → workload state → window state → key hints.
+     * Each section colored by semantic role so a glance at the bar tells
+     * you what kind of state to read at each position.
+     *
+     * Identity: ATOMiK wordmark (cyan = HARDWARE, the OS-chrome signal).
+     */
     const char *brand = "ATOMiK";
-    int brand_x = ATOMIK_GRID_L;
-    draw_text(brand_x, ty, brand, 1, ATOMIK_SEM_HARDWARE);
-    int after_brand = brand_x + text_width(brand, 1) + ATOMIK_GRID_M * 2;
+    int cur_x = ATOMIK_GRID_L;
+    draw_text(cur_x, ty, brand, 1, ATOMIK_SEM_HARDWARE);
+    cur_x += text_width(brand, 1) + ATOMIK_GRID_M;
 
-    /* v0.31 window-strip: one dot per open window, focused window
-     * gets a bright cyan filled square, buried windows get a dim
-     * outlined square.  Solves "I opened R but it's hidden under
-     * Document" — even when a window is fully covered, its dot
-     * stays visible on the status bar. */
+    /* Vertical separator between sections — dim, 1 px wide, stops the
+     * bar from feeling like one long undifferentiated text run. */
+    draw_rect(cur_x, bar_y + ATOMIK_GRID_S,
+              1, bar_h - ATOMIK_GRID_S * 2, ATOMIK_DOCK_BORDER);
+    cur_x += ATOMIK_GRID_M + 1;
+
+    /* === Active personality badge ===
+     *
+     * v0.34-B: surfaces the current Resource Fabric personality globally
+     * so the user doesn't need Fabric open to see what compute personality
+     * is running.  Pulled from fabric_active() + fabric_override_active().
+     * Color = semantic color of that personality (cyan/violet/green).
+     * "MANUAL:" prefix signals override mode (ChatGPT: "honest demo
+     * discipline — never present a forced personality as auto-detected").
+     */
+    {
+        personality_t p = fabric_active();
+        pixel_t  pcol = ATOMIK_FG_DIM;
+        switch (p) {
+        case PERSONALITY_STATE: pcol = ATOMIK_SEM_HARDWARE; break;
+        case PERSONALITY_AGENT: pcol = ATOMIK_SEM_AGENT;    break;
+        case PERSONALITY_SYNC:  pcol = ATOMIK_SEM_SAVINGS;  break;
+        default: break;
+        }
+        char pbadge[32];
+        if (fabric_override_active()) {
+            snprintf(pbadge, sizeof pbadge, "MANUAL:%s",
+                     fabric_personality_name(p));
+        } else {
+            snprintf(pbadge, sizeof pbadge, "%s",
+                     fabric_personality_name(p));
+        }
+        /* Filled dot before the name so the eye locks on the colored
+         * indicator without needing to read the word. */
+        int dot_y2 = bar_y + (bar_h - ATOMIK_GRID_M) / 2;
+        draw_rect(cur_x, dot_y2, ATOMIK_GRID_M, ATOMIK_GRID_M, pcol);
+        cur_x += ATOMIK_GRID_M + ATOMIK_GRID_S;
+        draw_text(cur_x, ty, pbadge, 1, pcol);
+        cur_x += text_width(pbadge, 1) + ATOMIK_GRID_M;
+    }
+
+    /* === Last-batch headline (mini-readout) ===
+     *
+     * v0.34-B: pulls the most recent perf_sample_t and shows the
+     * personality's headline number.  STATE shows ops collapsed,
+     * SYNC shows bytes avoided, AGENT shows hot/cold split.  When no
+     * sample exists (process just started, no batch run) shows nothing
+     * — the personality badge alone is enough chrome.
+     *
+     * Honest UI rule (ChatGPT): never fake a number.  When perf_last is
+     * NULL or zero, drop the readout entirely.
+     */
+    {
+        const perf_sample_t *s = perf_last_sample();
+        if (s && s->ops_logical > 0) {
+            char mini[32];
+            mini[0] = 0;
+            switch (s->active_personality) {
+            case PERSONALITY_STATE:
+                snprintf(mini, sizeof mini, "%u-%u ops",
+                         (unsigned)s->ops_logical,
+                         (unsigned)s->ops_issued);
+                break;
+            case PERSONALITY_SYNC:
+                if (s->bytes_avoided > 0) {
+                    snprintf(mini, sizeof mini, "%uB avoided",
+                             (unsigned)s->bytes_avoided);
+                } else {
+                    snprintf(mini, sizeof mini, "%u/%u emitted",
+                             (unsigned)s->ops_issued,
+                             (unsigned)s->regions_unique);
+                }
+                break;
+            case PERSONALITY_AGENT:
+                snprintf(mini, sizeof mini, "%u hot",
+                         (unsigned)s->ops_issued);
+                break;
+            default: break;
+            }
+            if (mini[0]) {
+                draw_text(cur_x, ty, mini, 1, ATOMIK_FG_DIM);
+                cur_x += text_width(mini, 1) + ATOMIK_GRID_M;
+            }
+        }
+    }
+
+    /* Separator before window strip + hints. */
+    draw_rect(cur_x, bar_y + ATOMIK_GRID_S,
+              1, bar_h - ATOMIK_GRID_S * 2, ATOMIK_DOCK_BORDER);
+    cur_x += ATOMIK_GRID_M + 1;
+
+    /* === Window strip (v0.31): one dot per open window ===
+     * Focused = filled cyan; buried = hollow outline.  Lets the user
+     * see buried windows even when fully covered. */
     int dot_size  = ATOMIK_GRID_M;
     int dot_gap   = ATOMIK_GRID_S;
     int dot_y     = bar_y + (bar_h - dot_size) / 2;
-    int dots_x    = after_brand;
+    int dots_x    = cur_x;
     const window_t *top = wm_topmost();
     for (int i = 0; i < wm_count(); i++) {
         const window_t *w = wm_get(i);
@@ -113,24 +207,21 @@ void status_draw(void) {
         if (focused) {
             draw_rect(dots_x, dot_y, dot_size, dot_size, ATOMIK_SEM_HARDWARE);
         } else {
-            /* Hollow rect for buried windows — outline only. */
-            draw_rect(dots_x,            dot_y,                  dot_size, 1,        ATOMIK_DOCK_BORDER);
-            draw_rect(dots_x,            dot_y + dot_size - 1,   dot_size, 1,        ATOMIK_DOCK_BORDER);
-            draw_rect(dots_x,            dot_y,                  1,        dot_size, ATOMIK_DOCK_BORDER);
-            draw_rect(dots_x + dot_size - 1, dot_y,              1,        dot_size, ATOMIK_DOCK_BORDER);
+            draw_rect(dots_x,                  dot_y,                  dot_size, 1, ATOMIK_DOCK_BORDER);
+            draw_rect(dots_x,                  dot_y + dot_size - 1,   dot_size, 1, ATOMIK_DOCK_BORDER);
+            draw_rect(dots_x,                  dot_y,                  1, dot_size, ATOMIK_DOCK_BORDER);
+            draw_rect(dots_x + dot_size - 1,   dot_y,                  1, dot_size, ATOMIK_DOCK_BORDER);
         }
         dots_x += dot_size + dot_gap;
     }
-    /* Spacer before hints so the strip + hints don't run together. */
-    int hint_x = (wm_count() > 0) ? dots_x + ATOMIK_GRID_M * 2 : after_brand;
+    int hint_x = (wm_count() > 0) ? dots_x + ATOMIK_GRID_M : cur_x;
 
-    /* v0.31 patch 8 + v0.32: hint reflects the global input router.
-     * R = Resource Fabric (always-on system shelf).  P = personality
-     * override (always-on demo control).  Tab/Esc/Ctrl-W = WM keys.
-     * Letter launchers fire only on bare desktop. */
+    /* Key hints — dim, last in the left segment because they're
+     * informational (which keys exist) not state (which one is
+     * currently happening). */
     const char *hint =
         "[R]es [P]ers   [Tab]/[Esc]/[^W]   "
-        "[D] [W] [S] | [A] [M] [T] [F] [N] | [C] [K] [G] [B] [H]";
+        "[D] [W] [S] | [A] [M] [T] [F] [N]";
     draw_text(hint_x, ty, hint, 1, ATOMIK_FG_DIM);
 
     /* Center: agent prediction (violet = AGENT in the semantic grammar).
