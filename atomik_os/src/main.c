@@ -33,14 +33,23 @@ static void redraw_frame(void) {
     fb_present();
 }
 
-/* v0.31: workspace_w returns the left-of-shelf width — the column
- * where normal app windows live.  Resource Fabric occupies the right
- * shelf as a pinned system panel; other apps center themselves
- * horizontally INSIDE the workspace so they don't overlap the shelf
- * even when Fabric isn't open yet.  This encodes the layout
- * convention: left = workspace, right = system shelf. */
-static int workspace_w(void) { return fabric_shelf_x() - ATOMIK_GRID_L; }
-static int workspace_cx(int ww) { return (workspace_w() - ww) / 2; }
+/* v0.31: workspace_w returns the width of the central column where
+ * normal app windows live.  Resource Fabric occupies the right shelf
+ * (pinned system panel); the Capability Rail (v0.34) occupies the
+ * left.  Apps center themselves INSIDE the workspace so they don't
+ * overlap either side.  This encodes the layout convention:
+ *
+ *   [Rail] [ Workspace ] [Fabric]
+ *
+ * v0.34 update: subtracts dock_right_edge() (Capability Rail's right
+ * edge) so apps no longer center over the Rail when small. */
+static int workspace_left(void)  { return dock_right_edge() + ATOMIK_GRID_L; }
+static int workspace_right(void) { return fabric_shelf_x() - ATOMIK_GRID_L; }
+static int workspace_w(void)     { return workspace_right() - workspace_left(); }
+static int workspace_cx(int ww)  {
+    /* Center inside the workspace, then offset back to absolute X. */
+    return workspace_left() + (workspace_w() - ww) / 2;
+}
 
 static int s_about_id = 0;
 static void open_about(void) {

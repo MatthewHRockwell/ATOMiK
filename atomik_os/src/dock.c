@@ -1,31 +1,53 @@
-/* dock.c — bottom dock with adaptive ordering.
+/* dock.c — Capability Rail (left-anchored vertical dock).
  *
- * v0.3: each icon is bound to an agent action_t. The dock asks the agent
- * for each icon's score and renders LEFT-TO-RIGHT in DESCENDING score
- * order, so the user's most-likely-next action floats to the left edge
- * (closest to the App-launcher key). This is the first user-visible piece
- * of the agentic-OS direction. */
+ * v0.34 (ChatGPT 2026-05-09 visual shell): the dock moves from a
+ * bottom-centered horizontal strip to a left-anchored vertical
+ * column.  The visual grammar of ATOMiK Desk is:
+ *
+ *   Pulse Bar              ← top, full width
+ *   Capability Rail (this) ← left, vertical column
+ *   Main Workspace         ← center, where surfaces live
+ *   Resource Fabric        ← right, pinned shelf
+ *
+ * Same five capabilities (About / Monitor / Terminal / Files / Notes),
+ * same agent-driven score-based reordering, same predicted-next
+ * violet pulse.  Just oriented vertically, with more breathing room
+ * and a cleaner card-style chrome.
+ *
+ * The hit-test, ordering, slot-action lookup APIs are unchanged — only
+ * the geometry flipped — so main.c's number-key launcher still works
+ * via dock_action_for_slot().
+ *
+ * Per ChatGPT 2026-05-09 hard rule: every visual element must answer
+ * "what changed / what did ATOMiK avoid / which personality / why
+ * adapt / what would software pay" — anything else is decoration.
+ * The Rail's answer: "which capability the agent predicts next, and
+ * which is currently focused."  That's why the violet pulse exists
+ * (predictive-AGENT signal) and why hover-grow exists (which the user
+ * is about to launch).  Both are state-aware affordances. */
 #include "atomik_os.h"
 #include <string.h>
 
-#define DOCK_HEIGHT      88
-#define DOCK_PADDING_X   24
-#define DOCK_PADDING_Y   12
-#define ICON_SIZE        56
-#define ICON_GAP         16
-#define DOCK_RADIUS      18
+/* === geometry === */
+/* Card-style icons: square, larger touch target than the prior 56-px
+ * bottom-dock chips, with vertical spacing.  Total rail width is
+ * ATOMIK_GRID_L (left margin) + icon + ATOMIK_GRID_L (right margin)
+ * = 64 + 16 + 16 = ~96 px.  That carves a thin strip from the left
+ * side of the workspace; everything else has more horizontal room. */
+#define RAIL_X_MARGIN    ATOMIK_GRID_L      /* 16 px from screen left */
+#define RAIL_TOP_MARGIN  (ATOMIK_SAFE_TOP + 32 + ATOMIK_GRID_L * 2)
+                                            /* below Pulse Bar + breathing */
+#define ICON_SIZE        64
+#define ICON_GAP         ATOMIK_GRID_L      /* 16 px between icons */
+#define RAIL_PADDING     ATOMIK_GRID_M      /* 8 px inside rail border */
+#define RAIL_RADIUS      12
+#define LABEL_GAP        ATOMIK_GRID_S      /* 4 px between icon and pulse */
 
 static const struct {
     const char *label;
     pixel_t     color;
-    action_t    action;     /* which agent action does clicking this icon log? */
+    action_t    action;
 } ICONS[] = {
-    /* v0.31 patch 5: removed the trailing "ATOMiK" brand chip — its
-     * action was ACT_NONE so clicking did nothing, and visually it
-     * looked like a 6th launcher conflicting with the status bar's
-     * "[A][M][T][F][N]" hint that lists only 5 system keys.  Brand
-     * presence already lives in the status bar wordmark.  User-noted
-     * inconsistency, 2026-05-07. */
     { "About",     rgb(0xA8, 0xB2, 0xC4), ACT_OPEN_ABOUT    },
     { "Monitor",   rgb(0x6E, 0xC4, 0x6E), ACT_OPEN_MONITOR  },
     { "Terminal",  rgb(0x36, 0x44, 0x60), ACT_OPEN_TERMINAL },
@@ -36,25 +58,25 @@ static const struct {
 
 int dock_count(void) { return N_ICONS; }
 
-static int dock_x0(void) {
-    int total_w = N_ICONS * ICON_SIZE + (N_ICONS - 1) * ICON_GAP +
-                  2 * DOCK_PADDING_X;
-    return (FB_W - total_w) / 2;
+/* The Rail's outer left edge.  Consumed by other modules (e.g. main.c
+ * workspace_cx() should account for the Rail like it accounts for
+ * the right-side Resource Fabric shelf). */
+int dock_left_edge(void) { return RAIL_X_MARGIN; }
+int dock_right_edge(void) {
+    return RAIL_X_MARGIN + RAIL_PADDING * 2 + ICON_SIZE;
 }
 
-static int dock_y0(void) {
-    /* visionOS-style floating dock: ATOMIK_DOCK_GAP px from the screen
-     * edge. Smaller gap reads as "floating slab" instead of "edge-pinned
-     * tray".  Was 16 px; v0.25 adopts the design-system default of 8. */
-    return FB_H - DOCK_HEIGHT - ATOMIK_DOCK_GAP;
+static int rail_x(void) { return RAIL_X_MARGIN; }
+static int rail_y(void) { return RAIL_TOP_MARGIN; }
+static int rail_w(void) { return RAIL_PADDING * 2 + ICON_SIZE; }
+static int rail_h(void) {
+    return RAIL_PADDING * 2 + N_ICONS * ICON_SIZE + (N_ICONS - 1) * ICON_GAP;
 }
 
-/* Cached order from the last dock_draw, so dock_action_for_slot can
- * resolve a visible-slot index back to an icon without recomputing. */
+/* Cached agent-score order so dock_action_for_slot resolves visible
+ * positions back to original icon indices without recomputing. */
 static int s_last_order[N_ICONS] = {0,1,2,3,4};
 
-/* Compute the icon order based on agent score. Higher score = closer to
- * the left edge of the dock. Ties broken by original index for stability. */
 static void compute_order(int order[N_ICONS]) {
     double scores[N_ICONS];
     for (int i = 0; i < N_ICONS; i++) {
@@ -62,7 +84,8 @@ static void compute_order(int order[N_ICONS]) {
         scores[i] = ICONS[i].action == ACT_NONE ? 0.0
                                                 : agent_score(ICONS[i].action);
     }
-    /* Insertion sort by descending score (small N). */
+    /* Insertion sort — top score floats to slot 0 (top of the Rail).
+     * Reads naturally because the user's eye starts at the top. */
     for (int i = 1; i < N_ICONS; i++) {
         int    cur_i = order[i];
         double cur_s = scores[cur_i];
@@ -76,53 +99,54 @@ static void compute_order(int order[N_ICONS]) {
 }
 
 void dock_draw(int hover_index) {
-    int total_w = N_ICONS * ICON_SIZE + (N_ICONS - 1) * ICON_GAP +
-                  2 * DOCK_PADDING_X;
-    int dx = dock_x0();
-    int dy = dock_y0();
+    int rx = rail_x();
+    int ry = rail_y();
+    int rw = rail_w();
+    int rh = rail_h();
 
-    /* Dock background panel — translucent dark, rounded. */
-    draw_rect_rounded(dx, dy, total_w, DOCK_HEIGHT, DOCK_RADIUS,
+    /* Rail background — translucent dark slab with a subtle border.
+     * Same visual weight as the Resource Fabric shelf on the right
+     * so the layout reads as bilaterally balanced chrome. */
+    draw_rect_rounded(rx, ry, rw, rh, RAIL_RADIUS,
                       ATOMIK_DOCK_BG & 0xFFFFFF);
-
-    /* 1px border highlight */
-    draw_rect_rounded(dx, dy, total_w, 1,             DOCK_RADIUS,
-                      ATOMIK_DOCK_BORDER);
+    /* 1-px border accent at top + bottom for definition.  Single
+     * draw_rect calls so we don't pay the rounded-rect cost twice. */
+    draw_rect(rx + RAIL_RADIUS / 2, ry, rw - RAIL_RADIUS, 1,
+              ATOMIK_DOCK_BORDER);
+    draw_rect(rx + RAIL_RADIUS / 2, ry + rh - 1, rw - RAIL_RADIUS, 1,
+              ATOMIK_DOCK_BORDER);
 
     int order[N_ICONS];
     compute_order(order);
     memcpy(s_last_order, order, sizeof order);
 
-    int ix = dx + DOCK_PADDING_X;
-    int iy = dy + DOCK_PADDING_Y;
+    int ix = rx + RAIL_PADDING;
+    int iy = ry + RAIL_PADDING;
     for (int slot = 0; slot < N_ICONS; slot++) {
         int i     = order[slot];
         int hover = (slot == hover_index);
-        int size  = hover ? ICON_SIZE + 8 : ICON_SIZE;
-        int off   = (ICON_SIZE - size) / 2;
-        draw_rect_rounded(ix + off, iy + off, size, size, 12, ICONS[i].color);
+        int size  = hover ? ICON_SIZE + 6 : ICON_SIZE;
+        int off_x = (ICON_SIZE - size) / 2;
+        int off_y = (ICON_SIZE - size) / 2;
+        draw_rect_rounded(ix + off_x, iy + off_y, size, size, 10,
+                          ICONS[i].color);
 
-        /* First-letter chip for now — real glyph icons later. */
+        /* First-letter chip — same convention as the prior bottom dock.
+         * v0.40 swap to real glyph icons (per the design north star). */
         char ch[2] = { ICONS[i].label[0], 0 };
         int  scale = 3;
         int  tw    = text_width(ch, scale);
         int  th    = text_height(scale);
-        draw_text(ix + off + (size - tw) / 2,
-                  iy + off + (size - th) / 2,
+        draw_text(ix + off_x + (size - tw) / 2,
+                  iy + off_y + (size - th) / 2,
                   ch, scale, ATOMIK_FG);
 
-        /* If this icon's action is the agent's predicted next, draw a
-         * pulsing dot under it.  v0.25: use ATOMIK_SEM_AGENT (violet)
-         * instead of raw cyan — agent prediction is AGENT in the
-         * semantic grammar, not HARDWARE.  The bug the previous version
-         * carried was that prediction-pulse and focus-indicator both
-         * used cyan, making it impossible to read at a glance whether
-         * a glowing element meant "active state" or "agent suggests
-         * this".  Violet for AGENT, cyan stays for HARDWARE/active. */
+        /* Predicted-next pulse: violet dot to the RIGHT of the icon
+         * (was below, in the bottom-dock layout).  Right-of-icon reads
+         * as "what's next" given Western reading direction.  v0.32
+         * established this as the AGENT semantic signal. */
         if (ICONS[i].action != ACT_NONE && agent_predict() == ICONS[i].action) {
             unsigned long t  = anim_now_ms();
-            /* 1.5 s cycle, alpha 0.7..1.0.  4-term Taylor sin so we
-             * stay libm-free in the per-pixel hot path. */
             double phase = ((t % 1500) / 1500.0) * 6.2831853;
             double s = phase;
             double s3 = s*s*s, s5 = s3*s*s;
@@ -132,25 +156,22 @@ void dock_draw(int hover_index) {
             double bright = 0.7 + 0.3 * sinv;
             if (bright < 0.0) bright = 0.0;
             if (bright > 1.0) bright = 1.0;
-
-            /* Decompose ATOMIK_SEM_AGENT (#9B7EE0) into channels and
-             * scale by `bright` to get the pulse color. */
             uint8_t r = (uint8_t)(0x9B * bright);
             uint8_t g = (uint8_t)(0x7E * bright);
             uint8_t b = (uint8_t)(0xE0 * bright);
             pixel_t pulse_color = rgb(r, g, b);
-
-            int dot_x = ix + ICON_SIZE / 2;
-            int dot_y = iy + ICON_SIZE + 4;
+            /* Pulse dot to the right of the icon, vertically centered. */
+            int dot_x = ix + ICON_SIZE + LABEL_GAP + 2;
+            int dot_y = iy + ICON_SIZE / 2;
             int radius = 3;
             for (int dy2 = -radius; dy2 <= radius; dy2++)
                 for (int dx2 = -radius; dx2 <= radius; dx2++)
                     if (dx2*dx2 + dy2*dy2 <= radius*radius)
                         draw_pixel(dot_x + dx2, dot_y + dy2, pulse_color);
-            anim_tick();   /* keep frame loop alive while pulse animates */
+            anim_tick();
         }
 
-        ix += ICON_SIZE + ICON_GAP;
+        iy += ICON_SIZE + ICON_GAP;
     }
 }
 
@@ -161,14 +182,14 @@ action_t dock_action_for_slot(int slot) {
 }
 
 int dock_hit_test(int mouse_x, int mouse_y) {
-    int dy = dock_y0();
-    if (mouse_y < dy || mouse_y > dy + DOCK_HEIGHT) return -1;
-    int ix = dock_x0() + DOCK_PADDING_X;
-    int iy = dy + DOCK_PADDING_Y;
+    int rx = rail_x();
+    int ry = rail_y();
+    if (mouse_x < rx + RAIL_PADDING ||
+        mouse_x >= rx + RAIL_PADDING + ICON_SIZE) return -1;
+    int iy = ry + RAIL_PADDING;
     for (int i = 0; i < N_ICONS; i++) {
-        if (mouse_x >= ix && mouse_x < ix + ICON_SIZE &&
-            mouse_y >= iy && mouse_y < iy + ICON_SIZE) return i;
-        ix += ICON_SIZE + ICON_GAP;
+        if (mouse_y >= iy && mouse_y < iy + ICON_SIZE) return i;
+        iy += ICON_SIZE + ICON_GAP;
     }
     return -1;
 }

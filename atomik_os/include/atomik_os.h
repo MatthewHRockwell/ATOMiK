@@ -9,7 +9,7 @@
  * carries a user-visible change. About window, status bar, and the
  * /tmp/atomik_os_version stamp all read from here so the screen output
  * NEVER lies about which build is running. */
-#define AOS_VERSION "v0.33-E"
+#define AOS_VERSION "v0.34-A"
 
 /* Display geometry — locked to 1920x1080 XRGB8888 since simplefb is fixed. */
 #define FB_W       1920
@@ -165,10 +165,15 @@ double      agent_recency(action_t a);            /* 0..1, 1=most recent */
 double      agent_score(action_t a);              /* freq * recency */
 void        agent_flush(void);                    /* persist now */
 
-/* dock.c */
+/* dock.c — Capability Rail (left-anchored vertical, v0.34). */
 void dock_draw(int hover_index);
 int  dock_hit_test(int mouse_x, int mouse_y);  /* returns icon index or -1 */
 int  dock_count(void);
+/* Rail geometry: left + right edge of the Capability Rail's outer
+ * frame.  Other layout code (workspace_left() in main.c) reads these
+ * so apps don't tuck under the Rail. */
+int  dock_left_edge(void);
+int  dock_right_edge(void);
 /* Returns the action_t bound to the icon at visible slot `slot`, taking
  * into account the current adaptive ordering. ACT_NONE if the slot is a
  * placeholder app (Terminal/Files/Editor not yet implemented). */
