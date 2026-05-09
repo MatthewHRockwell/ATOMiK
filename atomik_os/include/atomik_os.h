@@ -9,7 +9,7 @@
  * carries a user-visible change. About window, status bar, and the
  * /tmp/atomik_os_version stamp all read from here so the screen output
  * NEVER lies about which build is running. */
-#define AOS_VERSION "v0.33-A"
+#define AOS_VERSION "v0.33-B"
 
 /* Display geometry — locked to 1920x1080 XRGB8888 since simplefb is fixed. */
 #define FB_W       1920
@@ -266,6 +266,75 @@ double   perf_bytes_avoided_pct(const perf_sample_t *s);
 double   perf_coalesce_ratio(const perf_sample_t *s);
 const perf_sample_t *perf_last_sample(void);
 const perf_sample_t *perf_last_for(personality_t p);
+
+/* atomik_batch.c — dynamic batching API, v0.33-B.
+ *
+ * Each personality gets a different batching strategy.  Callers don't
+ * choose the strategy directly; they declare WHICH PERSONALITY their
+ * workload class belongs to, and the batching layer routes
+ * accordingly.  This is the architectural piece that makes Resource
+ * Fabric REAL — every personality changes execution behavior, not
+ * just UI state.
+ *
+ * Profile semantics:
+ *   STATE — coalesce repeated writes to the same region.  XOR/sum
+ *           into a per-region accumulator within the batch.  At
+ *           commit, emit ONE hardware op per UNIQUE region with the
+ *           final accumulated delta.  One fence per batch (not per
+ *           op).  Optimizes: ops_issued, fence overhead.
+ *   SYNC  — track dirty regions since last commit.  At commit, emit
+ *           a compact (region_id, delta) list of CHANGED regions
+ *           only.  Skip unchanged regions entirely.  Optimizes:
+ *           bytes_avoided.
+ *   AGENT — relevance-weighted memory work.  Per-region recency +
+ *           access-frequency score.  At commit, emit ATOMiK ops
+ *           weighted toward high-relevance regions; skip stale
+ *           regions.  Optimizes: memory work avoided.
+ *
+ * The whole point: a Document edit that touches 47 sub-deltas across
+ * 8 regions becomes 8 hardware ops + 1 fence under STATE, not 47 ops
+ * + 47 fences.  Software baseline does the unbatched thing for direct
+ * comparison via the perf_counter layer.
+ */
+
+#define ATOMIK_BATCH_MAX_REGIONS 64
+
+typedef enum {
+    ATOMIK_PROFILE_NONE  = 0,
+    ATOMIK_PROFILE_STATE = 1,    /* coalesce + low latency */
+    ATOMIK_PROFILE_SYNC  = 2,    /* compact delta packets, skip unchanged */
+    ATOMIK_PROFILE_AGENT = 3,    /* relevance-weighted memory work */
+} atomik_profile_t;
+
+/* Map a Resource Fabric personality to its corresponding batch profile.
+ * Sync inverse mapping in fabric.c so the visualization stays honest. */
+atomik_profile_t atomik_profile_from_personality(personality_t p);
+
+/* Batch lifecycle.  Caller is responsible for matching begin/commit
+ * pairs; nested batches are NOT supported (would complicate coalesce). */
+void atomik_batch_begin(atomik_profile_t profile);
+/* Add a delta operation to the in-flight batch.  region_id selects
+ * the per-region accumulator slot (0..ATOMIK_BATCH_MAX_REGIONS-1).
+ * delta is the value to XOR/sum into that region. */
+void atomik_batch_add(uint32_t region_id, uint32_t delta);
+/* Commit: apply the accumulated batch to the ATOMiK hardware (or the
+ * software fallback if /dev/mem isn't mapped).  Side-effect: publishes
+ * a perf_sample_t via perf_end so Resource Fabric can render the
+ * just-completed batch's metrics.  Returns count of hardware ops
+ * actually issued (always <= number of atomik_batch_add calls; equals
+ * the number of UNIQUE regions touched under STATE coalesce). */
+int  atomik_batch_commit(void);
+
+/* For the software baseline path (v0.33-D): same input sequence, but
+ * apply each delta with no coalescing — emits one MMIO op per
+ * atomik_batch_add call, one fence per op.  Used to measure speedup. */
+int  atomik_batch_commit_baseline(void);
+
+/* Inspector: peek at the current batch state without committing.
+ * Returns 1 if a batch is in flight, 0 otherwise. */
+int  atomik_batch_in_flight(void);
+uint32_t atomik_batch_pending_ops(void);
+uint32_t atomik_batch_pending_unique_regions(void);
 
 /* atomik_event.c — workload event bus.  v0.31 patch 2/N.
  *
