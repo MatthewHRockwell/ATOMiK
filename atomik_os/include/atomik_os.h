@@ -9,7 +9,7 @@
  * carries a user-visible change. About window, status bar, and the
  * /tmp/atomik_os_version stamp all read from here so the screen output
  * NEVER lies about which build is running. */
-#define AOS_VERSION "v0.34-C"
+#define AOS_VERSION "v0.34-D"
 
 /* Display geometry — locked to 1920x1080 XRGB8888 since simplefb is fixed. */
 #define FB_W       1920
@@ -391,6 +391,10 @@ void          atomik_event_emit(atomik_event_kind_t kind, int detail);
 unsigned long atomik_event_last_ts(atomik_event_kind_t kind);
 int           atomik_event_last_detail(atomik_event_kind_t kind);
 unsigned long atomik_event_total(void);
+/* v0.34-D: per-kind cumulative count.  Lets the Resource Fabric EVENT
+ * and VISUAL lanes derive event-rate (count delta / sample window)
+ * from real producers without re-walking the ring buffer every tick. */
+unsigned long atomik_event_count(atomik_event_kind_t kind);
 /* Walk the ring in chronological order.  Returns 1 if idx-th record
  * exists, 0 if not.  out_* may be NULL. */
 int           atomik_event_iter(int idx, atomik_event_kind_t *out_kind,
@@ -482,6 +486,53 @@ int           fabric_shelf_x(void);
 int           fabric_shelf_y(void);
 int           fabric_shelf_w(void);
 int           fabric_shelf_h(void);
+
+/* v0.34-D: 5-lane Resource Fabric — Class A visual upgrade per
+ * ChatGPT 2026-05-09 directive ("real metrics + cinematic assets, no
+ * fake numbers").  Each lane has its own circular history buffer that
+ * the fabric tick samples at a fixed cadence from real producers
+ * (perf samples, event-bus counters).  The mini-waveform draws the
+ * history; the freshness state distinguishes LIVE / STALE / WAITING.
+ *
+ * Lane → producer mapping:
+ *   STATE  ← perf_last_for(PERSONALITY_STATE)  (ops_logical → ops_issued ratio)
+ *   SYNC   ← perf_last_for(PERSONALITY_SYNC)   (bytes_avoided rate)
+ *   AGENT  ← perf_last_for(PERSONALITY_AGENT)  (regions_unique → ops_issued retention)
+ *   EVENT  ← atomik_event_total() delta over the sample window
+ *   VISUAL ← atomik_event_count(EVT_VIS_RENDER) delta over the sample window
+ *
+ * If a lane has no producer activity yet, its history stays at zero
+ * and freshness is WAITING — the renderer shows the lane as dim with
+ * no waveform line, never a fabricated value. */
+typedef enum {
+    FABRIC_LANE_STATE  = 0,
+    FABRIC_LANE_SYNC   = 1,
+    FABRIC_LANE_AGENT  = 2,
+    FABRIC_LANE_EVENT  = 3,
+    FABRIC_LANE_VISUAL = 4,
+    FABRIC_N_LANES_V2  = 5,
+} fabric_lane_t;
+
+typedef enum {
+    FABRIC_FRESH_WAITING = 0,    /* no producer has fired since boot */
+    FABRIC_FRESH_LIVE    = 1,    /* sample arrived within FABRIC_FRESH_LIVE_MS */
+    FABRIC_FRESH_STALE   = 2,    /* sample is older than LIVE but younger than dead */
+} fabric_fresh_t;
+
+#define FABRIC_HISTORY_N   64    /* circular history depth per lane */
+
+typedef struct {
+    uint16_t       values[FABRIC_HISTORY_N];
+    uint8_t        head;            /* next write index, wraps at FABRIC_HISTORY_N */
+    uint8_t        count;           /* up to FABRIC_HISTORY_N */
+    uint16_t       v_min;           /* running min over the buffered window */
+    uint16_t       v_max;           /* running max — used to normalize the waveform */
+    unsigned long  last_update_ms;
+    fabric_fresh_t fresh;
+} fabric_lane_history_t;
+
+const fabric_lane_history_t *fabric_history(fabric_lane_t lane);
+const char                  *fabric_lane_name(fabric_lane_t lane);
 
 /* terminal.c — pty-backed terminal app. Must be declared AFTER wm.c
  * because terminal_draw signature uses window_t. */

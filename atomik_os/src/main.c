@@ -277,8 +277,12 @@ int main(int argc, char **argv) {
     wallet_init();
     atomik_open();   /* /dev/mem map for the live monitor; non-fatal if it fails */
 
-    /* Open the About window automatically so first-launch shows the WM
-     * working without requiring a key press. */
+    /* Open About automatically so first-launch shows the WM working
+     * without requiring a key press.  The Resource Fabric is opened
+     * via 'R' (system-shelf hotkey) — auto-opening it during boot
+     * triggered a race with seed_metrics_if_empty() (three perf_bench
+     * MMIO runs before the main loop settles); we surface it post-
+     * boot via the key router instead. */
     open_about();
     redraw_frame();
 

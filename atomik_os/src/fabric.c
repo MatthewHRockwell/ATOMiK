@@ -1,72 +1,88 @@
-/* fabric.c — Resource Fabric panel.  v0.30 differentiator.
+/* fabric.c — Resource Fabric panel.  v0.34-D 5-lane Class A upgrade.
  *
- * "What is ATOMiK doing with its compute resources right now?"  That is
- * the one question this panel answers.  Three workload personalities
- * (STATE / SYNC / AGENT), one of which is "active" at any moment, with
- * visible bank/lane allocation and a batch queue depth + efficiency
- * delta vs a software baseline.
+ * Per ChatGPT 2026-05-09 directive: "real metrics + cinematic assets,
+ * never fake numbers."  This is the Class A piece — five lanes, each
+ * with a circular history buffer sampled from REAL producers, mini-
+ * waveforms drawn from that history, freshness states (LIVE / STALE /
+ * WAITING) so the audience can never mistake a quiet lane for an
+ * active one.  Class B (background art via the asset pipeline) lands
+ * in v0.36; Class C fake numbers are explicitly forbidden.
  *
- * Auto-detection of the active personality is driven by REAL signals,
- * not stub state:
- *   - LLM dispatch within the last AGENT_HOLD_MS  → AGENT active
- *   - delta_log activity within the last STATE_HOLD_MS → STATE active
- *   - default idle → SYNC
+ * Lane → producer mapping (all real, no synthetic):
  *
- * Visualization uses the v0.25 semantic-color grammar:
- *   cyan  = active hardware lane (lane 0)
- *   violet = agent-allocated lane (lane 1)
- *   green = efficiency / cycles saved (lane 2)
+ *   STATE   ← perf_last_for(PERSONALITY_STATE)
+ *               history value = ops_logical (deltas the workload would
+ *               have emitted under software).  Coalesce ratio is
+ *               communicated by the secondary metric, not faked.
+ *   SYNC    ← perf_last_for(PERSONALITY_SYNC)
+ *               history value = bytes_avoided.  Single-batch runs
+ *               legitimately produce 0 here — surface the replay-engine
+ *               dependency rather than masking it.
+ *   AGENT   ← perf_last_for(PERSONALITY_AGENT)
+ *               history value = ops_issued (regions retained after
+ *               relevance sort).  Secondary metric carries retention %.
+ *   EVENT   ← atomik_event_total() delta over the sample window
+ *               history value = events emitted in the last 200 ms.
+ *               Captures cross-cutting workload pulses regardless of
+ *               which personality is currently active.
+ *   VISUAL  ← atomik_event_count(EVT_VIS_RENDER) delta
+ *               history value = render-events in the last 200 ms.
+ *               Honest signal for "framebuffer pressure right now".
  *
- * Architectural-claim discipline (per project_atomik_desk_vision):
- * we do NOT claim ATOMiK literally morphs silicon into a different
- * processor.  We claim ATOMiK organizes its existing execution
- * resources into workload-specific batching/scheduling personalities,
- * and the fabric labels which one is active.  Hardware stays the same;
- * the resource allocation and operation batching change.  Believable
- * and powerful — and exactly what a future partial-reconfig + ASIC
- * scheduling fabric story can grow out of.
- */
+ * Layout (right-side shelf, ~480 px wide):
+ *
+ *   ┌──────────────────────────────────────────┐
+ *   │  RESOURCE FABRIC          [ AUTO: STATE ]│
+ *   │  active personality: STATE PROCESSOR     │
+ *   │  ↳ change detection · dirty regions ·    │
+ *   ├──────────────────────────────────────────┤
+ *   │  ● STATE                LIVE             │  <- lane row
+ *   │     ops collapsed 47 → 8                 │
+ *   │     ▁▁▂▃▅█▇▅▃▂▁ (mini-waveform)          │
+ *   │     61% cycles saved                     │
+ *   ├──────────────────────────────────────────┤
+ *   │  ● SYNC                 WAITING          │
+ *   │     ...                                  │
+ *   └──────────────────────────────────────────┘
+ *
+ * The active personality lane gets a left-edge accent strip and a
+ * bright label colour; idle lanes are dim with the lane name in
+ * neutral grey.
+ *
+ * Honest UI rule (verbatim from feedback_no_class_c_metrics): every
+ * number on screen traces back to a producer or is omitted.  No
+ * "Tasks Accomplished 47", no "Focus Score 92", no "Predictive
+ * Accuracy 96.7%" until those signals exist. */
 #include "atomik_os.h"
 #include <stdio.h>
 #include <string.h>
 
-/* Lane count rendered.  Three is enough to read at a glance and matches
- * the three semantic colors we use for them.  Real ATOMiK SoCs have
- * more banks (production single-bank, sweep up to 16) — when we wire
- * to live atomik_read_slots() in v0.40, this can scale to N_SLOTS. */
-#define FABRIC_N_LANES 3
-
 #define AGENT_HOLD_MS    10000   /* AGENT stays "active" for 10s after last LLM call */
 #define STATE_HOLD_MS    3000    /* STATE stays "active" for 3s after last delta */
 #define SYNC_HOLD_MS     5000    /* SYNC  stays "active" for 5s after last replica event */
-/* v0.32: manual override decay.  30s gives a presenter time to talk
- * about each personality during a demo without the override silently
- * expiring mid-sentence, but short enough that a forgotten override
- * doesn't permanently mis-represent the system. */
 #define FABRIC_OVERRIDE_HOLD_MS  30000
+
+#define FABRIC_FRESH_LIVE_MS   2000   /* under 2s = LIVE */
+#define FABRIC_FRESH_STALE_MS  10000  /* under 10s = STALE; older = WAITING-or-decayed */
+#define FABRIC_SAMPLE_MS       200    /* push one history sample per 200 ms */
 
 static personality_t s_active           = PERSONALITY_SYNC;
 static int           s_window_id        = -1;
-/* v0.32: presenter override state.  s_override_p == PERSONALITY_NONE
- * means "AUTO" (no override active).  Set via fabric_cycle_override();
- * decays after FABRIC_OVERRIDE_HOLD_MS unless cycled again. */
 static personality_t s_override_p       = PERSONALITY_NONE;
 static unsigned long s_override_set_ms  = 0;
 
-/* Per-lane utilization snapshot, 0..100.  Recomputed each tick from the
- * detected personality so the visualization shows lanes "leaning" toward
- * whichever workload class is active.  Smoothed with a 1/4 IIR so the
- * lanes don't jitter visibly when personality flips. */
-static int s_lane_pct[FABRIC_N_LANES] = {0, 0, 0};
+/* === per-lane history buffers === */
+static fabric_lane_history_t s_history[FABRIC_N_LANES_V2];
 
-/* Cycles-saved tracker.  This is the ATOMiK architectural claim made
- * legible: vs a software-only baseline that has to read+compare every
- * field on every redraw, ATOMiK's delta-state path skips bytes that
- * haven't changed.  The baseline number is empirically derived
- * (PRODUCTION_DEPLOYMENT.md: change-detection 76-80% faster).  We
- * report a session-running estimate; v0.40 will swap to a measured
- * value from the running delta_log. */
-#define FABRIC_BASELINE_PCT 47    /* +47% cycles saved vs software baseline */
+/* Track last consumed perf-sample identity per personality so we only
+ * push a new history value when a fresh sample actually lands. */
+static uint64_t s_last_cycles_total[PERSONALITY_AGENT + 1] = {0};
+
+/* For EVENT and VISUAL we sample at fixed cadence regardless of
+ * producer cadence — the history value is a delta-over-window. */
+static unsigned long s_last_sample_ms       = 0;
+static unsigned long s_last_total_emits     = 0;
+static unsigned long s_last_vis_render_ct   = 0;
 
 const char *fabric_personality_name(personality_t p) {
     switch (p) {
@@ -77,30 +93,29 @@ const char *fabric_personality_name(personality_t p) {
     }
 }
 
+const char *fabric_lane_name(fabric_lane_t lane) {
+    switch (lane) {
+    case FABRIC_LANE_STATE:  return "STATE";
+    case FABRIC_LANE_SYNC:   return "SYNC";
+    case FABRIC_LANE_AGENT:  return "AGENT";
+    case FABRIC_LANE_EVENT:  return "EVENT";
+    case FABRIC_LANE_VISUAL: return "VISUAL";
+    default:                 return "----";
+    }
+}
+
+const fabric_lane_history_t *fabric_history(fabric_lane_t lane) {
+    if (lane < 0 || lane >= FABRIC_N_LANES_V2) return NULL;
+    return &s_history[lane];
+}
+
 personality_t fabric_active(void) { return s_active; }
 
-/* v0.31: detect the personality from the workload event bus instead of
- * polling app-internal state.  Priority order = decay window length
- * (longer-decay wins) so a fresh LLM dispatch doesn't get instantly
- * overridden by the next stocks tick.  AGENT > STATE > SYNC.  If
- * nothing has fired within its window, fall back to SYNC default-idle.
- *
- * v0.32: presenter override beats auto-detection while it's fresh.
- * The override carries a decay so a forgotten override doesn't lie
- * indefinitely.  When override decays, we silently fall back to auto-
- * detection — no jarring transition needed because the auto path
- * generally produces the same answer the override was forcing.
- *
- * Architectural framing (per project_v031_plan.md): the user-visible
- * story is "ATOMiK organizes resources around the workload class".
- * The override is a presenter shim, NOT the primary mechanism — that's
- * why the rendering shows "MANUAL:" prefix when override is active. */
 static personality_t detect(unsigned long now) {
     if (s_override_p != PERSONALITY_NONE &&
         (now - s_override_set_ms) < FABRIC_OVERRIDE_HOLD_MS) {
         return s_override_p;
     }
-    /* Override decayed — clear it so subsequent reads don't re-arm. */
     if (s_override_p != PERSONALITY_NONE) s_override_p = PERSONALITY_NONE;
 
     unsigned long t_agent = atomik_event_last_ts(EVT_AGENT_CONTEXT);
@@ -113,10 +128,6 @@ static personality_t detect(unsigned long now) {
 }
 
 void fabric_cycle_override(void) {
-    /* AUTO → STATE → SYNC → AGENT → AUTO.  Each press advances; pressing
-     * P during an active override resets the decay clock so a presenter
-     * can hold a personality across a long talking point.  Emits an
-     * EVT_OVERRIDE event onto the bus so future subscribers can react. */
     switch (s_override_p) {
     case PERSONALITY_NONE:  s_override_p = PERSONALITY_STATE; break;
     case PERSONALITY_STATE: s_override_p = PERSONALITY_SYNC;  break;
@@ -135,73 +146,364 @@ int fabric_override_active(void) {
 
 personality_t fabric_override_personality(void) { return s_override_p; }
 
-/* Update per-lane utilization based on active personality.  Lane 0
- * (cyan) leans high when STATE is active (raw hardware compute);
- * lane 1 (violet) leans high when AGENT is active (memory work);
- * lane 2 (green, efficiency) breathes between 35-55% to make the
- * panel feel alive without faking activity that isn't there. */
-static void update_lanes(unsigned long now) {
-    int target[FABRIC_N_LANES];
-    switch (s_active) {
-    case PERSONALITY_STATE:
-        target[0] = 70 + (int)((now / 200) % 15);   /* 70-85, breathing */
-        target[1] = 25;
-        target[2] = 50;
-        break;
-    case PERSONALITY_AGENT:
-        target[0] = 30;
-        target[1] = 75 + (int)((now / 200) % 15);
-        target[2] = 45;
-        break;
-    case PERSONALITY_SYNC:
-    default:
-        target[0] = 40;
-        target[1] = 30;
-        target[2] = 35 + (int)((now / 300) % 20);
-        break;
+/* === history buffer management === */
+
+static void history_push(fabric_lane_t lane, unsigned long now,
+                         uint16_t value) {
+    fabric_lane_history_t *h = &s_history[lane];
+    h->values[h->head] = value;
+    h->head = (h->head + 1) % FABRIC_HISTORY_N;
+    if (h->count < FABRIC_HISTORY_N) h->count++;
+    h->last_update_ms = now;
+    h->fresh = FABRIC_FRESH_LIVE;
+
+    /* Recompute min/max over the buffered window so the renderer can
+     * normalize the waveform dynamically.  Cheap (<= 64 entries). */
+    uint16_t mn = 0xFFFF, mx = 0;
+    for (uint8_t i = 0; i < h->count; i++) {
+        uint16_t v = h->values[i];
+        if (v < mn) mn = v;
+        if (v > mx) mx = v;
     }
-    /* 1/4 IIR smoothing.  Avoids visible jumps when personality flips. */
-    for (int i = 0; i < FABRIC_N_LANES; i++) {
-        s_lane_pct[i] = (s_lane_pct[i] * 3 + target[i]) / 4;
+    h->v_min = (h->count > 0) ? mn : 0;
+    h->v_max = (h->count > 0) ? mx : 0;
+}
+
+static void freshness_decay(unsigned long now) {
+    for (int i = 0; i < FABRIC_N_LANES_V2; i++) {
+        fabric_lane_history_t *h = &s_history[i];
+        if (h->count == 0) {
+            h->fresh = FABRIC_FRESH_WAITING;
+            continue;
+        }
+        unsigned long age = now - h->last_update_ms;
+        if      (age < FABRIC_FRESH_LIVE_MS)  h->fresh = FABRIC_FRESH_LIVE;
+        else if (age < FABRIC_FRESH_STALE_MS) h->fresh = FABRIC_FRESH_STALE;
+        else                                   h->fresh = FABRIC_FRESH_STALE;
+        /* Note: we keep STALE rather than reverting to WAITING so the
+         * waveform stays visible and the audience sees the recent past
+         * even when the workload pauses. */
+    }
+}
+
+static uint16_t clamp_u16(uint64_t v) {
+    return (v > 0xFFFF) ? 0xFFFF : (uint16_t)v;
+}
+
+static void sample_perf_lane(fabric_lane_t lane, personality_t p,
+                             unsigned long now) {
+    const perf_sample_t *s = perf_last_for(p);
+    if (!s) return;
+    /* Only push when a NEW sample has landed since we last looked. */
+    if (s->cycles_total == s_last_cycles_total[p]) return;
+    s_last_cycles_total[p] = s->cycles_total;
+
+    uint16_t value;
+    switch (lane) {
+    case FABRIC_LANE_STATE:
+        /* History tracks the size of the logical work the personality
+         * absorbed.  The coalesce ratio is shown in the secondary
+         * metric — we don't fold it into the waveform because that
+         * would conflate "how much work arrived" with "how well we
+         * compressed it". */
+        value = clamp_u16(s->ops_logical);
+        break;
+    case FABRIC_LANE_SYNC:
+        /* History tracks bytes_avoided — single-batch will be 0,
+         * which is fine and HONEST.  Cross-batch replay engine
+         * (v0.39) starts producing non-zero history. */
+        value = clamp_u16(s->bytes_avoided);
+        break;
+    case FABRIC_LANE_AGENT:
+        /* History tracks ops_issued — number of regions retained
+         * after the relevance sort.  Higher = more context kept. */
+        value = clamp_u16(s->ops_issued);
+        break;
+    default:
+        return;
+    }
+    history_push(lane, now, value);
+}
+
+static void sample_event_lanes(unsigned long now) {
+    /* EVENT lane: emits-since-last-sample.  Reads atomik_event_total
+     * because it captures every kind of workload pulse — the EVENT
+     * lane is "is anything happening at all?". */
+    unsigned long total = atomik_event_total();
+    unsigned long delta = total - s_last_total_emits;
+    s_last_total_emits = total;
+    if (delta > 0 || s_history[FABRIC_LANE_EVENT].count > 0) {
+        /* Push every sample window, even zero, once we've seen any
+         * activity — so the waveform reflects pauses rather than
+         * stretching the previous active value across them. */
+        history_push(FABRIC_LANE_EVENT, now, clamp_u16(delta));
+    }
+
+    /* VISUAL lane: VIS_RENDER pulses-since-last-sample.  Honest
+     * "framebuffer pressure" indicator — every heavy redraw
+     * (scene change, fabric refresh, animation tick) counts. */
+    unsigned long vis = atomik_event_count(EVT_VIS_RENDER);
+    unsigned long vis_delta = vis - s_last_vis_render_ct;
+    s_last_vis_render_ct = vis;
+    if (vis_delta > 0 || s_history[FABRIC_LANE_VISUAL].count > 0) {
+        history_push(FABRIC_LANE_VISUAL, now, clamp_u16(vis_delta));
     }
 }
 
 void fabric_tick(void) {
     unsigned long now = anim_now_ms();
-    /* v0.31: detection driven entirely by the workload event bus —
-     * no more polling, no more wallet-spend hacks.  Producers wired:
-     *   - agent_log() emits EVT_STATE_DELTA on every user action
-     *   - llm_query() emits EVT_AGENT_CONTEXT on every dispatch
-     *   - stocks_tick() emits EVT_SYNC_REPLICA on every row mutation
-     * Consumers can subscribe to the same bus without touching producers. */
     s_active = detect(now);
-    update_lanes(now);
+
+    /* Sample real producers at fixed cadence.  Matches ChatGPT's
+     * spec: "Update it whenever a perf sample arrives, a workload
+     * event fires, a replay event runs, a personality changes." */
+    if (now - s_last_sample_ms >= FABRIC_SAMPLE_MS) {
+        s_last_sample_ms = now;
+        sample_perf_lane(FABRIC_LANE_STATE, PERSONALITY_STATE, now);
+        sample_perf_lane(FABRIC_LANE_SYNC,  PERSONALITY_SYNC,  now);
+        sample_perf_lane(FABRIC_LANE_AGENT, PERSONALITY_AGENT, now);
+        sample_event_lanes(now);
+    }
+
+    freshness_decay(now);
 }
 
-static pixel_t lane_color(int idx) {
-    switch (idx) {
-    case 0: return ATOMIK_SEM_HARDWARE;  /* cyan: live ATOMiK / hardware */
-    case 1: return ATOMIK_SEM_AGENT;     /* violet: agent reasoning */
-    case 2: return ATOMIK_SEM_SAVINGS;   /* green: efficiency wins */
-    default: return ATOMIK_FG_DIM;
+/* === colour helpers === */
+
+static pixel_t lane_color(fabric_lane_t lane) {
+    switch (lane) {
+    case FABRIC_LANE_STATE:  return ATOMIK_SEM_HARDWARE;     /* cyan   */
+    case FABRIC_LANE_SYNC:   return ATOMIK_SEM_SAVINGS;      /* green  */
+    case FABRIC_LANE_AGENT:  return ATOMIK_SEM_AGENT;        /* violet */
+    case FABRIC_LANE_EVENT:  return rgb(0xF0, 0x9C, 0x55);   /* amber-warm: cross-cutting bus */
+    case FABRIC_LANE_VISUAL: return rgb(0xE5, 0x6E, 0xC0);   /* magenta: pixel/render */
+    default:                 return ATOMIK_FG_DIM;
     }
 }
 
-static const char *lane_label(int idx) {
-    switch (idx) {
-    case 0: return "compute";
-    case 1: return "agent  ";
-    case 2: return "savings";
-    default: return "       ";
+static const char *lane_oneliner(fabric_lane_t lane) {
+    switch (lane) {
+    case FABRIC_LANE_STATE:  return "coalesce repeated writes";
+    case FABRIC_LANE_SYNC:   return "skip unchanged regions";
+    case FABRIC_LANE_AGENT:  return "retain by relevance";
+    case FABRIC_LANE_EVENT:  return "workload pulses on the bus";
+    case FABRIC_LANE_VISUAL: return "framebuffer / render activity";
+    default:                 return "";
     }
 }
+
+static personality_t lane_to_personality(fabric_lane_t lane) {
+    switch (lane) {
+    case FABRIC_LANE_STATE: return PERSONALITY_STATE;
+    case FABRIC_LANE_SYNC:  return PERSONALITY_SYNC;
+    case FABRIC_LANE_AGENT: return PERSONALITY_AGENT;
+    default:                return PERSONALITY_NONE;
+    }
+}
+
+/* === mini-waveform render ===
+ *
+ * Polyline through the buffered history, oldest-first, normalized to
+ * the row's vertical range.  Bresenham-ish line draw via draw_pixel
+ * — no anti-aliasing, but the values are crisp at 1 px which reads
+ * better than smoothed lines on a 32-bit framebuffer.
+ *
+ * If the buffer is empty (WAITING), we draw nothing — avoids the
+ * temptation to draw a "flat zero line" that an audience might read
+ * as activity. */
+static void draw_line_segment(int x0, int y0, int x1, int y1,
+                              pixel_t color) {
+    int dx = (x1 > x0) ? (x1 - x0) : (x0 - x1);
+    int dy = (y1 > y0) ? (y1 - y0) : (y0 - y1);
+    int sx = (x0 < x1) ? 1 : -1;
+    int sy = (y0 < y1) ? 1 : -1;
+    int err = dx - dy;
+    while (1) {
+        draw_pixel(x0, y0, color);
+        if (x0 == x1 && y0 == y1) break;
+        int e2 = err * 2;
+        if (e2 > -dy) { err -= dy; x0 += sx; }
+        if (e2 <  dx) { err += dx; y0 += sy; }
+    }
+}
+
+static void draw_waveform(const fabric_lane_history_t *h,
+                          int x, int y, int w, int hgt, pixel_t color) {
+    /* Track outline — single dim hairline so an empty lane still has
+     * a visible bed.  Always 1 px tall along the bottom. */
+    pixel_t bed = rgb(0x1F, 0x27, 0x38);
+    draw_rect(x, y + hgt - 1, w, 1, bed);
+
+    if (h->count < 2) return;     /* not enough samples for a line */
+
+    uint16_t mn = h->v_min;
+    uint16_t mx = h->v_max;
+    if (mx <= mn) {
+        /* Constant-value series — draw a flat line near the bottom so
+         * the audience can see the lane is producing samples (just
+         * with no variation).  This is honest: we DO have samples. */
+        draw_rect(x, y + hgt - 2, w, 1, color);
+        return;
+    }
+    uint16_t span = mx - mn;
+
+    /* Map each sample to (px, py).  Walk the buffer in chronological
+     * order so the rightmost point is the most recent — natural
+     * "time flowing left to right". */
+    int prev_px = -1, prev_py = -1;
+    for (uint8_t i = 0; i < h->count; i++) {
+        /* Oldest sample first.  In the ring, oldest = (head - count) mod N. */
+        int idx = (h->head - h->count + i + FABRIC_HISTORY_N) % FABRIC_HISTORY_N;
+        uint16_t v = h->values[idx];
+
+        int px = x + (int)((long)i * (w - 1) / (FABRIC_HISTORY_N - 1));
+        /* Normalize: bottom of band = v_min, top = v_max. */
+        int py = y + hgt - 1 -
+                 (int)((long)(v - mn) * (hgt - 2) / span);
+        if (py < y) py = y;
+        if (py > y + hgt - 1) py = y + hgt - 1;
+
+        if (prev_px >= 0) {
+            draw_line_segment(prev_px, prev_py, px, py, color);
+        } else {
+            draw_pixel(px, py, color);
+        }
+        prev_px = px;
+        prev_py = py;
+    }
+}
+
+/* === per-lane primary/secondary metric strings ===
+ *
+ * Honest framing: each string's content is derived from real producer
+ * data.  When the producer hasn't fired, we say so — no placeholder
+ * numbers. */
+static void lane_metrics(fabric_lane_t lane, char *primary, size_t plen,
+                         char *secondary, size_t slen) {
+    primary[0] = secondary[0] = 0;
+    personality_t p = lane_to_personality(lane);
+    const perf_sample_t *s = (p != PERSONALITY_NONE) ? perf_last_for(p) : NULL;
+    const fabric_lane_history_t *h = &s_history[lane];
+
+    switch (lane) {
+    case FABRIC_LANE_STATE:
+        if (!s) {
+            snprintf(primary, plen, "no STATE workload yet");
+            snprintf(secondary, slen, "press ! to seed perf bench");
+        } else {
+            snprintf(primary, plen, "ops collapsed  %u → %u",
+                     (unsigned)s->ops_logical, (unsigned)s->ops_issued);
+            if (s->cycles_software_baseline && s->cycles_atomik) {
+                double sp = perf_speedup(s);
+                snprintf(secondary, slen, "%.2fx vs sw  ·  fences 1",
+                         sp);
+            } else {
+                snprintf(secondary, slen, "fences 1  ·  %u cycles",
+                         (unsigned)s->cycles_total);
+            }
+        }
+        break;
+    case FABRIC_LANE_SYNC:
+        if (!s) {
+            snprintf(primary, plen, "no SYNC workload yet");
+            snprintf(secondary, slen, "press ! to seed perf bench");
+        } else {
+            snprintf(primary, plen, "regions emitted %u / %u",
+                     (unsigned)s->ops_issued,
+                     (unsigned)s->regions_unique);
+            if (s->bytes_avoided == 0) {
+                snprintf(secondary, slen, "(replay engine = v0.39)");
+            } else {
+                snprintf(secondary, slen, "%u bytes avoided",
+                         (unsigned)s->bytes_avoided);
+            }
+        }
+        break;
+    case FABRIC_LANE_AGENT:
+        if (!s) {
+            snprintf(primary, plen, "no AGENT workload yet");
+            snprintf(secondary, slen, "press ! to seed perf bench");
+        } else {
+            unsigned cold = s->bytes_avoided / 4;
+            unsigned total = s->regions_unique + cold;
+            unsigned retained = s->ops_issued;
+            unsigned pct = total ? (retained * 100u / total)
+                                  : (retained ? 100u : 0u);
+            snprintf(primary, plen, "hot retained  %u / %u",
+                     retained, total ? total : retained);
+            snprintf(secondary, slen, "%u%% kept by relevance", pct);
+        }
+        break;
+    case FABRIC_LANE_EVENT: {
+        unsigned long total = atomik_event_total();
+        if (total == 0) {
+            snprintf(primary, plen, "no events yet");
+            snprintf(secondary, slen, "bus is idle");
+        } else {
+            /* Most recent sample window = h->values[(head-1) mod N]. */
+            uint16_t last_window = 0;
+            if (h->count > 0) {
+                int idx = (h->head + FABRIC_HISTORY_N - 1) % FABRIC_HISTORY_N;
+                last_window = h->values[idx];
+            }
+            snprintf(primary, plen, "%lu total · %u in last %dms",
+                     (unsigned long)total, last_window, FABRIC_SAMPLE_MS);
+            snprintf(secondary, slen, "STATE %lu · SYNC %lu · AGENT %lu",
+                     atomik_event_count(EVT_STATE_DELTA),
+                     atomik_event_count(EVT_SYNC_REPLICA),
+                     atomik_event_count(EVT_AGENT_CONTEXT));
+        }
+        break;
+    }
+    case FABRIC_LANE_VISUAL: {
+        unsigned long vis = atomik_event_count(EVT_VIS_RENDER);
+        if (vis == 0) {
+            snprintf(primary, plen, "no render-events yet");
+            snprintf(secondary, slen, "(producers wire in v0.35)");
+        } else {
+            uint16_t last_window = 0;
+            if (h->count > 0) {
+                int idx = (h->head + FABRIC_HISTORY_N - 1) % FABRIC_HISTORY_N;
+                last_window = h->values[idx];
+            }
+            snprintf(primary, plen, "%lu redraws · %u in last %dms",
+                     (unsigned long)vis, last_window, FABRIC_SAMPLE_MS);
+            snprintf(secondary, slen, "framebuffer pressure (real)");
+        }
+        break;
+    }
+    default: break;
+    }
+}
+
+static const char *fresh_label(fabric_fresh_t f) {
+    switch (f) {
+    case FABRIC_FRESH_LIVE:    return "LIVE";
+    case FABRIC_FRESH_STALE:   return "STALE";
+    case FABRIC_FRESH_WAITING:
+    default:                   return "WAITING";
+    }
+}
+
+static pixel_t fresh_color(fabric_fresh_t f) {
+    switch (f) {
+    case FABRIC_FRESH_LIVE:    return ATOMIK_SEM_SAVINGS;    /* green */
+    case FABRIC_FRESH_STALE:   return ATOMIK_SEM_WASTE;      /* amber */
+    case FABRIC_FRESH_WAITING:
+    default:                   return ATOMIK_FG_DIM;
+    }
+}
+
+/* === main draw === */
+
+#define LANE_ROW_H        76     /* per-lane vertical budget */
+#define LANE_GAP          6      /* between lanes */
+#define LANE_ACCENT_W     3      /* left-edge personality strip */
 
 void fabric_draw(window_t *w, int x, int y, int wd, int ht) {
     (void)w; (void)ht;
 
-    /* Header: "RESOURCE FABRIC" + active personality badge on the right.
-     * Personality color matches its semantic token so the badge tells you
-     * BOTH the current state AND the visual grammar in one glance. */
+    /* Header */
     draw_text(x + ATOMIK_GRID_L, y + ATOMIK_GRID_M,
               "RESOURCE FABRIC", 2, ATOMIK_FG);
 
@@ -212,11 +514,6 @@ void fabric_draw(window_t *w, int x, int y, int wd, int ht) {
     case PERSONALITY_SYNC:  badge_color = ATOMIK_SEM_SAVINGS;  break;
     default:                badge_color = ATOMIK_FG_DIM;       break;
     }
-    /* v0.32: prefix badge with "MANUAL:" when presenter override is
-     * active so the audience (and the presenter) always know whether
-     * the personality came from real workload signals or from the
-     * override key.  Honest demo discipline: never present a forced
-     * personality as if it were auto-detected. */
     char badge[32];
     if (fabric_override_active()) {
         snprintf(badge, sizeof badge, "[ MANUAL: %s ]",
@@ -229,9 +526,7 @@ void fabric_draw(window_t *w, int x, int y, int wd, int ht) {
     draw_text(x + wd - bw - ATOMIK_GRID_L, y + ATOMIK_GRID_M + 4,
               badge, 1, badge_color);
 
-    /* Subtitle: human-readable description of what the active personality
-     * actually means.  Reads as "active personality: X PROCESSOR / ↳ what
-     * it does" which is exactly the framing the vision memo uses. */
+    /* Subtitle: what the active personality means. */
     int sub_y = y + ATOMIK_GRID_M + ATOMIK_TITLEBAR_H + ATOMIK_GRID_M;
     char sub[80];
     snprintf(sub, sizeof sub, "active personality: %s PROCESSOR",
@@ -241,225 +536,98 @@ void fabric_draw(window_t *w, int x, int y, int wd, int ht) {
     const char *desc = "";
     switch (s_active) {
     case PERSONALITY_STATE:
-        desc = "change detection - dirty region tracking - cache invalidation"; break;
+        desc = "change detection · dirty regions · cache invalidation"; break;
     case PERSONALITY_SYNC:
-        desc = "replica updates - delta propagation - state reconciliation"; break;
+        desc = "replica updates · delta propagation · skip unchanged"; break;
     case PERSONALITY_AGENT:
-        desc = "agent context - memory compression - relevance detection"; break;
+        desc = "context retention · relevance scoring · cold pruning"; break;
     default: break;
     }
     draw_text(x + ATOMIK_GRID_L, sub_y + text_height(1) + 2,
               desc, 1, ATOMIK_FG_DIM);
 
-    /* Bank / lane visualization.  Three horizontal bars, one per lane,
-     * each labeled with its semantic role and showing utilization 0..100.
-     * The bar fill color is the lane's semantic color (cyan/violet/green).
-     * The unfilled portion is dim border so the bar's length is always
-     * legible regardless of fill. */
-    int lanes_y    = sub_y + text_height(1) + ATOMIK_GRID_L * 2;
-    int label_w    = text_width("savings", 1) + ATOMIK_GRID_L;
-    int bar_x      = x + ATOMIK_GRID_L + label_w;
-    int bar_max_w  = wd - label_w - ATOMIK_GRID_L * 4 - text_width("100%", 1);
-    int bar_h      = ATOMIK_GRID_L;
-    int bar_gap    = ATOMIK_GRID_L * 2;
+    /* === lanes === */
+    int lanes_y = sub_y + text_height(1) * 2 + ATOMIK_GRID_L;
+    int lane_x  = x + ATOMIK_GRID_L;
+    int lane_w  = wd - ATOMIK_GRID_L * 2;
 
-    for (int i = 0; i < FABRIC_N_LANES; i++) {
-        int row_y = lanes_y + i * bar_gap;
-        /* Label */
-        draw_text(x + ATOMIK_GRID_L, row_y + 2,
-                  lane_label(i), 1, ATOMIK_FG_DIM);
-        /* Track (dim background to show full lane length) */
-        draw_rect(bar_x, row_y, bar_max_w, bar_h, rgb(0x1A, 0x22, 0x32));
-        /* Fill */
-        int pct  = s_lane_pct[i];
-        if (pct < 0) pct = 0; if (pct > 100) pct = 100;
-        int fill = (bar_max_w * pct) / 100;
-        draw_rect(bar_x, row_y, fill, bar_h, lane_color(i));
-        /* Percent right-aligned */
-        char pct_str[8];
-        snprintf(pct_str, sizeof pct_str, "%d%%", pct);
-        int pw = text_width(pct_str, 1);
-        draw_text(bar_x + bar_max_w + ATOMIK_GRID_M, row_y + 2,
-                  pct_str, 1, ATOMIK_FG);
-    }
+    for (int i = 0; i < FABRIC_N_LANES_V2; i++) {
+        fabric_lane_t lane  = (fabric_lane_t)i;
+        int           ly    = lanes_y + i * (LANE_ROW_H + LANE_GAP);
+        const fabric_lane_history_t *h = &s_history[i];
 
-    /* v0.33-E: per-personality metrics cards.  Replaces the prior
-     * stylized "batch queue / cycles saved" footer with three small
-     * cards that each display the LAST COMPLETED perf_sample_t for
-     * their personality, read from perf_last_for(p).
-     *
-     * Honest UI rules per ChatGPT 2026-05-09 review:
-     *   - No sample for this personality yet → "WAITING FOR WORKLOAD"
-     *   - Sample present but profile produced no step-change beyond
-     *     batched (e.g. SYNC bytes_avoided=0 in single-batch runs) →
-     *     show the actual collapse/avoidance metric, NOT a forced
-     *     speedup percentage
-     *   - Lane copy explicitly explains what each personality DID
-     *     (ops collapsed, bytes avoided, regions retained), not what
-     *     mode is "active" generically
-     *
-     * Each card is its semantic color when its personality is active
-     * (filled left-edge marker); dim when idle.  The user can read
-     * three independent stories at once. */
-    int foot_y = lanes_y + FABRIC_N_LANES * bar_gap + ATOMIK_GRID_L;
+        /* Card chrome — slightly elevated rect, 1-px outline. */
+        draw_rect(lane_x, ly, lane_w, LANE_ROW_H, wm_card_bg());
+        draw_rect(lane_x, ly, lane_w, 1, wm_card_border());
+        draw_rect(lane_x, ly + LANE_ROW_H - 1, lane_w, 1, wm_card_border());
+        draw_rect(lane_x, ly, 1, LANE_ROW_H, wm_card_border());
+        draw_rect(lane_x + lane_w - 1, ly, 1, LANE_ROW_H, wm_card_border());
 
-    const personality_t card_p[3] = { PERSONALITY_STATE, PERSONALITY_SYNC,
-                                      PERSONALITY_AGENT };
-    int card_h = 88;
-    int card_gap = ATOMIK_GRID_M;
-    for (int i = 0; i < 3; i++) {
-        int  cy       = foot_y + i * (card_h + card_gap);
-        int  active   = (s_active == card_p[i]);
-        pixel_t accent = (card_p[i] == PERSONALITY_STATE) ? ATOMIK_SEM_HARDWARE
-                       : (card_p[i] == PERSONALITY_AGENT) ? ATOMIK_SEM_AGENT
-                       :                                    ATOMIK_SEM_SAVINGS;
-
-        /* Card background — slightly elevated rect with a 4-px left
-         * accent strip in the personality color when active. */
-        draw_rect(x + ATOMIK_GRID_L, cy,
-                  wd - ATOMIK_GRID_L * 2, card_h,
-                  rgb(0x12, 0x18, 0x26));
-        draw_rect(x + ATOMIK_GRID_L, cy, 4, card_h,
-                  active ? accent : ATOMIK_DOCK_BORDER);
-
-        int tx = x + ATOMIK_GRID_L + ATOMIK_GRID_M + 4;
-        int ty_card = cy + ATOMIK_GRID_M;
-
-        /* Card title */
-        draw_text(tx, ty_card,
-                  fabric_personality_name(card_p[i]), 1,
-                  active ? accent : ATOMIK_FG);
-
-        /* Read the most recent completed sample for this personality.
-         * NULL means "no batch has run with this profile yet" — show
-         * WAITING per the honest-UI rule. */
-        const perf_sample_t *s = perf_last_for(card_p[i]);
-        char l1[64], l2[64], l3[64];
-        l1[0] = l2[0] = l3[0] = 0;
-
-        if (!s) {
-            snprintf(l1, sizeof l1, "WAITING FOR WORKLOAD");
-            snprintf(l2, sizeof l2, "press ! to seed metrics");
-            snprintf(l3, sizeof l3, " ");
-        } else {
-            switch (card_p[i]) {
-            case PERSONALITY_STATE:
-                /* STATE: optimal coalesce.  Show the literal
-                 * collapse + the cycles saved vs the software
-                 * baseline captured during the same bench run. */
-                snprintf(l1, sizeof l1, "ops collapsed  %u -> %u",
-                         (unsigned)s->ops_logical, (unsigned)s->ops_issued);
-                snprintf(l2, sizeof l2, "fences         %u -> 1",
-                         (unsigned)s->ops_logical);
-                if (s->cycles_software_baseline && s->cycles_atomik) {
-                    double speedup = perf_speedup(s);
-                    snprintf(l3, sizeof l3, "cycles saved   %.1fx vs sw",
-                             speedup);
-                } else {
-                    snprintf(l3, sizeof l3, "cycles total   %llu",
-                             (unsigned long long)s->cycles_total);
-                }
-                break;
-            case PERSONALITY_SYNC:
-                /* SYNC: skip-unchanged.  Single-batch runs don't
-                 * exercise the cross-batch advantage — say so. */
-                snprintf(l1, sizeof l1, "ops emitted    %u / %u regions",
-                         (unsigned)s->ops_issued,
-                         (unsigned)s->regions_unique);
-                snprintf(l2, sizeof l2, "bytes avoided  %u",
-                         (unsigned)s->bytes_avoided);
-                if (s->bytes_avoided == 0) {
-                    snprintf(l3, sizeof l3, "(replay engine = v0.33-G)");
-                } else {
-                    snprintf(l3, sizeof l3, "unchanged skip %u",
-                             (unsigned)(s->bytes_avoided / 4));
-                }
-                break;
-            case PERSONALITY_AGENT:
-                /* AGENT: relevance retention.  Show retained vs
-                 * total + a flag that the relevance sort is what
-                 * drives the skip. */
-                {
-                    unsigned cold = s->bytes_avoided / 4;
-                    unsigned total = s->regions_unique + cold;
-                    unsigned retained = s->ops_issued;
-                    snprintf(l1, sizeof l1, "hot retained   %u / %u (%u%%)",
-                             retained, total ? total : retained,
-                             total ? (retained * 100 / total) : 60);
-                    snprintf(l2, sizeof l2, "bytes avoided  %u",
-                             (unsigned)s->bytes_avoided);
-                    snprintf(l3, sizeof l3, "relevance sort active");
-                }
-                break;
-            default: break;
-            }
+        /* Active-personality accent strip down the left edge. */
+        personality_t lp = lane_to_personality(lane);
+        int active = (lp != PERSONALITY_NONE && lp == s_active);
+        if (active) {
+            draw_rect(lane_x, ly, LANE_ACCENT_W, LANE_ROW_H,
+                      lane_color(lane));
         }
 
-        int line_h = text_height(1) + 2;
-        draw_text(tx, ty_card + ATOMIK_TITLEBAR_H, l1, 1, ATOMIK_FG);
-        draw_text(tx, ty_card + ATOMIK_TITLEBAR_H + line_h,
-                  l2, 1, ATOMIK_FG_DIM);
-        draw_text(tx, ty_card + ATOMIK_TITLEBAR_H + line_h * 2,
-                  l3, 1, ATOMIK_FG_DIM);
-    }
+        int tx = lane_x + LANE_ACCENT_W + ATOMIK_GRID_M;
+        int ty = ly + ATOMIK_GRID_S + 2;
 
-    /* Personality selector pills at the very bottom — kept from v0.30
-     * because they remain a quick at-a-glance "which personality is
-     * current" indicator alongside the per-card "active" marker. */
-    int pill_y = foot_y + 3 * (card_h + card_gap) + ATOMIK_GRID_M;
-    const personality_t pills[3] = { PERSONALITY_STATE, PERSONALITY_SYNC,
-                                     PERSONALITY_AGENT };
-    int pill_x = x + ATOMIK_GRID_L;
-    for (int i = 0; i < 3; i++) {
-        const char *name = fabric_personality_name(pills[i]);
-        int        tw    = text_width(name, 1);
-        int        pad   = ATOMIK_GRID_M;
-        int        pill_w = tw + pad * 2;
-        int        active = (pills[i] == s_active);
-        pixel_t    fill_c = active ?
-            (pills[i] == PERSONALITY_STATE ? ATOMIK_SEM_HARDWARE :
-             pills[i] == PERSONALITY_AGENT ? ATOMIK_SEM_AGENT    :
-                                             ATOMIK_SEM_SAVINGS) :
-            rgb(0x1A, 0x22, 0x32);
-        pixel_t    text_c = active ? ATOMIK_BG_TOP : ATOMIK_FG_DIM;
-        draw_rect_rounded(pill_x, pill_y, pill_w, ATOMIK_TITLEBAR_H, 6, fill_c);
-        draw_text(pill_x + pad, pill_y + (ATOMIK_TITLEBAR_H - text_height(1)) / 2,
-                  name, 1, text_c);
-        pill_x += pill_w + ATOMIK_GRID_M;
+        /* Row 1: lane name (coloured) + freshness tag right-aligned. */
+        char name_str[16];
+        snprintf(name_str, sizeof name_str, "%s", fabric_lane_name(lane));
+        draw_text(tx, ty, name_str, 1,
+                  active ? lane_color(lane)
+                         : (h->fresh == FABRIC_FRESH_WAITING
+                                ? ATOMIK_FG_DIM : ATOMIK_FG));
+
+        const char *fl = fresh_label(h->fresh);
+        int fw = text_width(fl, 1);
+        draw_text(lane_x + lane_w - fw - ATOMIK_GRID_M, ty,
+                  fl, 1, fresh_color(h->fresh));
+
+        /* Row 2: one-liner (dim). */
+        int ty2 = ty + text_height(1) + 2;
+        draw_text(tx, ty2, lane_oneliner(lane), 1, ATOMIK_FG_DIM);
+
+        /* Row 3: mini-waveform (full inner width, 22 px tall). */
+        int wf_y = ty2 + text_height(1) + 4;
+        int wf_x = tx;
+        int wf_w = lane_w - (LANE_ACCENT_W + ATOMIK_GRID_M * 2);
+        int wf_h = 22;
+        draw_waveform(h, wf_x, wf_y, wf_w, wf_h, lane_color(lane));
+
+        /* Row 4: primary metric + secondary metric.  Secondary right-
+         * aligned.  Honest UI — if neither has data, both will say so. */
+        int metric_y = wf_y + wf_h + 4;
+        char primary[64], secondary[64];
+        lane_metrics(lane, primary, sizeof primary,
+                           secondary, sizeof secondary);
+        draw_text(tx, metric_y, primary, 1, ATOMIK_FG);
+        int sw = text_width(secondary, 1);
+        draw_text(lane_x + lane_w - sw - ATOMIK_GRID_M, metric_y,
+                  secondary, 1, ATOMIK_FG_DIM);
     }
 }
 
-/* Geometry of the system-shelf slot.  Fixed so Resource Fabric always
- * lands in the same place — no centered-overlap with whatever the user
- * just opened.  The shelf occupies the right 480 px column from below
- * the status bar to roughly the dock, leaving the left ~1440 px of a
- * 1920 px screen for normal app windows.
- *
- * v0.31 patch 4: Y position bumped from 48 to 72 because the status
- * bar now extends from y=0 to y=64 (top half in the HDMI safe-area
- * crop zone, bottom half visible).  At y=48 the Fabric title bar
- * was tucked under the visible portion of the status bar.  72 = 64
- * (bar-bottom) + 8 (GRID_M breathing room). */
+/* === shelf geometry — unchanged from v0.34-C === */
 #define FABRIC_SHELF_W   480
 #define FABRIC_SHELF_X   (FB_W - FABRIC_SHELF_W - ATOMIK_GRID_L)
-/* Computed: SAFE_TOP (=48) + bar_h (=32) + GRID_M breathing room (=8) = 88 */
 #define FABRIC_SHELF_Y   (ATOMIK_SAFE_TOP + 32 + ATOMIK_GRID_M)
-#define FABRIC_SHELF_H   620                      /* enough for header + lanes + footer + pills */
+/* v0.34-D: 5 lanes × (76 + 6) + header (~84) ≈ 494; bump to 540 for
+ * comfortable bottom margin and to leave room for v0.35 status row. */
+#define FABRIC_SHELF_H   540
 
 int fabric_shelf_x(void) { return FABRIC_SHELF_X; }
 int fabric_shelf_y(void) { return FABRIC_SHELF_Y; }
 int fabric_shelf_w(void) { return FABRIC_SHELF_W; }
 int fabric_shelf_h(void) { return FABRIC_SHELF_H; }
 
-/* v0.33-E: seed perf samples for each personality so the metrics
- * cards show real numbers on first open instead of three "WAITING
- * FOR WORKLOAD" placeholders.  Runs three quick perf_bench_run
- * calls (one per profile, 8 regions × 64 ops each) — produces
- * REAL measurements (not faked values), just with synthetic input.
- * Cheap: ~150 ms total on the AX7020.
- *
- * Once v0.33-G replay engine ships, real workloads will populate
- * these samples organically and seed_metrics becomes optional. */
+/* Seed perf samples so STATE/SYNC/AGENT lanes show real numbers on
+ * first open instead of three "no workload yet" placeholders.  The
+ * EVENT/VISUAL lanes don't need seeding — they pick up real activity
+ * from the running system within one sample window. */
 static int s_metrics_seeded = 0;
 static void seed_metrics_if_empty(void) {
     if (s_metrics_seeded) return;
@@ -471,20 +639,11 @@ static void seed_metrics_if_empty(void) {
 }
 
 void fabric_open(void) {
-    /* Always seed metrics on open if we haven't yet.  Cheap, real,
-     * and removes the embarrassment of the panel landing with three
-     * WAITING placeholders before any workload runs. */
     seed_metrics_if_empty();
-
     if (s_window_id >= 0) {
-        /* Already open — raise to top so it's never buried. */
         wm_focus(s_window_id);
         return;
     }
-    /* Pinned right-side system panel.  Always opens at the same slot
-     * regardless of what's already on screen.  Other apps are placed
-     * by main.c::open_*() to avoid this rect (see also wm_open_auto
-     * once that lands later in v0.31). */
     window_t *w = wm_open("Resource Fabric",
                           FABRIC_SHELF_X, FABRIC_SHELF_Y,
                           FABRIC_SHELF_W, FABRIC_SHELF_H,

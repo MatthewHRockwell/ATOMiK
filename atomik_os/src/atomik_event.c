@@ -44,6 +44,7 @@ static int          s_count = 0;         /* # records actually written */
 #define EVT_N_KINDS 8
 static unsigned long s_last_ts[EVT_N_KINDS] = {0};
 static int           s_last_detail[EVT_N_KINDS] = {0};
+static unsigned long s_count_by_kind[EVT_N_KINDS] = {0};
 static unsigned long s_total_emits = 0;
 
 void atomik_event_emit(atomik_event_kind_t kind, int detail) {
@@ -56,8 +57,14 @@ void atomik_event_emit(atomik_event_kind_t kind, int detail) {
     if (kind >= 0 && kind < EVT_N_KINDS) {
         s_last_ts[kind]     = now;
         s_last_detail[kind] = detail;
+        s_count_by_kind[kind]++;
     }
     s_total_emits++;
+}
+
+unsigned long atomik_event_count(atomik_event_kind_t kind) {
+    if (kind < 0 || kind >= EVT_N_KINDS) return 0;
+    return s_count_by_kind[kind];
 }
 
 unsigned long atomik_event_last_ts(atomik_event_kind_t kind) {
