@@ -9,7 +9,7 @@
  * carries a user-visible change. About window, status bar, and the
  * /tmp/atomik_os_version stamp all read from here so the screen output
  * NEVER lies about which build is running. */
-#define AOS_VERSION "v0.33-C"
+#define AOS_VERSION "v0.33-D"
 
 /* Display geometry — locked to 1920x1080 XRGB8888 since simplefb is fixed. */
 #define FB_W       1920
@@ -335,6 +335,28 @@ int  atomik_batch_commit_baseline(void);
 int  atomik_batch_in_flight(void);
 uint32_t atomik_batch_pending_ops(void);
 uint32_t atomik_batch_pending_unique_regions(void);
+
+/* perf_bench.c — four-way comparison harness, v0.33-D.
+ *
+ * software / atomik_direct / atomik_batched / atomik_profile.  Same
+ * input across all four columns; deterministic seed per shape; full
+ * perf_sample_t captured per column.  See project_v033_substance_plan.md
+ * for the architectural-compounding framing. */
+typedef struct {
+    int               regions;
+    int               ops;
+    atomik_profile_t  profile;
+    perf_sample_t     software;
+    perf_sample_t     atomik_direct;
+    perf_sample_t     atomik_batched;
+    perf_sample_t     atomik_profile_col;
+} perf_bench_result_t;
+
+void perf_bench_run(int regions, int ops, atomik_profile_t profile,
+                    perf_bench_result_t *out);
+void perf_bench_print_header(void);
+void perf_bench_print_row(const perf_bench_result_t *r);
+void perf_bench_matrix(void);
 
 /* atomik_event.c — workload event bus.  v0.31 patch 2/N.
  *

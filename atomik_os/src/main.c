@@ -338,6 +338,15 @@ int main(int argc, char **argv) {
                 fabric_open();        /* surface the panel so the change is visible */
                 dirty = 1;
             }
+            /* v0.33-D: press '!' to dump the four-way perf matrix to
+             * stdout (UART console).  System-shelf class because it's
+             * an instrumentation / debug command, not an app launcher.
+             * Uses '!' (Shift+1) to avoid conflicting with any app
+             * letter shortcut. */
+            else if (ev.key == '!') {
+                perf_bench_matrix();
+                dirty = 1;
+            }
             /* (3) FOCUSED-APP KEYS — terminal/files/notes/document */
             else if (s_terminal_id) {
                 window_t *top = wm_topmost();

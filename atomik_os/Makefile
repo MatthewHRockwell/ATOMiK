@@ -19,10 +19,19 @@ BIN       = build/atomik_os
 
 all: $(BIN) tools
 
-tools: build/fb2png
+tools: build/fb2png build/perf_bench
 
 build/fb2png: tools/fb2png.c | build
 	$(CC) -O2 -Wall -o $@ tools/fb2png.c
+	$(STRIP) $@
+	@ls -la $@
+
+# Standalone perf-bench runner (v0.33-D).  Cross-compiles for the
+# board with the standard ATOMiK toolchain.  Links the perf/batch/
+# bench sources directly — no anim.c (uses CLOCK_MONOTONIC stub in
+# tools/perf_bench_main.c).
+build/perf_bench: tools/perf_bench_main.c src/perf_counter.c src/atomik_batch.c src/perf_bench.c | build
+	$(CC) $(CFLAGS) -o $@ $^
 	$(STRIP) $@
 	@ls -la $@
 
