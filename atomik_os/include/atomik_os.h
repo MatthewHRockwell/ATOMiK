@@ -9,7 +9,7 @@
  * carries a user-visible change. About window, status bar, and the
  * /tmp/atomik_os_version stamp all read from here so the screen output
  * NEVER lies about which build is running. */
-#define AOS_VERSION "v0.32"
+#define AOS_VERSION "v0.33-A"
 
 /* Display geometry — locked to 1920x1080 XRGB8888 since simplefb is fixed. */
 #define FB_W       1920
@@ -205,6 +205,9 @@ void atomik_close(void);
 /* Read each slot's accumulator. Fills `out[ATOMIK_N_SLOTS]`. */
 int  atomik_read_slots(uint32_t *out);
 
+/* perf_counter.c declarations live below the personality_t enum.
+ * (See the fabric.c declaration block further down.) */
+
 /* fabric.c declarations are below the wm.c block (window_t needed). */
 typedef enum {
     PERSONALITY_NONE = 0,
@@ -212,6 +215,57 @@ typedef enum {
     PERSONALITY_SYNC,
     PERSONALITY_AGENT,
 } personality_t;
+
+/* perf_counter.c — performance instrumentation, v0.33-A.
+ *
+ * Foundational measurement layer.  Every other v0.33 substance piece
+ * (dynamic batching, software baselines, Resource Fabric live metrics,
+ * compiler skeleton, replay engine) reads from this module.
+ *
+ * Design rule per ChatGPT 2026-05-08: "make performance observable
+ * everywhere".  perf_sample_t captures everything we'd want to see in
+ * a four-way comparison matrix — software baseline, ATOMiK direct,
+ * ATOMiK batched, ATOMiK profile-selected.
+ *
+ * Cycle source: RV64 `csrr cycle` (1-cycle granularity, ~10 ns at our
+ * 100 MHz fabric clock; deterministic, no syscalls).
+ */
+#define PERF_MAX_OPS 256
+
+typedef struct {
+    uint64_t cycles_total;
+    uint64_t cycles_software_baseline;
+    uint64_t cycles_atomik;
+
+    uint32_t ops_issued;
+    uint32_t ops_logical;
+    uint32_t batch_count;
+
+    uint32_t bytes_processed;
+    uint32_t bytes_avoided;
+
+    uint32_t regions_touched;
+    uint32_t regions_unique;
+
+    personality_t active_personality;
+
+    uint64_t per_op_cycles[PERF_MAX_OPS];
+    uint32_t per_op_count;
+    uint64_t p50, p95, p99;
+} perf_sample_t;
+
+uint64_t perf_rdcycle(void);
+void     perf_begin(perf_sample_t *s, personality_t p);
+void     perf_op(perf_sample_t *s, uint32_t bytes_in, uint32_t bytes_out,
+                 uint32_t region_id);
+void     perf_hw_op(perf_sample_t *s);
+void     perf_batch_summary(perf_sample_t *s, uint32_t logical, uint32_t unique);
+void     perf_end(perf_sample_t *s);
+double   perf_speedup(const perf_sample_t *s);
+double   perf_bytes_avoided_pct(const perf_sample_t *s);
+double   perf_coalesce_ratio(const perf_sample_t *s);
+const perf_sample_t *perf_last_sample(void);
+const perf_sample_t *perf_last_for(personality_t p);
 
 /* atomik_event.c — workload event bus.  v0.31 patch 2/N.
  *
