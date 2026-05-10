@@ -311,6 +311,10 @@ int main(int argc, char **argv) {
          * Passive observer — reads existing producers + maintains
          * its own personality timeline + speedup sparkline rings. */
         state_watch_tick();
+        /* v0.37: tick the Replica Flow surface.  Spawns/expires the
+         * in-flight delta pulses based on EVT_SYNC_REPLICA event-bus
+         * deltas.  Passive observer; cheap. */
+        replica_flow_tick();
         if (ev.kind == EV_QUIT) { s_running = 0; break; }
         if (ev.kind == EV_KEY) {
             int dirty = 0;
@@ -371,6 +375,13 @@ int main(int argc, char **argv) {
              * not an app. */
             else if (ev.key == 'v' || ev.key == 'V') {
                 state_watch_open();
+                dirty = 1;
+            }
+            /* v0.37: 'X' opens the Replica Flow surface — the SYNC
+             * personality's product story (LOCAL → DELTA → REMOTE).
+             * System-shelf class. */
+            else if (ev.key == 'x' || ev.key == 'X') {
+                replica_flow_open();
                 dirty = 1;
             }
             /* (3) FOCUSED-APP KEYS — terminal/files/notes/document */

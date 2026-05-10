@@ -9,7 +9,7 @@
  * carries a user-visible change. About window, status bar, and the
  * /tmp/atomik_os_version stamp all read from here so the screen output
  * NEVER lies about which build is running. */
-#define AOS_VERSION "v0.36-A"
+#define AOS_VERSION "v0.37"
 
 /* Display geometry — locked to 1920x1080 XRGB8888 since simplefb is fixed. */
 #define FB_W       1920
@@ -620,6 +620,41 @@ void atomik_asset_blit_alpha(const atomik_asset_t *a, int dx, int dy,
  * a small (480×270) seamless grid tile, keeping peak memory bounded. */
 void atomik_asset_blit_tiled(const atomik_asset_t *a,
                              int dx, int dy, int w, int h);
+
+/* replica_flow.c — v0.37 SYNC personality product story.
+ *
+ * Wide horizontal surface that visualizes the SYNC personality's job:
+ * propagating state deltas from a LOCAL edge node to a REMOTE replica.
+ * Per ChatGPT 2026-05-09 directive (Lane 2): real SYNC metrics from
+ * perf_last_for + atomik_event_iter, no fake numbers.  Class B art
+ * comes via the asset pipeline once we have a flow texture.
+ *
+ * Layout (in window content rect):
+ *   ┌────────────────────────────────────────────────────────┐
+ *   │ REPLICA FLOW                  [ AUTO: SYNC ]           │
+ *   ├──────────┬──────────────────────────────────┬──────────┤
+ *   │ LOCAL    │       DELTA PROPAGATION          │ REMOTE   │
+ *   │ NODE     │  (animated stream of pulses)     │ REPLICA  │
+ *   │ metrics  │       <delta count>              │ metrics  │
+ *   ├──────────┴──────────────────────────────────┴──────────┤
+ *   │ RECENT DELTA SHARES (last N SYNC_REPLICA bus events)   │
+ *   └────────────────────────────────────────────────────────┘
+ *
+ * Honest UI rule: there is NO remote endpoint configured.  We label
+ * the right panel "(local simulation)" so the audience never confuses
+ * the replica art with an actual network sync.  Real SYNC metrics
+ * still display because they describe what ATOMiK *would* ship if a
+ * remote were attached.
+ *
+ * Lifecycle: replica_flow_tick() runs every frame; advances the
+ * delta-stream animation phase + samples event-bus deltas.
+ * replica_flow_open() opens (or focuses) the window via the 'X' key
+ * (eXchange).  replica_flow_draw() composes the panels. */
+#define REPLICA_DELTA_RING_N  16    /* in-flight delta pulses */
+
+void replica_flow_open(void);
+void replica_flow_draw(window_t *w, int x, int y, int wd, int ht);
+void replica_flow_tick(void);
 
 /* terminal.c — pty-backed terminal app. Must be declared AFTER wm.c
  * because terminal_draw signature uses window_t. */
