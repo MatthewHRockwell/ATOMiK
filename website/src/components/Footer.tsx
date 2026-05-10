@@ -2,23 +2,21 @@ import Link from "next/link";
 
 const footerCols: { title: string; links: [string, string][] }[] = [
   {
-    title: "Product",
+    title: "Evaluate",
     links: [
-      ["/get-started", "Get Started"],
-      ["/dashboard", "Dashboard"],
-      ["/pricing", "Pricing"],
-      ["/integrations", "Integrations"],
-      ["/get-started#downloads", "Downloads"],
+      ["/contact?intent=evaluation", "Evaluation Access"],
+      ["/contact?intent=demo", "Technical Demo"],
+      ["/contact?intent=design-partner", "Design Partnership"],
+      ["/pricing", "Offer Structure"],
     ],
   },
   {
-    title: "Developers",
+    title: "Proof",
     links: [
-      ["/docs", "Docs"],
-      ["/blog", "Blog"],
       ["/benchmarks", "Benchmarks"],
-      ["/roi", "ROI Calculator"],
-      ["/faq", "FAQ"],
+      ["/docs", "Docs"],
+      ["https://github.com/MatthewHRockwell/ATOMiK/blob/main/docs/evidence-labels.md", "Evidence Labels"],
+      ["https://github.com/MatthewHRockwell/ATOMiK/blob/main/results/claims_registry.yaml", "Claims Registry"],
     ],
   },
   {
@@ -26,9 +24,7 @@ const footerCols: { title: string; links: [string, string][] }[] = [
     links: [
       ["/about", "About"],
       ["/about/roadmap", "Roadmap"],
-      ["/case-studies", "Case Studies"],
-      ["/solutions", "Solutions"],
-      ["/compliance", "Compliance"],
+      ["/solutions", "Workloads"],
       ["mailto:mrockwell@atomik.tech", "Contact"],
     ],
   },
@@ -37,7 +33,6 @@ const footerCols: { title: string; links: [string, string][] }[] = [
     links: [
       ["/privacy", "Privacy"],
       ["/terms", "Terms"],
-      ["/changelog", "Changelog"],
       ["https://github.com/MatthewHRockwell/ATOMiK", "GitHub"],
     ],
   },
@@ -46,27 +41,23 @@ const footerCols: { title: string; links: [string, string][] }[] = [
 export default function Footer() {
   return (
     <footer
-      className="px-6 pt-14 pb-10 text-sm"
-      style={{ borderTop: "1px solid #1e1e2e", background: "#0a0a0f", color: "#8888a0" }}
+      className="px-6 pb-10 pt-14 text-sm"
+      style={{ borderTop: "1px solid #1d324a", background: "#070b12", color: "#9fb1c7" }}
     >
-      <div className="max-w-5xl mx-auto">
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-10 mb-10">
-          {/* Logo + tagline */}
+      <div className="mx-auto max-w-6xl">
+        <div className="mb-10 grid grid-cols-2 gap-10 md:grid-cols-5">
           <div>
-            <div className="text-lg font-bold text-white mb-3">
-              <span style={{ color: "#8b5cf6" }}>ATOM</span>
-              <span style={{ color: "#4f8fff" }}>i</span>
-              <span style={{ color: "#8b5cf6" }}>K</span>
+            <div className="mb-3 text-lg font-bold text-white">
+              ATOM<span style={{ color: "#22d3ee" }}>i</span>K
             </div>
             <p className="text-xs leading-relaxed">
-              Delta-state computing infrastructure. Stop moving data. Start
-              evolving it.
+              State-aware compute for systems that spend too much work rediscovering what changed.
             </p>
           </div>
 
           {footerCols.map((col) => (
             <div key={col.title}>
-              <h4 className="text-xs font-semibold uppercase tracking-wide text-white mb-3">
+              <h4 className="mb-3 text-xs font-semibold uppercase text-white">
                 {col.title}
               </h4>
               <div className="flex flex-col gap-2">
@@ -74,8 +65,8 @@ export default function Footer() {
                   const isExternal =
                     href.startsWith("http") || href.startsWith("mailto:");
                   const cls =
-                    "hover:text-white transition-colors text-xs no-underline";
-                  const s = { color: "#8888a0" as const };
+                    "text-xs no-underline transition-colors hover:text-white";
+                  const s = { color: "#9fb1c7" as const };
                   return isExternal ? (
                     <a key={label} href={href} className={cls} style={s}>
                       {label}
@@ -91,33 +82,23 @@ export default function Footer() {
           ))}
         </div>
 
-        <div
-          className="flex flex-wrap justify-between items-center gap-4 pt-6"
-          style={{ borderTop: "1px solid #1e1e2e" }}
-        >
-          <p>&copy; 2026 ATOMiK Project. All rights reserved.</p>
-          <div className="flex gap-5">
-            <Link
-              href="/privacy"
-              className="hover:text-white transition-colors no-underline"
-              style={{ color: "#8888a0" }}
-            >
-              Privacy
-            </Link>
-            <Link
-              href="/terms"
-              className="hover:text-white transition-colors no-underline"
-              style={{ color: "#8888a0" }}
-            >
-              Terms
-            </Link>
-            <a
-              href="mailto:support@atomik.tech"
-              className="hover:text-white transition-colors no-underline"
-              style={{ color: "#8888a0" }}
-            >
-              Support
-            </a>
+        <div className="pt-6" style={{ borderTop: "1px solid #1d324a" }}>
+          <p className="max-w-4xl text-xs leading-6">
+            Live screenshots show current prototypes. Concept visuals show product direction and are not represented as current shipped functionality. Performance claims are only stated when backed by measured artifacts.
+          </p>
+          <div className="mt-5 flex flex-wrap justify-between gap-4">
+            <p>&copy; 2026 ATOMiK Project. All rights reserved.</p>
+            <div className="flex gap-5">
+              <Link href="/privacy" className="no-underline transition-colors hover:text-white" style={{ color: "#9fb1c7" }}>
+                Privacy
+              </Link>
+              <Link href="/terms" className="no-underline transition-colors hover:text-white" style={{ color: "#9fb1c7" }}>
+                Terms
+              </Link>
+              <a href="mailto:support@atomik.tech" className="no-underline transition-colors hover:text-white" style={{ color: "#9fb1c7" }}>
+                Support
+              </a>
+            </div>
           </div>
         </div>
       </div>

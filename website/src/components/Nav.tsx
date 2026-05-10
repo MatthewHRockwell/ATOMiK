@@ -8,15 +8,13 @@ export default function Nav({ active }: { active?: string }) {
   const navRef = useRef<HTMLElement>(null);
 
   const links = [
-    { href: "/solutions", label: "Solutions" },
     { href: "/docs", label: "Docs" },
-    { href: "/pricing", label: "Pricing" },
-    { href: "/blog", label: "Blog" },
-    { href: "/dashboard", label: "Dashboard" },
+    { href: "/benchmarks", label: "Proof" },
+    { href: "/pricing", label: "Evaluation" },
+    { href: "/about/roadmap", label: "Roadmap" },
     { href: "https://github.com/MatthewHRockwell/ATOMiK", label: "GitHub" },
   ];
 
-  // Close menu when clicking outside the nav
   useEffect(() => {
     if (!menuOpen) return;
     function handleClickOutside(e: MouseEvent) {
@@ -28,7 +26,6 @@ export default function Nav({ active }: { active?: string }) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [menuOpen]);
 
-  // Close menu on route change (resize past md breakpoint)
   useEffect(() => {
     function handleResize() {
       if (window.innerWidth >= 768) {
@@ -42,111 +39,90 @@ export default function Nav({ active }: { active?: string }) {
   return (
     <nav
       ref={navRef}
-      className="sticky top-0 z-50 backdrop-blur-md border-b"
-      style={{ background: "rgba(10, 10, 15, 0.85)", borderColor: "#1e1e2e" }}
+      className="sticky top-0 z-50 border-b backdrop-blur-md"
+      style={{ background: "rgba(7, 11, 18, 0.88)", borderColor: "#1d324a" }}
     >
-      <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
-        {/* Logo */}
+      <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
         <Link
           href="/"
-          className="text-lg font-bold tracking-tight hover:opacity-80 transition-opacity"
+          className="text-lg font-bold no-underline transition-opacity hover:opacity-80"
+          style={{ color: "#f4f8ff" }}
         >
-          <span style={{ color: "#8b5cf6" }}>ATOM</span>
-          <span style={{ color: "#4f8fff" }}>i</span>
-          <span style={{ color: "#8b5cf6" }}>K</span>
+          ATOM<span style={{ color: "#22d3ee" }}>i</span>K
         </Link>
 
-        {/* Desktop links */}
-        <div
-          className="hidden md:flex items-center gap-6 text-sm"
-          style={{ color: "#8888a0" }}
-        >
+        <div className="hidden items-center gap-6 text-sm md:flex" style={{ color: "#9fb1c7" }}>
           {links.map((link) =>
             link.label === active ? (
-              <span key={link.href} className="text-white font-medium">
+              <span key={link.href} className="font-medium text-white">
                 {link.label}
               </span>
             ) : (
               <Link
                 key={link.href}
                 href={link.href}
-                className="hover:text-white transition-colors"
+                className="no-underline transition-colors hover:text-white"
               >
                 {link.label}
               </Link>
             )
           )}
           <Link
-            href="/get-started"
-            className="px-4 py-1.5 rounded-full text-sm font-semibold text-white no-underline transition-opacity hover:opacity-85"
-            style={{
-              background: "linear-gradient(135deg, #22d3ee, #4f8fff)",
-              boxShadow: "0 2px 12px rgba(79,143,255,0.3)",
-            }}
+            href="/contact?intent=evaluation"
+            className="rounded-lg px-4 py-2 text-sm font-semibold text-white no-underline transition-opacity hover:opacity-90"
+            style={{ background: "#4f8fff" }}
           >
-            Get Started
+            Request Evaluation Access
           </Link>
         </div>
 
-        {/* Hamburger button (mobile only) */}
         <button
-          className="md:hidden flex flex-col justify-center items-center w-8 h-8 gap-[5px] group"
+          className="flex h-8 w-8 flex-col items-center justify-center gap-[5px] md:hidden"
           onClick={() => setMenuOpen((prev) => !prev)}
           aria-label={menuOpen ? "Close menu" : "Open menu"}
           aria-expanded={menuOpen}
         >
           <span
-            className="block w-5 h-[2px] rounded-full transition-all duration-300 ease-in-out"
+            className="block h-[2px] w-5 rounded-full transition-all duration-300"
             style={{
-              background: "#8888a0",
-              transform: menuOpen
-                ? "translateY(7px) rotate(45deg)"
-                : "none",
+              background: "#9fb1c7",
+              transform: menuOpen ? "translateY(7px) rotate(45deg)" : "none",
             }}
           />
           <span
-            className="block w-5 h-[2px] rounded-full transition-all duration-300 ease-in-out"
-            style={{
-              background: "#8888a0",
-              opacity: menuOpen ? 0 : 1,
-            }}
+            className="block h-[2px] w-5 rounded-full transition-all duration-300"
+            style={{ background: "#9fb1c7", opacity: menuOpen ? 0 : 1 }}
           />
           <span
-            className="block w-5 h-[2px] rounded-full transition-all duration-300 ease-in-out"
+            className="block h-[2px] w-5 rounded-full transition-all duration-300"
             style={{
-              background: "#8888a0",
-              transform: menuOpen
-                ? "translateY(-7px) rotate(-45deg)"
-                : "none",
+              background: "#9fb1c7",
+              transform: menuOpen ? "translateY(-7px) rotate(-45deg)" : "none",
             }}
           />
         </button>
       </div>
 
-      {/* Mobile dropdown panel */}
       <div
-        className="md:hidden overflow-hidden transition-all duration-300 ease-in-out"
+        className="overflow-hidden transition-all duration-300 md:hidden"
         style={{
           maxHeight: menuOpen ? `${(links.length + 1) * 48 + 24}px` : "0px",
           opacity: menuOpen ? 1 : 0,
-          borderTop: menuOpen ? "1px solid #1e1e2e" : "none",
+          borderTop: menuOpen ? "1px solid #1d324a" : "none",
         }}
       >
-        <div className="max-w-5xl mx-auto px-6 py-2 flex flex-col text-sm">
+        <div className="mx-auto flex max-w-6xl flex-col px-6 py-2 text-sm">
           {links.map((link) =>
             link.label === active ? (
-              <span
-                key={link.href}
-                className="text-white font-medium py-2.5 px-2"
-              >
+              <span key={link.href} className="px-2 py-2.5 font-medium text-white">
                 {link.label}
               </span>
             ) : (
               <Link
                 key={link.href}
                 href={link.href}
-                className="py-2.5 px-2 hover:text-white transition-colors"
-                style={{ color: "#8888a0" }}
+                className="px-2 py-2.5 no-underline transition-colors hover:text-white"
+                style={{ color: "#9fb1c7" }}
                 onClick={() => setMenuOpen(false)}
               >
                 {link.label}
@@ -154,15 +130,12 @@ export default function Nav({ active }: { active?: string }) {
             )
           )}
           <Link
-            href="/get-started"
-            className="mt-2 mx-2 py-2.5 rounded-full text-sm font-semibold text-white text-center no-underline transition-opacity hover:opacity-85"
-            style={{
-              background: "linear-gradient(135deg, #22d3ee, #4f8fff)",
-              boxShadow: "0 2px 12px rgba(79,143,255,0.3)",
-            }}
+            href="/contact?intent=evaluation"
+            className="mx-2 mt-2 rounded-lg py-2.5 text-center text-sm font-semibold text-white no-underline transition-opacity hover:opacity-90"
+            style={{ background: "#4f8fff" }}
             onClick={() => setMenuOpen(false)}
           >
-            Get Started
+            Request Evaluation Access
           </Link>
         </div>
       </div>

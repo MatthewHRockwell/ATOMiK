@@ -14,8 +14,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ATOMiK — Delta-State Computing",
-  description: "O(1) state reconstruction, 99% less bandwidth, 330,000x less memory. Formally proven with 108 Lean4 theorems.",
+  title: "ATOMiK - State-Aware Compute",
+  description:
+    "State-aware compute for systems that spend too much work rediscovering what changed.",
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "any" },
@@ -25,18 +26,20 @@ export const metadata: Metadata = {
     apple: "/apple-touch-icon.png",
   },
   openGraph: {
-    title: "ATOMiK — Stop moving data. Start evolving it.",
-    description: "O(1) state reconstruction. 99% less bandwidth. 330,000x less memory. Formally proven with 108 Lean4 theorems.",
+    title: "ATOMiK - State-Aware Compute",
+    description:
+      "State-aware compute for systems that cannot afford to recompute everything.",
     url: "https://atomik.tech",
     siteName: "ATOMiK",
-    images: [{ url: "https://atomik.tech/og-image.jpg", width: 1200, height: 630 }],
+    images: [{ url: "https://atomik.tech/01-current-live-atomik-desk.jpg", width: 1200, height: 630 }],
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "ATOMiK — Stop moving data. Start evolving it.",
-    description: "O(1) state reconstruction. 99% less bandwidth. 330,000x less memory.",
-    images: ["https://atomik.tech/og-image.jpg"],
+    title: "ATOMiK - State-Aware Compute",
+    description:
+      "State-aware compute for systems that cannot afford to recompute everything.",
+    images: ["https://atomik.tech/01-current-live-atomik-desk.jpg"],
   },
 };
 
@@ -50,53 +53,19 @@ const jsonLd = {
       logo: "https://atomik.tech/logo.png",
       sameAs: ["https://github.com/MatthewHRockwell/ATOMiK"],
       description:
-        "Delta-state algebra for O(1) state reconstruction. 99% less bandwidth, 330,000x less memory. Formally proven with 108 Lean4 theorems.",
+        "State-aware compute for systems that spend too much work rediscovering what changed.",
     },
     {
-      "@type": "SoftwareApplication",
-      name: "ATOMiK SDK",
-      applicationCategory: "DeveloperApplication",
-      operatingSystem: "Linux, macOS, Windows",
-      description:
-        "Delta-state algebra for O(1) state reconstruction. 99% less bandwidth, 330,000x less memory. Formally proven with 108 Lean4 theorems.",
-      url: "https://atomik.tech",
-      offers: [
-        {
-          "@type": "Offer",
-          name: "Community",
-          price: "0",
-          priceCurrency: "USD",
-          description: "Python SDK, C99 header, JavaScript SDK, Apache 2.0",
-        },
-        {
-          "@type": "Offer",
-          name: "Pro",
-          price: "99",
-          priceCurrency: "USD",
-          description:
-            "Linux kernel module (COW detection, network dedup, cgroup tracking), 27 sysfs metrics, atomik-bench, 48hr SLA",
-        },
-        {
-          "@type": "Offer",
-          name: "Team",
-          price: "299",
-          priceCurrency: "USD",
-          description:
-            "SDK generation pipeline (5 languages), atomik-report waste analysis, 5-seat team license, JSON/CSV CI export",
-        },
-        {
-          "@type": "Offer",
-          name: "Enterprise",
-          price: "999",
-          priceCurrency: "USD",
-          description:
-            "FPGA hardware acceleration (Zynq, 512 banks), custom RV64I CPU, 4-hour SLA, dedicated support, formal verification",
-        },
-      ],
-      author: {
-        "@type": "Person",
-        name: "Matt Rockwell",
+      "@type": "Service",
+      name: "ATOMiK Evaluation Access",
+      serviceType: "Technical evaluation",
+      provider: {
+        "@type": "Organization",
+        name: "ATOMiK",
       },
+      description:
+        "Request-based technical evaluation access for state-heavy edge, embedded, and distributed workloads.",
+      url: "https://atomik.tech/contact",
     },
   ],
 };
