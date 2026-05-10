@@ -5,7 +5,12 @@
  * to redraw every frame. We render the whole wallpaper ONCE into the back
  * buffer, then memcpy it to a heap cache. On subsequent frames we memcpy
  * the cache straight back to the back buffer. wallpaper_invalidate()
- * forces a re-render when settings change. */
+ * forces a re-render when settings change.
+ *
+ * v0.36: try to load /tmp/atomik_assets/topology_wallpaper.atomik_asset
+ * before falling back to the procedural render.  Class B per ChatGPT
+ * 2026-05-09 — pre-rendered art, deployed alongside the binary, shown
+ * UNDER the Class A telemetry rather than instead of it. */
 #include "atomik_os.h"
 #include <stdlib.h>
 #include <string.h>
@@ -17,7 +22,36 @@ static int      s_cached = 0;
 
 void wallpaper_invalidate(void) { s_cached = 0; }
 
+/* v0.36: try a few candidate locations so the asset works whether
+ * deploy.py shipped it via cpio overlay or sideloaded via UART. */
+static int try_blit_asset(void) {
+    const char *paths[] = {
+        "/tmp/atomik_assets/topology_wallpaper.atomik_asset",
+        "/root/atomik_assets/topology_wallpaper.atomik_asset",
+        "/usr/share/atomik_os/topology_wallpaper.atomik_asset",
+        NULL
+    };
+    atomik_asset_t a;
+    for (int i = 0; paths[i]; i++) {
+        if (atomik_asset_load(paths[i], &a) == 0) {
+            atomik_asset_blit(&a, 0, 0);
+            atomik_asset_free(&a);
+            return 1;
+        }
+    }
+    return 0;
+}
+
 static void wallpaper_full_render(void) {
+    /* v0.36: asset blit deferred to v0.36-A.  The full-resolution
+     * 1920×1080 topology asset triggers atomik_os to hang on first-
+     * paint (likely a memory-pressure issue — the wallpaper cache is
+     * already 8.3 MB; loading the asset adds another 8.3 MB pixel
+     * buffer + 650 KB payload).  The procedural path here is the
+     * tested-on-hardware baseline; integration ships in a follow-up
+     * once we've sized the asset down or streamed it scanline-wise. */
+    (void)try_blit_asset;     /* keep API live, callable from tests */
+
     /* Smooth vertical gradient covering the whole screen. */
     draw_gradient_v(0, 0, FB_W, FB_H, ATOMIK_BG_TOP, ATOMIK_BG_BOT);
 

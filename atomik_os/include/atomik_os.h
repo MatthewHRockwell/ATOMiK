@@ -9,7 +9,7 @@
  * carries a user-visible change. About window, status bar, and the
  * /tmp/atomik_os_version stamp all read from here so the screen output
  * NEVER lies about which build is running. */
-#define AOS_VERSION "v0.35"
+#define AOS_VERSION "v0.36"
 
 /* Display geometry — locked to 1920x1080 XRGB8888 since simplefb is fixed. */
 #define FB_W       1920
@@ -563,6 +563,56 @@ const char                  *fabric_lane_name(fabric_lane_t lane);
 void          state_watch_open(void);
 void          state_watch_draw(window_t *w, int x, int y, int wd, int ht);
 void          state_watch_tick(void);
+
+/* atomik_asset.c — board-side asset loader, v0.36 (Class B foundation).
+ *
+ * Loads `.atomik_asset` files (ATKA v1 format) into XRGB8888 pixel
+ * buffers and blits them to the framebuffer.  Per ChatGPT 2026-05-09
+ * directive: raw + RLE board-friendly format, NOT PNG decode.  The
+ * host converter (tools/make_atomik_asset.py) does any PNG → XRGB
+ * conversion work; the board does memcpy-equivalent blits.
+ *
+ * File format (all little-endian, 24-byte header):
+ *   0x00  magic        4 bytes  "ATKA"
+ *   0x04  version      uint16   = 1
+ *   0x06  flags        uint16   bit 0 = RLE-compressed payload
+ *   0x08  width        uint32   pixels
+ *   0x0C  height       uint32   pixels
+ *   0x10  payload_bytes uint32  size of payload after header
+ *   0x14  reserved     uint32   = 0
+ *   0x18  payload begins
+ *
+ * Raw payload: width*height pixels, scanline-major, XRGB8888 LE
+ * (matches /dev/fb0 layout — no swizzle at blit time).
+ *
+ * RLE payload: stream of records.  Each record = uint16 count followed
+ * by uint32 pixel, meaning "count copies of pixel".  Decode ends when
+ * total reconstructed pixel count equals width*height. */
+#define ATOMIK_ASSET_MAGIC      "ATKA"
+#define ATOMIK_ASSET_VERSION    1
+#define ATOMIK_ASSET_FLAG_RLE   0x0001
+
+typedef struct {
+    uint32_t width;
+    uint32_t height;
+    pixel_t *pixels;     /* owned, freed via atomik_asset_free */
+} atomik_asset_t;
+
+/* Returns 0 on success; nonzero on any error (file missing, bad magic,
+ * unsupported version/flags, malloc failure, payload underrun).  On
+ * failure, *out is left zero-initialized. */
+int  atomik_asset_load(const char *path, atomik_asset_t *out);
+void atomik_asset_free(atomik_asset_t *a);
+
+/* Blit at (dx, dy) on the back buffer.  Clips to framebuffer bounds.
+ * No alpha — opaque source overwrites destination. */
+void atomik_asset_blit(const atomik_asset_t *a, int dx, int dy);
+
+/* Blit with constant alpha (0=transparent, 255=opaque).  Lets us use
+ * a single asset as a subtle background overlay without baking the
+ * desired opacity into the asset. */
+void atomik_asset_blit_alpha(const atomik_asset_t *a, int dx, int dy,
+                             uint8_t alpha);
 
 /* terminal.c — pty-backed terminal app. Must be declared AFTER wm.c
  * because terminal_draw signature uses window_t. */

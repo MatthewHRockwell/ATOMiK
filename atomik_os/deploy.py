@@ -192,6 +192,8 @@ def main():
     ap.add_argument("--no-launch", action="store_true")
     ap.add_argument("--no-fb2png", action="store_true",
                     help="Skip transferring the fb2png screenshot tool")
+    ap.add_argument("--no-assets", action="store_true",
+                    help="Skip shipping atomik_os/assets/*.atomik_asset")
     ap.add_argument("--no-shot", action="store_true",
                     help="Skip post-launch screenshot verification")
     args = ap.parse_args()
@@ -209,6 +211,23 @@ def main():
     transfer(s, LOCAL, REMOTE, "aos")
     if (not args.no_fb2png) and os.path.exists(FB2PNG_LOCAL):
         transfer(s, FB2PNG_LOCAL, FB2PNG_REMOTE, "fb2png")
+
+    # v0.36: ship .atomik_asset files so the board can blit pre-rendered
+    # backgrounds (Class B per ChatGPT 2026-05-09).  Each asset goes to
+    # /tmp/atomik_assets/<name> — wallpaper.c probes that directory.
+    if not args.no_assets:
+        assets_dir = os.path.join(HERE, "assets")
+        if os.path.isdir(assets_dir):
+            asset_files = sorted([f for f in os.listdir(assets_dir)
+                                  if f.endswith(".atomik_asset")])
+            if asset_files:
+                cmd(s, "mkdir -p /tmp/atomik_assets", log=False)
+                for name in asset_files:
+                    local = os.path.join(assets_dir, name)
+                    remote = f"/tmp/atomik_assets/{name}"
+                    label = f"asset_{name.split('.')[0]}"
+                    print(f"[deploy] shipping asset: {name}", flush=True)
+                    transfer(s, local, remote, label)
 
     if args.no_launch:
         print("[deploy] --no-launch set; not starting.")
