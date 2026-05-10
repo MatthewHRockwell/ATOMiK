@@ -1,97 +1,74 @@
-# ATOMiK — Delta-State Computing in Silicon
+# ATOMiK
 
-**1 Billion Operations/Second on a $13.50 Chip**
+**State-aware execution for systems that waste too much work rediscovering what changed.**
 
-ATOMiK is a hardware-accelerated delta-state computing architecture that replaces traditional full-state updates with XOR-based delta accumulation. Every operation completes in a single clock cycle (10.6 ns), scales linearly with parallel banks, and is backed by 108 machine-verified mathematical proofs.
+## Problem
 
----
+Most modern systems still move, copy, replay, and rescan full state even when
+only a small delta matters. That creates unnecessary bandwidth usage,
+synchronization complexity, rollback overhead, and wasted compute.
 
-## Key Metrics
+## Solution
 
-| Metric | Value |
-|--------|-------|
-| **Deployment Status** | ✅ **PRODUCTION** — Two SoC generations deployed on Tang Nano 9K |
-| **v3 SoC (latest)** | Custom RV64I CPU + ATOMiK direct-wire, 1280×720 HDMI, 8-screen demo |
-| **v2 SoC** | PicoRV32 + ATOMiK accelerator, 81 MHz, dual-clock CDC |
-| Throughput (validated) | **1,056 Mops/s** (16 parallel banks) |
-| v3 Memcpy speedup | **6.4× faster** than software (v2 was 12% slower) |
-| Operation latency | **10.6 ns** (single cycle @ 94.5 MHz standalone) |
-| Memory reduction | **95-100%** (sparse deltas vs. dense state) |
-| Formal proofs | **108** (Lean4 verified, 0 sorry statements) |
-| Hardware tests | **80/80** passing (sweep) + v3: 9/9 ATOMiK + 10/10 Phase 2 + 6/6 Display |
-| Timing closure | **0 TNS** across all clock domains (v2 and v3) |
-| LUT utilization | **69%** (v3 SoC) / **44%** (v2 SoC) / 20% (standalone 16-bank) |
-| SDK languages | **5** (Python, Rust, C, JavaScript, Verilog) |
-| SDK tests | **353** passing |
-| Device cost | **$13.50** (Tang Nano 9K FPGA) |
-| Total dev cost | **~$225** (AI-augmented development) |
+ATOMiK makes state change a first-class computational primitive. It applies
+compact deltas, reconstructs state on demand, and enables more efficient sync
+and adaptive execution paths for edge, embedded, and distributed systems.
 
-## How It Works
+## Live Proof
 
-Traditional systems copy full state on every update. ATOMiK stores only the changes (deltas) and reconstructs state on demand using XOR — a mathematically perfect operation with zero carry chains and natural parallelism.
+![Current ATOMiK Desk prototype running on live hardware](../../website/public/01-current-live-atomik-desk.jpg)
 
-```
-State_current = Initial XOR delta_1 XOR delta_2 XOR ... XOR delta_n
-```
+**HARDWARE_VALIDATED:** Current ATOMiK Desk prototype running on live hardware.
 
-**Properties** (formally proven):
-- **Commutative**: Order doesn't matter — enables lock-free parallelism
-- **Self-inverse**: Every change is its own undo — no checkpoints needed
-- **Single-cycle**: No carry propagation — pure LUT-based computation
+ATOMiK has public software artifacts, formal proof work, benchmark outputs, and
+hardware-backed demo surfaces. Public proof is labeled by validation tier so
+measured, synthesis-derived, projected, and conceptual claims stay separate.
 
-## Architecture
+## Concept / Roadmap Vision
 
-N parallel XOR accumulator banks with a binary merge tree achieve linear throughput scaling. 16 banks on a $13.50 FPGA break the 1 Gops/s barrier. The architecture extends to 32x, 64x, and beyond on larger FPGAs.
+ATOMiK Desk and Resource Fabric show how the same architecture can evolve into
+a state-aware compute environment where workloads reorganize around changing
+context instead of static application silos.
 
-## Market Applications
+Concept visuals are clearly labeled and are not represented as current shipped
+functionality.
 
-- **High-Frequency Trading**: Single-cycle tick processing with instant trade reversal
-- **IoT/Sensor Fusion**: Lock-free multi-stream merge at edge-device power budgets
-- **Video Processing**: 95% memory reduction for frame delta pipelines
-- **Database Replication**: O(1) state reconstruction vs. O(N) event replay
-- **Digital Twins**: Commutative merge enables distributed state synchronization
-- **Gaming**: Order-independent multiplayer state sync with instant rollback
+## Target Customer
 
----
+Engineering and platform teams working on state-heavy edge systems, sync-heavy
+distributed systems, embedded deployments, or adaptive execution environments.
 
-## Competitive Moat
+## Initial Wedge
 
-- **Patent Pending**: Architecture and execution model under IP protection
-- **Formal Verification**: 108 Lean4 proofs — machine-verified, not hand-tested
-- **Hardware Validated**: Real FPGA silicon, not just simulation
-- **Full Stack**: Math proofs + RTL + SDK + agentic pipeline — 6 phases complete
-- **Linear Scaling**: Proven to 16x, extends to 64x+ with larger devices
+Delta-native sync and execution for workloads where full-state movement is too
+expensive.
 
 ## Business Model
 
-1. **IP Licensing**: RTL cores for chip designers and FPGA integrators
-2. **Hardware Accelerator IP**: Pre-built vertical modules (HFT, IoT, video)
-3. **SDK Platform**: Schema-driven code generation subscription
-4. **Professional Services**: Custom enterprise integration
+Near term: evaluations and design-partner engagements.
 
----
+Longer term: enterprise support, integration, targeted licensing, and broader
+platform economics.
 
-## Development Status
+## Why Now
 
-| Phase | Status |
-|-------|--------|
-| Mathematical Formalization (108 proofs) | ✅ Complete |
-| Hardware Synthesis (Tang Nano 9K) | ✅ Complete |
-| SDK Code Generation (5 languages) | ✅ Complete |
-| Agentic Pipeline (25 modules, 353 tests) | ✅ Complete |
-| Parallel Scaling (16x, 1 Gops/s) | ✅ Complete |
-| **v2 Production SoC** (PicoRV32) | ✅ **DEPLOYED** (Feb 2026) |
-| **v3 Production SoC** (Custom RV64I + HDMI) | ✅ **DEPLOYED** (Mar 2026) |
-| 3-Node VC Demo | ✅ Complete |
-| Zynq Port (ALINX AX7020) | 🔄 In Progress (52/52 sim tests, board on order) |
+As compute shifts toward edge AI, appliance-like systems, and heterogeneous
+workloads, the cost of memory movement, synchronization, and orchestration waste
+is becoming harder to ignore.
 
-**v3 SoC Milestone** (Mar 2026): Custom RV64I CPU with direct-wire ATOMiK integration deployed on Tang Nano 9K. Features 1280×720@60Hz HDMI output with delta-driven display pipeline (`pixel_out = pixel_ref ⊕ LUT[index]`), 8-screen auto-cycling investor demo, and 6.4× memcpy speedup over software. All test suites passing (9/9 ATOMiK, 10/10 Phase 2, 6/6 Display). Zero TNS across all clock domains.
+## Design Partner Ask
 
-**v2 SoC Milestone** (Feb 2026): PicoRV32 SoC accelerator with dual-clock CDC, 81 MHz ATOMiK core, clean timing closure, persistent flash deployment.
+Bring ATOMiK one real workload, one real bottleneck, and one internal champion.
+We will define success criteria together and determine whether there is real
+deployment fit.
 
-## Contact
+## Contact CTA
 
-**ATOMiK — Delta-State Computing in Silicon**
-*Patent Pending*
-Repository: github.com/MatthewHRockwell/ATOMiK
-License: Apache 2.0 (evaluation) — Commercial license available
+Request a technical briefing, evaluation access, or a design-partner
+conversation: `mrockwell@atomik.tech`
+
+## Evidence Disclaimer
+
+Live screenshots show current prototypes. Concept visuals show product direction
+and are not represented as current shipped functionality. Performance claims
+are only stated when backed by measured artifacts.

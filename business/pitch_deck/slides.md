@@ -2,294 +2,134 @@
 marp: true
 theme: uncover
 paginate: true
-backgroundColor: "#1e1e2e"
-color: "#cdd6f4"
+backgroundColor: "#070b12"
+color: "#f4f8ff"
 style: |
-  section {
-    font-family: 'Inter', 'Segoe UI', sans-serif;
-  }
-  h1 { color: #89b4fa; }
-  h2 { color: #cba6f7; }
-  strong { color: #a6e3a1; }
-  em { color: #f9e2af; }
-  a { color: #89b4fa; }
-  code { background: #313244; color: #cdd6f4; padding: 2px 6px; border-radius: 4px; }
-  table { font-size: 0.8em; }
-  th { background: #313244; }
+  section { font-family: 'Inter', 'Segoe UI', sans-serif; }
+  h1, h2 { color: #22d3ee; }
+  strong { color: #f4f8ff; }
+  em { color: #9fb1c7; }
+  small { color: #9fb1c7; }
 ---
 
 # ATOMiK
 
-## Delta-State Computing in Silicon
+## State-aware execution for systems that waste too much work rediscovering what changed
 
-**1 billion operations/second on a $13.50 chip**
-
-*Mathematically proven. Hardware validated. Patent pending.*
+<small>HARDWARE_VALIDATED live prototype available</small>
 
 ---
 
-# The Problem: State Management is the Bottleneck
+# The Problem
 
-Modern systems waste enormous resources managing state:
+Modern systems repeatedly move, replay, and rescan full state even when change
+is sparse.
 
-- **Memory traffic**: Full-state copies on every update (64 bytes to change 1 bit)
-- **Lock contention**: Serialized access kills parallelism
-- **No native undo**: Checkpoint/rollback journals add latency and complexity
-- **Scaling wall**: Traditional architectures hit diminishing returns
-
-> Every database, every trading engine, every sensor network, every video pipeline faces this problem.
+- full-state copies
+- replay-heavy reconstruction
+- expensive change detection
+- rollback and sync overhead
 
 ---
 
-# The Solution: Delta-State Algebra
+# The Primitive
 
-Instead of storing full state, ATOMiK stores only **changes (deltas)**:
+ATOMiK makes state change a first-class compute primitive.
 
 ```
-Traditional:  State_n = Load(Store(full_state))     // 64-byte copy each time
-ATOMiK:       State_n = S0 XOR d1 XOR d2 XOR ... XOR dn   // single operation
+reference state + compact deltas -> reconstruct on demand
 ```
-
-**XOR as the universal operator:**
-- Single-cycle execution (10.6 ns)
-- No carry chain propagation
-- Naturally parallel (order doesn't matter)
-- Every change is its own undo
-
-*95-100% memory reduction. Zero lock contention. Instant reversal.*
 
 ---
 
-# How It Works
+# Why Customers Care
 
-### Traditional State Management
-```
-[Full State Copy] --> [Lock] --> [Modify] --> [Unlock] --> [Full State Copy]
-     64 bytes          wait       compute       signal        64 bytes
-```
+Less unnecessary state movement.
 
-### ATOMiK Delta Architecture
-```
-[Initial State] --> [XOR Delta 1] --> [XOR Delta 2] --> ... --> [Read State]
-   load once         1 cycle           1 cycle                   1 cycle
-```
+Cleaner rollback.
 
-**Key insight**: XOR is an Abelian group operation. This isn't just an optimization — it's a fundamentally different computational model with mathematically guaranteed properties.
+Simpler synchronization.
+
+More adaptive execution around what actually changed.
 
 ---
 
-# Mathematical Foundation
+# Live Proof Today
 
-**108 theorems formally proven in Lean4** — the same proof system used by mathematicians for the Fields Medal.
+![Current ATOMiK Desk prototype running on live hardware](../../website/public/01-current-live-atomik-desk.jpg)
 
-| Property | Formula | Implication |
-|----------|---------|-------------|
-| **Closure** | d1 XOR d2 is in Delta | Safe composition |
-| **Associativity** | (d1 XOR d2) XOR d3 = d1 XOR (d2 XOR d3) | Arbitrary grouping |
-| **Commutativity** | d1 XOR d2 = d2 XOR d1 | Lock-free parallelism |
-| **Identity** | d XOR 0 = d | Zero-cost filtering |
-| **Self-Inverse** | d XOR d = 0 | Instant undo |
-
-These aren't aspirational — they are **machine-verified mathematical proofs**. The algebra guarantees correctness regardless of execution order, parallelism, or scale.
+<small>HARDWARE_VALIDATED: Current ATOMiK Desk prototype running on live hardware.</small>
 
 ---
 
-# Production Deployment: Two SoC Generations ✅
+# Initial Wedge
 
-**Two production SoCs deployed on Tang Nano 9K** ($13.50 FPGA):
+Start where state movement pain is acute:
 
-### v3 SoC — Custom RV64I + HDMI (Mar 2026)
-| Metric | Result |
-|--------|--------|
-| **Status** | ✅ **DEPLOYED** — Persistent flash, boots on power-up |
-| Architecture | Custom RV64I CPU + ATOMiK **direct-wire** (no CDC) |
-| HDMI output | **1280×720@60Hz** — delta-driven display pipeline |
-| Investor demo | **8-screen auto-cycling** (runs unattended) |
-| Memcpy speedup | **6.4× faster** than software (v2 was 12% slower) |
-| LUT utilization | **69%** (5,966 / 8,640 LUTs) |
-| Validation | 9/9 ATOMiK + 10/10 Phase 2 + 6/6 Display |
-
-### v2 SoC — PicoRV32 Accelerator (Feb 2026)
-| Metric | Result |
-|--------|--------|
-| ATOMiK clock | 81 MHz (Fmax: **100.2 MHz**, +23% margin) |
-| LUT utilization | **44%** (3,838 / 8,640 LUTs) |
-| Integration tests | **5/5 passing** on hardware |
-
-*v3 proves ATOMiK works as a first-class CPU datapath element — not just a peripheral accelerator.*
+- edge and embedded systems
+- sync-heavy distributed systems
+- rollback-sensitive paths
+- adaptive execution surfaces
 
 ---
 
-# Parallel Scaling: Validated to 1 Gops/s
+# Adoption Path
 
-N parallel XOR accumulator banks with binary merge tree (hardware-validated):
-
-| Banks | Frequency | Throughput | Scaling | LUTs | Status |
-|------:|----------:|-----------:|--------:|-----:|--------|
-| 1 | 81 MHz | 81 Mops/s | 1.0x | 477 | ✅ **Production** |
-| 1 | 94.5 MHz | 94.5 Mops/s | 1.0x | 477 | ✅ Standalone |
-| 4 | 81.0 MHz | 324 Mops/s | **4.0x** | 738 | ✅ Validated |
-| 8 | 67.5 MHz | 540 Mops/s | **8.0x** | 1,125 | ✅ Validated |
-| 16 | 66.0 MHz | **1,056 Mops/s** | **16.0x** | 1,776 | ✅ Validated |
-
-**Linear scaling** — no diminishing returns. Throughput = N × Freq.
-
-The merge tree adds only log₂(N) levels of combinational logic. Zero ALU carry chains means the XOR merge has no arithmetic bottleneck.
-
-*Production deployment uses N=1 @ 81 MHz. Architecture validated to N=16 (1 Gops/s) using only 20% of the same $13.50 FPGA.*
+1. Explore the primitive in software
+2. Test it against one real workload
+3. Move into hardware-backed evaluation where justified
+4. Assess broader integration only after fit is clear
 
 ---
 
-# Architecture: Parallel XOR Merge Tree
+# ATOMiK Desk + Resource Fabric
 
-<p align="center">
-  <img src="parallel_merge_tree.svg" alt="ATOMiK Parallel XOR Merge Tree Architecture" width="900"/>
-</p>
+![ATOMiK Desk concept visual](../../website/public/02-atomik-desk-hero-concept.png)
 
-<details>
-<summary>ASCII diagram (click to expand)</summary>
-
-```
-         ┌─────────┐
-Input -->│ Round-   │--> Bank 0: [XOR Acc] ──┐
-         │ Robin    │--> Bank 1: [XOR Acc] ──┤
-         │ Distrib- │--> Bank 2: [XOR Acc] ──┼── Binary  --> Final
-         │ utor     │--> Bank 3: [XOR Acc] ──┤   Merge       Result
-         │          │--> ...                  │   Tree
-         │          │--> Bank N: [XOR Acc] ──┘
-         └─────────┘
-```
-</details>
-
-**Key innovations:**
-- Round-robin distribution: even bank utilization
-- Binary merge tree: O(log N) depth
-- syn_keep/syn_preserve: eliminates ALU inference
-- Zero carry chains: pure LUT-based XOR
-
-*Resource cost: ~65 LUTs + 64 FFs per additional bank*
-
----
-
-# Market Applications
-
-| Vertical | Application | ATOMiK Advantage |
-|----------|------------|-----------------|
-| **Finance** | HFT tick processing | Single-cycle updates, instant trade undo |
-| **IoT/Sensors** | Edge sensor fusion | Lock-free multi-stream merge, low power |
-| **Video** | Frame delta processing | 95% memory reduction, real-time H.264 |
-| **Databases** | Change data capture | O(1) reconstruction vs O(N) replay |
-| **Digital Twins** | State synchronization | Commutative merge across distributed nodes |
-| **Gaming** | Multiplayer state sync | Order-independent updates, instant rollback |
-
-**TAM**: $500B+ across database infrastructure, fintech, IoT, video processing, and real-time systems.
-
----
-
-# SDK Platform: One Schema, Five Languages
-
-**Schema-driven code generation pipeline:**
-
-```
-JSON Schema --> ATOMiK Generator --> Python + Rust + C + JavaScript + Verilog
-                                     (core + tests + build config per language)
-```
-
-- **19 files generated per schema** across 5 languages
-- **353 tests** verify algebraic properties in every implementation
-- **Agentic pipeline**: DAG orchestration, feedback loops, self-optimization
-- **25 modules**: including error KB, regression gate, cross-language consistency
-
-*Define once. Generate everywhere. Prove correctness automatically.*
-
----
-
-# Live Demo: 3-Node FPGA Cluster
-
-| Node | Domain | Banks | Throughput |
-|------|--------|------:|----------:|
-| Node 1 | Finance | 4 | 324 Mops/s |
-| Node 2 | Sensor | 8 | 540 Mops/s |
-| Node 3 | Peak | 16 | 1,056 Mops/s |
-
-**5-Act Demo Sequence:**
-1. Basic algebra: load, accumulate, read, verify
-2. Self-inverse: instant undo (apply delta twice = no change)
-3. Parallel scaling: same workload, 4x/8x/16x throughput
-4. Domain applications: finance ticks, sensor fusion, peak burst
-5. Distributed merge: 3-node XOR merge = single-node result
-
-*Grand finale: lock-free distributed computing — proven by commutativity.*
-
----
-
-# Competitive Moat
-
-| Advantage | Detail |
-|-----------|--------|
-| **Patent pending** | Architecture + execution model under protection |
-| **Formal proofs** | 108 Lean4 theorems — competitors can't "hand-wave" correctness |
-| **Hardware validated** | Real FPGA silicon, not just simulation or theory |
-| **6 phases complete** | Full stack: math, hardware, SDK, pipeline, parallel scaling |
-| **Schema-driven** | New domains require only a JSON schema, not new code |
-| **Linear scaling** | 16x proven; extends to 32x, 64x with larger FPGAs |
-
-**vs. Event Sourcing**: O(1) reconstruction vs O(N) replay
-**vs. CRDTs**: Hardware-accelerated, formally verified, single-cycle
-**vs. Traditional FPGA**: No carry chains, no arithmetic bottlenecks
+<small>CONCEPTUAL: ATOMiK Desk concept visual - target product direction, not current live UI.</small>
 
 ---
 
 # Business Model
 
-### Revenue Streams
+Near term:
 
-1. **IP Licensing** — License RTL IP cores to chip designers and FPGA integrators
-2. **Hardware Accelerator IP** — Pre-built modules for specific verticals (HFT, IoT, video)
-3. **SDK Platform** — Subscription for schema-driven code generation + support
-4. **Professional Services** — Custom integration for enterprise deployments
+- evaluation access
+- paid technical evaluations
+- design-partner engagements
 
-### Go-to-Market
+Longer term:
 
-- **Phase 1**: Open-source SDK builds developer community and validates use cases
-- **Phase 2**: IP licensing to FPGA-heavy verticals (finance, defense, telecom)
-- **Phase 3**: ASIC partnership for high-volume applications (IoT, automotive)
-
----
-
-# Team & Ask
-
-### Funding
-
-**Seeking**: Seed round to accelerate from proof-of-concept to product
-
-**Use of proceeds:**
-- Hardware development: larger FPGAs, ASIC exploration
-- SDK platform: production hardening, additional language targets
-- Business development: patent prosecution, strategic partnerships
-- Team expansion: FPGA engineers, application engineers, sales
-
-### Milestones Achieved
-- ✅ 108 formal mathematical proofs (Lean4 verified)
-- ✅ **v3 SoC deployed** — Custom RV64I + 1280×720 HDMI + 8-screen demo (Mar 2026)
-- ✅ **v2 SoC deployed** — PicoRV32 + ATOMiK accelerator (Feb 2026)
-- ✅ 1 Gops/s hardware validation (N=16 parallel banks)
-- ✅ 5-language SDK with 353 tests passing
-- ✅ 25-module agentic pipeline
-- ✅ Patent application filed
-- ✅ 0 TNS timing closure across all clock domains
-- ✅ Zynq port: 52/52 sim tests (ALINX AX7020 board on order)
+- support
+- integration
+- targeted licensing
+- enterprise deployment paths
 
 ---
 
-# Contact
+# Competition
 
-**ATOMiK — Delta-State Computing in Silicon**
+The first competitor is the status quo:
 
-*Patent Pending — Architecture and Execution Model*
-
-Repository: github.com/MatthewHRockwell/ATOMiK
+full-state movement, replay, rescans, and expensive orchestration treated as
+normal.
 
 ---
 
-*Built with Lean4 mathematical proofs, Gowin FPGA synthesis, and a schema-driven code generation pipeline. Every claim is backed by formal verification or hardware measurement.*
+# Roadmap
+
+Every public claim carries a tier:
+
+`LIVE_MEASURED` `HARDWARE_VALIDATED` `SOFTWARE_VALIDATED`
+
+`SYNTHESIS_VALIDATED` `PROJECTED` `CONCEPTUAL` `ROADMAP`
+
+---
+
+# Ask
+
+Bring one real workload, one technical champion, and one success criterion worth
+testing.
+
+Design partners, technical advisors, and investor conversations are the current
+priority.
