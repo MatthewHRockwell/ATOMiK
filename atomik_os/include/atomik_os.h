@@ -9,7 +9,7 @@
  * carries a user-visible change. About window, status bar, and the
  * /tmp/atomik_os_version stamp all read from here so the screen output
  * NEVER lies about which build is running. */
-#define AOS_VERSION "v0.34-D"
+#define AOS_VERSION "v0.35"
 
 /* Display geometry — locked to 1920x1080 XRGB8888 since simplefb is fixed. */
 #define FB_W       1920
@@ -533,6 +533,36 @@ typedef struct {
 
 const fabric_lane_history_t *fabric_history(fabric_lane_t lane);
 const char                  *fabric_lane_name(fabric_lane_t lane);
+
+/* state_watch.c — v0.35 State Watch surface.
+ *
+ * Wide horizontal time-ribbon showing the system's recent history.
+ * Class A per ChatGPT 2026-05-09 directive: every plotted value traces
+ * back to a real producer (fabric_history, perf_last_for,
+ * atomik_event_iter, fabric_active) — no fake numbers.
+ *
+ * Lifecycle:
+ *   - state_watch_tick() runs once per main-loop iteration at the
+ *     fabric sample cadence (200 ms).  Snapshots fabric_active() into
+ *     its own personality timeline ring; pushes perf_speedup into the
+ *     speedup sparkline whenever a fresh STATE sample lands.
+ *   - state_watch_open() opens (or focuses) the window.  Bound to the
+ *     'V' key for "View timeline".
+ *   - state_watch_draw() composes the time-ribbon layout from the
+ *     snapshot ring and the existing producers.
+ *
+ * Layout (within the window content rect):
+ *   1. Header                — title + sample-window + cadence
+ *   2. Personality ribbon    — color stripe per tick, who was active
+ *   3. Cycles-saved sparkline — perf_speedup history for STATE batches
+ *   4. Lane mini-strips × 5  — fabric_history(lane) replayed wider
+ *   5. Event spikes          — vertical pulses keyed to event ring
+ *   6. Footer                — cumulative event counts per kind */
+#define SW_HISTORY_N 128   /* 128 samples × 200 ms = ~25 s of history */
+
+void          state_watch_open(void);
+void          state_watch_draw(window_t *w, int x, int y, int wd, int ht);
+void          state_watch_tick(void);
 
 /* terminal.c — pty-backed terminal app. Must be declared AFTER wm.c
  * because terminal_draw signature uses window_t. */

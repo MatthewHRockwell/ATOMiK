@@ -306,6 +306,11 @@ int main(int argc, char **argv) {
          * personality auto-detection re-classifies based on recent
          * LLM/state activity.  Cheap (no I/O, no allocation). */
         fabric_tick();
+        /* v0.35: tick the State Watch sampler.  Self-rate-limits to
+         * 200 ms per sample, so calling it every frame is fine.
+         * Passive observer — reads existing producers + maintains
+         * its own personality timeline + speedup sparkline rings. */
+        state_watch_tick();
         if (ev.kind == EV_QUIT) { s_running = 0; break; }
         if (ev.kind == EV_KEY) {
             int dirty = 0;
@@ -358,6 +363,14 @@ int main(int argc, char **argv) {
              * letter shortcut. */
             else if (ev.key == '!') {
                 perf_bench_matrix();
+                dirty = 1;
+            }
+            /* v0.35: 'V' opens the State Watch surface — the time-
+             * ribbon view of system history.  System-shelf class
+             * (always wins over focused apps) because it's chrome,
+             * not an app. */
+            else if (ev.key == 'v' || ev.key == 'V') {
+                state_watch_open();
                 dirty = 1;
             }
             /* (3) FOCUSED-APP KEYS — terminal/files/notes/document */
