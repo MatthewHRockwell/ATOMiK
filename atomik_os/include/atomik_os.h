@@ -9,7 +9,7 @@
  * carries a user-visible change. About window, status bar, and the
  * /tmp/atomik_os_version stamp all read from here so the screen output
  * NEVER lies about which build is running. */
-#define AOS_VERSION "v0.38"
+#define AOS_VERSION "v0.38-A"
 
 /* Display geometry — locked to 1920x1080 XRGB8888 since simplefb is fixed. */
 #define FB_W       1920
@@ -735,6 +735,46 @@ int                    metric_visible(const atomik_metric_t *m);
  * Pulse Bar's "DATA: <source>" badge to summarize whether the screen
  * is showing pure live data, mixed sources, or any mock values. */
 metric_source_t        metric_worst_source(void);
+
+/* dirty.c — v0.38-A tile-based dirty-region tracker.
+ *
+ * Per ChatGPT 2026-05-09 perf directive: "Performance comes from
+ * making change visible and then only paying for change."  Tile
+ * granularity = 32×32 px; for 1920×1080 that's 60×34 = 2040 tiles.
+ * Each component declares the rect it touches via dirty_rect(); the
+ * tracker turns rects into tile-bitmap updates and publishes
+ * per-frame stats into the metric provider.
+ *
+ * v0.38-A ships the tracker + instrumentation only (so the VISUAL
+ * Resource Fabric lane becomes a real LIVE measurement instead of
+ * an EVT_VIS_RENDER count proxy).  v0.38-B will use the tile bitmap
+ * to actually skip un-dirty work in the wallpaper / window blit
+ * paths, turning the measurement into a speedup. */
+#define DIRTY_TILE_W       32
+#define DIRTY_TILE_H       32
+#define DIRTY_TILES_X      (FB_W / DIRTY_TILE_W)        /* 60 */
+#define DIRTY_TILES_Y      ((FB_H + DIRTY_TILE_H - 1) / DIRTY_TILE_H) /* 34 */
+#define DIRTY_TILES_TOTAL  (DIRTY_TILES_X * DIRTY_TILES_Y)            /* 2040 */
+
+void dirty_init(void);
+/* Mark every tile that intersects rect (x, y, w, h) as dirty. */
+void dirty_rect(int x, int y, int w, int h);
+/* Mark all tiles dirty (full repaint). */
+void dirty_all(void);
+/* Mark all tiles clean (call at frame START). */
+void dirty_clear(void);
+/* Snapshot per-frame stats (called at frame END before clear).
+ * After this call, the metric provider returns:
+ *   visual.tiles_dirty       — tiles touched in the just-finished frame
+ *   visual.tiles_total       — DIRTY_TILES_TOTAL (constant)
+ *   visual.tiles_avoided     — total - dirty (tiles we DIDN'T have to redraw)
+ *   visual.frame_pct_avoided — bytes-saved %, derived */
+void dirty_finalize_frame(void);
+
+int  dirty_count(void);            /* current dirty tile count */
+int  dirty_count_last_frame(void); /* count from last finalize */
+int  dirty_total(void);            /* DIRTY_TILES_TOTAL */
+unsigned long dirty_frame_count(void);     /* total frames finalized */
 
 /* terminal.c — pty-backed terminal app. Must be declared AFTER wm.c
  * because terminal_draw signature uses window_t. */

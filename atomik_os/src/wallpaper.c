@@ -96,6 +96,12 @@ static void wallpaper_full_render(void) {
 
 void wallpaper_draw(void) {
     pixel_t *bb = fb_back();
+    /* v0.38-A: wallpaper paints the entire framebuffer every frame
+     * (whole-screen memcpy from cache).  Honest dirty mark = all
+     * 2040 tiles.  v0.38-B will teach this path to memcpy only the
+     * tiles that other layers will actually overwrite, dropping the
+     * dirty count to whatever the per-surface union is. */
+    dirty_all();
     if (!s_cache) {
         s_cache = aligned_alloc(64, FB_BYTES);
         if (!s_cache) {

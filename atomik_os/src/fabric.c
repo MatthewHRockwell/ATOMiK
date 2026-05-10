@@ -239,14 +239,14 @@ static void sample_event_lanes(unsigned long now) {
         history_push(FABRIC_LANE_EVENT, now, clamp_u16(delta));
     }
 
-    /* VISUAL lane: VIS_RENDER pulses-since-last-sample.  Honest
-     * "framebuffer pressure" indicator — every heavy redraw
-     * (scene change, fabric refresh, animation tick) counts. */
-    unsigned long vis = atomik_event_count(EVT_VIS_RENDER);
-    unsigned long vis_delta = vis - s_last_vis_render_ct;
-    s_last_vis_render_ct = vis;
-    if (vis_delta > 0 || s_history[FABRIC_LANE_VISUAL].count > 0) {
-        history_push(FABRIC_LANE_VISUAL, now, clamp_u16(vis_delta));
+    /* VISUAL lane: v0.38-A — push the per-frame DIRTY-TILE count
+     * from the dirty-region tracker (real measurement), replacing the
+     * v0.34-D EVT_VIS_RENDER proxy.  History values now show the EMA
+     * of tiles dirtied per frame, so the mini-waveform tracks actual
+     * OS redraw waste over time. */
+    const atomik_metric_t *vd = metric_get("visual.tiles_dirty");
+    if (vd) {
+        history_push(FABRIC_LANE_VISUAL, now, clamp_u16((uint64_t)vd->value));
     }
 }
 
@@ -456,19 +456,23 @@ static void lane_metrics(fabric_lane_t lane, char *primary, size_t plen,
         break;
     }
     case FABRIC_LANE_VISUAL: {
-        unsigned long vis = atomik_event_count(EVT_VIS_RENDER);
-        if (vis == 0) {
-            snprintf(primary, plen, "no render-events yet");
-            snprintf(secondary, slen, "(producers wire in v0.35)");
+        /* v0.38-A: real tile-based redraw measurement.  Was an
+         * EVT_VIS_RENDER count proxy in v0.34-D; now a LIVE
+         * measurement from the dirty-region tracker. */
+        const atomik_metric_t *frames = metric_get("visual.frames");
+        if (!frames || frames->source == METRIC_WAITING) {
+            snprintf(primary, plen, "no frames painted yet");
+            snprintf(secondary, slen, "(awaiting first redraw)");
         } else {
-            uint16_t last_window = 0;
-            if (h->count > 0) {
-                int idx = (h->head + FABRIC_HISTORY_N - 1) % FABRIC_HISTORY_N;
-                last_window = h->values[idx];
-            }
-            snprintf(primary, plen, "%lu redraws · %u in last %dms",
-                     (unsigned long)vis, last_window, FABRIC_SAMPLE_MS);
-            snprintf(secondary, slen, "framebuffer pressure (real)");
+            const atomik_metric_t *dirty   = metric_get("visual.tiles_dirty");
+            const atomik_metric_t *avoided = metric_get("visual.frame_pct_avoided");
+            int dirty_n   = dirty   ? (int)dirty->value   : 0;
+            int total     = dirty_total();
+            double pct    = avoided ? avoided->value : 0.0;
+            snprintf(primary, plen, "tiles dirty %d / %d",
+                     dirty_n, total);
+            snprintf(secondary, slen, "%.1f%% framebuffer avoided (EMA)",
+                     pct);
         }
         break;
     }

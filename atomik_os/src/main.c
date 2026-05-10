@@ -19,6 +19,13 @@ void monitor_draw(window_t *w, int x, int y, int wd, int ht);  /* monitor.c */
 /* terminal_draw, terminal_send_key, terminal_start declared in atomik_os.h */
 
 static void redraw_frame(void) {
+    /* v0.38-A: tile-based dirty tracking.  Each visible surface
+     * declares the rect it touches via dirty_rect() during its draw
+     * call.  At frame end, dirty_finalize_frame() snapshots the per-
+     * frame stats into the metric provider so the VISUAL Resource
+     * Fabric lane reports a real measurement instead of an event-
+     * count proxy. */
+    dirty_clear();
     /* v0.31 patch 3 (ChatGPT review 2026-05-07): status_draw() now fires
      * AFTER wm_draw_all() so the status bar is global chrome layered on
      * top of every window, not painted underneath them.  Previously, any
@@ -31,6 +38,7 @@ static void redraw_frame(void) {
     status_draw();      /* global chrome — drawn after windows */
     notify_draw();
     fb_present();
+    dirty_finalize_frame();
 }
 
 /* v0.31: workspace_w returns the width of the central column where
@@ -280,6 +288,11 @@ int main(int argc, char **argv) {
      * provider.  Surfaces can now consume by ID through metric_get(),
      * and the Pulse Bar's "DATA:" badge reads metric_worst_source(). */
     metric_init();
+    /* v0.38-A: tile-based dirty-region tracker.  Components declare
+     * their dirty rects each frame; redraw_frame() finalizes per-
+     * frame stats so the VISUAL Resource Fabric lane reflects real
+     * OS redraw waste. */
+    dirty_init();
 
     /* Open About automatically so first-launch shows the WM working
      * without requiring a key press.  The Resource Fabric is opened

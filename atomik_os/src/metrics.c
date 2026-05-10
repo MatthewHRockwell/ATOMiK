@@ -276,6 +276,35 @@ static metric_value_t getter_event_total(void *ctx) {
     return v;
 }
 
+/* === VISUAL: tile-based dirty-region tracker (v0.38-A) ===
+ *
+ * Uses internal accessors from dirty.c — kept private to this file
+ * so dirty.c doesn't have to know about the metric_value_t shape. */
+extern double dirty_metric_tiles_dirty(void);
+extern double dirty_metric_tiles_avoided(void);
+extern double dirty_metric_pct_avoided(void);
+extern double dirty_metric_frame_count(void);
+
+#define MK_DIRTY_GETTER(name, fn)                                          \
+    static metric_value_t getter_##name(void *ctx) {                       \
+        (void)ctx;                                                         \
+        metric_value_t v = { fn(),                                         \
+                             dirty_metric_frame_count() > 0                \
+                                ? METRIC_LIVE : METRIC_WAITING };          \
+        return v;                                                          \
+    }
+
+MK_DIRTY_GETTER(visual_tiles_dirty,    dirty_metric_tiles_dirty)
+MK_DIRTY_GETTER(visual_tiles_avoided,  dirty_metric_tiles_avoided)
+MK_DIRTY_GETTER(visual_pct_avoided,    dirty_metric_pct_avoided)
+MK_DIRTY_GETTER(visual_frames,         dirty_metric_frame_count)
+
+static metric_value_t getter_visual_tiles_total(void *ctx) {
+    (void)ctx;
+    metric_value_t v = { (double)dirty_total(), METRIC_LIVE };
+    return v;
+}
+
 /* === init: register every built-in metric === */
 
 void metric_init(void) {
@@ -327,4 +356,17 @@ void metric_init(void) {
                     getter_event_build_count, NULL);
     metric_register("event.override_count", "OVERRIDE events",     "ev",
                     getter_event_override_count, NULL);
+    /* VISUAL — tile-based dirty-region tracker (v0.38-A).
+     * These were previously MOCK proxies via EVT_VIS_RENDER count;
+     * now LIVE measurements of OS redraw waste. */
+    metric_register("visual.tiles_dirty",     "tiles dirty / frame",   "tile",
+                    getter_visual_tiles_dirty, NULL);
+    metric_register("visual.tiles_avoided",   "tiles avoided / frame", "tile",
+                    getter_visual_tiles_avoided, NULL);
+    metric_register("visual.tiles_total",     "tiles in framebuffer",  "tile",
+                    getter_visual_tiles_total, NULL);
+    metric_register("visual.frame_pct_avoided","framebuffer % avoided", "%",
+                    getter_visual_pct_avoided, NULL);
+    metric_register("visual.frames",          "frames painted",        "fr",
+                    getter_visual_frames, NULL);
 }
