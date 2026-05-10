@@ -22,19 +22,22 @@ static int      s_cached = 0;
 
 void wallpaper_invalidate(void) { s_cached = 0; }
 
-/* v0.36: try a few candidate locations so the asset works whether
- * deploy.py shipped it via cpio overlay or sideloaded via UART. */
-static int try_blit_asset(void) {
+/* v0.36-A: tile a SMALL (480×270) asset across the full framebuffer,
+ * then let the procedural overlay handle vignette/glow/wordmark.
+ * Smaller asset → ~9 MB heap peak instead of the ~17 MB that hung
+ * v0.36 #1 on AX7020.  Tile dimensions (480×270) divide 1920×1080
+ * evenly (4×4) so there are no partial-tile edges. */
+static int try_tile_asset(void) {
     const char *paths[] = {
-        "/tmp/atomik_assets/topology_wallpaper.atomik_asset",
-        "/root/atomik_assets/topology_wallpaper.atomik_asset",
-        "/usr/share/atomik_os/topology_wallpaper.atomik_asset",
+        "/tmp/atomik_assets/topology_tile.atomik_asset",
+        "/root/atomik_assets/topology_tile.atomik_asset",
+        "/usr/share/atomik_os/topology_tile.atomik_asset",
         NULL
     };
     atomik_asset_t a;
     for (int i = 0; paths[i]; i++) {
         if (atomik_asset_load(paths[i], &a) == 0) {
-            atomik_asset_blit(&a, 0, 0);
+            atomik_asset_blit_tiled(&a, 0, 0, FB_W, FB_H);
             atomik_asset_free(&a);
             return 1;
         }
@@ -43,17 +46,14 @@ static int try_blit_asset(void) {
 }
 
 static void wallpaper_full_render(void) {
-    /* v0.36: asset blit deferred to v0.36-A.  The full-resolution
-     * 1920×1080 topology asset triggers atomik_os to hang on first-
-     * paint (likely a memory-pressure issue — the wallpaper cache is
-     * already 8.3 MB; loading the asset adds another 8.3 MB pixel
-     * buffer + 650 KB payload).  The procedural path here is the
-     * tested-on-hardware baseline; integration ships in a follow-up
-     * once we've sized the asset down or streamed it scanline-wise. */
-    (void)try_blit_asset;     /* keep API live, callable from tests */
-
-    /* Smooth vertical gradient covering the whole screen. */
-    draw_gradient_v(0, 0, FB_W, FB_H, ATOMIK_BG_TOP, ATOMIK_BG_BOT);
+    /* v0.36-A: tile the small (480×270) topology asset across the full
+     * screen.  If the asset isn't present, draw the procedural gradient
+     * as a fallback.  Either way, the vignette, accent glow, and
+     * wordmark are layered on top procedurally — they're cheap and
+     * keep the wordmark sharp regardless of asset presence. */
+    if (!try_tile_asset()) {
+        draw_gradient_v(0, 0, FB_W, FB_H, ATOMIK_BG_TOP, ATOMIK_BG_BOT);
+    }
 
     /* Soft accent vignette in the center: a few translucent ellipses. */
     int cx = FB_W / 2;

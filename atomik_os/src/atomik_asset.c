@@ -182,6 +182,23 @@ static inline pixel_t blend(pixel_t src, pixel_t dst, uint8_t a) {
     return (pixel_t)((r << 16) | (g << 8) | b);
 }
 
+void atomik_asset_blit_tiled(const atomik_asset_t *a,
+                             int dx, int dy, int w, int h) {
+    if (!a || !a->pixels || w <= 0 || h <= 0) return;
+    /* Iterate over destination by asset-sized tiles.  Each tile call
+     * goes through atomik_asset_blit which already clips to the
+     * framebuffer, so partial-tiles at the right/bottom edge are
+     * handled for free. */
+    int aw = (int)a->width;
+    int ah = (int)a->height;
+    if (aw <= 0 || ah <= 0) return;
+    for (int ty = 0; ty < h; ty += ah) {
+        for (int tx = 0; tx < w; tx += aw) {
+            atomik_asset_blit(a, dx + tx, dy + ty);
+        }
+    }
+}
+
 void atomik_asset_blit_alpha(const atomik_asset_t *a, int dx, int dy,
                              uint8_t alpha) {
     if (!a || !a->pixels) return;

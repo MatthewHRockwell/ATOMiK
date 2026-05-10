@@ -9,7 +9,7 @@
  * carries a user-visible change. About window, status bar, and the
  * /tmp/atomik_os_version stamp all read from here so the screen output
  * NEVER lies about which build is running. */
-#define AOS_VERSION "v0.36"
+#define AOS_VERSION "v0.36-A"
 
 /* Display geometry — locked to 1920x1080 XRGB8888 since simplefb is fixed. */
 #define FB_W       1920
@@ -613,6 +613,13 @@ void atomik_asset_blit(const atomik_asset_t *a, int dx, int dy);
  * desired opacity into the asset. */
 void atomik_asset_blit_alpha(const atomik_asset_t *a, int dx, int dy,
                              uint8_t alpha);
+
+/* Tiled blit: fill the rectangle (dx, dy, w, h) by repeating the asset.
+ * The asset's (0, 0) aligns with (dx, dy); subsequent tiles step by the
+ * asset's width/height.  Used by v0.36-A wallpaper to fill 1920×1080 from
+ * a small (480×270) seamless grid tile, keeping peak memory bounded. */
+void atomik_asset_blit_tiled(const atomik_asset_t *a,
+                             int dx, int dy, int w, int h);
 
 /* terminal.c — pty-backed terminal app. Must be declared AFTER wm.c
  * because terminal_draw signature uses window_t. */

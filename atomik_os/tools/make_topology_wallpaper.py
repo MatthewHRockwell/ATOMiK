@@ -23,7 +23,9 @@ except ImportError:
     sys.exit("error: PIL/Pillow not installed — pip install Pillow")
 
 
-def render(width: int, height: int, grid: int) -> Image.Image:
+def render(width: int, height: int, grid: int,
+           with_vignette: bool = True,
+           with_glow: bool = True) -> Image.Image:
     base = (0x0A, 0x0E, 0x1A)         # ATOMIK_BG_TOP
     bot  = (0x12, 0x18, 0x28)         # ATOMIK_BG_BOT
     accent = (0x4F, 0xC3, 0xFF)       # cyan, low alpha
@@ -56,38 +58,41 @@ def render(width: int, height: int, grid: int) -> Image.Image:
             d.ellipse([x - 1, y - 1, x + 1, y + 1],
                       fill=accent + (node_alpha,))
 
-    # Radial darkening toward the edges (vignette) so foreground UI
-    # reads cleanly.  Computed as a soft falloff from the center.
-    cx, cy = width / 2, height / 2 - 40
-    max_r = math.hypot(cx, cy)
-    vignette = Image.new("RGBA", (width, height), (0, 0, 0, 0))
-    vp = vignette.load()
-    for y in range(height):
-        for x in range(width):
-            dx = (x - cx) / max_r
-            dy = (y - cy) / max_r
-            r = math.hypot(dx, dy)
-            # 0 at center, ~1 at corner — invert so center is brighter.
-            a = int(min(80, max(0, (r - 0.55) * 200)))
-            vp[x, y] = (0, 0, 0, a)
-
     img = img.convert("RGBA")
     img = Image.alpha_composite(img, draw_layer)
-    img = Image.alpha_composite(img, vignette)
 
-    # A faint accent glow near where the ATOMiK wordmark will sit.
-    glow = Image.new("RGBA", (width, height), (0, 0, 0, 0))
-    gp = glow.load()
-    gx, gy = width / 2, height / 2 - 40
-    for y in range(height):
-        for x in range(width):
-            dx = (x - gx) / 320
-            dy = (y - gy) / 200
-            r = math.hypot(dx, dy)
-            if r < 1:
-                a = int((1 - r) * (1 - r) * 32)
-                gp[x, y] = (accent[0], accent[1], accent[2], a)
-    img = Image.alpha_composite(img, glow)
+    # v0.36-A: vignette and glow are now optional.  When the asset is
+    # being used as a small tileable surface, both must be omitted
+    # (otherwise tiling produces a polka-dot pattern of darkening or
+    # repeated highlight spots).  Procedural overlays apply them once
+    # at full screen size after the tiled blit instead.
+    if with_vignette:
+        cx, cy = width / 2, height / 2 - 40
+        max_r = math.hypot(cx, cy)
+        vignette = Image.new("RGBA", (width, height), (0, 0, 0, 0))
+        vp = vignette.load()
+        for y in range(height):
+            for x in range(width):
+                dx = (x - cx) / max_r
+                dy = (y - cy) / max_r
+                r = math.hypot(dx, dy)
+                a = int(min(80, max(0, (r - 0.55) * 200)))
+                vp[x, y] = (0, 0, 0, a)
+        img = Image.alpha_composite(img, vignette)
+
+    if with_glow:
+        glow = Image.new("RGBA", (width, height), (0, 0, 0, 0))
+        gp = glow.load()
+        gx, gy = width / 2, height / 2 - 40
+        for y in range(height):
+            for x in range(width):
+                dx = (x - gx) / 320
+                dy = (y - gy) / 200
+                r = math.hypot(dx, dy)
+                if r < 1:
+                    a = int((1 - r) * (1 - r) * 32)
+                    gp[x, y] = (accent[0], accent[1], accent[2], a)
+        img = Image.alpha_composite(img, glow)
 
     return img.convert("RGB")
 
@@ -99,9 +104,15 @@ def main() -> int:
     ap.add_argument("--height", type=int, default=1080)
     ap.add_argument("--grid",   type=int, default=64,
                     help="grid spacing in pixels (default 64)")
+    ap.add_argument("--no-vignette", action="store_true",
+                    help="skip the radial vignette (use for tileable assets)")
+    ap.add_argument("--no-glow", action="store_true",
+                    help="skip the center accent glow (use for tileable assets)")
     args = ap.parse_args()
 
-    img = render(args.width, args.height, args.grid)
+    img = render(args.width, args.height, args.grid,
+                 with_vignette=not args.no_vignette,
+                 with_glow=not args.no_glow)
     Path(args.output).parent.mkdir(parents=True, exist_ok=True)
     img.save(args.output, "PNG", optimize=True)
     print(f"wrote {args.output}  {args.width}x{args.height}  "
