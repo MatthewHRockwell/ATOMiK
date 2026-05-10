@@ -276,6 +276,42 @@ static metric_value_t getter_event_total(void *ctx) {
     return v;
 }
 
+/* === TEXT: glyph cache hit-rate (v0.38-B) ===
+ *
+ * Pre-rendered glyph cache exposes per-frame counters: how many
+ * glyphs we drew this session, how many came from the fast path
+ * (mask blit, no per-pixel bounds), and the derived hit rate.  Lets
+ * the audience see a real text-rendering perf claim, not a vibe. */
+extern unsigned long font_glyphs_drawn(void);
+extern unsigned long font_glyphs_cached(void);
+extern unsigned long font_glyphs_clipped(void);
+
+static metric_value_t getter_text_glyphs_drawn(void *ctx) {
+    (void)ctx;
+    unsigned long n = font_glyphs_drawn();
+    metric_value_t v = { (double)n,
+                         n > 0 ? METRIC_LIVE : METRIC_WAITING };
+    return v;
+}
+static metric_value_t getter_text_glyphs_cached(void *ctx) {
+    (void)ctx;
+    unsigned long n = font_glyphs_cached();
+    metric_value_t v = { (double)n,
+                         font_glyphs_drawn() > 0 ? METRIC_LIVE : METRIC_WAITING };
+    return v;
+}
+static metric_value_t getter_text_cache_hit_pct(void *ctx) {
+    (void)ctx;
+    unsigned long total  = font_glyphs_drawn();
+    unsigned long cached = font_glyphs_cached();
+    metric_value_t v = { 0.0, METRIC_WAITING };
+    if (total > 0) {
+        v.value = 100.0 * (double)cached / (double)total;
+        v.source = METRIC_DERIVED;
+    }
+    return v;
+}
+
 /* === VISUAL: tile-based dirty-region tracker (v0.38-A) ===
  *
  * Uses internal accessors from dirty.c — kept private to this file
@@ -369,4 +405,11 @@ void metric_init(void) {
                     getter_visual_pct_avoided, NULL);
     metric_register("visual.frames",          "frames painted",        "fr",
                     getter_visual_frames, NULL);
+    /* TEXT — glyph cache (v0.38-B). */
+    metric_register("text.glyphs_drawn",  "glyphs drawn",        "g",
+                    getter_text_glyphs_drawn, NULL);
+    metric_register("text.glyphs_cached", "glyphs from cache",   "g",
+                    getter_text_glyphs_cached, NULL);
+    metric_register("text.cache_hit_pct", "glyph cache hit",     "%",
+                    getter_text_cache_hit_pct, NULL);
 }
