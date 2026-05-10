@@ -107,6 +107,36 @@ void status_draw(void) {
               1, bar_h - ATOMIK_GRID_S * 2, ATOMIK_DOCK_BORDER);
     cur_x += ATOMIK_GRID_M + 1;
 
+    /* === DATA: <source> badge — v0.38 truth-aware indicator ===
+     *
+     * Reads the worst metric source currently in the registry and
+     * shows it next to the brand.  Audience can tell at a glance
+     * whether the screen is fully LIVE, has WAITING lanes, or
+     * (crucially) has any MOCK / SCENARIO values mixed in.  Per
+     * feedback_metric_provider_directive: "Every number on screen
+     * must know where it came from."  This badge is the sentence
+     * that the rest of the UI is held to.
+     *
+     * Color encoding: green=LIVE, cyan=DERIVED, violet=SCENARIO,
+     * amber=MOCK/STALE, dim=WAITING.  Audiences should immediately
+     * notice if it ever drops into amber outside dev mode. */
+    {
+        metric_source_t worst = metric_worst_source();
+        char data_badge[32];
+        snprintf(data_badge, sizeof data_badge, "DATA: %s",
+                 metric_source_label(worst));
+        pixel_t dcol = metric_source_color(worst);
+        /* Filled dot for visual lock-on. */
+        int dot_y3 = bar_y + (bar_h - ATOMIK_GRID_M) / 2;
+        draw_rect(cur_x, dot_y3, ATOMIK_GRID_M, ATOMIK_GRID_M, dcol);
+        cur_x += ATOMIK_GRID_M + ATOMIK_GRID_S;
+        draw_text(cur_x, ty, data_badge, 1, dcol);
+        cur_x += text_width(data_badge, 1) + ATOMIK_GRID_M;
+        draw_rect(cur_x, bar_y + ATOMIK_GRID_S,
+                  1, bar_h - ATOMIK_GRID_S * 2, ATOMIK_DOCK_BORDER);
+        cur_x += ATOMIK_GRID_M + 1;
+    }
+
     /* === Active personality badge ===
      *
      * v0.34-B: surfaces the current Resource Fabric personality globally

@@ -9,7 +9,7 @@
  * carries a user-visible change. About window, status bar, and the
  * /tmp/atomik_os_version stamp all read from here so the screen output
  * NEVER lies about which build is running. */
-#define AOS_VERSION "v0.37"
+#define AOS_VERSION "v0.38"
 
 /* Display geometry — locked to 1920x1080 XRGB8888 since simplefb is fixed. */
 #define FB_W       1920
@@ -655,6 +655,86 @@ void atomik_asset_blit_tiled(const atomik_asset_t *a,
 void replica_flow_open(void);
 void replica_flow_draw(window_t *w, int x, int y, int wd, int ht);
 void replica_flow_tick(void);
+
+/* metrics.c — v0.38 truth-aware metric provider.
+ *
+ * Per ChatGPT 2026-05-09/05-10 directives: every on-screen number
+ * flows through a single registry that knows where it came from.
+ * Components ask metric_get("state.ops_collapsed") instead of reading
+ * globals directly.  This lets us:
+ *   - label each value LIVE / DERIVED / SCENARIO / MOCK / STALE / WAITING
+ *   - gate visibility by mode (DEV / DEMO / INVESTOR)
+ *   - swap producers without rewriting consumer rendering code
+ *
+ * Hard rule (from feedback_metric_provider_directive):
+ * "Build the concept UI now, but wire every number through a
+ *  truth-aware metric layer."
+ *
+ * Mock values are allowed for layout work, but NEVER masquerade as
+ * live.  Investor mode hides anything that isn't LIVE / DERIVED /
+ * explicitly labeled SCENARIO. */
+typedef enum {
+    METRIC_LIVE     = 0,    /* measured from real producer */
+    METRIC_DERIVED  = 1,    /* computed from one+ live values */
+    METRIC_SCENARIO = 2,    /* projected model, label assumptions */
+    METRIC_MOCK     = 3,    /* UI prototype only — DEV mode */
+    METRIC_STALE    = 4,    /* live producer hasn't updated recently */
+    METRIC_WAITING  = 5,    /* no data yet from the producer */
+} metric_source_t;
+
+typedef enum {
+    METRIC_MODE_DEV       = 0,    /* MOCK + SCENARIO + LIVE + STALE allowed */
+    METRIC_MODE_DEMO      = 1,    /* LIVE + DERIVED + SCENARIO only */
+    METRIC_MODE_INVESTOR  = 2,    /* LIVE + DERIVED + labeled SCENARIO only */
+} metric_mode_t;
+
+#define METRIC_ID_MAX     48
+#define METRIC_LABEL_MAX  48
+#define METRIC_REGISTRY_MAX 64
+
+/* getter returns CURRENT value + source.  source can downgrade —
+ * e.g. a producer that returns LIVE when its underlying perf sample
+ * is fresh but WAITING when no sample exists yet. */
+typedef struct {
+    double          value;
+    metric_source_t source;
+} metric_value_t;
+
+typedef metric_value_t (*metric_getter_fn)(void *ctx);
+
+typedef struct atomik_metric {
+    char              id[METRIC_ID_MAX];
+    char              label[METRIC_LABEL_MAX];
+    const char       *unit;            /* e.g. "ops", "%", "B", NULL */
+    double            value;            /* last refreshed via getter */
+    metric_source_t   source;           /* last refreshed source */
+    unsigned long     updated_ms;       /* anim_now_ms() of last refresh */
+    metric_getter_fn  getter;
+    void             *getter_ctx;
+} atomik_metric_t;
+
+void                   metric_init(void);
+void                   metric_register(const char *id, const char *label,
+                                       const char *unit,
+                                       metric_getter_fn getter, void *ctx);
+/* Refresh + return.  Returns NULL if id is not registered. */
+const atomik_metric_t *metric_get(const char *id);
+/* Cached lookup, no refresh.  Returns NULL if id is not registered. */
+const atomik_metric_t *metric_peek(const char *id);
+int                    metric_count(void);
+const atomik_metric_t *metric_at(int idx);
+const char            *metric_source_label(metric_source_t s);
+pixel_t                metric_source_color(metric_source_t s);
+
+void                   metric_set_mode(metric_mode_t mode);
+metric_mode_t          metric_mode(void);
+/* Should this metric be drawn under the current mode? */
+int                    metric_visible(const atomik_metric_t *m);
+
+/* Worst (most "dishonest") source currently registered.  Used by the
+ * Pulse Bar's "DATA: <source>" badge to summarize whether the screen
+ * is showing pure live data, mixed sources, or any mock values. */
+metric_source_t        metric_worst_source(void);
 
 /* terminal.c — pty-backed terminal app. Must be declared AFTER wm.c
  * because terminal_draw signature uses window_t. */

@@ -276,6 +276,10 @@ int main(int argc, char **argv) {
     agent_init();
     wallet_init();
     atomik_open();   /* /dev/mem map for the live monitor; non-fatal if it fails */
+    /* v0.38: register every built-in metric with the truth-aware
+     * provider.  Surfaces can now consume by ID through metric_get(),
+     * and the Pulse Bar's "DATA:" badge reads metric_worst_source(). */
+    metric_init();
 
     /* Open About automatically so first-launch shows the WM working
      * without requiring a key press.  The Resource Fabric is opened
