@@ -1,0 +1,102 @@
+schema_version: 1
+last_updated: "2026-05-10"
+disclaimer: "Live screenshots show current prototypes. Concept visuals show product direction and are not represented as current shipped functionality. Performance claims are only stated when backed by measured artifacts."
+
+evidence_labels:
+  LIVE_MEASURED: "Observed on a running system with recorded measurement artifacts."
+  HARDWARE_VALIDATED: "Demonstrated on physical hardware, but not necessarily accompanied by full benchmark artifacts."
+  SOFTWARE_VALIDATED: "Shown in software prototype, simulation, local runtime, or non-hardware environment."
+  SYNTHESIS_VALIDATED: "Validated through synthesis, build, compile, or toolchain output."
+  PROJECTED: "A model, estimate, or expected economic/performance outcome. Must not be phrased as a result."
+  CONCEPTUAL: "Used to explain product direction, UX, architecture, or design intent. Not current proof."
+  ROADMAP: "Planned work that may change."
+
+claims:
+  - id: live-desk-screenshot-2026-05-10
+    label: HARDWARE_VALIDATED
+    claim: "Current ATOMiK Desk prototype running on live hardware."
+    artifact: "website/public/01-current-live-atomik-desk.jpg"
+    date: "2026-05-10"
+    public_safe: true
+    notes: "Use as proof image. Do not represent as polished shipped product."
+
+  - id: ax7020-perf-matrix-2026-05-09
+    label: LIVE_MEASURED
+    claim: "AX7020 board run produced a four-way software / direct / batched / profiled performance matrix."
+    artifact: "results/perf_matrix_ax7020_20260509.txt"
+    interpretation: "docs/perf/20260509_matrix_interpretation.md"
+    date: "2026-05-09"
+    public_safe: true
+    notes: "Publish with interpretation caveats: naive hardware access can lose; batching/coalescing is workload-dependent; SYNC row has known measurement limitation."
+
+  - id: linux-userspace-validation-2026-04-06
+    label: HARDWARE_VALIDATED
+    claim: "ATOMiK algebraic property checks passed through a Linux userspace to FPGA accelerator path."
+    artifact: "docs/LINUX_USERSPACE_PROOF.md"
+    date: "2026-04-06"
+    public_safe: true
+    notes: "The source document records 16 algebraic checks and environment details."
+
+  - id: parallel-bank-hardware-validation-2026-01-27
+    label: HARDWARE_VALIDATED
+    claim: "Parallel accumulator bank configurations were programmed to Tang Nano 9K hardware and tested."
+    artifact: "docs/HARDWARE_SYNTHESIS.md"
+    date: "2026-01-27"
+    public_safe: true
+    notes: "Use exact counts only when quoting directly from the source artifact."
+
+  - id: xc7z020-synthesis-ceiling
+    label: SYNTHESIS_VALIDATED
+    claim: "XC7Z020 high-bank throughput ceilings are synthesis-derived, not live-board measurements."
+    artifact: "docs/HARDWARE_SYNTHESIS.md"
+    date: "2026-01-27"
+    public_safe: true
+    notes: "Must be labeled as synthesis-validated wherever used."
+
+  - id: formal-proof-work
+    label: SOFTWARE_VALIDATED
+    claim: "Formal proof work is present in the public repository."
+    artifact: "math/proofs/"
+    date: null
+    public_safe: true
+    notes: "Avoid public proof counts until the count is audited across website, README, and deck."
+
+  - id: atomik-desk-hero-concept
+    label: CONCEPTUAL
+    claim: "ATOMiK Desk concept visual shows target product direction, not current live UI."
+    artifact: "website/public/02-atomik-desk-hero-concept.png"
+    date: "2026-05-10"
+    public_safe: true
+    notes: "Use only with concept/design-target caption."
+
+  - id: resource-fabric-adaptive-concept
+    label: ROADMAP
+    claim: "Resource Fabric adaptive workload reallocation image is a roadmap concept visual."
+    artifact: "website/public/03-adaptive-mode-mixed-workload-concept.png"
+    date: "2026-05-10"
+    public_safe: true
+    notes: "Do not imply current adaptive allocation behavior."
+
+  - id: build-lane-gcc-concept
+    label: ROADMAP
+    claim: "Standard-C / GCC adoption lane image is a roadmap concept visual."
+    artifact: "website/public/04-build-lane-gcc-concept.png"
+    date: "2026-05-10"
+    public_safe: true
+    notes: "Only label as hardware-validated if an end-to-end recorded compiler path exists."
+
+  - id: replica-flow-concept
+    label: ROADMAP
+    claim: "Replica Flow image is a roadmap concept visual for delta propagation."
+    artifact: "website/public/05-replica-flow-sync-concept.png"
+    date: "2026-05-10"
+    public_safe: true
+    notes: "Pair with live proof if used in public materials."
+
+  - id: memory-weave-agent-concept
+    label: ROADMAP
+    claim: "Memory Weave / Agent image is a longer-term concept visual."
+    artifact: "website/public/06-memory-weave-agent-concept.png"
+    date: "2026-05-10"
+    public_safe: true
+    notes: "Avoid homepage hero and README proof zones."
