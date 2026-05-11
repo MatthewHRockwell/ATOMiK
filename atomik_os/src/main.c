@@ -303,6 +303,16 @@ int main(int argc, char **argv) {
     open_about();
     redraw_frame();
 
+    /* v0.38-C+: Resource Fabric is the differentiator — it should
+     * always be in the default desktop chrome, not buried behind 'R'.
+     * Open AFTER the first redraw_frame() succeeds so fb_open() is
+     * confirmed working and seed_metrics_if_empty()'s MMIO bursts
+     * don't race with framebuffer setup (the failure mode that
+     * crashed v0.34-D #2 boot-time auto-open).  fb_open already
+     * succeeded above; this is safe. */
+    fabric_open();
+    redraw_frame();    /* second paint so Fabric is visible immediately */
+
     while (s_running) {
         /* Frame-loop: when an animation is active or the terminal is
          * focused (async pty output), poll fast (16ms = ~60Hz). Otherwise

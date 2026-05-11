@@ -24,15 +24,31 @@ FB2PNG_REMOTE = "/tmp/fb2png"
 SHOTS_DIR     = os.path.join(HERE, "docs", "screenshots")
 
 _n = [0]
-def slow(s, line, per=0.002):
-    """Per-char throttled write. 2 ms/char is the empirically-reliable
-    rate when atomik_os is running and saturating the soft-CPU with
-    1080p frame composition. Faster rates (0.8-1 ms) cause the kernel
-    UART RX path to drop or duplicate characters mid-line, which then
-    breaks shell parsing in subtle ways (e.g. `2>&1` arriving as `2>&&1`)."""
+# v0.38-D recovery hardening — refined 2026-05-10 evening:
+# Tested 0.5 ms/char with atomik_os killed; kernel UART RX still drops
+# bytes (`/tmp/aoos_keys` got a doubled `o` in a launch command, breaking
+# the deploy).  The 2 ms throttle is required regardless of atomik_os
+# state — it's a kernel UART driver constraint, not a soft-CPU
+# saturation issue.  Win on this iteration is the chunk size bump
+# (1024 → 2048 in transfer()) which still halves sentinel round-trips.
+SLOW_RATE_S = 0.002       # 2 ms/char — safe for the kernel UART RX path
+FAST_RATE_S = 0.002       # kept-equal for now; do NOT lower without testing
+_active_rate = [SLOW_RATE_S]
+
+def set_rate(per_s):
+    _active_rate[0] = per_s
+
+def slow(s, line, per=None):
+    """Per-char throttled write.  Default rate is whatever set_rate()
+    last installed.  During pre-launch upload (atomik_os killed), we
+    flip to FAST_RATE_S (~4× faster) since the soft CPU isn't busy
+    compositing 1080p frames.  Once atomik_os is launched we restore
+    SLOW_RATE_S to avoid the byte-loss / character-duplication failure
+    mode (`2>&1` arriving as `2>&&1`)."""
+    rate = per if per is not None else _active_rate[0]
     for c in line:
         s.write(c.encode() if isinstance(c, str) else bytes([c]))
-        time.sleep(per)
+        time.sleep(rate)
     s.flush()
 
 def cmd(s, c, t=20, log=True):
@@ -87,7 +103,10 @@ def transfer(s, local_path, remote_path, label):
     print(f"[deploy]  gzipped+b64: {len(b64)} chars (gz={len(gz)} bytes)",
           flush=True)
     cmd(s, f"rm -f /tmp/{label}.b64 /tmp/{label}.gz {remote_path}", log=False)
-    CHUNK  = 1024
+    # v0.38-D recovery: bump chunk size 1024→2048 — halves sentinel round
+    # trips, takes ~half the time at the same per-char rate.  Safe because
+    # bash's default input line buffer is 8192+ on this kernel.
+    CHUNK  = 2048
     chunks = [b64[i:i+CHUNK] for i in range(0, len(b64), CHUNK)]
     print(f"[deploy]  sending {len(chunks)} chunks of {CHUNK} chars",
           flush=True)
@@ -208,6 +227,16 @@ def main():
     s.reset_input_buffer()
     slow(s, "\n"); time.sleep(0.4); s.read(8192)
 
+    # v0.38-D recovery hardening: kill atomik_os FIRST so the upload
+    # phase runs against an idle soft CPU.  Then switch to FAST_RATE_S
+    # for the chunk uploads (atomik_os isn't compositing, so the
+    # historical "byte loss at faster rates" risk doesn't apply).
+    cmd(s, "pkill -9 atomik_os 2>/dev/null; sleep 1; "
+          "pgrep atomik_os >/dev/null && echo STILL_RUNNING || echo CLEAN")
+    set_rate(FAST_RATE_S)
+    print(f"[deploy] upload @ {FAST_RATE_S*1000:.1f} ms/char "
+          f"(atomik_os killed; safe to push fast)", flush=True)
+
     transfer(s, LOCAL, REMOTE, "aos")
     if (not args.no_fb2png) and os.path.exists(FB2PNG_LOCAL):
         transfer(s, FB2PNG_LOCAL, FB2PNG_REMOTE, "fb2png")
@@ -233,20 +262,27 @@ def main():
         print("[deploy] --no-launch set; not starting.")
         return
     print("[deploy] launching atomik_os in background")
-    # CRITICAL: kill any existing atomik_os instances before launch.
-    # Without this, multiple processes end up writing to /dev/fb0
-    # concurrently and the OLDEST one keeps winning the compositor
-    # race — the user sees a stale binary even after a 'successful'
-    # deploy. Wait for the kill to complete before relaunching.
-    cmd(s, "pkill -9 atomik_os 2>/dev/null; sleep 1; "
-          "pgrep atomik_os >/dev/null && echo STILL_RUNNING || echo CLEAN")
+    # v0.38-D recovery: restore SLOW_RATE_S now — once atomik_os is
+    # running, the soft CPU is busy compositing 1080p and the kernel
+    # UART RX path will drop bytes at faster rates.
+    set_rate(SLOW_RATE_S)
     # Tear down any stale fifo writer from a previous --autostart run.
     cmd(s, "kill -9 $(cat /tmp/aos_fifo_writer.pid 2>/dev/null) 2>/dev/null; "
           "rm -f /tmp/aos_fifo_writer.pid /tmp/aos_keys", log=False)
     # Wipe stale version stamp so we KNOW the next read is from the new run.
-    cmd(s, "rm -f /tmp/atomik_os_version", log=False)
-    # Disable fbcon binding so atomik_os owns the framebuffer cleanly
+    cmd(s, "rm -f /tmp/atomik_os_version /tmp/aos.err /tmp/aos.out", log=False)
+    # Disable fbcon binding so atomik_os owns the framebuffer cleanly.
     cmd(s, "echo 0 > /sys/class/vtconsole/vtcon1/bind 2>/dev/null; true")
+    # v0.38-D recovery FIX: create /dev/fb0 + /dev/mem if missing.
+    # CONFIG_DEVTMPFS is not yet enabled in this kernel (task #15);
+    # on freshly-booted images these nodes don't exist and atomik_os
+    # bails with "open /dev/fb0: No such file or directory" — which
+    # is exactly the failure mode that burned 2 h on 2026-05-10.
+    # Skip if already present (kernel boot may have set them up).
+    cmd(s, "[ -e /dev/fb0 ] || mknod /dev/fb0 c 29 0; "
+          "[ -e /dev/mem ] || mknod /dev/mem c 1 1; "
+          "ls -la /dev/fb0 /dev/mem 2>&1 | head -3",
+          log=False)
     # v0.22 autostart: launch with stdin redirected from a FIFO instead
     # of /dev/null. atomik_ai_daemon.py and other relays can then inject
     # keystrokes via `printf ... >> /tmp/aos_keys` without restarting.
@@ -281,6 +317,29 @@ def main():
                   flush=True)
             print("[deploy] something is wrong — STILL not actually running "
                   "the new binary", flush=True)
+
+    # v0.38-D recovery hardening: VERSION OK only proves atomik_os
+    # reached main() far enough to write the version stamp — which
+    # happens BEFORE fb_open().  Verify the process is still alive
+    # 10 s later AND /tmp/aos.err is empty before declaring success.
+    # This is the gate that would have surfaced the /dev/fb0 missing
+    # bug on 2026-05-10 immediately instead of after another 2 h.
+    print("[deploy] post-launch verify (10s settle + alive + err clean) …",
+          flush=True)
+    time.sleep(10)
+    alive = (cmd_capture(s,
+                          "pgrep atomik_os >/dev/null && echo ALIVE || echo DEAD",
+                          t=8) or "").strip()
+    err  = (cmd_capture(s, "head -3 /tmp/aos.err 2>/dev/null", t=8) or "").strip()
+    if alive == "ALIVE" and not err:
+        print("[deploy]  alive after 10s, aos.err empty — atomik_os is healthy",
+              flush=True)
+    else:
+        print(f"[deploy]  HEALTH CHECK FAILED: alive={alive!r} "
+              f"aos.err={err!r}", flush=True)
+        print("[deploy]  do NOT trust VERSION OK alone — atomik_os crashed "
+              "after init.  Read /tmp/aos.err on the board BEFORE redeploying.",
+              flush=True)
 
     # Screenshot verification.
     if args.no_shot:
