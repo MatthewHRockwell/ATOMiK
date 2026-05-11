@@ -175,10 +175,21 @@ void status_draw(void) {
      * which appeared bottom-biased on monitors with less than 32 px
      * of overscan (text 8 px from the bottom edge of a visibly-larger
      * bar).  User feedback 2026-05-07. */
-    const int bar_h = ATOMIK_PULSE_BAR_H;     /* v0.38-C: 40 px */
+    const int bar_h = ATOMIK_PULSE_BAR_H;     /* v0.38-E: 64 px, two-row */
     const int bar_y = ATOMIK_SAFE_TOP;
-    const int ty    = bar_y + (bar_h - text_height(1)) / 2;
-    const int ty_brand = bar_y + (bar_h - text_height(2)) / 2;
+    /* Two-row geometry: top row is identity zone (brand + DATA/MODE/
+     * PERSONALITY badges), bottom row is metrics zone (mini-readout
+     * + window strip + key hints + wallet/cpu/uptime/version).
+     * Each row is 30 px tall with 2 px gap; cyan-dim hairline divider
+     * sits between them. */
+    const int row_h    = (bar_h - 4) / 2;             /* 30 */
+    const int top_y    = bar_y + 2;
+    const int bot_y    = bar_y + 2 + row_h + 2;
+    const int ty_top   = top_y + (row_h - text_height(1)) / 2;
+    const int ty_bot   = bot_y + (row_h - text_height(1)) / 2;
+    const int ty_brand = top_y + (row_h - text_height(2)) / 2;
+    /* legacy ty for the few spots that still use a single coordinate */
+    const int ty       = ty_top;
 
     /* Bar fills only the safe zone — wallpaper covers y=0..SAFE_TOP
      * (cropped/invisible on this monitor; visible as a thin strip on
@@ -238,15 +249,11 @@ void status_draw(void) {
         snprintf(data_badge, sizeof data_badge, "DATA: %s",
                  metric_source_label(worst));
         pixel_t dcol = metric_source_color(worst);
-        /* Filled dot for visual lock-on. */
-        int dot_y3 = bar_y + (bar_h - ATOMIK_GRID_M) / 2;
+        int dot_y3 = top_y + (row_h - ATOMIK_GRID_M) / 2;
         draw_rect(cur_x, dot_y3, ATOMIK_GRID_M, ATOMIK_GRID_M, dcol);
         cur_x += ATOMIK_GRID_M + ATOMIK_GRID_S;
-        draw_text(cur_x, ty, data_badge, 1, dcol);
-        cur_x += text_width(data_badge, 1) + ATOMIK_GRID_M;
-        draw_rect(cur_x, bar_y + ATOMIK_GRID_S,
-                  1, bar_h - ATOMIK_GRID_S * 2, ATOMIK_DOCK_BORDER);
-        cur_x += ATOMIK_GRID_M + 1;
+        draw_text(cur_x, ty_top, data_badge, 1, dcol);
+        cur_x += text_width(data_badge, 1) + ATOMIK_GRID_L;
     }
 
     /* === MODE: <DEV/DEMO/INVESTOR> badge — v0.38-C ===
@@ -261,14 +268,11 @@ void status_draw(void) {
         char mode_badge[32];
         snprintf(mode_badge, sizeof mode_badge, "MODE: %s", mode_label(m));
         pixel_t mcol = mode_color(m);
-        int dot_y4 = bar_y + (bar_h - ATOMIK_GRID_M) / 2;
+        int dot_y4 = top_y + (row_h - ATOMIK_GRID_M) / 2;
         draw_rect(cur_x, dot_y4, ATOMIK_GRID_M, ATOMIK_GRID_M, mcol);
         cur_x += ATOMIK_GRID_M + ATOMIK_GRID_S;
-        draw_text(cur_x, ty, mode_badge, 1, mcol);
-        cur_x += text_width(mode_badge, 1) + ATOMIK_GRID_M;
-        draw_rect(cur_x, bar_y + ATOMIK_GRID_S,
-                  1, bar_h - ATOMIK_GRID_S * 2, ATOMIK_DOCK_BORDER);
-        cur_x += ATOMIK_GRID_M + 1;
+        draw_text(cur_x, ty_top, mode_badge, 1, mcol);
+        cur_x += text_width(mode_badge, 1) + ATOMIK_GRID_L;
     }
 
     /* === Active personality badge ===
@@ -299,12 +303,20 @@ void status_draw(void) {
         }
         /* Filled dot before the name so the eye locks on the colored
          * indicator without needing to read the word. */
-        int dot_y2 = bar_y + (bar_h - ATOMIK_GRID_M) / 2;
+        int dot_y2 = top_y + (row_h - ATOMIK_GRID_M) / 2;
         draw_rect(cur_x, dot_y2, ATOMIK_GRID_M, ATOMIK_GRID_M, pcol);
         cur_x += ATOMIK_GRID_M + ATOMIK_GRID_S;
-        draw_text(cur_x, ty, pbadge, 1, pcol);
+        draw_text(cur_x, ty_top, pbadge, 1, pcol);
         cur_x += text_width(pbadge, 1) + ATOMIK_GRID_M;
     }
+
+    /* v0.38-E two-row split: reset cursor to start of BOTTOM row.
+     * Top row holds identity + workload-state badges; bottom row
+     * holds the live signal strip (mini-readout, pulse, window dots,
+     * hints) plus the right-anchored wallet/cpu/uptime/version. */
+    cur_x = ATOMIK_GRID_L;
+    /* Hairline divider between the two rows for visual separation. */
+    draw_rect(0, top_y + row_h + 1, FB_W, 1, ATOMIK_DOCK_BORDER);
 
     /* === Last-batch headline (mini-readout) ===
      *
@@ -345,8 +357,8 @@ void status_draw(void) {
             default: break;
             }
             if (mini[0]) {
-                draw_text(cur_x, ty, mini, 1, ATOMIK_FG_DIM);
-                cur_x += text_width(mini, 1) + ATOMIK_GRID_M;
+                draw_text(cur_x, ty_bot, mini, 1, ATOMIK_FG_DIM);
+                cur_x += text_width(mini, 1) + ATOMIK_GRID_L;
             }
         }
     }
@@ -360,18 +372,18 @@ void status_draw(void) {
      * as system telemetry, not application state. */
     {
         const char *pulse_label = "PULSE";
-        draw_text(cur_x, ty, pulse_label, 1, ATOMIK_FG_DIM);
+        draw_text(cur_x, ty_bot, pulse_label, 1, ATOMIK_FG_DIM);
         cur_x += text_width(pulse_label, 1) + ATOMIK_GRID_S;
-        int pulse_w = 96;
-        int pulse_h = bar_h - ATOMIK_GRID_S * 2;
-        int pulse_y = bar_y + ATOMIK_GRID_S;
+        int pulse_w = 128;
+        int pulse_h = row_h - 4;
+        int pulse_y = bot_y + 2;
         draw_event_pulse(cur_x, pulse_y, pulse_w, pulse_h);
-        cur_x += pulse_w + ATOMIK_GRID_M;
+        cur_x += pulse_w + ATOMIK_GRID_L;
     }
 
-    /* Separator before window strip + hints. */
-    draw_rect(cur_x, bar_y + ATOMIK_GRID_S,
-              1, bar_h - ATOMIK_GRID_S * 2, ATOMIK_DOCK_BORDER);
+    /* Separator before window strip + hints (bottom-row only). */
+    draw_rect(cur_x, bot_y + 2,
+              1, row_h - 4, ATOMIK_DOCK_BORDER);
     cur_x += ATOMIK_GRID_M + 1;
 
     /* === Window strip (v0.31): one dot per open window ===
@@ -379,7 +391,7 @@ void status_draw(void) {
      * see buried windows even when fully covered. */
     int dot_size  = ATOMIK_GRID_M;
     int dot_gap   = ATOMIK_GRID_S;
-    int dot_y     = bar_y + (bar_h - dot_size) / 2;
+    int dot_y     = bot_y + (row_h - dot_size) / 2;
     int dots_x    = cur_x;
     const window_t *top = wm_topmost();
     for (int i = 0; i < wm_count(); i++) {
@@ -404,7 +416,7 @@ void status_draw(void) {
     const char *hint =
         "[R]es [P]ers   [Tab]/[Esc]/[^W]   "
         "[D] [W] [S] | [A] [M] [T] [F] [N]";
-    draw_text(hint_x, ty, hint, 1, ATOMIK_FG_DIM);
+    draw_text(hint_x, ty_bot, hint, 1, ATOMIK_FG_DIM);
 
     /* Center: agent prediction (violet = AGENT in the semantic grammar).
      * The previous version used ATOMIK_ACCENT (cyan), which conflicted
@@ -419,7 +431,7 @@ void status_draw(void) {
          * placeholder boxes — user-confirmed 2026-05-07. */
         snprintf(buf, sizeof buf, ">> %s", agent_action_name(pred));
         int tw = text_width(buf, 1);
-        draw_text((FB_W - tw) / 2, ty, buf, 1, ATOMIK_SEM_AGENT);
+        draw_text((FB_W - tw) / 2, ty_top, buf, 1, ATOMIK_SEM_AGENT);
     }
 
     /* Right: wallet/spend (violet — agent activity) || cpu/uptime (cyan
@@ -449,7 +461,10 @@ void status_draw(void) {
     int sep   = ATOMIK_GRID_M * 2;
     int total = ai_w + sep + hw_w + sep + ver_w;
     int rx    = FB_W - ATOMIK_GRID_L - total;
-    draw_text(rx,                              ty, ai_seg,      1, ATOMIK_SEM_AGENT);
-    draw_text(rx + ai_w + sep,                 ty, hw_seg,      1, ATOMIK_SEM_HARDWARE);
-    draw_text(rx + ai_w + sep + hw_w + sep,    ty, AOS_VERSION, 1, ATOMIK_FG_DIM);
+    draw_text(rx,                              ty_bot, ai_seg,      1, ATOMIK_SEM_AGENT);
+    draw_text(rx + ai_w + sep,                 ty_bot, hw_seg,      1, ATOMIK_SEM_HARDWARE);
+    draw_text(rx + ai_w + sep + hw_w + sep,    ty_top, AOS_VERSION, 1, ATOMIK_FG_DIM);
+
+    /* v0.38-A: status bar dirties the bar rect every frame; mark it. */
+    dirty_rect(0, bar_y, FB_W, bar_h);
 }

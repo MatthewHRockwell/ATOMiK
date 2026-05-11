@@ -9,7 +9,7 @@
  * carries a user-visible change. About window, status bar, and the
  * /tmp/atomik_os_version stamp all read from here so the screen output
  * NEVER lies about which build is running. */
-#define AOS_VERSION "v0.38-C2"
+#define AOS_VERSION "v0.38-E"
 
 /* Display geometry — locked to 1920x1080 XRGB8888 since simplefb is fixed. */
 #define FB_W       1920
@@ -37,8 +37,11 @@
 /* v0.38-C: Pulse Bar grew from 32 → 40 px to give the brand (now scale-2)
  * + event-pulse waveform + DATA / MODE badges room to breathe.  Surfaces
  * that anchor below the bar must read this constant — fabric_shelf_y and
- * replica_flow_open use it so the layout shifts coherently. */
-#define ATOMIK_PULSE_BAR_H 40
+ * replica_flow_open use it so the layout shifts coherently.
+ * v0.38-E: bumped to 64 for two-row layout (top: identity zone,
+ * bottom: metrics + hints + meta).  Fixes the crowded-single-row
+ * complaint from the concept-fidelity audit. */
+#define ATOMIK_PULSE_BAR_H 64
 #define ATOMIK_SAFE_BOT    16
 #define ATOMIK_SAFE_LEFT   16
 #define ATOMIK_SAFE_RIGHT  16
@@ -131,6 +134,17 @@ void draw_text(int x, int y, const char *s, int scale, pixel_t color);
 
 /* wallpaper.c */
 void wallpaper_draw(void);
+
+/* hero.c — v0.38-E procedural centerpiece visualization.
+ *
+ * The concept image's 3D iridescent fabric visualization is the
+ * primary visual anchor.  We don't have art assets for it yet; this
+ * renders an approximation directly from primitives — layered
+ * hexagons + radial spokes + pulsing center — placed at the
+ * workspace center.  Draws AFTER wallpaper, BEFORE windows.  Acts
+ * as the OS's identity statement, not as a window.  About moves
+ * to A-key only. */
+void hero_draw(void);
 
 /* agent.c — agentic usage logger + adaptive surfacing.
  *
