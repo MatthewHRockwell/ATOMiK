@@ -332,6 +332,9 @@ int main(int argc, char **argv) {
          * in-flight delta pulses based on EVT_SYNC_REPLICA event-bus
          * deltas.  Passive observer; cheap. */
         replica_flow_tick();
+        /* v0.38-C: tick the Pulse Bar's event-pulse sparkline sampler.
+         * Self-rate-limits to 150 ms.  Cheap. */
+        status_tick();
         if (ev.kind == EV_QUIT) { s_running = 0; break; }
         if (ev.kind == EV_KEY) {
             int dirty = 0;
@@ -399,6 +402,15 @@ int main(int argc, char **argv) {
              * System-shelf class. */
             else if (ev.key == 'x' || ev.key == 'X') {
                 replica_flow_open();
+                dirty = 1;
+            }
+            /* v0.38-C: 'O' cycles the metric_mode (DEV → DEMO →
+             * INVESTOR → DEV).  System-shelf class — the Pulse Bar's
+             * MODE badge updates immediately to show the new gating. */
+            else if (ev.key == 'o' || ev.key == 'O') {
+                metric_mode_t m = metric_mode();
+                m = (metric_mode_t)((m + 1) % 3);
+                metric_set_mode(m);
                 dirty = 1;
             }
             /* (3) FOCUSED-APP KEYS — terminal/files/notes/document */

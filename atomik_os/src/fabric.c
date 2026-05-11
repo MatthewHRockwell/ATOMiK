@@ -618,7 +618,7 @@ void fabric_draw(window_t *w, int x, int y, int wd, int ht) {
 /* === shelf geometry — unchanged from v0.34-C === */
 #define FABRIC_SHELF_W   480
 #define FABRIC_SHELF_X   (FB_W - FABRIC_SHELF_W - ATOMIK_GRID_L)
-#define FABRIC_SHELF_Y   (ATOMIK_SAFE_TOP + 32 + ATOMIK_GRID_M)
+#define FABRIC_SHELF_Y   (ATOMIK_SAFE_TOP + ATOMIK_PULSE_BAR_H + ATOMIK_GRID_M)
 /* v0.34-D: 5 lanes × (76 + 6) + header (~84) ≈ 494; bump to 540 for
  * comfortable bottom margin and to leave room for v0.35 status row. */
 #define FABRIC_SHELF_H   540

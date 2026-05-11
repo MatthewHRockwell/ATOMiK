@@ -440,7 +440,7 @@ void replica_flow_open(void) {
     int x  = dock_right_edge() + ATOMIK_GRID_L;
     int w  = fabric_shelf_x() - x - ATOMIK_GRID_L;
     int h  = 480;
-    int y  = ATOMIK_SAFE_TOP + 32 + ATOMIK_GRID_L;
+    int y  = ATOMIK_SAFE_TOP + ATOMIK_PULSE_BAR_H + ATOMIK_GRID_L;
     if (w < 700) w = 700;     /* clamp on narrower boards */
     window_t *win = wm_open("Replica Flow",
                             x, y, w, h,

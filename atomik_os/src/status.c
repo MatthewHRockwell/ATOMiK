@@ -1,8 +1,16 @@
-/* status.c — top status bar.
+/* status.c — Pulse Bar.
  *
  * Reads /proc/uptime for clock display (since this rootfs has no RTC),
- * /proc/stat for CPU usage, and surfaces the agent prediction. Renders
- * along the very top edge of the screen above the desktop. */
+ * /proc/stat for CPU usage, and surfaces the agent prediction.
+ *
+ * v0.38-C: Pulse Bar 2.0 per ChatGPT 2026-05-10 directive — make the
+ * top bar feel like a real status instrument, not a thin text strip.
+ *   - bar height 32 → ATOMIK_PULSE_BAR_H (40 px) for visual weight
+ *   - ATOMiK wordmark scaled 1 → 2 (the visual anchor on the left)
+ *   - DATA / MODE / PERSONALITY badges with colored locator dots
+ *   - Event-pulse mini-waveform driven by atomik_event_total deltas
+ *   - Mode is now controllable via 'M' (DEV → DEMO → INVESTOR → DEV)
+ *   - Right segment still: wallet · cpu · uptime · version */
 #include "atomik_os.h"
 #include <stdio.h>
 #include <string.h>
@@ -18,6 +26,20 @@
 static unsigned long s_last_total = 0;
 static unsigned long s_last_idle  = 0;
 static int           s_cpu_pct    = 0;
+
+/* === v0.38-C: event-pulse mini-waveform state ===
+ *
+ * Sample atomik_event_total() at fixed cadence; render the last N
+ * deltas as a thin sparkline inside the Pulse Bar.  Visible signal of
+ * "is the system alive and doing work right now."  Real data — the
+ * bus is the same event ring every other surface consumes. */
+#define PULSE_HISTORY_N    32
+#define PULSE_SAMPLE_MS    150
+static uint16_t       s_pulse_hist[PULSE_HISTORY_N];
+static uint8_t        s_pulse_head;
+static uint8_t        s_pulse_count;
+static unsigned long  s_last_pulse_sample_ms;
+static unsigned long  s_last_pulse_total;
 
 static void update_cpu(void) {
     FILE *f = fopen("/proc/stat", "r");
@@ -51,6 +73,93 @@ static void format_uptime(char *out, size_t cap) {
     snprintf(out, cap, "uptime %02d:%02d:%02d", h, m, s);
 }
 
+/* v0.38-C: poll the event bus at PULSE_SAMPLE_MS and push the delta
+ * into the sparkline ring.  Called every frame; self-rate-limits.  No
+ * heavy work — one atomik_event_total() call + a ring store. */
+void status_tick(void) {
+    unsigned long now = anim_now_ms();
+    if (now - s_last_pulse_sample_ms < PULSE_SAMPLE_MS) return;
+    s_last_pulse_sample_ms = now;
+    unsigned long total = atomik_event_total();
+    unsigned long delta = total - s_last_pulse_total;
+    s_last_pulse_total = total;
+    /* Clamp so a burst doesn't blow out the auto-normalization. */
+    if (delta > 0xFFFF) delta = 0xFFFF;
+    s_pulse_hist[s_pulse_head] = (uint16_t)delta;
+    s_pulse_head = (s_pulse_head + 1) % PULSE_HISTORY_N;
+    if (s_pulse_count < PULSE_HISTORY_N) s_pulse_count++;
+}
+
+/* Thin Bresenham segment — same approach as fabric_history mini-waves. */
+static void pulse_line(int x0, int y0, int x1, int y1, pixel_t color) {
+    int dx = (x1 > x0) ? (x1 - x0) : (x0 - x1);
+    int dy = (y1 > y0) ? (y1 - y0) : (y0 - y1);
+    int sx = (x0 < x1) ? 1 : -1;
+    int sy = (y0 < y1) ? 1 : -1;
+    int err = dx - dy;
+    while (1) {
+        draw_pixel(x0, y0, color);
+        if (x0 == x1 && y0 == y1) break;
+        int e2 = err * 2;
+        if (e2 > -dy) { err -= dy; x0 += sx; }
+        if (e2 <  dx) { err += dx; y0 += sy; }
+    }
+}
+
+static int draw_event_pulse(int x, int y, int w, int h) {
+    /* Track outline — dim 1-px hairline so the sparkline always sits
+     * on a visible bed. */
+    pixel_t bed = rgb(0x11, 0x18, 0x28);
+    draw_rect(x, y, w, h, bed);
+    draw_rect(x, y + h - 1, w, 1, ATOMIK_DOCK_BORDER);
+    if (s_pulse_count < 2) return w;
+    /* Auto-normalize: max-of-window so quiet periods don't compress. */
+    uint16_t mx = 0;
+    for (uint8_t i = 0; i < s_pulse_count; i++)
+        if (s_pulse_hist[i] > mx) mx = s_pulse_hist[i];
+    if (mx == 0) {
+        /* Constant zero — draw a flat dim baseline. */
+        draw_rect(x, y + h - 2, w, 1, ATOMIK_DOCK_BORDER);
+        return w;
+    }
+    /* Walk samples in chronological order. */
+    int prev_px = -1, prev_py = -1;
+    for (uint8_t i = 0; i < s_pulse_count; i++) {
+        int idx = (s_pulse_head - s_pulse_count + i + PULSE_HISTORY_N)
+                  % PULSE_HISTORY_N;
+        uint16_t v = s_pulse_hist[idx];
+        int px = x + (int)((long)i * (w - 1) / (PULSE_HISTORY_N - 1));
+        int py = y + h - 2 -
+                 (int)((long)v * (h - 3) / mx);
+        if (py < y + 1)         py = y + 1;
+        if (py > y + h - 2)     py = y + h - 2;
+        if (prev_px >= 0)
+            pulse_line(prev_px, prev_py, px, py, ATOMIK_SEM_HARDWARE);
+        else
+            draw_pixel(px, py, ATOMIK_SEM_HARDWARE);
+        prev_px = px;
+        prev_py = py;
+    }
+    return w;
+}
+
+static const char *mode_label(metric_mode_t m) {
+    switch (m) {
+    case METRIC_MODE_DEV:      return "DEV";
+    case METRIC_MODE_DEMO:     return "DEMO";
+    case METRIC_MODE_INVESTOR: return "INVESTOR";
+    default:                   return "?";
+    }
+}
+static pixel_t mode_color(metric_mode_t m) {
+    switch (m) {
+    case METRIC_MODE_DEV:      return ATOMIK_SEM_WASTE;       /* amber — relaxed truth */
+    case METRIC_MODE_DEMO:     return ATOMIK_SEM_HARDWARE;    /* cyan — rehearsal */
+    case METRIC_MODE_INVESTOR: return ATOMIK_SEM_SAVINGS;     /* green — strictest */
+    default:                   return ATOMIK_FG_DIM;
+    }
+}
+
 void status_draw(void) {
     update_cpu();
 
@@ -66,9 +175,10 @@ void status_draw(void) {
      * which appeared bottom-biased on monitors with less than 32 px
      * of overscan (text 8 px from the bottom edge of a visibly-larger
      * bar).  User feedback 2026-05-07. */
-    const int bar_h = 32;
+    const int bar_h = ATOMIK_PULSE_BAR_H;     /* v0.38-C: 40 px */
     const int bar_y = ATOMIK_SAFE_TOP;
     const int ty    = bar_y + (bar_h - text_height(1)) / 2;
+    const int ty_brand = bar_y + (bar_h - text_height(2)) / 2;
 
     /* Bar fills only the safe zone — wallpaper covers y=0..SAFE_TOP
      * (cropped/invisible on this monitor; visible as a thin strip on
@@ -98,8 +208,10 @@ void status_draw(void) {
      */
     const char *brand = "ATOMiK";
     int cur_x = ATOMIK_GRID_L;
-    draw_text(cur_x, ty, brand, 1, ATOMIK_SEM_HARDWARE);
-    cur_x += text_width(brand, 1) + ATOMIK_GRID_M;
+    /* v0.38-C: scale-2 brand — visual anchor on the left.  Scale-2
+     * text is 32 px tall, vertically centered inside the 40 px bar. */
+    draw_text(cur_x, ty_brand, brand, 2, ATOMIK_SEM_HARDWARE);
+    cur_x += text_width(brand, 2) + ATOMIK_GRID_L;
 
     /* Vertical separator between sections — dim, 1 px wide, stops the
      * bar from feeling like one long undifferentiated text run. */
@@ -132,6 +244,28 @@ void status_draw(void) {
         cur_x += ATOMIK_GRID_M + ATOMIK_GRID_S;
         draw_text(cur_x, ty, data_badge, 1, dcol);
         cur_x += text_width(data_badge, 1) + ATOMIK_GRID_M;
+        draw_rect(cur_x, bar_y + ATOMIK_GRID_S,
+                  1, bar_h - ATOMIK_GRID_S * 2, ATOMIK_DOCK_BORDER);
+        cur_x += ATOMIK_GRID_M + 1;
+    }
+
+    /* === MODE: <DEV/DEMO/INVESTOR> badge — v0.38-C ===
+     *
+     * Surfaces the metric_mode_t that gates which metric sources can
+     * display.  DEV (amber) shows everything including MOCK; DEMO
+     * (cyan) hides pure MOCK; INVESTOR (green) shows only LIVE +
+     * DERIVED + labeled SCENARIO.  Cycle with 'M' key from the global
+     * key router. */
+    {
+        metric_mode_t m = metric_mode();
+        char mode_badge[32];
+        snprintf(mode_badge, sizeof mode_badge, "MODE: %s", mode_label(m));
+        pixel_t mcol = mode_color(m);
+        int dot_y4 = bar_y + (bar_h - ATOMIK_GRID_M) / 2;
+        draw_rect(cur_x, dot_y4, ATOMIK_GRID_M, ATOMIK_GRID_M, mcol);
+        cur_x += ATOMIK_GRID_M + ATOMIK_GRID_S;
+        draw_text(cur_x, ty, mode_badge, 1, mcol);
+        cur_x += text_width(mode_badge, 1) + ATOMIK_GRID_M;
         draw_rect(cur_x, bar_y + ATOMIK_GRID_S,
                   1, bar_h - ATOMIK_GRID_S * 2, ATOMIK_DOCK_BORDER);
         cur_x += ATOMIK_GRID_M + 1;
@@ -215,6 +349,24 @@ void status_draw(void) {
                 cur_x += text_width(mini, 1) + ATOMIK_GRID_M;
             }
         }
+    }
+
+    /* === Event-pulse mini-waveform — v0.38-C ===
+     *
+     * Sparkline of atomik_event_total() deltas over the last ~5 s
+     * (32 samples × 150 ms).  Real data — the same event ring every
+     * other surface consumes.  Visual signal: "is the system alive
+     * and producing events right now?".  Cyan (HARDWARE) so it reads
+     * as system telemetry, not application state. */
+    {
+        const char *pulse_label = "PULSE";
+        draw_text(cur_x, ty, pulse_label, 1, ATOMIK_FG_DIM);
+        cur_x += text_width(pulse_label, 1) + ATOMIK_GRID_S;
+        int pulse_w = 96;
+        int pulse_h = bar_h - ATOMIK_GRID_S * 2;
+        int pulse_y = bar_y + ATOMIK_GRID_S;
+        draw_event_pulse(cur_x, pulse_y, pulse_w, pulse_h);
+        cur_x += pulse_w + ATOMIK_GRID_M;
     }
 
     /* Separator before window strip + hints. */

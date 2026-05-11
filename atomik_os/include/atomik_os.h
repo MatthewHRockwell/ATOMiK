@@ -9,7 +9,7 @@
  * carries a user-visible change. About window, status bar, and the
  * /tmp/atomik_os_version stamp all read from here so the screen output
  * NEVER lies about which build is running. */
-#define AOS_VERSION "v0.38-B"
+#define AOS_VERSION "v0.38-C"
 
 /* Display geometry — locked to 1920x1080 XRGB8888 since simplefb is fixed. */
 #define FB_W       1920
@@ -34,6 +34,11 @@
  * margin above the bar so the bar's top doesn't sit right on the
  * crop boundary. */
 #define ATOMIK_SAFE_TOP    48
+/* v0.38-C: Pulse Bar grew from 32 → 40 px to give the brand (now scale-2)
+ * + event-pulse waveform + DATA / MODE badges room to breathe.  Surfaces
+ * that anchor below the bar must read this constant — fabric_shelf_y and
+ * replica_flow_open use it so the layout shifts coherently. */
+#define ATOMIK_PULSE_BAR_H 40
 #define ATOMIK_SAFE_BOT    16
 #define ATOMIK_SAFE_LEFT   16
 #define ATOMIK_SAFE_RIGHT  16
@@ -799,8 +804,11 @@ void notes_draw(window_t *w, int x, int y, int wd, int ht);
 void notify_post(const char *text);
 void notify_draw(void);
 
-/* status.c — top status bar (clock, CPU, prediction surface) */
+/* status.c — top status bar (clock, CPU, prediction surface).
+ * v0.38-C adds status_tick() which samples the event-bus delta into
+ * the Pulse Bar's mini-waveform ring at PULSE_SAMPLE_MS cadence. */
 void status_draw(void);
+void status_tick(void);
 
 /* ============================================================
  * INVARIANT FRAME + FIELD-DELTA RUNTIME (v0.9)
