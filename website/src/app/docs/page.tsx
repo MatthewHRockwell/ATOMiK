@@ -2,94 +2,66 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Documentation — ATOMiK Delta-State Computing",
+  title: "Documentation - ATOMiK",
   description:
-    "Developer documentation for ATOMiK: Quick start, API reference, kernel module, architecture, examples, and FPGA deployment.",
+    "ATOMiK public docs, evidence labels, proof artifacts, hardware validation, and roadmap concepts.",
 };
 
 const cards = [
   {
-    href: "/docs/quickstart",
-    title: "Quick Start",
-    desc: "Install the Python SDK and run your first delta-state operation in under a minute.",
-    color: "#8b5cf6",
-    icon: "\u26A1",
+    href: "https://github.com/MatthewHRockwell/ATOMiK/blob/main/docs/evidence-labels.md",
+    title: "Evidence Labels",
+    desc: "Definitions for LIVE_MEASURED, HARDWARE_VALIDATED, SOFTWARE_VALIDATED, SYNTHESIS_VALIDATED, PROJECTED, CONCEPTUAL, and ROADMAP.",
   },
   {
-    href: "/docs/kernel-module",
-    title: "Kernel Module",
-    desc: "Linux kernel module exposing delta-state operations via /dev/atomik and sysfs. DKMS-managed.",
-    color: "#d4a843",
-    icon: "\u2699",
+    href: "https://github.com/MatthewHRockwell/ATOMiK/blob/main/docs/technical-proof.md",
+    title: "Technical Proof",
+    desc: "Artifact map for current proof, benchmark outputs, hardware validation, software proof, and concept material.",
   },
   {
-    href: "/docs/api",
-    title: "API Reference",
-    desc: "Three interfaces, one algebra. Python, C, and kernel module APIs with multi-context tables.",
-    color: "#4f8fff",
-    icon: "\u2630",
+    href: "https://github.com/MatthewHRockwell/ATOMiK/blob/main/docs/hardware-validation.md",
+    title: "Hardware Validation",
+    desc: "Separation of live hardware proof, hardware validation, synthesis output, and roadmap hardware work.",
   },
   {
-    href: "/docs/architecture",
-    title: "Architecture",
-    desc: "The fundamental equation, four algebraic properties, and four operations that define ATOMiK.",
-    color: "#22c55e",
-    icon: "\u2227",
+    href: "https://github.com/MatthewHRockwell/ATOMiK/blob/main/docs/roadmap.md",
+    title: "Roadmap",
+    desc: "Live today, near-term evaluation path, and roadmap concepts with explicit proof boundaries.",
   },
   {
-    href: "/docs/examples",
-    title: "Examples",
-    desc: "Production-ready patterns: distributed cache, IoT sensor fusion, and real-time analytics.",
-    color: "#c084fc",
-    icon: "\u2237",
+    href: "https://github.com/MatthewHRockwell/ATOMiK/blob/main/docs/design-partners.md",
+    title: "Design Partners",
+    desc: "Evaluation access, paid technical evaluation, qualification questions, and expected deliverables.",
   },
   {
-    href: "/docs/hardware",
-    title: "Hardware",
-    desc: "FPGA-validated across two platforms, from a $13.50 Tang Nano 9K to 69.7 Gops/s on Zynq.",
-    color: "#38bdf8",
-    icon: "\u2B22",
+    href: "https://github.com/MatthewHRockwell/ATOMiK/blob/main/results/claims_registry.yaml",
+    title: "Claims Registry",
+    desc: "Current source of truth for public claim labels, artifact paths, and publication status.",
   },
 ];
 
 export default function DocsIndexPage() {
   return (
-    <div className="max-w-5xl mx-auto px-6 py-16">
-      <p
-        className="text-sm font-mono tracking-widest uppercase mb-4"
-        style={{ color: "#8b5cf6" }}
-      >
-        Developer Documentation
+    <div className="mx-auto max-w-5xl px-6 py-16">
+      <p className="text-sm font-semibold uppercase" style={{ color: "#22d3ee" }}>
+        Developer documentation
       </p>
-      <h1 className="text-4xl sm:text-5xl font-bold tracking-tight mb-4">
-        <span
-          className="bg-clip-text text-transparent"
-          style={{ backgroundImage: "linear-gradient(135deg, #8b5cf6, #4f8fff, #22c55e)" }}
-        >
-          Docs
-        </span>
-      </h1>
-      <p className="text-lg mb-12" style={{ color: "#8888a0" }}>
-        Everything you need to integrate delta-state algebra into your stack
-        &mdash; from a single Python import to a Linux kernel module to custom FPGA silicon.
+      <h1 className="mt-4 text-4xl font-bold md:text-5xl">Docs</h1>
+      <p className="mt-4 max-w-3xl text-lg leading-8" style={{ color: "#8888a0" }}>
+        Start with the evidence framework and proof map. Deep implementation docs remain available in the repository, but public claims should route through the labeled artifacts.
       </p>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-        {cards.map((c) => (
+      <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        {cards.map((card) => (
           <Link
-            key={c.href}
-            href={c.href}
-            className="group rounded-xl p-6 border transition-all duration-300 hover:-translate-y-1 no-underline"
-            style={{ background: "#12121a", borderColor: "#1e1e2e" }}
+            key={card.href}
+            href={card.href}
+            className="rounded-lg p-6 no-underline"
+            style={{ background: "#12121a", border: "1px solid #1d324a", color: "#f4f8ff" }}
           >
-            <div className="flex items-center gap-3 mb-3">
-              <span className="text-2xl" style={{ color: c.color }}>{c.icon}</span>
-              <h2 className="text-lg font-bold group-hover:underline" style={{ color: c.color }}>
-                {c.title}
-              </h2>
-            </div>
-            <p className="text-sm leading-relaxed" style={{ color: "#8888a0" }}>
-              {c.desc}
+            <h2 className="text-lg font-bold" style={{ color: "#22d3ee" }}>{card.title}</h2>
+            <p className="mt-3 text-sm leading-6" style={{ color: "#9fb1c7" }}>
+              {card.desc}
             </p>
           </Link>
         ))}
