@@ -74,24 +74,16 @@ static void wallpaper_full_render(void) {
         }
     }
 
-    /* Wordmark — ATOMiK in big text, with a subtle drop shadow. */
-    const char *mark = "ATOMiK";
-    int scale = 6;
-    int tw = text_width(mark, scale);
-    int th = text_height(scale);
-    int tx = (FB_W - tw) / 2;
-    int ty = (FB_H - th) / 2 - 40;
-
-    /* Drop shadow */
-    draw_text(tx + 3, ty + 4, mark, scale, rgb(0x00, 0x00, 0x00));
-    /* Main text */
-    draw_text(tx, ty, mark, scale, ATOMIK_FG);
-
-    /* Tagline below */
-    const char *tag = "Delta-State Desktop";
-    int tag_scale = 2;
-    int tag_w = text_width(tag, tag_scale);
-    draw_text((FB_W - tag_w) / 2, ty + th + 24, tag, tag_scale, ATOMIK_ACCENT);
+    /* v0.38-F: wallpaper wordmark + tagline removed.
+     *
+     * The big "ATOMiK / Delta-State Desktop" text used to print at
+     * screen center, but it overlapped with src/hero.c's procedural
+     * centerpiece and competed with the Class B iridescent background
+     * for visual attention.  Per the v0.38 concept-fidelity audit
+     * (memory project_v038_concept_fidelity_audit.md), the hero
+     * owns the center now; ATOMiK identity lives in the Pulse Bar's
+     * scale-2 wordmark only.  Cleaner composition, closer to the
+     * concept-image macro hierarchy. */
 }
 
 void wallpaper_draw(void) {
