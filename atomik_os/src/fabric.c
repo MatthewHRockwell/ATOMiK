@@ -498,11 +498,138 @@ static pixel_t fresh_color(fabric_fresh_t f) {
     }
 }
 
+/* === filled-area waveform (v0.38-G) ===
+ *
+ * The v0.34-D mini-waveform is a polyline.  Per the concept-fidelity
+ * audit (memory project_v038_concept_fidelity_audit), each Fabric lane
+ * should read as an instrument, not a wireframe — that means filling
+ * the area under the wave so the lane glows with lane-color presence
+ * instead of a hairline trace.  We fill bottom-to-top: each column
+ * from x0..x1 gets a vertical fill from the baseline up to the wave's
+ * height at that column.  Quality of glow: enough columns of fill at
+ * the lane's accent color reads as "saturated instrument", matching
+ * concept images 02-06's Fabric panels. */
+static void draw_filled_waveform(const fabric_lane_history_t *h,
+                                 int x, int y, int w, int hgt,
+                                 pixel_t fill, pixel_t line) {
+    /* Bed: dim hairline at baseline. */
+    pixel_t bed = rgb(0x1F, 0x27, 0x38);
+    draw_rect(x, y + hgt - 1, w, 1, bed);
+
+    if (h->count < 2) return;
+
+    uint16_t mn = h->v_min, mx = h->v_max;
+    if (mx <= mn) {
+        /* Constant series — flat band near the bottom. */
+        draw_rect(x, y + hgt - 4, w, 3, fill);
+        return;
+    }
+    uint16_t span = mx - mn;
+
+    /* First pass: compute the height-per-column array. */
+    int col_h[256];
+    int n_cols = (w < 256) ? w : 256;
+    /* Interpolate the wave across w columns. */
+    for (int col = 0; col < n_cols; col++) {
+        /* Map this column back to a sample index in the buffer. */
+        int   sample_i = (int)((long)col * (h->count - 1) / (n_cols - 1));
+        int   idx      = (h->head - h->count + sample_i + FABRIC_HISTORY_N)
+                          % FABRIC_HISTORY_N;
+        uint16_t v     = h->values[idx];
+        int      hh    = (int)((long)(v - mn) * (hgt - 2) / span);
+        if (hh < 1) hh = 1;
+        if (hh > hgt - 2) hh = hgt - 2;
+        col_h[col] = hh;
+    }
+
+    /* Fill pass: column-wise vertical strokes from baseline to col_h.
+     * The fill alpha builds up the glow body of the lane. */
+    for (int col = 0; col < n_cols; col++) {
+        int px      = x + col;
+        int top_y   = y + hgt - 1 - col_h[col];
+        for (int yy = top_y; yy < y + hgt - 1; yy++) {
+            draw_pixel(px, yy, fill);
+        }
+        /* Bright line at the top of the fill — readable "wave" edge. */
+        draw_pixel(px, top_y, line);
+        if (top_y - 1 >= y) draw_pixel(px, top_y - 1, line);
+    }
+}
+
+/* === big-metric string per lane (v0.38-G focal number) === */
+static void lane_big_metric(fabric_lane_t lane,
+                            char *buf, size_t cap,
+                            char *unit, size_t unit_cap) {
+    buf[0] = unit[0] = 0;
+    personality_t p = lane_to_personality(lane);
+    const perf_sample_t *s = (p != PERSONALITY_NONE) ? perf_last_for(p) : NULL;
+    const fabric_lane_history_t *h = &s_history[lane];
+
+    switch (lane) {
+    case FABRIC_LANE_STATE:
+        if (s && s->ops_logical > 0) {
+            unsigned pct = (unsigned)
+                (100u * (s->ops_logical - s->ops_issued) / s->ops_logical);
+            snprintf(buf, cap, "%u", pct);
+            snprintf(unit, unit_cap, "%%");
+        } else {
+            snprintf(buf, cap, "--");
+            snprintf(unit, unit_cap, "%%");
+        }
+        break;
+    case FABRIC_LANE_SYNC:
+        if (s) {
+            snprintf(buf, cap, "%u", (unsigned)s->ops_issued);
+            snprintf(unit, unit_cap, "deltas");
+        } else {
+            snprintf(buf, cap, "--");
+            snprintf(unit, unit_cap, "deltas");
+        }
+        break;
+    case FABRIC_LANE_AGENT:
+        if (s) {
+            unsigned cold = s->bytes_avoided / 4;
+            unsigned total = s->regions_unique + cold;
+            unsigned pct = total ? (s->ops_issued * 100u / total) : 0;
+            snprintf(buf, cap, "%u", pct);
+            snprintf(unit, unit_cap, "%% hot");
+        } else {
+            snprintf(buf, cap, "--");
+            snprintf(unit, unit_cap, "%% hot");
+        }
+        break;
+    case FABRIC_LANE_EVENT: {
+        unsigned long total = atomik_event_total();
+        if (total > 0) {
+            snprintf(buf, cap, "%lu", total);
+            snprintf(unit, unit_cap, "events");
+        } else {
+            snprintf(buf, cap, "--");
+            snprintf(unit, unit_cap, "events");
+        }
+        break;
+    }
+    case FABRIC_LANE_VISUAL: {
+        const atomik_metric_t *avd = metric_get("visual.frame_pct_avoided");
+        if (avd && avd->source != METRIC_WAITING) {
+            snprintf(buf, cap, "%.0f", avd->value);
+            snprintf(unit, unit_cap, "%% avoided");
+        } else {
+            snprintf(buf, cap, "--");
+            snprintf(unit, unit_cap, "%% avoided");
+        }
+        (void)h;
+        break;
+    }
+    default: break;
+    }
+}
+
 /* === main draw === */
 
-#define LANE_ROW_H        76     /* per-lane vertical budget */
-#define LANE_GAP          6      /* between lanes */
-#define LANE_ACCENT_W     3      /* left-edge personality strip */
+#define LANE_ROW_H        158    /* v0.38-G: was 76; taller panels = instrument feel */
+#define LANE_GAP          ATOMIK_GRID_M
+#define LANE_ACCENT_W     2      /* outer-rim thickness on active lane */
 
 void fabric_draw(window_t *w, int x, int y, int wd, int ht) {
     (void)w; (void)ht;
@@ -559,59 +686,100 @@ void fabric_draw(window_t *w, int x, int y, int wd, int ht) {
         fabric_lane_t lane  = (fabric_lane_t)i;
         int           ly    = lanes_y + i * (LANE_ROW_H + LANE_GAP);
         const fabric_lane_history_t *h = &s_history[i];
+        personality_t lp     = lane_to_personality(lane);
+        int           active = (lp != PERSONALITY_NONE && lp == s_active);
+        pixel_t       lc     = lane_color(lane);
 
-        /* Card chrome — slightly elevated rect, 1-px outline. */
+        /* === v0.38-G card: instrument, not wireframe ===
+         *
+         * Layered composition:
+         *   1. Base card body (slightly elevated dark navy).
+         *   2. Lane-color gradient stripe at the top (12 px) reading
+         *      as a tinted shoulder so each lane has its identity
+         *      color in chrome, not just text.
+         *   3. 1-px hairline border.
+         *   4. ACTIVE-rim: 2-px saturated outer border in lane color
+         *      drawn AROUND the card (one px outside each edge) so the
+         *      currently-active personality lane glows. */
         draw_rect(lane_x, ly, lane_w, LANE_ROW_H, wm_card_bg());
+
+        /* Tinted shoulder — top band gets the lane's accent color at
+         * low alpha so the lane reads as colored even without active. */
+        int shoulder_h = 12;
+        for (int sy = 0; sy < shoulder_h; sy++) {
+            uint8_t alpha = (uint8_t)(60 - (sy * 60 / shoulder_h));
+            for (int sx = 0; sx < lane_w; sx++) {
+                draw_blend_pixel(lane_x + sx, ly + sy, lc, alpha);
+            }
+        }
+
+        /* Hairline border. */
         draw_rect(lane_x, ly, lane_w, 1, wm_card_border());
         draw_rect(lane_x, ly + LANE_ROW_H - 1, lane_w, 1, wm_card_border());
         draw_rect(lane_x, ly, 1, LANE_ROW_H, wm_card_border());
         draw_rect(lane_x + lane_w - 1, ly, 1, LANE_ROW_H, wm_card_border());
 
-        /* Active-personality accent strip down the left edge. */
-        personality_t lp = lane_to_personality(lane);
-        int active = (lp != PERSONALITY_NONE && lp == s_active);
+        /* Active-rim: 2-px saturated outer ring (drawn on the inner edge
+         * so it doesn't bleed into the gap between cards). */
         if (active) {
-            draw_rect(lane_x, ly, LANE_ACCENT_W, LANE_ROW_H,
-                      lane_color(lane));
+            for (int t = 0; t < LANE_ACCENT_W; t++) {
+                draw_rect(lane_x + t,     ly + t,     lane_w - 2 * t, 1, lc);
+                draw_rect(lane_x + t,     ly + LANE_ROW_H - 1 - t,
+                          lane_w - 2 * t, 1, lc);
+                draw_rect(lane_x + t,     ly + t, 1, LANE_ROW_H - 2 * t, lc);
+                draw_rect(lane_x + lane_w - 1 - t, ly + t,
+                          1, LANE_ROW_H - 2 * t, lc);
+            }
         }
 
-        int tx = lane_x + LANE_ACCENT_W + ATOMIK_GRID_M;
-        int ty = ly + ATOMIK_GRID_S + 2;
+        /* === content === */
+        int pad_x = ATOMIK_GRID_L;
+        int tx    = lane_x + pad_x;
+        int inner_w = lane_w - pad_x * 2;
 
-        /* Row 1: lane name (coloured) + freshness tag right-aligned. */
-        char name_str[16];
-        snprintf(name_str, sizeof name_str, "%s", fabric_lane_name(lane));
-        draw_text(tx, ty, name_str, 1,
-                  active ? lane_color(lane)
-                         : (h->fresh == FABRIC_FRESH_WAITING
-                                ? ATOMIK_FG_DIM : ATOMIK_FG));
+        /* Row 1: scale-2 lane NAME in saturated lane color +
+         * freshness chip right-aligned. */
+        int ty1 = ly + ATOMIK_GRID_M;
+        const char *name = fabric_lane_name(lane);
+        draw_text(tx, ty1, name, 2, lc);
 
         const char *fl = fresh_label(h->fresh);
         int fw = text_width(fl, 1);
-        draw_text(lane_x + lane_w - fw - ATOMIK_GRID_M, ty,
-                  fl, 1, fresh_color(h->fresh));
+        /* Small filled freshness chip with color background. */
+        pixel_t fcol = fresh_color(h->fresh);
+        int chip_w = fw + ATOMIK_GRID_M;
+        int chip_h = text_height(1) + 4;
+        int chip_x = lane_x + lane_w - chip_w - pad_x;
+        int chip_y = ty1 + (text_height(2) - chip_h) / 2;
+        draw_rect(chip_x, chip_y, chip_w, chip_h,
+                  wm_card_bg() & 0x0F0F0F);   /* darker chip body */
+        draw_rect(chip_x, chip_y, chip_w, 1, fcol);
+        draw_rect(chip_x, chip_y + chip_h - 1, chip_w, 1, fcol);
+        draw_text(chip_x + ATOMIK_GRID_S, chip_y + 2, fl, 1, fcol);
 
-        /* Row 2: one-liner (dim). */
-        int ty2 = ty + text_height(1) + 2;
-        draw_text(tx, ty2, lane_oneliner(lane), 1, ATOMIK_FG_DIM);
+        /* Row 2: scale-3 BIG METRIC number in lane color +
+         * unit label scale-1 dim below. */
+        int ty2 = ty1 + text_height(2) + ATOMIK_GRID_M;
+        char big[16], unit[24];
+        lane_big_metric(lane, big, sizeof big, unit, sizeof unit);
+        draw_text(tx, ty2, big, 3, lc);
+        int big_w = text_width(big, 3);
+        draw_text(tx + big_w + ATOMIK_GRID_M, ty2 + text_height(3) - text_height(1),
+                  unit, 1, ATOMIK_FG_DIM);
 
-        /* Row 3: mini-waveform (full inner width, 22 px tall). */
-        int wf_y = ty2 + text_height(1) + 4;
+        /* Row 3: FILLED area waveform across inner width. */
+        int wf_y = ty2 + text_height(3) + ATOMIK_GRID_S;
         int wf_x = tx;
-        int wf_w = lane_w - (LANE_ACCENT_W + ATOMIK_GRID_M * 2);
-        int wf_h = 22;
-        draw_waveform(h, wf_x, wf_y, wf_w, wf_h, lane_color(lane));
-
-        /* Row 4: primary metric + secondary metric.  Secondary right-
-         * aligned.  Honest UI — if neither has data, both will say so. */
-        int metric_y = wf_y + wf_h + 4;
-        char primary[64], secondary[64];
-        lane_metrics(lane, primary, sizeof primary,
-                           secondary, sizeof secondary);
-        draw_text(tx, metric_y, primary, 1, ATOMIK_FG);
-        int sw = text_width(secondary, 1);
-        draw_text(lane_x + lane_w - sw - ATOMIK_GRID_M, metric_y,
-                  secondary, 1, ATOMIK_FG_DIM);
+        int wf_w = inner_w;
+        int wf_h = LANE_ROW_H - (wf_y - ly) - ATOMIK_GRID_M;
+        if (wf_h < 12) wf_h = 12;
+        /* Build a darker fill color (lane color at half intensity) so the
+         * filled band reads as glow body, with brighter line on top. */
+        uint8_t fr = (lc >> 16) & 0xFF;
+        uint8_t fg_ = (lc >>  8) & 0xFF;
+        uint8_t fb = (lc      ) & 0xFF;
+        pixel_t fill_dim = rgb(fr / 3, fg_ / 3, fb / 3);
+        draw_filled_waveform(h, wf_x, wf_y, wf_w, wf_h, fill_dim, lc);
     }
 }
 
@@ -619,9 +787,11 @@ void fabric_draw(window_t *w, int x, int y, int wd, int ht) {
 #define FABRIC_SHELF_W   480
 #define FABRIC_SHELF_X   (FB_W - FABRIC_SHELF_W - ATOMIK_GRID_L)
 #define FABRIC_SHELF_Y   (ATOMIK_SAFE_TOP + ATOMIK_PULSE_BAR_H + ATOMIK_GRID_M)
-/* v0.34-D: 5 lanes × (76 + 6) + header (~84) ≈ 494; bump to 540 for
- * comfortable bottom margin and to leave room for v0.35 status row. */
-#define FABRIC_SHELF_H   540
+/* v0.38-G: 5 lanes × (158 + 8) + header (~84) ≈ 920; bump shelf to 920
+ * so the bigger instrument cards fit.  Workspace below the shelf is
+ * the bottom 84 px (cushion), Memory Weave / State Watch surfaces
+ * still open with their own y-positions and aren't affected. */
+#define FABRIC_SHELF_H   920
 
 int fabric_shelf_x(void) { return FABRIC_SHELF_X; }
 int fabric_shelf_y(void) { return FABRIC_SHELF_Y; }
