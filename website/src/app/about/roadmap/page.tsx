@@ -4,7 +4,7 @@ import Nav from "@/components/Nav";
 export const metadata: Metadata = {
   title: "ASIC Roadmap | ATOMiK",
   description:
-    "ATOMiK's path from FPGA validation to custom silicon — sub-linear scaling, formally verified delta-state algebra, targeting >1 Tops/s in ASIC.",
+    "ATOMiK's evidence-labeled path from FPGA validation toward custom silicon and future Resource Fabric hardware.",
 };
 
 /* ------------------------------------------------------------------ */
@@ -397,18 +397,18 @@ export default function ASICRoadmapPage() {
             touch to discuss early access, licensing, or integration.
           </p>
           <a
-            href="mailto:sales@atomik.tech"
+            href="/contact?intent=design-partner"
             className="inline-flex items-center gap-2 rounded-lg px-8 py-3 text-sm font-semibold text-white transition-shadow hover:shadow-lg"
             style={{
               background: `linear-gradient(135deg, ${accent}, ${accent2})`,
               boxShadow: `0 4px 24px ${accent}33`,
             }}
           >
-            Contact Sales
+            Discuss Design Partnership
             <span aria-hidden="true">&rarr;</span>
           </a>
           <p className="mt-4 text-xs text-gray-600">
-            sales@atomik.tech
+            Use the evaluation form to anchor on workload, proof boundary, and timeline.
           </p>
           <p className="mt-6 text-sm text-gray-400">
             Questions about our timeline?{" "}

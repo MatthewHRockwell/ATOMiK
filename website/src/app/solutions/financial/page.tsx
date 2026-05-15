@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   title:
     "Deterministic State for Financial Systems — ATOMiK | Trading State Sync, Real-Time P&L",
   description:
-    "Constant-time state reconstruction for trading systems. Zero timing jitter eliminates side channels. Self-inverse undo for instant trade cancellations. Lock-free multi-venue P&L aggregation backed by 108 formal proofs.",
+    "Evaluate fixed-path delta-state operations for trading state, financial audit, undo, and multi-venue P&L aggregation workloads.",
   keywords: [
     "deterministic state management",
     "trading system state sync",

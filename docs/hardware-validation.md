@@ -53,5 +53,5 @@ Avoid:
 - shipped product
 - production deployment
 - customer validated
-- guaranteed speedup
+- unqualified speedup
 - hardware verified for synthesis-only claims

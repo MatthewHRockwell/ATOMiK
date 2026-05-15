@@ -1,7 +1,7 @@
 "use client";
 
 import Nav from "@/components/Nav";
-import { useState, FormEvent } from "react";
+import { useEffect, useState, FormEvent } from "react";
 
 const requestTypes = [
   "Request Evaluation Access",
@@ -34,6 +34,13 @@ const timelines = [
   "Roadmap research",
 ];
 
+const requestTypeByIntent: Record<string, string> = {
+  evaluation: "Request Evaluation Access",
+  demo: "Request Technical Demo",
+  "technical-demo": "Request Technical Demo",
+  "design-partner": "Discuss Design Partnership",
+};
+
 export default function ContactPage() {
   const [form, setForm] = useState({
     name: "",
@@ -48,6 +55,22 @@ export default function ContactPage() {
     message: "",
   });
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
+
+  useEffect(() => {
+    const intent = new URLSearchParams(window.location.search).get("intent");
+    if (!intent) return;
+
+    const requestType = requestTypeByIntent[intent];
+    if (!requestType) return;
+
+    const timeout = window.setTimeout(() => {
+      setForm((current) =>
+        current.requestType === requestType ? current : { ...current, requestType }
+      );
+    }, 0);
+
+    return () => window.clearTimeout(timeout);
+  }, []);
 
   function update(field: string, value: string) {
     setForm((f) => ({ ...f, [field]: value }));

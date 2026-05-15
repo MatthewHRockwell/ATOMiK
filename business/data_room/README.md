@@ -21,7 +21,7 @@ performance, production, customer, pricing, or roadmap language.
 | **Intellectual Property** | [03_intellectual_property/](03_intellectual_property/) | Patent status, provisional patent PDF, formal proofs inventory, trade secrets | Patent Pending architecture, 108 Lean4 proofs, IP protection strategy |
 | **Team** | [04_team/](04_team/) | Founder profile, advisory board plan | Solo founder background, post-funding hiring plan, advisory needs |
 | **Technical** | [05_technical/](05_technical/) | XOR data type explainer, memory traffic analysis, ASIC economics | Deep-dive technical documents for engineering due diligence |
-| **Customers** | [05_customers/](05_customers/) | Customer pipeline | Target verticals (HFT, edge AI, streaming), engagement status |
+| **Market / pipeline** | [05_customers/](05_customers/) | Target-buyer pipeline | Target verticals (HFT, edge AI, streaming), engagement status |
 | **Hiring** | [06_team/](06_team/) | First hires plan | Priority roles, compensation strategy, team scaling roadmap |
 
 ---
