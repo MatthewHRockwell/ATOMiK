@@ -10,6 +10,8 @@ Second follow-up: 2026-05-15
 
 v0.38-I follow-up: 2026-05-15
 
+Public site truth update: 2026-05-15
+
 ## Scope Reviewed
 
 Risky claim search was run across:
@@ -133,6 +135,29 @@ revolutionary
 - Kept the claim boundary narrow: the v0.38-I screenshot supports visible UI
   proof only. It does not support benchmark, uptime, allocation, maturity,
   commercial product, power, or performance claims.
+
+## Tightened In 2026-05-15 Public Site Truth Update
+
+- Homepage reframed around `Stop rediscovering state. Compute what changed.`
+  and a five-section structure: hero, four operations, why it matters, proof
+  hierarchy, and evaluation/licensing.
+- Case-study framing replaced with target workload scenarios. No customer,
+  production, logo, revenue, or deployment claims are made.
+- Evaluation page reduced to two public options: Design Partner Evaluation and
+  Enterprise / IP / SDK Licensing.
+- Benchmarks page now distinguishes synthesis-validated Zynq ceilings, live
+  AX7020/Zynq prototype progress, ATOMiK Desk / Resource Fabric prototype proof,
+  and first-silicon roadmap work.
+- Public dashboard route now shows a request-based evaluation placeholder
+  instead of mock usage, uptime, saved-bandwidth, API-key, or pricing-tier data.
+- Integrations, comparison, ROI, changelog, register, contact, and OpenGraph
+  surfaces were softened to avoid unsupported product, pricing, and metric
+  claims.
+- Community, blog, migration docs, and solution pages were swept for stale
+  proof-count, free-registration, zero-coordination, automatic-convergence, and
+  customer-reference phrasing.
+- See `docs/public-site-truth-update-2026-05-15.md` for the concise changelog,
+  claims-hygiene note, and next-pass TODOs.
 
 ## Remaining Legacy Risk
 

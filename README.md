@@ -20,7 +20,7 @@ polished commercial product.
 | Live hardware prototype | Yes. Current and historical proof screenshots are available and labeled above. |
 | Public benchmark artifacts | Present where artifact packages exist. See `results/` and `docs/perf/`. |
 | Concept UI | Design target and roadmap material, not commercial product UI. |
-| Evaluation access | Request-based. No conventional free tier is presented publicly. |
+| Evaluation access | Request-based. No self-serve public plan is presented publicly. |
 
 ## What Is Live
 
