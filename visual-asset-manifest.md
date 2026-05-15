@@ -24,6 +24,17 @@ constrained.
 | `website/public/05-replica-flow-sync-concept.png` | `reference-documents-tmp/05-replica-flow-sync-concept.png` | CONCEPT VISUAL / ROADMAP VISUAL | Product vision page, technical note, pitch deck | Concept visualization of Replica Flow and delta propagation. | Do not use as standalone customer proof. |
 | `website/public/06-memory-weave-agent-concept.png` | `reference-documents-tmp/06-memory-weave-agent-concept.png` | LONGER-TERM CONCEPT / ROADMAP VISUAL | Pitch deck, product vision page, internal roadmap | Longer-term concept visual for adaptive agent/context surfaces. | Avoid above the fold and README proof zones. |
 
+## Current UI Upgrade Screenshots
+
+These screenshots are live prototype artifacts from the ATOMiK Desk UI/UX
+upgrade track. They may be used as proof images when labeled as prototype
+screenshots, not as shipped product UI.
+
+| Public filename | Source file | Classification | Caption | Notes |
+|---|---|---|---|---|
+| `website/public/07-current-live-atomik-desk-v038g.png` | `atomik_os/docs/screenshots/deploy_20260512_092422_v0.38-G.png` | LIVE SCREENSHOT / HARDWARE_VALIDATED | ATOMiK Desk v0.38-G prototype UI running on live hardware. | Closer to concept direction: dark/cyan palette, app rail, top status bar, Resource Fabric panel, and live desktop surface. |
+| pending | pending v0.38-H screenshot or demo artifact | pending | ATOMiK Desk v0.38-H prototype UI running on live hardware. | Do not use publicly until a recorded artifact exists. |
+
 ## Required Disclaimer
 
 Live screenshots show current prototypes. Concept visuals show product direction

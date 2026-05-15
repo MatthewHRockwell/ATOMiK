@@ -2,6 +2,8 @@
 
 Date: 2026-05-10
 
+Updated: 2026-05-14
+
 ## Scope Reviewed
 
 Risky claim search was run across:
@@ -38,6 +40,45 @@ enterprise-ready
   production-result framing and replaced it with evidence posture.
 - README, one-pager, deck source, and outreach materials: aligned with evidence
   labels and current live proof.
+
+## Tightened In 2026-05-14 Update
+
+- Homepage and README: promoted the v0.38-G live UI screenshot as the current
+  public proof image while preserving the prototype/not-shipped label.
+- Visual manifest, ATOMiK Desk concept doc, technical proof doc, claims
+  registry, and pitch visual map: added the v0.38-G UI proof artifact and kept
+  v0.38-H pending until a recorded screenshot or demo artifact exists.
+- FAQ, register, terms, dashboard, ROI, kernel-module docs, changelog, and
+  selected blog/solution CTAs: removed stale self-serve free-trial / Pro-plan
+  language and aligned public conversion to request-based evaluation access.
+- AI demo route: replaced projected AI power/cost comparison content with a
+  concept/evaluation page that requires measured artifacts before AI-specific
+  performance or power claims.
+- Whitepaper and OpenGraph metadata: removed unlabeled headline metrics and
+  reframed them around evidence-labeled technical proof.
+
+The 2026-05-14 high-risk public-site scan found no remaining matches for:
+
+```text
+90-day free trial
+90-day free Pro trial
+free Pro
+Pro trial
+Start Pro Trial
+Start Your 90-Day Free Trial
+free 90-day trial
+Free 90-day trial
+916,000x
+7,670x
+220W
+12W
+18x
+less power
+same AI output
+production results
+world's first
+revolutionary
+```
 
 ## Remaining Legacy Risk
 

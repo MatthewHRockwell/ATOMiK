@@ -9,6 +9,7 @@ together.
 | Claim area | Label | Artifact |
 |---|---|---|
 | Current ATOMiK Desk prototype screenshot | `HARDWARE_VALIDATED` | `website/public/01-current-live-atomik-desk.jpg` |
+| ATOMiK Desk v0.38-G UI proof screenshot | `HARDWARE_VALIDATED` | `website/public/07-current-live-atomik-desk-v038g.png` |
 | AX7020 performance matrix board run | `LIVE_MEASURED` | `results/perf_matrix_ax7020_20260509.txt` |
 | AX7020 matrix interpretation and caveats | `LIVE_MEASURED` | `docs/perf/20260509_matrix_interpretation.md` |
 | Linux userspace validation path | `HARDWARE_VALIDATED` | `docs/LINUX_USERSPACE_PROOF.md` |
@@ -34,7 +35,16 @@ one-pager when labeled as:
 
 > Current ATOMiK Desk prototype running on live hardware.
 
-It should not be described as a polished shipping product.
+The v0.38-G screenshot is also hardware-validated prototype evidence and shows
+the UI/UX direction moving closer to the concept visuals: dark/cyan palette,
+left app rail, top status bar, live Resource Fabric instrumentation, and a
+desktop-like visual surface. It should be labeled as:
+
+> ATOMiK Desk v0.38-G prototype UI running on live hardware.
+
+It should not be described as a polished shipping product. v0.38-H should not
+become a public claim until a screenshot, demo clip, or other recorded artifact
+is added.
 
 ## Benchmark Artifact Guidance
 
@@ -51,8 +61,9 @@ New benchmark packages should include:
 - evidence label
 - commit hash when available
 
-Measured results will be posted when artifact packages are ready. Do not fill
-gaps with estimated performance numbers.
+Do not fill gaps with estimated performance numbers. If a result is not backed
+by a raw artifact and interpretation note, classify it as projected, conceptual,
+or roadmap instead of phrasing it as an observed result.
 
 ## Source Of Truth
 
