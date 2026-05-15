@@ -1,10 +1,15 @@
 # HAX (SOSV) Application — ATOMiK
 
+> **Publication status: APPLICATION DRAFT / REVIEW REQUIRED.**
+> This draft predates the current public evidence framework. Replace hard
+> throughput, power, cost, and maturity claims with artifact-linked language
+> before submission.
+
 ## Company Overview
 
 **Company:** Rockwell Industries (converting to Delaware C-Corp)
 **Product:** ATOMiK — formally verified delta-state computation hardware IP
-**Stage:** Pre-seed with production hardware
+**Stage:** Pre-seed with prototype hardware
 **Founder:** Matthew H. Rockwell (solo)
 **Contact:** matthew.h.rockwell@gmail.com
 **Repository:** github.com/MatthewHRockwell/ATOMiK
@@ -24,7 +29,8 @@ Formally verified hardware IP cores for delta-state computation — a new comput
 - 80/80 hardware tests, 353 SDK tests across 5 languages
 - Total development cost: **$225**
 
-This is not a concept. It's working silicon.
+This is prototype hardware with public proof artifacts, not a commercial
+hardware product.
 
 ## What problem does it solve?
 

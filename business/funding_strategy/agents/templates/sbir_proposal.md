@@ -28,24 +28,25 @@
 ## 1. Project Summary
 
 {{ company.name }} proposes to develop and validate a formally verified hardware
-architecture for delta-state computing that achieves single-cycle, lock-free
-state accumulation at 1 billion operations per second on commodity FPGA
-hardware.
+architecture for delta-state computing. Any latency, throughput, power, or
+memory-traffic claim in this proposal must be tied to the current evidence
+label and artifact package before submission.
 
 {{ pitch_angle }}
 
 **Key innovation:** Rather than the traditional Load-Modify-Store cycle,
-{{ company.name }} accumulates state changes (deltas) via single-cycle XOR
-operations, yielding mathematical properties — commutativity, associativity,
-self-inverse — that are proven correct through 108 Lean4 formal proofs.
+{{ company.name }} accumulates state changes (deltas) via XOR operations,
+yielding proof-scoped properties such as commutativity, associativity, and
+self-inverse behavior.
 
 **Intellectual merit:** This work advances the state of the art in formally
 verified hardware design by demonstrating that non-trivial computing primitives
 can be both mathematically proven and practically efficient in silicon.
 
-**Broader impact:** The technology reduces memory bandwidth requirements by
-95-100% compared to full-state architectures, with applications in AI inference,
-sensor fusion, database replication, and secure state management.
+**Broader impact:** The technology may reduce memory movement in state-heavy
+workloads when the workload maps to the delta-state model. AI inference, sensor
+fusion, database replication, and secure state management are evaluation
+directions, not current performance results.
 
 ---
 
@@ -88,14 +89,14 @@ State_current = S₀ ⊕ δ₁ ⊕ δ₂ ⊕ ... ⊕ δₙ
 
 This algebraic structure provides:
 
-- **Commutativity:** Order of delta application does not matter — enables
-  lock-free parallelism across multiple processing banks.
+- **Commutativity:** Order of delta application does not matter inside the
+  proof model; system-level concurrency claims require workload validation.
 - **Associativity:** Deltas can be grouped and merged hierarchically via a
   binary merge tree.
 - **Self-inverse:** Every delta is its own inverse (δ ⊕ δ = 0) — instant
   undo without checkpoints.
-- **Single-cycle execution:** XOR has no carry propagation, enabling pure
-  LUT-based computation at full clock speed.
+- **Fixed-path execution:** XOR has no carry propagation; exact hardware
+  latency requires a linked hardware or synthesis artifact.
 
 ### 3.2 Hardware Architecture
 
@@ -103,14 +104,14 @@ The {{ company.name }} architecture consists of N parallel XOR accumulator banks
 connected by a binary merge tree. Each bank independently accumulates deltas,
 and the merge tree combines bank outputs to produce a unified state.
 
-**Current implementation:** 16 parallel banks on a Tang Nano 9K FPGA, achieving
-1,056 Mops/s at 7% LUT utilization (single bank) / 20% (16 banks).
+**Current implementation:** quote bank count, throughput, and utilization only
+from the current hardware-validation or synthesis artifacts attached to the
+submission.
 
 ### 3.3 Formal Verification
 
-All algebraic properties are machine-verified through 108 Lean4 proofs with zero
-`sorry` statements. This provides guarantees that no amount of testing can
-deliver:
+Algebraic properties are machine-checked in Lean4. Quote exact theorem counts
+and proof status only from current proof artifacts:
 
 - Closure under XOR operations
 - Commutativity and associativity of delta composition
@@ -147,7 +148,8 @@ deliver:
 {{ company.name }}'s approach differs from prior work in several key dimensions:
 
 - **vs. CRDTs:** CRDTs provide algebraic conflict resolution in software;
-  {{ company.name }} moves the algebra into hardware with single-cycle execution.
+  {{ company.name }} evaluates moving related algebra into hardware, with
+  execution timing tied to hardware artifacts.
 - **vs. Event sourcing:** Event logs require O(N) replay; {{ company.name }}
   achieves O(1) state reconstruction via XOR accumulation.
 - **vs. Near-memory computing:** NMC reduces data movement distance;

@@ -1,5 +1,9 @@
 # Y Combinator Summer 2026 Application — ATOMiK
 
+> **Publication status: APPLICATION DRAFT / REVIEW REQUIRED.**
+> This draft contains older performance, funding, and maturity language. Rewrite
+> against current evidence labels before submission.
+
 ## Company
 
 **Company name:** Rockwell Industries (converting to Delaware C-Corp)
@@ -10,7 +14,7 @@
 
 **Founder:** Matthew H. Rockwell
 **Email:** matthew.h.rockwell@gmail.com
-**Role:** Solo founder — designed the math, wrote the proofs, built the silicon, shipped the SDK
+**Role:** Solo founder — designed the math, wrote the proofs, built prototype hardware, and built the SDK
 
 ---
 
@@ -59,7 +63,7 @@ I wrote everything. Every Lean4 proof (108), every line of SystemVerilog RTL, ev
 
 ### How far along are you?
 
-**Production hardware, not a prototype.**
+**Prototype hardware and proof artifacts.**
 
 - 108 formal proofs (Lean4, machine-verified)
 - Production SoC on Tang Nano 9K FPGA ($13.50) — 287 LUTs, 1.8 mW

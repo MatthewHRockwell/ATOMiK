@@ -29,7 +29,7 @@ planned.
 ## What Not To Claim Yet
 
 - ATOMiK Desk is not presented as a market-ready desktop product.
-- Concept visuals are not current shipped UI.
+- Concept visuals are not current commercial UI.
 - Synthesis ceilings are not live-board measurements.
 - Projected economics or performance must not be phrased as results.
 - Broad production traction requires referenceable proof before public use.

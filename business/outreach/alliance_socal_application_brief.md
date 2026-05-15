@@ -1,5 +1,9 @@
 # Alliance for SoCal Innovation — Application Brief
 
+> **Publication status: APPLICATION DRAFT / REVIEW REQUIRED.**
+> Do not submit without updating metrics, market comparisons, and maturity
+> claims against current evidence labels and founder-approved positioning.
+
 **Company:** Rockwell Industries, LLC (converting to Delaware C-Corp)
 **Founder:** Matthew H. Rockwell — Solo technical founder
 **Contact:** matthew.h.rockwell@gmail.com
@@ -10,9 +14,12 @@
 
 ## What We Do
 
-ATOMiK is a hardware IP core that eliminates redundant memory operations in real-time embedded systems. Instead of reading and writing full state buffers every cycle, it tracks only what changed — using XOR delta accumulation that's formally proven correct with 108 machine-verified mathematical theorems.
+ATOMiK is state-aware compute for systems that spend too much work
+rediscovering what changed. It evaluates XOR delta accumulation as a primitive
+for state-heavy embedded and distributed workloads.
 
-**One line:** ARM-style IP licensing for a new computing primitive that cuts memory traffic by 95–100%.
+**One line:** Request-based evaluation and design partnerships for state-aware
+compute, with public claims separated by evidence label.
 
 ---
 
@@ -22,8 +29,8 @@ ATOMiK is a hardware IP core that eliminates redundant memory operations in real
 - **108 formal proofs** in Lean4 (0 unproven assumptions) — highest standard of correctness in CS
 - **Two production SoC generations** deployed on $13.50 FPGA (Tang Nano 9K)
 - **v3 SoC (March 2026):** Custom 64-bit RISC-V CPU with 1280×720 HDMI output, 8-screen investor demo
-- **1,056 Mops/s** peak throughput (16 parallel banks), 10.6 ns single-cycle latency
-- **95–100% memory traffic reduction** (up to 30,740× on validated workloads)
+- Throughput, latency, and memory-traffic claims require linked artifacts
+- Current public proof is organized by evidence label and claims registry
 - **SDK:** Schema-driven code generation in 5 languages, 353 passing tests
 - **Total development cost: ~$225** (AI-augmented development)
 

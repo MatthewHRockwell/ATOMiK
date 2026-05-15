@@ -1,4 +1,9 @@
-"""Content engine — reads existing ATOMiK materials and adapts per-program."""
+"""Content engine — reads existing ATOMiK materials and adapts per-program.
+
+PUBLICATION STATUS: INTERNAL FUNDING GENERATOR / REVIEW REQUIRED.
+Generated material must be reviewed against docs/evidence-labels.md and
+results/claims_registry.yaml before submission or external publication.
+"""
 
 from __future__ import annotations
 
@@ -15,8 +20,8 @@ if TYPE_CHECKING:
 _PITCH_ANGLES: dict[str, str] = {
     "nvidia_inception": (
         "Hardware-accelerated state management for AI inference pipelines. "
-        "Delta-state accumulation reduces memory bandwidth by 95-100%, "
-        "enabling faster model serving at the edge."
+        "Evaluate delta-state accumulation against memory-bandwidth pressure "
+        "with claims tied to measured workload artifacts."
     ),
     "cdl": (
         "A new computing primitive — delta-state algebra in silicon. Not an "
@@ -25,9 +30,8 @@ _PITCH_ANGLES: dict[str, str] = {
         "mandate to support science-based ventures."
     ),
     "icorps": (
-        "Use $50K to validate which vertical (HFT, IoT, video processing, "
-        "database replication) has the highest willingness-to-pay for "
-        "delta-state hardware IP. 100+ customer discovery interviews."
+        "Use customer discovery to validate which state-heavy vertical has "
+        "real willingness to evaluate delta-state hardware IP."
     ),
     "nsf_sbir": (
         "Novel semiconductor architecture with 108 formal proofs — advancing "
@@ -36,27 +40,24 @@ _PITCH_ANGLES: dict[str, str] = {
         "sensor fusion, and secure state management."
     ),
     "dod_sbir": (
-        "Formally verified hardware for assured state management at the "
-        "tactical edge. 108 Lean4 proofs guarantee correctness properties "
-        "(commutativity, idempotence, self-inverse) that eliminate classes "
-        "of hardware bugs. Single-cycle operation at ~20 mW."
+        "Formally specified hardware direction for assured state management "
+        "at the tactical edge. Proof and hardware claims must stay scoped to "
+        "the current artifact set."
     ),
     "doe_sbir": (
-        "Delta-state accumulation eliminates 95-100% of memory bus traffic "
-        "compared to full-state copy architectures. At ~20 mW on a $10 "
-        "FPGA, ATOMiK demonstrates a path to orders-of-magnitude energy "
-        "reduction in state-heavy workloads."
+        "Delta-state accumulation may reduce memory traffic in state-heavy "
+        "workloads. Energy and bandwidth claims require workload-specific "
+        "measurement artifacts."
     ),
     "nasa_sbir": (
-        "XOR-based accumulation is inherently radiation-tolerant (single-bit "
-        "upsets are self-correcting via commutative merge). 108 formal proofs "
-        "provide flight-system-grade assurance without simulation gaps."
+        "XOR-based accumulation and formal methods may be relevant to "
+        "flight-system review, but radiation-tolerance and assurance claims "
+        "require scoped validation."
     ),
     "chips_act": (
-        "Novel XOR-based computing primitive that achieves linear throughput "
-        "scaling in 7% LUT utilization — extreme area efficiency for a fully "
-        "formally verified hardware block. Applicable as a co-processor IP "
-        "block for next-generation American semiconductor designs."
+        "Novel XOR-based computing primitive with synthesis and prototype "
+        "artifacts. Co-processor IP claims should be separated into measured, "
+        "synthesis-validated, and roadmap tiers."
     ),
     "silicon_catalyst": (
         "Formally verified XOR accumulator IP targeting ASIC integration. 108 "
@@ -65,34 +66,30 @@ _PITCH_ANGLES: dict[str, str] = {
         "introductions to move from FPGA to ASIC."
     ),
     "alchemist": (
-        "B2B IP licensing play — delta-state hardware blocks for chip "
-        "designers and system integrators. Proven architecture (1 Gops/s on "
-        "$10 FPGA), 5-language SDK for customer integration, patent pending."
+        "B2B IP licensing hypothesis around delta-state hardware blocks for "
+        "chip designers and system integrators. Use artifact-linked proof "
+        "claims only."
     ),
     "hax": (
-        "Working hardware on $10 FPGA — not a slide deck, not a simulation. "
-        "1 Gops/s throughput, 108 formal proofs, $225 total development cost. "
-        "Ready for HAX's hardware-to-market pipeline."
+        "Working FPGA prototype and formal proof artifacts, with commercial "
+        "hardware-to-market work still to validate."
     ),
     "yc": (
-        "Hardware that works, math that's proven, software that ships. 92 "
-        "formal proofs, 1 Gops/s on a $10 chip, 314 passing tests, $225 "
-        "total spend. The IP licensing business model scales without "
-        "manufacturing risk."
+        "Prototype hardware, formal proof work, and software artifacts. The "
+        "IP licensing business model remains a commercial validation path."
     ),
     "techstars": (
-        "Novel computing IP with working hardware and multi-language SDK. "
-        "Seeking commercial pilot customers in HFT, IoT, or database "
-        "replication verticals."
+        "Novel computing IP with prototype hardware and multi-language SDK "
+        "artifacts. Seeking design-partner discovery in state-heavy verticals."
     ),
     "vc_outreach": (
         "IP licensing in $600B+ semiconductor market — irreproducible formal "
         "verification moat, working silicon, patent pending."
     ),
     "defense_outreach": (
-        "Assured hardware for intelligence/defense community — formally "
-        "verified, self-inverse (instant rollback), commutative (lock-free "
-        "merge). Dual-use hardware IP."
+        "Assured-state hardware direction for intelligence/defense review. "
+        "Rollback and merge claims must be tied to proof scope and workload "
+        "assumptions."
     ),
 }
 
@@ -127,9 +124,9 @@ class ContentEngine:
             if text and not text.startswith("#") and not text.startswith("|"):
                 return _truncate(text, max_chars)
         return _truncate(
-            "ATOMiK is a formally verified hardware architecture for "
-            "delta-state computing, achieving 1 billion operations per "
-            "second on a $10 FPGA.",
+            "ATOMiK is a state-aware compute architecture for systems that "
+            "spend too much work rediscovering what changed. Public claims "
+            "are separated by evidence label and artifact.",
             max_chars,
         )
 
@@ -152,15 +149,15 @@ class ContentEngine:
         if not metrics:
             # Fallback hard-coded from known one-pager content.
             metrics = {
-                "Throughput": "1,056 Mops/s (16 parallel banks)",
-                "Operation latency": "10.6 ns (single cycle)",
-                "Memory reduction": "95-100%",
-                "Formal proofs": "108 (Lean4 verified)",
-                "Hardware tests": "80/80 passing",
-                "LUT utilization": "7% (single bank)",
+                "Throughput": "Use only with linked measured or synthesis artifact",
+                "Operation latency": "Artifact required",
+                "Memory reduction": "Workload-specific; artifact required",
+                "Formal proofs": "See current proof artifacts",
+                "Hardware tests": "See current hardware-validation docs",
+                "LUT utilization": "Use only with linked synthesis artifact",
                 "SDK languages": "5 (Python, Rust, C, JavaScript, Verilog)",
-                "SDK tests": "314 passing",
-                "Device cost": "$10 (Tang Nano 9K FPGA)",
+                "SDK tests": "See current test output",
+                "Device cost": "Use only with current board BOM/source",
             }
         return metrics
 
@@ -179,14 +176,12 @@ class ContentEngine:
             return _truncate(section, max_chars)
         return _truncate(
             "ATOMiK implements a delta-state XOR algebra in hardware. "
-            "Rather than the traditional Load-Modify-Store cycle, ATOMiK "
-            "accumulates deltas via single-cycle XOR operations: "
+            "Rather than relying only on full-state movement, ATOMiK "
+            "accumulates deltas via XOR operations: "
             "State = S0 XOR d1 XOR d2 ... XOR dn. "
-            "This yields commutativity (lock-free parallelism), "
-            "self-inverse (instant undo), and single-cycle latency "
-            "(no carry propagation). The architecture scales linearly "
-            "via parallel accumulator banks — proven to 16x on a "
-            "Tang Nano 9K FPGA at 7% LUT utilization.",
+            "Commutativity and self-inverse properties are proof-scoped; "
+            "latency, scaling, and area claims require linked hardware or "
+            "synthesis artifacts.",
             max_chars,
         )
 
@@ -204,12 +199,12 @@ class ContentEngine:
                 break
         if not apps:
             apps = [
-                "High-Frequency Trading: Single-cycle tick processing",
-                "IoT/Sensor Fusion: Lock-free multi-stream merge",
-                "Video Processing: 95% memory reduction",
-                "Database Replication: O(1) state reconstruction",
-                "Digital Twins: Commutative distributed sync",
-                "Gaming: Order-independent multiplayer state",
+                "High-Frequency Trading: deterministic state-tracking evaluation",
+                "IoT/Sensor Fusion: multi-stream delta evaluation",
+                "Video Processing: delta-oriented workload experiments",
+                "Database Replication: state reconstruction evaluation",
+                "Digital Twins: distributed-state model review",
+                "Gaming: rollback and state-sync experiments",
             ]
         return apps
 
@@ -238,22 +233,19 @@ class ContentEngine:
             parts.append(bio)
         parts.append(
             "Solo technical founder who built the full ATOMiK stack — "
-            "from 108 Lean4 formal proofs to FPGA synthesis to a "
-            "5-language SDK — for $225 total development cost."
+            "from formal proof artifacts to FPGA synthesis work to a "
+            "multi-language SDK. Use current artifact links for exact "
+            "proof counts, test counts, and cost claims."
         )
         return " ".join(parts)
 
     def get_traction(self) -> str:
         """Build traction narrative from known deliverables."""
         return (
-            "108 formal proofs (Lean4, zero sorry statements), "
-            "314 passing tests across 5 SDK languages, "
-            "working FPGA prototype on Tang Nano 9K ($10), "
-            "80/80 hardware tests passing, "
-            "1,056 Mops/s throughput (16 parallel banks), "
-            "$225 total development cost, "
-            "patent pending, "
-            "6 development phases complete."
+            "formal proof artifacts, SDK and software tests, working FPGA "
+            "prototype artifacts, hardware-validation notes, live ATOMiK Desk "
+            "screenshots, patent-pending status, and evidence labels. Exact "
+            "performance, cost, and test-count claims require current links."
         )
 
     def adapt_for_form(

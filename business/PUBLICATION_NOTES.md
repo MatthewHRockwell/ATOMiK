@@ -33,6 +33,8 @@ public-ready collateral:
 - `faq/investor_faq.md`
 - `comparisons/`
 - `funding_strategy/`
+- `outreach/` files other than the public-safe design-partner/email sequence
+  drafts listed above
 - `vc_diligence_response_*.md`
 - `meeting_prep_*.md`
 - `pitch_deck/investor_deck_full.md`
@@ -57,5 +59,5 @@ Before sharing any review-required material externally:
 ## Required Disclaimer
 
 Live screenshots show current prototypes. Concept visuals show product direction
-and are not represented as current shipped functionality. Performance claims
+and are not represented as current commercial functionality. Performance claims
 are only stated when backed by measured artifacts.

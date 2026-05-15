@@ -1,4 +1,9 @@
-"""Email template engine — generates personalised outreach emails."""
+"""Email template engine — generates personalised outreach emails.
+
+PUBLICATION STATUS: INTERNAL OUTREACH GENERATOR / REVIEW REQUIRED.
+Generated emails must be checked against docs/evidence-labels.md and
+results/claims_registry.yaml before sending.
+"""
 
 from __future__ import annotations
 
@@ -42,9 +47,8 @@ class EmailDrafter:
                 "phone": self.config.founder.phone,
             },
             "one_liner": (
-                "a formally verified hardware architecture for delta-state "
-                "computing, achieving 1 billion operations per second on a "
-                "$10 FPGA"
+                "a state-aware compute architecture for systems that spend "
+                "too much work rediscovering what changed"
             ),
             "metrics_block": metrics_block,
             "traction": self.engine.get_traction(),
@@ -62,7 +66,7 @@ class EmailDrafter:
             {
                 "contact_name": contact_name or "team",
                 "firm": firm,
-                "pitch_hook": "Formally verified silicon IP — 1 Gops/s on a $10 chip",
+                "pitch_hook": "State-aware compute with evidence-labeled hardware proof",
                 "opening_line": (
                     f"I'm reaching out because {firm}'s investment thesis "
                     "in deep-tech hardware aligns with what we're building."

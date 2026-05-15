@@ -84,7 +84,7 @@ export default function Footer() {
 
         <div className="pt-6" style={{ borderTop: "1px solid #1d324a" }}>
           <p className="max-w-4xl text-xs leading-6">
-            Live screenshots show current prototypes. Concept visuals show product direction and are not represented as current shipped functionality. Performance claims are only stated when backed by measured artifacts.
+            Live screenshots show current prototypes. Concept visuals show product direction and are not represented as current commercial functionality. Performance claims are only stated when backed by measured artifacts.
           </p>
           <div className="mt-5 flex flex-wrap justify-between gap-4">
             <p>&copy; 2026 ATOMiK Project. All rights reserved.</p>

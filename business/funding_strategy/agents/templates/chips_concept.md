@@ -21,17 +21,18 @@ becomes the dominant bottleneck for American semiconductor competitiveness.
 ## 2. Proposed Approach
 
 {{ company.name }} has developed a formally verified hardware architecture for
-delta-state computing that eliminates the read-modify-write cycle entirely.
+delta-state computing that evaluates alternatives to repeated full-state
+read-modify-write behavior.
 
 {{ technical_summary }}
 
 ### Core Innovation
 
 The XOR-based delta accumulation model achieves:
-- **Single-cycle operation** — no carry propagation, pure LUT-based computation
-- **95-100% memory traffic reduction** — only deltas move, not full state
-- **Linear throughput scaling** — proven to 16 parallel banks, extendable to 64+
-- **Formal correctness guarantees** — 108 Lean4 proofs, zero `sorry` statements
+- **Fixed-path XOR computation** — latency claims require linked artifacts
+- **Reduced memory movement potential** — workload-specific measurement required
+- **Parallel bank roadmap** — scaling claims must be labeled by artifact tier
+- **Formal proof artifacts** — quote exact theorem counts only from current proof docs
 
 ### Current Technology Readiness
 
@@ -42,8 +43,9 @@ The XOR-based delta accumulation model achieves:
 ### Architecture
 
 N parallel XOR accumulator banks with binary merge tree. Each bank independently
-accumulates deltas at single-cycle latency. The merge tree combines bank outputs
-via the same XOR operation, preserving all algebraic guarantees.
+accumulates deltas. The merge tree combines bank outputs via the same XOR
+operation. Latency and scaling claims require current hardware or synthesis
+artifacts.
 
 ### Key Metrics
 
@@ -64,12 +66,12 @@ All properties machine-verified in Lean4:
 
 1. **Domestic semiconductor IP:** American-designed, formally verified compute
    block ready for integration into next-generation chip designs.
-2. **Area efficiency:** 7% LUT utilization (single bank) enables integration
-   as a co-processor alongside existing architectures.
-3. **Energy efficiency:** 95-100% memory traffic reduction at ~20 mW on a $13.50
-   FPGA — orders of magnitude improvement in energy per operation.
-4. **Formal assurance:** 108 machine-verified proofs provide hardware assurance
-   properties relevant to both commercial and defense applications.
+2. **Area efficiency:** Synthesis-labeled utilization claims can support
+   co-processor evaluation when the artifact is attached.
+3. **Energy efficiency:** Energy and memory-traffic claims remain workload
+   specific until measured artifacts are attached.
+4. **Formal assurance:** Machine-checked proof artifacts may support assurance
+   review when the proof scope is stated precisely.
 
 ## 5. Proposed R&D Plan
 

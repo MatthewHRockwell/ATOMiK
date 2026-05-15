@@ -1,5 +1,9 @@
 # NVIDIA Inception Application — ATOMiK
 
+> **Publication status: APPLICATION DRAFT / REVIEW REQUIRED.**
+> Do not submit this version without replacing technical, power, throughput,
+> market, and maturity claims with current evidence-labeled artifacts.
+
 ## Company Information
 
 **Company Name:** Rockwell Industries (converting to Delaware C-Corp)
@@ -14,44 +18,53 @@
 
 ## Company Description
 
-Rockwell Industries builds ATOMiK — formally verified hardware IP cores for delta-state computation. Our technology replaces traditional full-state memory operations with XOR-based delta accumulation, reducing memory traffic by 120x–30,720x while consuming just 287 LUTs and 1.8 mW.
+Rockwell Industries builds ATOMiK — state-aware compute for systems that spend
+too much work rediscovering what changed. ATOMiK evaluates XOR-based delta
+accumulation against state-heavy workloads, with public claims separated by
+evidence label and artifact.
 
 **Key numbers:**
-- 108 machine-verified proofs (Lean4) — the most rigorously proven computing primitive in production
-- 1,056 Mops/s throughput on a $13.50 FPGA (Tang Nano 9K)
-- 80/80 hardware tests, 353 SDK tests across 5 languages
-- Total development cost to date: $225
+- Formal proof artifacts in Lean4
+- Live hardware prototype and synthesis artifacts in the public repo
+- SDK and software tests available for technical review
+- Evidence labels and claims registry for exact public proof statements
 - Patent pending
 
 We license RTL to chip designers (ARM-style IP model), targeting edge AI, IoT, HFT, and database acceleration.
 
 ## Technology Overview
 
-ATOMiK implements delta-state algebra in silicon. Instead of copying full state on every update (the universal default in computing), ATOMiK accumulates XOR deltas and reconstructs state in a single clock cycle (10.6 ns, zero carry chains).
+ATOMiK implements delta-state algebra in hardware prototypes. Instead of
+framing every update as full-state movement, ATOMiK accumulates XOR deltas and
+reconstructs state from reference plus accumulated changes. Latency, power, and
+throughput language should be quoted only from linked artifacts.
 
 **Core algebraic properties (all formally proven in Lean4):**
-- **Commutative**: enables lock-free parallelism — no mutexes, no CAS
-- **Self-inverse**: every operation is its own undo — instant rollback for free
-- **Associative**: linear throughput scaling with parallel banks
+- **Commutative**: supports order-independent algebra within the proof model
+- **Self-inverse**: supports undo models when the workload maps to XOR deltas
+- **Associative**: supports merge-tree reasoning within the proof model
 - **Identity**: clean initialization — no special setup required
 
-**Production hardware metrics:**
-- 287 LUTs per delta-state bank (tiny silicon footprint)
-- 1.8 mW power consumption
-- 1,056 Mops/s throughput (16 parallel banks)
-- 120x–30,720x memory traffic reduction vs. full-state architectures
-- +23% timing margin (room to clock higher)
-- Production SoC: custom RV64I CPU + delta-state engine + HDMI output on Tang Nano 9K
+**Prototype evidence to attach before submission:**
+- Current live hardware screenshot and caption
+- Current synthesis or hardware-validation artifact for any LUT, timing, or
+  throughput statement
+- Current measured artifact for any memory-traffic, power, or energy statement
+- Current test output for any test-count statement
 
 ## Relevance to NVIDIA Ecosystem
 
 ### 1. Edge AI State Management (Jetson / Orin)
 
-ATOMiK's power profile (1.8 mW, 287 LUTs) makes it ideal for NVIDIA's edge AI platforms where memory bandwidth and power are the primary constraints:
+ATOMiK may be relevant to NVIDIA edge AI platforms where memory bandwidth and
+power are primary constraints:
 
-- **KV-cache state management for transformer inference**: Instead of copying full KV-cache state during attention computation, delta-state accumulation tracks only what changed — 120x–30,720x less memory traffic. On Jetson Orin's shared memory architecture, this directly translates to more bandwidth available for the GPU.
-- **Multi-model orchestration**: Edge deployments increasingly run multiple models (vision + language + sensor fusion). ATOMiK provides lock-free state synchronization between model pipelines at hardware speed — no software mutexes, no cache coherence overhead.
-- **Sensor fusion preprocessing**: Autonomous systems ingest streams from cameras, LiDAR, radar, and IMUs. Delta-state accumulation merges these streams with mathematical guarantees of correctness (commutative = order-independent).
+- **KV-cache state management for transformer inference**: evaluate whether
+  delta-state tracking can reduce movement for a scoped cache-update workload.
+- **Multi-model orchestration**: evaluate state handoff between model pipelines
+  against conventional software synchronization baselines.
+- **Sensor fusion preprocessing**: evaluate whether XOR-delta models fit a
+  specific sensor-fusion state path.
 
 ### 2. GPU-Accelerated Verification Pipeline
 

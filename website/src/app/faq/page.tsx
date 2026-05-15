@@ -25,7 +25,7 @@ const faqCategories = [
       },
       {
         q: "Is ATOMiK Desk commercially available today?",
-        a: "No. ATOMiK Desk is a live prototype and demonstration surface for state-aware compute. Live screenshots show prototype progress; concept visuals show product direction and are not represented as shipped functionality.",
+        a: "No. ATOMiK Desk is a live prototype and demonstration surface for state-aware compute. Live screenshots show prototype progress; concept visuals show product direction and are not represented as commercial functionality.",
       },
     ],
   },

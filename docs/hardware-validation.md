@@ -50,7 +50,7 @@ recorded artifact exists.
 
 Avoid:
 
-- shipped product
+- commercial product
 - production deployment
 - customer validated
 - unqualified speedup

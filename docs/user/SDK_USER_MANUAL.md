@@ -1,5 +1,11 @@
 # ATOMiK SDK User Manual
 
+> **Publication status: LEGACY SDK DRAFT / REVIEW REQUIRED.**
+> This January 2026 manual predates the current public evidence framework. Use
+> it as implementation guidance only; performance, memory, power, and
+> production-readiness language must be checked against
+> `../evidence-labels.md` and `../../results/claims_registry.yaml` before reuse.
+
 **Version**: 1.0.0 (Initial Draft)
 **Date**: January 26, 2026
 **Audience**: Application developers, system integrators
@@ -24,14 +30,14 @@
 ATOMiK SDK is a **multi-language code generation toolkit** for delta-state computing. Instead of managing full state snapshots, ATOMiK:
 
 - Stores only **changes** (deltas) using XOR operations
-- Reduces memory traffic by **95-100%**
-- Enables **single-cycle** hardware operations
+- Can reduce memory movement when the workload fits the delta-state model
+- Can target fixed-path hardware operations when backed by hardware artifacts
 - Generates code for **5 languages** from one JSON schema
 
 **Key Benefits**:
 - ✅ Write once, deploy everywhere (Python, Rust, C, Verilog, JavaScript)
-- ✅ Mathematically proven correctness (108 Lean4 theorems)
-- ✅ Hardware-validated performance (10/10 tests passing on FPGA)
+- ✅ Algebraic properties with formal proof artifacts
+- ✅ Hardware-validation paths where dated artifacts are linked
 - ✅ Automatic namespace generation from schema metadata
 
 ### 1.2 Who Should Use It?
@@ -41,10 +47,10 @@ ATOMiK SDK is ideal for:
 | Use Case | Why ATOMiK? |
 |----------|-------------|
 | **Embedded Systems** | Minimal memory footprint, low power consumption |
-| **Real-Time Systems** | Predictable single-cycle operations, no garbage collection |
+| **Real-Time Systems** | Predictable operation paths when mapped to validated hardware |
 | **Distributed Systems** | Efficient state synchronization, conflict resolution |
 | **Edge Computing** | Hardware acceleration ready, small binary size |
-| **Video/Audio Processing** | 240:1 compression on steady frames, real-time throughput |
+| **Video/Audio Processing** | Delta-oriented experiments where artifacts validate the workload |
 
 ### 1.3 Installation
 
@@ -536,7 +542,7 @@ Explore reference patterns for common use cases:
 Deploy your delta architecture to FPGA:
 - Generate Verilog RTL from your schema
 - Synthesize for target FPGA (Gowin, Xilinx, Intel)
-- Achieve single-cycle delta operations
+- Validate hardware operation timing with synthesis or board-run artifacts
 
 **Documentation**: See [`../technical/HARDWARE_INTEGRATION.md`](../technical/HARDWARE_INTEGRATION.md) *(coming in Phase 4C)*
 

@@ -52,7 +52,7 @@ for founder and counsel review.
 
 ## Out Of Scope
 
-- guaranteed performance outcomes
+- promised performance outcomes
 - production deployment commitments
 - broad custom engineering beyond the scoped workload
 - transfer of ATOMiK IP

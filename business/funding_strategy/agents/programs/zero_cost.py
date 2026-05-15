@@ -1,4 +1,8 @@
-"""Zero-cost program agents — NVIDIA Inception, CDL, I-Corps, Intel Partner Alliance."""
+"""Zero-cost program agents — NVIDIA Inception, CDL, I-Corps, Intel Partner Alliance.
+
+PUBLICATION STATUS: INTERNAL FUNDING GENERATOR / REVIEW REQUIRED.
+Generated content must be evidence-checked before submission.
+"""
 
 from __future__ import annotations
 
@@ -24,7 +28,8 @@ class NvidiaInception(BaseApplication):
     url = "https://www.nvidia.com/en-us/startups/"
     pitch_angle = (
         "Hardware-accelerated state management for AI inference pipelines. "
-        "Delta-state accumulation reduces memory bandwidth by 95-100%."
+        "Delta-state accumulation should be evaluated against measured "
+        "memory-bandwidth artifacts."
     )
 
     def check_prerequisites(self, config: FundingConfig) -> tuple[bool, list[str]]:
@@ -239,8 +244,8 @@ class IntelPartnerAlliance(BaseApplication):
     url = "https://www.intel.com/content/www/us/en/partner-alliance/overview.html"
     pitch_angle = (
         "Delta-state computing IP for Intel Agilex FPGAs. "
-        "Projected 9.6 Gops/s on Agilex with 16 parallel banks — "
-        "validated architecture on Gowin, ready to port to Intel."
+        "Intel throughput projections require Quartus synthesis and board "
+        "artifacts before external use."
     )
 
     def check_prerequisites(self, config: FundingConfig) -> tuple[bool, list[str]]:
@@ -265,8 +270,8 @@ class IntelPartnerAlliance(BaseApplication):
                 "Partner Type": "IP Provider / Design Ecosystem",
                 "Intel Products Used": (
                     "Targeting Intel Agilex FPGAs for delta-state "
-                    "computing IP cores. Architecture validated on Gowin "
-                    "GW1NR-9 at 1 Gops/s, projected ~9.6 Gops/s on Agilex."
+                    "computing IP cores. Any Agilex throughput projection "
+                    "must be labeled as roadmap until supported by artifacts."
                 ),
                 "Value Proposition": engine.get_pitch_for_program(self.name),
             },

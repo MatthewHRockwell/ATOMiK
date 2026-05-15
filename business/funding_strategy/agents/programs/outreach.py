@@ -3,6 +3,9 @@
 Firms with email addresses receive cold emails via SMTP.
 Firms without email (web-form only) are opened in the browser
 with pitch content displayed in a Rich panel for manual copy-paste.
+
+PUBLICATION STATUS: INTERNAL OUTREACH GENERATOR / REVIEW REQUIRED.
+Generated emails and web-form copy must be evidence-checked before sending.
 """
 
 from __future__ import annotations
@@ -54,8 +57,8 @@ class VCOutreach(BaseApplication):
     submission_method = SubmissionMethod.OUTREACH
     url = ""
     pitch_angle = (
-        "IP licensing in $600B+ semiconductor market — irreproducible "
-        "formal verification moat, working silicon, patent pending."
+        "IP licensing hypothesis in state-aware compute, with proof and "
+        "prototype artifacts available for diligence."
     )
 
     def check_prerequisites(self, config: FundingConfig) -> tuple[bool, list[str]]:
@@ -166,8 +169,9 @@ class VCOutreach(BaseApplication):
                 f"Firm: {firm_info['firm']}\n"
                 f"Thesis match: {firm_info.get('thesis', '')}\n\n"
                 f"{self.pitch_angle}\n\n"
-                f"ATOMiK: 1 Gops/s on $10 FPGA, 108 formal proofs, "
-                f"patent pending, $225 total dev cost.\n\n"
+                f"ATOMiK: state-aware compute with public proof, prototype, "
+                f"and evidence-label artifacts. Quote exact metrics only "
+                f"with current links attached.\n\n"
                 f"Contact: {config.founder.name} ({config.founder.email})"
             )
             console.print(Panel(
@@ -194,7 +198,8 @@ class DefenseOutreach(BaseApplication):
     url = ""
     pitch_angle = (
         "Formally verified hardware for assured edge computing. "
-        "Self-inverse + commutative = instant rollback + lock-free merge."
+        "Self-inverse and commutative properties are proof-scoped; deployment "
+        "claims require workload validation."
     )
 
     def check_prerequisites(self, config: FundingConfig) -> tuple[bool, list[str]]:
@@ -297,7 +302,8 @@ class DefenseOutreach(BaseApplication):
                 f"Role: {org_info.get('role', '')}\n\n"
                 f"{self.pitch_angle}\n\n"
                 f"ATOMiK: formally verified delta-state computing, "
-                f"80/80 FPGA tests, 1 Gops/s, patent pending.\n\n"
+                f"with public proof and prototype artifacts. Quote exact "
+                f"metrics only with current links attached.\n\n"
                 f"Contact: {config.founder.name} ({config.founder.email})"
             )
             console.print(Panel(

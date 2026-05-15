@@ -25,7 +25,7 @@ together.
 - `SYNTHESIS_VALIDATED` means toolchain output supports the result, not live
   board execution.
 - `CONCEPTUAL` and `ROADMAP` explain product direction. They are not current
-  shipped functionality.
+  commercial functionality.
 
 ## Current Live Proof
 

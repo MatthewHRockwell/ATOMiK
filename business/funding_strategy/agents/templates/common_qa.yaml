@@ -3,17 +3,16 @@ what_does_your_company_do:
   long: >-
     ATOMiK is a formally verified hardware architecture for delta-state
     computing. Rather than the traditional Load-Modify-Store cycle, ATOMiK
-    accumulates state changes via single-cycle XOR operations, achieving 1
-    billion operations per second on a $10 FPGA. The architecture is backed
-    by 108 Lean4 formal proofs and a 5-language SDK.
+    accumulates state changes via XOR operations. The public proof stack
+    separates formal proof artifacts, live hardware prototype artifacts,
+    synthesis output, and roadmap work by evidence label.
 
 how_far_along:
   answer: >-
-    Working FPGA prototype achieving 1,056 Mops/s (16 parallel banks) on a
-    Tang Nano 9K. 108 formal proofs in Lean4 with zero sorry statements.
-    314 passing tests across 5 SDK languages (Python, Rust, C, JavaScript,
-    Verilog). 80/80 hardware tests passing. All 6 development phases
-    complete. Patent pending. $225 total development cost.
+    Working FPGA and live ATOMiK Desk prototype artifacts exist in the repo,
+    along with formal proof work, SDK code, hardware-validation notes, and
+    evidence labels. Specific performance, test-count, cost, and maturity
+    claims should be quoted only with the current artifact link attached.
 
 why_now:
   answer: >-
@@ -26,18 +25,15 @@ why_now:
 what_is_the_technical_approach:
   answer: >-
     XOR-based delta accumulation: State = S0 XOR d1 XOR d2 ... XOR dn.
-    This yields commutativity (lock-free parallelism), self-inverse (instant
-    undo), and single-cycle latency (no carry propagation). N parallel
-    accumulator banks with binary merge tree achieve linear throughput
-    scaling. Implemented in Verilog, synthesised on Tang Nano 9K FPGA.
+    Commutativity and self-inverse behavior are proof-scoped properties.
+    Hardware latency, throughput, power, and area statements require a linked
+    hardware or synthesis artifact before external use.
 
 what_is_the_market:
   answer: >-
-    TAM: ~$85B (FPGA $10-14B + edge computing $61B + AI accelerators
-    $10.2B). SAM: ~$8B. SOM (Year 5): ~$80M. Beachhead markets:
-    high-frequency trading (single-cycle tick processing), IoT sensor
-    fusion (lock-free multi-stream merge), streaming transforms (95%
-    memory reduction for frame delta pipelines).
+    State-heavy edge, embedded, distributed sync, and infrastructure teams are
+    the evaluation focus. Market sizing and revenue forecasts are projected
+    planning inputs, not results, and require founder review before submission.
 
 what_is_the_business_model:
   answer: >-
@@ -48,25 +44,23 @@ what_is_the_business_model:
 
 how_is_this_different:
   answer: >-
-    ATOMiK is the only hardware architecture with machine-verified
-    algebraic properties. 108 Lean4 proofs create an irreproducible moat —
-    competitors would need years of mathematical work to replicate. Working
-    silicon on $10 FPGA (not simulation), patent pending, and a full-stack
-    implementation from math proofs to 5-language SDK.
+    ATOMiK treats state change and delta application as compute primitives,
+    with proof artifacts, prototype hardware, and SDK work in one public repo.
+    Competitor and moat claims require current source checks and evidence
+    labels before external use.
 
 what_do_you_need:
   answer: >-
-    Seed capital to fund ASIC feasibility study, larger FPGA port (64+
-    banks), vertical SDK modules for beachhead markets, and first pilot
-    customer deployments. Delaware C-Corp incorporation is the immediate
-    next step.
+    Design partners, technical advisors, and funding conversations to validate
+    real state-heavy workloads, prototype mappings, and evidence packages.
+    Delaware C-Corp incorporation remains an operating dependency for many
+    funding paths.
 
 team_background:
   answer: >-
-    Solo technical founder who built the entire ATOMiK stack — from 92
-    Lean4 formal proofs to FPGA synthesis to a 5-language SDK — for $225
-    total development cost. Demonstrates exceptional technical range and
-    capital efficiency.
+    Solo technical founder behind the ATOMiK proof, software, hardware, and
+    public-materials work. Specific proof counts, cost figures, and build
+    status should be checked against current artifacts before reuse.
 
 what_are_the_risks:
   answer: >-

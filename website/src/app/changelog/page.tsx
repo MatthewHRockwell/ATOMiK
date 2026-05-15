@@ -174,7 +174,7 @@ const releases: Release[] = [
   },
   {
     version: "v2.0.0",
-    title: "PicoRV32 Production SoC",
+    title: "PicoRV32 Prototype SoC",
     date: "2025-09",
     category: "hardware",
     items: [

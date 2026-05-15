@@ -1,4 +1,9 @@
-"""Accelerator program agents — Silicon Catalyst, Alchemist, HAX, YC, Techstars."""
+"""Accelerator program agents — Silicon Catalyst, Alchemist, HAX, YC, Techstars.
+
+PUBLICATION STATUS: INTERNAL ACCELERATOR GENERATOR / REVIEW REQUIRED.
+Generated application text must be checked against current evidence labels
+before submission.
+"""
 
 from __future__ import annotations
 
@@ -35,7 +40,8 @@ class SiliconCatalyst(BaseApplication):
     url = "https://siliconcatalyst.com/application"
     pitch_angle = (
         "Formally verified XOR accumulator IP targeting ASIC integration. "
-        "108 Lean4 proofs, working FPGA prototype, 7% LUT utilization."
+        "Use current proof, prototype, and synthesis artifacts for exact "
+        "claims."
     )
 
     def check_prerequisites(self, config: FundingConfig) -> tuple[bool, list[str]]:
@@ -55,7 +61,7 @@ class SiliconCatalyst(BaseApplication):
                 "Company Name": config.company.name,
                 "IC Design Details": (
                     "XOR accumulator array — N parallel banks with binary merge tree. "
-                    "Single-cycle delta accumulation via pure LUT-based XOR computation. "
+                    "Delta accumulation via LUT-based XOR computation. "
                     "Currently on Tang Nano 9K (GW1NR-9) FPGA. Target: ASIC integration "
                     "as a co-processor IP block."
                 ),
@@ -63,12 +69,9 @@ class SiliconCatalyst(BaseApplication):
                     "FPGA prototype on Gowin GW1NR-9 (Tang Nano 9K). "
                     "ASIC roadmap: 28nm or 65nm initial shuttle."
                 ),
-                "LUT Utilization": metrics.get("LUT utilization", "7% (single bank)"),
-                "Throughput": metrics.get("Throughput", "1,056 Mops/s"),
-                "TAM/SAM/SOM": (
-                    "TAM: ~$85B (FPGA + edge + AI accelerators). "
-                    "SAM: ~$8B. SOM (Year 5): ~$80M."
-                ),
+                "LUT Utilization": metrics.get("LUT utilization", "Artifact required"),
+                "Throughput": metrics.get("Throughput", "Artifact required"),
+                "TAM/SAM/SOM": "Projected planning model; review before submission.",
                 "Team": engine.get_team_description(),
                 "Formal Verification": (
                     "108 Lean4 proofs — closure, commutativity, associativity, "
@@ -172,8 +175,8 @@ class HAXAccelerator(BaseApplication):
     submission_method = SubmissionMethod.BROWSER
     url = "https://hax.co/"
     pitch_angle = (
-        "Working hardware on $10 FPGA — 1 Gops/s, 108 formal proofs, "
-        "$225 total cost."
+        "Working FPGA prototype and formal proof artifacts; exact metrics "
+        "require artifact links."
     )
 
     def check_prerequisites(self, config: FundingConfig) -> tuple[bool, list[str]]:
@@ -192,15 +195,15 @@ class HAXAccelerator(BaseApplication):
                 "Product Description": qa.get("what_does_your_company_do", {}).get("long", ""),
                 "Hardware Details": (
                     "Tang Nano 9K FPGA ($10). XOR accumulator array with binary "
-                    "merge tree. 7% LUT utilization per bank, 20% at 16 banks. "
-                    "1,056 Mops/s throughput. 80/80 hardware tests passing."
+                    "merge tree. Use current synthesis and hardware-validation "
+                    "artifacts for LUT, throughput, and test-count claims."
                 ),
                 "Traction": qa.get("how_far_along", {}).get("answer", engine.get_traction()),
                 "Market": qa.get("what_is_the_market", {}).get("answer", ""),
                 "Team": engine.get_team_description(),
                 "Why HAX?": (
                     "HAX's hardware-to-market pipeline is exactly what ATOMiK needs "
-                    "to move from FPGA prototype to production-ready IP. "
+                    "to move from FPGA prototype toward commercial IP. "
                     "Prototyping resources and supply chain support."
                 ),
             },
@@ -241,8 +244,8 @@ class YCombinator(BaseApplication):
     submission_method = SubmissionMethod.BROWSER
     url = "https://www.ycombinator.com/apply/"
     pitch_angle = (
-        "Hardware that works, math that's proven, software that ships. "
-        "108 proofs, 1 Gops/s, $225 total spend."
+        "Prototype hardware, formal proof work, and software artifacts. "
+        "Exact metrics require artifact links."
     )
 
     def check_prerequisites(self, config: FundingConfig) -> tuple[bool, list[str]]:
@@ -279,9 +282,9 @@ class YCombinator(BaseApplication):
                 "How long have the founders known each other?": "Solo founder",
                 "Please tell us about the time you most successfully hacked some system": (
                     "Built a complete formally verified hardware architecture — "
-                    "108 Lean4 proofs, FPGA prototype, and 5-language SDK — for "
-                    "$225 total development cost. That's a 4-million-to-one ratio "
-                    "of performance ($1B ops/s) to cost."
+                    "proof artifacts, FPGA prototype work, and multi-language SDK — "
+                    "with unusually low early spend. Exact cost and performance "
+                    "claims require current artifact links."
                 ),
             },
             notes=(
@@ -350,13 +353,13 @@ class Techstars(BaseApplication):
             fields={
                 "Company Name": config.company.name,
                 "What does your company do?": qa.get("what_does_your_company_do", {}).get("long", ""),
-                "What stage are you at?": "Pre-seed — working prototype, seeking first customers",
+                "What stage are you at?": "Pre-seed — prototype and proof artifacts, seeking design partners",
                 "Traction": qa.get("how_far_along", {}).get("answer", engine.get_traction()),
                 "Business Model": qa.get("what_is_the_business_model", {}).get("answer", ""),
                 "Team": engine.get_team_description(),
                 "Why Techstars?": (
                     "Seeking commercial traction support — specifically pilot "
-                    "customers in HFT, IoT, or database replication verticals."
+                    "design partners in state-heavy verticals."
                 ),
             },
             notes="Apply for a Spring 2026 Techstars programme.",

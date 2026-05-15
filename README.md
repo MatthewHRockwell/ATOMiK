@@ -11,7 +11,7 @@ Desk and Resource Fabric.
 
 **HARDWARE_VALIDATED:** ATOMiK Desk v0.38-G prototype UI running on live
 hardware. This screenshot is proof of current prototype progress, not a
-polished shipped product.
+polished commercial product.
 
 ## Current Status
 
@@ -19,7 +19,7 @@ polished shipped product.
 |---|---|
 | Live hardware prototype | Yes. Current and historical proof screenshots are available and labeled above. |
 | Public benchmark artifacts | Present where artifact packages exist. See `results/` and `docs/perf/`. |
-| Concept UI | Design target and roadmap material, not shipped product UI. |
+| Concept UI | Design target and roadmap material, not commercial product UI. |
 | Evaluation access | Request-based. No conventional free tier is presented publicly. |
 
 ## What Is Live
@@ -85,7 +85,7 @@ Public CTAs:
 ## Evidence Hygiene
 
 Live screenshots show current prototypes. Concept visuals show product direction
-and are not represented as current shipped functionality. Performance claims
+and are not represented as current commercial functionality. Performance claims
 are only stated when backed by measured artifacts.
 
 Every public claim should use one of these labels:

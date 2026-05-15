@@ -56,5 +56,5 @@ Depending on scope:
 ## Evidence Hygiene
 
 Live screenshots show current prototypes. Concept visuals show product direction
-and are not represented as current shipped functionality. Performance claims
+and are not represented as current commercial functionality. Performance claims
 are only stated when backed by measured artifacts.

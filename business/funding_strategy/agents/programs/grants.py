@@ -1,4 +1,8 @@
-"""Grant program agents — NSF/DoD/DOE/NASA SBIR + CHIPS Act."""
+"""Grant program agents — NSF/DoD/DOE/NASA SBIR + CHIPS Act.
+
+PUBLICATION STATUS: INTERNAL GRANT GENERATOR / REVIEW REQUIRED.
+Generated proposals require evidence-label, compliance, and counsel review.
+"""
 
 from __future__ import annotations
 
@@ -128,8 +132,8 @@ class DoeSbir(_SbirBase):
     phase = 2
     url = "https://science.osti.gov/sbir"
     pitch_angle = (
-        "95-100% memory traffic reduction at ~20 mW — "
-        "orders-of-magnitude energy reduction."
+        "Evaluate state-aware execution for memory-traffic and energy "
+        "reduction in state-heavy workloads, with measured artifacts required."
     )
 
     def generate_content(self, config: FundingConfig, engine: ContentEngine) -> ApplicationContent:

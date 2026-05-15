@@ -302,7 +302,7 @@ export default function Home() {
           </div>
 
           <p className="mt-8 max-w-4xl text-xs leading-6" style={{ color: colors.faint }}>
-            Live screenshots show current prototypes. Concept visuals show product direction and are not represented as current shipped functionality. Performance claims are only stated when backed by measured artifacts.
+            Live screenshots show current prototypes. Concept visuals show product direction and are not represented as current commercial functionality. Performance claims are only stated when backed by measured artifacts.
           </p>
         </div>
       </section>

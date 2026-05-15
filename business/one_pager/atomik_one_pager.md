@@ -30,7 +30,7 @@ ATOMiK Desk and Resource Fabric show how the same architecture can evolve into
 a state-aware compute environment where workloads reorganize around changing
 context instead of static application silos.
 
-Concept visuals are clearly labeled and are not represented as current shipped
+Concept visuals are clearly labeled and are not represented as current commercial
 functionality.
 
 ## Target Customer
@@ -70,5 +70,5 @@ conversation: `mrockwell@atomik.tech`
 ## Evidence Disclaimer
 
 Live screenshots show current prototypes. Concept visuals show product direction
-and are not represented as current shipped functionality. Performance claims
+and are not represented as current commercial functionality. Performance claims
 are only stated when backed by measured artifacts.

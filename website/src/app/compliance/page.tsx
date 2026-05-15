@@ -67,7 +67,7 @@ export default function CompliancePage() {
         <div className="rounded-lg p-6" style={{ background: colors.panel, border: `1px solid ${colors.border}` }}>
           <h2 className="text-2xl font-bold">Review the evidence framework</h2>
           <p className="mt-3 text-sm leading-6" style={{ color: colors.muted }}>
-            Live screenshots show current prototypes. Concept visuals show product direction and are not represented as current shipped functionality. Performance claims are only stated when backed by measured artifacts.
+            Live screenshots show current prototypes. Concept visuals show product direction and are not represented as current commercial functionality. Performance claims are only stated when backed by measured artifacts.
           </p>
           <div className="mt-5 flex flex-wrap gap-3">
             <Link href="https://github.com/MatthewHRockwell/ATOMiK/blob/main/docs/evidence-labels.md" className="rounded-lg px-4 py-2 text-sm font-semibold text-white no-underline" style={{ background: colors.blue }}>
