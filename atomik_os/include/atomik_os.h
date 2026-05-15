@@ -9,7 +9,7 @@
  * carries a user-visible change. About window, status bar, and the
  * /tmp/atomik_os_version stamp all read from here so the screen output
  * NEVER lies about which build is running. */
-#define AOS_VERSION "v0.38-H"
+#define AOS_VERSION "v0.38-I"
 
 /* Display geometry — locked to 1920x1080 XRGB8888 since simplefb is fixed. */
 #define FB_W       1920
@@ -40,8 +40,12 @@
  * replica_flow_open use it so the layout shifts coherently.
  * v0.38-E: bumped to 64 for two-row layout (top: identity zone,
  * bottom: metrics + hints + meta).  Fixes the crowded-single-row
- * complaint from the concept-fidelity audit. */
-#define ATOMIK_PULSE_BAR_H 64
+ * complaint from the concept-fidelity audit.
+ * v0.38-I: 80 px gives the scale-3 brand room (48 px text) +
+ * structured zone dividers between identity / personality / pulse /
+ * meta.  Closes the "bar still doesn't have concept-image presence"
+ * gap from the v0.38-H audit. */
+#define ATOMIK_PULSE_BAR_H 80
 #define ATOMIK_SAFE_BOT    16
 #define ATOMIK_SAFE_LEFT   16
 #define ATOMIK_SAFE_RIGHT  16
@@ -64,8 +68,12 @@ typedef uint32_t pixel_t;
  * tokens by meaning, not by aesthetic fit. */
 #define ATOMIK_BG_TOP       rgb(0x0A, 0x0E, 0x1A)  /* near-black, slight blue */
 #define ATOMIK_BG_BOT       rgb(0x12, 0x18, 0x28)  /* deep navy */
-#define ATOMIK_ACCENT       rgb(0x4F, 0xC3, 0xFF)  /* electric cyan */
-#define ATOMIK_ACCENT_DIM   rgb(0x2A, 0x6E, 0x95)
+/* v0.38-I saturation pass: bump cyan brightness so the identity color
+ * reads at the concept-image-06 intensity level.  Was 0x4F,0xC3,0xFF;
+ * now 0x6E,0xDD,0xFF — same hue, more luminance.  Audit feedback:
+ * "Cyan saturation muted vs concept's bright glow." */
+#define ATOMIK_ACCENT       rgb(0x6E, 0xDD, 0xFF)  /* electric cyan (brighter) */
+#define ATOMIK_ACCENT_DIM   rgb(0x32, 0x82, 0xAB)  /* slightly brighter dim cyan too */
 #define ATOMIK_FG           rgb(0xF2, 0xF5, 0xFA)
 #define ATOMIK_FG_DIM       rgb(0xA8, 0xB2, 0xC4)
 #define ATOMIK_DOCK_BG      rgba(0x1A, 0x20, 0x30, 0xC0) /* translucent dock */
@@ -74,12 +82,16 @@ typedef uint32_t pixel_t;
 /* Semantic tokens (v0.25, ChatGPT design review 2026-05-06). Use these
  * BY MEANING, not by color preference. Adding a new "looks nice violet"
  * UI element is a smell — pick the semantic token that matches the state
- * the element represents. */
-#define ATOMIK_SEM_HARDWARE ATOMIK_ACCENT             /* live ATOMiK / hardware / active */
-#define ATOMIK_SEM_AGENT    rgb(0x9B, 0x7E, 0xE0)     /* agent reasoning / dynamic adapt */
-#define ATOMIK_SEM_SAVINGS  rgb(0x46, 0xA7, 0x58)     /* efficiency wins, cycles saved */
-#define ATOMIK_SEM_WASTE    rgb(0xF2, 0xC9, 0x7D)     /* contention, redundant compute */
-#define ATOMIK_SEM_OVERLOAD rgb(0xE5, 0x48, 0x4D)     /* crash, stale, IRQ storm */
+ * the element represents.
+ *
+ * v0.38-I saturation pass: violet (AGENT) and green (SAVINGS) bumped
+ * to match concept-image-06 intensity.  Each personality color is now
+ * within ~20% luminance of the reference. */
+#define ATOMIK_SEM_HARDWARE ATOMIK_ACCENT             /* cyan: hardware / active */
+#define ATOMIK_SEM_AGENT    rgb(0xB0, 0x8C, 0xFF)     /* violet: agent (brighter) */
+#define ATOMIK_SEM_SAVINGS  rgb(0x5C, 0xE0, 0x6E)     /* green: savings (brighter) */
+#define ATOMIK_SEM_WASTE    rgb(0xF8, 0xD0, 0x82)     /* amber: contention (brighter) */
+#define ATOMIK_SEM_OVERLOAD rgb(0xF0, 0x56, 0x5A)     /* red: overload (brighter) */
 
 /* Window chrome geometry — v0.25 makes these explicit so the spacing
  * grid is enforceable. Allowed values for any layout literal in app
