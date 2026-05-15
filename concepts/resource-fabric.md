@@ -5,7 +5,7 @@
 Resource Fabric is currently a product direction and evaluation narrative for
 adaptive state-aware execution. Public proof should link back to current live
 hardware screenshots and measured artifacts rather than presenting concept art
-as current shipped behavior.
+as current commercial behavior.
 
 ## Concept
 

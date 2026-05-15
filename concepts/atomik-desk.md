@@ -27,7 +27,7 @@ Keep the proof boundary explicit:
 - v0.38-G is represented by a recorded live prototype screenshot.
 - v0.38-H should be added only after a screenshot, demo clip, or other recorded
   artifact is available.
-- Concept visuals remain product direction, not current shipped UI.
+- Concept visuals remain product direction, not current commercial UI.
 
 ## Concept
 

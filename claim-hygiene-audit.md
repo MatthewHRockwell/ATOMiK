@@ -6,6 +6,8 @@ Updated: 2026-05-14
 
 Follow-up: 2026-05-15
 
+Second follow-up: 2026-05-15
+
 ## Scope Reviewed
 
 Risky claim search was run across:
@@ -102,6 +104,22 @@ revolutionary
 - v0.38-H claims remain intentionally unpromoted until a screenshot or recorded
   artifact is saved and classified.
 
+## Tightened In 2026-05-15 Second Follow-Up
+
+- Replaced `shipped product` / `shipped functionality` disclaimer wording in
+  current public copy with `commercial product` / `commercial functionality` to
+  reduce noisy claim-scan matches without weakening the prototype disclaimer.
+- Marked the legacy SDK user manual as review-required and softened its intro
+  bullets so memory, latency, and validation claims point back to evidence
+  labels.
+- Updated funding/outreach generators and shared Q&A defaults so generated
+  accelerator, grant, VC, and video copy defaults to artifact-linked language
+  instead of old hard metrics.
+- Added review-required warnings to NVIDIA, Alliance SoCal, YC, and HAX
+  application drafts.
+- Added `docs/public-claim-scan.md` as the repeatable scan checklist for current
+  public surfaces versus quarantined legacy material.
+
 ## Remaining Legacy Risk
 
 Older claims still exist in historical or specialized materials, including:
@@ -113,6 +131,7 @@ Older claims still exist in historical or specialized materials, including:
 - `business/cosmos-cookoff/**`
 - `business/data_room/**`
 - `business/funding_strategy/**`
+- `business/outreach/**` application drafts and generated VC emails
 - `business/score_package/**`
 - `business/pitch_deck/investor_deck_full.md`
 - `business/pitch_deck/generate_deck.py`
@@ -128,17 +147,18 @@ Those areas are now explicitly marked as review-required by:
 - `business/score_package/00_START_HERE.md`
 - visible banners on `docs/site/*.html`
 - inline publication-status banners on high-risk legacy business files
+- `docs/public-claim-scan.md` for repeatable current/legacy claim scans
 
 Do not send or publish review-required material without either backing the
 claims with artifacts, adding evidence labels, or rewriting it against the
 current public positioning.
 
 Residual risk: some legacy files still contain old numbers by design so past
-work can be audited. Their current mitigation is quarantine and review-required
-labeling, not full historical rewrite.
+work can be audited. Their current mitigation is quarantine, review-required
+labeling, and generator default softening, not full historical rewrite.
 
 ## Current Rule
 
 Live screenshots show current prototypes. Concept visuals show product direction
-and are not represented as current shipped functionality. Performance claims
+and are not represented as current commercial functionality. Performance claims
 are only stated when backed by measured artifacts.

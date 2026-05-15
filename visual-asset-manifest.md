@@ -28,7 +28,7 @@ constrained.
 
 These screenshots are live prototype artifacts from the ATOMiK Desk UI/UX
 upgrade track. They may be used as proof images when labeled as prototype
-screenshots, not as shipped product UI.
+screenshots, not as commercial product UI.
 
 | Public filename | Source file | Classification | Caption | Notes |
 |---|---|---|---|---|
@@ -38,5 +38,5 @@ screenshots, not as shipped product UI.
 ## Required Disclaimer
 
 Live screenshots show current prototypes. Concept visuals show product direction
-and are not represented as current shipped functionality. Performance claims
+and are not represented as current commercial functionality. Performance claims
 are only stated when backed by measured artifacts.
