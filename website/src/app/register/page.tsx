@@ -12,7 +12,7 @@ const roles = [
   "Engineering Manager",
   "CTO / VP Engineering",
   "DevOps / SRE",
-  "Student / Researcher",
+  "Researcher",
   "Other",
 ];
 
@@ -25,7 +25,7 @@ const tierSummaries: Record<string, { name: string; price: string; color: string
       "Public docs and proof notes",
       "Evidence-labeled artifacts",
       "GitHub issue path for repo bugs",
-      "No conventional public free tier",
+      "No self-serve public plan",
     ],
   },
   professional: {
@@ -504,7 +504,7 @@ Same result: True`}
     );
   }
 
-  // --- Free tier: email-only ---
+  // --- Request-based path: email-only ---
   return (
     <>
       <div className="max-w-lg mx-auto px-6 mb-6">
@@ -584,7 +584,7 @@ Same result: True`}
         )}
 
         <p className="text-xs text-center" style={{ color: "#555566" }}>
-          Free forever. No credit card required.
+          Request-based access. No self-serve public plan.
         </p>
       </form>
     </section>
@@ -606,10 +606,10 @@ export default function RegisterPage() {
           <span className="bg-gradient-to-r from-[#4f8fff] to-[#22d3ee] bg-clip-text text-transparent">
             ATOMiK
           </span>{" "}
-          Developer Program
+          Evaluation Access
         </h1>
         <p className="text-lg max-w-xl mx-auto" style={{ color: "#8888a0" }}>
-          Join the delta-state computing community. Free to register.
+          Request technical evaluation access, a design-partner discussion, or a proof review.
         </p>
       </section>
 

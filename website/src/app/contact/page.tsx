@@ -4,9 +4,11 @@ import Nav from "@/components/Nav";
 import { useEffect, useState, FormEvent } from "react";
 
 const requestTypes = [
-  "Request Evaluation Access",
-  "Request Technical Demo",
-  "Discuss Design Partnership",
+  "Request Technical Evaluation",
+  "Request Demo",
+  "Design Partner Interest",
+  "Enterprise / IP Licensing Inquiry",
+  "Investor / Advisor Contact",
 ];
 
 const roles = [
@@ -14,6 +16,7 @@ const roles = [
   "Engineer / architect",
   "Infrastructure team",
   "Researcher",
+  "Enterprise / licensing lead",
   "Investor / advisor",
   "Other",
 ];
@@ -35,10 +38,14 @@ const timelines = [
 ];
 
 const requestTypeByIntent: Record<string, string> = {
-  evaluation: "Request Evaluation Access",
-  demo: "Request Technical Demo",
-  "technical-demo": "Request Technical Demo",
-  "design-partner": "Discuss Design Partnership",
+  evaluation: "Request Technical Evaluation",
+  demo: "Request Demo",
+  "technical-demo": "Request Demo",
+  "design-partner": "Design Partner Interest",
+  licensing: "Enterprise / IP Licensing Inquiry",
+  enterprise: "Enterprise / IP Licensing Inquiry",
+  investor: "Investor / Advisor Contact",
+  advisor: "Investor / Advisor Contact",
 };
 
 export default function ContactPage() {
@@ -123,11 +130,11 @@ export default function ContactPage() {
 
       <div className="mx-auto max-w-3xl px-6 pb-24 pt-16">
         <p className="text-sm font-semibold uppercase" style={{ color: "#22d3ee" }}>
-          Lead request
+          Evaluation request
         </p>
         <h1 className="mt-3 text-4xl font-bold">Tell us what you want to evaluate.</h1>
         <p className="mt-4 leading-7" style={{ color: "#9fb1c7" }}>
-          Use this form for evaluation access, technical demo requests, and design partner conversations. The most useful request includes one real workload or state-heavy path.
+          Use this form for technical evaluation, demo requests, design partner interest, enterprise/IP licensing, investor diligence, or technical advisor conversations. The most useful request includes one real workload or state-heavy path.
         </p>
 
         {status === "sent" ? (
@@ -137,11 +144,11 @@ export default function ContactPage() {
           >
             <h2 className="text-xl font-bold">Request received</h2>
             <p className="mt-3 leading-7" style={{ color: "#9fb1c7" }}>
-              Thanks. The next step is to anchor on the workload, current stack, and desired path: proof review, technical demo, or scoped evaluation conversation.
+              Thanks. The next step is to anchor on the workload, current stack, and desired path: proof review, technical demo, licensing discussion, advisor call, or scoped evaluation conversation.
             </p>
             <p className="mt-3 text-sm" style={{ color: "#9fb1c7" }}>
               You can also reach ATOMiK at{" "}
-              <a href="mailto:mrockwell@atomik.tech" style={{ color: "#22d3ee" }}>
+              <a href={`mailto:mrockwell@atomik.tech?subject=${encodeURIComponent(form.requestType)}`} style={{ color: "#22d3ee" }}>
                 mrockwell@atomik.tech
               </a>
               .
@@ -249,7 +256,7 @@ export default function ContactPage() {
                 rows={4}
                 value={form.useCase}
                 onChange={(e) => update("useCase", e.target.value)}
-                placeholder="Example: sync-heavy edge telemetry, rollback-sensitive state path, distributed cache replay, embedded state tracking..."
+                placeholder="Example: sync-heavy edge telemetry, rollback-sensitive state path, distributed cache replay, embedded state tracking, IP evaluation, first-silicon diligence..."
                 className="w-full resize-y rounded-lg px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-[#22d3ee]"
                 style={inputStyle}
               />
@@ -283,6 +290,14 @@ export default function ContactPage() {
                 Something went wrong. Email mrockwell@atomik.tech directly if the form does not submit.
               </p>
             )}
+
+            <p className="text-xs leading-5" style={{ color: "#6f8097" }}>
+              Static fallback: email{" "}
+              <a href={`mailto:mrockwell@atomik.tech?subject=${encodeURIComponent(form.requestType)}`} style={{ color: "#22d3ee" }}>
+                mrockwell@atomik.tech
+              </a>{" "}
+              with the same subject if the form is unavailable.
+            </p>
 
             <button
               type="submit"

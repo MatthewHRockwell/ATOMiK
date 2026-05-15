@@ -34,8 +34,8 @@ const faqCategories = [
     color: "#4f8fff",
     items: [
       {
-        q: "Is there a public free tier?",
-        a: "No conventional public free tier is listed. ATOMiK is currently request-based so evaluation time is focused on real workloads, evidence review, and technical fit.",
+        q: "Is there a self-serve public plan?",
+        a: "No. ATOMiK is currently request-based so evaluation time is focused on real workloads, evidence review, and technical fit.",
         link: { href: "/pricing", label: "View evaluation options" },
       },
       {

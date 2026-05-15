@@ -3,9 +3,9 @@ import Link from "next/link";
 import Nav from "@/components/Nav";
 
 export const metadata: Metadata = {
-  title: "Evaluation Access - ATOMiK",
+  title: "Evaluation & Licensing - ATOMiK",
   description:
-    "Two public paths for evaluating ATOMiK: request evaluation access or discuss a design partner engagement.",
+    "Two public paths for evaluating ATOMiK: design partner evaluation and enterprise/IP/SDK licensing.",
 };
 
 const colors = {
@@ -20,45 +20,45 @@ const colors = {
 
 const offers = [
   {
-    name: "Evaluation Access",
+    name: "Design Partner Evaluation",
     cta: "Request Evaluation Access",
     href: "/contact?intent=evaluation",
-    for: "Technical founders, engineers, researchers, infrastructure teams, and early evaluators.",
+    for: "Edge, embedded, distributed systems, AI/agent infrastructure, and state-heavy system teams.",
     includes: [
       "Proof artifact review",
       "Workload-fit conversation",
-      "Technical updates and early demo availability",
-      "Path to a scoped benchmark exchange when fit is strong",
+      "Technical demo or proof review when fit is strong",
+      "Scoped evaluation plan with success criteria",
     ],
-    body: "Request limited evaluation access and receive technical updates, proof artifacts, and availability for early demos.",
+    body: "Request limited evaluation access for a real workload and receive proof artifacts, technical updates, and an evidence-labeled evaluation path.",
   },
   {
-    name: "Design Partner / Paid Technical Evaluation",
-    cta: "Discuss Design Partnership",
-    href: "/contact?intent=design-partner",
-    for: "Teams with a real state-heavy workload, edge or embedded deployment, distributed sync problem, or compute-efficiency requirement.",
+    name: "Enterprise / IP / SDK Licensing",
+    cta: "Discuss Licensing",
+    href: "/contact?intent=licensing",
+    for: "Teams evaluating ATOMiK IP, SDK integration, hardware acceleration, or first-silicon partnerships.",
     includes: [
-      "Technical discovery and workload mapping",
-      "Success criteria and evaluation plan",
-      "Prototype mapping where appropriate",
-      "Evaluation deliverables and continue / refine / stop recommendation",
+      "Enterprise or SDK licensing discussion",
+      "IP and hardware-integration discovery",
+      "First-silicon evaluation-chip partnership fit",
+      "Counsel-reviewed commercial terms when needed",
     ],
-    body: "Work with ATOMiK to evaluate whether state-aware execution can improve a real workload.",
+    body: "Discuss ATOMiK licensing, IP, SDK, and hardware-integration paths without implying production readiness before evidence exists.",
   },
 ];
 
 const faqs = [
   {
-    q: "Is there a free tier?",
-    a: "No conventional public free tier is listed. ATOMiK is currently request-based so evaluation time is focused on real workloads and evidence review.",
+    q: "Is there a self-serve public plan?",
+    a: "No. ATOMiK is currently request-based so evaluation time is focused on real workloads and evidence review.",
   },
   {
     q: "Do I need custom hardware to evaluate ATOMiK?",
     a: "Not necessarily. The right starting point may be software exploration, a proof review, a benchmark exchange, or a hardware-backed demo depending on the workload.",
   },
   {
-    q: "Is ATOMiK Desk the product?",
-    a: "ATOMiK Desk is a live demonstration surface and product direction signal. The near-term commercial wedge is state-aware execution for real state-heavy workloads.",
+    q: "What public options are available?",
+    a: "Only two are listed publicly: Design Partner Evaluation and Enterprise / IP / SDK Licensing. Limited evaluation access may be available for qualified teams.",
   },
   {
     q: "How are performance claims handled?",
@@ -79,7 +79,7 @@ export default function PricingPage() {
           Start with a scoped evaluation, not a subscription plan.
         </h1>
         <p className="mx-auto mt-5 max-w-2xl text-lg leading-8" style={{ color: colors.muted }}>
-          ATOMiK has two public paths: request evaluation access or discuss a design partner / paid technical evaluation. Bring one real workload and define success criteria before making larger commitments.
+          ATOMiK has two public paths: design partner evaluation or enterprise/IP/SDK licensing. Bring one real workload and define success criteria before making larger commitments.
         </p>
       </section>
 
