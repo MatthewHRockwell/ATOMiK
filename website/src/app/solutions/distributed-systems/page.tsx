@@ -4,14 +4,14 @@ import Nav from "@/components/Nav";
 
 export const metadata: Metadata = {
   title:
-    "Distributed State Without Consensus — ATOMiK | CRDT Alternative, Lock-Free Convergence",
+    "Distributed State Evaluation — ATOMiK | CRDT Alternative, Delta-State Algebra",
   description:
     "Evaluate XOR delta-state algebra for consensus-heavy replication, CRDT alternatives, event-sourcing replay paths, and distributed state synchronization.",
   keywords: [
-    "consensus-free state sync",
+    "consensus-heavy state sync",
     "CRDT alternative",
-    "distributed cache without leader",
-    "lock-free convergence",
+    "distributed cache evaluation",
+    "lock-free state model",
     "distributed state synchronization",
     "conflict-free replication",
     "delta-state algebra",
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     "event sourcing alternative",
   ],
   openGraph: {
-    title: "Distributed State Without Consensus — ATOMiK",
+    title: "Distributed State Evaluation — ATOMiK",
     description:
       "Evaluate XOR delta-state algebra for consensus-heavy replication, CRDT alternatives, and distributed state synchronization.",
     type: "website",
@@ -50,7 +50,7 @@ const painPoints = [
     problem:
       "Event sourcing stores every mutation forever. Replaying 10M events to reconstruct current state takes minutes. Compaction is fragile. Storage costs grow linearly with history.",
     solution:
-      "O(1) state reconstruction: current_state = initial_state XOR accumulator. No log replay. No compaction. The accumulator is a fixed-size summary of all deltas ever applied.",
+      "In the XOR state model, current_state = initial_state XOR accumulator. Whether that replaces replay or compaction depends on the event semantics, audit requirements, and measured workload artifact.",
   },
   {
     label: "Split-Brain Scenarios",
@@ -58,14 +58,14 @@ const painPoints = [
     problem:
       "Network partitions create divergent state. Rejoining requires conflict resolution, manual intervention, or data loss. Vector clocks add per-node metadata to every message.",
     solution:
-      "XOR is associative and commutative \u2014 partitioned nodes accumulate deltas locally, then exchange them in any order upon reconnection. States converge automatically. No vector clocks needed.",
+      "XOR is associative and commutative in the modeled path, so partitioned nodes can be evaluated with order-independent delta exchange. Production conflict handling remains workload-specific.",
   },
 ];
 
 const comparisonRows = [
   {
     metric: "Write Latency",
-    atomik: "O(1) local",
+    atomik: "Local delta path",
     raft: "O(n) quorum RTT",
     crdt: "O(1) local",
     eventsource: "O(1) append",
@@ -79,28 +79,28 @@ const comparisonRows = [
   },
   {
     metric: "Conflict Resolution",
-    atomik: "None needed",
+    atomik: "Model-dependent",
     raft: "Leader decides",
     crdt: "Type-specific merge",
     eventsource: "Manual / LWW",
   },
   {
     metric: "State Reconstruction",
-    atomik: "O(1) XOR",
+    atomik: "O(1) in XOR model",
     raft: "Log replay",
     crdt: "Merge all replicas",
     eventsource: "Replay all events",
   },
   {
     metric: "Metadata Overhead",
-    atomik: "Zero",
+    atomik: "Reduced when fitting",
     raft: "Term + index/entry",
     crdt: "Vector clocks / dots",
     eventsource: "Sequence numbers",
   },
   {
     metric: "Partition Recovery",
-    atomik: "Automatic",
+    atomik: "Model-dependent merge",
     raft: "Re-election + catch-up",
     crdt: "Automatic (slow)",
     eventsource: "Conflict detection",
@@ -131,9 +131,9 @@ const metrics = [
     detail: "Lean4-verified algebraic properties",
   },
   {
-    value: "0",
-    label: "Coordination Messages",
-    detail: "No leader election, no quorum, no locking",
+    value: "Scoped",
+    label: "Coordination",
+    detail: "Architecture review required before quoting coordination removal",
   },
 ];
 
@@ -161,7 +161,7 @@ export default function DistributedSystemsPage() {
               backgroundImage: "linear-gradient(135deg, #8b5cf6, #4f8fff)",
             }}
           >
-            Without Consensus
+            Evaluation
           </span>
         </h1>
         <p
@@ -260,9 +260,9 @@ export default function DistributedSystemsPage() {
           className="text-center mb-10 max-w-2xl mx-auto"
           style={{ color: "#8888a0" }}
         >
-          Three nodes send deltas in any order. XOR commutativity supports an
-          identical final state under the modeled algebra &mdash; no coordination
-          required in that state path.
+          Three nodes send deltas in any order. XOR commutativity supports the
+          same modeled final state when the state representation fits the
+          algebra and the workload assumptions are explicit.
         </p>
         <div
           className="rounded-xl border p-6 md:p-10 overflow-x-auto"
@@ -299,8 +299,8 @@ export default function DistributedSystemsPage() {
   │ ⊕ d_C    │           │ ⊕ d_C    │           │ ⊕ d_C    │
   └──────────┘           └──────────┘           └──────────┘
 
-  Order doesn't matter: d_A ⊕ d_B ⊕ d_C  =  d_C ⊕ d_A ⊕ d_B
-  Algebraic guarantee:  Abelian group (commutative, associative, self-inverse)`}</code>
+  Under the model: d_A ⊕ d_B ⊕ d_C  =  d_C ⊕ d_A ⊕ d_B
+  Proof scope: Abelian-group algebra, not a full distributed-system guarantee`}</code>
           </pre>
         </div>
       </section>
@@ -308,15 +308,15 @@ export default function DistributedSystemsPage() {
       {/* Code Example */}
       <section className="max-w-3xl mx-auto px-6 pb-20">
         <h2 className="text-3xl font-bold text-center mb-4">
-          Convergence in 10 Lines
+          Modeled Convergence in 10 Lines
         </h2>
         <p
           className="text-center mb-10 max-w-2xl mx-auto"
           style={{ color: "#8888a0" }}
         >
           Two nodes start with the same reference state. Each accumulates a
-          different delta. Exchange deltas in any order &mdash; the result is
-          always identical.
+          different delta. Exchange deltas in any order under the XOR model and
+          the modeled result matches.
         </p>
         <div
           className="rounded-xl border overflow-hidden"
@@ -346,7 +346,7 @@ export default function DistributedSystemsPage() {
               <span style={{ color: "#e0e0e8" }}> DeltaStream</span>
               {"\n\n"}
               <span style={{ color: "#6a6a80" }}>
-                # Node A and Node B converge without coordination
+                # Node A and Node B converge under the XOR model
               </span>
               {"\n"}
               <span style={{ color: "#e0e0e8" }}>stream_a = </span>
@@ -398,7 +398,7 @@ export default function DistributedSystemsPage() {
               <span style={{ color: "#e0e0e8" }}>)</span>
               {"\n\n"}
               <span style={{ color: "#6a6a80" }}>
-                # Exchange deltas in any order -- result is identical
+                # Exchange deltas in any order -- modeled result matches
               </span>
               {"\n"}
               <span style={{ color: "#e0e0e8" }}>stream_a.</span>
@@ -434,7 +434,7 @@ export default function DistributedSystemsPage() {
               <span style={{ color: "#f59e0b" }}>0</span>
               <span style={{ color: "#e0e0e8" }}>)</span>
               <span style={{ color: "#6a6a80" }}>
-                {"  "}# Always true
+                {"  "}# True under the modeled algebra
               </span>
             </code>
           </pre>

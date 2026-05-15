@@ -42,7 +42,7 @@ const painPoints = [
     problem:
       "Floating-point arithmetic is non-deterministic across platforms — different CPUs, compilers, and optimization levels produce different results. Client prediction diverges from the authoritative server. Players see rubberbanding, teleporting, and ghost hits.",
     solution:
-      "XOR is bitwise-exact on every platform. No floating-point rounding, no platform-dependent behavior. Delta accumulation is deterministic by construction — every client and server converges to the identical state, bit for bit. Proven by 108 Lean4 theorems.",
+      "XOR state transitions are bitwise-exact in the modeled path. That can remove floating-point variance from a narrow state representation, but client/server convergence still needs a workload-specific protocol and measured artifact.",
   },
   {
     label: "Rollback Netcode Complexity",
@@ -50,7 +50,7 @@ const painPoints = [
     problem:
       "Rollback (GGPO-style) requires snapshotting game state every frame, detecting mispredictions, rewinding, and re-simulating. The implementation complexity is enormous — save/load serialization for every game object, plus CPU cost scales with rollback depth.",
     solution:
-      "XOR self-inverse gives O(1) undo: applying a delta twice cancels it. Rollback is a single XOR operation, not a full state reload and re-simulation. No serialization, no snapshots, no frame-by-frame replay — just reverse the delta.",
+      "XOR self-inverse gives an O(1) undo primitive inside the modeled state path. Replacing snapshots or re-simulation requires mapping the game state representation and validating behavior under real rollback cases.",
   },
   {
     label: "State Prediction Failures",
@@ -65,49 +65,49 @@ const painPoints = [
 const comparisonRows = [
   {
     metric: "Update Size",
-    atomik: "8 bytes (fixed)",
+    atomik: "8-byte delta artifact",
     snapshot: "Full state (KB-MB)",
     deltaComp: "Variable (compressed diff)",
     lockstep: "Input only (small)",
   },
   {
     metric: "Bandwidth at 60 Hz",
-    atomik: "480 B/s per property",
+    atomik: "Quote with artifact",
     snapshot: "KB-MB/s per client",
     deltaComp: "Varies with change rate",
     lockstep: "Low (inputs only)",
   },
   {
     metric: "Rollback Cost",
-    atomik: "O(1) single XOR",
+    atomik: "O(1) in XOR model",
     snapshot: "O(n) state reload",
     deltaComp: "O(n) diff reapply",
     lockstep: "O(n) re-simulate",
   },
   {
     metric: "Platform Determinism",
-    atomik: "Bitwise-exact (XOR)",
+    atomik: "Bitwise XOR path",
     snapshot: "N/A (authoritative)",
     deltaComp: "N/A (authoritative)",
     lockstep: "Requires IEEE 754 lockstep",
   },
   {
     metric: "Packet Reorder Tolerance",
-    atomik: "Fully commutative",
+    atomik: "Commutative in model",
     snapshot: "Sequence numbers required",
     deltaComp: "Ordered application",
     lockstep: "Must synchronize inputs",
   },
   {
     metric: "Late Join / Reconnect",
-    atomik: "Send accumulator (8B)",
+    atomik: "Artifact-defined",
     snapshot: "Send full state",
     deltaComp: "Send full state + log",
     lockstep: "Replay from start",
   },
   {
     metric: "Implementation Complexity",
-    atomik: "3 operations (load/accum/read)",
+    atomik: "3 core ops in model",
     snapshot: "Serialize entire state",
     deltaComp: "Diff + patch + compress",
     lockstep: "Deterministic simulation",
@@ -123,12 +123,12 @@ const metrics = [
   {
     value: "8B",
     label: "Per Update",
-    detail: "Fixed-size delta, any state change",
+    detail: "Fixed-size delta representation in the modeled path",
   },
   {
     value: "O(1)",
     label: "Rollback",
-    detail: "Single XOR reversal, not re-simulation",
+    detail: "Single XOR reversal inside the modeled state path",
   },
   {
     value: "Order-free",
@@ -257,15 +257,15 @@ export default function GamingPage() {
       {/* Code Example */}
       <section className="max-w-3xl mx-auto px-6 pb-20">
         <h2 className="text-3xl font-bold text-center mb-4">
-          Game State Sync in 12 Lines
+          Modeled State Sync in 12 Lines
         </h2>
         <p
           className="text-center mb-10 max-w-2xl mx-auto"
           style={{ color: "#8888a0" }}
         >
-          Server applies movement deltas from any client, in any order. Every
-          client converges to the same position &mdash; no reconciliation
-          needed.
+          Server-side movement deltas can be modeled in any order when the game
+          state fits the XOR representation. Production reconciliation remains
+          part of the evaluated workload.
         </p>
         <div
           className="rounded-xl border overflow-hidden"
@@ -307,7 +307,7 @@ export default function GamingPage() {
               <span style={{ color: "#e0e0e8" }}>(initial_position)</span>
               {"\n\n"}
               <span style={{ color: "#6a6a80" }}>
-                # Server applies movement deltas from any client, any order
+                # Server models movement deltas in any order
               </span>
               {"\n"}
               <span style={{ color: "#e0e0e8" }}>player.</span>
@@ -325,7 +325,7 @@ export default function GamingPage() {
               </span>
               {"\n\n"}
               <span style={{ color: "#6a6a80" }}>
-                # All clients converge to same state -- no reconciliation needed
+                # Modeled state converges under the XOR representation
               </span>
               {"\n"}
               <span style={{ color: "#e0e0e8" }}>position = player.</span>
@@ -333,7 +333,7 @@ export default function GamingPage() {
               <span style={{ color: "#e0e0e8" }}>()</span>
               {"\n\n"}
               <span style={{ color: "#6a6a80" }}>
-                # O(1) rollback: undo any action with a single XOR
+                # O(1) modeled undo: apply the same XOR delta
               </span>
               {"\n"}
               <span style={{ color: "#e0e0e8" }}>player.</span>
