@@ -5,16 +5,16 @@ import Nav from "@/components/Nav";
 export const metadata: Metadata = {
   title: "Solutions — ATOMiK",
   description:
-    "ATOMiK solutions for distributed systems, IoT/edge computing, and financial infrastructure. Delta-state algebra for every industry.",
+    "ATOMiK workload directions for distributed systems, IoT/edge computing, and financial infrastructure. Evaluate state-aware compute with evidence labels.",
 };
 
 const solutions = [
   {
     href: "/solutions/distributed-systems",
     title: "Distributed Systems",
-    subtitle: "Consensus-free state synchronization",
+    subtitle: "State-sync evaluation",
     description:
-      "Replace Raft/Paxos coordination with commutative XOR deltas. Nodes converge regardless of message order — no leader election, no vector clocks.",
+      "Evaluate commutative XOR-delta patterns alongside Raft, Paxos, and CRDT baselines. Convergence and coordination claims depend on workload assumptions and artifacts.",
     color: "#4f8fff",
     keywords: ["State sync", "CRDTs", "Convergence"],
   },
@@ -23,7 +23,7 @@ const solutions = [
     title: "IoT & Edge Computing",
     subtitle: "Bandwidth-constrained edge evaluation",
     description:
-      "Send 8-byte deltas instead of full sensor payloads. Fingerprint-based change detection skips unchanged data. Works over intermittent connections.",
+      "Evaluate compact delta payloads and fingerprint-based change detection for constrained sensor paths and intermittent connections.",
     color: "#22c55e",
     keywords: ["Bandwidth", "Sensors", "Edge-cloud sync"],
   },
@@ -41,14 +41,14 @@ const solutions = [
     title: "Gaming & Real-Time",
     subtitle: "Multiplayer state-sync evaluation",
     description:
-      "8-byte deltas for position/health/inventory updates. Commutative accumulation means player actions apply in any order. Self-inverse gives instant rollback.",
+      "Explore compact deltas for position, health, and inventory updates. Commutative and self-inverse properties can inform rollback models when the workload fits.",
     color: "#a855f7",
     keywords: ["Multiplayer", "Netcode", "Rollback"],
   },
   {
     href: "/solutions/database-sync",
     title: "Database Change Detection",
-    subtitle: "No CDC, no triggers, no replication slots",
+    subtitle: "CDC-adjacent evaluation",
     description:
       "Evaluate row-change fingerprints and delta-first sync against PostgreSQL, MySQL, SQLite, or custom replication paths.",
     color: "#22d3ee",

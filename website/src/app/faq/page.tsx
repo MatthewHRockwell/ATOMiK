@@ -24,7 +24,7 @@ const faqCategories = [
         link: { href: "https://github.com/MatthewHRockwell/ATOMiK", label: "View GitHub", external: true },
       },
       {
-        q: "Is ATOMiK Desk a shipped product?",
+        q: "Is ATOMiK Desk commercially available today?",
         a: "No. ATOMiK Desk is a live prototype and demonstration surface for state-aware compute. Live screenshots show prototype progress; concept visuals show product direction and are not represented as shipped functionality.",
       },
     ],
