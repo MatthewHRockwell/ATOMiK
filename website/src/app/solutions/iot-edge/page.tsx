@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   title:
     "Edge Intelligence Without the Bandwidth — ATOMiK | IoT State Sync, Sensor Deduplication",
   description:
-    "Reduce IoT sensor data transfer by 99% with 8-byte XOR deltas. Fingerprint-based change detection skips unchanged data. Order-free convergence works across intermittent cellular, satellite, and LoRa links.",
+    "Evaluate XOR delta-state algebra for edge telemetry, sensor deduplication, and intermittent-link synchronization with workload-specific proof artifacts.",
   keywords: [
     "edge state synchronization",
     "IoT bandwidth reduction",
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Edge Intelligence Without the Bandwidth — ATOMiK",
     description:
-      "Reduce IoT sensor data transfer by 99% with 8-byte XOR deltas. O(1) change detection. Works over intermittent links.",
+      "Evaluate XOR delta-state algebra for edge telemetry, sensor deduplication, and intermittent-link synchronization.",
     type: "website",
   },
 };
@@ -36,7 +36,7 @@ const painPoints = [
     problem:
       "Cellular, satellite, and LoRa links charge per byte or throttle after quotas. Uploading full sensor state every interval burns through data budgets. A fleet of 10,000 devices sending 4KB readings every minute is 57 GB/day \u2014 most of it redundant.",
     solution:
-      "ATOMiK sends 8-byte XOR deltas instead of full payloads. Only the bits that actually changed are transmitted. Same 10,000-device fleet drops to under 1 GB/day \u2014 a 99% reduction that fits within even the most constrained cellular plans.",
+      "ATOMiK frames changed readings as compact XOR deltas instead of repeated full payloads. Any bandwidth-reduction number should be quoted only with a linked measured artifact and workload definition.",
   },
   {
     label: "Battery Drain",
@@ -109,7 +109,7 @@ const comparisonRows = [
   },
   {
     metric: "Formal Guarantees",
-    atomik: "108 Lean4 proofs",
+    atomik: "Formal proof work",
     mqtt: "Delivery QoS only",
     coap: "Delivery semantics",
     custom: "None standard",
@@ -118,9 +118,9 @@ const comparisonRows = [
 
 const metrics = [
   {
-    value: "99%",
-    label: "Bandwidth Reduction",
-    detail: "8-byte deltas vs. multi-KB full-state uploads",
+    value: "Artifact",
+    label: "Bandwidth Claims",
+    detail: "Measured workload package required before quoting reductions",
   },
   {
     value: "8 B",

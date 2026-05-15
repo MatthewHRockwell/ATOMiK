@@ -21,7 +21,7 @@ const solutions = [
   {
     href: "/solutions/iot-edge",
     title: "IoT & Edge Computing",
-    subtitle: "99% bandwidth reduction at the edge",
+    subtitle: "Bandwidth-constrained edge evaluation",
     description:
       "Send 8-byte deltas instead of full sensor payloads. Fingerprint-based change detection skips unchanged data. Works over intermittent connections.",
     color: "#22c55e",
@@ -32,14 +32,14 @@ const solutions = [
     title: "Financial Systems",
     subtitle: "Deterministic, timing-safe state management",
     description:
-      "O(1) constant-time operations with zero timing jitter. Lock-free multi-venue aggregation. Self-inverse undo for instant trade cancellation.",
+      "Evaluate fixed-path delta-state operations for risk, audit, undo, and multi-venue aggregation workloads.",
     color: "#f59e0b",
     keywords: ["Trading", "P&L", "Deterministic"],
   },
   {
     href: "/solutions/gaming",
     title: "Gaming & Real-Time",
-    subtitle: "5M ops/sec multiplayer state sync",
+    subtitle: "Multiplayer state-sync evaluation",
     description:
       "8-byte deltas for position/health/inventory updates. Commutative accumulation means player actions apply in any order. Self-inverse gives instant rollback.",
     color: "#a855f7",
@@ -50,7 +50,7 @@ const solutions = [
     title: "Database Change Detection",
     subtitle: "No CDC, no triggers, no replication slots",
     description:
-      "Detect which rows changed in O(1) per row using XOR fingerprinting. Works with PostgreSQL, MySQL, SQLite. Zero infrastructure — just pip install.",
+      "Evaluate row-change fingerprints and delta-first sync against PostgreSQL, MySQL, SQLite, or custom replication paths.",
     color: "#22d3ee",
     keywords: ["CDC alternative", "Triggers", "Row-level sync"],
   },

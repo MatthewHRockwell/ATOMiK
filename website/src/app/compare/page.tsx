@@ -202,7 +202,7 @@ const useCases = [
   "Applications that need undo/rollback without an event log",
   "Sensor fusion pipelines that merge readings from independent sources",
   "Reducing memory traffic in copy-on-write workloads (containers, VMs)",
-  "Systems requiring formal correctness guarantees (108 Lean4 proofs)",
+  "Systems requiring formal correctness proof artifacts (108 Lean4 proofs)",
 ];
 
 const antiPatterns = [

@@ -58,7 +58,7 @@ const painPoints = [
     problem:
       "Client-side prediction assumes actions will be confirmed by the server. When they aren't — rejected movement, lag spike, packet reorder — the client must reconcile divergent state. Reconciliation logic is error-prone and game-specific.",
     solution:
-      "Commutative accumulation means player actions apply in any order with the same result. Packet reorder doesn't cause divergence. Late-arriving deltas just get XOR'd in — the math guarantees convergence regardless of arrival order. No reconciliation logic needed.",
+      "Commutative accumulation means player actions can be modeled in any order with the same XOR result. Packet reorder becomes an evaluation question around the state model and workload, not a public zero-desync claim.",
   },
 ];
 
@@ -116,9 +116,9 @@ const comparisonRows = [
 
 const metrics = [
   {
-    value: "5M",
-    label: "Ops/Second",
-    detail: "Python SDK throughput per core",
+    value: "Scoped",
+    label: "Evaluation",
+    detail: "Use measured workload artifacts before quoting throughput",
   },
   {
     value: "8B",
@@ -131,9 +131,9 @@ const metrics = [
     detail: "Single XOR reversal, not re-simulation",
   },
   {
-    value: "0",
-    label: "Desync",
-    detail: "Bitwise-exact convergence, all platforms",
+    value: "Order-free",
+    label: "State Model",
+    detail: "XOR deltas compose without sequence-dependent merge logic",
   },
 ];
 
@@ -154,14 +154,14 @@ export default function GamingPage() {
           Solutions for Gaming &amp; Real-Time Applications
         </p>
         <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-6">
-          Real-Time State at{" "}
+          Real-Time State{" "}
           <span
             className="bg-clip-text text-transparent"
             style={{
               backgroundImage: "linear-gradient(135deg, #8b5cf6, #4f8fff)",
             }}
           >
-            5M Ops/Second
+            Sync Evaluation
           </span>
         </h1>
         <p

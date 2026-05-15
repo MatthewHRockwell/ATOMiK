@@ -119,7 +119,7 @@ const milestones: Milestone[] = [
       "TSMC / Samsung / GlobalFoundries engagement",
       "SRAM compiler integration for on-die state tables",
       "Multi-bank ASIC with dedicated on-die interconnect",
-      "Target: >1 GHz clock, >1 Tops/s with minimal die area",
+      "Projected high-throughput custom silicon target with minimal die area",
     ],
   },
   {
@@ -129,7 +129,7 @@ const milestones: Milestone[] = [
     bullets: [
       "Edge SKU: ultra-low-power, sub-1 mm\u00b2 die for IoT / embedded",
       "Data-center SKU: thousands of parallel banks, PCIe / CXL attach",
-      "Hardware root-of-trust with zero timing side channels",
+      "Hardware root-of-trust direction with reduced data-dependent timing surfaces",
       "Orders-of-magnitude improvement over FPGA on power and throughput",
     ],
   },
@@ -261,10 +261,10 @@ interface ScalingRow {
 }
 
 const scalingData: ScalingRow[] = [
-  { label: "N=1", lut: "302", freq: "444 MHz", throughput: "446 Mops/s", barPct: 0.6, color: accent2 },
-  { label: "N=16", lut: "941", freq: "267 MHz", throughput: "4.4 Gops/s", barPct: 6.3, color: accent },
+  { label: "N=1", lut: "302", freq: "444 MHz", throughput: "Synthesis row", barPct: 0.6, color: accent2 },
+  { label: "N=16", lut: "941", freq: "267 MHz", throughput: "Synthesis row", barPct: 6.3, color: accent },
   { label: "N=512", lut: "23,542", freq: "136 MHz", throughput: "Synthesis ceiling", barPct: 100, color: green },
-  { label: "ASIC (proj.)", lut: "~25K gates", freq: ">1 GHz", throughput: ">1 Tops/s", barPct: 100, color: gold },
+  { label: "ASIC (proj.)", lut: "~25K gates", freq: ">1 GHz", throughput: "Projected", barPct: 100, color: gold },
 ];
 
 function ScalingChart() {

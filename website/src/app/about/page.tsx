@@ -103,9 +103,9 @@ const proofPoints = [
     gradient: "from-blue-400 to-blue-600",
   },
   {
-    value: "69.7",
-    label: "Gops/s Peak",
-    sublabel: "512 parallel banks",
+    value: "SYNTH",
+    label: "Scaling Path",
+    sublabel: "Zynq evidence-labeled",
     gradient: "from-yellow-400 to-yellow-600",
   },
 ];
@@ -421,8 +421,8 @@ export default function AboutPage() {
             </p>
             <p>
               Traditional computing wastes enormous resources moving data that hasn&apos;t
-              changed. Delta-state algebra eliminates this by design — tracking only what
-              changes, with mathematical guarantees that the approach is correct.
+              changed. Delta-state algebra addresses this by design — tracking only what
+              changes, with formal proof work around the core algebra.
             </p>
             <p>
               From 108 formal proofs to a custom RISC-V CPU running on a $13.50 FPGA, ATOMiK

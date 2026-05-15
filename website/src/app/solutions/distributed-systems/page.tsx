@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   title:
     "Distributed State Without Consensus — ATOMiK | CRDT Alternative, Lock-Free Convergence",
   description:
-    "Replace Raft, Paxos, CRDTs, and event sourcing with XOR delta-state algebra. Consensus-free state sync with 99% bandwidth reduction, O(1) reconstruction, and 108 formal proofs. The distributed cache without a leader.",
+    "Evaluate XOR delta-state algebra for consensus-heavy replication, CRDT alternatives, event-sourcing replay paths, and distributed state synchronization.",
   keywords: [
     "consensus-free state sync",
     "CRDT alternative",
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Distributed State Without Consensus — ATOMiK",
     description:
-      "Replace consensus protocols, CRDTs, and event sourcing with XOR algebra. 99% bandwidth reduction. O(1) reconstruction. 108 formal proofs.",
+      "Evaluate XOR delta-state algebra for consensus-heavy replication, CRDT alternatives, and distributed state synchronization.",
     type: "website",
   },
 };
@@ -116,9 +116,9 @@ const comparisonRows = [
 
 const metrics = [
   {
-    value: "99%",
-    label: "Bandwidth Reduction",
-    detail: "Fixed-size deltas vs. full state replication",
+    value: "Delta",
+    label: "Sync Bandwidth",
+    detail: "Quote reductions only with a measured workload artifact",
   },
   {
     value: "O(1)",
@@ -260,8 +260,9 @@ export default function DistributedSystemsPage() {
           className="text-center mb-10 max-w-2xl mx-auto"
           style={{ color: "#8888a0" }}
         >
-          Three nodes send deltas in any order. XOR commutativity guarantees
-          identical final state &mdash; no coordination required.
+          Three nodes send deltas in any order. XOR commutativity supports an
+          identical final state under the modeled algebra &mdash; no coordination
+          required in that state path.
         </p>
         <div
           className="rounded-xl border p-6 md:p-10 overflow-x-auto"

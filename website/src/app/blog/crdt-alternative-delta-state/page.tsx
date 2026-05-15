@@ -152,7 +152,7 @@ export default function CrdtAlternativePage() {
                 Composing CRDTs into larger structures (e.g., a CRDT map of CRDT counters)
                 requires careful analysis. The merge semantics of the container interact
                 with the merge semantics of the contents in subtle ways that can break
-                convergence guarantees.
+                convergence assumptions.
               </p>
             </div>
             <div>
@@ -470,7 +470,7 @@ ctx.accum(0x02)  # Undo node B
               scale with node count.
             </li>
             <li>
-              <strong>Formal guarantees matter.</strong> 108 Lean4 theorems cover every
+              <strong>Formal proof coverage matters.</strong> 108 Lean4 theorems cover every
               property universally. No per-type analysis, no informal hand-waving.
             </li>
           </ul>

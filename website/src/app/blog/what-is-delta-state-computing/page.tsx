@@ -648,7 +648,7 @@ print(f"After undo: 0x{node_a.read():08X}")  # 0xCA00BABE (delta 1 removed)`}</C
                     Python
                   </span>
                   <span className="text-sm" style={{ color: "#8888a0" }}>
-                    ~500K ops/sec
+                    Software prototype path
                   </span>
                 </div>
                 <p className="text-sm" style={{ color: "#c8c8d4" }}>
@@ -666,7 +666,7 @@ print(f"After undo: 0x{node_a.read():08X}")  # 0xCA00BABE (delta 1 removed)`}</C
                     C / Kernel
                   </span>
                   <span className="text-sm" style={{ color: "#8888a0" }}>
-                    ~50M ops/sec
+                    Native integration path
                   </span>
                 </div>
                 <p className="text-sm" style={{ color: "#c8c8d4" }}>

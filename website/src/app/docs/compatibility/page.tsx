@@ -77,17 +77,17 @@ const refArchitectures = [
 const cloudProviders = [
   {
     provider: "AWS",
-    detail: "c7g.xlarge (Graviton3): 6.3M ops/s, $0.17/hr",
+    detail: "c7g.xlarge (Graviton3): run local benchmark before quoting throughput",
     color: "#ff9900",
   },
   {
     provider: "GCP",
-    detail: "c3-standard-4: estimated 7M ops/s",
+    detail: "c3-standard-4: estimate requires workload-specific benchmark",
     color: "#4285f4",
   },
   {
     provider: "Azure",
-    detail: "Dv5 series: estimated 6.5M ops/s",
+    detail: "Dv5 series: estimate requires workload-specific benchmark",
     color: "#00bcf2",
   },
 ];

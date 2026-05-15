@@ -47,7 +47,7 @@ export function AnimatedCounter({
     if (!isNumeric) return;
 
     const isDecimal = numericStr.includes(".");
-    const trailingText = value.replace(numericStr, ""); // e.g., "%" or " Gops/s"
+    const trailingText = value.replace(numericStr, ""); // e.g., "%" or another unit suffix
 
     let start: number | null = null;
     let raf: number;

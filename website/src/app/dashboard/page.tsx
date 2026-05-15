@@ -127,7 +127,7 @@ assert stream.state("A") == stream.state("C")`,
   },
   {
     title: "Benchmark",
-    description: "Measure ops/sec on your hardware and get a shareable results card.",
+    description: "Measure throughput on your hardware and get a shareable results card.",
     icon: "\u26A1",
     color: "#8b5cf6",
     code: `# Run from terminal:
@@ -136,7 +136,7 @@ python -m atomik_core benchmark --share
 # Programmatic:
 from atomik_core import benchmark
 results = benchmark.run(iterations=1_000_000)
-print(f"{results.ops_per_sec:,.0f} ops/sec")`,
+print(f"{results.ops_per_sec:,.0f} measured iterations/s")`,
   },
 ];
 
@@ -709,7 +709,7 @@ export default function DashboardPage() {
                     <GaugeChart
                       value={MOCK_METRICS.opsPerSec}
                       max={10_000_000}
-                      label="Ops/sec"
+                      label="Throughput"
                       color="#4f8fff"
                       format={(v) => `${(v / 1_000_000).toFixed(1)}M`}
                     />
@@ -810,7 +810,7 @@ export default function DashboardPage() {
                 </div>
                 <h3 className="text-lg font-bold mb-2">Upgrade to Pro to see live metrics</h3>
                 <p className="text-sm mb-5 max-w-md mx-auto" style={{ color: "#8888a0" }}>
-                  Real-time operations per second, bandwidth savings, waste detection, and active context
+                  Real-time throughput, bandwidth savings, waste detection, and active context
                   monitoring. Track your delta-state infrastructure performance at a glance.
                 </p>
                 <Link

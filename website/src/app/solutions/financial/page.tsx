@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Deterministic State for Financial Systems — ATOMiK",
     description:
-      "O(1) state reconstruction with zero timing jitter. Eliminates side channels, enables instant undo, and provides lock-free multi-venue aggregation. 108 formal proofs.",
+      "Evaluate fixed-path delta-state operations for financial risk, audit, undo, and multi-venue aggregation workloads.",
     type: "website",
   },
 };
@@ -189,9 +189,9 @@ export default function FinancialSolutionsPage() {
           className="text-center mb-12 max-w-2xl mx-auto"
           style={{ color: "#8888a0" }}
         >
-          Financial infrastructure demands guarantees that conventional state
-          management cannot provide &mdash; constant timing, provable
-          correctness, and real-time multi-venue consistency.
+          Financial infrastructure demands evidence that conventional state
+          management often lacks: explicit timing assumptions, proof artifacts,
+          and workload-specific validation.
         </p>
 
         <div className="grid md:grid-cols-2 gap-6">
@@ -363,9 +363,10 @@ export default function FinancialSolutionsPage() {
           className="text-center mb-10 max-w-2xl mx-auto"
           style={{ color: "#8888a0" }}
         >
-          ATOMiK&apos;s security guarantees are architectural, not bolted on.
-          Constant-time operations and the absence of speculative execution
-          eliminate entire classes of side-channel attacks.
+          ATOMiK&apos;s security posture starts with architecture, not a bolt-on
+          filter. Fixed-path state operations reduce data-dependent timing in
+          the modeled path, but deployment claims still require workload-specific
+          review.
         </p>
         <div
           className="rounded-xl border overflow-hidden overflow-x-auto"

@@ -83,7 +83,7 @@ export default function FPGABlogPost() {
           style={{ background: "#12121a", borderColor: "#1e1e2e" }}
         >
           <Stat value="$13.50" label="Board cost" />
-          <Stat value="94.5M" label="Ops/sec (single bank)" />
+          <Stat value="SYNTHESIS" label="Single-bank row" />
           <Stat value="SYNTHESIS" label="512-bank ceiling" />
           <Stat value="3" label="SoC generations" />
         </div>
@@ -150,7 +150,8 @@ export default function FPGABlogPost() {
 uint32_t state = *(volatile uint32_t*)ATOMIK_READ;
 // state == 0xDEADBE10`}</Code>
           <p>
-            Result: single-bank ATOMiK at 81 MHz, 94.5 million operations per second.
+            Result: a single-bank ATOMiK synthesis row at the target demo clock.
+            Use the hardware proof map before repeating performance figures.
             The entire SoC fits in 44% of the GW1NR-9K. 11/11 hardware tests pass.
             The core has +23% Fmax margin — it could run faster, but we&apos;re limited by
             the PicoRV32&apos;s bus timing.
@@ -237,16 +238,16 @@ uint32_t state = *(volatile uint32_t*)ATOMIK_READ;
                   <th className="text-right p-2" style={{ color: "#8888a0" }}>Fmax (MHz)</th>
                   <th className="text-right p-2" style={{ color: "#8888a0" }}>LUT</th>
                   <th className="text-right p-2" style={{ color: "#8888a0" }}>LUT %</th>
-                  <th className="text-right p-2" style={{ color: "#8888a0" }}>Gops/s</th>
+                  <th className="text-right p-2" style={{ color: "#8888a0" }}>Evidence</th>
                 </tr>
               </thead>
               <tbody style={{ color: "#b0b0c0" }}>
                 {[
-                  ["N=1", "444.4", "302", "0.6%", "0.4"],
-                  ["N=4", "347.8", "543", "1.0%", "1.4"],
-                  ["N=16", "266.7", "941", "1.8%", "4.4"],
-                  ["N=64", "205.1", "3,498", "6.6%", "13.4"],
-                  ["N=256", "148.1", "15,197", "28.6%", "38.1"],
+                  ["N=1", "444.4", "302", "0.6%", "synthesis"],
+                  ["N=4", "347.8", "543", "1.0%", "synthesis"],
+                  ["N=16", "266.7", "941", "1.8%", "synthesis"],
+                  ["N=64", "205.1", "3,498", "6.6%", "synthesis"],
+                  ["N=256", "148.1", "15,197", "28.6%", "synthesis"],
                   ["N=512", "135.6", "23,542", "44.3%", "see artifact"],
                 ].map(([banks, fmax, lut, pct, gops]) => (
                   <tr key={banks} style={{ borderBottom: "1px solid #1e1e2e" }}>
