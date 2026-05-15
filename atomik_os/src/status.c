@@ -10,7 +10,7 @@
  *   - DATA / MODE / PERSONALITY badges with colored locator dots
  *   - Event-pulse mini-waveform driven by atomik_event_total deltas
  *   - Mode is now controllable via 'M' (DEV → DEMO → INVESTOR → DEV)
- *   - Right segment still: wallet · cpu · uptime · version */
+ *   - Right segment still: wallet / cpu / uptime / version */
 #include "atomik_os.h"
 #include <stdio.h>
 #include <string.h>

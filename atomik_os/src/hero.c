@@ -197,9 +197,9 @@ void hero_draw(void) {
         pixel_t c = (active == ps[i]) ? cols[i] : ATOMIK_FG_DIM;
         draw_text(cxs[i] - tw / 2, label_y, n, 2, c);
         /* Small dim subtitle under each name. */
-        const char *sub = (i == 0) ? "memory · regions" :
-                          (i == 1) ? "replica · skip"   :
-                                     "context · prune";
+        const char *sub = (i == 0) ? "memory / regions" :
+                          (i == 1) ? "replica / skip"   :
+                                     "context / prune";
         int sw = text_width(sub, 1);
         draw_text(cxs[i] - sw / 2, label_y + text_height(2) + 4,
                   sub, 1, ATOMIK_FG_DIM);

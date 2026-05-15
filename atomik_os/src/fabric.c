@@ -34,7 +34,7 @@
  *   ┌──────────────────────────────────────────┐
  *   │  RESOURCE FABRIC          [ AUTO: STATE ]│
  *   │  active personality: STATE PROCESSOR     │
- *   │  ↳ change detection · dirty regions ·    │
+ *   │  ↳ change detection / dirty regions /    │
  *   ├──────────────────────────────────────────┤
  *   │  ● STATE                LIVE             │  <- lane row
  *   │     ops collapsed 47 → 8                 │
@@ -292,6 +292,21 @@ static const char *lane_oneliner(fabric_lane_t lane) {
     }
 }
 
+/* v0.38-J+ short semantic subtitle per lane — drawn right under the
+ * lane NAME at scale-1, replaces the verbose header prose ChatGPT
+ * asked us to drop in v0.38-J.  Keeps the architecture legible
+ * without making the panel text-heavy again. */
+static const char *lane_subtitle(fabric_lane_t lane) {
+    switch (lane) {
+    case FABRIC_LANE_STATE:  return "coalesce writes";
+    case FABRIC_LANE_SYNC:   return "skip unchanged";
+    case FABRIC_LANE_AGENT:  return "retain hot context";
+    case FABRIC_LANE_EVENT:  return "event bus activity";
+    case FABRIC_LANE_VISUAL: return "render deltas";
+    default:                 return "";
+    }
+}
+
 static personality_t lane_to_personality(fabric_lane_t lane) {
     switch (lane) {
     case FABRIC_LANE_STATE: return PERSONALITY_STATE;
@@ -395,10 +410,10 @@ static void lane_metrics(fabric_lane_t lane, char *primary, size_t plen,
                      (unsigned)s->ops_logical, (unsigned)s->ops_issued);
             if (s->cycles_software_baseline && s->cycles_atomik) {
                 double sp = perf_speedup(s);
-                snprintf(secondary, slen, "%.2fx vs sw  ·  fences 1",
+                snprintf(secondary, slen, "%.2fx vs sw  /  fences 1",
                          sp);
             } else {
-                snprintf(secondary, slen, "fences 1  ·  %u cycles",
+                snprintf(secondary, slen, "fences 1  /  %u cycles",
                          (unsigned)s->cycles_total);
             }
         }
@@ -446,9 +461,9 @@ static void lane_metrics(fabric_lane_t lane, char *primary, size_t plen,
                 int idx = (h->head + FABRIC_HISTORY_N - 1) % FABRIC_HISTORY_N;
                 last_window = h->values[idx];
             }
-            snprintf(primary, plen, "%lu total · %u in last %dms",
+            snprintf(primary, plen, "%lu total / %u in last %dms",
                      (unsigned long)total, last_window, FABRIC_SAMPLE_MS);
-            snprintf(secondary, slen, "STATE %lu · SYNC %lu · AGENT %lu",
+            snprintf(secondary, slen, "STATE %lu / SYNC %lu / AGENT %lu",
                      atomik_event_count(EVT_STATE_DELTA),
                      atomik_event_count(EVT_SYNC_REPLICA),
                      atomik_event_count(EVT_AGENT_CONTEXT));
@@ -516,7 +531,26 @@ static void draw_filled_waveform(const fabric_lane_history_t *h,
     pixel_t bed = rgb(0x1F, 0x27, 0x38);
     draw_rect(x, y + hgt - 1, w, 1, bed);
 
-    if (h->count < 2) return;
+    /* v0.38-J+ WAITING baseline glow — when the lane has no data, paint
+     * a calm low-amplitude glow band in lane color instead of nothing.
+     * Per ChatGPT 2026-05-15: WAITING = calm instrument glow, never a
+     * dead-flat empty lane.  Stays honest (no fake telemetry) — this is
+     * pure visual chrome, no number is rendered from it. */
+    if (h->count < 2) {
+        for (int gy = 0; gy < 3; gy++) {
+            uint8_t a = (uint8_t)(36 + gy * 30);
+            for (int sx = 0; sx < w; sx++) {
+                draw_blend_pixel(x + sx, y + hgt - 3 + gy, line, a);
+            }
+        }
+        for (int g = 1; g <= 4; g++) {
+            uint8_t a = (uint8_t)(20 - g * 4);
+            for (int sx = 0; sx < w; sx++) {
+                draw_blend_pixel(x + sx, y + hgt - 3 - g, line, a);
+            }
+        }
+        return;
+    }
 
     uint16_t mn = h->v_min, mx = h->v_max;
     if (mx <= mn) {
@@ -620,19 +654,19 @@ static void lane_big_metric(fabric_lane_t lane,
             unsigned pct = (unsigned)
                 (100u * (s->ops_logical - s->ops_issued) / s->ops_logical);
             snprintf(buf, cap, "%u", pct);
-            snprintf(unit, unit_cap, "%%");
+            snprintf(unit, unit_cap, "%% coalesced");
         } else {
             snprintf(buf, cap, "--");
-            snprintf(unit, unit_cap, "%%");
+            snprintf(unit, unit_cap, "%% coalesced");
         }
         break;
     case FABRIC_LANE_SYNC:
         if (s) {
             snprintf(buf, cap, "%u", (unsigned)s->ops_issued);
-            snprintf(unit, unit_cap, "deltas");
+            snprintf(unit, unit_cap, "deltas emitted");
         } else {
             snprintf(buf, cap, "--");
-            snprintf(unit, unit_cap, "deltas");
+            snprintf(unit, unit_cap, "deltas emitted");
         }
         break;
     case FABRIC_LANE_AGENT:
@@ -641,20 +675,20 @@ static void lane_big_metric(fabric_lane_t lane,
             unsigned total = s->regions_unique + cold;
             unsigned pct = total ? (s->ops_issued * 100u / total) : 0;
             snprintf(buf, cap, "%u", pct);
-            snprintf(unit, unit_cap, "%% hot");
+            snprintf(unit, unit_cap, "%% retained");
         } else {
             snprintf(buf, cap, "--");
-            snprintf(unit, unit_cap, "%% hot");
+            snprintf(unit, unit_cap, "%% retained");
         }
         break;
     case FABRIC_LANE_EVENT: {
         unsigned long total = atomik_event_total();
         if (total > 0) {
             snprintf(buf, cap, "%lu", total);
-            snprintf(unit, unit_cap, "events");
+            snprintf(unit, unit_cap, "events on bus");
         } else {
             snprintf(buf, cap, "--");
-            snprintf(unit, unit_cap, "events");
+            snprintf(unit, unit_cap, "events on bus");
         }
         break;
     }
@@ -662,10 +696,10 @@ static void lane_big_metric(fabric_lane_t lane,
         const atomik_metric_t *avd = metric_get("visual.frame_pct_avoided");
         if (avd && avd->source != METRIC_WAITING) {
             snprintf(buf, cap, "%.0f", avd->value);
-            snprintf(unit, unit_cap, "%% avoided");
+            snprintf(unit, unit_cap, "%% pixels avoided");
         } else {
             snprintf(buf, cap, "--");
-            snprintf(unit, unit_cap, "%% avoided");
+            snprintf(unit, unit_cap, "%% pixels avoided");
         }
         (void)h;
         break;
@@ -700,10 +734,10 @@ void fabric_draw(window_t *w, int x, int y, int wd, int ht) {
     }
     char badge[32];
     if (fabric_override_active()) {
-        snprintf(badge, sizeof badge, "MANUAL · %s",
+        snprintf(badge, sizeof badge, "MANUAL / %s",
                  fabric_personality_name(s_active));
     } else {
-        snprintf(badge, sizeof badge, "AUTO · %s",
+        snprintf(badge, sizeof badge, "AUTO / %s",
                  fabric_personality_name(s_active));
     }
     /* Badge as a rounded capsule with brighter border in active color. */
@@ -798,11 +832,13 @@ void fabric_draw(window_t *w, int x, int y, int wd, int ht) {
         int tx    = lane_x + pad_x;
         int inner_w = lane_w - pad_x * 2;
 
-        /* Row 1: scale-2 lane NAME in saturated lane color +
-         * freshness chip right-aligned. */
+        /* Row 1: scale-2 lane NAME in saturated lane color + scale-1
+         * dim semantic subtitle below + freshness chip right-aligned. */
         int ty1 = ly + ATOMIK_GRID_M;
         const char *name = fabric_lane_name(lane);
         draw_text(tx, ty1, name, 2, lc);
+        const char *sub = lane_subtitle(lane);
+        draw_text(tx, ty1 + text_height(2) + 2, sub, 1, ATOMIK_FG_DIM);
 
         const char *fl = fresh_label(h->fresh);
         int fw = text_width(fl, 1);
@@ -819,8 +855,8 @@ void fabric_draw(window_t *w, int x, int y, int wd, int ht) {
         draw_text(chip_x + ATOMIK_GRID_S, chip_y + 2, fl, 1, fcol);
 
         /* Row 2: scale-3 BIG METRIC number in lane color +
-         * unit label scale-1 dim below. */
-        int ty2 = ty1 + text_height(2) + ATOMIK_GRID_M;
+         * unit label scale-1 dim below.  Includes subtitle line. */
+        int ty2 = ty1 + text_height(2) + text_height(1) + ATOMIK_GRID_S;
         char big[16], unit[24];
         lane_big_metric(lane, big, sizeof big, unit, sizeof unit);
         draw_text(tx, ty2, big, 3, lc);

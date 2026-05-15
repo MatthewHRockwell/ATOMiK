@@ -407,7 +407,7 @@ void replica_flow_draw(window_t *w, int x, int y, int wd, int ht) {
               "REPLICA FLOW", 2, ATOMIK_FG);
     draw_text(x + ATOMIK_GRID_L,
               y + ATOMIK_GRID_M + ATOMIK_TITLEBAR_H + 4,
-              "SYNC personality · LOCAL → DELTA STREAM → REMOTE",
+              "SYNC personality / LOCAL → DELTA STREAM → REMOTE",
               1, ATOMIK_FG_DIM);
 
     /* Three-column body: LOCAL | PROPAGATION | REMOTE.

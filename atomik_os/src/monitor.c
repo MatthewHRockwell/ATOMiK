@@ -81,7 +81,7 @@ void monitor_draw(window_t *w, int x, int y, int wd, int ht) {
 
     /* Footer */
     const char *footer = ok == 0
-        ? "delta accumulators sampled OK  ·  XOR-commutative, lock-free"
+        ? "delta accumulators sampled OK  /  XOR-commutative, lock-free"
         : "delta accumulators NOT mapped (need root for /dev/mem)";
     draw_text(x + 24, y + ht - 28, footer, 1,
               ok == 0 ? ATOMIK_ACCENT : rgb(0xFF, 0x6F, 0x91));

@@ -315,7 +315,7 @@ static void draw_footer(int x, int y, int w, int h) {
     char buf[256];
     unsigned long total = atomik_event_total();
     snprintf(buf, sizeof buf,
-             "TOTAL %lu  ·  STATE %lu  ·  SYNC %lu  ·  AGENT %lu  ·  VIS %lu  ·  BUILD %lu  ·  OVR %lu",
+             "TOTAL %lu  /  STATE %lu  /  SYNC %lu  /  AGENT %lu  /  VIS %lu  /  BUILD %lu  /  OVR %lu",
              total,
              atomik_event_count(EVT_STATE_DELTA),
              atomik_event_count(EVT_SYNC_REPLICA),
@@ -336,7 +336,7 @@ void state_watch_draw(window_t *w, int x, int y, int wd, int ht) {
               "STATE WATCH", 2, ATOMIK_FG);
     char sub[96];
     snprintf(sub, sizeof sub,
-             "history ribbon  ·  %d samples  ·  %d ms cadence  ·  ~%d s window",
+             "history ribbon  /  %d samples  /  %d ms cadence  /  ~%d s window",
              SW_HISTORY_N, SW_SAMPLE_MS, (SW_HISTORY_N * SW_SAMPLE_MS) / 1000);
     draw_text(x + ATOMIK_GRID_L,
               y + ATOMIK_GRID_M + ATOMIK_TITLEBAR_H + 4,
