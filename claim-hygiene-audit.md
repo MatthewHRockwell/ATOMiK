@@ -8,6 +8,8 @@ Follow-up: 2026-05-15
 
 Second follow-up: 2026-05-15
 
+v0.38-I follow-up: 2026-05-15
+
 ## Scope Reviewed
 
 Risky claim search was run across:
@@ -101,8 +103,8 @@ revolutionary
   funding, diligence, data-room, score-package, launch-post, competitive memo,
   and generator/template files that still contain historical metrics or strong
   market claims.
-- v0.38-H claims remain intentionally unpromoted until a screenshot or recorded
-  artifact is saved and classified.
+- v0.38-H claims remained intentionally unpromoted in this pass because no
+  screenshot or recorded artifact had been saved and classified yet.
 
 ## Tightened In 2026-05-15 Second Follow-Up
 
@@ -119,6 +121,18 @@ revolutionary
   application drafts.
 - Added `docs/public-claim-scan.md` as the repeatable scan checklist for current
   public surfaces versus quarantined legacy material.
+
+## Tightened In 2026-05-15 v0.38-I Follow-Up
+
+- Added `website/public/08-current-live-atomik-desk-v038i.png` from
+  `atomik_os/docs/screenshots/deploy_20260514_223935_v0.38-I.png` as the current
+  public UI proof image.
+- Updated homepage, README, hardware docs, technical proof docs, visual asset
+  manifest, claims registry, one-pager, and pitch visual map to treat v0.38-I as
+  `HARDWARE_VALIDATED`.
+- Kept the claim boundary narrow: the v0.38-I screenshot supports visible UI
+  proof only. It does not support benchmark, uptime, allocation, maturity,
+  commercial product, power, or performance claims.
 
 ## Remaining Legacy Risk
 
