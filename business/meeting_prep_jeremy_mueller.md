@@ -1,4 +1,11 @@
 # Meeting Prep: Jeremy Mueller — Alliance for SoCal Innovation
+
+> **Publication status: INTERNAL_PREP / NOT PUBLIC CLAIM COPY.**
+> This file contains meeting notes, rough talk tracks, and older metric language.
+> Do not quote performance, customer, production, pricing, or fundraising claims
+> from this file unless each claim is reconciled with `results/claims_registry.yaml`
+> and the current evidence-label docs.
+
 **Date:** Thursday, March 12, 2026 at 3:00 PM PDT  
 **Format:** Zoom (link from Calendly invite)  
 **Contact:** jeremy@alliancesocal.org

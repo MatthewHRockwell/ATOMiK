@@ -6,7 +6,7 @@ import EmailCapture from "@/components/EmailCapture";
 export const metadata: Metadata = {
   title: "ATOMiK vs Event Sourcing: When XOR Beats Append-Only Logs — ATOMiK Blog",
   description:
-    "A quantitative comparison of delta-state algebra vs event sourcing for state management. O(1) reconstruction vs O(n) replay, 8 bytes vs unbounded logs.",
+    "A conceptual comparison of delta-state algebra and event sourcing for state management, including where accumulator models fit and where event logs still matter.",
 };
 
 function Code({ children }: { children: string }) {

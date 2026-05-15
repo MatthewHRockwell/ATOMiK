@@ -1,5 +1,10 @@
 # ATOMiK Launch Posts
 
+> **Publication status: ARCHIVED LAUNCH DRAFTS / DO NOT PUBLISH UNEDITED.**
+> These posts contain historical metrics and adoption claims. Rewrite against
+> the current evidence labels, live-prototype proof, and request-based CTA
+> before posting.
+
 ## Hacker News — Show HN
 
 **Title:** Show HN: ATOMiK – O(1) state reconstruction via XOR algebra, formally proven in Lean4

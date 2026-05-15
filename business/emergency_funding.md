@@ -1,5 +1,9 @@
 # Emergency Funding — Fast Cash Options
 
+> **Publication status: INTERNAL FUNDING OPTIONS / NOT PUBLIC COLLATERAL.**
+> This is an operating note, not a claim source. Rewrite any technical proof,
+> customer, or production language before external use.
+
 **Goal:** Get money in Matt's pocket within 1-4 weeks while the bigger raise closes.
 
 ---

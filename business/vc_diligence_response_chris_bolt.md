@@ -1,5 +1,9 @@
 # ATOMiK — Due Diligence Follow-Up
 
+> **Publication status: LEGACY DILIGENCE DRAFT / NOT CURRENT PUBLIC CLAIM COPY.**
+> Do not send without reconciling metrics, customer assumptions, and production
+> language against the current claims registry and evidence labels.
+
 **To:** Chris Bolt
 **From:** Matt Rockwell, Founder
 **Date:** March 11, 2026

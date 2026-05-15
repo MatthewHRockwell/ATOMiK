@@ -1,6 +1,7 @@
 import Nav from "@/components/Nav";
 import DocsSidebar from "@/components/DocsSidebar";
 import { DocsBreadcrumb, DocsPrevNext } from "@/components/DocsNav";
+import EvidenceBanner from "@/components/EvidenceBanner";
 
 const breadcrumbJsonLd = {
   "@context": "https://schema.org",
@@ -35,6 +36,9 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
       <main className="lg:ml-[240px]">
         <div className="max-w-5xl mx-auto px-6 pt-8">
           <DocsBreadcrumb />
+        </div>
+        <div className="pb-6">
+          <EvidenceBanner surface="docs" />
         </div>
         {children}
         <div className="max-w-5xl mx-auto px-6 pb-16">

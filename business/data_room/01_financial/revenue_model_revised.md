@@ -1,5 +1,9 @@
 # Revised Revenue Model — Bottoms-Up with Three Scenarios
 
+> **Publication status: INTERNAL FINANCIAL MODEL / PROJECTED.**
+> This is planning material, not a result. Revenue, customer, and pricing
+> assumptions require founder and counsel review before external use.
+
 *Prepared for due diligence — March 2026*
 
 ---

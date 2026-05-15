@@ -3,9 +3,9 @@
 import { AnimatedCounter } from "./AnimatedCounter";
 
 const metrics: { value: string; label: string; subtitle?: string; suffix?: string; color: string }[] = [
-  { value: "400-1100x", label: "Detection Speedup", subtitle: "hardware-measured state change detection vs software byte scan on Zynq RV64GC", color: "#22c55e" },
-  { value: "2.5", label: "M ops/s Hardware", suffix: " Mops/s", subtitle: "measured on NaxRiscv RV64GC @ 100MHz with 8-slot ATOMiK adapter", color: "#4f8fff" },
-  { value: "74%", label: "Bandwidth Saved", subtitle: "average across AI inference workload \u2014 skip unchanged model layers entirely", color: "#22d3ee" },
+  { value: "Artifact", label: "Detection Claims", subtitle: "Quote only with a linked measured workload artifact", color: "#22c55e" },
+  { value: "Artifact", label: "Hardware Ops", subtitle: "Use hardware-validation pages for current measured or synthesis-labeled throughput", color: "#4f8fff" },
+  { value: "Projected", label: "Bandwidth Claims", subtitle: "Workload-specific until backed by measured artifact packages", color: "#22d3ee" },
   { value: "108", label: "Lean4 Formal Proofs", color: "#8b5cf6" },
 ];
 

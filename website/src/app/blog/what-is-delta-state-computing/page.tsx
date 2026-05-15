@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "What is Delta-State Computing? The Definitive Guide",
     description:
-      "State is not stored. State is reconstructed. Learn the algebra behind delta-state computing and why it outperforms CRDTs, event sourcing, and consensus protocols.",
+      "State can be reconstructed from deltas in suitable models. Learn the algebra behind delta-state computing and where it may fit.",
     type: "article",
     publishedTime: "2026-03-16T00:00:00Z",
   },
@@ -78,8 +78,8 @@ export default function WhatIsDeltaStateComputingPage() {
             What is Delta-State Computing?
           </h1>
           <p className="text-lg mb-4" style={{ color: "#8888a0" }}>
-            The definitive guide to delta-state architecture, XOR state synchronization,
-            and why reconstructed state outperforms stored state.
+            An archived guide to delta-state architecture, XOR state synchronization,
+            and where reconstructed state may help.
           </p>
           <div className="flex flex-wrap gap-2">
             {["delta-state", "architecture", "distributed-systems", "pillar"].map((tag) => (
@@ -148,10 +148,10 @@ export default function WhatIsDeltaStateComputingPage() {
 
           <p>
             This single equation replaces read-modify-write cycles, cache coherence
-            protocols, lock hierarchies, and consensus algorithms. Every read is a
+            protocols, lock hierarchies, and consensus algorithms in suitable state paths. Every read is a
             reconstruction. Every write is a delta accumulated into a shared register.
-            The result is always consistent, always convergent, and mathematically proven
-            correct.
+            The algebraic result is consistent and convergent within the modeled
+            assumptions.
           </p>
 
           <p>
@@ -168,7 +168,7 @@ export default function WhatIsDeltaStateComputingPage() {
           <p>
             The key insight is that <strong>state does not need to be stored</strong>. In
             every Von Neumann machine, state lives in memory cells and must be explicitly
-            read, modified, and written back. Delta-state computing eliminates this
+            read, modified, and written back. Delta-state computing offers a different
             paradigm. State is a function of two values, and changes compose algebraically
             rather than sequentially.
           </p>
@@ -229,11 +229,11 @@ export default function WhatIsDeltaStateComputingPage() {
           </div>
 
           <p>
-            These properties give delta-state computing its power. Commutativity eliminates
-            ordering requirements. Self-inverse provides instant undo. Associativity enables
-            arbitrary batching. Together, they mean that <strong>the accumulator is a
+            These properties give delta-state computing its power. Commutativity can reduce
+            ordering requirements in a fit model. Self-inverse supports undo. Associativity
+            enables arbitrary batching. Together, they mean that <strong>the accumulator is a
             shared resource by design</strong> — multiple producers can feed deltas in any
-            order, and the result is identical.
+            order under the modeled assumptions.
           </p>
 
           <p>
@@ -369,7 +369,7 @@ export default function WhatIsDeltaStateComputingPage() {
           </ul>
 
           <p>
-            Delta-state computing eliminates all three problems. Storage is constant (one
+            Delta-state computing can reduce all three pressures when the workload fits. Storage is constant (one
             reference + one accumulator = 16 bytes). Reconstruction is O(1) (a single XOR).
             Multi-node sync is order-free (commutativity). The trade-off is that ATOMiK
             does not preserve event history — it tracks <em>cumulative change</em>, not
@@ -452,7 +452,8 @@ state = reference ^ accumulator  # One XOR, always`}</Code>
             &apos;a&apos; at position 7&quot;). ATOMiK operates on binary state. For
             collaborative text editing where character intent matters, OT or CRDTs like
             Yjs are still the right tool. For state synchronization where convergence
-            matters more than intent, ATOMiK is faster, simpler, and provably correct.
+            matters more than intent, ATOMiK may be a simpler fit when the workload
+            matches the algebraic model and measured artifacts support the claim.
           </p>
         </Section>
 
@@ -466,10 +467,10 @@ state = reference ^ accumulator  # One XOR, always`}</Code>
           </p>
 
           <p>
-            Delta-state computing does not need consensus because it does not need
+            Delta-state computing can reduce consensus pressure when it does not need
             ordering. The commutativity and associativity of XOR mean that <em>all
-            orderings produce the same result</em>. There is no leader, no quorum, no
-            election timeout, and no split-brain scenario.
+            orderings produce the same modeled result</em>. A production protocol may
+            still need a leader, quorum, election timeout, or split-brain handling.
           </p>
 
           <div
@@ -486,13 +487,13 @@ state = reference ^ accumulator  # One XOR, always`}</Code>
               </thead>
               <tbody style={{ color: "#b0b0c0" }}>
                 {[
-                  ["Leader election", "Required", "Not needed"],
-                  ["Quorum requirement", "Majority (n/2 + 1)", "None"],
-                  ["Network partitions", "Minority side blocks", "All sides continue"],
-                  ["Write latency", "2 RTT (leader + commit)", "0 RTT (local XOR)"],
-                  ["Ordering guarantee", "Total order", "No ordering needed"],
-                  ["Availability", "CP (sacrifices availability)", "AP (always available)"],
-                  ["Message complexity", "O(n) per write", "O(1) per delta"],
+                  ["Leader election", "Required", "Model-dependent"],
+                  ["Quorum requirement", "Majority (n/2 + 1)", "Workload-specific"],
+                  ["Network partitions", "Minority side blocks", "Protocol-specific"],
+                  ["Write latency", "2 RTT (leader + commit)", "Artifact required"],
+                  ["Ordering guarantee", "Total order", "Reduced in fit model"],
+                  ["Availability", "CP (sacrifices availability)", "Architecture-dependent"],
+                  ["Message complexity", "O(n) per write", "Model-dependent"],
                 ].map(([prop, raft, atomik], i) => (
                   <tr key={i} style={{ borderBottom: "1px solid #1e1e2e" }}>
                     <td className="p-4 font-medium" style={{ color: "#e0e0e8" }}>{prop}</td>
@@ -533,7 +534,7 @@ state = reference ^ accumulator  # One XOR, always`}</Code>
               {
                 href: "/solutions/distributed-systems",
                 title: "Distributed Systems",
-                desc: "Multi-region state sync without consensus. Nodes exchange 8-byte deltas over any transport and converge under the XOR algebra model.",
+                desc: "Multi-region state-sync evaluation. Nodes exchange fixed-width deltas and converge under the XOR algebra model.",
               },
               {
                 href: "/solutions/gaming",

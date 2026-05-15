@@ -1,5 +1,9 @@
 # ATOMiK Competitive Analysis
 
+> **Publication status: INTERNAL COMPETITIVE MEMO / REVIEW REQUIRED.**
+> Do not publish competitor comparisons or performance rows without current
+> source checking, evidence labels, and counsel review where appropriate.
+
 ## Summary Matrix
 
 | Dimension | ATOMiK | Event Sourcing | CRDTs | Traditional FPGA Accel. | Ubitium |

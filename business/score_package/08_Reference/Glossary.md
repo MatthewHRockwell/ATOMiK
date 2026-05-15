@@ -1,5 +1,9 @@
 # ATOMiK Glossary
 
+> **Publication status: LEGACY SCORE PACKAGE / REVIEW REQUIRED.**
+> Definitions here may contain historical claim language. Keep public copy
+> aligned to the current evidence-label framework.
+
 *Technical terms translated to plain English. Reference this whenever you encounter unfamiliar terminology in the ATOMiK materials.*
 
 ---

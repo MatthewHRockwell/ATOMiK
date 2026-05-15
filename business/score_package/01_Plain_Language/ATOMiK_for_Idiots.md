@@ -1,5 +1,9 @@
 # ATOMiK for Non-Engineers
 
+> **Publication status: LEGACY SCORE PACKAGE / NOT CURRENT PUBLIC COPY.**
+> Use the current one-pager and public FAQ instead. Rewrite any breakthrough,
+> speed, memory, or guarantee language against current evidence labels.
+
 *Everything you need to understand about ATOMiK — no technical background required.*
 
 ---

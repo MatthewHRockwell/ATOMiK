@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Examples — ATOMiK Docs",
   description:
-    "Production-ready patterns showing delta-state algebra in real workloads: distributed cache, IoT sensor fusion, real-time analytics.",
+    "Evaluation-oriented examples showing delta-state algebra patterns: distributed cache models, IoT sensor fusion sketches, and real-time analytics examples.",
 };
 
 const examples = [
@@ -10,7 +10,7 @@ const examples = [
     title: "Distributed Cache",
     file: "distributed_cache.py",
     description:
-      "Multi-node cache synchronization without consensus. Nodes broadcast XOR deltas — no leader election, no write-ahead log, no ordering constraints.",
+      "Multi-node cache synchronization model using XOR deltas. Treat as an educational pattern until a workload-specific architecture review supports deployment claims.",
     color: "#8b5cf6",
     icon: "\u21c4",
   },
@@ -18,7 +18,7 @@ const examples = [
     title: "IoT Sensor Fusion",
     file: "iot_sensor_fusion.py",
     description:
-      "Hundreds of sensors report 8-byte XOR deltas instead of full state. Gateway merges in any order. Lost packets self-cancel via self-inverse property.",
+      "Sensor-fusion sketch using fixed-width XOR deltas. Gateway merge and loss behavior require workload-specific protocol validation.",
     color: "#4f8fff",
     icon: "\u2b21",
   },
@@ -26,7 +26,7 @@ const examples = [
     title: "Real-Time Analytics",
     file: "realtime_analytics.py",
     description:
-      "Track metrics across hundreds of dimensions. XOR-accumulate deltas per dimension, read any time. No database writes, no event logs.",
+      "Track metric deltas across dimensions in a simplified accumulator model. Database and log replacement claims need measured workload artifacts.",
     color: "#22c55e",
     icon: "\u2237",
   },
@@ -43,7 +43,7 @@ export default function ExamplesPage() {
       </p>
       <h1 className="text-4xl font-bold tracking-tight mb-4">Examples</h1>
       <p className="text-lg mb-10" style={{ color: "#8888a0" }}>
-        Production-ready patterns showing delta-state algebra in real workloads.
+        Evaluation-oriented patterns showing delta-state algebra in simplified workloads.
       </p>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">

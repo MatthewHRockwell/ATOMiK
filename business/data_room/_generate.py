@@ -1,4 +1,9 @@
-"""Data room generator — reads config and project data to populate all documents."""
+"""Data room generator — reads config and project data to populate documents.
+
+PUBLICATION STATUS: INTERNAL DATA ROOM GENERATOR / REVIEW REQUIRED.
+Generated material may contain historical projections or technical claims. Do
+not publish generated output without evidence-label and counsel review.
+"""
 
 from __future__ import annotations
 

@@ -1,5 +1,9 @@
 # ATOMiK ROI Pathways
 
+> **Publication status: LEGACY SCORE PACKAGE / NOT CURRENT PUBLIC COPY.**
+> Revenue, ROI, pricing, and production-readiness claims here are historical
+> planning material and require counsel/evidence review before external use.
+
 *Revenue model, unit economics, and market sizing for ATOMiK delta-state computing.*
 
 ---

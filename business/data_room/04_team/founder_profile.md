@@ -1,5 +1,9 @@
 # Founder Profile
 
+> **Publication status: INTERNAL DATA ROOM / NOT PUBLIC CLAIM COPY.**
+> Founder and achievement language here must be reconciled with current proof
+> artifacts before reuse in public materials.
+
 *Generated: 2026-02-03*
 
 ## Matthew H Rockwell

@@ -4,6 +4,12 @@ ATOMiK Cosmos Cookoff Demo Video Generator
 
 Renders a presentation-style demo video using Pillow + ffmpeg.
 Output: 1920x1080 @ 30fps, H.264, ~2:45 duration
+
+PUBLICATION STATUS: ARCHIVED GENERATOR / DO NOT USE FOR CURRENT PUBLIC CLAIMS.
+This script still contains old overlay language for an archived submission.
+Before rendering or publishing, update every performance, timing, power,
+security, physical-AI, and memory-reduction claim against the current evidence
+labels and results/claims_registry.yaml.
 """
 
 import os

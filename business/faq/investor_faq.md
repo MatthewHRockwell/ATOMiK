@@ -1,5 +1,9 @@
 # ATOMiK — Investor FAQ
 
+> **Publication status: LEGACY INVESTOR FAQ / REVIEW REQUIRED.**
+> Use `business/faq/public_gtm_faq.md` for current external answers. Claims in
+> this file must be evidence-labeled or rewritten before use.
+
 ## Technology
 
 ### "How is this different from event sourcing?"

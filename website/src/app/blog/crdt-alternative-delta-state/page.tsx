@@ -6,7 +6,7 @@ import EmailCapture from "@/components/EmailCapture";
 export const metadata: Metadata = {
   title: "CRDT Alternative: Delta-State Algebra — ATOMiK Blog",
   description:
-    "CRDTs are powerful but complex. Delta-state algebra solves the same convergence problem with one operation, zero metadata, and 108 machine-checked proofs. Side-by-side comparison with code.",
+    "CRDTs are powerful but complex. Delta-state algebra offers a different modeled convergence path with one core operation and 108 machine-checked algebra proofs.",
   keywords: [
     "CRDT alternative",
     "simpler than CRDTs",
@@ -21,7 +21,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "CRDT Alternative: Delta-State Algebra",
     description:
-      "CRDTs require type-specific merge functions, unbounded metadata, and garbage collection. Delta-state algebra converges with one XOR. Here's the comparison.",
+      "CRDTs require type-specific merge functions, metadata, and garbage collection. Delta-state algebra offers a narrower XOR-based model.",
     type: "article",
     publishedTime: "2026-03-16T00:00:00Z",
   },
@@ -96,8 +96,8 @@ export default function CrdtAlternativePage() {
           <p>
             CRDTs (Conflict-free Replicated Data Types) are one of the most elegant ideas
             in distributed systems. The promise is compelling: data structures that
-            automatically converge across replicas without coordination. No consensus
-            protocol. No leader election. Just merge and converge.
+            can converge across replicas under clear assumptions. Consensus
+            protocols and leader election remain relevant outside those assumptions.
           </p>
 
           <p>
@@ -141,7 +141,8 @@ export default function CrdtAlternativePage() {
               <p className="text-sm" style={{ color: "#b0b0c0" }}>
                 Tombstones in OR-Sets, causal histories in delta-state CRDTs, and vector
                 clocks all require periodic garbage collection. This reintroduces
-                coordination — the very thing CRDTs were supposed to eliminate.
+                coordination, which is one of the operational costs CRDT users may be
+                trying to reduce.
               </p>
             </div>
             <div>
@@ -392,8 +393,9 @@ ctx.accum(0x02)  # Undo node B
           </div>
 
           <p>
-            At 1,000 nodes, the CRDT approach consumes 1,000x more network bandwidth for
-            the same convergence guarantee. The gap only widens with scale.
+            At 1,000 nodes, the illustrative CRDT approach can consume more network
+            bandwidth for a comparable modeled convergence path. Quote production
+            reduction only with a measured workload artifact.
           </p>
 
           {/* When to use CRDTs */}
@@ -446,8 +448,8 @@ ctx.accum(0x02)  # Undo node B
             </li>
             <li>
               <strong>Metadata overhead matters.</strong> Edge devices, IoT sensors,
-              mobile apps, satellite links. 8 bytes vs O(n) bytes per node is the
-              difference between feasible and infeasible on constrained hardware.
+              mobile apps, satellite links. Compare fixed-width delta artifacts against
+              measured CRDT payloads before making constrained-hardware claims.
             </li>
             <li>
               <strong>You need undo.</strong> Self-inverse means re-applying a delta

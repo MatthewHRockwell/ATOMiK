@@ -1,5 +1,9 @@
 # ATOMiK Cosmos Cookoff Demo Video Script
 
+> **Publication status: ARCHIVED SUBMISSION SCRIPT / DO NOT RECORD AS CURRENT COPY.**
+> This script contains old performance, timing, and physical-AI claims. Replace
+> them with evidence-labeled current copy before any public use.
+
 **Target length:** 2:30 - 2:50 (under 3 min limit)
 **Format:** Screen recording + FPGA board camera + voice narration
 

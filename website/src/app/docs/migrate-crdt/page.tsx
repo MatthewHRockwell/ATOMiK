@@ -52,13 +52,13 @@ const conceptMap = [
   },
   {
     crdt: "Causality metadata",
-    atomik: "Not needed",
-    notes: "Vector clocks, version vectors, dot stores -- ATOMiK needs none. Commutativity + associativity + idempotency from self-inverse.",
+    atomik: "Model-dependent",
+    notes: "Vector clocks, version vectors, and dot stores may not be needed inside a fit XOR model. Protocol-level causality remains workload-specific.",
   },
   {
     crdt: "Conflict resolution",
     atomik: "Algebraic convergence",
-    notes: "CRDTs resolve via lattice join (LWW, OR-Set, etc). ATOMiK converges via Abelian group -- no conflicts possible.",
+    notes: "CRDTs resolve via lattice join (LWW, OR-Set, etc). ATOMiK converges via Abelian-group algebra when the state model fits; application conflicts may still need product-specific handling.",
   },
   {
     crdt: "query()",
@@ -236,7 +236,7 @@ export default function MigrateCrdtPage() {
       <h2 className="text-2xl font-bold mb-4">Conceptual Mapping</h2>
       <p className="text-sm mb-6" style={{ color: "#8888a0" }}>
         CRDTs use a join-semilattice. ATOMiK uses an Abelian group. The algebraic
-        structure is different, but the convergence guarantee is the same -- any
+        structure is different, but the modeled convergence property is related -- any
         permutation of operations produces the same final state.
       </p>
       <div
@@ -406,7 +406,7 @@ export default function MigrateCrdtPage() {
       <h2 className="text-2xl font-bold mb-4">Pattern 2: LWW-Register</h2>
       <p className="text-sm mb-6" style={{ color: "#8888a0" }}>
         Last-Writer-Wins registers require synchronized clocks or hybrid logical clocks.
-        ATOMiK eliminates the timestamp dependency entirely -- convergence is algebraic, not temporal.
+        ATOMiK can remove timestamp dependency in the modeled register path -- convergence is algebraic, not temporal.
       </p>
       <div className="grid md:grid-cols-2 gap-4 mb-12">
         <div>
@@ -701,7 +701,7 @@ export default function MigrateCrdtPage() {
           and idempotent, but not invertible. State can only grow. ATOMiK forms an{" "}
           <strong>Abelian group</strong>: merge (XOR) is commutative, associative, has an
           identity element, and every element is its own inverse. This gives you free undo,
-          constant-size state, and zero metadata overhead -- at the cost of lattice
+          constant-size state and lower metadata pressure -- at the cost of lattice
           monotonicity. If your application needs monotonic convergence (e.g., grow-only sets),
           CRDTs remain the right choice.
         </p>

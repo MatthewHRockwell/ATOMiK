@@ -28,11 +28,21 @@ public-ready collateral:
 - `cosmos-cookoff/`
 - `launch_posts.md`
 - `marketing_posts_v2.md`
+- `software_licensing_strategy.md`
 - `emergency_funding.md`
+- `faq/investor_faq.md`
+- `comparisons/`
+- `funding_strategy/`
 - `vc_diligence_response_*.md`
+- `meeting_prep_*.md`
 - `pitch_deck/investor_deck_full.md`
+- `pitch_deck/generate_deck.py`
 - `pitch_deck/update_deck*.py`
 - generated PDFs, PPTX files, and ZIP packages
+
+Many legacy files now carry an inline `Publication status` banner. If a file
+does not yet have one, this note still applies: it is not current public claim
+copy unless listed in the public-safe section above.
 
 Before sharing any review-required material externally:
 

@@ -1,5 +1,10 @@
 # ATOMiK Investor Pitch Deck
 
+> **Publication status: LEGACY FULL DECK / NOT CURRENT INVESTOR SEND.**
+> This deck contains older performance, market, customer, production, ASIC, and
+> fundraising claims. Use the current one-pager, design-partner memo, evidence
+> labels, and claims registry as the source of truth before sending materials.
+
 **Delta-State Computing in Silicon**
 
 *Confidential — For Investor Use Only*

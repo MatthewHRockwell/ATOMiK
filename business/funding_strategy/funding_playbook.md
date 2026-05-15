@@ -1,5 +1,9 @@
 # ATOMiK Funding Playbook
 
+> **Publication status: INTERNAL FUNDING PLAYBOOK / NOT PUBLIC CLAIM COPY.**
+> Program strategy may be useful, but technical and market claims must be
+> rewritten against current evidence labels before reuse.
+
 **Prioritized by least dilution first, cross-ranked by relevance to ATOMiK's technology space.**
 
 ---

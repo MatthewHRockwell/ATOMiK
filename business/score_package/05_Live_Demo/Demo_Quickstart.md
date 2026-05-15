@@ -1,5 +1,9 @@
 # ATOMiK Demo Quickstart
 
+> **Publication status: LEGACY DEMO GUIDE / NOT CURRENT PUBLIC CLAIM COPY.**
+> Use only as historical demo context. Current public proof should come from
+> evidence-labeled artifacts and the live ATOMiK Desk screenshot.
+
 *Step-by-step instructions to run the ATOMiK demo in simulation mode. No hardware required.*
 
 ---

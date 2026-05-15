@@ -341,8 +341,8 @@ export default function ASICRoadmapPage() {
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
           <MetricCard label="Lean 4 Proofs" value="108" sub="Theorems verified" color={green} />
           <MetricCard label="Peak FPGA" value="Synthesis" sub="Zynq XC7Z020, N=512" color={accent} />
-          <MetricCard label="Single Core" value="444 MHz" sub="302 LUT, 446 Mops/s" color={accent2} />
-          <MetricCard label="ASIC Target" value=">1 Tops/s" sub=">1 GHz, ~25K gates" color={gold} />
+          <MetricCard label="Single Core" value="Synthesis" sub="See evidence labels" color={accent2} />
+          <MetricCard label="ASIC Target" value="Projected" sub="Roadmap, not measured" color={gold} />
         </div>
       </section>
 

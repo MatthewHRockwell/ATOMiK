@@ -1,5 +1,9 @@
 # XOR Is Data-Type Agnostic — How ATOMiK Works on Any Fixed-Width Data
 
+> **Publication status: INTERNAL DATA ROOM / EVIDENCE REVIEW REQUIRED.**
+> Use for technical context only. Public claims must be evidence-labeled and
+> scoped to the validated artifact or model.
+
 *Prepared for due diligence — March 2026*
 
 ---

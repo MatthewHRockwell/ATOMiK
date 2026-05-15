@@ -1,5 +1,10 @@
 # ATOMiK Go-To-Market Strategy
 
+> **Publication status: LEGACY BUSINESS MODEL DRAFT / NOT CURRENT PUBLIC COPY.**
+> Customer, revenue, pilot, partnership, and market-size language here is planning
+> material. Do not present it as traction or commercial proof without current
+> artifact-backed evidence and founder approval.
+
 *Phased commercialization plan for delta-state computing IP.*
 
 ---

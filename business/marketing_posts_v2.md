@@ -1,5 +1,10 @@
 # ATOMiK Marketing Posts — March 2026
 
+> **Publication status: ARCHIVED DRAFT POSTS / DO NOT PUBLISH UNEDITED.**
+> These posts contain older metric and savings language. Before posting, replace
+> claims with evidence-labeled copy tied to measured artifacts or label them as
+> projected/conceptual.
+
 ## LinkedIn (Enterprise + Senior Engineers)
 
 **Your infrastructure is wasting 23% of every copy-on-write operation. We can prove it.**

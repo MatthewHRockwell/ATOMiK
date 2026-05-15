@@ -1,5 +1,9 @@
 # {{ company.name }} — SBIR Phase I Proposal
 
+> **Publication status: TEMPLATE / COUNSEL AND EVIDENCE REVIEW REQUIRED.**
+> This generator input may include projected claims. Validate technical,
+> financial, and compliance language before submission.
+
 **Program:** {{ program_id | upper | replace("_", " ") }}
 
 ---

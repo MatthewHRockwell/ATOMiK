@@ -5,7 +5,7 @@ import Nav from "@/components/Nav";
 export const metadata: Metadata = {
   title: "Announcing ATOMiK v0.4.0: Per-Container Waste Tracking — ATOMiK Blog",
   description:
-    "The ATOMiK kernel module now detects redundant COW copies, deduplicates network sends, and attributes waste per Kubernetes container.",
+    "Archived release note for an ATOMiK kernel-module prototype exploring redundant COW-copy detection, network-send analysis, and Kubernetes container attribution.",
 };
 
 function Code({ children }: { children: string }) {

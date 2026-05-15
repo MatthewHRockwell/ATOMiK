@@ -1,5 +1,10 @@
 # ATOMiK Industry Application Guide
 
+> **Publication status: LEGACY SCORE PACKAGE / NOT CURRENT PUBLIC COPY.**
+> Industry claims in this guide are exploratory positioning, not validated
+> customer results. Performance, power, compliance, security, and cost statements
+> need evidence labels and artifact links before reuse.
+
 *How delta-state computing creates value across 15+ market verticals.*
 
 ---

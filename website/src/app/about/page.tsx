@@ -31,7 +31,7 @@ const timelineItems = [
     year: "2025",
     title: "FPGA v1 -- PicoRV32 + ATOMiK",
     description:
-      "First silicon proof: ATOMiK core integrated with PicoRV32 RISC-V on a $13.50 Tang Nano 9K. Single-bank at 81 MHz, 94.5 Mops/s.",
+      "First silicon proof: ATOMiK core integrated with PicoRV32 RISC-V on a Tang Nano 9K. Repeat clock and throughput figures only from the linked hardware-validation artifacts.",
     color: "text-green-400",
     border: "border-green-500/40",
     bg: "bg-green-500/5",

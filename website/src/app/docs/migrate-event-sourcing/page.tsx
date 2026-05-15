@@ -156,8 +156,8 @@ export default function MigrateEventSourcingPage() {
       </h1>
       <p className="text-lg mb-6" style={{ color: "#8888a0" }}>
         Event sourcing gives you a complete history. ATOMiK gives you instant current
-        state. This guide shows how to replace event replay with O(1) state
-        reconstruction, eliminate snapshots, and simplify undo -- and when to keep
+        state. This guide shows how to evaluate replacing event replay with O(1) state
+        reconstruction, reduce snapshot pressure, and simplify undo -- and when to keep
         your event log.
       </p>
 
@@ -189,7 +189,7 @@ export default function MigrateEventSourcingPage() {
       {/* Concept mapping table */}
       <h2 className="text-2xl font-bold mb-4">Event Sourcing to ATOMiK Mapping</h2>
       <p className="text-sm mb-6" style={{ color: "#8888a0" }}>
-        Each event sourcing concept has a direct (or eliminated) counterpart in ATOMiK.
+        Some event sourcing concepts have accumulator-model counterparts in ATOMiK.
       </p>
       <div
         className="rounded-xl border overflow-x-auto mb-12"
@@ -480,7 +480,7 @@ export default function MigrateEventSourcingPage() {
                 {"\n"}
                 <span style={{ color: cmtColor }}>{"    "}# Works for every delta type.</span>
                 {"\n\n"}
-                <span style={{ color: cmtColor }}># Mathematical guarantee:</span>
+                <span style={{ color: cmtColor }}># Algebraic property:</span>
                 {"\n"}
                 <span style={{ color: cmtColor }}># a XOR a = 0 (proven in Lean4)</span>
               </code>

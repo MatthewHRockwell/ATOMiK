@@ -1,5 +1,9 @@
 # Pitch Video Script (1-2 minutes)
 
+> **Publication status: LEGACY FUNDING TEMPLATE / DO NOT RECORD UNEDITED.**
+> Replace historical metrics with current evidence-labeled proof and keep
+> v0.38-H claims pending until a screenshot or recorded artifact is available.
+
 ## Hook (10s)
 
 One billion operations per second. Ten dollar chip. Two hundred and

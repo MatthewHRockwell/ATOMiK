@@ -1,5 +1,9 @@
 # Demo Video Script (2-3 minutes)
 
+> **Publication status: LEGACY FUNDING TEMPLATE / DO NOT RECORD UNEDITED.**
+> Rewrite benchmark and live-demo language against current artifacts before
+> using this script externally.
+
 ## Opening (15s)
 
 Hi, I'm Matthew Rockwell, founder of ATOMiK. I'm going to show you

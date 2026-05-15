@@ -1,5 +1,9 @@
 # Meeting Prep: Chris Bolt — Thursday
 
+> **Publication status: INTERNAL MEETING PREP / NOT PUBLIC CLAIM COPY.**
+> Treat demo, funding, and metric language here as private prep notes until
+> each claim is checked against current artifacts and evidence labels.
+
 **Context:** Chris reviewed the pitch deck and shared it with investor partners. He wants to discuss potentially funding the entire $3M–$4M seed round. A demo board is being shipped.
 
 ---

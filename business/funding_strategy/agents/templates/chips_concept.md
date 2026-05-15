@@ -1,5 +1,9 @@
 # CHIPS Act R&D BAA — Concept Plan
 
+> **Publication status: TEMPLATE / COUNSEL AND EVIDENCE REVIEW REQUIRED.**
+> Treat energy, performance, and market statements as proposal draft language
+> until backed by artifacts and reviewed for submission.
+
 **Submitted by:** {{ company.legal_name or company.name }}
 **Contact:** {{ founder.name or "TBD" }}, {{ founder.title }} — {{ founder.email or "TBD" }}
 **UEI:** {{ company.uei or "Pending SAM.gov registration" }}

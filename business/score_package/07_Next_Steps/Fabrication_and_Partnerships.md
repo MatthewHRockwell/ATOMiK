@@ -1,5 +1,9 @@
 # Fabrication Roadmap & Partnership Framework
 
+> **Publication status: LEGACY ROADMAP DRAFT / REVIEW REQUIRED.**
+> Treat fabrication, throughput, cost, and production-silicon language as
+> planning material unless backed by current evidence labels.
+
 *From $13.50 prototype to production silicon — ATOMiK's hardware path forward.*
 
 ---

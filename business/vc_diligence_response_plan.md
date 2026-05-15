@@ -1,5 +1,10 @@
 # VC Due Diligence Response Plan — Chris Bolt
 
+> **Publication status: INTERNAL DILIGENCE PREP / NOT PUBLIC CLAIM COPY.**
+> This plan mixes evidence, assumptions, and suggested responses. Verify every
+> numeric, customer, production, power, ASIC, and performance statement against
+> `results/claims_registry.yaml` before sending.
+
 **Date:** March 11, 2026
 **Context:** Chris Bolt raised 5 specific concerns after reviewing the pitch deck and sharing with partners. This plan addresses each concern with existing evidence AND concrete work items to close remaining gaps before Thursday's meeting and beyond.
 

@@ -1,5 +1,9 @@
 # ATOMiK Memory Traffic Reduction — Honest Range
 
+> **Publication status: INTERNAL DATA ROOM / EVIDENCE REVIEW REQUIRED.**
+> Figures here are historical due-diligence material. Do not quote externally
+> unless the raw artifacts, methodology, and evidence label are attached.
+
 *Prepared for due diligence — March 2026*
 
 ---

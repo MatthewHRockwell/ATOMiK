@@ -4,5 +4,5 @@ export const alt = "ATOMiK Blog";
 export const size = ogSize;
 export const contentType = "image/png";
 export default function OG() {
-  return generateOGImage({ title: "ATOMiK vs Event Sourcing", subtitle: "O(1) reconstruction vs O(n) replay. 8 bytes vs unbounded logs.", accent: "#22c55e", badge: "Comparison" });
+  return generateOGImage({ title: "ATOMiK vs Event Sourcing", subtitle: "Conceptual comparison of accumulator models and append-only logs.", accent: "#22c55e", badge: "Comparison" });
 }

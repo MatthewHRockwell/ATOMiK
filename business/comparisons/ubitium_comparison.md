@@ -1,5 +1,9 @@
 # ATOMiK vs. Ubitium — Competitive Positioning
 
+> **Publication status: INTERNAL COMPETITIVE MEMO / REVIEW REQUIRED.**
+> Third-party claims and ATOMiK performance statements require current source
+> checks and evidence labels before external use.
+
 ## Overview
 
 **Ubitium** is a "universal processor" startup attempting to unify CPU, GPU, FPGA, and DSP into a single reconfigurable architecture. They claim one chip to replace all specialized hardware.

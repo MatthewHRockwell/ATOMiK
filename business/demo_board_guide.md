@@ -1,5 +1,11 @@
 # ATOMiK Demo Board Guide
 
+> **Publication status: LEGACY DEMO SCRIPT / NOT CURRENT PUBLIC CLAIM COPY.**
+> This guide predates the current public evidence framework. Treat visible
+> metrics, timing/security language, power/savings statements, and investor
+> talk tracks as draft material until reconciled with measured artifacts and
+> `results/claims_registry.yaml`.
+
 **For Investors and Technical Evaluators**
 
 ---

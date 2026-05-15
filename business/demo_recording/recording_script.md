@@ -1,5 +1,11 @@
 # ATOMiK Demo Recording Script
 
+> **Publication status: LEGACY RECORDING SCRIPT / DO NOT PUBLISH AS CURRENT CLAIM COPY.**
+> This script contains aspirational narration and old metric language. Before
+> recording or publishing, replace every performance, power, security, customer,
+> and production statement with evidence-labeled copy from the current docs and
+> claims registry.
+
 ## Overview
 
 **Duration targets:**

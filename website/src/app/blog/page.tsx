@@ -14,7 +14,7 @@ const posts = [
     title: "What is Delta-State Computing? The Definitive Guide",
     date: "March 14, 2026",
     excerpt:
-      "The authoritative guide to delta-state architecture. Mathematical foundations, comparisons with CRDTs, event sourcing, OT, and Raft — and why reconstructed state outperforms stored state.",
+      "An archived guide to delta-state architecture: mathematical foundations, comparisons with CRDTs, event sourcing, OT, and Raft, and where reconstruction may help.",
     tags: ["delta-state", "architecture", "pillar"],
   },
   {
@@ -22,7 +22,7 @@ const posts = [
     title: "CRDT Alternative: Delta-State Algebra",
     date: "March 12, 2026",
     excerpt:
-      "CRDTs are powerful but complex. Delta-state algebra solves the same convergence problem with one operation, zero metadata, and 108 machine-checked proofs. Side-by-side comparison with code.",
+      "CRDTs are powerful but complex. Delta-state algebra offers a different modeled convergence path with one core operation and 108 machine-checked algebra proofs.",
     tags: ["CRDTs", "comparison", "pillar"],
   },
   {
@@ -38,7 +38,7 @@ const posts = [
     title: "Build a Distributed Cache in 50 Lines of Python",
     date: "March 7, 2026",
     excerpt:
-      "Step-by-step tutorial: 3-node distributed cache with automatic convergence. No consensus protocol, no leader election, no conflict resolution — just XOR.",
+      "Step-by-step tutorial: a 3-node cache model using XOR deltas. Treat it as an educational pattern, not a production distributed-systems guarantee.",
     tags: ["tutorial", "python", "distributed-systems"],
   },
   {
@@ -46,7 +46,7 @@ const posts = [
     title: "ATOMiK vs Event Sourcing: When XOR Beats Append-Only Logs",
     date: "March 4, 2026",
     excerpt:
-      "A quantitative comparison of delta-state algebra vs event sourcing. O(1) reconstruction vs O(n) replay, 8 bytes vs unbounded logs, and when each approach wins.",
+      "A conceptual comparison of delta-state algebra and event sourcing: where an accumulator model may help, and where append-only logs remain the right tool.",
     tags: ["architecture", "comparison", "event-sourcing"],
   },
   {
@@ -62,7 +62,7 @@ const posts = [
     title: "Announcing ATOMiK v0.4.0: Per-Container Waste Tracking for Kubernetes",
     date: "February 21, 2026",
     excerpt:
-      "The ATOMiK kernel module now detects redundant COW copies, deduplicates network sends, and attributes waste per container — all at kernel speed.",
+      "Archived release note for a kernel-module prototype exploring redundant COW-copy detection, network-send analysis, and per-container attribution.",
     tags: ["release", "kernel", "kubernetes"],
   },
 ];

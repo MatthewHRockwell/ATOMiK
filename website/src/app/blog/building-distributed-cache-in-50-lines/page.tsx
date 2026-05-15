@@ -6,7 +6,7 @@ import EmailCapture from "@/components/EmailCapture";
 export const metadata: Metadata = {
   title: "Build a Distributed Cache in 50 Lines of Python — ATOMiK Blog",
   description:
-    "A step-by-step tutorial: build a 3-node distributed cache with automatic convergence using ATOMiK's delta-state algebra. No consensus protocol, no leader election.",
+    "A step-by-step tutorial for a 3-node distributed-cache model using ATOMiK delta-state algebra. Educational pattern, not a production distributed-systems guarantee.",
 };
 
 function Code({ children }: { children: string }) {
@@ -155,11 +155,11 @@ stream.accum(msg.addr, msg.delta)`}</Code>
 
           <h2 className="text-2xl font-bold pt-4" style={{ color: "#e0e0e8" }}>What you get</h2>
           <ul className="list-disc pl-6 space-y-2">
-            <li><strong>Zero coordination.</strong> No leader election, no consensus rounds, no distributed locks.</li>
-            <li><strong>8 bytes per update.</strong> Regardless of the value size, the delta is always 8 bytes.</li>
-            <li><strong>O(1) everything.</strong> Write, read, and sync are all constant-time.</li>
-            <li><strong>Automatic convergence.</strong> All nodes reach the same state regardless of message ordering.</li>
-            <li><strong>Proven correct.</strong> 108 Lean4 theorems guarantee the algebra works.</li>
+            <li><strong>Modeled coordination reduction.</strong> The example avoids leader election inside the toy XOR state path.</li>
+            <li><strong>8-byte delta artifact.</strong> The tutorial uses a fixed-width delta representation for its model.</li>
+            <li><strong>O(1) model operations.</strong> The accumulator path is constant-time in this simplified example.</li>
+            <li><strong>Modeled convergence.</strong> Nodes reach the same state when the assumptions of the tutorial hold.</li>
+            <li><strong>Proof-scoped.</strong> 108 Lean4 theorems verify the algebraic properties used by the model.</li>
           </ul>
 
           <div className="rounded-xl border p-8 mt-8" style={{ background: "#12121a", borderColor: "#1e1e2e" }}>

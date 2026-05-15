@@ -120,8 +120,9 @@ export default function FPGABlogPost() {
           </p>
           <p>
             The practical consequence: deltas can arrive in any order, from any number of
-            producers, and the result is identical. No locks. No consensus protocol.
-            No ordering constraints. The accumulator is a shared resource by design.
+            producers, and the modeled result is identical. Production locks, consensus,
+            and ordering constraints remain workload-specific. The accumulator is a
+            shared resource by design.
           </p>
 
           <h2 className="text-2xl font-bold pt-4" style={{ color: "#e0e0e8" }}>
@@ -153,8 +154,8 @@ uint32_t state = *(volatile uint32_t*)ATOMIK_READ;
             Result: a single-bank ATOMiK synthesis row at the target demo clock.
             Use the hardware proof map before repeating performance figures.
             The entire SoC fits in 44% of the GW1NR-9K. 11/11 hardware tests pass.
-            The core has +23% Fmax margin — it could run faster, but we&apos;re limited by
-            the PicoRV32&apos;s bus timing.
+            The core had +23% Fmax margin in that artifact; avoid projecting speed from it
+            without a linked timing report.
           </p>
 
           <h2 className="text-2xl font-bold pt-4" style={{ color: "#e0e0e8" }}>
@@ -289,8 +290,8 @@ uint32_t state = *(volatile uint32_t*)ATOMIK_READ;
             </li>
             <li>
               <strong>Custom instructions matter.</strong> Going from MMIO (v1) to
-              native ISA (v3) eliminated all bus overhead. ATOMiK ops execute at the
-              same cost as ALU operations.
+              native ISA (v3) reduced bus overhead in the prototype path. Per-operation
+              cost claims should stay tied to the corresponding artifact.
             </li>
             <li>
               <strong>The ceiling is the fabric, not the design.</strong> At N=512,

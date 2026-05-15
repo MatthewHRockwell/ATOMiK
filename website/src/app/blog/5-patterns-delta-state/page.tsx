@@ -46,13 +46,14 @@ export default function PatternsPost() {
 
         <p className="text-base leading-relaxed mb-8" style={{ color: "#c8c8d4" }}>
           ATOMiK gives you four operations. What you build with them depends on how you
-          compose them. Here are five patterns we&apos;ve seen work well in production systems.
+          compose them. Here are five patterns for evaluation and prototype design.
         </p>
 
         <Pattern num={1} title="Accumulator Fan-In">
           <p>
             Multiple producers write deltas to the same context from different threads,
-            processes, or machines. Because XOR is commutative, no coordination is needed.
+            processes, or machines. Because XOR is commutative, coordination can be
+            reduced inside a fit accumulator model.
           </p>
           <Code>{`from atomik_core import AtomikContext
 import threading

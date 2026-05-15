@@ -1,5 +1,10 @@
 # ATOMiK Software Licensing Strategy
 
+> **Publication status: LEGACY MONETIZATION DRAFT / NOT CURRENT PUBLIC OFFER.**
+> Do not publish pricing, benchmark, customer, or production-license language from
+> this file without review against `../results/claims_registry.yaml` and the
+> current request-based evaluation positioning.
+
 *Revenue generation through pure-software delta-state libraries — no FPGA required.*
 
 ---

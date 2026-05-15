@@ -1,5 +1,10 @@
 # ATOMiK: Hardware-Verified State Reasoning for Physical AI
 
+> **Publication status: ARCHIVED SUBMISSION DRAFT / NOT CURRENT PUBLIC COPY.**
+> Physical-AI, performance, timing-side-channel, and memory-reduction statements
+> in this file require current artifact links and evidence labels before reuse.
+> Do not present this document as current product proof.
+
 ## What It Does
 
 ATOMiK is a hardware-accelerated state reasoning engine that provides mathematically-proven change detection for physical AI systems. Running on a $13.50 FPGA, it tracks state transitions using delta-state algebra (XOR-based Abelian group operations) with deterministic, constant-time verification — no cache timing side channels, no speculative execution vulnerabilities.
