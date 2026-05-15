@@ -83,7 +83,7 @@ With N > 1 banks, each bank has its own accumulator. This enables:
 The multi-bank architecture has been validated in synthesis on Zynq:
 - N=1: 302 LUT, 444 MHz
 - N=16: 941 LUT, 267 MHz
-- N=512: 23,542 LUT, 136 MHz (69.7 Gops/s)
+- N=512: 23,542 LUT, 136 MHz (`SYNTHESIS_VALIDATED`; see `docs/HARDWARE_SYNTHESIS.md`)
 
 Hardware validation of multi-bank parallel operation: 80/80 PASS on Tang Nano 9K.
 
