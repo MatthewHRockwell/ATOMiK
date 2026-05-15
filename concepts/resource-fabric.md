@@ -32,5 +32,5 @@ Resource Fabric is relevant when a workload has:
 
 - current autonomous workload reallocation
 - exact allocation percentages
-- guaranteed performance improvement
+- unqualified performance improvement
 - production deployment
