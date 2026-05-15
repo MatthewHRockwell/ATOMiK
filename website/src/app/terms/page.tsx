@@ -92,7 +92,7 @@ export default function TermsPage() {
                 permitted by your license tier.
               </li>
               <li>
-                Open-source components included in the Community tier are governed by their
+                Open-source components in the public repository are governed by their
                 respective open-source licenses.
               </li>
             </ul>
@@ -107,7 +107,7 @@ export default function TermsPage() {
               </li>
               <li>Interfere with or disrupt the Services or their infrastructure.</li>
               <li>
-                Use paid-tier features (Pro, Team, or Enterprise) without an active subscription.
+                Use restricted evaluation, SDK, IP, or licensing features without written authorization.
               </li>
             </ul>
           </Section>
@@ -145,8 +145,9 @@ export default function TermsPage() {
                 notice depending on the severity of the violation.
               </li>
               <li>
-                Upon termination, your license to use paid features ends immediately. You retain
-                the right to use Community-tier features under the applicable open-source license.
+                Upon termination, your license to use restricted evaluation, SDK, IP, or licensing
+                features ends immediately. You retain rights granted by applicable open-source
+                licenses for public repository components.
               </li>
               <li>
                 Sections 4, 6, 7, and 9 survive termination.

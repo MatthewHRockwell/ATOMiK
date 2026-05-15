@@ -34,12 +34,12 @@ const releases: Release[] = [
     date: "2026-04-28",
     category: "hardware",
     items: [
-      "15+ interactive demo screens with attract mode, State Storm, Break It challenge, Dollar-Per-Second Race",
-      "90-second scripted investor demo with Claude auto-narration (demo_claude_drive.py)",
-      "Freeze Frame closing with three proof cards: 456x benchmark, hardware validation, formal verification",
-      "State Storm visualization: software drowns in O(n) scans while ATOMiK stays sparse at O(1)",
-      "Dollar-Per-Second Race: real-time cost counters at 100K acceleration, ATOMiK vs traditional",
-      "Two-tier Claude integration: laptop-side operator + board-side command executor (13/13 commands pass)",
+      "Interactive demo surfaces for investor and technical review",
+      "Scripted demo narration and operator tooling",
+      "Freeze Frame closing with evidence-labeled proof cards",
+      "State Storm visualization framed as demo material, not a benchmark result",
+      "Cost-counter visualization retained as modeled scenario material",
+      "Laptop-side operator and board-side command-executor integration",
       "Slide sync (slide_sync.py + slide_advance.sh) for PowerPoint presentation coordination",
       "Framebuffer screenshot capture (board_selfie.py) for proof artifacts",
       "Browser control plane with live metrics streaming",
@@ -52,10 +52,10 @@ const releases: Release[] = [
     category: "hardware",
     items: [
       "End-to-end workload: track N memory regions, detect changes via ATOMiK vs memcmp",
-      "ATOMiK detection: O(1) per region (~262 cycles), independent of buffer size",
-      "Software memcmp: O(N \u00d7 size), degrades above 4 KB D-cache boundary",
-      "8\u00d74 KB regions: 5,983\u00d7 speedup | 64\u00d71 KB regions: 251\u00d7 speedup",
-      "ATOMiK monitoring rate: 1.2 million regions/sec at 64 contexts",
+      "Raw board-run output is kept separate from interpretation notes",
+      "Performance language requires the linked artifact and caveats",
+      "SYNC and repeat-run limitations are documented in the interpretation file",
+      "Use exact numbers only from the raw artifact package",
       "libatomik C runtime with /dev/mem backend and MMIO ordering fences",
     ],
   },
@@ -65,26 +65,24 @@ const releases: Release[] = [
     date: "2026-04-06",
     category: "hardware",
     items: [
-      "ATOMiK 16/16 PASS from Linux 6.9 userspace (S-mode, MMU enabled, /dev/mem mmap)",
-      "Full stack validated: user process \u2192 kernel \u2192 Wishbone CSR \u2192 ATOMiK core",
-      "Linux 6.9 + OpenSBI 1.3.1 booting on VexRiscv SMP (Zynq XC7Z020)",
+      "Linux userspace to FPGA accelerator validation path recorded",
+      "User process, kernel, Wishbone CSR, and ATOMiK core path documented",
+      "Linux and OpenSBI environment details remain in the source artifact",
       "MMIO ordering: fence iorw,iorw + STATUS readback required for Wishbone CSR correctness",
-      "Frozen baseline with SHA-256 manifest (tag: zynq-linux-v1)",
+      "Frozen baseline and manifest are referenced in the technical proof docs",
     ],
   },
   {
     version: "v0.5.0",
-    title: "Kernel Module — Enterprise Features",
+    title: "Kernel Module - Historical Release Notes",
     date: "2026-03-16",
     category: "tools",
     items: [
-      "/proc/atomik/audit ring-buffer audit log (last 1024 operations)",
-      "perf/ftrace tracepoints wired to all 4 ioctl handlers",
+      "Audit-log, perf/ftrace, and ioctl instrumentation work",
       "Memory shrinkers for COW and network hash tables",
       "atomik-report waste analysis tool (--json/--csv/--brief)",
-      "Prometheus exporter with health endpoints (/healthz, /ready)",
-      "Grafana dashboard (3-row pre-built JSON)",
-      "Kubernetes: DaemonSet, Helm chart with RBAC + NetworkPolicy + probes",
+      "Prometheus and Grafana materials retained as historical tooling notes",
+      "Kubernetes materials retained as historical deployment notes",
       "License key expiry (YYMM encoding) for subscription enforcement",
     ],
   },
@@ -100,7 +98,7 @@ const releases: Release[] = [
       "DeviceContext: Python bindings for /dev/atomik kernel module ioctls",
       "SyncTable + MemoryTransport + CallbackTransport (full transport layer)",
       "C accelerator wired into Fingerprint hot path",
-      "200+ tests passing",
+      "Test coverage retained in the source repository",
       "pip install atomik-core==0.4.0",
     ],
   },
@@ -114,7 +112,7 @@ const releases: Release[] = [
       "Fingerprint encapsulation fix: no more direct _accumulator access",
       "Benchmark --json flag for CI pipeline integration",
       "All bench_* functions return structured result dicts",
-      "67 tests passing (up from 60)",
+      "Test coverage retained in the source repository",
       "pip install atomik-core==0.3.0",
     ],
   },
@@ -141,9 +139,9 @@ const releases: Release[] = [
     category: "software",
     items: [
       "Benchmark module: python -m atomik_core.benchmark",
-      "5 public benchmark functions exported",
+      "Benchmark helper functions exported",
       "Project URLs on PyPI (atomik.tech, docs, changelog)",
-      "60 tests passing, zero dependencies",
+      "Test coverage retained in the source repository",
       "pip install atomik-core==0.2.0",
     ],
   },
@@ -154,11 +152,11 @@ const releases: Release[] = [
     category: "software",
     items: [
       "AtomikContext: LOAD, ACCUM, READ, SWAP operations",
-      "AtomikTable: 256-context state table",
+      "AtomikTable state table",
       "DeltaStream: multi-context streaming with message serialization",
       "Fingerprint: XOR-based change detection",
-      "Python 3.9\u20133.13, Apache 2.0, zero dependencies",
-      "50+ tests",
+      "Python package metadata and license information",
+      "Initial test coverage retained in the source repository",
     ],
   },
   {
@@ -167,9 +165,9 @@ const releases: Release[] = [
     date: "2026-02",
     category: "hardware",
     items: [
-      "6 configs (N=1 to N=512), 4 synthesis strategies",
-      "N=512 peak synthesis configuration documented for XC7Z020",
-      "Sub-linear LUT scaling confirmed (~34 LUT per additional bank)",
+      "Multiple synthesis configurations documented",
+      "XC7Z020 scaling path retained as synthesis-validated material",
+      "Use exact synthesis numbers only from the source artifact",
     ],
   },
   {
@@ -178,10 +176,10 @@ const releases: Release[] = [
     date: "2025-12",
     category: "hardware",
     items: [
-      "1280\u00d7720@60Hz on $13.50 Tang Nano 9K",
+      "HDMI output and display pipeline prototype work",
       "Custom RV64I CPU with native ATOMiK ISA extensions",
       "Delta-driven display pipeline",
-      "6,287 LUT (73%), zero TNS",
+      "Use exact utilization/timing numbers only from the source artifact",
     ],
   },
   {
@@ -190,9 +188,9 @@ const releases: Release[] = [
     date: "2025-09",
     category: "hardware",
     items: [
-      "Single-bank ATOMiK @ 81 MHz, 94.5 Mops/s",
+      "Single-bank ATOMiK prototype integration",
       "PicoRV32 integration, SPI XIP boot",
-      "11/11 hardware tests, +23% Fmax margin",
+      "Use exact timing and test counts only from the source artifact",
     ],
   },
 ];
@@ -254,7 +252,7 @@ export default function ChangelogPage() {
             </span>
           </h1>
           <p className="text-xl leading-relaxed max-w-3xl" style={{ color: "#8888a0" }}>
-            Every release, every improvement.
+            Public release notes with evidence boundaries preserved.
           </p>
           <div className="mt-4">
             <a
@@ -441,7 +439,7 @@ export default function ChangelogPage() {
         >
           <h2 className="text-2xl font-bold mb-3">Subscribe for Release Updates</h2>
           <p className="mb-6" style={{ color: "#8888a0" }}>
-            Get notified when we ship new versions. No spam, just releases.
+            Get notified when new release notes are published. No spam, just releases.
           </p>
           <div className="max-w-md mx-auto">
             <EmailCapture />

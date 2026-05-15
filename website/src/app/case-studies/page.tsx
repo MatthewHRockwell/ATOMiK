@@ -3,9 +3,9 @@ import Link from "next/link";
 import Nav from "@/components/Nav";
 
 export const metadata: Metadata = {
-  title: "Workload Briefs - ATOMiK",
+  title: "Target Workloads - ATOMiK",
   description:
-    "Public ATOMiK workload briefs and design-partner targets. No public customer case studies are claimed without approval and artifacts.",
+    "Illustrative ATOMiK target workloads and design-partner discovery paths, not external deployments.",
 };
 
 const colors = {
@@ -20,17 +20,32 @@ const colors = {
 
 const workloads = [
   {
-    label: "WORKLOAD HYPOTHESIS",
-    title: "Edge / embedded telemetry",
+    label: "TARGET APPLICATION",
+    title: "Order book / financial state replication",
+    body: "Example workload where fast-changing state needs careful evidence boundaries, auditability, and workload-specific validation.",
+  },
+  {
+    label: "TARGET APPLICATION",
+    title: "Edge sensor delta telemetry",
     body: "Constrained systems where full payloads, repeated scans, and limited backhaul make state movement expensive.",
   },
   {
-    label: "WORKLOAD HYPOTHESIS",
-    title: "Distributed sync / replication",
+    label: "TARGET APPLICATION",
+    title: "Distributed database replica sync",
     body: "Systems that repeatedly ask what changed across nodes, logs, or replicas before applying useful work.",
   },
   {
-    label: "WORKLOAD HYPOTHESIS",
+    label: "TARGET APPLICATION",
+    title: "Agent memory / context updates",
+    body: "Agentic systems where context churn, memory updates, and relevance pruning may benefit from delta-aware evaluation.",
+  },
+  {
+    label: "TARGET APPLICATION",
+    title: "Display / UI dirty-region rendering",
+    body: "Interactive surfaces where meaningful visual changes can be tracked without treating concept art as current product proof.",
+  },
+  {
+    label: "TARGET APPLICATION",
     title: "Rollback-sensitive execution",
     body: "Runtime paths where undo, replay, checkpoints, or recovery logic add operational and latency overhead.",
   },
@@ -43,13 +58,13 @@ export default function CaseStudiesPage() {
 
       <section className="mx-auto max-w-5xl px-6 pb-12 pt-16">
         <p className="text-sm font-semibold uppercase" style={{ color: colors.cyan }}>
-          Workload briefs
+          Target workloads
         </p>
         <h1 className="mt-4 max-w-3xl text-4xl font-bold md:text-5xl">
-          Public customer case studies are not claimed yet.
+          Where ATOMiK applies.
         </h1>
         <p className="mt-5 max-w-3xl text-lg leading-8" style={{ color: colors.muted }}>
-          This page now tracks target workload briefs for discovery and evaluation. Public customer results, production claims, logos, savings, or named references should only appear here when backed by referenceable artifacts and approval.
+          These are illustrative target applications for discovery and evaluation. They are not external deployments, production results, logos, savings claims, or named references.
         </p>
       </section>
 

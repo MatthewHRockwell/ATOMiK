@@ -144,8 +144,8 @@ export default function EmailCapture({ variant = "default" }: EmailCaptureProps)
           style={{ background: "#4f8fff" }}
         >
           {status === "loading"
-            ? isBlog ? "Registering..." : "Subscribing..."
-            : isBlog ? "Register Free" : "Subscribe"}
+            ? isBlog ? "Submitting..." : "Subscribing..."
+            : isBlog ? "Request Updates" : "Subscribe"}
         </button>
       </form>
       {status === "error" && (

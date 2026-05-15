@@ -125,7 +125,7 @@ const metrics = [
   {
     value: "8 B",
     label: "Per Delta",
-    detail: "Fixed-size, schema-free, zero overhead",
+    detail: "Fixed-size, low parsing overhead",
   },
   {
     value: "O(1)",
@@ -321,7 +321,7 @@ export default function IoTEdgePage() {
           style={{ color: "#8888a0" }}
         >
           Fingerprint the sensor reading on-device. If it changed, compute and
-          send an 8-byte delta. The gateway and cloud converge automatically
+          send an 8-byte delta. The gateway and cloud can converge under the fit model
           &mdash; no timestamps, no ordering.
         </p>
         <div
@@ -523,7 +523,7 @@ export default function IoTEdgePage() {
         </div>
       </section>
 
-      {/* Case Study CTA */}
+      {/* Workload Brief CTA */}
       <section className="max-w-4xl mx-auto px-6 pb-20">
         <Link
           href="/case-studies"
@@ -543,7 +543,7 @@ export default function IoTEdgePage() {
             Evaluate edge telemetry as a design-partner workload
           </h3>
           <p className="text-sm mb-4" style={{ color: "#8888a0" }}>
-            Public customer case studies are not claimed yet. Use the workload
+            Public deployment references are not claimed yet. Use the workload
             briefs page to define sensor payloads, gateway behavior, network
             constraints, and the measured artifact required for a credible claim.
           </p>

@@ -460,7 +460,7 @@ export default function FinancialSolutionsPage() {
         </div>
       </section>
 
-      {/* Case Study CTA */}
+      {/* Workload Brief CTA */}
       <section className="max-w-4xl mx-auto px-6 pb-20">
         <Link
           href="/case-studies"
@@ -480,7 +480,7 @@ export default function FinancialSolutionsPage() {
             Evaluate financial reconciliation as a design-partner workload
           </h3>
           <p className="text-sm mb-4" style={{ color: "#8888a0" }}>
-            Public customer case studies are not claimed yet. Use the workload
+            Public deployment references are not claimed yet. Use the workload
             briefs page to frame risk, audit, timing, and reconciliation paths
             that may merit a scoped evaluation.
           </p>

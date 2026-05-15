@@ -104,7 +104,7 @@ const tierColors: Record<string, string> = {
 };
 
 const tierLabels: Record<string, string> = {
-  community: "Free",
+  community: "Public repo",
   pro: "Pro",
   team: "Team",
   enterprise: "Enterprise",

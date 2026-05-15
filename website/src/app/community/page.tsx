@@ -36,28 +36,28 @@ const communityChannels = [
 
 const stats = [
   {
-    value: "Growing",
-    label: "GitHub Stars",
-    sublabel: "Join early",
+    value: "Open",
+    label: "GitHub Discussions",
+    sublabel: "Questions and patterns",
     gradient: "from-blue-400 to-blue-600",
     gradientColors: "#4f8fff, #3b82f6",
   },
   {
-    value: "92",
-    label: "Lean4 Theorems",
-    sublabel: "Formally verified",
+    value: "Proof-led",
+    label: "Evidence Labels",
+    sublabel: "Formal, software, hardware",
     gradientColors: "#a855f7, #7c3aed",
   },
   {
-    value: "500+",
-    label: "Tests Passing",
-    sublabel: "SDK + hardware",
+    value: "Artifact-led",
+    label: "Validation",
+    sublabel: "Builds, tests, logs",
     gradientColors: "#22c55e, #16a34a",
   },
   {
-    value: "5",
-    label: "Languages",
-    sublabel: "Python, C, Rust, Go, JS",
+    value: "Request-based",
+    label: "Evaluation Access",
+    sublabel: "Qualified teams",
     gradientColors: "#22d3ee, #06b6d4",
   },
 ];
