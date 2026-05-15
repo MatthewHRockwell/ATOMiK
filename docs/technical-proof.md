@@ -8,7 +8,8 @@ together.
 
 | Claim area | Label | Artifact |
 |---|---|---|
-| Current ATOMiK Desk v0.38-G UI proof screenshot | `HARDWARE_VALIDATED` | `website/public/07-current-live-atomik-desk-v038g.png` |
+| Current ATOMiK Desk v0.38-I UI proof screenshot | `HARDWARE_VALIDATED` | `website/public/08-current-live-atomik-desk-v038i.png` |
+| Earlier ATOMiK Desk v0.38-G UI proof screenshot | `HARDWARE_VALIDATED` | `website/public/07-current-live-atomik-desk-v038g.png` |
 | Earlier ATOMiK Desk prototype screenshot | `HARDWARE_VALIDATED` | `website/public/01-current-live-atomik-desk.jpg` |
 | AX7020 performance matrix board run | `LIVE_MEASURED` | `results/perf_matrix_ax7020_20260509.txt` |
 | AX7020 matrix interpretation and caveats | `LIVE_MEASURED` | `docs/perf/20260509_matrix_interpretation.md` |
@@ -29,17 +30,17 @@ together.
 
 ## Current Live Proof
 
-The current ATOMiK Desk v0.38-G screenshot is a live hardware prototype proof
+The current ATOMiK Desk v0.38-I screenshot is a live hardware prototype proof
 image. It is appropriate for the homepage, README, pitch deck, technical docs,
 and one-pager when labeled as:
 
-> ATOMiK Desk v0.38-G prototype UI running on live hardware.
+> ATOMiK Desk v0.38-I prototype UI running on live hardware.
 
-It should not be described as a polished shipping product. The earlier
+It should not be described as a polished commercial product. The earlier
 `01-current-live-atomik-desk.jpg` artifact remains useful as historical live
-proof, but the v0.38-G screenshot is the current public UI proof. v0.38-H should
-not become a public claim until a screenshot, demo clip, or other recorded
-artifact is added.
+proof, and the v0.38-G screenshot remains useful as a historical UI upgrade
+artifact. Do not infer benchmark, uptime, allocation, maturity, or commercial
+product claims from the screenshot.
 
 ## Benchmark Artifact Guidance
 

@@ -32,8 +32,8 @@ screenshots, not as commercial product UI.
 
 | Public filename | Source file | Classification | Caption | Notes |
 |---|---|---|---|---|
-| `website/public/07-current-live-atomik-desk-v038g.png` | `atomik_os/docs/screenshots/deploy_20260512_092422_v0.38-G.png` | LIVE SCREENSHOT / HARDWARE_VALIDATED | ATOMiK Desk v0.38-G prototype UI running on live hardware. | Closer to concept direction: dark/cyan palette, app rail, top status bar, Resource Fabric panel, and live desktop surface. |
-| pending | pending v0.38-H screenshot or demo artifact | pending | ATOMiK Desk v0.38-H prototype UI running on live hardware. | Do not use publicly until a recorded artifact exists. |
+| `website/public/08-current-live-atomik-desk-v038i.png` | `atomik_os/docs/screenshots/deploy_20260514_223935_v0.38-I.png` | LIVE SCREENSHOT / HARDWARE_VALIDATED | ATOMiK Desk v0.38-I prototype UI running on live hardware. | Current public proof image: dock polish, Pulse Bar, dark/cyan desktop surface, and Resource Fabric panel are visible in the recorded prototype screenshot. |
+| `website/public/07-current-live-atomik-desk-v038g.png` | `atomik_os/docs/screenshots/deploy_20260512_092422_v0.38-G.png` | LIVE SCREENSHOT / HARDWARE_VALIDATED | ATOMiK Desk v0.38-G prototype UI running on live hardware. | Historical UI upgrade proof: dark/cyan palette, app rail, top status bar, Resource Fabric panel, and live desktop surface. |
 
 ## Required Disclaimer
 

@@ -40,7 +40,7 @@ evaluation where justified. Assess broader integration only after fit is clear.
 ## 8. ATOMiK Desk + Resource Fabric
 
 Desk makes state-aware compute visible. Resource Fabric is the roadmap direction
-for adaptive workload surfaces. Concept visuals are not current shipped UI.
+for adaptive workload surfaces. Concept visuals are not current commercial UI.
 
 ## 9. Business Model
 

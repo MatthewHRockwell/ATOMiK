@@ -56,9 +56,9 @@ More adaptive execution around what actually changed.
 
 # Live Proof Today
 
-![Current ATOMiK Desk prototype running on live hardware](../../website/public/01-current-live-atomik-desk.jpg)
+![ATOMiK Desk v0.38-I prototype UI running on live hardware](../../website/public/08-current-live-atomik-desk-v038i.png)
 
-<small>HARDWARE_VALIDATED: Current ATOMiK Desk prototype running on live hardware.</small>
+<small>HARDWARE_VALIDATED: ATOMiK Desk v0.38-I prototype UI running on live hardware.</small>
 
 ---
 

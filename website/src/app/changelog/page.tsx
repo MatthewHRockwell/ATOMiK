@@ -17,6 +17,18 @@ type Release = {
 
 const releases: Release[] = [
   {
+    version: "v0.38-I",
+    title: "ATOMiK Desk Live Prototype UI Proof",
+    date: "2026-05-14",
+    category: "hardware",
+    items: [
+      "Recorded live-hardware screenshot captured as a public proof artifact",
+      "Dock polish, Pulse Bar, dark/cyan desktop surface, and Resource Fabric panel visible in the recorded prototype UI",
+      "Classified as HARDWARE_VALIDATED, not as commercial product UI or benchmark evidence",
+      "Public proof asset: 08-current-live-atomik-desk-v038i.png",
+    ],
+  },
+  {
     version: "",
     title: "Phase 10: Investor Demo System",
     date: "2026-04-28",
@@ -78,7 +90,7 @@ const releases: Release[] = [
   },
   {
     version: "v0.4.0",
-    title: "Python SDK — Production Ready",
+    title: "Python SDK - Historical Release Notes",
     date: "2026-03-16",
     category: "software",
     items: [

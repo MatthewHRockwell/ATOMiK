@@ -16,9 +16,9 @@ and adaptive execution paths for edge, embedded, and distributed systems.
 
 ## Live Proof
 
-![Current ATOMiK Desk prototype running on live hardware](../../website/public/01-current-live-atomik-desk.jpg)
+![ATOMiK Desk v0.38-I prototype UI running on live hardware](../../website/public/08-current-live-atomik-desk-v038i.png)
 
-**HARDWARE_VALIDATED:** Current ATOMiK Desk prototype running on live hardware.
+**HARDWARE_VALIDATED:** ATOMiK Desk v0.38-I prototype UI running on live hardware.
 
 ATOMiK has public software artifacts, formal proof work, benchmark outputs, and
 hardware-backed demo surfaces. Public proof is labeled by validation tier so

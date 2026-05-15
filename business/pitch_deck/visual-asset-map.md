@@ -2,8 +2,8 @@
 
 | Slide | Asset | Label | Caption |
 |---|---|---|---|
-| 1 | `../../website/public/07-current-live-atomik-desk-v038g.png` | `HARDWARE_VALIDATED` | ATOMiK Desk v0.38-G prototype UI running on live hardware. |
-| 5 | `../../website/public/01-current-live-atomik-desk.jpg` | `HARDWARE_VALIDATED` | Current ATOMiK Desk prototype running on live hardware. |
+| 1 | `../../website/public/08-current-live-atomik-desk-v038i.png` | `HARDWARE_VALIDATED` | ATOMiK Desk v0.38-I prototype UI running on live hardware. |
+| 5 | `../../website/public/01-current-live-atomik-desk.jpg` | `HARDWARE_VALIDATED` | Earlier ATOMiK Desk prototype running on live hardware. |
 | 6 | `../../website/public/05-replica-flow-sync-concept.png` | `ROADMAP` | Concept visualization of Replica Flow and delta propagation. |
 | 7 | `../../website/public/04-build-lane-gcc-concept.png` | `ROADMAP` | Concept visualization of a future standard-C / GCC adoption lane. |
 | 8 | `../../website/public/02-atomik-desk-hero-concept.png` | `CONCEPTUAL` | ATOMiK Desk concept visual - target product direction, not current live UI. |

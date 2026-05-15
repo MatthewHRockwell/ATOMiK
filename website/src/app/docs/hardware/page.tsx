@@ -10,9 +10,9 @@ export const metadata: Metadata = {
 const artifacts = [
   {
     label: "HARDWARE_VALIDATED",
-    title: "Current v0.38-G live prototype screenshot",
-    href: "https://github.com/MatthewHRockwell/ATOMiK/blob/main/website/public/07-current-live-atomik-desk-v038g.png",
-    body: "ATOMiK Desk v0.38-G prototype UI running on live hardware. v0.38-H remains pending until a recorded artifact is added.",
+    title: "Current v0.38-I live prototype screenshot",
+    href: "https://github.com/MatthewHRockwell/ATOMiK/blob/main/website/public/08-current-live-atomik-desk-v038i.png",
+    body: "ATOMiK Desk v0.38-I prototype UI running on live hardware. UI claims are limited to what the screenshot shows.",
   },
   {
     label: "HARDWARE_VALIDATED",
