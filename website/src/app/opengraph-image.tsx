@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
-export const alt = "ATOMiK — Delta-State Computing";
+export const alt = "ATOMiK - State-Aware Compute";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -10,7 +10,7 @@ export default function OGImage() {
     (
       <div
         style={{
-          background: "linear-gradient(135deg, #0a0a0f 0%, #12121a 50%, #0a0a0f 100%)",
+          background: "#070b12",
           width: "100%",
           height: "100%",
           display: "flex",
@@ -29,7 +29,7 @@ export default function OGImage() {
             left: 0,
             right: 0,
             height: 4,
-            background: "linear-gradient(90deg, #8b5cf6, #4f8fff, #22d3ee)",
+            background: "linear-gradient(90deg, #22d3ee, #4f8fff)",
           }}
         />
 
@@ -43,9 +43,9 @@ export default function OGImage() {
             marginBottom: 20,
           }}
         >
-          <span style={{ color: "#8b5cf6" }}>ATOM</span>
+          <span style={{ color: "#f4f8ff" }}>ATOM</span>
           <span style={{ color: "#4f8fff" }}>i</span>
-          <span style={{ color: "#8b5cf6" }}>K</span>
+          <span style={{ color: "#f4f8ff" }}>K</span>
         </div>
 
         {/* Tagline */}
@@ -57,7 +57,7 @@ export default function OGImage() {
             marginBottom: 12,
           }}
         >
-          Delta-State Computing
+          State-Aware Compute
         </div>
 
         {/* Subtitle */}
@@ -69,7 +69,7 @@ export default function OGImage() {
             textAlign: "center",
           }}
         >
-          O(1) state reconstruction. 99% less bandwidth. 108 formal proofs.
+          Live hardware prototypes. Evidence-labeled proof artifacts.
         </div>
 
         {/* Stats bar */}
@@ -81,9 +81,9 @@ export default function OGImage() {
           }}
         >
           {[
-            { value: "69.7G", label: "ops/sec" },
-            { value: "108", label: "proofs" },
-            { value: "218+", label: "tests" },
+            { value: "LIVE", label: "prototype" },
+            { value: "PROOF", label: "artifacts" },
+            { value: "EVAL", label: "access" },
           ].map((stat) => (
             <div
               key={stat.label}

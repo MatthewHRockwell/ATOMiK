@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Terms of Service - ATOMiK",
@@ -9,12 +10,12 @@ export default function TermsPage() {
   return (
     <div className="min-h-screen bg-[#0a0a0f] text-[#e0e0e8]">
       <div className="max-w-3xl mx-auto px-6 py-16">
-        <a
+        <Link
           href="/"
           className="inline-block text-sm text-[#8888a0] hover:text-[#8b5cf6] transition-colors mb-12"
         >
           &larr; Back to atomik.tech
-        </a>
+        </Link>
 
         <h1 className="text-4xl font-bold tracking-tight mb-2">Terms of Service</h1>
         <p className="text-[#8888a0] text-sm mb-12">Effective March 1, 2026</p>
@@ -28,52 +29,48 @@ export default function TermsPage() {
             </p>
           </Section>
 
-          <Section title="2. License Tiers">
-            <p>ATOMiK is available under four license tiers:</p>
+          <Section title="2. Evaluation and Licensing">
+            <p>
+              ATOMiK public evaluation is request-based. Commercial licensing,
+              support, and hardware/IP terms require a written agreement.
+            </p>
             <div className="mt-4 space-y-4">
               <TierCard
-                name="Community"
-                price="Free"
-                description="Open-source license under Apache 2.0. Includes the Python SDK (atomik-core), C99 header (atomik_core.h), JavaScript SDK (@atomik/core), 4-operation API, AtomikTable, DeltaStream, and Fingerprint. Community support via GitHub."
+                name="Public Repository"
+                price="Public review"
+                description="Public source, documentation, proof notes, and artifacts are available for technical review subject to the license terms in each package or directory."
               />
               <TierCard
-                name="Pro"
-                price="$99/month"
-                description="Everything in Community plus the Linux kernel module (COW detection, network dedup, cgroup tracking), 27 sysfs metrics, atomik-status dashboard, atomik-bench performance suite, and priority email support (48-hour SLA). Includes 90-day free trial."
+                name="Evaluation Access"
+                price="Request-based"
+                description="Limited evaluation access, proof artifact review, technical updates, and early demo availability for qualified evaluators."
               />
               <TierCard
-                name="Team"
-                price="$299/month"
-                description="Everything in Pro plus the SDK generation pipeline (Python, Rust, C, JavaScript, Verilog), atomik-report waste analysis, 5-seat team license, JSON/CSV CI export, and schema-driven code generation."
+                name="Design Partner / Paid Technical Evaluation"
+                price="Scoped"
+                description="Technical discovery, workload mapping, success criteria, prototype mapping where appropriate, and evaluation deliverables."
               />
               <TierCard
-                name="Enterprise"
-                price="$999/month"
-                description="Everything in Team plus FPGA hardware acceleration (Zynq AXI4-Lite, up to 512 parallel banks), custom RV64I CPU with ATOMiK ISA extensions, 4-hour response SLA, dedicated support channel, formal verification certificate, and ASIC development path."
+                name="Commercial Licensing"
+                price="Agreement-based"
+                description="Commercial use, support, hardware/IP, and enterprise licensing terms are handled through written agreements and counsel-reviewed documents."
               />
             </div>
           </Section>
 
-          <Section title="3. Subscription and Billing">
+          <Section title="3. Billing and Written Agreements">
             <ul className="list-disc list-inside space-y-2">
               <li>
-                Paid subscriptions (Pro, Team, and Enterprise) are billed monthly via Stripe.
+                Paid technical evaluations and commercial engagements are scoped in writing.
               </li>
               <li>
-                Your subscription renews automatically on the same day each month unless cancelled.
+                Payment timing, deliverables, and renewal terms are defined in the applicable agreement.
               </li>
               <li>
-                You may cancel at any time. Cancellation takes effect at the end of the current
-                billing period. No partial refunds are provided for the remaining days in a billing
-                cycle.
+                Self-serve subscriptions and public free trials are not currently presented as the public evaluation model.
               </li>
               <li>
-                We reserve the right to change pricing with 30 days&apos; written notice. Price
-                changes take effect at the start of your next billing cycle after the notice period.
-              </li>
-              <li>
-                Failed payments will be retried per Stripe&apos;s retry schedule. Access may be
-                suspended after repeated payment failures.
+                Pricing, support, and license language should be reviewed in the relevant agreement before use.
               </li>
             </ul>
           </Section>

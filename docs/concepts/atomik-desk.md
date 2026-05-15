@@ -10,6 +10,25 @@ ATOMiK Desk is a live prototype and demonstration surface for state-aware
 compute. It should be described as current prototype work, not as a polished
 shipping desktop product.
 
+## Current UI Upgrade Track
+
+![ATOMiK Desk v0.38-G prototype UI running on live hardware](../../website/public/07-current-live-atomik-desk-v038g.png)
+
+**HARDWARE_VALIDATED:** ATOMiK Desk v0.38-G prototype UI running on live
+hardware.
+
+The v0.38-F/G UI track materially narrows the distance between the live
+prototype and the concept visuals: dark/cyan palette, top status bar, left app
+rail, live Resource Fabric panel, and a desktop-like visual surface are now
+present in the recorded prototype screenshot.
+
+Keep the proof boundary explicit:
+
+- v0.38-G is represented by a recorded live prototype screenshot.
+- v0.38-H should be added only after a screenshot, demo clip, or other recorded
+  artifact is available.
+- Concept visuals remain product direction, not current shipped UI.
+
 ## Concept
 
 ![ATOMiK Desk concept visual](../../website/public/02-atomik-desk-hero-concept.png)
@@ -24,7 +43,8 @@ when paired with the live hardware screenshot.
 ## Roadmap
 
 - Clearer live proof capture and short demo clips.
-- Productized Desk narrative tied to state-aware execution.
+- Productized Desk narrative tied to state-aware execution and live Resource
+  Fabric instrumentation.
 - Resource Fabric surfaces that remain explicitly labeled by proof status.
 
 ## Caption Rule
@@ -32,6 +52,10 @@ when paired with the live hardware screenshot.
 Use the live screenshot caption:
 
 > Current ATOMiK Desk prototype running on live hardware.
+
+Use the current UI upgrade caption:
+
+> ATOMiK Desk v0.38-G prototype UI running on live hardware.
 
 Use the concept caption:
 

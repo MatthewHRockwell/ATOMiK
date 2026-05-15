@@ -176,7 +176,7 @@ monitoring-agent        170           1.7 MB       8,901       456 KB`}</Code>
           <h2 className="text-2xl font-bold pt-4" style={{ color: "#e0e0e8" }}>
             Install in 60 seconds
           </h2>
-          <Code>{`# Download and install (free 90-day trial)
+          <Code>{`# Evaluation install path (request access first)
 curl -sL https://atomik.tech/download/atomik-0.4.0.tar.gz | tar xz
 cd atomik-0.4.0
 sudo ./install.sh
@@ -213,11 +213,11 @@ python -m atomik_core.benchmark`}</Code>
           >
             <h3 className="text-xl font-bold mb-3">Ready to see your waste?</h3>
             <p className="text-sm mb-6" style={{ color: "#8888a0" }}>
-              Free 90-day trial. No credit card required.
+              Kernel-module evaluation is request-based and should be scoped to a real workload.
             </p>
             <div className="flex flex-wrap justify-center gap-4">
               <Link
-                href="/get-started"
+                href="/contact?intent=evaluation"
                 className="px-6 py-2.5 rounded-lg text-sm font-semibold"
                 style={{ background: "#4f8fff", color: "#fff" }}
               >

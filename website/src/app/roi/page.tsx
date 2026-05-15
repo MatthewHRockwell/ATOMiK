@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useRef } from "react";
+import { useState, useMemo } from "react";
 import Link from "next/link";
 import Nav from "@/components/Nav";
 
@@ -824,8 +824,8 @@ export default function RoiPage() {
           Stop paying for redundant data
         </h2>
         <p className="mb-8 max-w-xl mx-auto" style={{ color: "#8888a0" }}>
-          90-day free trial. No credit card required.
-          Install in 5 minutes, see real metrics from your infrastructure on day one.
+          Bring a real workload and define the evidence needed before treating
+          any ROI estimate as a result.
         </p>
         <div className="flex flex-wrap justify-center gap-4">
           <Link
@@ -833,7 +833,7 @@ export default function RoiPage() {
             className="inline-block px-6 py-3 rounded-lg text-sm font-bold transition-opacity hover:opacity-90"
             style={{ background: "#4f8fff", color: "#fff" }}
           >
-            Start Your 90-Day Free Trial
+            Request Evaluation Access
           </Link>
           <Link
             href="/docs"

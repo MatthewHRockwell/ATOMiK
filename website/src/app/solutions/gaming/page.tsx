@@ -34,7 +34,7 @@ const painPoints = [
     problem:
       "Traditional multiplayer engines broadcast entire game state every tick. A 64-player lobby sending full snapshots at 60 Hz generates gigabytes of redundant data. Most of that state hasn't changed — you're paying bandwidth for unchanged health bars, idle inventories, and static world objects.",
     solution:
-      "ATOMiK sends only 8-byte XOR deltas per changed property. Position moved? Send the delta. Health changed? Send the delta. Everything else costs zero bandwidth. Validated at 7,670x to 916,000x traffic reduction across real workloads.",
+      "ATOMiK frames changed game state as deltas instead of repeated full snapshots. Any bandwidth or traffic-reduction number should be quoted only with a linked measured artifact and workload definition.",
   },
   {
     label: "Client-Server Desync",

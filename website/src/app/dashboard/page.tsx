@@ -17,6 +17,8 @@ const MOCK_USER = {
   memberSince: "2025-12-01",
 };
 
+const MOCK_NOW_MS = new Date("2026-03-20T00:00:00Z").getTime();
+
 const PLAN_META: Record<
   string,
   { color: string; label: string; rank: number; gradient: string }
@@ -469,7 +471,7 @@ export default function DashboardPage() {
   }
 
   const daysUntilRenewal = Math.ceil(
-    (new Date(MOCK_USER.renewalDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24)
+    (new Date(MOCK_USER.renewalDate).getTime() - MOCK_NOW_MS) / (1000 * 60 * 60 * 24)
   );
 
   return (
@@ -816,7 +818,7 @@ export default function DashboardPage() {
                   className="inline-block text-sm font-semibold no-underline px-6 py-2.5 rounded-lg transition-opacity hover:opacity-90"
                   style={{ background: "#4f8fff", color: "#fff" }}
                 >
-                  Start Pro Trial
+                  Request Evaluation Access
                 </Link>
               </div>
             )}

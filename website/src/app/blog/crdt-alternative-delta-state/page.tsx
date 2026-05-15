@@ -563,7 +563,7 @@ print(f"Converged: 0x{a.read():08X}")`}</Code>
             </Link>
             {" "}and start a{" "}
             <Link href="/pricing" className="underline" style={{ color: "#4f8fff" }}>
-              90-day free Pro trial
+              request evaluation access
             </Link>.
           </p>
 

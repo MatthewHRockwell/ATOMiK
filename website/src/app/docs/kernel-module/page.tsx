@@ -234,15 +234,16 @@ export default function KernelModulePage() {
         </div>
 
         <p className="text-sm text-center" style={{ color: "#8888a0" }}>
-          This is what Pro shows you. 90-day free trial, no credit card.
+          Kernel-module evaluation is request-based and should be scoped against
+          a real workload and evidence plan.
         </p>
       </div>
 
       <UpgradeGate
         tier="pro"
-        title="Ready to install?"
-        description="Start your 90-day free trial to get the Linux kernel module with COW detection, network dedup, and real-time waste tracking."
-        ctaText="Start Pro Trial"
+        title="Ready to evaluate?"
+        description="Request evaluation access to review whether this kernel-module path fits your workload and deployment constraints."
+        ctaText="Request Evaluation Access"
       />
 
       {/* ioctl example */}
@@ -261,10 +262,10 @@ export default function KernelModulePage() {
               <span style={{ color: kwColor }}>=</span>{" "}
               <span style={{ color: fnColor }}>open</span>
               <span style={{ color: varColor }}>(</span>
-              <span style={{ color: strColor }}>"/dev/atomik"</span>
+              <span style={{ color: strColor }}>{'"'}/dev/atomik{'"'}</span>
               <span style={{ color: varColor }}>, O_RDWR);</span>
               {"\n\n"}
-              <span style={{ color: cmtColor }}>// Create a table with 256 contexts</span>
+              <span style={{ color: cmtColor }}>{"// Create a table with 256 contexts"}</span>
               {"\n"}
               <span style={{ color: kwColor }}>struct</span>{" "}
               <span style={{ color: typeColor }}>atomik_create_table_args</span>{" "}
@@ -280,7 +281,7 @@ export default function KernelModulePage() {
               <span style={{ color: fnColor }}>ioctl</span>
               <span style={{ color: varColor }}>(fd, ATOMIK_IOC_CREATE_TABLE, &amp;ct);</span>
               {"\n\n"}
-              <span style={{ color: cmtColor }}>// Core operations via ioctl</span>
+              <span style={{ color: cmtColor }}>{"// Core operations via ioctl"}</span>
               {"\n"}
               <span style={{ color: kwColor }}>struct</span>{" "}
               <span style={{ color: typeColor }}>atomik_load_args</span>{" "}

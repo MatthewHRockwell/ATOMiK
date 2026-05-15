@@ -118,7 +118,7 @@ const releases: Release[] = [
       "/proc/atomik machine-readable metrics interface",
       "27 sysfs attributes for real-time monitoring",
       "DKMS packaging, systemd service, udev rules",
-      "90-day free trial, graceful degradation on expiry",
+      "Request-based evaluation access and evidence review",
     ],
     blogLink: "/blog/announcing-atomik-kernel-module",
   },

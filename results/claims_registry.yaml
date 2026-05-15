@@ -1,5 +1,5 @@
 schema_version: 1
-last_updated: "2026-05-10"
+last_updated: "2026-05-14"
 disclaimer: "Live screenshots show current prototypes. Concept visuals show product direction and are not represented as current shipped functionality. Performance claims are only stated when backed by measured artifacts."
 
 evidence_labels:
@@ -19,6 +19,15 @@ claims:
     date: "2026-05-10"
     public_safe: true
     notes: "Use as proof image. Do not represent as polished shipped product."
+
+  - id: live-desk-ui-v038g-2026-05-12
+    label: HARDWARE_VALIDATED
+    claim: "ATOMiK Desk v0.38-G prototype UI screenshot shows the live UI/UX direction running on hardware."
+    artifact: "website/public/07-current-live-atomik-desk-v038g.png"
+    source_artifact: "atomik_os/docs/screenshots/deploy_20260512_092422_v0.38-G.png"
+    date: "2026-05-12"
+    public_safe: true
+    notes: "Use as current UI proof image. Do not represent as shipped product. v0.38-H remains pending until a recorded artifact is added."
 
   - id: ax7020-perf-matrix-2026-05-09
     label: LIVE_MEASURED

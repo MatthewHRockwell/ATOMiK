@@ -8,45 +8,48 @@ import { useState } from "react";
 const faqCategories = [
   {
     title: "General",
-    color: "#8b5cf6",
+    color: "#22d3ee",
     items: [
       {
         q: "What is ATOMiK?",
-        a: "ATOMiK is a delta-state algebra engine that fundamentally departs from Von Neumann architecture. Instead of storing and retrieving state, ATOMiK reconstructs it: current_state = initial_state XOR accumulator. The underlying math forms an Abelian group (commutative, associative, self-inverse, with identity), rigorously proven through 108 Lean4 theorems.",
+        a: "ATOMiK is a state-aware compute architecture for systems that spend too much work rediscovering what changed. The public materials cover the live hardware prototype direction, proof artifacts, developer adoption path, and roadmap toward ATOMiK Desk and Resource Fabric.",
       },
       {
         q: "What problem does ATOMiK solve?",
-        a: "Traditional computing copies full state on every operation, moving enormous amounts of redundant data. ATOMiK eliminates this by tracking only the changes (deltas) between states. This reduces memory traffic by 7,670x to 916,000x across validated workloads, with 22\u201358% execution time improvements.",
+        a: "State-heavy systems repeatedly move, replay, rescan, or reconstruct state even when only a small part changed. ATOMiK makes state change, delta application, and adaptive execution first-class primitives so a workload can be evaluated around the work that actually changed.",
       },
       {
-        q: "Is ATOMiK open source?",
-        a: "The core SDK is open source under the Apache 2.0 license. The kernel module and enterprise features (FPGA IP, hardware acceleration, priority support) are commercially licensed. See our pricing page for details.",
+        q: "What is public today?",
+        a: "The repository includes website, docs, proof notes, software, SDK, math, hardware, and live prototype implementation areas. Public claims are labeled as measured, hardware-validated, software-validated, synthesis-validated, projected, conceptual, or roadmap.",
+        link: { href: "https://github.com/MatthewHRockwell/ATOMiK", label: "View GitHub", external: true },
       },
       {
-        q: "What languages are supported?",
-        a: "ATOMiK provides SDKs for Python, C, JavaScript, Rust, and Verilog, all generated from a single canonical specification via the SDK generator pipeline. Install the Python SDK with pip install atomik-core.",
+        q: "Is ATOMiK Desk a shipped product?",
+        a: "No. ATOMiK Desk is a live prototype and demonstration surface for state-aware compute. Live screenshots show prototype progress; concept visuals show product direction and are not represented as shipped functionality.",
       },
     ],
   },
   {
-    title: "Pricing & Licensing",
+    title: "Evaluation",
     color: "#4f8fff",
     items: [
       {
-        q: "Can I use the free tier in production?",
-        a: "Yes. The free tier is built on the Apache 2.0 licensed core SDK, which has no restrictions on production use. You can deploy ATOMiK in production applications at no cost.",
+        q: "Is there a public free tier?",
+        a: "No conventional public free tier is listed. ATOMiK is currently request-based so evaluation time is focused on real workloads, evidence review, and technical fit.",
+        link: { href: "/pricing", label: "View evaluation options" },
       },
       {
-        q: "What happens after the 90-day Pro trial?",
-        a: "When your Pro trial ends, trial-exclusive features gracefully disable while your data is fully preserved. You can upgrade to a paid Pro plan, downgrade to the free tier, or contact sales for Enterprise options \u2014 all without losing any work.",
+        q: "What are the public evaluation paths?",
+        a: "There are two public paths: Evaluation Access for technical review and early demo availability, and Design Partner / Paid Technical Evaluation for teams with a real state-heavy workload and defined success criteria.",
+        link: { href: "/contact?intent=evaluation", label: "Request evaluation access" },
       },
       {
-        q: "Do I need Enterprise for FPGA development?",
-        a: "Yes. FPGA IP cores, hardware acceleration primitives, and the Verilog integration layer require an Enterprise license. This includes the ATOMiK parallel-bank core validated at up to 69.7 Gops/s on Xilinx Zynq.",
+        q: "Do I need custom hardware to evaluate ATOMiK?",
+        a: "Not necessarily. The right first step may be proof review, software exploration, a benchmark exchange, or a hardware-backed demo depending on the workload and available artifacts.",
       },
       {
-        q: "Is there a student or academic discount?",
-        a: "We offer academic licensing for qualified institutions and research programs. Contact sales@atomik.tech with your institution details for pricing.",
+        q: "Can researchers or technical founders request access?",
+        a: "Yes. Evaluation Access is intended for technical founders, engineers, researchers, infrastructure teams, and early evaluators who can review evidence and provide useful workload feedback.",
       },
     ],
   },
@@ -56,32 +59,32 @@ const faqCategories = [
     items: [
       {
         q: "Does ATOMiK require a specific operating system?",
-        a: "The SDK works everywhere Python, C, or JavaScript runs \u2014 Linux, macOS, and Windows. The kernel module requires Linux 5.15 or later. FPGA integration is supported on Gowin (Tang Nano 9K) and Xilinx (Zynq 7000 series).",
+        a: "Public software and proof materials can be reviewed in conventional development environments. The live hardware prototype path is currently documented around Zynq / NaxRiscv / Linux artifacts.",
       },
       {
         q: "How does ATOMiK compare to CRDTs?",
-        a: "Both ATOMiK and CRDTs enable conflict-free convergence in distributed systems. The key difference is algorithmic complexity: ATOMiK uses O(1) XOR algebra for merges, while CRDTs typically require O(n) merge functions. This makes ATOMiK significantly faster at scale. See our detailed comparison for benchmarks.",
+        a: "Both address state synchronization problems, but ATOMiK frames state change and delta application as compute primitives. Public comparisons should be read with the evidence labels and artifact links attached to any performance claim.",
         link: { href: "/compare", label: "View comparison" },
       },
       {
-        q: "What's the performance overhead?",
-        a: "Near-zero. The Python SDK adds approximately 200 nanoseconds per operation. The C library runs at about 2 nanoseconds per operation. On FPGA hardware, the parallel-bank architecture achieves 69.7 Gops/s. Overhead for tracked memcpy is just 5\u201312% versus plain memcpy.",
-        link: { href: "/benchmarks", label: "See benchmarks" },
+        q: "What performance claims are public-safe?",
+        a: "Performance claims are public-safe only when linked to measured artifacts or clearly labeled synthesis/modeling notes. The current AX7020 matrix is intentionally caveated: naive hardware access can lose, while batching and workload personality choices determine whether the architectural path helps.",
+        link: { href: "/benchmarks", label: "View proof artifacts" },
       },
       {
-        q: "Is ATOMiK secure?",
-        a: "Security in ATOMiK is architectural, not bolted on. The design provides deterministic latency (eliminating timing side channels), has no speculative execution (eliminating Spectre/Meltdown class attacks), and no cache coherency (eliminating cache-based covert channels). Dynamic reference states provide additional protection.",
+        q: "Is ATOMiK a certified security product?",
+        a: "No public certification claim is made. Some architecture properties may be relevant to security-sensitive systems, but security, compliance, and safety claims require scoped review and artifact-backed validation.",
         link: { href: "/compliance", label: "View compliance details" },
       },
     ],
   },
   {
     title: "Support",
-    color: "#10b981",
+    color: "#22d3ee",
     items: [
       {
         q: "How do I get support?",
-        a: "Support tiers match your plan: Community users get help via GitHub Discussions. Pro subscribers receive 48-hour email SLA support. Enterprise customers get 4-hour SLA with a dedicated support channel and named account engineer.",
+        a: "For public evaluation, use the contact form and include the workload, platform, and evidence you want reviewed. GitHub issues are appropriate for repo bugs and documentation problems.",
       },
       {
         q: "Where do I report bugs?",
@@ -94,7 +97,8 @@ const faqCategories = [
       },
       {
         q: "How do I request a feature?",
-        a: "Start a thread on GitHub Discussions for community input, or email support@atomik.tech for direct requests. Enterprise customers can request features through their dedicated support channel.",
+        a: "Feature requests should be tied to a concrete state-heavy workload or evaluation goal. Design partner conversations are the best path when the request affects roadmap, prototype mapping, or evaluation deliverables.",
+        link: { href: "/contact?intent=design-partner", label: "Discuss design partnership" },
       },
     ],
   },
@@ -226,14 +230,14 @@ export default function FAQPage() {
               className="text-base md:text-lg max-w-xl mx-auto"
               style={{ color: "#8888a0" }}
             >
-              Everything you need to know about ATOMiK. Can&apos;t find your
-              answer?{" "}
+              Public answers about evaluation access, proof labels, and current
+              prototype status. Can&apos;t find your answer?{" "}
               <Link
-                href="mailto:support@atomik.tech"
+                href="/contact?intent=question"
                 className="no-underline hover:opacity-80 transition-opacity"
                 style={{ color: "#4f8fff" }}
               >
-                Contact support
+                Contact ATOMiK
               </Link>
               .
             </p>
@@ -283,19 +287,19 @@ export default function FAQPage() {
           >
             <h3 className="text-xl font-semibold mb-2">Still have questions?</h3>
             <p className="text-sm mb-5" style={{ color: "#8888a0" }}>
-              Our team is here to help. Reach out and we&apos;ll get back to you
-              within 24 hours.
+              Bring a workload, proof question, or evaluation goal and ATOMiK
+              will route it to the right next step.
             </p>
             <div className="flex flex-wrap justify-center gap-3">
               <Link
-                href="mailto:support@atomik.tech"
+                href="/contact?intent=evaluation"
                 className="px-5 py-2 rounded-full text-sm font-semibold text-white no-underline transition-opacity hover:opacity-85"
                 style={{
-                  background: "linear-gradient(135deg, #22d3ee, #4f8fff)",
+                  background: "#4f8fff",
                   boxShadow: "0 2px 12px rgba(79,143,255,0.3)",
                 }}
               >
-                Contact Support
+                Request Evaluation Access
               </Link>
               <a
                 href="https://github.com/MatthewHRockwell/ATOMiK/discussions"

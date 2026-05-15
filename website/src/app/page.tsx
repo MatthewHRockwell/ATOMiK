@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     description:
       "State-aware compute for systems that cannot afford to recompute everything.",
     url: "https://atomik.tech",
-    images: [{ url: "https://atomik.tech/01-current-live-atomik-desk.jpg", width: 1200, height: 630 }],
+    images: [{ url: "https://atomik.tech/07-current-live-atomik-desk-v038g.png", width: 1200, height: 630 }],
     type: "website",
   },
   twitter: {
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     title: "ATOMiK - State-Aware Compute",
     description:
       "State-aware compute for systems that cannot afford to recompute everything.",
-    images: ["https://atomik.tech/01-current-live-atomik-desk.jpg"],
+    images: ["https://atomik.tech/07-current-live-atomik-desk-v038g.png"],
   },
 };
 
@@ -63,7 +63,7 @@ const mechanisms = [
 ];
 
 const proofItems = [
-  ["HARDWARE_VALIDATED", "Current ATOMiK Desk prototype running on live hardware."],
+  ["HARDWARE_VALIDATED", "Current ATOMiK Desk prototype and v0.38-G UI proof screenshots are live-hardware artifacts."],
   ["LIVE_MEASURED", "AX7020 board-run artifacts are tracked separately from interpretation notes."],
   ["SOFTWARE_VALIDATED", "Public software and formal proof work are linked from the repository."],
   ["SYNTHESIS_VALIDATED", "Toolchain ceilings are labeled separately from live-board measurements."],
@@ -161,16 +161,16 @@ export default function Home() {
             style={{ border: `1px solid ${colors.border}`, background: colors.panel }}
           >
             <Image
-              src="/01-current-live-atomik-desk.jpg"
-              width={2573}
-              height={1096}
+              src="/07-current-live-atomik-desk-v038g.png"
+              width={1920}
+              height={1080}
               priority
               sizes="(min-width: 768px) 48vw, 100vw"
-              alt="Current ATOMiK Desk prototype running on live hardware"
+              alt="ATOMiK Desk v0.38-G prototype UI running on live hardware"
               className="h-auto w-full"
             />
             <figcaption className="px-4 py-3 text-xs" style={{ color: colors.muted }}>
-              <strong style={{ color: colors.text }}>HARDWARE_VALIDATED:</strong> Current ATOMiK Desk prototype running on live hardware.
+              <strong style={{ color: colors.text }}>HARDWARE_VALIDATED:</strong> ATOMiK Desk v0.38-G prototype UI running on live hardware. Not a shipped desktop product.
             </figcaption>
           </figure>
         </div>

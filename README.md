@@ -7,16 +7,17 @@ The current public materials document the live hardware prototype direction,
 technical proof artifacts, developer adoption path, and roadmap toward ATOMiK
 Desk and Resource Fabric.
 
-![Current ATOMiK Desk prototype running on live hardware](website/public/01-current-live-atomik-desk.jpg)
+![ATOMiK Desk v0.38-G prototype UI running on live hardware](website/public/07-current-live-atomik-desk-v038g.png)
 
-**HARDWARE_VALIDATED:** Current ATOMiK Desk prototype running on live hardware.
-This screenshot is proof of a current prototype, not a polished shipped product.
+**HARDWARE_VALIDATED:** ATOMiK Desk v0.38-G prototype UI running on live
+hardware. This screenshot is proof of current prototype progress, not a
+polished shipped product.
 
 ## Current Status
 
 | Area | Status |
 |---|---|
-| Live hardware prototype | Yes. Current screenshot is available and labeled above. |
+| Live hardware prototype | Yes. Current and historical proof screenshots are available and labeled above. |
 | Public benchmark artifacts | Present where artifact packages exist. See `results/` and `docs/perf/`. |
 | Concept UI | Design target and roadmap material, not shipped product UI. |
 | Evaluation access | Request-based. No conventional free tier is presented publicly. |
@@ -25,7 +26,8 @@ This screenshot is proof of a current prototype, not a polished shipped product.
 
 - Hardware-backed ATOMiK prototype work is present in the repository and proof
   docs.
-- ATOMiK Desk has a current live prototype screenshot from running hardware.
+- ATOMiK Desk has live prototype screenshots from running hardware, including
+  the v0.38-G UI/UX proof image now closer to the concept direction.
 - Linux userspace validation, hardware synthesis documentation, and board-run
   performance artifacts are tracked with evidence labels.
 - Public software, formal proof, and SDK material remain available for technical
@@ -57,6 +59,7 @@ This screenshot is proof of a current prototype, not a polished shipped product.
 - [Roadmap](docs/roadmap.md)
 - [Design partner guide](docs/design-partners.md)
 - [ATOMiK Desk concept](docs/concepts/atomik-desk.md)
+- [Visual asset manifest](docs/visual-asset-manifest.md)
 - [Resource Fabric concept](docs/concepts/resource-fabric.md)
 - [Compiler adoption lane](docs/concepts/compiler-adoption-lane.md)
 - [Replica Flow](docs/concepts/replica-flow.md)

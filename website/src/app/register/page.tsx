@@ -18,43 +18,38 @@ const roles = [
 
 const tierSummaries: Record<string, { name: string; price: string; color: string; features: string[] }> = {
   community: {
-    name: "Community",
-    price: "Free",
-    color: "#22c55e",
+    name: "Public Repository",
+    price: "Public review",
+    color: "#22d3ee",
     features: [
-      "Python SDK (atomik-core)",
-      "C99 header (atomik_core.h)",
-      "JavaScript SDK (@atomik/core)",
-      "4-operation API (LOAD, ACCUM, READ, SWAP)",
-      "AtomikTable, DeltaStream, Fingerprint",
-      "Apache 2.0 license",
-      "Community support (GitHub)",
+      "Public docs and proof notes",
+      "Evidence-labeled artifacts",
+      "GitHub issue path for repo bugs",
+      "No conventional public free tier",
     ],
   },
   professional: {
-    name: "Pro",
-    price: "$99/mo",
+    name: "Evaluation Access",
+    price: "Request-based",
     color: "#4f8fff",
     features: [
-      "Everything in Community",
-      "Linux kernel module (COW detection, network dedup, cgroup tracking)",
-      "27 sysfs metrics + atomik-status dashboard",
-      "atomik-bench performance suite",
-      "Priority email support (48hr SLA)",
-      "90-day free trial",
+      "Proof artifact review",
+      "Workload-fit conversation",
+      "Technical updates",
+      "Early demo availability",
+      "Path to scoped benchmark exchange",
     ],
   },
   team: {
-    name: "Team",
-    price: "$299/mo",
+    name: "Design Partner",
+    price: "Scoped",
     color: "#22d3ee",
     features: [
-      "Everything in Pro",
-      "SDK generation pipeline (Python, Rust, C, JavaScript, Verilog)",
-      "atomik-report waste analysis",
-      "5-seat team license",
-      "JSON/CSV CI export",
-      "Schema-driven code generation",
+      "Technical discovery",
+      "Success criteria",
+      "Prototype mapping",
+      "Evaluation deliverables",
+      "Continue / refine / stop recommendation",
     ],
   },
 };
@@ -108,9 +103,9 @@ function RegisterForm() {
 
   const tierLabel =
     plan === "professional"
-      ? "Pro"
+      ? "Evaluation Access"
       : plan === "team"
-        ? "Team"
+        ? "Design Partner"
         : null;
 
   const tierKey = plan || "community";
@@ -491,10 +486,10 @@ Same result: True`}
               }}
             >
               {status === "loading"
-                ? "Creating your account..."
-                : tierLabel === "Pro"
-                  ? "Start Pro Trial"
-                  : "Start Team Trial"}
+                ? "Submitting request..."
+                : tierLabel === "Evaluation Access"
+                  ? "Request Evaluation Access"
+                  : "Discuss Design Partnership"}
             </button>
 
             {/* Error */}

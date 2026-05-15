@@ -3,7 +3,9 @@
 This directory is for recorded ATOMiK proof artifacts. Do not place projected
 or illustrative marketing numbers here unless they are clearly labeled.
 
-Measured results will be posted here when artifact packages are ready.
+The current public result package is the AX7020 performance matrix from
+2026-05-09. New measured results should be added only when the raw artifact,
+interpretation notes, and evidence label are ready together.
 
 ## Required Fields
 

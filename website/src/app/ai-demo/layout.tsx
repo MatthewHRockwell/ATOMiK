@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "AI Inference Demo — ATOMiK vs Traditional GPU Architecture",
+  title: "AI Workload Concept - ATOMiK",
   description:
-    "Interactive side-by-side comparison: same AI output, fraction of the energy. See how delta-state architecture reduces inference power from 220W to 12W.",
+    "Conceptual AI workload surface for exploring where state-aware execution could fit. Performance and power claims require measured artifacts.",
   openGraph: {
-    title: "AI Inference: Conventional Architecture vs ATOMiK",
-    description: "Same AI output. 18x less power. See why in 10 seconds.",
+    title: "AI Workload Concept - ATOMiK",
+    description:
+      "A concept surface for state-aware AI workload discussion, not a measured power benchmark.",
     url: "https://atomik.tech/ai-demo",
   },
 };

@@ -548,7 +548,7 @@ state = reference ^ accumulator  # One XOR, always`}</Code>
               {
                 href: "/solutions/database-sync",
                 title: "Database Synchronization",
-                desc: "Change detection at O(1) instead of row-by-row comparison. Fingerprint gates skip redundant replication. 7,670x to 916,000x memory traffic reduction.",
+                desc: "Change detection framed around deltas instead of repeated row-by-row comparison. Any traffic-reduction number should be quoted only with a linked measured artifact.",
               },
               {
                 href: "/solutions/financial",
@@ -742,10 +742,10 @@ print(f'State: 0x{ctx.read():08X}')  # 0xDEADBE10
             <Link href="/demo" className="underline" style={{ color: "#4f8fff" }}>
               interactive browser demo
             </Link>{" "}
-            to see delta-state operations in real time. For production use with the
-            kernel module, COW detection, and per-container waste tracking, start a{" "}
+            to see delta-state operations in real time. For workload-specific review,
+            kernel-module questions, and evidence planning,{" "}
             <Link href="/pricing" className="underline" style={{ color: "#4f8fff" }}>
-              90-day free Pro trial
+              request evaluation access
             </Link>.
           </p>
         </Section>
