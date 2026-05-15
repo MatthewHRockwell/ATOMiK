@@ -498,21 +498,21 @@ static pixel_t fresh_color(fabric_fresh_t f) {
     }
 }
 
-/* === filled-area waveform (v0.38-G) ===
+/* === filled-area waveform with layered glow (v0.38-J) ===
  *
- * The v0.34-D mini-waveform is a polyline.  Per the concept-fidelity
- * audit (memory project_v038_concept_fidelity_audit), each Fabric lane
- * should read as an instrument, not a wireframe — that means filling
- * the area under the wave so the lane glows with lane-color presence
- * instead of a hairline trace.  We fill bottom-to-top: each column
- * from x0..x1 gets a vertical fill from the baseline up to the wave's
- * height at that column.  Quality of glow: enough columns of fill at
- * the lane's accent color reads as "saturated instrument", matching
- * concept images 02-06's Fabric panels. */
+ * Per ChatGPT 2026-05-15 audit + feedback_layered_stroke_rendering:
+ * each lane reads as a luminous instrument, not a wireframe.  Stack:
+ *   1. Dim base fill   — area under the wave at low alpha (body)
+ *   2. Outer glow halo — 8 px wide above the wave edge, alpha ~16
+ *   3. Mid glow        — 4 px wide above the wave edge, alpha ~32
+ *   4. Core line       — 2 px thick at the wave's top edge, alpha ~210
+ *   5. Hot points      — tiny brighter dots at the highest peaks
+ *
+ * Result: from 6-8 ft the lane reads as a glowing band with a sharp
+ * top edge.  Mirrors concept-image instrument panels. */
 static void draw_filled_waveform(const fabric_lane_history_t *h,
                                  int x, int y, int w, int hgt,
                                  pixel_t fill, pixel_t line) {
-    /* Bed: dim hairline at baseline. */
     pixel_t bed = rgb(0x1F, 0x27, 0x38);
     draw_rect(x, y + hgt - 1, w, 1, bed);
 
@@ -520,18 +520,20 @@ static void draw_filled_waveform(const fabric_lane_history_t *h,
 
     uint16_t mn = h->v_min, mx = h->v_max;
     if (mx <= mn) {
-        /* Constant series — flat band near the bottom. */
-        draw_rect(x, y + hgt - 4, w, 3, fill);
+        /* Constant series — flat glow band near the bottom. */
+        for (int gy = 0; gy < 4; gy++) {
+            uint8_t a = (uint8_t)(40 + gy * 25);
+            for (int sx = 0; sx < w; sx++) {
+                draw_blend_pixel(x + sx, y + hgt - 4 + gy, line, a);
+            }
+        }
         return;
     }
     uint16_t span = mx - mn;
 
-    /* First pass: compute the height-per-column array. */
     int col_h[256];
     int n_cols = (w < 256) ? w : 256;
-    /* Interpolate the wave across w columns. */
     for (int col = 0; col < n_cols; col++) {
-        /* Map this column back to a sample index in the buffer. */
         int   sample_i = (int)((long)col * (h->count - 1) / (n_cols - 1));
         int   idx      = (h->head - h->count + sample_i + FABRIC_HISTORY_N)
                           % FABRIC_HISTORY_N;
@@ -542,17 +544,64 @@ static void draw_filled_waveform(const fabric_lane_history_t *h,
         col_h[col] = hh;
     }
 
-    /* Fill pass: column-wise vertical strokes from baseline to col_h.
-     * The fill alpha builds up the glow body of the lane. */
+    /* Pass 1: dim body fill from baseline up to the wave height.
+     * Uses `fill` (lane color at ~1/3 intensity) for low-glow body. */
     for (int col = 0; col < n_cols; col++) {
-        int px      = x + col;
-        int top_y   = y + hgt - 1 - col_h[col];
+        int px    = x + col;
+        int top_y = y + hgt - 1 - col_h[col];
         for (int yy = top_y; yy < y + hgt - 1; yy++) {
             draw_pixel(px, yy, fill);
         }
-        /* Bright line at the top of the fill — readable "wave" edge. */
+    }
+
+    /* Pass 2: outer glow halo — 8 px wide above the wave top edge.
+     * Per-column alpha-blended strokes; falls off with distance. */
+    for (int col = 0; col < n_cols; col++) {
+        int px    = x + col;
+        int top_y = y + hgt - 1 - col_h[col];
+        for (int g = 1; g <= 8; g++) {
+            int gy = top_y - g;
+            if (gy < y) break;
+            uint8_t a = (uint8_t)(18 - (g - 1) * 2);
+            draw_blend_pixel(px, gy, line, a);
+        }
+    }
+
+    /* Pass 3: mid glow — 4 px wide above the wave top edge, brighter. */
+    for (int col = 0; col < n_cols; col++) {
+        int px    = x + col;
+        int top_y = y + hgt - 1 - col_h[col];
+        for (int g = 1; g <= 4; g++) {
+            int gy = top_y - g;
+            if (gy < y) break;
+            uint8_t a = (uint8_t)(38 - (g - 1) * 6);
+            draw_blend_pixel(px, gy, line, a);
+        }
+    }
+
+    /* Pass 4: core line — 2 px thick at the wave top.  Bright. */
+    for (int col = 0; col < n_cols; col++) {
+        int px    = x + col;
+        int top_y = y + hgt - 1 - col_h[col];
         draw_pixel(px, top_y, line);
-        if (top_y - 1 >= y) draw_pixel(px, top_y - 1, line);
+        if (top_y - 1 >= y) {
+            draw_blend_pixel(px, top_y - 1, line, 220);
+        }
+    }
+
+    /* Pass 5: hot points — 3 px square highlights at local maxima.
+     * Local max = column whose col_h exceeds both neighbors by 2+. */
+    for (int col = 1; col < n_cols - 1; col++) {
+        if (col_h[col] >= col_h[col - 1] + 2 &&
+            col_h[col] >= col_h[col + 1] + 2) {
+            int px    = x + col;
+            int top_y = y + hgt - 1 - col_h[col];
+            for (int dy = -1; dy <= 1; dy++) {
+                for (int dx = -1; dx <= 1; dx++) {
+                    draw_pixel(px + dx, top_y + dy, line);
+                }
+            }
+        }
     }
 }
 
@@ -629,12 +678,16 @@ static void lane_big_metric(fabric_lane_t lane,
 
 #define LANE_ROW_H        158    /* v0.38-G: was 76; taller panels = instrument feel */
 #define LANE_GAP          ATOMIK_GRID_M
-#define LANE_ACCENT_W     2      /* outer-rim thickness on active lane */
+#define LANE_ACCENT_W     3      /* v0.38-J: thicker active rim (was 2) */
+#define LANE_ACTIVE_HALO  6      /* v0.38-J: outer alpha halo px */
 
 void fabric_draw(window_t *w, int x, int y, int wd, int ht) {
     (void)w; (void)ht;
 
-    /* Header */
+    /* v0.38-J header — drop the verbose 2-line subtitle.  Just the
+     * "RESOURCE FABRIC" title + the AUTO/MANUAL personality capsule.
+     * Concept images keep the panel header tight; the active
+     * personality is communicated by lane glow, not header prose. */
     draw_text(x + ATOMIK_GRID_L, y + ATOMIK_GRID_M,
               "RESOURCE FABRIC", 2, ATOMIK_FG);
 
@@ -647,38 +700,27 @@ void fabric_draw(window_t *w, int x, int y, int wd, int ht) {
     }
     char badge[32];
     if (fabric_override_active()) {
-        snprintf(badge, sizeof badge, "[ MANUAL: %s ]",
+        snprintf(badge, sizeof badge, "MANUAL · %s",
                  fabric_personality_name(s_active));
     } else {
-        snprintf(badge, sizeof badge, "[ AUTO: %s ]",
+        snprintf(badge, sizeof badge, "AUTO · %s",
                  fabric_personality_name(s_active));
     }
-    int bw = text_width(badge, 1);
-    draw_text(x + wd - bw - ATOMIK_GRID_L, y + ATOMIK_GRID_M + 4,
-              badge, 1, badge_color);
-
-    /* Subtitle: what the active personality means. */
-    int sub_y = y + ATOMIK_GRID_M + ATOMIK_TITLEBAR_H + ATOMIK_GRID_M;
-    char sub[80];
-    snprintf(sub, sizeof sub, "active personality: %s PROCESSOR",
-             fabric_personality_name(s_active));
-    draw_text(x + ATOMIK_GRID_L, sub_y, sub, 1, ATOMIK_FG);
-
-    const char *desc = "";
-    switch (s_active) {
-    case PERSONALITY_STATE:
-        desc = "change detection · dirty regions · cache invalidation"; break;
-    case PERSONALITY_SYNC:
-        desc = "replica updates · delta propagation · skip unchanged"; break;
-    case PERSONALITY_AGENT:
-        desc = "context retention · relevance scoring · cold pruning"; break;
-    default: break;
+    /* Badge as a rounded capsule with brighter border in active color. */
+    int bw   = text_width(badge, 1);
+    int bh   = text_height(1) + 8;
+    int bx   = x + wd - bw - ATOMIK_GRID_L * 2 - ATOMIK_GRID_M;
+    int by   = y + ATOMIK_GRID_M;
+    int bcap = bw + ATOMIK_GRID_L;
+    draw_rect_rounded(bx, by, bcap, bh, 6, wm_card_bg());
+    for (int t = 0; t < 1; t++) {
+        draw_rect(bx + 2, by + t,        bcap - 4, 1, badge_color);
+        draw_rect(bx + 2, by + bh - 1 - t, bcap - 4, 1, badge_color);
     }
-    draw_text(x + ATOMIK_GRID_L, sub_y + text_height(1) + 2,
-              desc, 1, ATOMIK_FG_DIM);
+    draw_text(bx + ATOMIK_GRID_S + 2, by + 4, badge, 1, badge_color);
 
     /* === lanes === */
-    int lanes_y = sub_y + text_height(1) * 2 + ATOMIK_GRID_L;
+    int lanes_y = y + ATOMIK_GRID_M + text_height(2) + ATOMIK_GRID_L;
     int lane_x  = x + ATOMIK_GRID_L;
     int lane_w  = wd - ATOMIK_GRID_L * 2;
 
@@ -719,8 +761,9 @@ void fabric_draw(window_t *w, int x, int y, int wd, int ht) {
         draw_rect(lane_x, ly, 1, LANE_ROW_H, wm_card_border());
         draw_rect(lane_x + lane_w - 1, ly, 1, LANE_ROW_H, wm_card_border());
 
-        /* Active-rim: 2-px saturated outer ring (drawn on the inner edge
-         * so it doesn't bleed into the gap between cards). */
+        /* v0.38-J active rim: 3-px saturated inner ring + soft outer
+         * alpha halo so the active lane glows from the body outward.
+         * Total visual rim ~ 9 px (3 hard + 6 halo). */
         if (active) {
             for (int t = 0; t < LANE_ACCENT_W; t++) {
                 draw_rect(lane_x + t,     ly + t,     lane_w - 2 * t, 1, lc);
@@ -729,6 +772,24 @@ void fabric_draw(window_t *w, int x, int y, int wd, int ht) {
                 draw_rect(lane_x + t,     ly + t, 1, LANE_ROW_H - 2 * t, lc);
                 draw_rect(lane_x + lane_w - 1 - t, ly + t,
                           1, LANE_ROW_H - 2 * t, lc);
+            }
+            /* Outer alpha halo: rings just outside the card edge, alpha
+             * falling off with distance.  Reads as luminous spill from
+             * the lane border, mirrors concept-image instrument glow. */
+            for (int g = 1; g <= LANE_ACTIVE_HALO; g++) {
+                uint8_t a = (uint8_t)(48 - (g - 1) * 7);
+                int hx = lane_x - g;
+                int hy = ly - g;
+                int hw = lane_w + 2 * g;
+                int hh = LANE_ROW_H + 2 * g;
+                for (int sx = 0; sx < hw; sx++) {
+                    draw_blend_pixel(hx + sx, hy,          lc, a);
+                    draw_blend_pixel(hx + sx, hy + hh - 1, lc, a);
+                }
+                for (int sy = 0; sy < hh; sy++) {
+                    draw_blend_pixel(hx,          hy + sy, lc, a);
+                    draw_blend_pixel(hx + hw - 1, hy + sy, lc, a);
+                }
             }
         }
 
