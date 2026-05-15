@@ -2,13 +2,20 @@
 
 **Prepared for SCORE Mentor Review**
 
+> Publication status: historical mentor-review package. Do not use this as
+> current public collateral without reconciling claims against
+> `../../results/claims_registry.yaml` and `../../docs/evidence-labels.md`.
+
 ---
 
 ## What Is ATOMiK?
 
-ATOMiK is a new computing architecture that processes data changes instead of entire data copies. It runs on a $13.50 chip, performs over 1 billion operations per second, and is backed by 108 mathematical proofs that guarantee correctness.
+ATOMiK is a state-aware compute architecture for systems that spend too much
+work rediscovering what changed. Current public claims should be taken from the
+claims registry and labeled by evidence tier.
 
-**In plain English:** Instead of saving the entire spreadsheet every time you change one cell, ATOMiK saves only the change — and it does this in hardware, at extreme speed, with mathematical certainty that nothing is lost.
+**In plain English:** Instead of repeatedly moving or rebuilding all state,
+ATOMiK focuses evaluation on the state that actually changed.
 
 ---
 
@@ -34,12 +41,15 @@ This package contains everything you need to evaluate ATOMiK as a business oppor
 ## Quick Facts
 
 - **What:** Hardware-accelerated delta-state computing architecture
-- **Speed:** 1,056 million operations per second (16 parallel banks)
-- **Cost:** Runs on a $13.50 FPGA chip (Tang Nano 9K)
-- **Proof:** 108 machine-verified mathematical proofs (Lean4)
-- **SDK:** Software tools in 5 languages (Python, Rust, C, JavaScript, Verilog)
-- **Tests:** 353 passing software tests, 80/80 passing hardware tests
-- **Status:** Working prototype — 6 development phases complete
+- **Speed:** Use only evidence-labeled measured or synthesis artifacts.
+- **Cost:** Treat chip, board, and development-cost numbers as artifact-backed
+  claims that must be checked before publication.
+- **Proof:** Formal proof claims must be checked against current proof artifacts.
+- **SDK:** Software tooling exists in the repo; quote exact language support only
+  from current docs.
+- **Tests:** Quote test counts only from current CI or hook output.
+- **Status:** Working prototype, with public proof status tracked in the claims
+  registry.
 - **IP:** Patent pending
 
 ---

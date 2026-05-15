@@ -8,8 +8,8 @@ together.
 
 | Claim area | Label | Artifact |
 |---|---|---|
-| Current ATOMiK Desk prototype screenshot | `HARDWARE_VALIDATED` | `website/public/01-current-live-atomik-desk.jpg` |
-| ATOMiK Desk v0.38-G UI proof screenshot | `HARDWARE_VALIDATED` | `website/public/07-current-live-atomik-desk-v038g.png` |
+| Current ATOMiK Desk v0.38-G UI proof screenshot | `HARDWARE_VALIDATED` | `website/public/07-current-live-atomik-desk-v038g.png` |
+| Earlier ATOMiK Desk prototype screenshot | `HARDWARE_VALIDATED` | `website/public/01-current-live-atomik-desk.jpg` |
 | AX7020 performance matrix board run | `LIVE_MEASURED` | `results/perf_matrix_ax7020_20260509.txt` |
 | AX7020 matrix interpretation and caveats | `LIVE_MEASURED` | `docs/perf/20260509_matrix_interpretation.md` |
 | Linux userspace validation path | `HARDWARE_VALIDATED` | `docs/LINUX_USERSPACE_PROOF.md` |
@@ -29,22 +29,17 @@ together.
 
 ## Current Live Proof
 
-The current ATOMiK Desk screenshot is a live hardware prototype proof image. It
-is appropriate for the homepage, README, pitch deck, technical docs, and
-one-pager when labeled as:
-
-> Current ATOMiK Desk prototype running on live hardware.
-
-The v0.38-G screenshot is also hardware-validated prototype evidence and shows
-the UI/UX direction moving closer to the concept visuals: dark/cyan palette,
-left app rail, top status bar, live Resource Fabric instrumentation, and a
-desktop-like visual surface. It should be labeled as:
+The current ATOMiK Desk v0.38-G screenshot is a live hardware prototype proof
+image. It is appropriate for the homepage, README, pitch deck, technical docs,
+and one-pager when labeled as:
 
 > ATOMiK Desk v0.38-G prototype UI running on live hardware.
 
-It should not be described as a polished shipping product. v0.38-H should not
-become a public claim until a screenshot, demo clip, or other recorded artifact
-is added.
+It should not be described as a polished shipping product. The earlier
+`01-current-live-atomik-desk.jpg` artifact remains useful as historical live
+proof, but the v0.38-G screenshot is the current public UI proof. v0.38-H should
+not become a public claim until a screenshot, demo clip, or other recorded
+artifact is added.
 
 ## Benchmark Artifact Guidance
 

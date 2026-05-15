@@ -573,7 +573,7 @@ Same result: True`}
             boxShadow: "0 4px 24px rgba(79,143,255,0.25)",
           }}
         >
-          {status === "loading" ? "Registering..." : "Get Started Free"}
+          {status === "loading" ? "Sending..." : "Request Evaluation Access"}
         </button>
 
         {/* Error */}

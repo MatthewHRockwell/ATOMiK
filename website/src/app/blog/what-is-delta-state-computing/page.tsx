@@ -508,7 +508,7 @@ state = reference ^ accumulator  # One XOR, always`}</Code>
             The CAP theorem forces a choice between consistency and availability during
             partitions. Raft chooses consistency (the minority partition cannot write).
             ATOMiK chooses availability (all partitions continue accumulating deltas) with
-            convergence guaranteed on reconnection. This makes delta-state computing
+            convergence under the XOR algebra model on reconnection. This makes delta-state computing
             particularly well-suited for edge computing, IoT networks, and any system
             where partitions are common rather than exceptional.
           </p>
@@ -523,9 +523,9 @@ state = reference ^ accumulator  # One XOR, always`}</Code>
         {/* 7. Real-World Applications */}
         <Section id="applications" title="Real-world applications">
           <p>
-            Delta-state computing is not theoretical. ATOMiK is deployed in production
-            across multiple domains. Here are five categories where the algebra provides
-            concrete advantages:
+            Delta-state computing is the direction ATOMiK is evaluating across
+            state-heavy workloads. Here are five categories where the algebra
+            can provide concrete advantages when the workload fits:
           </p>
 
           <div className="grid gap-4 my-6">
@@ -533,7 +533,7 @@ state = reference ^ accumulator  # One XOR, always`}</Code>
               {
                 href: "/solutions/distributed-systems",
                 title: "Distributed Systems",
-                desc: "Multi-region state sync without consensus. Nodes exchange 8-byte deltas over any transport. Convergence is guaranteed by the algebra, not the network.",
+                desc: "Multi-region state sync without consensus. Nodes exchange 8-byte deltas over any transport and converge under the XOR algebra model.",
               },
               {
                 href: "/solutions/gaming",
@@ -553,7 +553,7 @@ state = reference ^ accumulator  # One XOR, always`}</Code>
               {
                 href: "/solutions/financial",
                 title: "Financial Systems",
-                desc: "Deterministic latency for state operations. No speculative execution, no timing side channels. Hardware-validated at 69.7 Gops/s on commodity FPGAs.",
+                desc: "Deterministic state-operation paths for risk, reconciliation, and audit workloads that merit proof-backed technical evaluation.",
               },
             ].map((app) => (
               <Link
@@ -684,7 +684,7 @@ print(f"After undo: 0x{node_a.read():08X}")  # 0xCA00BABE (delta 1 removed)`}</C
                     FPGA
                   </span>
                   <span className="text-sm" style={{ color: "#8888a0" }}>
-                    69.7 Gops/sec
+                    Synthesis-characterized scaling
                   </span>
                 </div>
                 <p className="text-sm" style={{ color: "#c8c8d4" }}>
@@ -696,22 +696,20 @@ print(f"After undo: 0x{node_a.read():08X}")  # 0xCA00BABE (delta 1 removed)`}</C
           </div>
 
           <p>
-            This 140,000x performance range from Python to FPGA exists because XOR is a
-            single logic gate. There is no complex merge function to accelerate — the
-            operation <em>is</em> the gate. CRDTs, event sourcing, and OT cannot make
-            this claim because their merge/transform/replay logic is inherently sequential
-            and complex.
+            The software-to-hardware path exists because XOR maps directly to a
+            small hardware primitive. Specific performance numbers should be
+            repeated only with the linked artifact and evidence label.
           </p>
 
           <p>
-            The hardware story is not theoretical. ATOMiK has been synthesized and
-            validated on real silicon:{" "}
+            The hardware story is artifact-backed. ATOMiK has synthesis notes
+            and live hardware validation paths:{" "}
             <Link href="/blog/fpga-journey-13-dollar-chip" className="underline" style={{ color: "#4f8fff" }}>
-              69.7 Gops/s on a $13.50 chip
+              FPGA proof notes
             </Link>.
             The custom RISC-V CPU includes native LOAD, ACCUM, READ, and SWAP instructions
-            in the ISA. Delta-state operations execute in the same pipeline stage as
-            ADD or AND — zero extra latency.
+            in the ISA prototype path. Treat latency and throughput claims as
+            artifact-specific unless a current measured package is linked.
           </p>
         </Section>
 

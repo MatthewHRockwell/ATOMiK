@@ -170,8 +170,8 @@ export default function DistributedSystemsPage() {
         >
           ATOMiK replaces consensus protocols, CRDTs, and event sourcing with
           XOR delta-state algebra. Every node converges to the same state
-          without leaders, quorums, or conflict resolution &mdash; mathematically
-          guaranteed by 108 Lean4 proofs.
+          without leaders, quorums, or conflict resolution under the XOR state
+          model formalized by 108 Lean4 proofs.
         </p>
         <div className="flex flex-wrap justify-center gap-4 mt-10">
           <Link
@@ -179,10 +179,10 @@ export default function DistributedSystemsPage() {
             className="px-6 py-3 rounded-lg text-sm font-semibold transition-opacity hover:opacity-90"
             style={{ background: "#8b5cf6", color: "#fff" }}
           >
-            Get Started Free
+            Request Evaluation Access
           </Link>
           <Link
-            href="/pricing"
+            href="/docs/hardware"
             className="px-6 py-3 rounded-lg text-sm font-semibold transition-opacity hover:opacity-90"
             style={{
               background: "transparent",
@@ -190,7 +190,7 @@ export default function DistributedSystemsPage() {
               border: "1px solid #4f8fff",
             }}
           >
-            View Pricing
+            View Technical Proof
           </Link>
         </div>
       </section>
@@ -559,11 +559,11 @@ export default function DistributedSystemsPage() {
         style={{ borderTop: "1px solid #1e1e2e" }}
       >
         <h2 className="text-3xl font-bold mb-4">
-          Ready to eliminate consensus overhead?
+          Evaluating distributed state overhead?
         </h2>
         <p className="mb-8 max-w-xl mx-auto" style={{ color: "#8888a0" }}>
-          Start with the free Python SDK. Scale to kernel-level optimization or
-          FPGA hardware when you need 69.7 Gops/s throughput.
+          Start with one state-heavy path, one failure mode, and the evidence
+          needed to decide whether delta-first execution is worth testing.
         </p>
         <div className="flex flex-wrap justify-center gap-4">
           <Link
@@ -571,10 +571,10 @@ export default function DistributedSystemsPage() {
             className="px-8 py-3.5 rounded-lg text-sm font-semibold transition-opacity hover:opacity-90"
             style={{ background: "#8b5cf6", color: "#fff" }}
           >
-            Get Started Free
+            Request Evaluation Access
           </Link>
           <Link
-            href="/pricing"
+            href="/docs/hardware"
             className="px-8 py-3.5 rounded-lg text-sm font-semibold transition-opacity hover:opacity-90"
             style={{
               background: "transparent",
@@ -582,7 +582,7 @@ export default function DistributedSystemsPage() {
               border: "1px solid #4f8fff",
             }}
           >
-            View Pricing
+            View Technical Proof
           </Link>
         </div>
       </section>

@@ -336,7 +336,7 @@ ctx.accum(0x02)  # Undo node B
                   [
                     "Hardware acceleration",
                     "Impractical (complex merge logic)",
-                    "Native (69.7 Gops/s on FPGA)",
+                    "Mapped to FPGA proof artifacts",
                   ],
                 ].map(([dim, crdt, atomik], i) => (
                   <tr key={i} style={{ borderBottom: "1px solid #1e1e2e" }}>
@@ -460,9 +460,9 @@ ctx.accum(0x02)  # Undo node B
             </li>
             <li>
               <strong>Performance is critical.</strong> XOR is a single CPU instruction
-              and a single logic gate. ATOMiK has been synthesized at 69.7 billion
-              operations per second on a commodity FPGA. No CRDT merge function can
-              approach this.
+              and a single logic gate. ATOMiK has synthesis-characterized FPGA
+              scaling notes, but workload claims should be repeated only with the
+              linked artifact and evidence label.
             </li>
             <li>
               <strong>Many nodes, frequent sync.</strong> ATOMiK&apos;s O(1) metadata and
@@ -543,7 +543,7 @@ b.accum(0xFFFF0000)
 a.accum(0xFFFF0000)  # A receives B's delta
 b.accum(0x0000FFFF)  # B receives A's delta
 
-# Both converge — guaranteed by algebra
+# Both converge under the XOR algebra model
 assert a.read() == b.read()  # 0x3531B541
 print(f"Converged: 0x{a.read():08X}")`}</Code>
 
@@ -556,8 +556,8 @@ print(f"Converged: 0x{a.read():08X}")`}</Code>
           </p>
 
           <p>
-            For production deployment with kernel-level COW detection and per-container
-            waste tracking, see{" "}
+            For kernel-level COW detection and per-container waste tracking
+            notes, see{" "}
             <Link href="/docs/kernel-module" className="underline" style={{ color: "#4f8fff" }}>
               the kernel module docs
             </Link>

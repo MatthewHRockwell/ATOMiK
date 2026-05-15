@@ -448,7 +448,7 @@ export default function IntegrationsPage() {
             className="px-8 py-3.5 rounded-lg text-sm font-semibold transition-opacity hover:opacity-90"
             style={{ background: "#4f8fff", color: "#fff" }}
           >
-            Get Started Free
+            Request Evaluation Access
           </Link>
           <Link
             href="/contact"

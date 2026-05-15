@@ -14,6 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://atomik.tech"),
   title: "ATOMiK - State-Aware Compute",
   description:
     "State-aware compute for systems that spend too much work rediscovering what changed.",
@@ -31,7 +32,7 @@ export const metadata: Metadata = {
       "State-aware compute for systems that cannot afford to recompute everything.",
     url: "https://atomik.tech",
     siteName: "ATOMiK",
-    images: [{ url: "https://atomik.tech/01-current-live-atomik-desk.jpg", width: 1200, height: 630 }],
+    images: [{ url: "https://atomik.tech/07-current-live-atomik-desk-v038g.png", width: 1200, height: 630 }],
     type: "website",
   },
   twitter: {
@@ -39,7 +40,7 @@ export const metadata: Metadata = {
     title: "ATOMiK - State-Aware Compute",
     description:
       "State-aware compute for systems that cannot afford to recompute everything.",
-    images: ["https://atomik.tech/01-current-live-atomik-desk.jpg"],
+    images: ["https://atomik.tech/07-current-live-atomik-desk-v038g.png"],
   },
 };
 

@@ -85,19 +85,19 @@ const milestones: Milestone[] = [
       "Multi-node delta streaming: dual-SoC convergence proven",
       "53/54 compliance, 9/9 ATOMiK, 10/10 integration, 6/6 display tests",
     ],
-    highlight: "Production firmware running today",
+    highlight: "Prototype firmware running today",
   },
   {
     phase: "Phase 2",
     title: "Xilinx Zynq XC7Z020 \u2014 Parallel Scaling + Linux",
     status: "completed",
     bullets: [
-      "N=512 peak config: 23,542 LUT, 136 MHz, 69.7 Gops/s",
+      "N=512 synthesis config: 23,542 LUT at 136 MHz",
       "Sub-linear scaling: 3.7\u00d7 LUT growth for 16\u00d7 throughput",
       "Linux 6.9 userspace validation: 16/16 PASS via /dev/mem mmap (S-mode, MMU)",
       "Full OS stack proven: user process \u2192 kernel \u2192 Wishbone CSR \u2192 ATOMiK core",
     ],
-    highlight: "69.7 Gops/s + Linux userspace validated",
+    highlight: "Synthesis scaling + Linux userspace validated",
   },
   {
     phase: "Phase 3",
@@ -263,7 +263,7 @@ interface ScalingRow {
 const scalingData: ScalingRow[] = [
   { label: "N=1", lut: "302", freq: "444 MHz", throughput: "446 Mops/s", barPct: 0.6, color: accent2 },
   { label: "N=16", lut: "941", freq: "267 MHz", throughput: "4.4 Gops/s", barPct: 6.3, color: accent },
-  { label: "N=512", lut: "23,542", freq: "136 MHz", throughput: "69.7 Gops/s", barPct: 100, color: green },
+  { label: "N=512", lut: "23,542", freq: "136 MHz", throughput: "Synthesis ceiling", barPct: 100, color: green },
   { label: "ASIC (proj.)", lut: "~25K gates", freq: ">1 GHz", throughput: ">1 Tops/s", barPct: 100, color: gold },
 ];
 
@@ -331,9 +331,8 @@ export default function ASICRoadmapPage() {
           </span>
         </h1>
         <p className="relative mx-auto max-w-2xl text-lg text-gray-400">
-          ATOMiK&apos;s delta-state algebra is formally verified, FPGA-validated
-          at 69.7 Gops/s, and on a clear path to &gt;1 Tops/s in ASIC with
-          minimal die area.
+          ATOMiK&apos;s delta-state algebra is formally verified, FPGA-backed, and
+          mapped to a synthesis-characterized path toward custom silicon.
         </p>
       </section>
 
@@ -341,7 +340,7 @@ export default function ASICRoadmapPage() {
       <section className="mx-auto max-w-5xl px-6 pb-20">
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
           <MetricCard label="Lean 4 Proofs" value="108" sub="Theorems verified" color={green} />
-          <MetricCard label="Peak FPGA" value="69.7 Gops/s" sub="Zynq XC7Z020, N=512" color={accent} />
+          <MetricCard label="Peak FPGA" value="Synthesis" sub="Zynq XC7Z020, N=512" color={accent} />
           <MetricCard label="Single Core" value="444 MHz" sub="302 LUT, 446 Mops/s" color={accent2} />
           <MetricCard label="ASIC Target" value=">1 Tops/s" sub=">1 GHz, ~25K gates" color={gold} />
         </div>

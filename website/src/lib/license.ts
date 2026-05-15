@@ -1,4 +1,4 @@
-import { createHash, randomBytes } from 'crypto';
+import { createHash } from 'crypto';
 
 const LICENSE_SECRET = process.env.LICENSE_SECRET || 'atomik-dev-secret';
 

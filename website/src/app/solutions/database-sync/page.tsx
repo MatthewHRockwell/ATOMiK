@@ -175,11 +175,12 @@ print(f"{len(changed_ids)} rows changed")
         <div className="rounded-xl border p-8 text-center" style={{ background: "#12121a", borderColor: "#1e1e2e" }}>
           <h3 className="text-xl font-bold mb-3">Stop building CDC pipelines</h3>
           <p className="text-sm mb-6" style={{ color: "#8888a0" }}>
-            Detect database changes with one pip install. Zero infrastructure.
+            Bring a real CDC, replication, or reconciliation path and define
+            the measured artifact needed for a credible evaluation.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
-            <Link href="/get-started" className="px-6 py-2.5 rounded-lg text-sm font-semibold" style={{ background: "#4f8fff", color: "#fff" }}>Get Started Free</Link>
-            <Link href="/pricing" className="px-6 py-2.5 rounded-lg text-sm font-semibold" style={{ background: "transparent", color: "#e0e0e8", border: "1px solid #1e1e2e" }}>View Pricing</Link>
+            <Link href="/get-started" className="px-6 py-2.5 rounded-lg text-sm font-semibold" style={{ background: "#4f8fff", color: "#fff" }}>Request Evaluation Access</Link>
+            <Link href="/docs/hardware" className="px-6 py-2.5 rounded-lg text-sm font-semibold" style={{ background: "transparent", color: "#e0e0e8", border: "1px solid #1e1e2e" }}>View Technical Proof</Link>
           </div>
         </div>
       </section>

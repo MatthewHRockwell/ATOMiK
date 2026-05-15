@@ -1,6 +1,12 @@
 # ATOMiK — Investor Data Room
 
-This data room contains due diligence materials for ATOMiK, a delta-state computing architecture with two production SoC generations deployed, achieving 1 billion operations/second on a $13.50 FPGA.
+> Publication status: historical / diligence draft. Do not share this data room
+> externally without reconciling claims against `../../results/claims_registry.yaml`
+> and the evidence definitions in `../../docs/evidence-labels.md`.
+
+This data room contains due diligence materials for ATOMiK. Some documents in
+this folder predate the current public-positioning pass and may include older
+performance, production, customer, pricing, or roadmap language.
 
 *Last updated: March 2026*
 

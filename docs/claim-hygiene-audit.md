@@ -82,8 +82,7 @@ revolutionary
 
 ## Remaining Legacy Risk
 
-The search still finds older claims in legacy or specialized materials that were
-not fully rewritten in this pass, including:
+Older claims still exist in historical or specialized materials, including:
 
 - `docs/landing/index.html`
 - `docs/PRODUCTION_DEPLOYMENT.md`
@@ -92,9 +91,16 @@ not fully rewritten in this pass, including:
 - `business/pitch_deck/update_deck*.py`
 - older investor, diligence, and launch-post drafts under `business/`
 
-Those files should be reviewed before being used publicly. Do not send or
-publish them without either backing the claims with artifacts, adding evidence
-labels, or rewriting them against the current public positioning.
+Those areas are now explicitly marked as review-required by:
+
+- `docs/PUBLICATION_NOTES.md`
+- `business/PUBLICATION_NOTES.md`
+- `business/data_room/README.md`
+- `business/score_package/00_START_HERE.md`
+
+Do not send or publish review-required material without either backing the
+claims with artifacts, adding evidence labels, or rewriting it against the
+current public positioning.
 
 ## Current Rule
 

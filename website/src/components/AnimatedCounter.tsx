@@ -20,6 +20,9 @@ export function AnimatedCounter({
   const ref = useRef<HTMLSpanElement>(null);
   const [visible, setVisible] = useState(false);
   const [display, setDisplay] = useState(prefix + "0" + suffix);
+  const numericStr = value.replace(/[^0-9.]/g, "");
+  const target = parseFloat(numericStr);
+  const isNumeric = !isNaN(target);
 
   // Detect scroll into view
   useEffect(() => {
@@ -41,14 +44,7 @@ export function AnimatedCounter({
   // Animate once visible
   useEffect(() => {
     if (!visible) return;
-
-    // Parse the target: could be "99.9%", "69.7", "92", "5M+", "330,000x"
-    const numericStr = value.replace(/[^0-9.]/g, "");
-    const target = parseFloat(numericStr);
-    if (isNaN(target)) {
-      setDisplay(prefix + value + suffix);
-      return;
-    }
+    if (!isNumeric) return;
 
     const isDecimal = numericStr.includes(".");
     const trailingText = value.replace(numericStr, ""); // e.g., "%" or " Gops/s"
@@ -80,7 +76,7 @@ export function AnimatedCounter({
 
     raf = requestAnimationFrame(step);
     return () => cancelAnimationFrame(raf);
-  }, [visible, value, prefix, suffix, duration]);
+  }, [visible, value, prefix, suffix, duration, isNumeric, numericStr, target]);
 
-  return <span ref={ref}>{display}</span>;
+  return <span ref={ref}>{isNumeric ? display : prefix + value + suffix}</span>;
 }

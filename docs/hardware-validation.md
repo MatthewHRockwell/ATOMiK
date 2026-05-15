@@ -7,7 +7,8 @@ and roadmap work.
 
 | Artifact | Label | Notes |
 |---|---|---|
-| `website/public/01-current-live-atomik-desk.jpg` | `HARDWARE_VALIDATED` | Current ATOMiK Desk prototype running on live hardware. |
+| `website/public/07-current-live-atomik-desk-v038g.png` | `HARDWARE_VALIDATED` | Current ATOMiK Desk v0.38-G prototype UI running on live hardware. |
+| `website/public/01-current-live-atomik-desk.jpg` | `HARDWARE_VALIDATED` | Earlier ATOMiK Desk prototype running on live hardware. |
 | `docs/LINUX_USERSPACE_PROOF.md` | `HARDWARE_VALIDATED` | Linux userspace to FPGA accelerator validation path. |
 | `results/perf_matrix_ax7020_20260509.txt` | `LIVE_MEASURED` | Raw AX7020 board run output with interpretation caveats in `docs/perf/`. |
 
@@ -39,6 +40,13 @@ Examples:
 Use:
 
 > Current ATOMiK Desk prototype running on live hardware.
+
+For the current UI upgrade track, use:
+
+> ATOMiK Desk v0.38-G prototype UI running on live hardware.
+
+Do not add v0.38-H public claims until a screenshot, demo clip, or other
+recorded artifact exists.
 
 Avoid:
 

@@ -215,7 +215,7 @@ export default function ApiReferencePage() {
                 <span style={{ color: numColor }}>0</span>
                 <span style={{ color: varColor }}>);</span>
                 {"\n"}
-                <span style={{ color: cmtColor }}>// s == 0xCAFEBABF</span>
+                <span style={{ color: cmtColor }}>{"// s == 0xCAFEBABF"}</span>
               </code>
             </pre>
           </div>

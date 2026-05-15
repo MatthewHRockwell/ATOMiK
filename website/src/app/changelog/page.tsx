@@ -156,7 +156,7 @@ const releases: Release[] = [
     category: "hardware",
     items: [
       "6 configs (N=1 to N=512), 4 synthesis strategies",
-      "Peak: 69.7 Gops/s at N=512 on XC7Z020",
+      "N=512 peak synthesis configuration documented for XC7Z020",
       "Sub-linear LUT scaling confirmed (~34 LUT per additional bank)",
     ],
   },

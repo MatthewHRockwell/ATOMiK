@@ -4,5 +4,5 @@ export const alt = "ATOMiK Blog";
 export const size = ogSize;
 export const contentType = "image/png";
 export default function OG() {
-  return generateOGImage({ title: "From Math to Silicon: 69.7 Gops/s on a $13.50 Chip", subtitle: "3 SoC generations, custom RV64I CPU, HD HDMI — on a $13.50 FPGA.", accent: "#8b5cf6", badge: "Hardware" });
+  return generateOGImage({ title: "From Math to Silicon: FPGA Proof Notes", subtitle: "Archived engineering notes on custom RISC-V, HDMI, and synthesis-characterized FPGA scaling.", accent: "#8b5cf6", badge: "Hardware" });
 }

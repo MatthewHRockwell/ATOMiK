@@ -91,7 +91,7 @@ const methods: MethodDoc[] = [
           <span style={{ color: fnColor }}>atomik_context_create</span>
           <span style={{ color: varColor }}>();</span>
           {"\n"}
-          <span style={{ color: cmtColor }}>// ctx-&gt;reference == 0, ctx-&gt;accumulator == 0</span>
+          <span style={{ color: cmtColor }}>{"// ctx->reference == 0, ctx->accumulator == 0"}</span>
         </code>
       ),
       JavaScript: (
@@ -110,7 +110,7 @@ const methods: MethodDoc[] = [
           <span style={{ color: typeColor }}>AtomikContext</span>
           <span style={{ color: varColor }}>();</span>
           {"\n"}
-          <span style={{ color: cmtColor }}>// ctx.reference === 0, ctx.accumulator === 0</span>
+          <span style={{ color: cmtColor }}>{"// ctx.reference === 0, ctx.accumulator === 0"}</span>
         </code>
       ),
     },
@@ -174,7 +174,7 @@ const methods: MethodDoc[] = [
           <span style={{ color: numColor }}>0xCAFEBABE</span>
           <span style={{ color: varColor }}>);</span>
           {"\n"}
-          <span style={{ color: cmtColor }}>// ctx-&gt;reference == 0xCAFEBABE, ctx-&gt;accumulator == 0</span>
+          <span style={{ color: cmtColor }}>{"// ctx->reference == 0xCAFEBABE, ctx->accumulator == 0"}</span>
         </code>
       ),
       JavaScript: (
@@ -185,7 +185,7 @@ const methods: MethodDoc[] = [
           <span style={{ color: numColor }}>0xCAFEBABE</span>
           <span style={{ color: varColor }}>);</span>
           {"\n"}
-          <span style={{ color: cmtColor }}>// ctx.reference === 0xCAFEBABE, ctx.accumulator === 0</span>
+          <span style={{ color: cmtColor }}>{"// ctx.reference === 0xCAFEBABE, ctx.accumulator === 0"}</span>
         </code>
       ),
     },
@@ -268,14 +268,14 @@ const methods: MethodDoc[] = [
           <span style={{ color: numColor }}>7</span>
           <span style={{ color: varColor }}>);</span>
           {"  "}
-          <span style={{ color: cmtColor }}>// accumulator ^= 7</span>
+          <span style={{ color: cmtColor }}>{"// accumulator ^= 7"}</span>
           {"\n"}
           <span style={{ color: fnColor }}>atomik_accum</span>
           <span style={{ color: varColor }}>(ctx, </span>
           <span style={{ color: numColor }}>3</span>
           <span style={{ color: varColor }}>);</span>
           {"  "}
-          <span style={{ color: cmtColor }}>// accumulator ^= 3</span>
+          <span style={{ color: cmtColor }}>{"// accumulator ^= 3"}</span>
         </code>
       ),
       JavaScript: (
@@ -292,7 +292,7 @@ const methods: MethodDoc[] = [
           <span style={{ color: numColor }}>7</span>
           <span style={{ color: varColor }}>);</span>
           {"  "}
-          <span style={{ color: cmtColor }}>// accumulator ^= 7</span>
+          <span style={{ color: cmtColor }}>{"// accumulator ^= 7"}</span>
           {"\n"}
           <span style={{ color: varColor }}>ctx.</span>
           <span style={{ color: fnColor }}>accum</span>
@@ -300,7 +300,7 @@ const methods: MethodDoc[] = [
           <span style={{ color: numColor }}>3</span>
           <span style={{ color: varColor }}>);</span>
           {"  "}
-          <span style={{ color: cmtColor }}>// accumulator ^= 3</span>
+          <span style={{ color: cmtColor }}>{"// accumulator ^= 3"}</span>
         </code>
       ),
     },
@@ -380,7 +380,7 @@ const methods: MethodDoc[] = [
           <span style={{ color: fnColor }}>atomik_read</span>
           <span style={{ color: varColor }}>(ctx);</span>
           {"\n"}
-          <span style={{ color: cmtColor }}>// s == 0xFFFF  (0xFF00 ^ 0x00FF)</span>
+          <span style={{ color: cmtColor }}>{"// s == 0xFFFF  (0xFF00 ^ 0x00FF)"}</span>
         </code>
       ),
       JavaScript: (
@@ -402,7 +402,7 @@ const methods: MethodDoc[] = [
           <span style={{ color: fnColor }}>read</span>
           <span style={{ color: varColor }}>();</span>
           {"\n"}
-          <span style={{ color: cmtColor }}>// state === 0xFFFF  (0xFF00 ^ 0x00FF)</span>
+          <span style={{ color: cmtColor }}>{"// state === 0xFFFF  (0xFF00 ^ 0x00FF)"}</span>
         </code>
       ),
     },
@@ -481,9 +481,9 @@ const methods: MethodDoc[] = [
           <span style={{ color: fnColor }}>atomik_swap</span>
           <span style={{ color: varColor }}>(ctx);</span>
           {"\n"}
-          <span style={{ color: cmtColor }}>// saved == 1018  (1000 ^ 50)</span>
+          <span style={{ color: cmtColor }}>{"// saved == 1018  (1000 ^ 50)"}</span>
           {"\n"}
-          <span style={{ color: cmtColor }}>// ctx-&gt;reference == 1018, ctx-&gt;accumulator == 0</span>
+          <span style={{ color: cmtColor }}>{"// ctx->reference == 1018, ctx->accumulator == 0"}</span>
         </code>
       ),
       JavaScript: (
@@ -505,9 +505,9 @@ const methods: MethodDoc[] = [
           <span style={{ color: fnColor }}>swap</span>
           <span style={{ color: varColor }}>();</span>
           {"\n"}
-          <span style={{ color: cmtColor }}>// saved === 1018  (1000 ^ 50)</span>
+          <span style={{ color: cmtColor }}>{"// saved === 1018  (1000 ^ 50)"}</span>
           {"\n"}
-          <span style={{ color: cmtColor }}>// ctx.reference === 1018, ctx.accumulator === 0</span>
+          <span style={{ color: cmtColor }}>{"// ctx.reference === 1018, ctx.accumulator === 0"}</span>
         </code>
       ),
     },

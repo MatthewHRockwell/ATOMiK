@@ -207,6 +207,7 @@ export default function DemoPage() {
   const wsRef = useRef<WebSocket | null>(null);
 
   const currentState = xor32(reference, accumulator);
+  const activePeerCount = liveEnabled ? peerCount : 0;
 
   const historyEndRef = useRef<HTMLDivElement>(null);
 
@@ -220,7 +221,6 @@ export default function DemoPage() {
       if (wsRef.current) {
         wsRef.current.close();
         wsRef.current = null;
-        setPeerCount(0);
       }
       return;
     }
@@ -516,7 +516,8 @@ export default function DemoPage() {
             </p>
             <p className="text-sm leading-relaxed" style={{ color: "#b0b0c0" }}>
               You just performed the four fundamental ATOMiK operations. These same
-              operations run on custom RISC-V hardware at 69.7 Gops/s.
+              operations have hardware-backed proof artifacts and synthesis notes
+              available in the technical documentation.
             </p>
             <button
               onClick={() => setTourStep(0)}
@@ -541,15 +542,15 @@ export default function DemoPage() {
           <div className="flex items-center gap-3">
             <span
               className="inline-block w-2.5 h-2.5 rounded-full"
-              style={{ background: liveEnabled && peerCount > 0 ? "#22c55e" : "#555" }}
+              style={{ background: activePeerCount > 0 ? "#22c55e" : "#555" }}
             />
             <div>
               <span className="text-sm font-semibold">
                 {liveEnabled ? "Live Sync Active" : "Live Sync"}
               </span>
-              {liveEnabled && peerCount > 0 && (
+              {activePeerCount > 0 && (
                 <span className="text-xs ml-2" style={{ color: "#22c55e" }}>
-                  {peerCount} peer{peerCount !== 1 ? "s" : ""} connected
+                  {activePeerCount} peer{activePeerCount !== 1 ? "s" : ""} connected
                 </span>
               )}
               {!liveEnabled && (
@@ -853,9 +854,10 @@ export default function DemoPage() {
 
       {/* ======== CTA ======== */}
       <section className="text-center px-6 pb-24">
-        <h2 className="text-2xl font-bold mb-3">Ready to build?</h2>
+        <h2 className="text-2xl font-bold mb-3">Ready to evaluate?</h2>
         <p className="mb-8" style={{ color: "#8888a0" }}>
-          From pip install to FPGA silicon &mdash; start with the SDK and scale when you&apos;re ready.
+          Start with a workload-fit conversation, proof review, or scoped
+          technical evaluation.
         </p>
         <div className="flex flex-wrap justify-center gap-4">
           <Link
@@ -863,7 +865,7 @@ export default function DemoPage() {
             className="inline-block px-6 py-3 rounded-lg text-sm font-bold transition-opacity hover:opacity-90"
             style={{ background: "#4f8fff", color: "#fff" }}
           >
-            Get Started
+            Request Evaluation Access
           </Link>
           <Link
             href="/docs"

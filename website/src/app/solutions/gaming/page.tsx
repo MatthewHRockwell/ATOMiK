@@ -4,9 +4,9 @@ import Nav from "@/components/Nav";
 
 export const metadata: Metadata = {
   title:
-    "Real-Time Game State Sync at 5M Ops/Second — ATOMiK | Multiplayer Netcode, Deterministic Lockstep",
+    "Real-Time Game State Sync Evaluation — ATOMiK | Multiplayer Netcode, Deterministic Lockstep",
   description:
-    "Replace full state snapshots and rollback netcode with XOR delta-state algebra. 8-byte updates, O(1) rollback, zero desync — mathematically guaranteed. The multiplayer state engine that eliminates reconciliation.",
+    "Explore XOR delta-state algebra for multiplayer state sync, rollback, and reconciliation-heavy workloads with request-based technical evaluation.",
   keywords: [
     "game state synchronization",
     "multiplayer netcode",
@@ -20,9 +20,9 @@ export const metadata: Metadata = {
     "game state prediction",
   ],
   openGraph: {
-    title: "Real-Time Game State at 5M Ops/Second — ATOMiK",
+    title: "Real-Time Game State Evaluation — ATOMiK",
     description:
-      "Replace full state snapshots and rollback netcode with XOR delta-state algebra. 8-byte updates. O(1) rollback. Zero desync.",
+      "Explore XOR delta-state algebra for multiplayer state sync, rollback, and reconciliation-heavy workloads.",
     type: "website",
   },
 };
@@ -180,10 +180,10 @@ export default function GamingPage() {
             className="px-6 py-3 rounded-lg text-sm font-semibold transition-opacity hover:opacity-90"
             style={{ background: "#8b5cf6", color: "#fff" }}
           >
-            Get Started Free
+            Request Evaluation Access
           </Link>
           <Link
-            href="/pricing"
+            href="/docs/hardware"
             className="px-6 py-3 rounded-lg text-sm font-semibold transition-opacity hover:opacity-90"
             style={{
               background: "transparent",
@@ -191,7 +191,7 @@ export default function GamingPage() {
               border: "1px solid #4f8fff",
             }}
           >
-            View Pricing
+            View Technical Proof
           </Link>
         </div>
       </section>
@@ -464,11 +464,11 @@ export default function GamingPage() {
         style={{ borderTop: "1px solid #1e1e2e" }}
       >
         <h2 className="text-3xl font-bold mb-4">
-          Ready to eliminate netcode complexity?
+          Evaluating state-heavy multiplayer infrastructure?
         </h2>
         <p className="mb-8 max-w-xl mx-auto" style={{ color: "#8888a0" }}>
-          Start with the free Python SDK. Scale to FPGA hardware acceleration
-          when you need 69.7 Gops/s throughput for dedicated game servers.
+          Bring a concrete rollback, replication, or reconciliation path and
+          define the proof artifacts needed before treating ATOMiK as a fit.
         </p>
         <div className="flex flex-wrap justify-center gap-4">
           <Link
@@ -476,10 +476,10 @@ export default function GamingPage() {
             className="px-8 py-3.5 rounded-lg text-sm font-semibold transition-opacity hover:opacity-90"
             style={{ background: "#8b5cf6", color: "#fff" }}
           >
-            Get Started Free
+            Request Evaluation Access
           </Link>
           <Link
-            href="/pricing"
+            href="/docs/hardware"
             className="px-8 py-3.5 rounded-lg text-sm font-semibold transition-opacity hover:opacity-90"
             style={{
               background: "transparent",
@@ -487,7 +487,7 @@ export default function GamingPage() {
               border: "1px solid #4f8fff",
             }}
           >
-            View Pricing
+            View Technical Proof
           </Link>
         </div>
       </section>

@@ -62,7 +62,7 @@ const painPoints = [
     problem:
       "Positions span NYSE, NASDAQ, CBOE, dark pools. Reconciling state across venues requires ordered merge logic, conflict resolution, and expensive end-of-day batch processes. Real-time cross-venue exposure is approximated, not exact.",
     solution:
-      "XOR commutativity means venue deltas can arrive in any order and the result is identical. Lock-free parallel accumulation from every venue produces exact real-time exposure. No ordered merges. No batch reconciliation. Mathematically guaranteed convergence.",
+      "XOR commutativity means venue deltas can be evaluated without ordered merge logic in the modeled state path. Any production exposure or reconciliation claim still needs workload-specific validation and audit artifacts.",
   },
 ];
 
@@ -70,8 +70,8 @@ const securityProperties = [
   {
     property: "Operation Timing",
     traditional: "Variable (cache-dependent)",
-    atomik: "Constant (hardware-guaranteed)",
-    impact: "Eliminates timing oracle attacks on position state",
+    atomik: "Fixed-path hardware model",
+    impact: "Reduces data-dependent timing in the modeled state path",
   },
   {
     property: "Speculative Execution",
@@ -153,10 +153,10 @@ export default function FinancialSolutionsPage() {
           className="text-lg md:text-xl max-w-3xl mx-auto leading-relaxed"
           style={{ color: "#8888a0" }}
         >
-          O(1) state reconstruction with zero timing jitter. ATOMiK&apos;s
-          delta-state algebra eliminates timing side channels, enables instant
-          trade cancellations via self-inverse undo, and provides lock-free
-          multi-venue aggregation &mdash; all backed by 108 Lean4 formal proofs.
+          O(1) state reconstruction under a fixed delta-state model. ATOMiK&apos;s
+          algebra supports self-inverse undo and lock-free multi-venue
+          aggregation paths that should be validated against real trading,
+          risk, or reconciliation workloads.
         </p>
         <div className="flex flex-wrap justify-center gap-4 mt-10">
           <Link
@@ -164,10 +164,10 @@ export default function FinancialSolutionsPage() {
             className="px-6 py-3 rounded-lg text-sm font-semibold transition-opacity hover:opacity-90"
             style={{ background: "#8b5cf6", color: "#fff" }}
           >
-            Contact Sales
+            Discuss Design Partnership
           </Link>
           <Link
-            href="/pricing"
+            href="/docs/hardware"
             className="px-6 py-3 rounded-lg text-sm font-semibold transition-opacity hover:opacity-90"
             style={{
               background: "transparent",
@@ -175,7 +175,7 @@ export default function FinancialSolutionsPage() {
               border: "1px solid #4f8fff",
             }}
           >
-            View Pricing
+            View Technical Proof
           </Link>
         </div>
       </section>
@@ -509,10 +509,10 @@ export default function FinancialSolutionsPage() {
             className="px-8 py-3.5 rounded-lg text-sm font-semibold transition-opacity hover:opacity-90"
             style={{ background: "#8b5cf6", color: "#fff" }}
           >
-            Contact Sales
+            Discuss Design Partnership
           </Link>
           <Link
-            href="/pricing"
+            href="/docs/hardware"
             className="px-8 py-3.5 rounded-lg text-sm font-semibold transition-opacity hover:opacity-90"
             style={{
               background: "transparent",
@@ -520,7 +520,7 @@ export default function FinancialSolutionsPage() {
               border: "1px solid #4f8fff",
             }}
           >
-            View Pricing
+            View Technical Proof
           </Link>
         </div>
       </section>

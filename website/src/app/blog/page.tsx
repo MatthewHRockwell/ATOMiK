@@ -51,10 +51,10 @@ const posts = [
   },
   {
     slug: "fpga-journey-13-dollar-chip",
-    title: "From Math to Silicon: 69.7 Gops/s on a $13.50 Chip",
+    title: "From Math to Silicon: FPGA Proof Notes",
     date: "February 28, 2026",
     excerpt:
-      "How we went from 108 Lean4 theorems to a custom RISC-V CPU with native delta-state instructions, HD HDMI output, and 69.7 billion operations per second on commodity FPGAs.",
+      "An archived engineering note on moving from Lean4 proofs to custom RISC-V instructions, HDMI output, and synthesis-characterized FPGA scaling.",
     tags: ["hardware", "fpga", "risc-v", "engineering"],
   },
   {

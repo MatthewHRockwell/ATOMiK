@@ -170,10 +170,9 @@ export default function IoTEdgePage() {
           className="text-lg md:text-xl max-w-3xl mx-auto leading-relaxed"
           style={{ color: "#8888a0" }}
         >
-          ATOMiK reduces sensor data transfer by 99% with fixed-size XOR deltas.
-          Fingerprint-based change detection skips unchanged readings.
-          Order-free convergence syncs across intermittent cellular, satellite,
-          and LoRa links &mdash; no backlog replay, no ordering constraints.
+          ATOMiK frames edge telemetry as fixed-size XOR deltas so unchanged
+          readings can be skipped and intermittent links can be evaluated with a
+          clear workload, artifact, and proof boundary.
         </p>
         <div className="flex flex-wrap justify-center gap-4 mt-10">
           <Link
@@ -181,10 +180,10 @@ export default function IoTEdgePage() {
             className="px-6 py-3 rounded-lg text-sm font-semibold transition-opacity hover:opacity-90"
             style={{ background: "#8b5cf6", color: "#fff" }}
           >
-            Get Started Free
+            Request Evaluation Access
           </Link>
           <Link
-            href="/pricing"
+            href="/docs/hardware"
             className="px-6 py-3 rounded-lg text-sm font-semibold transition-opacity hover:opacity-90"
             style={{
               background: "transparent",
@@ -192,7 +191,7 @@ export default function IoTEdgePage() {
               border: "1px solid #4f8fff",
             }}
           >
-            View Pricing
+            View Technical Proof
           </Link>
         </div>
       </section>
@@ -562,11 +561,11 @@ export default function IoTEdgePage() {
         style={{ borderTop: "1px solid #1e1e2e" }}
       >
         <h2 className="text-3xl font-bold mb-4">
-          Ready to cut your IoT bandwidth by 99%?
+          Evaluating bandwidth-constrained edge workloads?
         </h2>
         <p className="mb-8 max-w-xl mx-auto" style={{ color: "#8888a0" }}>
-          Start with the free Python SDK on a single edge device. Scale to
-          millions of sensors with the same 8-byte delta protocol.
+          Bring one sensor, sync, or intermittently connected path and define
+          what measured artifact would make the evaluation credible.
         </p>
         <div className="flex flex-wrap justify-center gap-4">
           <Link
@@ -574,10 +573,10 @@ export default function IoTEdgePage() {
             className="px-8 py-3.5 rounded-lg text-sm font-semibold transition-opacity hover:opacity-90"
             style={{ background: "#8b5cf6", color: "#fff" }}
           >
-            Get Started Free
+            Request Evaluation Access
           </Link>
           <Link
-            href="/pricing"
+            href="/contact?intent=design-partner"
             className="px-8 py-3.5 rounded-lg text-sm font-semibold transition-opacity hover:opacity-90"
             style={{
               background: "transparent",
@@ -585,7 +584,7 @@ export default function IoTEdgePage() {
               border: "1px solid #4f8fff",
             }}
           >
-            View Pricing
+            Discuss Design Partnership
           </Link>
         </div>
       </section>

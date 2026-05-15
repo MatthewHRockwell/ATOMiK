@@ -1,6 +1,7 @@
 'use client';
 
 import { useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 import { useEffect, useState, Suspense } from 'react';
 
 interface LicenseInfo {
@@ -188,7 +189,7 @@ function SuccessContent() {
         </p>
       </div>
 
-      <a href="/" style={styles.backLink}>&larr; Back to atomik.tech</a>
+      <Link href="/" style={styles.backLink}>&larr; Back to atomik.tech</Link>
     </div>
   );
 }

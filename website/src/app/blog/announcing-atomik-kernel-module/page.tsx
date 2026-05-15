@@ -99,7 +99,7 @@ export default function BlogPost() {
           <p>
             This is backed by 108 formally proven Lean4 theorems (commutativity, associativity,
             self-inverse, identity) and runs on everything from a Python pip install to custom
-            FPGA silicon hitting 69.7 billion operations per second.
+            FPGA prototype and synthesis paths documented in the hardware proof map.
           </p>
 
           <h2 className="text-2xl font-bold pt-4" style={{ color: "#e0e0e8" }}>
@@ -203,7 +203,8 @@ python -m atomik_core.benchmark`}</Code>
           </p>
           <p>
             We&apos;re also bringing up ATOMiK on Xilinx Zynq for hardware-accelerated
-            delta processing at 69.7 Gops/s — but that&apos;s a story for another post.
+            delta processing in the hardware proof stack — but that&apos;s a story
+            for another post.
           </p>
 
           {/* CTA */}

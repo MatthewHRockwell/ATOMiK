@@ -4,9 +4,9 @@ import Nav from "@/components/Nav";
 import EmailCapture from "@/components/EmailCapture";
 
 export const metadata: Metadata = {
-  title: "From Math to Silicon: 69.7 Gops/s on a $13.50 Chip — ATOMiK Blog",
+  title: "From Math to Silicon: FPGA Proof Notes — ATOMiK Blog",
   description:
-    "How we went from 108 Lean4 theorems to a custom RISC-V CPU with native delta-state instructions, HD HDMI output, and 69.7 billion operations per second on commodity FPGAs.",
+    "An archived engineering note on moving from Lean4 proofs to custom RISC-V instructions, HDMI output, and synthesis-characterized FPGA scaling.",
 };
 
 function Code({ children }: { children: string }) {
@@ -58,7 +58,7 @@ export default function FPGABlogPost() {
             March 15, 2026
           </time>
           <h1 className="text-3xl font-bold tracking-tight mb-4 leading-tight">
-            From Math to Silicon: 69.7 Gops/s on a $13.50 Chip
+            From Math to Silicon: FPGA Proof Notes
           </h1>
           <div className="flex gap-2">
             {["hardware", "fpga", "risc-v", "engineering"].map((tag) => (
@@ -84,9 +84,14 @@ export default function FPGABlogPost() {
         >
           <Stat value="$13.50" label="Board cost" />
           <Stat value="94.5M" label="Ops/sec (single bank)" />
-          <Stat value="69.7B" label="Ops/sec (512 banks)" />
+          <Stat value="SYNTHESIS" label="512-bank ceiling" />
           <Stat value="3" label="SoC generations" />
         </div>
+        <p className="mb-10 text-sm leading-6" style={{ color: "#8888a0" }}>
+          Publication note: this archived post discusses synthesis-characterized
+          scaling. Treat specific performance numbers as artifact-linked
+          synthesis data, not current live-board benchmark claims.
+        </p>
 
         {/* Content */}
         <div className="space-y-6 text-base leading-relaxed" style={{ color: "#c8c8d4" }}>
@@ -242,7 +247,7 @@ uint32_t state = *(volatile uint32_t*)ATOMIK_READ;
                   ["N=16", "266.7", "941", "1.8%", "4.4"],
                   ["N=64", "205.1", "3,498", "6.6%", "13.4"],
                   ["N=256", "148.1", "15,197", "28.6%", "38.1"],
-                  ["N=512", "135.6", "23,542", "44.3%", "69.7"],
+                  ["N=512", "135.6", "23,542", "44.3%", "see artifact"],
                 ].map(([banks, fmax, lut, pct, gops]) => (
                   <tr key={banks} style={{ borderBottom: "1px solid #1e1e2e" }}>
                     <td className="p-2 font-mono">{banks}</td>
@@ -262,8 +267,9 @@ uint32_t state = *(volatile uint32_t*)ATOMIK_READ;
             (BRAM, merge tree, CDC bridge) amortizes across all banks.
           </p>
           <p>
-            69.7 billion operations per second. On a $99 development board. With
-            56% of the fabric still available for your application logic.
+            The N=512 row is a synthesis-characterized ceiling on the Zynq path.
+            Use the hardware proof map before repeating it as a public
+            performance claim.
           </p>
 
           <h2 className="text-2xl font-bold pt-4" style={{ color: "#e0e0e8" }}>

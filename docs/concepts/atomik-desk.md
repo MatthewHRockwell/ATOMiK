@@ -1,16 +1,16 @@
 # ATOMiK Desk Concept
 
-## Live Today
+## Earlier Live Proof
 
-![Current ATOMiK Desk prototype running on live hardware](../../website/public/01-current-live-atomik-desk.jpg)
+![Earlier ATOMiK Desk prototype running on live hardware](../../website/public/01-current-live-atomik-desk.jpg)
 
-**HARDWARE_VALIDATED:** Current ATOMiK Desk prototype running on live hardware.
+**HARDWARE_VALIDATED:** Earlier ATOMiK Desk prototype running on live hardware.
 
 ATOMiK Desk is a live prototype and demonstration surface for state-aware
 compute. It should be described as current prototype work, not as a polished
 shipping desktop product.
 
-## Current UI Upgrade Track
+## Current Live UI Proof
 
 ![ATOMiK Desk v0.38-G prototype UI running on live hardware](../../website/public/07-current-live-atomik-desk-v038g.png)
 
@@ -51,7 +51,7 @@ when paired with the live hardware screenshot.
 
 Use the live screenshot caption:
 
-> Current ATOMiK Desk prototype running on live hardware.
+> Earlier ATOMiK Desk prototype running on live hardware.
 
 Use the current UI upgrade caption:
 

@@ -58,7 +58,7 @@ const timelineItems = [
     year: "2026",
     title: "Zynq Characterization",
     description:
-      "69.7 Gops/s peak on Xilinx Zynq XC7Z020. 444 MHz single-bank. 512 parallel banks in 44% of the fabric. Sub-linear LUT scaling confirmed.",
+      "Synthesis-characterized Xilinx Zynq XC7Z020 scaling path with single-bank and parallel-bank resource notes. Use the hardware proof map for claim labels.",
     color: "text-yellow-400",
     border: "border-yellow-500/40",
     bg: "bg-yellow-500/5",
@@ -172,8 +172,8 @@ export default function AboutPage() {
             </p>
             <p>
               This is not an optimization. It is a new primitive — as fundamental as the
-              transistor or the cache line. The math is proven (108 Lean4 theorems). The hardware
-              is built (3 FPGA platforms, 69.7 Gops/s). The software is shipping (
+              transistor or the cache line. The math is formalized (108 Lean4 theorems). The hardware
+              is prototype-validated across FPGA paths. The software packages are available (
               <code
                 className="text-sm font-mono px-2 py-0.5 rounded"
                 style={{ background: "#1e1e2e", color: "#22c55e" }}
@@ -222,7 +222,7 @@ export default function AboutPage() {
             {
               step: "04",
               title: "The Silicon",
-              desc: "Three FPGA platforms validated. 444 MHz single-bank, 69.7 Gops/s parallel. ASIC evaluation underway.",
+              desc: "FPGA prototype paths and synthesis-characterized scaling are documented. ASIC evaluation is roadmap work.",
               color: "#d4a843",
             },
           ].map((item) => (
@@ -351,13 +351,13 @@ export default function AboutPage() {
                 Matt Rockwell is a systems engineer and founder of ATOMiK, with deep expertise
                 in embedded systems, FPGA development, and formal verification. He created the
                 delta-state algebra as a fundamental rethinking of how computers handle state
-                — proving it correct with 108 Lean4 theorems before writing the first line of
-                production code. ATOMiK grew from a mathematical insight into a
+                — proving the core algebra with 108 Lean4 theorems before writing the first line of
+                prototype code. ATOMiK grew from a mathematical insight into a
                 hardware-validated computing architecture running on custom RISC-V silicon.
               </p>
               <p className="leading-relaxed mb-6" style={{ color: "#b0b0c0" }}>
                 Designed the delta-state algebra, wrote the formal proofs, built the hardware,
-                and shipped the software. ATOMiK is a solo-founder deep-tech company —
+                and published the software tooling. ATOMiK is a solo-founder deep-tech company —
                 every theorem, every RTL module, and every line of SDK code traces back to one
                 engineer with a conviction that computing has a better primitive waiting to be
                 found.

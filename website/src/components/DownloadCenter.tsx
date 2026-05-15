@@ -117,7 +117,8 @@ export default function DownloadCenter({ currentTier = "pro" }: { currentTier?: 
   const [kmodVariant, setKmodVariant] = useState<string>("deb");
 
   useEffect(() => {
-    setPlatform(detectPlatform());
+    const id = window.setTimeout(() => setPlatform(detectPlatform()), 0);
+    return () => window.clearTimeout(id);
   }, []);
 
   function handleCopy(id: string, command: string) {

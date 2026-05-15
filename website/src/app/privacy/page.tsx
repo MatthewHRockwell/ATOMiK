@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Privacy Policy - ATOMiK",
@@ -9,12 +10,12 @@ export default function PrivacyPage() {
   return (
     <div className="min-h-screen bg-[#0a0a0f] text-[#e0e0e8]">
       <div className="max-w-3xl mx-auto px-6 py-16">
-        <a
+        <Link
           href="/"
           className="inline-block text-sm text-[#8888a0] hover:text-[#8b5cf6] transition-colors mb-12"
         >
           &larr; Back to atomik.tech
-        </a>
+        </Link>
 
         <h1 className="text-4xl font-bold tracking-tight mb-2">Privacy Policy</h1>
         <p className="text-[#8888a0] text-sm mb-12">Effective March 1, 2026</p>

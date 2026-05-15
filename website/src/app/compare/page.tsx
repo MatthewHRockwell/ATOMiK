@@ -164,7 +164,7 @@ const hwHeaders = ["Feature", "ATOMiK FPGA", "GPU Computing", "ASIC (custom)"];
 const hwRows: string[][] = [
   [
     "Operations/sec",
-    "69.7 Gops/s (512 banks, Zynq)",
+    "Synthesis-characterized Zynq scaling",
     "Tera-scale (matrix ops)",
     "Application-specific, highest",
   ],
@@ -428,7 +428,8 @@ export default function ComparePage() {
           ATOMiK targets FPGA because delta-state operations are
           simple, wide, and embarrassingly parallel&mdash;a natural fit for
           configurable fabric. A $13.50 Tang Nano 9K runs the full stack. A
-          Zynq-7020 reaches 69.7 Gops/s with 512 parallel banks at under 1W.
+          Zynq-7020 scaling path is documented as synthesis output, not as a
+          current live-board benchmark claim.
         </p>
         <ComparisonTable headers={hwHeaders} rows={hwRows} />
       </section>
@@ -481,10 +482,10 @@ export default function ComparePage() {
 
       {/* CTA */}
       <section className="text-center px-6 py-16 pb-24">
-        <h2 className="text-2xl font-bold mb-3">Ready to try it?</h2>
+        <h2 className="text-2xl font-bold mb-3">Ready to evaluate it?</h2>
         <p className="text-sm mb-8 max-w-lg mx-auto" style={{ color: "#8888a0" }}>
-          ATOMiK is open source (Apache 2.0). Install the Python SDK in
-          seconds, or read the docs to understand the algebra first.
+          Start with the evidence framework, then bring a concrete workload if
+          the algebra looks relevant.
         </p>
         <div className="flex items-center justify-center gap-4">
           <Link
@@ -492,7 +493,7 @@ export default function ComparePage() {
             className="inline-block px-6 py-3 rounded-lg text-sm font-semibold transition-opacity hover:opacity-90"
             style={{ background: "#4f8fff", color: "#fff" }}
           >
-            Get Started
+            Request Evaluation Access
           </Link>
           <Link
             href="/docs"

@@ -53,6 +53,8 @@ polished shipped product.
 ## Quick Links
 
 - [Evidence labels](docs/evidence-labels.md)
+- [Docs publication notes](docs/PUBLICATION_NOTES.md)
+- [Business material publication notes](business/PUBLICATION_NOTES.md)
 - [Claims registry](results/claims_registry.yaml)
 - [Technical proof](docs/technical-proof.md)
 - [Hardware validation](docs/hardware-validation.md)
