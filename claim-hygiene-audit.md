@@ -4,6 +4,8 @@ Date: 2026-05-10
 
 Updated: 2026-05-14
 
+Follow-up: 2026-05-15
+
 ## Scope Reviewed
 
 Risky claim search was run across:
@@ -80,16 +82,43 @@ world's first
 revolutionary
 ```
 
+## Tightened In 2026-05-15 Follow-Up
+
+- Blog and docs routes: added a reusable evidence banner warning that older
+  articles and technical notes may contain exploratory examples, synthesis
+  outputs, or modeled comparisons.
+- Blog index and claim-dense articles: softened CRDT, event-sourcing,
+  distributed-cache, kernel-module, and FPGA-story copy so examples are framed
+  as educational/model-based unless backed by artifacts.
+- Migration and examples docs: replaced production-ready, no-conflict,
+  no-consensus, and guarantee-style language with scoped evaluation language.
+- Static `docs/site/` dashboards: added visible legacy-warning banners and
+  classified them as historical demo/dashboard material, not current public
+  landing pages for `ATOMiK.tech`.
+- Legacy business collateral: added inline publication-status banners to
+  funding, diligence, data-room, score-package, launch-post, competitive memo,
+  and generator/template files that still contain historical metrics or strong
+  market claims.
+- v0.38-H claims remain intentionally unpromoted until a screenshot or recorded
+  artifact is saved and classified.
+
 ## Remaining Legacy Risk
 
 Older claims still exist in historical or specialized materials, including:
 
 - `docs/landing/index.html`
 - `docs/PRODUCTION_DEPLOYMENT.md`
+- older technical/reference files under `docs/reference/`
+- generated/static dashboards under `docs/site/`
 - `business/cosmos-cookoff/**`
+- `business/data_room/**`
+- `business/funding_strategy/**`
+- `business/score_package/**`
 - `business/pitch_deck/investor_deck_full.md`
+- `business/pitch_deck/generate_deck.py`
 - `business/pitch_deck/update_deck*.py`
-- older investor, diligence, and launch-post drafts under `business/`
+- older investor, diligence, comparison, and launch-post drafts under
+  `business/`
 
 Those areas are now explicitly marked as review-required by:
 
@@ -97,10 +126,16 @@ Those areas are now explicitly marked as review-required by:
 - `business/PUBLICATION_NOTES.md`
 - `business/data_room/README.md`
 - `business/score_package/00_START_HERE.md`
+- visible banners on `docs/site/*.html`
+- inline publication-status banners on high-risk legacy business files
 
 Do not send or publish review-required material without either backing the
 claims with artifacts, adding evidence labels, or rewriting it against the
 current public positioning.
+
+Residual risk: some legacy files still contain old numbers by design so past
+work can be audited. Their current mitigation is quarantine and review-required
+labeling, not full historical rewrite.
 
 ## Current Rule
 

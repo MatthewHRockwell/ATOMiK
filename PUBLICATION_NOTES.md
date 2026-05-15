@@ -25,11 +25,15 @@ The following areas can contain older claims, historical benchmarks,
 draft-positioning, or generated site material:
 
 - `landing/`
-- `site/`
+- `site/` (now carries visible legacy-warning banners in the static pages)
 - `PRODUCTION_DEPLOYMENT.md`
 - `SDK_ORCHESTRATION.md`
 - older reference guides under `reference/`
 - older brief/demo/session files not linked from `technical-proof.md`
+
+Files in those areas are not current landing pages for `ATOMiK.tech`. Treat
+them as archived implementation/demo context unless a page explicitly links to
+the current evidence labels and claims registry.
 
 Before using those materials publicly, reconcile claims against
 `../results/claims_registry.yaml` and the evidence definitions in
