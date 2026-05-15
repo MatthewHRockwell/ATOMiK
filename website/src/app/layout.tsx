@@ -32,7 +32,7 @@ export const metadata: Metadata = {
       "State-aware compute for systems that cannot afford to recompute everything.",
     url: "https://atomik.tech",
     siteName: "ATOMiK",
-    images: [{ url: "https://atomik.tech/08-current-live-atomik-desk-v038i.png", width: 1920, height: 1080 }],
+    images: [{ url: "https://atomik.tech/08-current-live-atomik-desk-v038i-og.jpg", width: 1200, height: 630 }],
     type: "website",
   },
   twitter: {
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
     title: "ATOMiK - State-Aware Compute",
     description:
       "State-aware compute for systems that cannot afford to recompute everything.",
-    images: ["https://atomik.tech/08-current-live-atomik-desk-v038i.png"],
+    images: ["https://atomik.tech/08-current-live-atomik-desk-v038i-og.jpg"],
   },
 };
 

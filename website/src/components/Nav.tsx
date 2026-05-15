@@ -8,10 +8,11 @@ export default function Nav({ active }: { active?: string }) {
   const navRef = useRef<HTMLElement>(null);
 
   const links = [
-    { href: "/docs", label: "Docs" },
+    { href: "/", label: "Product" },
     { href: "/benchmarks", label: "Proof" },
+    { href: "/docs", label: "Developers" },
     { href: "/pricing", label: "Evaluation" },
-    { href: "/about/roadmap", label: "Roadmap" },
+    { href: "/about", label: "About" },
     { href: "https://github.com/MatthewHRockwell/ATOMiK", label: "GitHub" },
   ];
 
@@ -72,7 +73,7 @@ export default function Nav({ active }: { active?: string }) {
             className="rounded-lg px-4 py-2 text-sm font-semibold text-white no-underline transition-opacity hover:opacity-90"
             style={{ background: "#4f8fff" }}
           >
-            Request Evaluation Access
+            Request Technical Evaluation
           </Link>
         </div>
 
@@ -135,7 +136,7 @@ export default function Nav({ active }: { active?: string }) {
             style={{ background: "#4f8fff" }}
             onClick={() => setMenuOpen(false)}
           >
-            Request Evaluation Access
+            Request Technical Evaluation
           </Link>
         </div>
       </div>
