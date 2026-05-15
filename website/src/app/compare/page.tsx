@@ -394,9 +394,9 @@ export default function ComparePage() {
           Traditional change detection scans the full content (checksums, diff)
           or walks a tree (Merkle). ATOMiK detects changes in O(1) by checking
           whether the accumulator equals the identity element. On FPGA, this is
-          a single-cycle comparison. The deterministic, constant-time execution
-          also eliminates timing side channels that affect hash-based
-          approaches.
+          a compact comparison in the modeled hardware path. Timing-side-channel
+          claims still require a measured workload, threat model, and deployment
+          boundary.
         </p>
         <ComparisonTable headers={changeHeaders} rows={changeRows} />
 

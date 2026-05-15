@@ -304,9 +304,9 @@ export default function IoTEdgePage() {
   └─────────────┘
                         * 0B when fingerprint detects no change
 
-  Per-device payload:     4,096 bytes (full state)  →  8 bytes (delta)
-  Fleet of 10,000 @ 1/min:  57 GB/day              →  0.5 GB/day
-  Gateway upload:           forward all             →  single XOR merge`}</code>
+  Per-device payload:     full reading              →  delta artifact
+  Fleet estimate:         quote only with workload  →  measured package
+  Gateway upload:         forward all               →  evaluated merge path`}</code>
           </pre>
         </div>
       </section>

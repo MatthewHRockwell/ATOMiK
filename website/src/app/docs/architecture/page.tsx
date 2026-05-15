@@ -21,7 +21,7 @@ const properties = [
   {
     property: "Self-inverse",
     formula: "a \u2295 a = 0",
-    desc: "Any delta applied twice cancels itself. Duplicate packets are harmless. Undo is free.",
+    desc: "Any delta applied twice cancels itself. This supports undo and duplicate-detection strategies, but transport-level replay handling still matters.",
     color: "#22c55e",
   },
   {

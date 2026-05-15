@@ -38,7 +38,7 @@ const painPoints = [
     problem:
       "Rebuilding position state from trade logs takes O(n) time. During market hours, replaying thousands of events to answer \"what is my current exposure?\" introduces latency that costs real money. Snapshotting helps but creates consistency gaps.",
     solution:
-      "current_state = initial_state XOR accumulator. One operation, constant time, regardless of how many trades have occurred. No log replay. No snapshot staleness. The accumulator is a fixed-size summary of every delta ever applied.",
+      "current_state = initial_state XOR accumulator in the modeled state path. The evaluation question is whether a fixed accumulator can replace part of the replay or reconciliation path without losing required audit semantics.",
   },
   {
     label: "Non-Deterministic Timing",
@@ -46,7 +46,7 @@ const painPoints = [
     problem:
       "Variable-latency state lookups create exploitable jitter. Cache misses, GC pauses, and speculative execution produce timing variations that sophisticated adversaries can measure and exploit for information leakage about positions and order flow.",
     solution:
-      "Every ATOMiK operation completes in constant time by design. No caches, no speculation, no garbage collection in the critical path. Hardware-validated deterministic latency with stdev below 0.5 cycles eliminates timing side channels entirely.",
+      "ATOMiK is relevant when the critical path can be narrowed to fixed-path state operations. Any timing-side-channel claim needs a workload-specific measurement package and threat model.",
   },
   {
     label: "Audit Trail Overhead",
@@ -76,44 +76,44 @@ const securityProperties = [
   {
     property: "Speculative Execution",
     traditional: "CPU speculates on branches",
-    atomik: "No speculation in data path",
-    impact: "No Spectre/Meltdown class vulnerabilities",
+    atomik: "Fixed data path in hardware model",
+    impact: "Reduces branch/speculation exposure in the modeled accelerator path",
   },
   {
     property: "Cache Side Channels",
     traditional: "Cache hit/miss leaks access patterns",
-    atomik: "No cache hierarchy in core",
-    impact: "Access patterns cannot be inferred",
+    atomik: "Cache-free modeled core path",
+    impact: "May reduce cache-observable state access when the path is isolated and validated",
   },
   {
     property: "State Integrity",
     traditional: "Separate checksum layer",
-    atomik: "XOR accumulator is the checksum",
-    impact: "Corruption detected at zero additional cost",
+    atomik: "Accumulator can serve as a fingerprint",
+    impact: "Integrity use needs workload-specific validation and audit review",
   },
   {
     property: "Replay Attacks",
     traditional: "Sequence number tracking",
-    atomik: "Self-inverse: double-apply cancels",
-    impact: "Duplicate deltas are algebraically harmless",
+    atomik: "Self-inverse deltas make duplicate application explicit",
+    impact: "Transport-level replay handling remains part of the evaluated system",
   },
 ];
 
 const metrics = [
   {
     value: "O(1)",
-    label: "Deterministic Latency",
-    detail: "Constant-time state reconstruction regardless of history depth",
+    label: "State Model",
+    detail: "Fixed accumulator read under the XOR state model",
   },
   {
-    value: "0",
-    label: "Timing Jitter",
-    detail: "Sub-0.5 cycle stdev eliminates side channel exploitation",
+    value: "Artifact",
+    label: "Timing Claims",
+    detail: "Measurement package required before quoting latency or jitter",
   },
   {
     value: "108",
-    label: "Formal Proofs",
-    detail: "Lean4-verified algebraic properties guarantee correctness",
+    label: "Proof Work",
+    detail: "Lean4-verified algebraic properties, not deployment guarantees",
   },
   {
     value: "\u22A5\u00B9",
@@ -474,20 +474,21 @@ export default function FinancialSolutionsPage() {
             className="text-xs font-semibold uppercase tracking-widest mb-3"
             style={{ color: "#f59e0b" }}
           >
-            See it in action
+            Workload brief
           </p>
           <h3 className="text-xl font-bold mb-2">
-            See how QuantumEdge Capital achieved 99.7% latency reduction with ATOMiK
+            Evaluate financial reconciliation as a design-partner workload
           </h3>
           <p className="text-sm mb-4" style={{ color: "#8888a0" }}>
-            QuantumEdge replaced their 45-minute end-of-day P&amp;L reconciliation pipeline
-            with real-time delta streaming across 4 trading venues &mdash; saving $2.3M annually.
+            Public customer case studies are not claimed yet. Use the workload
+            briefs page to frame risk, audit, timing, and reconciliation paths
+            that may merit a scoped evaluation.
           </p>
           <span
             className="text-sm font-semibold"
             style={{ color: "#f59e0b" }}
           >
-            Read case study &rarr;
+            View workload briefs &rarr;
           </span>
         </Link>
       </section>
@@ -506,7 +507,7 @@ export default function FinancialSolutionsPage() {
         </p>
         <div className="flex flex-wrap justify-center gap-4">
           <Link
-            href="/contact"
+            href="/contact?intent=design-partner"
             className="px-8 py-3.5 rounded-lg text-sm font-semibold transition-opacity hover:opacity-90"
             style={{ background: "#8b5cf6", color: "#fff" }}
           >
