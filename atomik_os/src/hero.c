@@ -1,40 +1,70 @@
-/* hero.c — v0.38-E procedural centerpiece visualization.
+/* hero.c — v0.38-H Adaptive Mode hero (3-personality energy flow).
  *
- * Closes the biggest concept-image gap: the iridescent 3D fabric
- * visualization that anchors `docs/design/concept_images/01_atomik_desk_home.png`.
- * We don't have pre-rendered art for it yet (asset pipeline shipped
- * but no hero asset generated); this renders an approximation from
- * primitives so the OS has a real visual anchor instead of the
- * About text card sitting in the middle of the screen.
+ * Replaces v0.38-E's hexagon centerpiece with the concept-image-06
+ * "ADAPTIVE MIXED WORKLOAD" visualization: three flowing energy fields
+ * side-by-side, each in its personality semantic color, labeled
+ * STATE / SYNC / AGENT below.  The bridge between substance (real
+ * personalities executing real batched MMIO) and visual identity
+ * (this is what the personality LANDSCAPE looks like).
  *
- * What it draws (all from draw_pixel + draw_blend_pixel + draw_rect):
- *   - Soft alpha-blended radial halo (cyan fading outward)
- *   - 4 concentric hexagon outlines (different rotations)
- *   - 6 radial spokes connecting inner to outer
- *   - Pulsing central dot (slow 2-Hz breathing)
+ * Geometry: centered between the Capability Rail (left) and the
+ * Resource Fabric shelf (right) — uses dock_right_edge() and
+ * fabric_shelf_x() so layout shifts with chrome changes.  Vertically
+ * sits below the Pulse Bar with margin; bottom labels at scale-2.
  *
- * Performance budget: bounded.  ~400 px diameter × outlines (no fill)
- * = a few thousand draw_pixel calls.  Acceptable on 100 MHz NaxRiscv
- * given we only redraw on frame-dirty + dirty-tile system will
- * eventually skip clean tiles entirely.
+ * What it draws (all from primitives — no asset dependency):
+ *   - Three vertical bands across the workspace, each containing:
+ *     * Soft elliptical glow stack (alpha-blended concentric rings)
+ *     * Flowing sine-wave streams in the personality color
+ *     * A brighter central anchor disk
+ *   - Active-personality field gets a saturated outer ring + brighter
+ *     core so the eye locks on the currently-running personality.
+ *   - Bottom labels: STATE / SYNC / AGENT in scale-2 saturated color.
  *
- * Class A discipline: this is decorative chrome only.  No numbers
- * rendered here, no metric values surfaced.  All telemetry stays
- * in Pulse Bar / Fabric / State Watch / Replica Flow — which read
- * from the metric provider.  Hero is pure visual identity. */
+ * Class A discipline: NO numbers rendered here.  Every metric in the
+ * UI still flows through the v0.38 provider; hero is pure identity. */
 #include "atomik_os.h"
 #include <math.h>
 
 extern pixel_t *fb_back(void);
 
-static int g_cx(void) { return FB_W / 2 + 60; }    /* shift slightly toward
-                                                       Fabric shelf for balance */
-static int g_cy(void) { return FB_H / 2 + 60; }    /* below screen center to
-                                                       avoid Pulse Bar */
+/* Soft filled disk with constant alpha. */
+static void disk(int cx, int cy, int r, pixel_t color, uint8_t alpha) {
+    int r2 = r * r;
+    for (int dy = -r; dy <= r; dy++) {
+        int row_x2 = r2 - dy * dy;
+        if (row_x2 < 0) continue;
+        int hr = 0;
+        while (hr * hr <= row_x2) hr++;
+        hr--;
+        for (int dx = -hr; dx <= hr; dx++) {
+            if (alpha == 255) draw_pixel(cx + dx, cy + dy, color);
+            else              draw_blend_pixel(cx + dx, cy + dy, color, alpha);
+        }
+    }
+}
 
-/* Bresenham line into back buffer with optional alpha. */
-static void hero_line(int x0, int y0, int x1, int y1,
-                      pixel_t color, uint8_t alpha) {
+/* Soft outline ring with alpha; thickness px wide. */
+static void ring(int cx, int cy, int radius, int thickness,
+                 pixel_t color, uint8_t alpha) {
+    int r_out = radius + thickness;
+    int r_in  = radius;
+    int r_out2 = r_out * r_out;
+    int r_in2  = r_in  * r_in;
+    for (int dy = -r_out; dy <= r_out; dy++) {
+        for (int dx = -r_out; dx <= r_out; dx++) {
+            int d2 = dx * dx + dy * dy;
+            if (d2 <= r_out2 && d2 >= r_in2) {
+                if (alpha == 255) draw_pixel(cx + dx, cy + dy, color);
+                else              draw_blend_pixel(cx + dx, cy + dy, color, alpha);
+            }
+        }
+    }
+}
+
+/* Thin Bresenham line into the back buffer, alpha-blended. */
+static void aaline(int x0, int y0, int x1, int y1,
+                   pixel_t color, uint8_t alpha) {
     int dx = (x1 > x0) ? (x1 - x0) : (x0 - x1);
     int dy = (y1 > y0) ? (y1 - y0) : (y0 - y1);
     int sx = (x0 < x1) ? 1 : -1;
@@ -50,114 +80,139 @@ static void hero_line(int x0, int y0, int x1, int y1,
     }
 }
 
-/* Hexagon outline at (cx, cy) with given radius and rotation in radians.
- * Stroke is `thickness` pixels (parallel offsets, cheap). */
-static void hex_at(int cx, int cy, double radius, double rotation,
-                   pixel_t color, uint8_t alpha, int thickness) {
-    int xs[7], ys[7];
-    for (int i = 0; i < 6; i++) {
-        double a = rotation + i * (M_PI / 3.0);
-        xs[i] = cx + (int)(radius * cos(a));
-        ys[i] = cy + (int)(radius * sin(a));
+/* Render one personality energy field at (cx, cy) within max_r.
+ *   - 4 concentric glow rings (alpha-fading)
+ *   - 5 sine-wave streams flowing through the field
+ *   - bright central anchor disk
+ *   - pulsing brightness driven by `phase` (0..1)
+ *   - `active` adds a saturated outer ring + brighter center */
+static void energy_field(int cx, int cy, int max_r,
+                         pixel_t color, double phase, int active,
+                         unsigned long now) {
+    /* Glow stack — concentric rings at decreasing radii.  Each ring
+     * stacks alpha so the center reads as bright cyan/violet/green. */
+    for (int r = max_r; r > 24; r -= 16) {
+        double t = (double)r / max_r;
+        uint8_t alpha = (uint8_t)(35 * (1.0 - t * t));
+        ring(cx, cy, r - 4, 4, color, alpha);
     }
-    xs[6] = xs[0]; ys[6] = ys[0];
-    for (int t = 0; t < thickness; t++) {
-        for (int i = 0; i < 6; i++) {
-            hero_line(xs[i], ys[i] + t, xs[i+1], ys[i+1] + t, color, alpha);
-            if (t > 0) {
-                hero_line(xs[i], ys[i] - t, xs[i+1], ys[i+1] - t, color, alpha);
-            }
-        }
+    /* Inner brighter disk gradient. */
+    for (int r = 90; r > 18; r -= 6) {
+        double t = (r - 18.0) / 72.0;
+        uint8_t alpha = (uint8_t)(70 * (1.0 - t));
+        disk(cx, cy, r, color, alpha);
     }
-}
 
-/* Soft halo: concentric circles drawn as outline rings at sparse
- * radii with linearly-fading alpha.  Cheap — sparse sample. */
-static void hero_halo(int cx, int cy, int outer_r, pixel_t color) {
-    for (int r = outer_r; r > outer_r / 6; r -= 12) {
-        double t = (double)r / outer_r;
-        uint8_t alpha = (uint8_t)(60.0 * (1.0 - t) * (1.0 - t) + 8);
-        /* Walk the circle's circumference, stepping in degrees. */
-        for (int deg = 0; deg < 360; deg += 2) {
-            double a = deg * M_PI / 180.0;
-            int x = cx + (int)(r * cos(a));
-            int y = cy + (int)(r * sin(a));
-            draw_blend_pixel(x, y, color, alpha);
+    /* Sine-wave streams — 5 horizontal flowing curves through the field
+     * at different vertical offsets and phases. */
+    double pulse_bright = 0.65 + 0.35 * phase;
+    for (int s = 0; s < 5; s++) {
+        double offset_v = -max_r + (s + 1) * (2.0 * max_r / 6.0);
+        double freq     = 0.022 + s * 0.004;
+        double amp      = max_r * (0.10 + 0.04 * (s % 3));
+        double pha      = (now / 6000.0) * (s % 2 ? 1.0 : -1.0) + s * 0.7;
+        int prev_y = -1;
+        int prev_x = -1;
+        for (int dx = -max_r; dx <= max_r; dx += 2) {
+            int x = cx + dx;
+            double dy_d = offset_v + amp * sin((cx + dx) * freq + pha);
+            int y = cy + (int)dy_d;
+            /* Clip to a circular mask so the field stays round. */
+            if (dx * dx + (int)(dy_d * dy_d) > max_r * max_r) {
+                prev_x = -1;
+                continue;
+            }
+            if (prev_x >= 0) {
+                uint8_t alpha = (uint8_t)(160 * pulse_bright);
+                aaline(prev_x, prev_y, x, y, color, alpha);
+                /* 1px above for thicker stroke at resolution-bump. */
+                aaline(prev_x, prev_y - 1, x, y - 1, color,
+                       (uint8_t)(alpha / 2));
+            }
+            prev_x = x; prev_y = y;
         }
     }
-}
 
-/* Filled disk at (cx, cy) radius r.  Used for the pulsing center. */
-static void hero_disk(int cx, int cy, int r, pixel_t color, uint8_t alpha) {
-    int r2 = r * r;
-    for (int dy = -r; dy <= r; dy++) {
-        for (int dx = -r; dx <= r; dx++) {
-            if (dx * dx + dy * dy <= r2) {
-                if (alpha == 255) draw_pixel(cx + dx, cy + dy, color);
-                else              draw_blend_pixel(cx + dx, cy + dy, color, alpha);
-            }
-        }
+    /* Central anchor — bright filled disk + thin outer ring. */
+    int anchor_r = 14 + (active ? 4 : 0);
+    disk(cx, cy, anchor_r, color, active ? 220 : 160);
+    disk(cx, cy, anchor_r - 6, ATOMIK_FG, 240);
+
+    /* Active outer ring — saturated, 3 px thick. */
+    if (active) {
+        ring(cx, cy, max_r - 6, 3, color, 200);
     }
 }
 
 void hero_draw(void) {
-    int cx = g_cx();
-    int cy = g_cy();
+    /* Workspace centerline: midpoint between rail right-edge and
+     * Fabric shelf left-edge.  This puts the hero properly centered
+     * regardless of chrome changes. */
+    int left_edge  = dock_right_edge() + ATOMIK_GRID_L * 2;
+    int right_edge = fabric_shelf_x() - ATOMIK_GRID_L * 2;
+    int ws_w       = right_edge - left_edge;
+    int cy         = ATOMIK_SAFE_TOP + ATOMIK_PULSE_BAR_H + 60
+                     + (FB_H - ATOMIK_SAFE_TOP - ATOMIK_PULSE_BAR_H - 60) / 2
+                     - 40;
+    if (cy < 320) cy = FB_H / 2 - 60;
 
+    /* Three fields across the workspace, equal slots. */
+    int field_w   = ws_w / 3;
+    int field_r   = (field_w * 4) / 9;     /* radius ≈ 44% of slot width */
+    int cx_state  = left_edge + field_w * 0 + field_w / 2;
+    int cx_sync   = left_edge + field_w * 1 + field_w / 2;
+    int cx_agent  = left_edge + field_w * 2 + field_w / 2;
+
+    /* Animation phase — slow breathing pulse (0..1 across 4 s). */
     unsigned long now = anim_now_ms();
-    /* Slow pulse: full cycle every ~4 s. */
-    double phase = (double)(now % 4000) / 4000.0;
-    double pulse = 0.5 + 0.5 * sin(phase * 2.0 * M_PI);
+    double phase = 0.5 + 0.5 * sin(((double)(now % 4000) / 4000.0)
+                                    * 2.0 * M_PI);
 
-    /* Soft outer halo — pre-multiplied cyan with fade. */
-    pixel_t cyan = ATOMIK_ACCENT;
-    hero_halo(cx, cy, 360, cyan);
+    personality_t active = fabric_active();
 
-    /* Inner halo, brighter, denser. */
-    for (int r = 60; r < 220; r += 18) {
-        double t = (r - 60.0) / 160.0;
-        uint8_t alpha = (uint8_t)(45 * (1.0 - t));
-        for (int deg = 0; deg < 360; deg += 1) {
-            double a = deg * M_PI / 180.0;
-            int x = cx + (int)(r * cos(a));
-            int y = cy + (int)(r * sin(a));
-            draw_blend_pixel(x, y, cyan, alpha);
-        }
+    energy_field(cx_state, cy, field_r,
+                 ATOMIK_SEM_HARDWARE,                     /* cyan = STATE */
+                 phase, active == PERSONALITY_STATE, now);
+    energy_field(cx_sync,  cy, field_r,
+                 ATOMIK_SEM_SAVINGS,                      /* green = SYNC */
+                 phase, active == PERSONALITY_SYNC,  now);
+    energy_field(cx_agent, cy, field_r,
+                 ATOMIK_SEM_AGENT,                        /* violet = AGENT */
+                 phase, active == PERSONALITY_AGENT, now);
+
+    /* Labels below the fields — STATE / SYNC / AGENT in scale-2
+     * saturated personality color.  Active personality gets brighter,
+     * idle gets dim. */
+    int label_y = cy + field_r + ATOMIK_GRID_L * 2;
+    const char *names[3] = { "STATE", "SYNC", "AGENT" };
+    int        cxs[3]    = { cx_state, cx_sync, cx_agent };
+    personality_t  ps[3] = { PERSONALITY_STATE, PERSONALITY_SYNC,
+                             PERSONALITY_AGENT };
+    pixel_t    cols[3]   = { ATOMIK_SEM_HARDWARE,
+                             ATOMIK_SEM_SAVINGS,
+                             ATOMIK_SEM_AGENT };
+    for (int i = 0; i < 3; i++) {
+        const char *n = names[i];
+        int tw = text_width(n, 2);
+        pixel_t c = (active == ps[i]) ? cols[i] : ATOMIK_FG_DIM;
+        draw_text(cxs[i] - tw / 2, label_y, n, 2, c);
+        /* Small dim subtitle under each name. */
+        const char *sub = (i == 0) ? "memory · regions" :
+                          (i == 1) ? "replica · skip"   :
+                                     "context · prune";
+        int sw = text_width(sub, 1);
+        draw_text(cxs[i] - sw / 2, label_y + text_height(2) + 4,
+                  sub, 1, ATOMIK_FG_DIM);
     }
 
-    /* Three nested hexagon rings at different rotations.  Outer ring
-     * dimmer; inner ring brighter.  Rotation crawls slowly with time. */
-    double base_rot = (double)(now % 16000) / 16000.0 * 2.0 * M_PI;
-    hex_at(cx, cy, 320, base_rot,            cyan, 60,  1);
-    hex_at(cx, cy, 240, base_rot + 0.2,      cyan, 110, 1);
-    hex_at(cx, cy, 160, base_rot + 0.4,      cyan, 180, 1);
-    hex_at(cx, cy, 100, base_rot + 0.6,      cyan, 230, 2);
+    /* Mark the dirty region: the bounding box of the three fields +
+     * labels.  Helps the v0.38-A dirty-tile tracker score the hero
+     * correctly. */
+    int dx = left_edge;
+    int dy = cy - field_r - ATOMIK_GRID_M;
+    int dw = ws_w;
+    int dh = (label_y + text_height(2) + text_height(1) + 8) - dy;
+    dirty_rect(dx, dy, dw, dh);
 
-    /* Six radial spokes from inner-ring radius to mid-ring radius.
-     * Brighten with pulse so the whole viz feels alive. */
-    uint8_t spoke_alpha = (uint8_t)(80 + 60 * pulse);
-    for (int i = 0; i < 6; i++) {
-        double a = base_rot + i * (M_PI / 3.0);
-        int x0 = cx + (int)(100 * cos(a));
-        int y0 = cy + (int)(100 * sin(a));
-        int x1 = cx + (int)(240 * cos(a));
-        int y1 = cy + (int)(240 * sin(a));
-        hero_line(x0, y0, x1, y1, cyan, spoke_alpha);
-    }
-
-    /* Central anchor: nested disks, brightest in the middle, with the
-     * outer ring pulsing in size.  Marks the OS identity at the
-     * geometric heart of the screen. */
-    int outer_d = 22 + (int)(4 * pulse);
-    hero_disk(cx, cy, outer_d, cyan, 90);
-    hero_disk(cx, cy, 14,      cyan, 200);
-    hero_disk(cx, cy, 6,       ATOMIK_FG, 255);
-
-    /* v0.38-A: register the dirty area.  The hero covers a ~720×720
-     * region centered on (cx, cy) — mark those tiles dirty so the
-     * upcoming tile-skip path knows to repaint when animation steps. */
-    dirty_rect(cx - 360, cy - 360, 720, 720);
-
-    /* Drive animation forward so the pulse keeps advancing. */
     anim_tick();
 }
