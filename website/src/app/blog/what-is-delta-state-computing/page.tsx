@@ -185,8 +185,8 @@ export default function WhatIsDeltaStateComputingPage() {
           <p>
             Delta-state computing is built on an <strong>Abelian group</strong> over
             the XOR operation. This is not marketing language — it is a formal algebraic
-            structure with four properties, each proven in Lean4 with 108 machine-checked
-            theorems:
+            structure with four properties covered by machine-checked Lean4 proof
+            artifacts:
           </p>
 
           <div
@@ -296,8 +296,8 @@ export default function WhatIsDeltaStateComputingPage() {
           <p>
             Delta-state computing achieves convergence with <em>one operation</em>: XOR.
             There is no type-specific logic. A delta is a bitstring. The merge function
-            is always XOR. The metadata is always zero bytes (the accumulator is the
-            metadata). The correctness proof is always the same 108 theorems.
+            is always XOR. The accumulator acts as the model&apos;s state summary.
+            Correctness is handled through the same proof-scoped algebraic model.
           </p>
 
           <div
@@ -317,9 +317,9 @@ export default function WhatIsDeltaStateComputingPage() {
                   ["Merge function", "Type-specific (per data type)", "Universal (XOR)"],
                   ["Metadata overhead", "O(n) — grows with nodes/ops", "O(1) — 8 bytes fixed"],
                   ["Implementation complexity", "Dozens of CRDT types", "4 operations, 1 type"],
-                  ["Correctness proof", "Per-type proofs required", "108 Lean4 theorems (universal)"],
-                  ["Undo support", "Not built-in (type-dependent)", "Free (self-inverse)"],
-                  ["Hardware acceleration", "Impractical (complex merge)", "Native (single XOR gate)"],
+                  ["Correctness proof", "Per-type proofs required", "Machine-checked algebra proofs"],
+                  ["Undo support", "Not built-in (type-dependent)", "Self-inverse in fit model"],
+                  ["Hardware acceleration", "Complex merge logic", "Maps to XOR-oriented hardware"],
                   ["Garbage collection", "Required (tombstones, etc.)", "Not needed"],
                   ["Learning curve", "High (choose correct type)", "Minimal (4 operations)"],
                 ].map(([dim, crdt, atomik], i) => (
@@ -382,7 +382,7 @@ for event in event_log:      # 10 million iterations
     state = apply(state, event)
 
 # Delta-state: O(1) reconstruction
-state = reference ^ accumulator  # One XOR, always`}</Code>
+state = reference ^ accumulator  # One XOR in the fit model`}</Code>
 
           <p>
             For a detailed quantitative comparison with code examples, see{" "}
@@ -426,7 +426,7 @@ state = reference ^ accumulator  # One XOR, always`}</Code>
                   ["Commutativity", "No (requires transform)", "Yes (by construction)"],
                   ["Central server", "Required", "Not needed"],
                   ["Algorithm complexity", "O(n^2) transform pairs", "O(1) XOR"],
-                  ["Correctness proofs", "Notoriously difficult", "108 machine-checked theorems"],
+                  ["Correctness proofs", "Notoriously difficult", "Machine-checked algebra proofs"],
                   ["Offline support", "Requires rebasing", "Deltas apply on reconnect"],
                   ["Bandwidth", "Full operation payload", "8 bytes per delta"],
                 ].map(([prop, ot, atomik], i) => (

@@ -22,7 +22,7 @@ const posts = [
     title: "CRDT Alternative: Delta-State Algebra",
     date: "March 12, 2026",
     excerpt:
-      "CRDTs are powerful but complex. Delta-state algebra offers a different modeled convergence path with one core operation and 108 machine-checked algebra proofs.",
+      "CRDTs are powerful but complex. Delta-state algebra offers a different modeled convergence path with one core operation and machine-checked algebra proofs.",
     tags: ["CRDTs", "comparison", "pillar"],
   },
   {

@@ -40,7 +40,7 @@ export default function DistributedCachePost() {
           <p>
             Traditional distributed caches need leader election, consensus rounds, and
             conflict resolution. With ATOMiK, you can build a 3-node cache where writes
-            from any node converge automatically — in about 50 lines of Python.
+            from any node converge under the fit model — in about 50 lines of Python.
           </p>
 
           <h2 className="text-2xl font-bold pt-4" style={{ color: "#e0e0e8" }}>Setup</h2>
@@ -159,7 +159,7 @@ stream.accum(msg.addr, msg.delta)`}</Code>
             <li><strong>8-byte delta artifact.</strong> The tutorial uses a fixed-width delta representation for its model.</li>
             <li><strong>O(1) model operations.</strong> The accumulator path is constant-time in this simplified example.</li>
             <li><strong>Modeled convergence.</strong> Nodes reach the same state when the assumptions of the tutorial hold.</li>
-            <li><strong>Proof-scoped.</strong> 108 Lean4 theorems verify the algebraic properties used by the model.</li>
+            <li><strong>Proof-scoped.</strong> Lean4 proof artifacts verify the algebraic properties used by the model.</li>
           </ul>
 
           <div className="rounded-xl border p-8 mt-8" style={{ background: "#12121a", borderColor: "#1e1e2e" }}>

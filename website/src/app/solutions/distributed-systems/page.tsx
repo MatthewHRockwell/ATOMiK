@@ -107,7 +107,7 @@ const comparisonRows = [
   },
   {
     metric: "Formal Proofs",
-    atomik: "108 Lean4 theorems",
+    atomik: "Lean4 proof artifacts",
     raft: "TLA+ spec",
     crdt: "Per-type proofs",
     eventsource: "None standard",
@@ -126,9 +126,9 @@ const metrics = [
     detail: "Single XOR operation, not log replay",
   },
   {
-    value: "108",
+    value: "Lean4",
     label: "Formal Proofs",
-    detail: "Lean4-verified algebraic properties",
+    detail: "Machine-checked algebraic properties",
   },
   {
     value: "Scoped",
@@ -168,10 +168,10 @@ export default function DistributedSystemsPage() {
           className="text-lg md:text-xl max-w-3xl mx-auto leading-relaxed"
           style={{ color: "#8888a0" }}
         >
-          ATOMiK replaces consensus protocols, CRDTs, and event sourcing with
-          XOR delta-state algebra. Every node converges to the same state
-          without leaders, quorums, or conflict resolution under the XOR state
-          model formalized by 108 Lean4 proofs.
+          ATOMiK evaluates whether XOR delta-state algebra can reduce repeated
+          synchronization and replay work in systems that fit the model. Leaders,
+          quorums, and conflict handling remain workload-specific until validated
+          with an architecture review and measured artifacts.
         </p>
         <div className="flex flex-wrap justify-center gap-4 mt-10">
           <Link

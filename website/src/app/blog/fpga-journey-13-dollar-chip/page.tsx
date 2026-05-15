@@ -113,10 +113,10 @@ export default function FPGABlogPost() {
           </p>
           <Code>{`current_state = initial_state XOR accumulator`}</Code>
           <p>
-            XOR gives you an Abelian group for free — commutative, associative,
-            self-inverse, with identity element zero. We proved all of this formally
-            with 108 Lean4 theorems. Not &quot;we tested it&quot; — we <em>proved</em> it.
-            The algebra is correct by construction.
+            XOR gives the model an Abelian-group structure: commutative, associative,
+            self-inverse, with identity element zero. The algebraic properties are
+            covered by Lean4 proof artifacts, while workload and hardware claims
+            still need measured evidence.
           </p>
           <p>
             The practical consequence: deltas can arrive in any order, from any number of
@@ -279,7 +279,7 @@ uint32_t state = *(volatile uint32_t*)ATOMIK_READ;
           </h2>
           <ul className="list-disc pl-6 space-y-2">
             <li>
-              <strong>Start with the math.</strong> The 108 Lean4 proofs caught edge
+              <strong>Start with the math.</strong> The Lean4 proof artifacts caught edge
               cases that testing never would have found. When your algebra is
               provably correct, debugging hardware becomes purely a plumbing exercise.
             </li>

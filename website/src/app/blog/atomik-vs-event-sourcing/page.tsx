@@ -145,10 +145,10 @@ state = ctx.read()  # O(1)
                   ["Bandwidth per update", "Full event payload", "8 bytes (one delta)"],
                   ["Undo operation", "Complex (compensating events)", "Re-apply delta (self-inverse)"],
                   ["Multi-node sync", "Log shipping + ordering", "XOR deltas (order-free)"],
-                  ["Snapshot overhead", "Periodic compaction needed", "Not needed (state is always current)"],
+                  ["Snapshot overhead", "Periodic compaction needed", "Reduced in current-state accumulator model"],
                   ["Conflict resolution", "Application-specific merge", "Automatic (XOR commutativity)"],
                   ["Audit trail", "Complete (every event)", "Cumulative (current delta only)"],
-                  ["Formal proof coverage", "Implementation-dependent", "108 Lean4 theorems"],
+                  ["Formal proof coverage", "Implementation-dependent", "Lean4 proof artifacts"],
                 ].map(([prop, es, atomik], i) => (
                   <tr key={i} style={{ borderBottom: "1px solid #1e1e2e" }}>
                     <td className="p-4 font-medium" style={{ color: "#e0e0e8" }}>{prop}</td>
@@ -235,7 +235,8 @@ for replica in replicas:
     replica.accum(delta)  # 8 bytes, order-free, O(1) apply`}</Code>
           <p>
             The event log serves audit and compliance. ATOMiK handles the hot path —
-            keeping replicas converged with minimal bandwidth and zero coordination.
+            keeping replicas converged in the fit model while workload-level bandwidth
+            and coordination claims remain validation tasks.
           </p>
 
           <h2 className="text-2xl font-bold pt-4" style={{ color: "#e0e0e8" }}>

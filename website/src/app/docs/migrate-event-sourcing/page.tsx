@@ -13,7 +13,7 @@ import {
 export const metadata: Metadata = {
   title: "Migrate from Event Sourcing to ATOMiK — Docs",
   description:
-    "Replace event logs and snapshot replay with ATOMiK O(1) state reconstruction. Migration guide with code examples and trade-off analysis.",
+    "Evaluate whether event replay and snapshot pressure can map to ATOMiK state reconstruction. Migration guide with code examples and trade-off analysis.",
   keywords: [
     "event sourcing migration",
     "event sourcing alternative",
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Migrate from Event Sourcing to ATOMiK — ATOMiK Docs",
     description:
-      "Eliminate event replay and snapshot overhead. O(1) state reconstruction replaces O(n) event log replay.",
+      "Evaluate ATOMiK state reconstruction as an alternative to event replay in fit workloads.",
     type: "website",
   },
 };
@@ -181,8 +181,9 @@ export default function MigrateEventSourcingPage() {
           >
             current_state = initial_state &oplus; accumulator
           </code>
-          . You trade history for speed: O(1) instead of O(n), constant storage instead of
-          linear growth, and free undo via self-inverse instead of compensating events.
+          . You trade historical replay semantics for a current-state accumulator:
+          O(1) modeled reads instead of O(n) replay, constant accumulator storage,
+          and self-inverse undo inside the fit state model.
         </p>
       </div>
 

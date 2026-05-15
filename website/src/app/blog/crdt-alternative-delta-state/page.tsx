@@ -6,7 +6,7 @@ import EmailCapture from "@/components/EmailCapture";
 export const metadata: Metadata = {
   title: "CRDT Alternative: Delta-State Algebra — ATOMiK Blog",
   description:
-    "CRDTs are powerful but complex. Delta-state algebra offers a different modeled convergence path with one core operation and 108 machine-checked algebra proofs.",
+    "CRDTs are powerful but complex. Delta-state algebra offers a different modeled convergence path with one core operation and machine-checked algebra proofs.",
   keywords: [
     "CRDT alternative",
     "simpler than CRDTs",
@@ -188,8 +188,9 @@ state = ctx.read()         # Reconstruct: reference ^ accumulator`}</Code>
 
           <p>
             That is the entire API. No type selection. No merge function. No metadata.
-            No garbage collection. Convergence is a mathematical property of XOR
-            commutativity, proven in 108 machine-checked Lean4 theorems.
+            No garbage collection inside the fit model. Convergence is a
+            mathematical property of XOR commutativity, covered by
+            machine-checked Lean4 proof artifacts.
           </p>
 
           {/* Side-by-side comparison */}
@@ -307,7 +308,7 @@ ctx.accum(0x02)  # Undo node B
                   [
                     "Metadata per node",
                     "O(n) — grows with cluster size",
-                    "O(1) — 8 bytes, always",
+                    "O(1) in fit model",
                   ],
                   [
                     "Sync payload",
@@ -332,7 +333,7 @@ ctx.accum(0x02)  # Undo node B
                   [
                     "Formal verification",
                     "Per-type proofs (often informal)",
-                    "108 Lean4 theorems (universal)",
+                    "Machine-checked algebra proofs",
                   ],
                   [
                     "Hardware acceleration",
@@ -472,8 +473,9 @@ ctx.accum(0x02)  # Undo node B
               scale with node count.
             </li>
             <li>
-              <strong>Formal proof coverage matters.</strong> 108 Lean4 theorems cover every
-              property universally. No per-type analysis, no informal hand-waving.
+              <strong>Formal proof coverage matters.</strong> The algebraic proof artifacts
+              cover the fit state model. Deployment claims still need workload-specific
+              validation.
             </li>
           </ul>
 

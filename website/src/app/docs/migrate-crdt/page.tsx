@@ -12,7 +12,7 @@ import {
 export const metadata: Metadata = {
   title: "Migrate from CRDTs to ATOMiK — Docs",
   description:
-    "Step-by-step migration guide from CRDTs to ATOMiK delta-state algebra. Conceptual mapping, code examples, performance comparison, and checklist.",
+    "Step-by-step migration guide from CRDTs to ATOMiK delta-state algebra. Conceptual mapping, code examples, fit criteria, and validation checklist.",
   keywords: [
     "CRDT migration",
     "CRDT alternative",
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Migrate from CRDTs to ATOMiK — ATOMiK Docs",
     description:
-      "Replace join-semilattice CRDTs with Abelian group delta-state algebra. Migration guide with code examples and performance comparison.",
+      "Evaluate whether join-semilattice CRDT paths can map to Abelian group delta-state algebra.",
     type: "website",
   },
 };
@@ -86,7 +86,7 @@ const perfComparison = [
   {
     dimension: "State reconstruction",
     crdt: "O(1) if materialized, O(n) if from ops",
-    atomik: "O(1) always -- initial XOR accumulator",
+    atomik: "O(1) in fit model -- initial XOR accumulator",
   },
   {
     dimension: "Undo / rollback",
@@ -96,7 +96,7 @@ const perfComparison = [
   {
     dimension: "Formal guarantees",
     crdt: "SEC (Strong Eventual Consistency)",
-    atomik: "SEC + self-inverse + 108 Lean4 proofs",
+    atomik: "SEC-style model + self-inverse proof artifacts",
   },
   {
     dimension: "Implementation complexity",
@@ -121,7 +121,7 @@ const migrationChecklist = [
       "Install atomik-core: pip install atomik-core",
       "Replace one simple CRDT (G-Counter or LWW-Register) with AtomikContext",
       "Validate convergence: feed the same deltas in different orders, confirm identical read()",
-      "Measure bandwidth reduction: compare CRDT sync payload vs 8-byte ATOMiK delta",
+      "Compare payload size: CRDT sync payload vs a modeled ATOMiK delta",
     ],
   },
   {
@@ -138,8 +138,8 @@ const migrationChecklist = [
     items: [
       "Run convergence tests: all replicas must reach identical state regardless of delta order",
       "Verify self-inverse property: double-applying any delta returns to previous state",
-      "Load test: confirm O(1) merge performance holds under production traffic",
-      "Monitor bandwidth: measure actual reduction vs CRDT baseline",
+      "Load test the modeled merge path under representative traffic",
+      "Monitor payload size and only claim reduction after measured artifacts exist",
     ],
   },
 ];
@@ -161,10 +161,10 @@ export default function MigrateCrdtPage() {
         Migrate from CRDTs to ATOMiK
       </h1>
       <p className="text-lg mb-6" style={{ color: "#8888a0" }}>
-        CRDTs and ATOMiK both solve distributed convergence without coordination.
-        This guide maps CRDT concepts to ATOMiK operations, shows before/after
-        code for three common patterns, and provides a step-by-step migration
-        checklist.
+        CRDTs and ATOMiK both address distributed convergence, but they make
+        different tradeoffs. This guide maps CRDT concepts to ATOMiK operations,
+        shows before/after code for common patterns, and provides a validation
+        checklist for deciding whether the model fits.
       </p>
 
       {/* When to migrate */}
@@ -202,7 +202,7 @@ export default function MigrateCrdtPage() {
               </li>
               <li className="flex gap-2">
                 <span style={{ color: "#22c55e" }} className="shrink-0">{"\u2713"}</span>
-                You want formal verification (108 Lean4 proofs vs informal CRDT specs)
+                You want formal proof artifacts for the algebraic model
               </li>
             </ul>
           </div>
@@ -575,7 +575,7 @@ export default function MigrateCrdtPage() {
                 <span style={{ color: varColor }}>{"    "}peer.</span>
                 <span style={{ color: fnColor }}>send</span>
                 <span style={{ color: varColor }}>(delta)</span>
-                <span style={{ color: cmtColor }}> # 8 bytes, always</span>
+                <span style={{ color: cmtColor }}> # 8-byte modeled delta</span>
                 {"\n\n"}
                 <span style={{ color: kwColor }}>def</span>
                 <span style={{ color: fnColor }}> on_receive</span>
