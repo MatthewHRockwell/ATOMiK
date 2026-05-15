@@ -217,21 +217,21 @@ function ROIReportExport() {
           </>
         ) : !showForm ? (
           <>
-            <h3 className="font-bold mb-2">Need this for a purchase decision?</h3>
+            <h3 className="font-bold mb-2">Need this for an evaluation?</h3>
             <p className="text-sm mb-4" style={{ color: "#8888a0" }}>
-              Download a custom ROI report with your exact numbers — formatted for procurement.
+              Download a custom scenario report with your exact inputs and methodology notes.
             </p>
             <button
               onClick={() => setShowForm(true)}
               className="px-6 py-2.5 rounded-lg text-sm font-semibold"
               style={{ background: "linear-gradient(135deg, #4f8fff, #8b5cf6)", color: "#fff" }}
             >
-              Get Custom ROI Report
+              Get Scenario Report
             </button>
           </>
         ) : (
           <form onSubmit={handleSubmit} className="text-left space-y-3">
-            <h3 className="font-bold text-center mb-3">Get Your Custom ROI Report</h3>
+            <h3 className="font-bold text-center mb-3">Get Your Custom Scenario Report</h3>
             <div className="grid md:grid-cols-2 gap-3">
               <input required type="text" placeholder="Full name" value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} className="w-full px-3 py-2 rounded-lg text-sm outline-none" style={inputStyle} />
               <input required type="email" placeholder="Work email" value={form.email} onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))} className="w-full px-3 py-2 rounded-lg text-sm outline-none" style={inputStyle} />
@@ -239,10 +239,10 @@ function ROIReportExport() {
               <input type="text" placeholder="Title (e.g., VP Engineering)" value={form.title} onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))} className="w-full px-3 py-2 rounded-lg text-sm outline-none" style={inputStyle} />
             </div>
             <button type="submit" className="w-full py-2.5 rounded-lg text-sm font-semibold" style={{ background: "linear-gradient(135deg, #4f8fff, #8b5cf6)", color: "#fff" }}>
-              Send ROI Report
+              Send Scenario Report
             </button>
             <p className="text-[10px] text-center" style={{ color: "#555" }}>
-              We&apos;ll email a PDF with your exact inputs, computed savings, and methodology notes.
+              We&apos;ll email a PDF with your exact inputs, modeled outputs, and methodology notes.
             </p>
           </form>
         )}
@@ -322,7 +322,7 @@ export default function RoiPage() {
   const PAGE_SIZE = 4096; // 4KB
   const AVG_PACKET = 1400; // average TCP payload bytes
   const HOURS_PER_MONTH = 720;
-  const ATOMIK_EFFICIENCY = 0.85; // 85% waste reduction (conservative mid-range)
+  const ATOMIK_EFFICIENCY = 0.85; // Scenario assumption, not a measured public result.
 
   /* --- Derived calculations --- */
   const results = useMemo(() => {
@@ -367,15 +367,15 @@ export default function RoiPage() {
     const cpuFractionWasted = effectiveCapacityWasted;
     const totalMonthlyCost = bandwidthCost + overProvisionCost + cachePressureCost;
 
-    // With ATOMiK Pro ($99/mo)
+    // Scenario A reference cost ($99/mo)
     const proPrice = 99;
     const proSavings = totalMonthlyCost * ATOMIK_EFFICIENCY;
     const proROI = proPrice > 0 ? proSavings / proPrice : 0;
     const proBreakEvenHours = proSavings > 0 ? (proPrice / (proSavings / HOURS_PER_MONTH)) : Infinity;
 
-    // With ATOMiK Team ($299/mo)
+    // Scenario B reference cost ($299/mo)
     const teamPrice = 299;
-    // Team tier adds SDK-driven optimization: extra 5-10% on top of base savings
+    // Scenario B assumes deeper workload mapping; this is illustrative only.
     const teamEfficiency = Math.min(ATOMIK_EFFICIENCY + 0.08, 0.95);
     const teamSavings = totalMonthlyCost * teamEfficiency;
     const teamROI = teamPrice > 0 ? teamSavings / teamPrice : 0;
@@ -409,17 +409,18 @@ export default function RoiPage() {
       {/* Hero */}
       <section className="text-center px-6 pt-20 pb-12">
         <h1 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">
-          How Much Is Your Infrastructure{" "}
+          Model One Infrastructure{" "}
           <span
             className="bg-clip-text text-transparent"
             style={{ backgroundImage: "linear-gradient(135deg, #ef4444, #f59e0b)" }}
           >
-            Wasting
+            Waste Scenario
           </span>
           ?
         </h1>
         <p className="text-lg max-w-2xl mx-auto" style={{ color: "#8888a0" }}>
-          Enter your numbers. See your savings.
+          Enter your numbers to explore a scenario model. This is not a measured
+          ATOMiK result or a production savings claim.
         </p>
       </section>
 
@@ -646,31 +647,31 @@ export default function RoiPage() {
               </div>
             </Card>
 
-            {/* ATOMiK Pro tier */}
+            {/* Scenario A */}
             <Card>
               <div className="flex items-center gap-2 mb-4">
                 <h2
                   className="text-sm font-semibold uppercase tracking-wider"
                   style={{ color: "#8888a0" }}
                 >
-                  With ATOMiK Pro
+                  Scenario A
                 </h2>
                 <span
                   className="text-xs font-bold px-2 py-0.5 rounded-full"
                   style={{ background: "#4f8fff20", color: "#4f8fff" }}
                 >
-                  $99/mo
+                  model
                 </span>
               </div>
               <div className="space-y-3">
                 <div className="flex items-center justify-between text-sm">
-                  <span style={{ color: "#b0b0c0" }}>Estimated savings (85% reduction)</span>
+                  <span style={{ color: "#b0b0c0" }}>Modeled avoidable cost</span>
                   <span className="font-bold tabular-nums" style={{ color: "#22c55e" }}>
                     {fmtDollars(results.proSavings)}/mo
                   </span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
-                  <span style={{ color: "#b0b0c0" }}>Return on investment</span>
+                  <span style={{ color: "#b0b0c0" }}>Ratio vs reference cost</span>
                   <span className="font-bold tabular-nums" style={{ color: "#22c55e" }}>
                     {results.proROI.toFixed(1)}x
                   </span>
@@ -688,41 +689,41 @@ export default function RoiPage() {
               </div>
             </Card>
 
-            {/* ATOMiK Team tier */}
+            {/* Scenario B */}
             <Card>
               <div className="flex items-center gap-2 mb-4">
                 <h2
                   className="text-sm font-semibold uppercase tracking-wider"
                   style={{ color: "#8888a0" }}
                 >
-                  With ATOMiK Team
+                  Scenario B
                 </h2>
                 <span
                   className="text-xs font-bold px-2 py-0.5 rounded-full"
                   style={{ background: "#8b5cf620", color: "#8b5cf6" }}
                 >
-                  $299/mo
+                  model
                 </span>
               </div>
               <div className="space-y-3">
                 <div className="flex items-center justify-between text-sm">
                   <span style={{ color: "#b0b0c0" }}>
-                    Savings with SDK optimization (93% reduction)
+                    Modeled avoidable cost with deeper workload mapping
                   </span>
                   <span className="font-bold tabular-nums" style={{ color: "#22c55e" }}>
                     {fmtDollars(results.teamSavings)}/mo
                   </span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
-                  <span style={{ color: "#b0b0c0" }}>Return on investment</span>
+                  <span style={{ color: "#b0b0c0" }}>Ratio vs reference cost</span>
                   <span className="font-bold tabular-nums" style={{ color: "#22c55e" }}>
                     {results.teamROI.toFixed(1)}x
                   </span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
-                  <span style={{ color: "#b0b0c0" }}>ROI per seat (5 seats)</span>
+                  <span style={{ color: "#b0b0c0" }}>Scenario value per seat (5 seats)</span>
                   <span className="font-bold tabular-nums" style={{ color: "#22d3ee" }}>
-                    {fmtDollars(results.teamSavings / 5)}/seat/mo saved
+                    {fmtDollars(results.teamSavings / 5)}/seat/mo modeled
                   </span>
                 </div>
               </div>
@@ -737,19 +738,19 @@ export default function RoiPage() {
           {/* Big numbers */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
             <StatBlock
-              label="Monthly savings"
+              label="Modeled avoidable cost"
               value={fmtDollars(results.proSavings)}
               color="#22c55e"
-              sub="with ATOMiK Pro"
+              sub="scenario A"
             />
             <StatBlock
-              label="Return on $99/mo"
+              label="Ratio vs $99 model"
               value={`${results.proROI.toFixed(1)}x`}
               color="#4f8fff"
               sub="ROI"
             />
             <StatBlock
-              label="Pays for itself in"
+              label="Model break-even"
               value={
                 results.proBreakEvenHours < HOURS_PER_MONTH
                   ? `${Math.ceil(results.proBreakEvenHours)}h`
@@ -773,12 +774,12 @@ export default function RoiPage() {
             className="text-sm font-semibold uppercase tracking-wider mb-4"
             style={{ color: "#8888a0" }}
           >
-            Waste Cost vs. ATOMiK Cost
+            Waste Cost vs. Scenario Cost
           </h3>
           <BarComparison
             wasteLabel="Infrastructure waste"
             wasteValue={results.totalMonthlyCost}
-            atomikLabel="ATOMiK Pro subscription"
+            atomikLabel="Scenario A reference cost"
             atomikValue={results.proPrice}
             maxValue={Math.max(results.totalMonthlyCost, results.proPrice)}
           />
@@ -807,7 +808,7 @@ export default function RoiPage() {
               <strong>Cache pressure:</strong> redundant data movement evicts hot L3 cache lines, degrading throughput for all co-located workloads. Severity scales with per-server waste volume.
             </li>
             <li>
-              <strong>ATOMiK reduction:</strong> 85% (Pro) to 93% (Team) of detected waste eliminated via delta-state deduplication
+              <strong>Scenario assumption:</strong> the model explores 85% to 93% avoidable waste in a high-fit path. Treat this as PROJECTED until replaced by measured workload artifacts.
             </li>
             <li>
               Defaults reflect typical mid-scale microservices workloads. Your results will vary based on actual workload characteristics.

@@ -206,7 +206,9 @@ export default function GamingPage() {
           style={{ color: "#8888a0" }}
         >
           Game state synchronization forces a choice between bandwidth,
-          determinism, complexity, and latency. ATOMiK eliminates the tradeoff.
+          determinism, complexity, and latency. ATOMiK is relevant where a
+          delta-state path can be evaluated against that tradeoff with measured
+          artifacts.
         </p>
 
         <div className="grid md:grid-cols-2 gap-6">

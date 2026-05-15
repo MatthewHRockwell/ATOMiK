@@ -537,20 +537,21 @@ export default function IoTEdgePage() {
             className="text-xs font-semibold uppercase tracking-widest mb-3"
             style={{ color: "#22c55e" }}
           >
-            See it in action
+            Workload brief
           </p>
           <h3 className="text-xl font-bold mb-2">
-            See how SensorGrid IoT achieved 97.8% bandwidth reduction with ATOMiK
+            Evaluate edge telemetry as a design-partner workload
           </h3>
           <p className="text-sm mb-4" style={{ color: "#8888a0" }}>
-            SensorGrid cut 340 GB/day of sensor telemetry down to 7.5 GB/day across
-            50,000 industrial sensors &mdash; saving $180K annually in cloud and cellular costs.
+            Public customer case studies are not claimed yet. Use the workload
+            briefs page to define sensor payloads, gateway behavior, network
+            constraints, and the measured artifact required for a credible claim.
           </p>
           <span
             className="text-sm font-semibold"
             style={{ color: "#22c55e" }}
           >
-            Read case study &rarr;
+            View workload briefs &rarr;
           </span>
         </Link>
       </section>

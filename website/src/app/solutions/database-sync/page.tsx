@@ -129,7 +129,7 @@ print(f"{len(changed_ids)} rows changed")
             ["O(1)", "Per-row detection"],
             ["8 bytes", "Per fingerprint"],
             ["Zero", "Dependencies"],
-            ["125x", "Less memory"],
+            ["Artifact", "Memory claims"],
           ].map(([val, label]) => (
             <div key={label} className="text-center rounded-xl p-4" style={{ background: "#12121a", border: "1px solid #1e1e2e" }}>
               <div className="text-xl font-bold" style={{ color: "#4f8fff" }}>{val}</div>
@@ -153,20 +153,21 @@ print(f"{len(changed_ids)} rows changed")
             className="text-xs font-semibold uppercase tracking-widest mb-3"
             style={{ color: "#8b5cf6" }}
           >
-            See it in action
+            Workload brief
           </p>
           <h3 className="text-xl font-bold mb-2">
-            See how CloudSync DB achieved 0% throughput impact with ATOMiK
+            Evaluate database sync as a design-partner workload
           </h3>
           <p className="text-sm mb-4" style={{ color: "#8888a0" }}>
-            CloudSync replaced trigger-based CDC with O(1) XOR fingerprinting &mdash;
-            eliminating 23% throughput degradation and unblocking 3 enterprise deals.
+            Public customer case studies are not claimed yet. Use the workload
+            briefs page to frame CDC, replication, reconciliation, and audit
+            paths that may merit a scoped evaluation.
           </p>
           <span
             className="text-sm font-semibold"
             style={{ color: "#8b5cf6" }}
           >
-            Read case study &rarr;
+            View workload briefs &rarr;
           </span>
         </Link>
       </section>

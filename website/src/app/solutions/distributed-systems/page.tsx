@@ -34,7 +34,7 @@ const painPoints = [
     problem:
       "Raft and Paxos require leader election, log replication, and quorum agreement for every state change. Latency scales with cluster size. A single slow node stalls the entire pipeline.",
     solution:
-      "Delta commutativity eliminates ordering requirements. Every node accumulates XOR deltas independently \u2014 no leader, no quorum, no round-trips. Latency is O(1) regardless of cluster size.",
+      "Delta commutativity can reduce ordering pressure for workloads that fit the XOR state model. Any leader, quorum, round-trip, or latency claim needs a workload-specific architecture review and measured artifact.",
   },
   {
     label: "CRDT Complexity",
@@ -42,7 +42,7 @@ const painPoints = [
     problem:
       "G-Counters, LWW-Registers, OR-Sets \u2014 each data type needs its own merge function, metadata overhead, and correctness proof. State bloat grows unbounded as tombstones accumulate.",
     solution:
-      "One algebraic operation (XOR) handles all merge semantics. Self-inverse property means no tombstones: applying a delta twice cancels it. Zero metadata overhead per operation.",
+      "One algebraic operation handles the modeled merge path. Self-inverse deltas can reduce tombstone pressure in suitable encodings, but metadata and correctness obligations remain workload-specific.",
   },
   {
     label: "Event Log Growth",

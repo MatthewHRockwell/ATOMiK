@@ -4,5 +4,5 @@ export const alt = "ATOMiK";
 export const size = ogSize;
 export const contentType = "image/png";
 export default function OG() {
-  return generateOGImage({ title: "ROI Calculator", subtitle: "How much is your infrastructure wasting? Calculate your savings.", accent: "#22c55e", badge: "Calculator" });
+  return generateOGImage({ title: "Scenario Calculator", subtitle: "Model where redundant state movement may create avoidable cost.", accent: "#22c55e", badge: "Calculator" });
 }
