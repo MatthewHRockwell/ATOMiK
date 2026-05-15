@@ -31,7 +31,7 @@ function statusColor(s: Status) {
 }
 
 function statusLabel(s: Status) {
-  if (s === "completed") return "Validated";
+  if (s === "completed") return "Evidence";
   if (s === "in-progress") return "In Progress";
   return "Planned";
 }
@@ -69,11 +69,11 @@ const milestones: Milestone[] = [
     title: "Mathematical Foundation",
     status: "completed",
     bullets: [
-      "108 Lean 4 theorems proving delta-state algebra properties",
+      "Formal proof work for delta-state algebra properties",
       "Abelian group: commutative, associative, self-inverse, identity",
-      "Security architecture: no caches, no speculation, deterministic latency",
+      "Security and timing claims require a specific threat model and measured boundary",
     ],
-    highlight: "Formally verified correctness",
+    highlight: "Software-validated proof work",
   },
   {
     phase: "Phase 1",
@@ -81,23 +81,23 @@ const milestones: Milestone[] = [
     status: "completed",
     bullets: [
       "Custom RV64I CPU + ATOMiK ISA extensions on GW1NR-9K",
-      "1280\u00d7720 @60 Hz HDMI output from a $13.50 FPGA",
-      "Multi-node delta streaming: dual-SoC convergence proven",
-      "53/54 compliance, 9/9 ATOMiK, 10/10 integration, 6/6 display tests",
+      "HDMI output and display pipeline prototype work",
+      "Multi-node delta streaming prototype path",
+      "Exact compliance, timing, and display-test counts belong in source artifacts",
     ],
-    highlight: "Prototype firmware running today",
+    highlight: "FPGA prototype path",
   },
   {
     phase: "Phase 2",
     title: "Xilinx Zynq XC7Z020 \u2014 Parallel Scaling + Linux",
     status: "completed",
     bullets: [
-      "N=512 synthesis config: 23,542 LUT at 136 MHz",
-      "Sub-linear scaling: 3.7\u00d7 LUT growth for 16\u00d7 throughput",
-      "Linux 6.9 userspace validation: 16/16 PASS via /dev/mem mmap (S-mode, MMU)",
-      "Full OS stack proven: user process \u2192 kernel \u2192 Wishbone CSR \u2192 ATOMiK core",
+      "Synthesis-characterized scaling path on XC7Z020",
+      "Linux userspace validation path documented through /dev/mem and MMIO ordering",
+      "Live AX7020/Zynq prototype work is tracked separately from synthesis ceilings",
+      "Exact counts and frequencies should be quoted only from source artifacts",
     ],
-    highlight: "Synthesis scaling + Linux userspace validated",
+    highlight: "Synthesis + hardware-validation evidence",
   },
   {
     phase: "Phase 3",
@@ -105,21 +105,21 @@ const milestones: Milestone[] = [
     status: "in-progress",
     bullets: [
       "Open-source PDK via Efabless / Silicon Catalyst partnership",
-      "Gate-count estimate: ~500 gates for a single ATOMiK core",
-      "Prove delta-state algebra works in custom silicon",
+      "Gate-count and area estimates remain projected until tape-out artifacts exist",
+      "Prepare a first-silicon evaluation chip path",
       "Full open-source toolchain: OpenLane 2, Magic, KLayout",
     ],
-    highlight: "First silicon target",
+    highlight: "First-silicon evaluation path",
   },
   {
     phase: "Phase 4",
-    title: "Production Foundry Partnership",
+    title: "Foundry / IP Partnership",
     status: "future",
     bullets: [
       "TSMC / Samsung / GlobalFoundries engagement",
       "SRAM compiler integration for on-die state tables",
       "Multi-bank ASIC with dedicated on-die interconnect",
-      "Projected high-throughput custom silicon target with minimal die area",
+      "Projected custom-silicon target with die area and throughput to be validated",
     ],
   },
   {
@@ -127,10 +127,10 @@ const milestones: Milestone[] = [
     title: "Volume ASIC \u2014 Edge + Data-Center SKUs",
     status: "future",
     bullets: [
-      "Edge SKU: ultra-low-power, sub-1 mm\u00b2 die for IoT / embedded",
+      "Edge SKU concept for IoT / embedded evaluation",
       "Data-center SKU: thousands of parallel banks, PCIe / CXL attach",
-      "Hardware root-of-trust direction with reduced data-dependent timing surfaces",
-      "Orders-of-magnitude improvement over FPGA on power and throughput",
+      "Hardware root-of-trust direction with timing claims held for evidence",
+      "Power and throughput improvements remain projected until measured silicon exists",
     ],
   },
 ];
@@ -261,10 +261,10 @@ interface ScalingRow {
 }
 
 const scalingData: ScalingRow[] = [
-  { label: "N=1", lut: "302", freq: "444 MHz", throughput: "Synthesis row", barPct: 0.6, color: accent2 },
-  { label: "N=16", lut: "941", freq: "267 MHz", throughput: "Synthesis row", barPct: 6.3, color: accent },
-  { label: "N=512", lut: "23,542", freq: "136 MHz", throughput: "Synthesis ceiling", barPct: 100, color: green },
-  { label: "ASIC (proj.)", lut: "~25K gates", freq: ">1 GHz", throughput: "Projected", barPct: 100, color: gold },
+  { label: "Zynq low-bank", lut: "artifact", freq: "source", throughput: "Synthesis row", barPct: 18, color: accent2 },
+  { label: "Zynq mid-bank", lut: "artifact", freq: "source", throughput: "Synthesis row", barPct: 48, color: accent },
+  { label: "Zynq high-bank", lut: "artifact", freq: "source", throughput: "Synthesis ceiling", barPct: 100, color: green },
+  { label: "ASIC path", lut: "projected", freq: "projected", throughput: "Roadmap", barPct: 100, color: gold },
 ];
 
 function ScalingChart() {
@@ -287,7 +287,7 @@ function ScalingChart() {
           </div>
           <div className="col-span-4 text-xs text-gray-400">
             <span className="font-semibold text-white">{row.throughput}</span>{" "}
-            &middot; {row.freq} &middot; {row.lut} LUT
+            &middot; {row.freq} &middot; {row.lut}
           </div>
         </div>
       ))}
@@ -331,30 +331,30 @@ export default function ASICRoadmapPage() {
           </span>
         </h1>
         <p className="relative mx-auto max-w-2xl text-lg text-gray-400">
-          ATOMiK&apos;s delta-state algebra is formally verified, FPGA-backed, and
-          mapped to a synthesis-characterized path toward custom silicon.
+          ATOMiK&apos;s delta-state algebra has formal proof work, FPGA validation
+          artifacts, and a synthesis-characterized path toward first silicon.
         </p>
       </section>
 
       {/* ---- Key metrics ---- */}
       <section className="mx-auto max-w-5xl px-6 pb-20">
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-          <MetricCard label="Lean 4 Proofs" value="108" sub="Theorems verified" color={green} />
+          <MetricCard label="Formal Proof" value="Software" sub="Evidence-labeled" color={green} />
           <MetricCard label="Peak FPGA" value="Synthesis" sub="Zynq XC7Z020, N=512" color={accent} />
           <MetricCard label="Single Core" value="Synthesis" sub="See evidence labels" color={accent2} />
-          <MetricCard label="ASIC Target" value="Projected" sub="Roadmap, not measured" color={gold} />
+          <MetricCard label="First Silicon" value="Roadmap" sub="Not measured ASIC" color={gold} />
         </div>
       </section>
 
       {/* ---- Scaling chart ---- */}
       <section className="mx-auto max-w-5xl px-6 pb-20">
         <h2 className="mb-2 text-2xl font-bold text-white">
-          Throughput Scaling
+          Synthesis Scaling
         </h2>
         <p className="mb-8 text-sm text-gray-500">
-          Sub-linear resource growth: 3.7&times; LUT increase yields 16&times;
-          throughput. ASIC projections assume &gt;1 GHz clock with equivalent
-          bank count.
+          Zynq rows are synthesis-characterized and should be quoted only from
+          source artifacts. ASIC rows are roadmap projections until silicon
+          exists and is measured.
         </p>
         <div
           className="rounded-xl p-6"
@@ -370,8 +370,8 @@ export default function ASICRoadmapPage() {
           Development Timeline
         </h2>
         <p className="mb-10 text-sm text-gray-500">
-          Each phase builds on hardware-validated results from the previous one
-          &mdash; no paper designs.
+          Each phase is separated by evidence status so synthesis, hardware
+          validation, and roadmap work do not blur together.
         </p>
 
         {milestones.map((m, i) => (
@@ -392,19 +392,19 @@ export default function ASICRoadmapPage() {
             Interested in ATOMiK Silicon?
           </h2>
           <p className="mb-6 text-gray-400">
-            We&apos;re partnering with foundries and system integrators to bring
-            formally verified delta-state processing to custom silicon. Get in
-            touch to discuss early access, licensing, or integration.
+            ATOMiK is preparing the path toward a first-silicon evaluation chip.
+            Get in touch to discuss design-partner fit, licensing, or technical
+            diligence.
           </p>
           <a
-            href="/contact?intent=design-partner"
+            href="/contact?intent=licensing"
             className="inline-flex items-center gap-2 rounded-lg px-8 py-3 text-sm font-semibold text-white transition-shadow hover:shadow-lg"
             style={{
               background: `linear-gradient(135deg, ${accent}, ${accent2})`,
               boxShadow: `0 4px 24px ${accent}33`,
             }}
           >
-            Discuss Design Partnership
+            Discuss Licensing
             <span aria-hidden="true">&rarr;</span>
           </a>
           <p className="mt-4 text-xs text-gray-600">

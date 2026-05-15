@@ -33,28 +33,28 @@ const stateSyncHeaders = ["Feature", "ATOMiK", "Redis", "etcd", "ZooKeeper"];
 const stateSyncRows: string[][] = [
   [
     "Consistency model",
-    "Convergent (Abelian group)",
+    "Modeled Abelian-group path",
     "Eventual / strong (configurable)",
     "Linearizable (Raft)",
     "Linearizable (ZAB)",
   ],
   [
     "Sync bandwidth",
-    "O(delta) \u2014 XOR of changes only",
+    "Delta-sized in mapped paths",
     "Full key-value per write",
     "Full key-value per write",
     "Full znode per write",
   ],
   [
     "Coordination needed",
-    "None \u2014 order-independent",
+    "Workload-dependent",
     "Leader for writes (Cluster)",
     "Leader election required",
     "Leader election required",
   ],
   [
     "Write latency",
-    "Deterministic, constant-time",
+    "Evaluation-dependent",
     "Sub-ms (single node), variable (cluster)",
     "~10ms (Raft consensus round)",
     "~10ms (ZAB proposal round)",
@@ -68,7 +68,7 @@ const stateSyncRows: string[][] = [
   ],
   [
     "Formal proofs",
-    "108 Lean4 theorems",
+    "Formal proof work",
     "No formal verification",
     "TLA+ spec (partial)",
     "No formal verification",
@@ -86,7 +86,7 @@ const streamRows: string[][] = [
   ],
   [
     "Replay cost",
-    "O(1) \u2014 no replay needed",
+    "No event replay in modeled path",
     "O(n) \u2014 scan from offset",
     "O(n) \u2014 replay all events",
     "O(1) \u2014 merge states directly",
@@ -100,7 +100,7 @@ const streamRows: string[][] = [
   ],
   [
     "Conflict resolution",
-    "Automatic (commutativity)",
+    "Algebraic in scoped model",
     "Partition-based ordering",
     "Application-level logic",
     "Automatic (join-semilattice)",
@@ -125,35 +125,35 @@ const changeHeaders = ["Feature", "ATOMiK", "Checksums (SHA/MD5)", "Diff / Patch
 const changeRows: string[][] = [
   [
     "Detection complexity",
-    "O(1) \u2014 compare accumulator to identity",
+    "Accumulator comparison in scoped path",
     "O(n) \u2014 hash full content",
     "O(n) \u2014 byte-by-byte comparison",
     "O(log n) \u2014 walk tree path",
   ],
   [
     "Per-page cost",
-    "Single XOR (1 cycle on FPGA)",
+    "Compact XOR path when hardware-backed",
     "Full hash computation",
     "Full content scan",
     "Hash per node on path",
   ],
   [
     "False negative rate",
-    "Zero (algebraically proven)",
+    "Depends on representation and threat model",
     "Negligible (collision probability)",
     "Zero",
     "Negligible (collision probability)",
   ],
   [
     "Deterministic timing",
-    "Yes \u2014 constant-time, no branches",
+    "Requires measured workload boundary",
     "No \u2014 data-dependent",
     "No \u2014 data-dependent",
     "Partially \u2014 fixed-depth trees only",
   ],
   [
     "Side channels",
-    "None \u2014 no speculative execution",
+    "Requires threat-model review",
     "Timing varies with input",
     "Timing varies with differences",
     "Path-dependent timing",
@@ -170,25 +170,25 @@ const hwRows: string[][] = [
   ],
   [
     "Dev board cost",
-    "$13.50 (Tang Nano 9K)",
+    "Low-cost dev boards available",
     "$200+ (entry-level)",
     "$100K+ (tape-out)",
   ],
   [
     "Power consumption",
-    "< 1W (FPGA fabric)",
+    "Artifact-required",
     "75\u2013350W (typical GPU)",
     "Lowest for given task",
   ],
   [
     "Formal verification",
-    "108 Lean4 theorems + RTL sim",
+    "Formal proof work + RTL/synthesis artifacts",
     "Numerical verification only",
     "Full verification possible",
   ],
   [
     "Time to prototype",
-    "Hours (parameterized RTL)",
+    "Workload-dependent",
     "Days (CUDA/OpenCL)",
     "12\u201318 months (fab cycle)",
   ],
@@ -202,7 +202,7 @@ const useCases = [
   "Applications that need undo/rollback without an event log",
   "Sensor fusion pipelines that merge readings from independent sources",
   "Reducing memory traffic in copy-on-write workloads (containers, VMs)",
-  "Systems requiring formal correctness proof artifacts (108 Lean4 proofs)",
+  "Systems requiring explicit formal-proof and hardware-validation artifacts",
 ];
 
 const antiPatterns = [
@@ -327,11 +327,10 @@ export default function ComparePage() {
         <p className="text-sm mb-6 max-w-3xl leading-relaxed" style={{ color: "#8888a0" }}>
           Redis, etcd, and ZooKeeper are production-grade data stores with rich
           ecosystems. ATOMiK is not a replacement for any of them. It solves a
-          narrower problem: synchronizing state across nodes with minimal
-          bandwidth and zero coordination. Where these tools store and serve
-          full key-value pairs, ATOMiK transmits only the XOR delta of what
-          changed, and reconstructs the current state in O(1) from a single
-          accumulator.
+          narrower problem: evaluating whether state changes can be represented
+          as compact deltas. Where these tools store and serve full key-value
+          pairs, ATOMiK evaluates paths that move deltas and reconstruct current
+          state from an accumulator.
         </p>
         <ComparisonTable headers={stateSyncHeaders} rows={stateSyncRows} />
 
@@ -391,12 +390,10 @@ export default function ComparePage() {
       <section id="compare-change" className="max-w-5xl mx-auto px-6 py-12 scroll-mt-20 rounded-xl transition-all duration-500">
         <h2 className="text-2xl font-bold mb-3">Change Detection</h2>
         <p className="text-sm mb-6 max-w-3xl leading-relaxed" style={{ color: "#8888a0" }}>
-          Traditional change detection scans the full content (checksums, diff)
-          or walks a tree (Merkle). ATOMiK detects changes in O(1) by checking
-          whether the accumulator equals the identity element. On FPGA, this is
-          a compact comparison in the modeled hardware path. Timing-side-channel
-          claims still require a measured workload, threat model, and deployment
-          boundary.
+          Traditional change detection often scans full content or walks a tree.
+          ATOMiK evaluates whether an accumulator comparison can replace that
+          repeated work in a scoped path. Timing-side-channel claims still
+          require a measured workload, threat model, and deployment boundary.
         </p>
         <ComparisonTable headers={changeHeaders} rows={changeRows} />
 
@@ -427,9 +424,9 @@ export default function ComparePage() {
           ASICs deliver the highest performance per watt for a fixed function.
           ATOMiK targets FPGA because delta-state operations are
           simple, wide, and embarrassingly parallel&mdash;a natural fit for
-          configurable fabric. A $13.50 Tang Nano 9K runs the full stack. A
-          Zynq-7020 scaling path is documented as synthesis output, not as a
-          current live-board benchmark claim.
+          configurable fabric. Development-board and Zynq work should be quoted
+          only through the hardware validation map, with synthesis output kept
+          separate from live-board benchmark claims.
         </p>
         <ComparisonTable headers={hwHeaders} rows={hwRows} />
       </section>

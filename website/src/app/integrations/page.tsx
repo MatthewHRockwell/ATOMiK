@@ -13,12 +13,12 @@ const integrations = [
   {
     name: "Docker",
     category: "Containerization",
-    status: "Available",
-    statusColor: "#22c55e",
+    status: "Evaluation example",
+    statusColor: "#4f8fff",
     color: "#2496ed",
     icon: "D",
     description:
-      "Run ATOMiK as a sidecar container alongside your application. The sidecar handles delta accumulation, change detection, and state reconstruction over a local Unix socket. Your application stays language-agnostic -- any language that can write to a socket can use ATOMiK.",
+      "Run ATOMiK as a sidecar-style evaluation pattern alongside an application. The example shows delta accumulation, change detection, and state reconstruction over a local Unix socket. Treat deployment packaging as evaluation work until tied to a specific workload.",
     code: `# docker-compose.yml
 services:
   app:
@@ -46,12 +46,12 @@ volumes:
     color: "#326ce5",
     icon: "K",
     description:
-      "The ATOMiK Kubernetes Operator manages AtomikCluster custom resources. It handles automatic sidecar injection, horizontal scaling of delta accumulation banks, and cross-pod state convergence. Helm chart includes Prometheus ServiceMonitor and Grafana dashboard definitions.",
+      "Kubernetes support is roadmap material. The example shows the shape of a possible custom resource and metrics path, not a current production operator commitment.",
     code: `# atomik-cluster.yaml
 apiVersion: atomik.tech/v1alpha1
 kind: AtomikCluster
 metadata:
-  name: production
+  name: evaluation
 spec:
   replicas: 3
   banks: 16
@@ -69,12 +69,12 @@ spec:
   {
     name: "Prometheus + Grafana",
     category: "Observability",
-    status: "Available",
-    statusColor: "#22c55e",
+    status: "Evaluation example",
+    statusColor: "#4f8fff",
     color: "#e6522c",
     icon: "P",
     description:
-      "The ATOMiK metrics exporter exposes accumulator state, delta throughput, change detection rates, and convergence latency as Prometheus metrics. Pre-built Grafana dashboards visualize delta throughput per second, accumulator drift between replicas, and change detection hit/miss ratios.",
+      "Observability examples can expose accumulator state, delta counts, and change-detection events as Prometheus-style metrics. Dashboard language should stay evaluation-scoped until backed by a packaged release artifact.",
     code: `# prometheus.yml — scrape config
 scrape_configs:
   - job_name: 'atomik'
@@ -93,12 +93,12 @@ scrape_configs:
   {
     name: "PostgreSQL",
     category: "Database",
-    status: "Available",
-    statusColor: "#22c55e",
+    status: "Evaluation example",
+    statusColor: "#4f8fff",
     color: "#336791",
     icon: "PG",
     description:
-      "Detect row-level changes without triggers, WAL parsing, or replication slots. ATOMiK fingerprints each row with an XOR accumulator. Change detection is O(1) per row: compare the fingerprint to the identity element. Works alongside your existing schema -- no DDL changes required on production tables.",
+      "Explore row-level change detection without making a production-database claim. The example fingerprints rows with an XOR accumulator and should be validated against a real schema, workload, and correctness envelope before use.",
     code: `from atomik_core import AtomikContext
 import psycopg2
 
@@ -118,17 +118,17 @@ for row_id, data in cur:
         replicate(row_id, data)
         known_fingerprints[row_id] = hash(data)
 
-# Zero triggers. Zero WAL parsing. O(1) per row.`,
+# Evaluation example only; validate against the real schema and workload.`,
   },
   {
     name: "Redis",
     category: "Key-Value Store",
-    status: "Available",
-    statusColor: "#22c55e",
+    status: "Evaluation example",
+    statusColor: "#4f8fff",
     color: "#dc382d",
     icon: "R",
     description:
-      "Track which Redis keys changed between sync intervals without subscribing to keyspace notifications or scanning the full key space. ATOMiK maintains a per-key fingerprint that detects changes in O(1). Ideal for cache invalidation pipelines where you need to know what changed, not subscribe to everything.",
+      "Explore whether per-key fingerprints can reduce repeated scans in a cache-invalidation path. Treat the example as a workload-mapping pattern, not a drop-in Redis feature claim.",
     code: `from atomik_core import AtomikContext
 import redis
 
@@ -156,18 +156,18 @@ def track_key(key: str):
     ctx.accum(delta)
     return True  # Changed
 
-# Batch check: O(1) per key, no SCAN needed
+# Batch check example; validate against the real access pattern
 changed = [k for k in watched_keys if track_key(k)]`,
   },
   {
     name: "GitHub Actions",
     category: "CI/CD",
-    status: "Available",
-    statusColor: "#22c55e",
+    status: "Evaluation example",
+    statusColor: "#4f8fff",
     color: "#8b5cf6",
     icon: "GH",
     description:
-      "Generate type-safe ATOMiK SDK bindings for Python, TypeScript, Go, Rust, and C as part of your CI/CD pipeline. The ATOMiK code generation action validates your schema, runs the 353-test suite, and publishes versioned packages to your registry. Integrates with existing release workflows.",
+      "Generate ATOMiK SDK bindings as part of an evaluation workflow. The example shows schema-driven generation and test hooks without promising a packaged marketplace action or registry publishing path.",
     code: `# .github/workflows/atomik-sdk.yml
 name: Generate ATOMiK SDK
 on:
@@ -192,10 +192,8 @@ jobs:
       - name: Run test suite
         run: atomik-gen test --all  # 353 tests
 
-      - name: Publish to registry
-        run: atomik-gen publish --registry $REGISTRY_URL
-        env:
-          REGISTRY_URL: \${{ secrets.REGISTRY_URL }}`,
+      - name: Archive generated bindings
+        run: tar -czf atomik-generated.tar.gz generated/`,
   },
 ];
 
@@ -234,9 +232,9 @@ export default function IntegrationsPage() {
           className="text-lg md:text-xl max-w-3xl mx-auto leading-relaxed"
           style={{ color: "#8888a0" }}
         >
-          Delta-state algebra works alongside the tools you already use.
-          Containers, databases, observability, CI/CD -- ATOMiK integrates
-          without replacing your infrastructure.
+          Delta-state algebra can be evaluated alongside the tools you already
+          use. These examples are starting points for workload mapping, not
+          production integration commitments.
         </p>
       </section>
 
@@ -329,8 +327,9 @@ export default function IntegrationsPage() {
           className="text-center mb-10 max-w-2xl mx-auto"
           style={{ color: "#8888a0" }}
         >
-          ATOMiK is not middleware. It is a library with four operations. Integrations
-          are thin wrappers that expose those operations to your existing stack.
+          ATOMiK is not middleware. It is an evaluation path around a small set
+          of state operations. Integrations should be scoped against a real
+          workload before being described as deployable.
         </p>
         <div className="grid md:grid-cols-3 gap-6">
           <div
@@ -354,7 +353,8 @@ export default function IntegrationsPage() {
               >
                 pip install atomik-core
               </code>{" "}
-              or add the sidecar container. No infrastructure changes.
+              or evaluate a sidecar pattern. Keep infrastructure changes scoped
+              to a test environment first.
             </p>
           </div>
           <div
@@ -418,8 +418,8 @@ export default function IntegrationsPage() {
             </div>
             <h3 className="text-sm font-semibold mb-2">Observe</h3>
             <p className="text-sm" style={{ color: "#8888a0" }}>
-              Metrics export to Prometheus automatically. Grafana dashboards show
-              delta throughput, convergence lag, and change detection rates.
+              Metrics can be exported in a Prometheus-style shape. Dashboard
+              claims should be tied to the actual evaluation harness.
             </p>
           </div>
         </div>
@@ -439,8 +439,8 @@ export default function IntegrationsPage() {
           Need a custom integration?
         </h2>
         <p className="mb-8 max-w-xl mx-auto" style={{ color: "#8888a0" }}>
-          ATOMiK&apos;s four-operation API makes integration straightforward.
-          If you need help connecting to your specific stack, our team can help.
+          Bring one real workload and ATOMiK can map the relevant integration
+          surface, success criteria, and proof artifacts.
         </p>
         <div className="flex flex-wrap justify-center gap-4">
           <Link

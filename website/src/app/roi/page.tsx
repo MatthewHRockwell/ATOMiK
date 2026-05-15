@@ -211,7 +211,7 @@ function ROIReportExport() {
             <div className="text-2xl mb-2" style={{ color: "#22c55e" }}>&#10003;</div>
             <h3 className="font-bold mb-2">Report request received</h3>
             <p className="text-sm" style={{ color: "#8888a0" }}>
-              A custom ROI report based on your inputs will be prepared and sent to {form.email}.
+              A custom scenario report based on your inputs will be prepared and sent to {form.email}.
               In the meantime, bookmark this page — your slider settings are preserved in the URL.
             </p>
           </>
@@ -367,14 +367,14 @@ export default function RoiPage() {
     const cpuFractionWasted = effectiveCapacityWasted;
     const totalMonthlyCost = bandwidthCost + overProvisionCost + cachePressureCost;
 
-    // Scenario A reference cost ($99/mo)
-    const proPrice = 99;
+    // Scenario A reference budget. This is not public product pricing.
+    const proPrice = 100;
     const proSavings = totalMonthlyCost * ATOMIK_EFFICIENCY;
     const proROI = proPrice > 0 ? proSavings / proPrice : 0;
     const proBreakEvenHours = proSavings > 0 ? (proPrice / (proSavings / HOURS_PER_MONTH)) : Infinity;
 
-    // Scenario B reference cost ($299/mo)
-    const teamPrice = 299;
+    // Scenario B reference budget. This is not public product pricing.
+    const teamPrice = 300;
     // Scenario B assumes deeper workload mapping; this is illustrative only.
     const teamEfficiency = Math.min(ATOMIK_EFFICIENCY + 0.08, 0.95);
     const teamSavings = totalMonthlyCost * teamEfficiency;
@@ -671,7 +671,7 @@ export default function RoiPage() {
                   </span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
-                  <span style={{ color: "#b0b0c0" }}>Ratio vs reference cost</span>
+                  <span style={{ color: "#b0b0c0" }}>Ratio vs scenario budget</span>
                   <span className="font-bold tabular-nums" style={{ color: "#22c55e" }}>
                     {results.proROI.toFixed(1)}x
                   </span>
@@ -715,7 +715,7 @@ export default function RoiPage() {
                   </span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
-                  <span style={{ color: "#b0b0c0" }}>Ratio vs reference cost</span>
+                  <span style={{ color: "#b0b0c0" }}>Ratio vs scenario budget</span>
                   <span className="font-bold tabular-nums" style={{ color: "#22c55e" }}>
                     {results.teamROI.toFixed(1)}x
                   </span>
@@ -744,10 +744,10 @@ export default function RoiPage() {
               sub="scenario A"
             />
             <StatBlock
-              label="Ratio vs $99 model"
+              label="Ratio vs scenario budget"
               value={`${results.proROI.toFixed(1)}x`}
               color="#4f8fff"
-              sub="ROI"
+              sub="model only"
             />
             <StatBlock
               label="Model break-even"
@@ -779,7 +779,7 @@ export default function RoiPage() {
           <BarComparison
             wasteLabel="Infrastructure waste"
             wasteValue={results.totalMonthlyCost}
-            atomikLabel="Scenario A reference cost"
+            atomikLabel="Scenario A budget"
             atomikValue={results.proPrice}
             maxValue={Math.max(results.totalMonthlyCost, results.proPrice)}
           />
@@ -822,7 +822,7 @@ export default function RoiPage() {
       {/* CTA */}
       <section className="text-center px-6 pb-24">
         <h2 className="text-2xl font-bold mb-3">
-          Stop paying for redundant data
+          Model waste before claiming savings
         </h2>
         <p className="mb-8 max-w-xl mx-auto" style={{ color: "#8888a0" }}>
           Bring a real workload and define the evidence needed before treating

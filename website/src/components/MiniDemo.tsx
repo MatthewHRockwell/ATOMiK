@@ -126,7 +126,7 @@ export default function MiniDemo() {
 
       {/* Caption */}
       <p className="text-center text-sm mb-8" style={{ color: "#8888a0" }}>
-        Same result regardless of operation order. Proven with 108 theorems.
+        Same modeled result regardless of operation order under the formal delta-state algebra.
       </p>
 
       {/* CTA buttons */}

@@ -27,7 +27,7 @@ const verdicts: Record<Challenge, Verdict> = {
   sync: {
     recommendation: "ATOMiK",
     reason:
-      "ATOMiK transmits only XOR deltas (not full key-value pairs), needs zero coordination, and converges automatically via commutative algebra. Ideal when bandwidth is constrained or you cannot afford leader election.",
+      "ATOMiK models state updates as XOR deltas rather than repeated full-state transfers. It can reduce coordination pressure for workloads that fit the algebra, but deployment claims still require workload-specific validation.",
     alternative: "Redis, etcd, or ZooKeeper",
     alternativeReason:
       "you need a full-featured data store with queries, transactions, pub/sub, or strong consistency (linearizable reads). ATOMiK is not a database.",
@@ -36,7 +36,7 @@ const verdicts: Record<Challenge, Verdict> = {
   stream: {
     recommendation: "ATOMiK",
     reason:
-      "ATOMiK accumulates deltas into constant-size state with free undo (self-inverse). No log retention, no replay cost. Best when you care about current state, not event history.",
+      "ATOMiK accumulates deltas into constant-size modeled state with self-inverse undo. It is most relevant when current-state reconstruction matters more than retaining every event.",
     alternative: "Kafka or Event Sourcing",
     alternativeReason:
       "you need ordered event delivery, consumer groups, replayable audit trails, or dead-letter queues. ATOMiK does not store individual events.",
@@ -45,7 +45,7 @@ const verdicts: Record<Challenge, Verdict> = {
   change: {
     recommendation: "ATOMiK",
     reason:
-      "Change detection is O(1) — compare the accumulator to the identity element. On FPGA, this takes a single cycle with deterministic timing and zero side channels.",
+      "Change detection can be modeled as an accumulator comparison. Hardware timing, side-channel, and deployment claims need measured artifacts for the specific implementation.",
     alternative: "Merkle Trees",
     alternativeReason:
       "you need to efficiently identify which specific subtree changed in a large hierarchical dataset. Merkle Trees give O(log n) localization; ATOMiK tells you that something changed, not where.",
