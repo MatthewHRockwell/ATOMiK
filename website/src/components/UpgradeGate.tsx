@@ -7,9 +7,15 @@ const tierColors: Record<string, string> = {
 };
 
 const tierLabels: Record<string, string> = {
-  pro: "Pro",
-  team: "Team",
-  enterprise: "Enterprise",
+  pro: "Evaluation",
+  team: "SDK Evaluation",
+  enterprise: "Enterprise / IP",
+};
+
+const tierLinks: Record<string, string> = {
+  pro: "/contact?intent=evaluation",
+  team: "/contact?intent=evaluation",
+  enterprise: "/contact?intent=licensing",
 };
 
 export default function UpgradeGate({
@@ -61,7 +67,7 @@ export default function UpgradeGate({
         </p>
 
         <Link
-          href={`/register?plan=${tier}`}
+          href={tierLinks[tier]}
           className="inline-block text-sm font-semibold no-underline px-5 py-2.5 rounded-lg transition-opacity hover:opacity-90"
           style={{ background: color, color: "#fff" }}
         >

@@ -161,8 +161,8 @@ export default function WhatIsDeltaStateComputingPage() {
             </Link>{" "}
             to describe this architecture. It draws from delta-state CRDTs, XOR-based
             error correction, and algebraic group theory, but synthesizes them into
-            something new: a universal state primitive that works from Python scripts to
-            custom RISC-V silicon.
+            something new: a state primitive that can be explored in software and mapped
+            toward FPGA/RTL prototype paths.
           </p>
 
           <p>
@@ -654,7 +654,7 @@ print(f"After undo: 0x{node_a.read():08X}")  # 0xCA00BABE (delta 1 removed)`}</C
                 </div>
                 <p className="text-sm" style={{ color: "#c8c8d4" }}>
                   Pure Python SDK. <code style={{ color: "#22d3ee" }}>pip install atomik-core</code>.
-                  Prototyping, data science, scripting. 218 tests passing.
+                  Prototyping, data science, and scripting paths.
                 </p>
               </div>
 

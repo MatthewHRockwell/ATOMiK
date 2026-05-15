@@ -105,9 +105,9 @@ const tierColors: Record<string, string> = {
 
 const tierLabels: Record<string, string> = {
   community: "Public repo",
-  pro: "Pro",
-  team: "Team",
-  enterprise: "Enterprise",
+  pro: "Evaluation",
+  team: "SDK evaluation",
+  enterprise: "Enterprise / IP",
 };
 
 export default function DownloadCenter({ currentTier = "pro" }: { currentTier?: string }) {

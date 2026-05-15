@@ -23,25 +23,3 @@ export const stripe = new Proxy({} as Stripe, {
     return (getStripeClient() as any)[prop];
   },
 });
-
-// Product/price configuration
-export const PRODUCTS = {
-  professional: {
-    name: 'ATOMiK Pro',
-    description: 'Linux kernel module + system-level optimization + priority support',
-    mode: 'subscription' as const,
-    priceMonthly: 9900, // $99.00 in cents
-  },
-  team: {
-    name: 'ATOMiK Team',
-    description: 'SDK generation pipeline (5 languages) + waste analysis + team license',
-    mode: 'subscription' as const,
-    priceMonthly: 29900, // $299.00 in cents
-  },
-  enterprise: {
-    name: 'ATOMiK Enterprise',
-    description: 'FPGA hardware acceleration + custom CPU + dedicated support + consulting',
-    mode: 'subscription' as const,
-    priceMonthly: 99900, // $999.00 in cents
-  },
-} as const;

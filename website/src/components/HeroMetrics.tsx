@@ -6,7 +6,7 @@ const metrics: { value: string; label: string; subtitle?: string; suffix?: strin
   { value: "Artifact", label: "Detection Claims", subtitle: "Quote only with a linked measured workload artifact", color: "#22c55e" },
   { value: "Artifact", label: "Hardware Ops", subtitle: "Use hardware-validation pages for current measured or synthesis-labeled throughput", color: "#4f8fff" },
   { value: "Projected", label: "Bandwidth Claims", subtitle: "Workload-specific until backed by measured artifact packages", color: "#22d3ee" },
-  { value: "108", label: "Lean4 Formal Proofs", color: "#8b5cf6" },
+  { value: "Lean4", label: "Formal Proof Artifacts", color: "#8b5cf6" },
 ];
 
 export default function HeroMetrics() {

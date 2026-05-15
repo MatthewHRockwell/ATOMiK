@@ -103,8 +103,8 @@ export default function ApiReferencePage() {
       <UpgradeGate
         tier="team"
         title="Generate SDKs in 5 Languages"
-        description="Team tier includes the SDK generation pipeline: Python, Rust, C, JavaScript, and Verilog from a single schema definition."
-        ctaText="Start Team Trial"
+        description="SDK generation is available for scoped technical evaluation: Python, Rust, C, JavaScript, and Verilog from a single schema definition."
+        ctaText="Request SDK Evaluation"
       />
 
       {/* ─────────────── Core Operations Reference ─────────────── */}

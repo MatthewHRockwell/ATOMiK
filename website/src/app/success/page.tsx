@@ -101,8 +101,8 @@ function SuccessContent() {
   return (
     <div style={styles.container}>
       <div style={styles.checkmark}>&#10003;</div>
-      <h1 style={styles.title}>Welcome to ATOMiK {license.tier === 'enterprise' ? 'Enterprise' : license.tier === 'team' ? 'Team' : 'Pro'}</h1>
-      <p style={styles.subtitle}>Your license has been activated for {license.email}</p>
+      <h1 style={styles.title}>ATOMiK evaluation access</h1>
+      <p style={styles.subtitle}>Evaluation materials have been prepared for {license.email}</p>
 
       <div style={styles.card}>
         <h2 style={styles.cardTitle}>Your License Key</h2>
@@ -154,7 +154,7 @@ function SuccessContent() {
         <h2 style={styles.cardTitle}>Need Help?</h2>
         <p style={styles.helpText}>
           Email <a href="mailto:support@atomik.tech" style={styles.link}>support@atomik.tech</a> for
-          {license.tier === 'enterprise' ? ' 4-hour response SLA' : ' priority support (48hr SLA)'}.
+          scoped evaluation support and artifact questions.
         </p>
       </div>
 
@@ -185,7 +185,7 @@ function SuccessContent() {
         <p style={styles.nextHelp}>
           Need help? Reach out at{' '}
           <a href="mailto:support@atomik.tech" style={styles.link}>support@atomik.tech</a>
-          {' '}&mdash; we&apos;re here to get you up and running.
+          {" "}for evaluation support.
         </p>
       </div>
 

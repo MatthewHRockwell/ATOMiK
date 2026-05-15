@@ -56,8 +56,8 @@ export default function PrivacyPage() {
           <Section title="3. How We Use Your Data">
             <ul className="list-disc list-inside space-y-2 text-[#8888a0]">
               <li>Deliver and activate software licenses.</li>
-              <li>Process subscription payments and send billing-related communications.</li>
-              <li>Provide technical support and respond to inquiries.</li>
+              <li>Process evaluation, licensing, and advisor inquiries.</li>
+              <li>Provide scoped technical support and respond to inquiries.</li>
               <li>Improve our products, documentation, and user experience.</li>
               <li>Send product updates and security notices (you may opt out at any time).</li>
             </ul>
