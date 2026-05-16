@@ -143,6 +143,208 @@ static int draw_event_pulse(int x, int y, int w, int h) {
     return w;
 }
 
+/* === v0.38-K2 glass-capsule pill primitive ===
+ *
+ * Draws a rounded-rect chip with a subtle alpha border in the supplied
+ * accent color, AA text inside.  The "glass" effect comes from:
+ *   - dark slightly-translucent body (wm_card_bg derivative)
+ *   - 2 px wide rounded outline rendered with the layered-stroke
+ *     doctrine: outer halo at low alpha + bright core border
+ *   - text rendered through the AA atlas
+ *
+ * Returns the width consumed (chip width + trailing gap). */
+static int draw_glass_pill(int x, int y_center, const char *text,
+                           pixel_t accent) {
+    if (!font_aa_loaded(FONT_AA_UI)) {
+        /* Pre-atlas fallback: plain text in accent color, no chip. */
+        int ty = y_center - text_height(1) / 2;
+        draw_text(x, ty, text, 1, accent);
+        return text_width(text, 1) + ATOMIK_GRID_L;
+    }
+
+    int pad_x  = ATOMIK_GRID_M + 2;
+    int pad_y  = 4;
+    int tw     = text_width_aa(FONT_AA_UI, text);
+    int th     = text_height_aa(FONT_AA_UI);
+    int chip_w = tw + pad_x * 2;
+    int chip_h = th + pad_y * 2;
+    int chip_x = x;
+    int chip_y = y_center - chip_h / 2;
+    int radius = chip_h / 2;
+
+    /* Dark glass body. */
+    pixel_t body = rgb(0x10, 0x18, 0x2C);
+    draw_rect_rounded(chip_x, chip_y, chip_w, chip_h, radius, body);
+
+    /* Outer halo — 3 px alpha falloff in accent color. */
+    for (int g = 1; g <= 3; g++) {
+        uint8_t a = (uint8_t)(24 - (g - 1) * 6);
+        for (int sx = 0; sx < chip_w + 2 * g; sx++) {
+            draw_blend_pixel(chip_x - g + sx, chip_y - g,            accent, a);
+            draw_blend_pixel(chip_x - g + sx, chip_y + chip_h - 1 + g, accent, a);
+        }
+        for (int sy = 0; sy < chip_h + 2 * g; sy++) {
+            draw_blend_pixel(chip_x - g,            chip_y - g + sy, accent, a);
+            draw_blend_pixel(chip_x + chip_w - 1 + g, chip_y - g + sy, accent, a);
+        }
+    }
+    /* Core border — bright 1 px line in accent color. */
+    draw_rect(chip_x + radius, chip_y,              chip_w - radius * 2, 1, accent);
+    draw_rect(chip_x + radius, chip_y + chip_h - 1, chip_w - radius * 2, 1, accent);
+    draw_rect(chip_x,              chip_y + radius, 1, chip_h - radius * 2, accent);
+    draw_rect(chip_x + chip_w - 1, chip_y + radius, 1, chip_h - radius * 2, accent);
+
+    /* Text inside, vertically centered using ascender for stability. */
+    int text_y = chip_y + pad_y;
+    draw_text_aa(FONT_AA_UI, chip_x + pad_x, text_y, text, accent);
+
+    return chip_w + ATOMIK_GRID_M;
+}
+
+/* Helper: pick the active personality's display color. */
+static pixel_t personality_color(personality_t p) {
+    switch (p) {
+    case PERSONALITY_STATE: return ATOMIK_SEM_HARDWARE;
+    case PERSONALITY_SYNC:  return ATOMIK_SEM_SAVINGS;
+    case PERSONALITY_AGENT: return ATOMIK_SEM_AGENT;
+    default:                return ATOMIK_FG_DIM;
+    }
+}
+
+/* v0.38-K2 investor Pulse Bar — full premium pass.
+ *
+ * Layout (left → right):
+ *   ATOMiK wordmark (FONT_AA_BRAND 36 px)
+ *   METRICS: <state> glass pill (FONT_AA_UI, dim cyan or amber)
+ *   <PERSONALITY> ACTIVE glass pill (FONT_AA_UI, lane color)
+ *   <pulse waveform>  (layered-stroke sparkline)
+ *   ... center: agent prediction in AA UI ...
+ *   ... right: SYSTEM LIVE chip + uptime plain text ... */
+static void draw_pulse_bar_investor(int bar_y, int bar_h) {
+    int y_center = bar_y + bar_h / 2;
+    int cur_x    = ATOMIK_GRID_L;
+
+    /* ATOMiK wordmark — atomik_36 brand atlas. */
+    const char *brand = "ATOMiK";
+    if (font_aa_loaded(FONT_AA_BRAND)) {
+        int brand_h = text_height_aa(FONT_AA_BRAND);
+        int brand_y = y_center - brand_h / 2 - 2;
+        draw_text_aa(FONT_AA_BRAND, cur_x, brand_y, brand,
+                     ATOMIK_SEM_HARDWARE);
+        cur_x += text_width_aa(FONT_AA_BRAND, brand) + ATOMIK_GRID_L * 2;
+    } else if (font_aa_loaded(FONT_AA_DISPLAY)) {
+        int brand_h = text_height_aa(FONT_AA_DISPLAY);
+        int brand_y = y_center - brand_h / 2 - 2;
+        draw_text_aa(FONT_AA_DISPLAY, cur_x, brand_y, brand,
+                     ATOMIK_SEM_HARDWARE);
+        cur_x += text_width_aa(FONT_AA_DISPLAY, brand) + ATOMIK_GRID_L * 2;
+    } else {
+        int ty = y_center - text_height(2) / 2;
+        draw_text(cur_x, ty, brand, 2, ATOMIK_SEM_HARDWARE);
+        cur_x += text_width(brand, 2) + ATOMIK_GRID_L * 2;
+    }
+
+    /* METRICS: <state> glass pill — color follows worst source. */
+    {
+        metric_source_t worst = metric_worst_source();
+        const char *agg = metric_aggregate_label();
+        char pill[32];
+        snprintf(pill, sizeof pill, "METRICS: %s", agg);
+        pixel_t mc = metric_source_color(worst);
+        cur_x += draw_glass_pill(cur_x, y_center, pill, mc);
+    }
+
+    /* Active personality glass pill — "SYNC ACTIVE" etc, lane color. */
+    {
+        personality_t p = fabric_active();
+        const char *pname = fabric_personality_name(p);
+        char pill[32];
+        snprintf(pill, sizeof pill, "%s ACTIVE", pname);
+        cur_x += draw_glass_pill(cur_x, y_center, pill,
+                                 personality_color(p));
+    }
+
+    /* Pulse waveform — same source as before, repositioned and given
+     * a layered-stroke pass so it reads as instrument, not debug line. */
+    {
+        int pulse_w = 160;
+        int pulse_h = bar_h - 24;
+        int pulse_y = y_center - pulse_h / 2;
+        draw_event_pulse(cur_x, pulse_y, pulse_w, pulse_h);
+        cur_x += pulse_w + ATOMIK_GRID_L;
+    }
+
+    /* Center: agent prediction (AA UI, violet) if any. */
+    {
+        action_t pred = agent_predict();
+        if (pred != ACT_NONE && font_aa_loaded(FONT_AA_UI)) {
+            char buf[80];
+            snprintf(buf, sizeof buf, ">> %s",
+                     agent_action_name(pred));
+            int tw = text_width_aa(FONT_AA_UI, buf);
+            int ax = (FB_W - tw) / 2;
+            int ay = y_center - text_height_aa(FONT_AA_UI) / 2;
+            draw_text_aa(FONT_AA_UI, ax, ay, buf, ATOMIK_SEM_AGENT);
+        }
+    }
+
+    /* Right segment: SYSTEM LIVE chip + uptime plain text. */
+    {
+        char up[64];
+        format_uptime(up, sizeof up);
+        const char *health = "SYSTEM LIVE";
+
+        int up_w, up_h, up_y;
+        if (font_aa_loaded(FONT_AA_UI)) {
+            up_w = text_width_aa(FONT_AA_UI, up);
+            up_h = text_height_aa(FONT_AA_UI);
+            up_y = y_center - up_h / 2;
+        } else {
+            up_w = text_width(up, 1);
+            up_h = text_height(1);
+            up_y = y_center - up_h / 2;
+        }
+
+        /* Measure the chip width by simulating one render at far-right;
+         * cheaper: just budget a fixed pad_x. */
+        int pad_x = ATOMIK_GRID_M + 2;
+        int pad_y = 4;
+        int chip_text_w = font_aa_loaded(FONT_AA_UI)
+                          ? text_width_aa(FONT_AA_UI, health)
+                          : text_width(health, 1);
+        int chip_text_h = font_aa_loaded(FONT_AA_UI)
+                          ? text_height_aa(FONT_AA_UI)
+                          : text_height(1);
+        int chip_w = chip_text_w + pad_x * 2;
+        int chip_h = chip_text_h + pad_y * 2;
+
+        int total_w = chip_w + ATOMIK_GRID_L + up_w;
+        int right_x = FB_W - ATOMIK_GRID_L - total_w;
+
+        draw_glass_pill(right_x, y_center, health, ATOMIK_SEM_HARDWARE);
+
+        if (font_aa_loaded(FONT_AA_UI)) {
+            draw_text_aa(FONT_AA_UI,
+                         right_x + chip_w + ATOMIK_GRID_L,
+                         up_y, up, ATOMIK_FG_DIM);
+        } else {
+            draw_text(right_x + chip_w + ATOMIK_GRID_L,
+                      up_y, up, 1, ATOMIK_FG_DIM);
+        }
+    }
+
+    /* Subtle cyan bottom edge — soft 2-px alpha falloff above the
+     * hard separator for a glass-highlight feel. */
+    draw_rect(0, bar_y + bar_h - 1, FB_W, 1, ATOMIK_ACCENT_DIM);
+    for (int g = 1; g <= 2; g++) {
+        uint8_t a = (uint8_t)(40 / g);
+        for (int sx = 0; sx < FB_W; sx++) {
+            draw_blend_pixel(sx, bar_y + bar_h - 1 - g,
+                             ATOMIK_SEM_HARDWARE, a);
+        }
+    }
+}
+
 static const char *mode_label(metric_mode_t m) {
     switch (m) {
     case METRIC_MODE_DEV:      return "DEV";
@@ -209,6 +411,15 @@ void status_draw(void) {
     /* Hard cyan-dim separator at the bottom of the bar — sharp visual
      * end of the chrome, start of the desktop. */
     draw_rect(0, bar_y + bar_h - 1, FB_W, 1,     ATOMIK_ACCENT_DIM);
+
+    /* v0.38-K2 — investor mode renders an entirely separate premium
+     * Pulse Bar path with glass pills + AA throughout.  Dev / Demo
+     * keep the previous diagnostic layout below. */
+    if (is_investor) {
+        draw_pulse_bar_investor(bar_y, bar_h);
+        dirty_rect(0, bar_y, FB_W, bar_h);
+        return;
+    }
 
 #if ATOMIK_DEBUG_STATUS
     /* If re-enabled, draws a magenta sentinel + PID-marker for diagnosis. */

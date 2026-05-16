@@ -62,6 +62,7 @@ static const char *atlas_path(font_aa_id_t id) {
     case FONT_AA_LABEL:   return "/tmp/atomik_fonts/atomik_14.atomik_font";
     case FONT_AA_UI:      return "/tmp/atomik_fonts/atomik_18.atomik_font";
     case FONT_AA_DISPLAY: return "/tmp/atomik_fonts/atomik_28.atomik_font";
+    case FONT_AA_BRAND:   return "/tmp/atomik_fonts/atomik_36.atomik_font";
     default:              return NULL;
     }
 }
@@ -160,7 +161,8 @@ void draw_text_aa(font_aa_id_t id, int x, int y, const char *s,
     if (!s) return;
     if (id < 0 || id >= FONT_AA_COUNT || !s_atlases[id].loaded) {
         /* Pixel font fallback so missing atlases don't blank the UI. */
-        int scale = (id == FONT_AA_DISPLAY) ? 3
+        int scale = (id == FONT_AA_BRAND)   ? 4
+                  : (id == FONT_AA_DISPLAY) ? 3
                   : (id == FONT_AA_UI)      ? 2 : 1;
         draw_text(x, y, s, scale, color);
         return;

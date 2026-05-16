@@ -9,7 +9,7 @@
  * carries a user-visible change. About window, status bar, and the
  * /tmp/atomik_os_version stamp all read from here so the screen output
  * NEVER lies about which build is running. */
-#define AOS_VERSION "v0.38-K"
+#define AOS_VERSION "v0.38-K2"
 
 /* Display geometry — locked to 1920x1080 XRGB8888 since simplefb is fixed. */
 #define FB_W       1920
@@ -158,8 +158,9 @@ void draw_text(int x, int y, const char *s, int scale, pixel_t color);
 typedef enum {
     FONT_AA_LABEL   = 0,    /* 14 px — subtitles, units              */
     FONT_AA_UI      = 1,    /* 18 px — panel titles, lane names      */
-    FONT_AA_DISPLAY = 2,    /* 28 px — wordmark, hero, big metrics   */
-    FONT_AA_COUNT   = 3
+    FONT_AA_DISPLAY = 2,    /* 28 px — hero labels, big metrics      */
+    FONT_AA_BRAND   = 3,    /* 36 px — wordmark, marquee headings    */
+    FONT_AA_COUNT   = 4
 } font_aa_id_t;
 
 int  font_aa_init(void);          /* loads all atlases from /tmp/atomik_fonts/ */
