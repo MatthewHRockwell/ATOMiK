@@ -687,7 +687,9 @@ static void lane_big_metric(fabric_lane_t lane,
             snprintf(buf, cap, "%lu", total);
             snprintf(unit, unit_cap, "events on bus");
         } else {
-            snprintf(buf, cap, "--");
+            /* v0.38-J++ — "0" beats "--".  Dashes read as unfinished
+             * implementation; zero is honest "no events yet". */
+            snprintf(buf, cap, "0");
             snprintf(unit, unit_cap, "events on bus");
         }
         break;
@@ -840,19 +842,29 @@ void fabric_draw(window_t *w, int x, int y, int wd, int ht) {
         const char *sub = lane_subtitle(lane);
         draw_text(tx, ty1 + text_height(2) + 2, sub, 1, ATOMIK_FG_DIM);
 
+        /* v0.38-J++ — WAITING chips were "too visually loud" per the
+         * ChatGPT review.  LIVE chips keep the lane-color border so
+         * the audience knows data is flowing; WAITING/STALE drop the
+         * border + dim the text so they recede behind the lane title.
+         * Either way the chip is on the same baseline; only weight
+         * changes. */
         const char *fl = fresh_label(h->fresh);
         int fw = text_width(fl, 1);
-        /* Small filled freshness chip with color background. */
         pixel_t fcol = fresh_color(h->fresh);
+        pixel_t text_col = (h->fresh == FABRIC_FRESH_LIVE)
+                            ? fcol : ATOMIK_FG_DIM;
+        int draw_border = (h->fresh == FABRIC_FRESH_LIVE);
         int chip_w = fw + ATOMIK_GRID_M;
         int chip_h = text_height(1) + 4;
         int chip_x = lane_x + lane_w - chip_w - pad_x;
         int chip_y = ty1 + (text_height(2) - chip_h) / 2;
-        draw_rect(chip_x, chip_y, chip_w, chip_h,
-                  wm_card_bg() & 0x0F0F0F);   /* darker chip body */
-        draw_rect(chip_x, chip_y, chip_w, 1, fcol);
-        draw_rect(chip_x, chip_y + chip_h - 1, chip_w, 1, fcol);
-        draw_text(chip_x + ATOMIK_GRID_S, chip_y + 2, fl, 1, fcol);
+        if (draw_border) {
+            draw_rect(chip_x, chip_y, chip_w, chip_h,
+                      wm_card_bg() & 0x0F0F0F);
+            draw_rect(chip_x, chip_y, chip_w, 1, fcol);
+            draw_rect(chip_x, chip_y + chip_h - 1, chip_w, 1, fcol);
+        }
+        draw_text(chip_x + ATOMIK_GRID_S, chip_y + 2, fl, 1, text_col);
 
         /* Row 2: scale-3 BIG METRIC number in lane color +
          * unit label scale-1 dim below.  Includes subtitle line. */

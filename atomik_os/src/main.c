@@ -275,6 +275,27 @@ int main(int argc, char **argv) {
     FILE *pf = fopen("/tmp/atomik_os_pid", "w");
     if (pf) { fprintf(pf, "%d\n", (int)getpid()); fclose(pf); }
 
+    /* v0.38-J++ startup mode read.  Deploy / operator writes one of
+     * "DEV" / "DEMO" / "INVESTOR" to /tmp/atomik_mode BEFORE launching;
+     * we honor it instead of the DEV default so the screenshot can
+     * capture investor-mode chrome without keystroke injection.
+     * 'O' still cycles at runtime. */
+    {
+        FILE *mf = fopen("/tmp/atomik_mode", "r");
+        if (mf) {
+            char buf[16] = {0};
+            if (fgets(buf, sizeof buf, mf)) {
+                for (size_t i = 0; buf[i]; i++) {
+                    if (buf[i] == '\n' || buf[i] == '\r') { buf[i] = 0; break; }
+                }
+                if      (strcmp(buf, "INVESTOR") == 0) metric_set_mode(METRIC_MODE_INVESTOR);
+                else if (strcmp(buf, "DEMO")     == 0) metric_set_mode(METRIC_MODE_DEMO);
+                else if (strcmp(buf, "DEV")      == 0) metric_set_mode(METRIC_MODE_DEV);
+            }
+            fclose(mf);
+        }
+    }
+
     if (fb_open() < 0) { fprintf(stderr, "fb_open failed\n"); return 1; }
     fb_clear(0);
     fb_present();

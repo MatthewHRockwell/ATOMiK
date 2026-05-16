@@ -9,7 +9,7 @@
  * carries a user-visible change. About window, status bar, and the
  * /tmp/atomik_os_version stamp all read from here so the screen output
  * NEVER lies about which build is running. */
-#define AOS_VERSION "v0.38-J+"
+#define AOS_VERSION "v0.38-J++"
 
 /* Display geometry — locked to 1920x1080 XRGB8888 since simplefb is fixed. */
 #define FB_W       1920
@@ -766,6 +766,12 @@ int                    metric_visible(const atomik_metric_t *m);
  * Pulse Bar's "DATA: <source>" badge to summarize whether the screen
  * is showing pure live data, mixed sources, or any mock values. */
 metric_source_t        metric_worst_source(void);
+
+/* v0.38-J++ aggregate label — "LIVE" / "DERIVED" / "MIXED" / "STALE"
+ * / "WAITING" / "SCENARIO" / "MOCK".  Distinguishes "all lanes live"
+ * from "some live, some quiet" so the top bar can't contradict the
+ * Resource Fabric. */
+const char            *metric_aggregate_label(void);
 
 /* dirty.c — v0.38-A tile-based dirty-region tracker.
  *

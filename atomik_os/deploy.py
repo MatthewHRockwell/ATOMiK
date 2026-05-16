@@ -215,6 +215,10 @@ def main():
                     help="Skip shipping atomik_os/assets/*.atomik_asset")
     ap.add_argument("--no-shot", action="store_true",
                     help="Skip post-launch screenshot verification")
+    ap.add_argument("--mode", choices=["DEV", "DEMO", "INVESTOR"],
+                    default="DEV",
+                    help="Initial metric_mode (writes /tmp/atomik_mode "
+                         "before launch). Default DEV.")
     args = ap.parse_args()
 
     expected = expected_version()
@@ -271,6 +275,10 @@ def main():
           "rm -f /tmp/aos_fifo_writer.pid /tmp/aos_keys", log=False)
     # Wipe stale version stamp so we KNOW the next read is from the new run.
     cmd(s, "rm -f /tmp/atomik_os_version /tmp/aos.err /tmp/aos.out", log=False)
+    # v0.38-J++ mode hint: write /tmp/atomik_mode so atomik_os reads it
+    # at startup and skips the DEV default.
+    print(f"[deploy] initial mode = {args.mode}", flush=True)
+    cmd(s, f"echo {args.mode} > /tmp/atomik_mode", log=False)
     # Disable fbcon binding so atomik_os owns the framebuffer cleanly.
     cmd(s, "echo 0 > /sys/class/vtconsole/vtcon1/bind 2>/dev/null; true")
     # v0.38-D recovery FIX: create /dev/fb0 + /dev/mem if missing.

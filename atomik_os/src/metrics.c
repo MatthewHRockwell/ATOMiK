@@ -164,6 +164,49 @@ metric_source_t metric_worst_source(void) {
     return worst;
 }
 
+/* v0.38-J++ aggregate label — what the top-bar DATA badge should say
+ * when several lanes are alive and others are waiting.  Worst-source
+ * still drives the color (so MOCK / SCENARIO still trigger amber),
+ * but the LABEL becomes "MIXED" so the bar stops contradicting the
+ * Resource Fabric.  ChatGPT 2026-05-15: "DATA: WAITING while Fabric
+ * shows real values" was a perception contradiction. */
+const char *metric_aggregate_label(void) {
+    int n_live = 0, n_derived = 0, n_waiting = 0, n_stale = 0;
+    int n_mock = 0, n_scenario = 0;
+    for (int i = 0; i < s_count; i++) {
+        if (s_metrics[i].getter) {
+            metric_value_t v = s_metrics[i].getter(s_metrics[i].getter_ctx);
+            s_metrics[i].value      = v.value;
+            s_metrics[i].source     = v.source;
+            s_metrics[i].updated_ms = anim_now_ms();
+        }
+        switch (s_metrics[i].source) {
+        case METRIC_LIVE:     n_live++; break;
+        case METRIC_DERIVED:  n_derived++; break;
+        case METRIC_WAITING:  n_waiting++; break;
+        case METRIC_STALE:    n_stale++; break;
+        case METRIC_SCENARIO: n_scenario++; break;
+        case METRIC_MOCK:     n_mock++; break;
+        }
+    }
+    /* Trust-breaking sources still win: never hide them behind MIXED. */
+    if (n_mock     > 0) return "MOCK";
+    if (n_scenario > 0) return "SCENARIO";
+    /* Pure live or derived. */
+    if (n_waiting + n_stale == 0) {
+        if (n_live > 0)    return "LIVE";
+        if (n_derived > 0) return "DERIVED";
+        return "WAITING";
+    }
+    /* All waiting / stale. */
+    if (n_live + n_derived == 0) {
+        if (n_stale > 0) return "STALE";
+        return "WAITING";
+    }
+    /* Some live, some quiet — honest aggregate. */
+    return "MIXED";
+}
+
 /* === built-in producers ===
  *
  * Each getter wraps an existing API and returns a metric_value_t with

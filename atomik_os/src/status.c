@@ -163,6 +163,16 @@ static pixel_t mode_color(metric_mode_t m) {
 void status_draw(void) {
     update_cpu();
 
+    /* v0.38-J++ mode gating — investor mode strips dev clutter from the
+     * top bar.  Per ChatGPT 2026-05-15: "anything that says DEV", raw
+     * CPU%, wallet/spent, key hints, exact version string all hide.
+     * DATA: prefix becomes METRICS:.  MODE badge hides (don't reveal
+     * the curtain).  Operator switches to investor mode BEFORE
+     * presenting, sees the switch happen, then walks away from the
+     * keyboard. */
+    metric_mode_t cur_mode = metric_mode();
+    int is_investor = (cur_mode == METRIC_MODE_INVESTOR);
+
     /* Top bar — anchored to the SAFE-AREA top, not screen y=0.
      *
      * v0.31 patch 5: bar is now exactly bar_h tall starting at SAFE_TOP,
@@ -246,8 +256,10 @@ void status_draw(void) {
     {
         metric_source_t worst = metric_worst_source();
         char data_badge[32];
-        snprintf(data_badge, sizeof data_badge, "DATA: %s",
-                 metric_source_label(worst));
+        /* v0.38-J++ investor-mode rename: DATA: → METRICS:. */
+        snprintf(data_badge, sizeof data_badge, "%s: %s",
+                 is_investor ? "METRICS" : "DATA",
+                 metric_aggregate_label());
         pixel_t dcol = metric_source_color(worst);
         int dot_y3 = top_y + (row_h - ATOMIK_GRID_M) / 2;
         draw_rect(cur_x, dot_y3, ATOMIK_GRID_M, ATOMIK_GRID_M, dcol);
@@ -258,13 +270,11 @@ void status_draw(void) {
 
     /* === MODE: <DEV/DEMO/INVESTOR> badge — v0.38-C ===
      *
-     * Surfaces the metric_mode_t that gates which metric sources can
-     * display.  DEV (amber) shows everything including MOCK; DEMO
-     * (cyan) hides pure MOCK; INVESTOR (green) shows only LIVE +
-     * DERIVED + labeled SCENARIO.  Cycle with 'M' key from the global
-     * key router. */
-    {
-        metric_mode_t m = metric_mode();
+     * Hidden in investor mode (v0.38-J++) — "don't reveal the curtain".
+     * Operator can verify the switch happened before presenting.
+     * DEV/DEMO modes still see the badge so they know discipline level. */
+    if (!is_investor) {
+        metric_mode_t m = cur_mode;
         char mode_badge[32];
         snprintf(mode_badge, sizeof mode_badge, "MODE: %s", mode_label(m));
         pixel_t mcol = mode_color(m);
@@ -412,11 +422,15 @@ void status_draw(void) {
 
     /* Key hints — dim, last in the left segment because they're
      * informational (which keys exist) not state (which one is
-     * currently happening). */
-    const char *hint =
-        "[R]es [P]ers   [Tab]/[Esc]/[^W]   "
-        "[D] [W] [S] | [A] [M] [T] [F] [N]";
-    draw_text(hint_x, ty_bot, hint, 1, ATOMIK_FG_DIM);
+     * currently happening).  Hidden in investor mode — v0.38-J++ rule:
+     * investors don't need to see what keys exist on the operator's
+     * keyboard. */
+    if (!is_investor) {
+        const char *hint =
+            "[R]es [P]ers   [Tab]/[Esc]/[^W]   "
+            "[D] [W] [S] | [A] [M] [T] [F] [N]";
+        draw_text(hint_x, ty_bot, hint, 1, ATOMIK_FG_DIM);
+    }
 
     /* Center: agent prediction (violet = AGENT in the semantic grammar).
      * The previous version used ATOMIK_ACCENT (cyan), which conflicted
@@ -442,13 +456,25 @@ void status_draw(void) {
      * (Humane-Pin failure-avoidance rule: never hide active state).
      * Today dispatch is synchronous-blocking so the pulse can't fire
      * — wait for async dispatch in v0.30. */
+    /* v0.38-J++ right-segment mode gating.  DEV/DEMO keep the full
+     * trio (wallet + cpu/uptime + version) so the operator sees spend
+     * + system load + build at all times.  INVESTOR mode hides:
+     *   - wallet/spent           (perception poison)
+     *   - exact CPU% number      (replaced with "SYSTEM LIVE")
+     *   - version string         (debug-y, leaks build state)
+     * and keeps uptime so the audience has a "board is genuinely
+     * running" signal. */
     char up[64];
     format_uptime(up, sizeof up);
     const wallet_state_t *w = wallet_get();
     int spend_uusd = llm_audit_total_uusd();
 
     char hw_seg[80];
-    snprintf(hw_seg, sizeof hw_seg, "cpu %3d%%   %s", s_cpu_pct, up);
+    if (is_investor) {
+        snprintf(hw_seg, sizeof hw_seg, "SYSTEM LIVE   %s", up);
+    } else {
+        snprintf(hw_seg, sizeof hw_seg, "cpu %3d%%   %s", s_cpu_pct, up);
+    }
     char ai_seg[80];
     snprintf(ai_seg, sizeof ai_seg, "wallet $%d.%02d   spent $%d.%03d",
              w->balance_uusd / 1000000,
@@ -456,14 +482,20 @@ void status_draw(void) {
              spend_uusd / 1000000,
              (spend_uusd / 1000) % 1000);
     int hw_w = text_width(hw_seg, 1);
-    int ai_w = text_width(ai_seg, 1);
-    int ver_w = text_width(AOS_VERSION, 1);
-    int sep   = ATOMIK_GRID_M * 2;
-    int total = ai_w + sep + hw_w + sep + ver_w;
-    int rx    = FB_W - ATOMIK_GRID_L - total;
-    draw_text(rx,                              ty_bot, ai_seg,      1, ATOMIK_SEM_AGENT);
-    draw_text(rx + ai_w + sep,                 ty_bot, hw_seg,      1, ATOMIK_SEM_HARDWARE);
-    draw_text(rx + ai_w + sep + hw_w + sep,    ty_top, AOS_VERSION, 1, ATOMIK_FG_DIM);
+    int sep  = ATOMIK_GRID_M * 2;
+    if (is_investor) {
+        /* Investor: hw_seg only, right-anchored.  No wallet, no version. */
+        int rx = FB_W - ATOMIK_GRID_L - hw_w;
+        draw_text(rx, ty_bot, hw_seg, 1, ATOMIK_SEM_HARDWARE);
+    } else {
+        int ai_w  = text_width(ai_seg, 1);
+        int ver_w = text_width(AOS_VERSION, 1);
+        int total = ai_w + sep + hw_w + sep + ver_w;
+        int rx    = FB_W - ATOMIK_GRID_L - total;
+        draw_text(rx,                              ty_bot, ai_seg,      1, ATOMIK_SEM_AGENT);
+        draw_text(rx + ai_w + sep,                 ty_bot, hw_seg,      1, ATOMIK_SEM_HARDWARE);
+        draw_text(rx + ai_w + sep + hw_w + sep,    ty_top, AOS_VERSION, 1, ATOMIK_FG_DIM);
+    }
 
     /* v0.38-A: status bar dirties the bar rect every frame; mark it. */
     dirty_rect(0, bar_y, FB_W, bar_h);
