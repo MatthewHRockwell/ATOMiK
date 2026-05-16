@@ -302,6 +302,10 @@ int main(int argc, char **argv) {
     fb_enable_scanout(1);
 
     font_init();
+    /* v0.38-K: load AA bitmap atlases.  Silently no-ops if the .atomik_font
+     * files haven't been shipped to /tmp/atomik_fonts/ yet — draw_text_aa
+     * falls back to the pixel font, so the board is still usable. */
+    font_aa_init();
     input_open();
     wm_init();
     agent_init();

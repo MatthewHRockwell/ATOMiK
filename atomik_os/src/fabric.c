@@ -722,10 +722,15 @@ void fabric_draw(window_t *w, int x, int y, int wd, int ht) {
 
     /* v0.38-J header — drop the verbose 2-line subtitle.  Just the
      * "RESOURCE FABRIC" title + the AUTO/MANUAL personality capsule.
-     * Concept images keep the panel header tight; the active
-     * personality is communicated by lane glow, not header prose. */
-    draw_text(x + ATOMIK_GRID_L, y + ATOMIK_GRID_M,
-              "RESOURCE FABRIC", 2, ATOMIK_FG);
+     * v0.38-K renders the title in the AA UI atlas when available
+     * for a noticeably premium look. */
+    if (font_aa_loaded(FONT_AA_UI)) {
+        draw_text_aa(FONT_AA_UI, x + ATOMIK_GRID_L, y + ATOMIK_GRID_M,
+                     "RESOURCE FABRIC", ATOMIK_FG);
+    } else {
+        draw_text(x + ATOMIK_GRID_L, y + ATOMIK_GRID_M,
+                  "RESOURCE FABRIC", 2, ATOMIK_FG);
+    }
 
     pixel_t badge_color;
     switch (s_active) {
@@ -834,13 +839,30 @@ void fabric_draw(window_t *w, int x, int y, int wd, int ht) {
         int tx    = lane_x + pad_x;
         int inner_w = lane_w - pad_x * 2;
 
-        /* Row 1: scale-2 lane NAME in saturated lane color + scale-1
-         * dim semantic subtitle below + freshness chip right-aligned. */
+        /* Row 1: lane NAME in saturated lane color + dim semantic
+         * subtitle below + freshness chip right-aligned.
+         * v0.38-K: lane name uses AA UI atlas; subtitle uses AA LABEL
+         * atlas.  Both fall back to pixel font if missing. */
         int ty1 = ly + ATOMIK_GRID_M;
         const char *name = fabric_lane_name(lane);
-        draw_text(tx, ty1, name, 2, lc);
-        const char *sub = lane_subtitle(lane);
-        draw_text(tx, ty1 + text_height(2) + 2, sub, 1, ATOMIK_FG_DIM);
+        const char *sub  = lane_subtitle(lane);
+        int name_h, sub_h;
+        if (font_aa_loaded(FONT_AA_UI)) {
+            draw_text_aa(FONT_AA_UI, tx, ty1, name, lc);
+            name_h = text_height_aa(FONT_AA_UI);
+        } else {
+            draw_text(tx, ty1, name, 2, lc);
+            name_h = text_height(2);
+        }
+        if (font_aa_loaded(FONT_AA_LABEL)) {
+            draw_text_aa(FONT_AA_LABEL, tx, ty1 + name_h + 2, sub,
+                         ATOMIK_FG_DIM);
+            sub_h = text_height_aa(FONT_AA_LABEL);
+        } else {
+            draw_text(tx, ty1 + name_h + 2, sub, 1, ATOMIK_FG_DIM);
+            sub_h = text_height(1);
+        }
+        (void)sub_h;
 
         /* v0.38-J++ — WAITING chips were "too visually loud" per the
          * ChatGPT review.  LIVE chips keep the lane-color border so
@@ -866,18 +888,36 @@ void fabric_draw(window_t *w, int x, int y, int wd, int ht) {
         }
         draw_text(chip_x + ATOMIK_GRID_S, chip_y + 2, fl, 1, text_col);
 
-        /* Row 2: scale-3 BIG METRIC number in lane color +
-         * unit label scale-1 dim below.  Includes subtitle line. */
-        int ty2 = ty1 + text_height(2) + text_height(1) + ATOMIK_GRID_S;
+        /* Row 2: BIG METRIC number in lane color + unit label dim
+         * below.  v0.38-K: big number uses AA DISPLAY atlas; unit
+         * uses AA LABEL atlas. */
+        int ty2 = ty1 + name_h + sub_h + ATOMIK_GRID_S;
         char big[16], unit[24];
         lane_big_metric(lane, big, sizeof big, unit, sizeof unit);
-        draw_text(tx, ty2, big, 3, lc);
-        int big_w = text_width(big, 3);
-        draw_text(tx + big_w + ATOMIK_GRID_M, ty2 + text_height(3) - text_height(1),
-                  unit, 1, ATOMIK_FG_DIM);
+        int big_w, big_h, unit_h;
+        if (font_aa_loaded(FONT_AA_DISPLAY)) {
+            draw_text_aa(FONT_AA_DISPLAY, tx, ty2, big, lc);
+            big_w = text_width_aa(FONT_AA_DISPLAY, big);
+            big_h = text_height_aa(FONT_AA_DISPLAY);
+        } else {
+            draw_text(tx, ty2, big, 3, lc);
+            big_w = text_width(big, 3);
+            big_h = text_height(3);
+        }
+        if (font_aa_loaded(FONT_AA_LABEL)) {
+            unit_h = text_height_aa(FONT_AA_LABEL);
+            draw_text_aa(FONT_AA_LABEL,
+                         tx + big_w + ATOMIK_GRID_M,
+                         ty2 + big_h - unit_h, unit, ATOMIK_FG_DIM);
+        } else {
+            unit_h = text_height(1);
+            draw_text(tx + big_w + ATOMIK_GRID_M,
+                      ty2 + big_h - unit_h, unit, 1, ATOMIK_FG_DIM);
+        }
+        (void)unit_h;
 
         /* Row 3: FILLED area waveform across inner width. */
-        int wf_y = ty2 + text_height(3) + ATOMIK_GRID_S;
+        int wf_y = ty2 + big_h + ATOMIK_GRID_S;
         int wf_x = tx;
         int wf_w = inner_w;
         int wf_h = LANE_ROW_H - (wf_y - ly) - ATOMIK_GRID_M;

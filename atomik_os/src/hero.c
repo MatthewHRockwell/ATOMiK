@@ -193,16 +193,29 @@ void hero_draw(void) {
                              ATOMIK_SEM_AGENT };
     for (int i = 0; i < 3; i++) {
         const char *n = names[i];
-        int tw = text_width(n, 2);
         pixel_t c = (active == ps[i]) ? cols[i] : ATOMIK_FG_DIM;
-        draw_text(cxs[i] - tw / 2, label_y, n, 2, c);
-        /* Small dim subtitle under each name. */
         const char *sub = (i == 0) ? "memory / regions" :
                           (i == 1) ? "replica / skip"   :
                                      "context / prune";
-        int sw = text_width(sub, 1);
-        draw_text(cxs[i] - sw / 2, label_y + text_height(2) + 4,
-                  sub, 1, ATOMIK_FG_DIM);
+        int name_h;
+        if (font_aa_loaded(FONT_AA_UI)) {
+            int tw = text_width_aa(FONT_AA_UI, n);
+            draw_text_aa(FONT_AA_UI, cxs[i] - tw / 2, label_y, n, c);
+            name_h = text_height_aa(FONT_AA_UI);
+        } else {
+            int tw = text_width(n, 2);
+            draw_text(cxs[i] - tw / 2, label_y, n, 2, c);
+            name_h = text_height(2);
+        }
+        if (font_aa_loaded(FONT_AA_LABEL)) {
+            int sw = text_width_aa(FONT_AA_LABEL, sub);
+            draw_text_aa(FONT_AA_LABEL, cxs[i] - sw / 2,
+                         label_y + name_h + 4, sub, ATOMIK_FG_DIM);
+        } else {
+            int sw = text_width(sub, 1);
+            draw_text(cxs[i] - sw / 2, label_y + name_h + 4,
+                      sub, 1, ATOMIK_FG_DIM);
+        }
     }
 
     /* Mark the dirty region: the bounding box of the three fields +

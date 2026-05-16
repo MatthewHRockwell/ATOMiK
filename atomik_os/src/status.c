@@ -229,10 +229,20 @@ void status_draw(void) {
      */
     const char *brand = "ATOMiK";
     int cur_x = ATOMIK_GRID_L;
-    /* v0.38-C: scale-2 brand — visual anchor on the left.  Scale-2
-     * text is 32 px tall, vertically centered inside the 40 px bar. */
-    draw_text(cur_x, ty_brand, brand, 2, ATOMIK_SEM_HARDWARE);
-    cur_x += text_width(brand, 2) + ATOMIK_GRID_L;
+    /* v0.38-K: ATOMiK wordmark uses the AA display atlas if loaded —
+     * the single biggest perceived-quality lift from the typography
+     * slice.  Falls back to scale-2 pixel font if the .atomik_font
+     * isn't on disk yet. */
+    if (font_aa_loaded(FONT_AA_DISPLAY)) {
+        int brand_h  = text_height_aa(FONT_AA_DISPLAY);
+        int brand_y  = top_y + (row_h - brand_h) / 2 - 2;
+        draw_text_aa(FONT_AA_DISPLAY, cur_x, brand_y, brand,
+                     ATOMIK_SEM_HARDWARE);
+        cur_x += text_width_aa(FONT_AA_DISPLAY, brand) + ATOMIK_GRID_L;
+    } else {
+        draw_text(cur_x, ty_brand, brand, 2, ATOMIK_SEM_HARDWARE);
+        cur_x += text_width(brand, 2) + ATOMIK_GRID_L;
+    }
 
     /* Vertical separator between sections — dim, 1 px wide, stops the
      * bar from feeling like one long undifferentiated text run. */

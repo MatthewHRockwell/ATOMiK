@@ -262,6 +262,23 @@ def main():
                     print(f"[deploy] shipping asset: {name}", flush=True)
                     transfer(s, local, remote, label)
 
+        # v0.38-K: ship .atomik_font atlases to /tmp/atomik_fonts/.
+        # font_aa.c probes that directory at startup; missing fonts
+        # fall back to the pixel font.  Ship-once cost — atlases don't
+        # change between deploys unless tools/font_pack.py output does.
+        fonts_dir = os.path.join(HERE, "assets", "fonts")
+        if os.path.isdir(fonts_dir):
+            font_files = sorted([f for f in os.listdir(fonts_dir)
+                                 if f.endswith(".atomik_font")])
+            if font_files:
+                cmd(s, "mkdir -p /tmp/atomik_fonts", log=False)
+                for name in font_files:
+                    local = os.path.join(fonts_dir, name)
+                    remote = f"/tmp/atomik_fonts/{name}"
+                    label = f"font_{name.split('.')[0]}"
+                    print(f"[deploy] shipping font: {name}", flush=True)
+                    transfer(s, local, remote, label)
+
     if args.no_launch:
         print("[deploy] --no-launch set; not starting.")
         return
