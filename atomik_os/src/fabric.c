@@ -887,21 +887,27 @@ void fabric_draw(window_t *w, int x, int y, int wd, int ht) {
         (void)sub_h;
 
         /* v0.38-K3 — freshness chip AA + WAITING dimmed further.
-         * LIVE: bordered glass capsule in lane color (instrument).
-         * WAITING / STALE: tiny dim AA text only, no chip body —
-         * ChatGPT 2026-05-16: "WAITING should be present but quiet.
-         * Right now it still competes too much with the lane title." */
-        const char *fl = fresh_label(h->fresh);
+         * v0.38-K3A — when this lane IS the active personality,
+         * override the label to "ACTIVE" and force the bright
+         * lane-color bordered capsule so the top bar doesn't
+         * contradict the panel. Inactive lanes keep LIVE/WAITING/
+         * STALE based on metric source. ChatGPT 2026-05-16:
+         * "Active means active. Waiting means waiting. Never let
+         * the UI contradict itself." */
+        int is_active_lane = (lp != PERSONALITY_NONE &&
+                              lp == s_active);
+        const char *fl = is_active_lane ? "ACTIVE"
+                                         : fresh_label(h->fresh);
         int chip_use_aa = font_aa_loaded(FONT_AA_LABEL);
         int fw = chip_use_aa ? text_width_aa(FONT_AA_LABEL, fl)
                              : text_width(fl, 1);
-        pixel_t fcol = fresh_color(h->fresh);
+        pixel_t fcol = is_active_lane ? lc : fresh_color(h->fresh);
         int chip_h = (chip_use_aa ? text_height_aa(FONT_AA_LABEL)
                                   : text_height(1)) + 4;
         int chip_w = fw + ATOMIK_GRID_M;
         int chip_x = lane_x + lane_w - chip_w - pad_x;
         int chip_y = ty1 + (name_h - chip_h) / 2;
-        if (h->fresh == FABRIC_FRESH_LIVE) {
+        if (is_active_lane || h->fresh == FABRIC_FRESH_LIVE) {
             int radius = chip_h / 2;
             draw_rect_rounded(chip_x, chip_y, chip_w, chip_h, radius,
                               wm_card_bg() & 0x0F0F0F);
