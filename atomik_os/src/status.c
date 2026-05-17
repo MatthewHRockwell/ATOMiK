@@ -143,6 +143,133 @@ static int draw_event_pulse(int x, int y, int w, int h) {
     return w;
 }
 
+/* === v0.38-K2.5 small primitives ===
+ *
+ * Filled diamond glyph in the supplied color, centered at (cx, cy)
+ * with radius r.  Used as the active-personality icon inside the
+ * SYNC ACTIVE / STATE ACTIVE / AGENT ACTIVE pill.  Diamond was
+ * chosen over a hexagon because the rasterized hex looks chunky at
+ * 10 px on this pixel grid; the diamond's |dx|+|dy|<=r mask gives a
+ * crisp recognizable shape. */
+static void draw_personality_glyph(int cx, int cy, int r,
+                                   pixel_t color) {
+    for (int dy = -r; dy <= r; dy++) {
+        int span = r - (dy < 0 ? -dy : dy);
+        for (int dx = -span; dx <= span; dx++) {
+            draw_pixel(cx + dx, cy + dy, color);
+        }
+    }
+    /* 1 px bright inner highlight — top-left corner of the diamond
+     * picks up the "glass" feel by reading slightly hotter. */
+    pixel_t hot = rgb(0xFF, 0xFF, 0xFF);
+    draw_blend_pixel(cx - 1, cy - 1, hot, 90);
+    draw_blend_pixel(cx,     cy - 2, hot, 60);
+}
+
+/* v0.38-K2.5 layered-stroke pulse waveform.
+ *
+ * Replaces the old 1-px Bresenham line in draw_event_pulse() for the
+ * investor bar.  Stack per column:
+ *   - 8 px outer halo (alpha ~16)
+ *   - 4 px mid glow   (alpha ~36)
+ *   - 2 px bright core line
+ * Plus a hot dot at the most recent sample so the eye locks onto
+ * "right now."  Reads as instrument, not debug trace. */
+static void draw_event_pulse_glow(int x, int y, int w, int h,
+                                  pixel_t accent) {
+    pixel_t bed = rgb(0x10, 0x18, 0x28);
+    draw_rect(x, y, w, h, bed);
+    draw_rect(x, y + h - 1, w, 1, ATOMIK_DOCK_BORDER);
+
+    if (s_pulse_count < 2) {
+        /* Calm baseline glow when no data — matches Fabric WAITING bed. */
+        for (int gy = 0; gy < 3; gy++) {
+            uint8_t a = (uint8_t)(36 + gy * 30);
+            for (int sx = 0; sx < w; sx++) {
+                draw_blend_pixel(x + sx, y + h - 3 + gy, accent, a);
+            }
+        }
+        return;
+    }
+
+    /* Compute per-column heights so we can apply the layered stack
+     * uniformly across the visible width. */
+    uint16_t mx = 0;
+    for (uint8_t i = 0; i < s_pulse_count; i++)
+        if (s_pulse_hist[i] > mx) mx = s_pulse_hist[i];
+    if (mx == 0) {
+        /* Flat zero line at the bottom — honest "system idle". */
+        for (int gy = 0; gy < 2; gy++) {
+            uint8_t a = (uint8_t)(80 - gy * 30);
+            for (int sx = 0; sx < w; sx++) {
+                draw_blend_pixel(x + sx, y + h - 2 + gy, accent, a);
+            }
+        }
+        return;
+    }
+
+    int col_y[1024];
+    int n_cols = (w < 1024) ? w : 1024;
+    for (int col = 0; col < n_cols; col++) {
+        int sample_i = (int)((long)col * (s_pulse_count - 1) /
+                              (n_cols - 1));
+        int idx = (s_pulse_head - s_pulse_count + sample_i
+                   + PULSE_HISTORY_N) % PULSE_HISTORY_N;
+        uint16_t v = s_pulse_hist[idx];
+        int py = y + h - 2 - (int)((long)v * (h - 3) / mx);
+        if (py < y + 1)     py = y + 1;
+        if (py > y + h - 2) py = y + h - 2;
+        col_y[col] = py;
+    }
+
+    /* Outer halo — 8 px wide above the wave edge. */
+    for (int col = 0; col < n_cols; col++) {
+        int px = x + col;
+        for (int g = 1; g <= 8; g++) {
+            int gy = col_y[col] - g;
+            if (gy < y) break;
+            uint8_t a = (uint8_t)(16 - (g - 1) * 2);
+            draw_blend_pixel(px, gy, accent, a);
+        }
+        /* Also halo below the wave for a softer fill body. */
+        for (int g = 1; g <= 4; g++) {
+            int gy = col_y[col] + g;
+            if (gy > y + h - 2) break;
+            uint8_t a = (uint8_t)(16 - (g - 1) * 4);
+            draw_blend_pixel(px, gy, accent, a);
+        }
+    }
+    /* Mid glow — 4 px wide. */
+    for (int col = 0; col < n_cols; col++) {
+        int px = x + col;
+        for (int g = 1; g <= 4; g++) {
+            int gy = col_y[col] - g;
+            if (gy < y) break;
+            uint8_t a = (uint8_t)(36 - (g - 1) * 8);
+            draw_blend_pixel(px, gy, accent, a);
+        }
+    }
+    /* Bright core line + 1 px below for thickness. */
+    for (int col = 0; col < n_cols; col++) {
+        int px = x + col;
+        draw_pixel(px, col_y[col], accent);
+        draw_blend_pixel(px, col_y[col] + 1, accent, 200);
+    }
+
+    /* Hot point at the most-recent sample — picks the eye to "now". */
+    int hot_col = n_cols - 1;
+    int hot_x   = x + hot_col;
+    int hot_y   = col_y[hot_col];
+    int hr      = 3;
+    for (int dy = -hr; dy <= hr; dy++) {
+        for (int dx = -hr; dx <= hr; dx++) {
+            if (dx*dx + dy*dy <= hr*hr) {
+                draw_pixel(hot_x + dx, hot_y + dy, accent);
+            }
+        }
+    }
+}
+
 /* === v0.38-K2 glass-capsule pill primitive ===
  *
  * Draws a rounded-rect chip with a subtle alpha border in the supplied
@@ -254,38 +381,101 @@ static void draw_pulse_bar_investor(int bar_y, int bar_h) {
         cur_x += draw_glass_pill(cur_x, y_center, pill, mc);
     }
 
-    /* Active personality glass pill — "SYNC ACTIVE" etc, lane color. */
+    /* Active personality glass pill with glyph — diamond icon in lane
+     * color sits inside the pill before the "<NAME> ACTIVE" text.
+     * The glyph turns the pill from a label into an instrument. */
     {
         personality_t p = fabric_active();
         const char *pname = fabric_personality_name(p);
+        pixel_t pcol = personality_color(p);
         char pill[32];
         snprintf(pill, sizeof pill, "%s ACTIVE", pname);
-        cur_x += draw_glass_pill(cur_x, y_center, pill,
-                                 personality_color(p));
-    }
 
-    /* Pulse waveform — same source as before, repositioned and given
-     * a layered-stroke pass so it reads as instrument, not debug line. */
-    {
-        int pulse_w = 160;
-        int pulse_h = bar_h - 24;
-        int pulse_y = y_center - pulse_h / 2;
-        draw_event_pulse(cur_x, pulse_y, pulse_w, pulse_h);
-        cur_x += pulse_w + ATOMIK_GRID_L;
-    }
+        /* Measure pill, draw it, then overlay the glyph + redraw text
+         * shifted right so the glyph sits cleanly inside. */
+        int pad_x  = ATOMIK_GRID_M + 2;
+        int pad_y  = 4;
+        int glyph_r = 5;   /* 10 px diamond */
+        int glyph_gap = ATOMIK_GRID_S + 1;
 
-    /* Center: agent prediction (AA UI, violet) if any. */
-    {
-        action_t pred = agent_predict();
-        if (pred != ACT_NONE && font_aa_loaded(FONT_AA_UI)) {
-            char buf[80];
-            snprintf(buf, sizeof buf, ">> %s",
-                     agent_action_name(pred));
-            int tw = text_width_aa(FONT_AA_UI, buf);
-            int ax = (FB_W - tw) / 2;
-            int ay = y_center - text_height_aa(FONT_AA_UI) / 2;
-            draw_text_aa(FONT_AA_UI, ax, ay, buf, ATOMIK_SEM_AGENT);
+        if (font_aa_loaded(FONT_AA_UI)) {
+            int tw     = text_width_aa(FONT_AA_UI, pill);
+            int th     = text_height_aa(FONT_AA_UI);
+            int chip_w = tw + pad_x * 2 + glyph_r * 2 + glyph_gap;
+            int chip_h = th + pad_y * 2;
+            int chip_x = cur_x;
+            int chip_y = y_center - chip_h / 2;
+            int radius = chip_h / 2;
+
+            pixel_t body = rgb(0x10, 0x18, 0x2C);
+            draw_rect_rounded(chip_x, chip_y, chip_w, chip_h, radius,
+                              body);
+            for (int g = 1; g <= 3; g++) {
+                uint8_t a = (uint8_t)(24 - (g - 1) * 6);
+                for (int sx = 0; sx < chip_w + 2 * g; sx++) {
+                    draw_blend_pixel(chip_x - g + sx, chip_y - g, pcol, a);
+                    draw_blend_pixel(chip_x - g + sx,
+                                     chip_y + chip_h - 1 + g, pcol, a);
+                }
+                for (int sy = 0; sy < chip_h + 2 * g; sy++) {
+                    draw_blend_pixel(chip_x - g, chip_y - g + sy, pcol, a);
+                    draw_blend_pixel(chip_x + chip_w - 1 + g,
+                                     chip_y - g + sy, pcol, a);
+                }
+            }
+            draw_rect(chip_x + radius, chip_y, chip_w - radius * 2, 1, pcol);
+            draw_rect(chip_x + radius, chip_y + chip_h - 1,
+                      chip_w - radius * 2, 1, pcol);
+            draw_rect(chip_x,              chip_y + radius,
+                      1, chip_h - radius * 2, pcol);
+            draw_rect(chip_x + chip_w - 1, chip_y + radius,
+                      1, chip_h - radius * 2, pcol);
+
+            int gx = chip_x + pad_x + glyph_r;
+            int gy = y_center;
+            draw_personality_glyph(gx, gy, glyph_r, pcol);
+            draw_text_aa(FONT_AA_UI,
+                         chip_x + pad_x + glyph_r * 2 + glyph_gap,
+                         chip_y + pad_y, pill, pcol);
+            cur_x += chip_w + ATOMIK_GRID_M;
+        } else {
+            cur_x += draw_glass_pill(cur_x, y_center, pill, pcol);
         }
+    }
+
+    /* v0.38-K2.5 center module — SYSTEM PULSE label + layered-stroke
+     * waveform.  Replaces the dev-y `>> Open About` agent prediction
+     * and the old 1-px Bresenham pulse line.  The "SYSTEM PULSE"
+     * phrase reads as machine heartbeat, not a debug instruction. */
+    {
+        const char *label   = "SYSTEM PULSE";
+        int label_w = font_aa_loaded(FONT_AA_UI)
+                      ? text_width_aa(FONT_AA_UI, label)
+                      : text_width(label, 1);
+        int label_h = font_aa_loaded(FONT_AA_UI)
+                      ? text_height_aa(FONT_AA_UI)
+                      : text_height(1);
+        int pulse_w = 320;
+        int pulse_h = bar_h - 24;
+        int total_w = label_w + ATOMIK_GRID_M + pulse_w;
+        int center_x = (FB_W - total_w) / 2;
+        /* If the active-personality pill encroaches on the center,
+         * push the module right to avoid overlap. */
+        if (center_x < cur_x + ATOMIK_GRID_L) {
+            center_x = cur_x + ATOMIK_GRID_L;
+        }
+        int label_y = y_center - label_h / 2;
+        if (font_aa_loaded(FONT_AA_UI)) {
+            draw_text_aa(FONT_AA_UI, center_x, label_y, label,
+                         ATOMIK_FG_DIM);
+        } else {
+            draw_text(center_x, label_y, label, 1, ATOMIK_FG_DIM);
+        }
+        int pulse_x = center_x + label_w + ATOMIK_GRID_M;
+        int pulse_y = y_center - pulse_h / 2;
+        draw_event_pulse_glow(pulse_x, pulse_y, pulse_w, pulse_h,
+                              ATOMIK_SEM_HARDWARE);
+        cur_x = pulse_x + pulse_w + ATOMIK_GRID_L;
     }
 
     /* Right segment: SYSTEM LIVE chip + uptime plain text. */
