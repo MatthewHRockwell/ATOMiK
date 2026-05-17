@@ -177,18 +177,51 @@ static void draw_personality_glyph(int cx, int cy, int r,
  * "right now."  Reads as instrument, not debug trace. */
 static void draw_event_pulse_glow(int x, int y, int w, int h,
                                   pixel_t accent) {
-    pixel_t bed = rgb(0x10, 0x18, 0x28);
-    draw_rect(x, y, w, h, bed);
-    draw_rect(x, y + h - 1, w, 1, ATOMIK_DOCK_BORDER);
+    /* v0.38-K2.5A — soften the bed so the waveform is the visual
+     * hero instead of an opaque dark rectangle sitting under it.
+     * Previous bed was a solid rgb(0x10,0x18,0x28) fill; ChatGPT
+     * 2026-05-16 flagged that as "an empty status slot" — too
+     * visually dominant. Now: just a very subtle accent-tinted
+     * alpha wash so the strip reads as embedded in the glass bar.
+     * No hard bottom hairline either — the bar's own glass edge
+     * is the boundary. */
+    for (int sy = 0; sy < h; sy++) {
+        for (int sx = 0; sx < w; sx++) {
+            draw_blend_pixel(x + sx, y + sy, accent, 8);
+        }
+    }
+
+    /* Procedural baseline pulse — visible at idle, never seeds
+     * the metric ring.  The breathing is decorative chrome
+     * (Class B): tells the audience "the instrument is alive,
+     * waiting for events" without claiming there ARE events.
+     * Driven by anim_now_ms so dirty-render still notices. */
+    unsigned long now = anim_now_ms();
+    double  phase = (double)(now % 2400) / 2400.0 * 6.2831853;
+    double  s = phase;
+    double  s3 = s*s*s, s5 = s3*s*s;
+    double  sinv = s - s3/6.0 + s5/120.0;
+    if (sinv >  1.0) sinv =  1.0;
+    if (sinv < -1.0) sinv = -1.0;
+    int     breath = (int)((sinv + 1.0) * 30);   /* 0..60 alpha */
+    if (breath < 0) breath = 0;
+
+    int baseline_y = y + h - 2;
+    int bb_top     = y + h * 2 / 3;
+    for (int sy = bb_top; sy < baseline_y; sy++) {
+        uint8_t a = (uint8_t)(((sy - bb_top) * 40 / (baseline_y - bb_top)) + breath / 3);
+        for (int sx = 0; sx < w; sx++) {
+            draw_blend_pixel(x + sx, sy, accent, a);
+        }
+    }
+    /* Soft 1 px highlight at the baseline carrier line. */
+    for (int sx = 0; sx < w; sx++) {
+        draw_blend_pixel(x + sx, baseline_y, accent,
+                         (uint8_t)(90 + breath));
+    }
 
     if (s_pulse_count < 2) {
-        /* Calm baseline glow when no data — matches Fabric WAITING bed. */
-        for (int gy = 0; gy < 3; gy++) {
-            uint8_t a = (uint8_t)(36 + gy * 30);
-            for (int sx = 0; sx < w; sx++) {
-                draw_blend_pixel(x + sx, y + h - 3 + gy, accent, a);
-            }
-        }
+        /* No event history yet — return after baseline animation. */
         return;
     }
 
@@ -198,13 +231,8 @@ static void draw_event_pulse_glow(int x, int y, int w, int h,
     for (uint8_t i = 0; i < s_pulse_count; i++)
         if (s_pulse_hist[i] > mx) mx = s_pulse_hist[i];
     if (mx == 0) {
-        /* Flat zero line at the bottom — honest "system idle". */
-        for (int gy = 0; gy < 2; gy++) {
-            uint8_t a = (uint8_t)(80 - gy * 30);
-            for (int sx = 0; sx < w; sx++) {
-                draw_blend_pixel(x + sx, y + h - 2 + gy, accent, a);
-            }
-        }
+        /* All-zero history — the procedural baseline above already
+         * painted the idle line; nothing more to render. */
         return;
     }
 
@@ -222,41 +250,44 @@ static void draw_event_pulse_glow(int x, int y, int w, int h,
         col_y[col] = py;
     }
 
-    /* Outer halo — 8 px wide above the wave edge. */
+    /* v0.38-K2.5A — brighter halo stack so the wave anchors the
+     * center module instead of getting lost.  Outer halo widened
+     * 8 → 10 with a flatter falloff; mid glow brightened; core
+     * 2 px thick at full intensity. */
     for (int col = 0; col < n_cols; col++) {
         int px = x + col;
-        for (int g = 1; g <= 8; g++) {
+        for (int g = 1; g <= 10; g++) {
             int gy = col_y[col] - g;
             if (gy < y) break;
-            uint8_t a = (uint8_t)(16 - (g - 1) * 2);
+            uint8_t a = (uint8_t)(28 - (g - 1) * 2);
             draw_blend_pixel(px, gy, accent, a);
         }
-        /* Also halo below the wave for a softer fill body. */
-        for (int g = 1; g <= 4; g++) {
+        for (int g = 1; g <= 6; g++) {
             int gy = col_y[col] + g;
             if (gy > y + h - 2) break;
-            uint8_t a = (uint8_t)(16 - (g - 1) * 4);
+            uint8_t a = (uint8_t)(26 - (g - 1) * 3);
             draw_blend_pixel(px, gy, accent, a);
         }
     }
-    /* Mid glow — 4 px wide. */
+    /* Mid glow — 5 px wide, brighter. */
     for (int col = 0; col < n_cols; col++) {
         int px = x + col;
-        for (int g = 1; g <= 4; g++) {
+        for (int g = 1; g <= 5; g++) {
             int gy = col_y[col] - g;
             if (gy < y) break;
-            uint8_t a = (uint8_t)(36 - (g - 1) * 8);
+            uint8_t a = (uint8_t)(60 - (g - 1) * 9);
             draw_blend_pixel(px, gy, accent, a);
         }
     }
-    /* Bright core line + 1 px below for thickness. */
+    /* Bright core: 2 hard px + 1 px alpha 240 below. */
     for (int col = 0; col < n_cols; col++) {
         int px = x + col;
         draw_pixel(px, col_y[col], accent);
-        draw_blend_pixel(px, col_y[col] + 1, accent, 200);
+        draw_pixel(px, col_y[col] - 1, accent);
+        draw_blend_pixel(px, col_y[col] + 1, accent, 240);
     }
 
-    /* Hot point at the most-recent sample — picks the eye to "now". */
+    /* Hot point at the most-recent sample — small, bright. */
     int hot_col = n_cols - 1;
     int hot_x   = x + hot_col;
     int hot_y   = col_y[hot_col];
@@ -265,6 +296,18 @@ static void draw_event_pulse_glow(int x, int y, int w, int h,
         for (int dx = -hr; dx <= hr; dx++) {
             if (dx*dx + dy*dy <= hr*hr) {
                 draw_pixel(hot_x + dx, hot_y + dy, accent);
+            }
+        }
+    }
+    /* Hot point outer halo — 5 px alpha ring. */
+    int hr2 = 6;
+    for (int dy = -hr2; dy <= hr2; dy++) {
+        for (int dx = -hr2; dx <= hr2; dx++) {
+            int d2 = dx*dx + dy*dy;
+            if (d2 > hr*hr && d2 <= hr2*hr2) {
+                int dist = hr2 - (int)(d2 / (hr2 + 1));
+                uint8_t a = (uint8_t)(dist * 18);
+                draw_blend_pixel(hot_x + dx, hot_y + dy, accent, a);
             }
         }
     }
@@ -444,30 +487,29 @@ static void draw_pulse_bar_investor(int bar_y, int bar_h) {
     }
 
     /* v0.38-K2.5 center module — SYSTEM PULSE label + layered-stroke
-     * waveform.  Replaces the dev-y `>> Open About` agent prediction
-     * and the old 1-px Bresenham pulse line.  The "SYSTEM PULSE"
-     * phrase reads as machine heartbeat, not a debug instruction. */
+     * waveform.  v0.38-K2.5A: label uses FONT_AA_LABEL (14 px) at
+     * ATOMIK_FG_DIM so the waveform is visually dominant.  The label
+     * is a tiny instrument caption, not a header. */
     {
-        const char *label   = "SYSTEM PULSE";
-        int label_w = font_aa_loaded(FONT_AA_UI)
-                      ? text_width_aa(FONT_AA_UI, label)
+        const char *label = "SYSTEM PULSE";
+        font_aa_id_t lf = font_aa_loaded(FONT_AA_LABEL)
+                          ? FONT_AA_LABEL : FONT_AA_UI;
+        int label_w = font_aa_loaded(lf)
+                      ? text_width_aa(lf, label)
                       : text_width(label, 1);
-        int label_h = font_aa_loaded(FONT_AA_UI)
-                      ? text_height_aa(FONT_AA_UI)
+        int label_h = font_aa_loaded(lf)
+                      ? text_height_aa(lf)
                       : text_height(1);
         int pulse_w = 320;
         int pulse_h = bar_h - 24;
         int total_w = label_w + ATOMIK_GRID_M + pulse_w;
         int center_x = (FB_W - total_w) / 2;
-        /* If the active-personality pill encroaches on the center,
-         * push the module right to avoid overlap. */
         if (center_x < cur_x + ATOMIK_GRID_L) {
             center_x = cur_x + ATOMIK_GRID_L;
         }
         int label_y = y_center - label_h / 2;
-        if (font_aa_loaded(FONT_AA_UI)) {
-            draw_text_aa(FONT_AA_UI, center_x, label_y, label,
-                         ATOMIK_FG_DIM);
+        if (font_aa_loaded(lf)) {
+            draw_text_aa(lf, center_x, label_y, label, ATOMIK_FG_DIM);
         } else {
             draw_text(center_x, label_y, label, 1, ATOMIK_FG_DIM);
         }
