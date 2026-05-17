@@ -191,33 +191,56 @@ static void draw_event_pulse_glow(int x, int y, int w, int h,
         }
     }
 
-    /* Procedural baseline pulse — visible at idle, never seeds
-     * the metric ring.  The breathing is decorative chrome
-     * (Class B): tells the audience "the instrument is alive,
-     * waiting for events" without claiming there ARE events.
-     * Driven by anim_now_ms so dirty-render still notices. */
+    /* v0.38-K3 — baseline is now a low-amplitude SINE WAVE traveling
+     * across the strip, not a flat glow band.  ChatGPT 2026-05-16:
+     * "the baseline is too flat. It looks like a powered strip,
+     * not a waveform. ... give it a shallow sinusoidal contour."
+     * Class B discipline preserved: still never writes to the
+     * metric ring; pure decorative chrome saying "instrument alive."
+     *
+     * Distinguishes waiting from active:
+     *   - waiting: low amplitude, low alpha, no hot point, no peaks
+     *   - active (data branch below): bright core, peaks, hot point
+     */
     unsigned long now = anim_now_ms();
-    double  phase = (double)(now % 2400) / 2400.0 * 6.2831853;
-    double  s = phase;
-    double  s3 = s*s*s, s5 = s3*s*s;
-    double  sinv = s - s3/6.0 + s5/120.0;
-    if (sinv >  1.0) sinv =  1.0;
-    if (sinv < -1.0) sinv = -1.0;
-    int     breath = (int)((sinv + 1.0) * 30);   /* 0..60 alpha */
-    if (breath < 0) breath = 0;
-
-    int baseline_y = y + h - 2;
-    int bb_top     = y + h * 2 / 3;
-    for (int sy = bb_top; sy < baseline_y; sy++) {
-        uint8_t a = (uint8_t)(((sy - bb_top) * 40 / (baseline_y - bb_top)) + breath / 3);
-        for (int sx = 0; sx < w; sx++) {
-            draw_blend_pixel(x + sx, sy, accent, a);
-        }
+    int   baseline_y = y + h * 3 / 4;
+    int   amp        = h / 6;                       /* shallow */
+    int   col_y[1024];
+    int   n_cols     = (w < 1024) ? w : 1024;
+    /* Two-component sine for organic motion. */
+    double t = (double)now / 1000.0;
+    for (int col = 0; col < n_cols; col++) {
+        double u = (double)col / (double)(n_cols - 1);
+        double phase = u * 6.2831853 * 1.5 + t * 1.2;
+        /* Taylor sin to avoid pulling math.h in here. */
+        double s  = phase;
+        while (s > 3.14159265) s -= 6.2831853;
+        while (s < -3.14159265) s += 6.2831853;
+        double s3 = s*s*s, s5 = s3*s*s;
+        double sn = s - s3/6.0 + s5/120.0;
+        col_y[col] = baseline_y + (int)(sn * amp);
     }
-    /* Soft 1 px highlight at the baseline carrier line. */
-    for (int sx = 0; sx < w; sx++) {
-        draw_blend_pixel(x + sx, baseline_y, accent,
-                         (uint8_t)(90 + breath));
+    /* Soft fill + 2 px line — quieter than the active waveform. */
+    for (int col = 0; col < n_cols; col++) {
+        int px = x + col;
+        int cy = col_y[col];
+        /* Halo above the line. */
+        for (int g = 1; g <= 4; g++) {
+            int gy = cy - g;
+            if (gy < y) break;
+            uint8_t a = (uint8_t)(18 - (g - 1) * 4);
+            draw_blend_pixel(px, gy, accent, a);
+        }
+        /* Soft fill below the line into the bar floor. */
+        for (int g = 1; g <= 6; g++) {
+            int gy = cy + g;
+            if (gy > y + h - 2) break;
+            uint8_t a = (uint8_t)(14 - (g - 1) * 2);
+            draw_blend_pixel(px, gy, accent, a);
+        }
+        /* The line itself — soft, no hot point. */
+        draw_blend_pixel(px, cy,     accent, 120);
+        draw_blend_pixel(px, cy - 1, accent, 60);
     }
 
     if (s_pulse_count < 2) {
@@ -236,8 +259,8 @@ static void draw_event_pulse_glow(int x, int y, int w, int h,
         return;
     }
 
-    int col_y[1024];
-    int n_cols = (w < 1024) ? w : 1024;
+    /* Reuse col_y array — same scope as baseline above.  Overwrite
+     * with data-driven heights for the active waveform. */
     for (int col = 0; col < n_cols; col++) {
         int sample_i = (int)((long)col * (s_pulse_count - 1) /
                               (n_cols - 1));

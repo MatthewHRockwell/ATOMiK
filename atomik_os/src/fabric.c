@@ -687,10 +687,13 @@ static void lane_big_metric(fabric_lane_t lane,
             snprintf(buf, cap, "%lu", total);
             snprintf(unit, unit_cap, "events on bus");
         } else {
-            /* v0.38-J++ — "0" beats "--".  Dashes read as unfinished
-             * implementation; zero is honest "no events yet". */
+            /* v0.38-K3 — investor idle phrasing matches VISUAL. */
             snprintf(buf, cap, "0");
-            snprintf(unit, unit_cap, "events on bus");
+            if (metric_mode() == METRIC_MODE_INVESTOR) {
+                snprintf(unit, unit_cap, "waiting for workload");
+            } else {
+                snprintf(unit, unit_cap, "events on bus");
+            }
         }
         break;
     }
@@ -700,8 +703,14 @@ static void lane_big_metric(fabric_lane_t lane,
             snprintf(buf, cap, "%.0f", avd->value);
             snprintf(unit, unit_cap, "%% pixels avoided");
         } else {
-            snprintf(buf, cap, "--");
-            snprintf(unit, unit_cap, "%% pixels avoided");
+            /* v0.38-K3 — investor mode shows a WAITING phrase instead
+             * of "0 %% pixels avoided" which read as unfinished. */
+            snprintf(buf, cap, "0");
+            if (metric_mode() == METRIC_MODE_INVESTOR) {
+                snprintf(unit, unit_cap, "waiting for render workload");
+            } else {
+                snprintf(unit, unit_cap, "render deltas observed");
+            }
         }
         (void)h;
         break;
@@ -747,9 +756,14 @@ void fabric_draw(window_t *w, int x, int y, int wd, int ht) {
         snprintf(badge, sizeof badge, "AUTO / %s",
                  fabric_personality_name(s_active));
     }
-    /* Badge as a rounded capsule with brighter border in active color. */
-    int bw   = text_width(badge, 1);
-    int bh   = text_height(1) + 8;
+    /* v0.38-K3: Fabric panel capsule now uses the AA UI atlas when
+     * available so it matches the premium top-bar pills.  Falls back
+     * to pixel font 1 px otherwise. */
+    int use_aa = font_aa_loaded(FONT_AA_LABEL);
+    int bw = use_aa ? text_width_aa(FONT_AA_LABEL, badge)
+                    : text_width(badge, 1);
+    int bh = use_aa ? text_height_aa(FONT_AA_LABEL) + 8
+                    : text_height(1) + 8;
     int bx   = x + wd - bw - ATOMIK_GRID_L * 2 - ATOMIK_GRID_M;
     int by   = y + ATOMIK_GRID_M;
     int bcap = bw + ATOMIK_GRID_L;
@@ -758,10 +772,18 @@ void fabric_draw(window_t *w, int x, int y, int wd, int ht) {
         draw_rect(bx + 2, by + t,        bcap - 4, 1, badge_color);
         draw_rect(bx + 2, by + bh - 1 - t, bcap - 4, 1, badge_color);
     }
-    draw_text(bx + ATOMIK_GRID_S + 2, by + 4, badge, 1, badge_color);
+    if (use_aa) {
+        draw_text_aa(FONT_AA_LABEL, bx + ATOMIK_GRID_S + 2, by + 4,
+                     badge, badge_color);
+    } else {
+        draw_text(bx + ATOMIK_GRID_S + 2, by + 4, badge, 1, badge_color);
+    }
 
     /* === lanes === */
-    int lanes_y = y + ATOMIK_GRID_M + text_height(2) + ATOMIK_GRID_L;
+    int header_h = font_aa_loaded(FONT_AA_UI)
+                   ? text_height_aa(FONT_AA_UI)
+                   : text_height(2);
+    int lanes_y = y + ATOMIK_GRID_M + header_h + ATOMIK_GRID_L;
     int lane_x  = x + ATOMIK_GRID_L;
     int lane_w  = wd - ATOMIK_GRID_L * 2;
 
@@ -864,57 +886,74 @@ void fabric_draw(window_t *w, int x, int y, int wd, int ht) {
         }
         (void)sub_h;
 
-        /* v0.38-J++ — WAITING chips were "too visually loud" per the
-         * ChatGPT review.  LIVE chips keep the lane-color border so
-         * the audience knows data is flowing; WAITING/STALE drop the
-         * border + dim the text so they recede behind the lane title.
-         * Either way the chip is on the same baseline; only weight
-         * changes. */
+        /* v0.38-K3 — freshness chip AA + WAITING dimmed further.
+         * LIVE: bordered glass capsule in lane color (instrument).
+         * WAITING / STALE: tiny dim AA text only, no chip body —
+         * ChatGPT 2026-05-16: "WAITING should be present but quiet.
+         * Right now it still competes too much with the lane title." */
         const char *fl = fresh_label(h->fresh);
-        int fw = text_width(fl, 1);
+        int chip_use_aa = font_aa_loaded(FONT_AA_LABEL);
+        int fw = chip_use_aa ? text_width_aa(FONT_AA_LABEL, fl)
+                             : text_width(fl, 1);
         pixel_t fcol = fresh_color(h->fresh);
-        pixel_t text_col = (h->fresh == FABRIC_FRESH_LIVE)
-                            ? fcol : ATOMIK_FG_DIM;
-        int draw_border = (h->fresh == FABRIC_FRESH_LIVE);
+        int chip_h = (chip_use_aa ? text_height_aa(FONT_AA_LABEL)
+                                  : text_height(1)) + 4;
         int chip_w = fw + ATOMIK_GRID_M;
-        int chip_h = text_height(1) + 4;
         int chip_x = lane_x + lane_w - chip_w - pad_x;
-        int chip_y = ty1 + (text_height(2) - chip_h) / 2;
-        if (draw_border) {
-            draw_rect(chip_x, chip_y, chip_w, chip_h,
-                      wm_card_bg() & 0x0F0F0F);
-            draw_rect(chip_x, chip_y, chip_w, 1, fcol);
-            draw_rect(chip_x, chip_y + chip_h - 1, chip_w, 1, fcol);
+        int chip_y = ty1 + (name_h - chip_h) / 2;
+        if (h->fresh == FABRIC_FRESH_LIVE) {
+            int radius = chip_h / 2;
+            draw_rect_rounded(chip_x, chip_y, chip_w, chip_h, radius,
+                              wm_card_bg() & 0x0F0F0F);
+            draw_rect(chip_x + radius, chip_y, chip_w - radius * 2, 1, fcol);
+            draw_rect(chip_x + radius, chip_y + chip_h - 1,
+                      chip_w - radius * 2, 1, fcol);
+            if (chip_use_aa) {
+                draw_text_aa(FONT_AA_LABEL,
+                             chip_x + ATOMIK_GRID_S, chip_y + 2,
+                             fl, fcol);
+            } else {
+                draw_text(chip_x + ATOMIK_GRID_S, chip_y + 2,
+                          fl, 1, fcol);
+            }
+        } else {
+            /* Quiet: tiny dim text right-aligned at the same baseline,
+             * no body, no border. */
+            pixel_t quiet = rgb(0x5A, 0x66, 0x82);
+            if (chip_use_aa) {
+                draw_text_aa(FONT_AA_LABEL,
+                             chip_x + ATOMIK_GRID_S, chip_y + 2,
+                             fl, quiet);
+            } else {
+                draw_text(chip_x + ATOMIK_GRID_S, chip_y + 2,
+                          fl, 1, quiet);
+            }
         }
-        draw_text(chip_x + ATOMIK_GRID_S, chip_y + 2, fl, 1, text_col);
 
-        /* Row 2: BIG METRIC number in lane color + unit label dim
-         * below.  v0.38-K: big number uses AA DISPLAY atlas; unit
-         * uses AA LABEL atlas. */
+        /* Row 2: stacked metric layout — BIG NUMBER above DIM UNIT
+         * (v0.38-K3, ChatGPT 2026-05-16: "stacked is cleaner than
+         * baseline-aligning a tiny unit to a giant number").
+         * Number in AA DISPLAY, unit on its own line in AA LABEL. */
         int ty2 = ty1 + name_h + sub_h + ATOMIK_GRID_S;
         char big[16], unit[24];
         lane_big_metric(lane, big, sizeof big, unit, sizeof unit);
-        int big_w, big_h, unit_h;
+        int big_h, unit_h;
         if (font_aa_loaded(FONT_AA_DISPLAY)) {
             draw_text_aa(FONT_AA_DISPLAY, tx, ty2, big, lc);
-            big_w = text_width_aa(FONT_AA_DISPLAY, big);
             big_h = text_height_aa(FONT_AA_DISPLAY);
         } else {
             draw_text(tx, ty2, big, 3, lc);
-            big_w = text_width(big, 3);
             big_h = text_height(3);
         }
+        int unit_y = ty2 + big_h + 2;
         if (font_aa_loaded(FONT_AA_LABEL)) {
             unit_h = text_height_aa(FONT_AA_LABEL);
-            draw_text_aa(FONT_AA_LABEL,
-                         tx + big_w + ATOMIK_GRID_M,
-                         ty2 + big_h - unit_h, unit, ATOMIK_FG_DIM);
+            draw_text_aa(FONT_AA_LABEL, tx, unit_y, unit,
+                         ATOMIK_FG_DIM);
         } else {
             unit_h = text_height(1);
-            draw_text(tx + big_w + ATOMIK_GRID_M,
-                      ty2 + big_h - unit_h, unit, 1, ATOMIK_FG_DIM);
+            draw_text(tx, unit_y, unit, 1, ATOMIK_FG_DIM);
         }
-        (void)unit_h;
 
         /* Row 3: FILLED area waveform across inner width. */
         int wf_y = ty2 + big_h + ATOMIK_GRID_S;
