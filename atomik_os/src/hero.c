@@ -103,13 +103,15 @@ static void energy_field(int cx, int cy, int max_r,
         disk(cx, cy, r, color, alpha);
     }
 
-    /* Sine-wave streams — 5 horizontal flowing curves through the field
-     * at different vertical offsets and phases. */
+    /* Sine-wave streams — v0.38-L2: shrunk from 5 → 3 streams per
+     * field per ChatGPT 2026-05-16 "less diagram feel."  The previous
+     * dense stream pattern read as a technical visualization; three
+     * streams keep the field alive without crowding the surface. */
     double pulse_bright = 0.65 + 0.35 * phase;
-    for (int s = 0; s < 5; s++) {
-        double offset_v = -max_r + (s + 1) * (2.0 * max_r / 6.0);
-        double freq     = 0.022 + s * 0.004;
-        double amp      = max_r * (0.10 + 0.04 * (s % 3));
+    for (int s = 0; s < 3; s++) {
+        double offset_v = -max_r * 0.55 + s * (max_r * 0.55);
+        double freq     = 0.024 + s * 0.006;
+        double amp      = max_r * (0.10 + 0.03 * (s % 3));
         double pha      = (now / 6000.0) * (s % 2 ? 1.0 : -1.0) + s * 0.7;
         int prev_y = -1;
         int prev_x = -1;
@@ -117,15 +119,13 @@ static void energy_field(int cx, int cy, int max_r,
             int x = cx + dx;
             double dy_d = offset_v + amp * sin((cx + dx) * freq + pha);
             int y = cy + (int)dy_d;
-            /* Clip to a circular mask so the field stays round. */
             if (dx * dx + (int)(dy_d * dy_d) > max_r * max_r) {
                 prev_x = -1;
                 continue;
             }
             if (prev_x >= 0) {
-                uint8_t alpha = (uint8_t)(160 * pulse_bright);
+                uint8_t alpha = (uint8_t)(140 * pulse_bright);
                 aaline(prev_x, prev_y, x, y, color, alpha);
-                /* 1px above for thicker stroke at resolution-bump. */
                 aaline(prev_x, prev_y - 1, x, y - 1, color,
                        (uint8_t)(alpha / 2));
             }
@@ -133,14 +133,100 @@ static void energy_field(int cx, int cy, int max_r,
         }
     }
 
-    /* Central anchor — bright filled disk + thin outer ring. */
-    int anchor_r = 14 + (active ? 4 : 0);
+    /* Central anchor — v0.38-L2: smaller, doesn't dominate.  Active
+     * field gets a brighter rim instead of a bigger anchor. */
+    int anchor_r = 12 + (active ? 2 : 0);
     disk(cx, cy, anchor_r, color, active ? 220 : 160);
     disk(cx, cy, anchor_r - 6, ATOMIK_FG, 240);
 
-    /* Active outer ring — saturated, 3 px thick. */
     if (active) {
-        ring(cx, cy, max_r - 6, 3, color, 200);
+        /* Two thin rings — soft outer + bright inner — gives the
+         * active field a 25%-or-so visual lift without making it
+         * bigger than the others. */
+        ring(cx, cy, max_r - 8, 2, color, 220);
+        ring(cx, cy, max_r - 4, 1, color, 90);
+    }
+}
+
+/* v0.38-L2 central ATOMiK core node — small luminous nexus that the
+ * three personality fields visibly feed into.  ChatGPT 2026-05-16:
+ * "make STATE / SYNC / AGENT feed into one fabric, not three
+ * separate diagrams."  The core uses a neutral cyan-leaning palette
+ * so it doesn't compete with whichever personality is active. */
+static void core_node(int cx, int cy, unsigned long now) {
+    pixel_t base = ATOMIK_SEM_HARDWARE;     /* cyan = OS chrome */
+    /* Outer glow stack — wider, very low alpha. */
+    for (int r = 80; r > 20; r -= 8) {
+        double t = (double)(r - 20) / 60.0;
+        uint8_t alpha = (uint8_t)(40 * (1.0 - t));
+        ring(cx, cy, r, 4, base, alpha);
+    }
+    /* Atomic orbital rings — two thin ellipses rotated through phase,
+     * implemented as alpha-blended elliptical traces. */
+    double t = (double)now / 1500.0;
+    for (int ring_i = 0; ring_i < 2; ring_i++) {
+        double tilt = (ring_i == 0 ? 0.6 : -0.6) + t * 0.0;
+        int   rx_e  = 36 - ring_i * 8;
+        int   ry_e  = 14 - ring_i * 2;
+        int   steps = 120;
+        for (int i = 0; i < steps; i++) {
+            double theta = (double)i / steps * 6.2831853;
+            double x = rx_e * cos(theta);
+            double y = ry_e * sin(theta);
+            /* Rotate by tilt. */
+            double rx = x * cos(tilt) - y * sin(tilt);
+            double ry = x * sin(tilt) + y * cos(tilt);
+            int px = cx + (int)rx;
+            int py = cy + (int)ry;
+            uint8_t a = 200 - (uint8_t)(i % 8) * 4;
+            draw_blend_pixel(px, py, base, a);
+            draw_blend_pixel(px, py - 1, base, a / 3);
+        }
+    }
+    /* Core disk — bright filled center + halo. */
+    int r = 14;
+    for (int dy = -r; dy <= r; dy++) {
+        int row = r * r - dy * dy;
+        if (row < 0) continue;
+        int hr = 0;
+        while (hr * hr <= row) hr++;
+        hr--;
+        for (int dx = -hr; dx <= hr; dx++) {
+            draw_pixel(cx + dx, cy + dy, base);
+        }
+    }
+    disk(cx, cy, 7, ATOMIK_FG, 250);
+}
+
+/* Curved energy link from a personality field anchor to the central
+ * core, drawn as an alpha-blended quadratic Bezier polyline.  Reads
+ * as "this lane is feeding the core" — supports the "one fabric"
+ * composition. */
+static void energy_link(int ax, int ay, int bx, int by,
+                        pixel_t color, double phase) {
+    /* Control point pulled slightly toward the screen baseline so the
+     * curve arcs through the workspace rather than running flat. */
+    double cx = (ax + bx) / 2.0;
+    double cy = (ay + by) / 2.0 + 70.0;
+    int steps = 32;
+    int prev_x = -1, prev_y = -1;
+    for (int i = 0; i <= steps; i++) {
+        double t = (double)i / steps;
+        double omt = 1.0 - t;
+        double x = omt*omt*ax + 2*omt*t*cx + t*t*bx;
+        double y = omt*omt*ay + 2*omt*t*cy + t*t*by;
+        int px = (int)x;
+        int py = (int)y;
+        /* Brighter near the source field, fading toward the core
+         * to suggest energy flowing inward.  Multiply by personality
+         * phase so the link breathes with the field. */
+        double tail   = 1.0 - t * 0.5;
+        uint8_t a = (uint8_t)(110 * tail * (0.7 + 0.3 * phase));
+        if (prev_x >= 0) {
+            aaline(prev_x, prev_y, px, py, color, a);
+            aaline(prev_x, prev_y - 1, px, py - 1, color, a / 2);
+        }
+        prev_x = px; prev_y = py;
     }
 }
 
@@ -156,29 +242,59 @@ void hero_draw(void) {
                      - 40;
     if (cy < 320) cy = FB_H / 2 - 60;
 
-    /* Three fields across the workspace, equal slots. */
+    /* v0.38-L2: three fields shrunk ~15% so they no longer fill the
+     * workspace + a central ATOMiK core node sits between them.
+     * Energy links arc from each personality anchor into the core,
+     * making the composition read as ONE fabric instead of three
+     * separate diagrams. */
     int field_w   = ws_w / 3;
-    int field_r   = (field_w * 4) / 9;     /* radius ≈ 44% of slot width */
+    int field_r   = (field_w * 7) / 18;     /* ~39% of slot, was ~44%  */
     int cx_state  = left_edge + field_w * 0 + field_w / 2;
     int cx_sync   = left_edge + field_w * 1 + field_w / 2;
     int cx_agent  = left_edge + field_w * 2 + field_w / 2;
+    int core_x    = cx_sync;
+    int core_y    = cy - 12;                /* slight lift above fields */
 
-    /* Animation phase — slow breathing pulse (0..1 across 4 s). */
     unsigned long now = anim_now_ms();
     double phase = 0.5 + 0.5 * sin(((double)(now % 4000) / 4000.0)
                                     * 2.0 * M_PI);
 
     personality_t active = fabric_active();
 
+    /* Pass 1 — paint each personality field. */
     energy_field(cx_state, cy, field_r,
-                 ATOMIK_SEM_HARDWARE,                     /* cyan = STATE */
+                 ATOMIK_SEM_HARDWARE,
                  phase, active == PERSONALITY_STATE, now);
     energy_field(cx_sync,  cy, field_r,
-                 ATOMIK_SEM_SAVINGS,                      /* green = SYNC */
+                 ATOMIK_SEM_SAVINGS,
                  phase, active == PERSONALITY_SYNC,  now);
     energy_field(cx_agent, cy, field_r,
-                 ATOMIK_SEM_AGENT,                        /* violet = AGENT */
+                 ATOMIK_SEM_AGENT,
                  phase, active == PERSONALITY_AGENT, now);
+
+    /* Pass 2 — curved energy links from each anchor to the core.
+     * Drawn AFTER the fields so the link starts crisp at the anchor
+     * and fades into the core glow as it converges. */
+    energy_link(cx_state, cy, core_x, core_y, ATOMIK_SEM_HARDWARE, phase);
+    energy_link(cx_agent, cy, core_x, core_y, ATOMIK_SEM_AGENT,    phase);
+    /* SYNC sits directly under the core; use a short vertical link
+     * instead of a curved arc. */
+    {
+        int steps = 20;
+        for (int i = 0; i <= steps; i++) {
+            double t = (double)i / steps;
+            int py = (int)(cy * (1 - t) + core_y * t);
+            uint8_t a = (uint8_t)(120 * (1.0 - t * 0.4)
+                                 * (0.7 + 0.3 * phase));
+            draw_blend_pixel(core_x,     py,     ATOMIK_SEM_SAVINGS, a);
+            draw_blend_pixel(core_x - 1, py,     ATOMIK_SEM_SAVINGS, a / 2);
+            draw_blend_pixel(core_x + 1, py,     ATOMIK_SEM_SAVINGS, a / 2);
+        }
+    }
+
+    /* Pass 3 — central ATOMiK core node painted last so it sits on
+     * top of where the three links converge. */
+    core_node(core_x, core_y, now);
 
     /* Labels below the fields — STATE / SYNC / AGENT in scale-2
      * saturated personality color.  Active personality gets brighter,
