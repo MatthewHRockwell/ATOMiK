@@ -9,7 +9,7 @@
  * carries a user-visible change. About window, status bar, and the
  * /tmp/atomik_os_version stamp all read from here so the screen output
  * NEVER lies about which build is running. */
-#define AOS_VERSION "v0.38-L2"
+#define AOS_VERSION "v0.39-A"
 
 /* Display geometry — locked to 1920x1080 XRGB8888 since simplefb is fixed. */
 #define FB_W       1920
@@ -207,6 +207,7 @@ typedef enum {
     ACT_OPEN_BRIEF,
     ACT_OPEN_CHAT,
     ACT_OPEN_DOCUMENT,
+    ACT_OPEN_ASSISTANT,
     ACT_CLOSE_WINDOW,
     ACT_CYCLE_FOCUS,
     ACT_DOCK_HOVER,
@@ -677,6 +678,21 @@ void atomik_asset_blit_alpha(const atomik_asset_t *a, int dx, int dy,
  * a small (480×270) seamless grid tile, keeping peak memory bounded. */
 void atomik_asset_blit_tiled(const atomik_asset_t *a,
                              int dx, int dy, int w, int h);
+
+/* assistant.c — v0.39-A summoned ATOMiK Assistant ("Atom") overlay.
+ *
+ * Silicon-octopus character, summoned via the Atom rail cell or `?`
+ * key.  Renders as a glass speech bubble in the lower-left workspace
+ * with a bust avatar and a deterministic explanation of the active
+ * personality + one real metric value.  Class B chrome (the
+ * character art) driven by Class A state (the active personality
+ * and metric values come from the provider). */
+int  assistant_init(void);          /* loads the 160 px asset       */
+void assistant_summon(void);        /* show overlay                  */
+void assistant_dismiss(void);       /* hide overlay                  */
+int  assistant_visible(void);
+void assistant_draw(void);          /* paint overlay if visible      */
+void assistant_tick(void);          /* per-frame: auto-dismiss timeout */
 
 /* replica_flow.c — v0.37 SYNC personality product story.
  *

@@ -38,6 +38,8 @@ static void redraw_frame(void) {
     dock_draw(s_dock_hover);
     wm_draw_all();
     status_draw();      /* global chrome — drawn after windows */
+    assistant_tick();   /* v0.39-A: auto-dismiss timeout check */
+    assistant_draw();   /* v0.39-A: summoned Atom overlay on top of chrome */
     notify_draw();
     fb_present();
     dirty_finalize_frame();
@@ -306,6 +308,10 @@ int main(int argc, char **argv) {
      * files haven't been shipped to /tmp/atomik_fonts/ yet — draw_text_aa
      * falls back to the pixel font, so the board is still usable. */
     font_aa_init();
+    /* v0.39-A: load the Atom assistant asset.  Silently no-ops if the
+     * .atomik_asset hasn't been shipped yet; the summon overlay falls
+     * back to a placeholder rectangle. */
+    assistant_init();
     input_open();
     wm_init();
     agent_init();
@@ -386,6 +392,16 @@ int main(int argc, char **argv) {
              *      S, digits, space) — only reach here if no app holds
              *      focus.  Letter pressed on bare desktop → app opens.
              */
+
+            /* v0.39-A: Esc dismisses the Atom assistant overlay
+             * BEFORE the WM gets it.  Otherwise wm_handle_key would
+             * eat Esc to close the topmost window — Esc-to-dismiss
+             * an overlay is the universal expectation. */
+            if (ev.key == 0x1B && assistant_visible()) {
+                assistant_dismiss();
+                dirty = 1;
+                continue;
+            }
 
             /* (1) SYSTEM HOTKEYS */
             if (wm_handle_key(ev.key)) {
@@ -511,6 +527,10 @@ int main(int argc, char **argv) {
                 open_chat();
                 agent_log(ACT_OPEN_CHAT);
                 dirty = 1;
+            } else if (!dirty && (ev.key == 'i' || ev.key == 'I')) {
+                /* v0.39-A — 'I' (info) toggles the Atom assistant. */
+                assistant_summon();
+                dirty = 1;
             } else if (!dirty && (ev.key == 'd' || ev.key == 'D')) {
                 open_document();
                 agent_log(ACT_OPEN_DOCUMENT);
@@ -528,11 +548,12 @@ int main(int argc, char **argv) {
                 int slot = ev.key - '1';
                 s_dock_hover = slot;
                 action_t a = dock_action_for_slot(slot);
-                if      (a == ACT_OPEN_ABOUT)    open_about();
-                else if (a == ACT_OPEN_MONITOR)  open_monitor();
-                else if (a == ACT_OPEN_TERMINAL) open_terminal();
-                else if (a == ACT_OPEN_FILES)    open_files();
-                else if (a == ACT_OPEN_NOTES)    open_notes();
+                if      (a == ACT_OPEN_ABOUT)     open_about();
+                else if (a == ACT_OPEN_MONITOR)   open_monitor();
+                else if (a == ACT_OPEN_TERMINAL)  open_terminal();
+                else if (a == ACT_OPEN_FILES)     open_files();
+                else if (a == ACT_OPEN_NOTES)     open_notes();
+                else if (a == ACT_OPEN_ASSISTANT) assistant_summon();
                 if (a != ACT_NONE) agent_log(a);
                 else               agent_log(ACT_DOCK_HOVER);
                 dirty = 1;

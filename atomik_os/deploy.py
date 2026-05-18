@@ -219,6 +219,11 @@ def main():
                     default="DEV",
                     help="Initial metric_mode (writes /tmp/atomik_mode "
                          "before launch). Default DEV.")
+    ap.add_argument("--summon-assistant", action="store_true",
+                    help="After launch + health check, inject 'I' "
+                         "via /tmp/aos_keys so the Atom assistant "
+                         "overlay is visible in the post-launch "
+                         "screenshot.  v0.39-A.")
     args = ap.parse_args()
 
     expected = expected_version()
@@ -251,12 +256,19 @@ def main():
     if not args.no_assets:
         assets_dir = os.path.join(HERE, "assets")
         if os.path.isdir(assets_dir):
-            asset_files = sorted([f for f in os.listdir(assets_dir)
-                                  if f.endswith(".atomik_asset")])
+            # v0.39-A: walk subdirectories so assets/assistant/*.atomik_asset
+            # ships alongside the top-level assets.  The board flattens
+            # all of them into /tmp/atomik_assets/<basename>.
+            asset_files = []
+            for root, _dirs, files in os.walk(assets_dir):
+                for f in files:
+                    if f.endswith(".atomik_asset"):
+                        asset_files.append(os.path.join(root, f))
+            asset_files.sort()
             if asset_files:
                 cmd(s, "mkdir -p /tmp/atomik_assets", log=False)
-                for name in asset_files:
-                    local = os.path.join(assets_dir, name)
+                for local in asset_files:
+                    name = os.path.basename(local)
                     remote = f"/tmp/atomik_assets/{name}"
                     label = f"asset_{name.split('.')[0]}"
                     print(f"[deploy] shipping asset: {name}", flush=True)
@@ -311,9 +323,17 @@ def main():
     # v0.22 autostart: launch with stdin redirected from a FIFO instead
     # of /dev/null. atomik_ai_daemon.py and other relays can then inject
     # keystrokes via `printf ... >> /tmp/aos_keys` without restarting.
-    cmd(s, "mkfifo /tmp/aos_keys 2>/dev/null; "
-          "( while true; do sleep 3600; done ) > /tmp/aos_keys &"
-          " echo $! > /tmp/aos_fifo_writer.pid")
+    # v0.39-A: split FIFO setup into three SEPARATE cmd() calls so the
+    # literal "/tmp/aos_keys" only travels over UART once per command.
+    # On this board, long single-line commands with two `/tmp/aos_keys`
+    # references reliably byte-duplicate the second one to
+    # `/tmp/aoos_keys`, silently breaking launch.  The shell-variable
+    # workaround failed too (the `$F` got duplicated to `$$F`).
+    # Splitting the commands shifts the glitch onto safe ground.
+    cmd(s, "mkfifo /tmp/aos_keys 2>/dev/null; true", log=False)
+    cmd(s, "( while true; do sleep 3600; done ) > /tmp/aos_keys &",
+        log=False)
+    cmd(s, "echo $! > /tmp/aos_fifo_writer.pid", log=False)
     # Bash rejects `cmd &; echo marker`, so launch on its own line.
     slow(s, f"nohup {REMOTE} > /tmp/aos.out 2> /tmp/aos.err "
             f"< /tmp/aos_keys &\n")
@@ -365,6 +385,16 @@ def main():
         print("[deploy]  do NOT trust VERSION OK alone — atomik_os crashed "
               "after init.  Read /tmp/aos.err on the board BEFORE redeploying.",
               flush=True)
+
+    # v0.39-A — if --summon-assistant is set, inject the 'I' key via
+    # the running atomik_os FIFO so the screenshot captures the Atom
+    # overlay.  No effect if the running build doesn't have the
+    # assistant handler.
+    if getattr(args, "summon_assistant", False):
+        print("[deploy] summoning Atom assistant (inject 'I' via FIFO)",
+              flush=True)
+        cmd(s, "printf 'I' > /tmp/aos_keys", log=False)
+        time.sleep(2)
 
     # Screenshot verification.
     if args.no_shot:
