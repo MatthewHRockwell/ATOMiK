@@ -126,12 +126,10 @@ def main() -> int:
     out_dir.mkdir(parents=True, exist_ok=True)
 
     raw = Image.open(src).convert("RGB")
-    # v0.39-A MVP — alpha cutout deferred (make_atomik_asset.py doesn't
-    # implement --alpha-key yet).  Instead we composite the character
-    # onto the speech-bubble glass body color so the rectangular blit
-    # visually matches the bubble.  GLASS_BG mirrors the body color in
-    # status.c draw_glass_pill (rgb(0x10,0x18,0x2C)).
-    GLASS_BG = (0x10, 0x18, 0x2C)
+    # v0.39-A.5: real alpha cutout via chromakey.  Paint background
+    # pixels with a magic magenta key (#FF00FF) and ship the asset with
+    # --alpha-key FF00FF so the board-side blit skips matching pixels.
+    KEY = (0xFF, 0x00, 0xFF)
     bg = avg_corner_color(raw)
     thresh2 = THRESHOLD * THRESHOLD
     px = raw.load()
@@ -141,13 +139,13 @@ def main() -> int:
             r, g, b = px[x, y]
             dr = r - bg[0]; dg = g - bg[1]; db = b - bg[2]
             if dr*dr + dg*dg + db*db < thresh2:
-                px[x, y] = GLASS_BG
-    # Tight crop based on non-bg pixels (anything not the glass color).
+                px[x, y] = KEY
+    # Tight crop based on non-key pixels.
     min_x, min_y = w_src, h_src
     max_x, max_y = -1, -1
     for y in range(h_src):
         for x in range(w_src):
-            if px[x, y] != GLASS_BG:
+            if px[x, y] != KEY:
                 if x < min_x: min_x = x
                 if y < min_y: min_y = y
                 if x > max_x: max_x = x
@@ -165,11 +163,20 @@ def main() -> int:
         new_w = max(1, int(round(w * scale)))
         new_h = max(1, int(round(h * scale)))
         scaled = cropped.resize((new_w, new_h), Image.LANCZOS)
+        # Re-snap any pixels close to magenta back to exact magenta so
+        # the chromakey still matches after Lanczos resampling.
+        sp = scaled.load()
+        for yy in range(new_h):
+            for xx in range(new_w):
+                rr, gg, bb = sp[xx, yy]
+                if rr > 220 and gg < 40 and bb > 220:
+                    sp[xx, yy] = KEY
         png_path = out_dir / f"assistant_idle_{sz}.png"
         scaled.save(png_path)
         asset_path = out_dir / f"assistant_idle_{sz}.atomik_asset"
         cmd = [sys.executable, str(HERE / "make_atomik_asset.py"),
-               str(png_path), str(asset_path), "--auto"]
+               str(png_path), str(asset_path), "--auto",
+               "--alpha-key", "FF00FF"]
         print("  " + " ".join(cmd), flush=True)
         subprocess.check_call(cmd)
         explain_path = out_dir / f"assistant_explain_{sz}.atomik_asset"

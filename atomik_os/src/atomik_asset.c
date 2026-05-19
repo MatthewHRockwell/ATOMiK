@@ -31,6 +31,8 @@ int atomik_asset_load(const char *path, atomik_asset_t *out) {
     if (!out) return -1;
     out->width = out->height = 0;
     out->pixels = NULL;
+    out->flags = 0;
+    out->alpha_key = 0;
 
     FILE *f = fopen(path, "rb");
     if (!f) return -1;
@@ -49,6 +51,9 @@ int atomik_asset_load(const char *path, atomik_asset_t *out) {
     uint32_t width    = rd_u32(hdr + 8);
     uint32_t height   = rd_u32(hdr + 12);
     uint32_t pl_bytes = rd_u32(hdr + 16);
+    /* When FLAG_ALPHA_KEY is set, the 4-byte reserved/alpha-key slot
+     * holds the XRGB888 chromakey color.  v0.39-A.5. */
+    uint32_t alpha_key = rd_u32(hdr + 20);
 
     if (version != ATOMIK_ASSET_VERSION) {
         fclose(f);
@@ -119,9 +124,12 @@ int atomik_asset_load(const char *path, atomik_asset_t *out) {
     }
     fclose(f);
 
-    out->width  = width;
-    out->height = height;
-    out->pixels = pix;
+    out->width     = width;
+    out->height    = height;
+    out->pixels    = pix;
+    out->flags     = flags;
+    out->alpha_key = (flags & ATOMIK_ASSET_FLAG_ALPHA_KEY)
+                      ? (pixel_t)alpha_key : 0;
     return 0;
 }
 
@@ -158,6 +166,21 @@ void atomik_asset_blit(const atomik_asset_t *a, int dx, int dy) {
     int rdx, rdy, rsx, rsy, rw, rh;
     if (!clip(a, dx, dy, &rdx, &rdy, &rsx, &rsy, &rw, &rh)) return;
     pixel_t *bb = fb_back();
+    /* v0.39-A.5 — chromakey path: per-pixel walk that skips the
+     * alpha-key color so the asset reads as a cutout.  Opaque path
+     * stays a memcpy. */
+    if (a->flags & ATOMIK_ASSET_FLAG_ALPHA_KEY) {
+        pixel_t key = a->alpha_key;
+        for (int row = 0; row < rh; row++) {
+            const pixel_t *src = a->pixels + (size_t)(rsy + row) * a->width + rsx;
+            pixel_t       *dst = bb + (size_t)(rdy + row) * FB_W + rdx;
+            for (int col = 0; col < rw; col++) {
+                pixel_t p = src[col];
+                if (p != key) dst[col] = p;
+            }
+        }
+        return;
+    }
     size_t row_bytes = (size_t)rw * sizeof(pixel_t);
     for (int row = 0; row < rh; row++) {
         const pixel_t *src = a->pixels + (size_t)(rsy + row) * a->width + rsx;

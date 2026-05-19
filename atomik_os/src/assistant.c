@@ -90,63 +90,68 @@ void assistant_tick(void) {
     }
 }
 
-/* Build deterministic two-line explanation for the current active
- * personality + a real metric value.  Class A discipline: every
- * number flows from metric_get() / atomik_event_total(); never
- * fabricated.  When the producer is WAITING we say so explicitly. */
-static void compose_message(char *line1, size_t l1cap,
-                            char *line2, size_t l2cap) {
+/* v0.39-A.5 speech composition.  Three pieces:
+ *   - title   : dominant line in the active personality color
+ *                ("SYNC active" / "STATE active" / "AGENT active").
+ *   - detail  : Class A-safe explanation referencing one live metric.
+ *   - color   : lane color for the title.  ATOMIK_FG_DIM if idle.
+ * The "Atom" name is no longer the dominant header — per ChatGPT
+ * 2026-05-18 "Atom explains ATOMiK; Atom does not become ATOMiK." */
+static void compose_message(char *title, size_t tcap,
+                            char *detail, size_t dcap,
+                            pixel_t *color_out) {
     personality_t p = fabric_active();
-    line1[0] = line2[0] = 0;
+    title[0] = detail[0] = 0;
+    pixel_t c = ATOMIK_FG_DIM;
     switch (p) {
     case PERSONALITY_STATE: {
         const atomik_metric_t *coal = metric_get("state.coalesce_pct");
-        snprintf(line1, l1cap, "STATE is active.");
+        snprintf(title, tcap, "STATE active");
+        c = ATOMIK_SEM_HARDWARE;
         if (coal && coal->source != METRIC_WAITING) {
-            snprintf(line2, l2cap,
-                     "Repeated writes coalesced %.0f%% before commit.",
+            snprintf(detail, dcap,
+                     "Repeated writes coalesce %.0f%%; unchanged regions stay quiet.",
                      coal->value);
         } else {
-            snprintf(line2, l2cap,
-                     "Repeated writes will be coalesced before commit.");
+            snprintf(detail, dcap,
+                     "Repeated writes coalesce before commit.");
         }
         break;
     }
     case PERSONALITY_SYNC: {
         const atomik_metric_t *ops = metric_get("sync.ops_issued");
-        snprintf(line1, l1cap, "SYNC is active.");
+        snprintf(title, tcap, "SYNC active");
+        c = ATOMIK_SEM_SAVINGS;
         if (ops && ops->source != METRIC_WAITING && ops->value > 0) {
-            snprintf(line2, l2cap,
-                     "ATOMiK emitted %u deltas and skipped "
-                     "unchanged replica state.",
+            snprintf(detail, dcap,
+                     "ATOMiK emitted %u deltas; unchanged replica state stays quiet.",
                      (unsigned)ops->value);
         } else {
-            snprintf(line2, l2cap,
-                     "ATOMiK is replica-tracking. Unchanged regions "
-                     "will be skipped.");
+            snprintf(detail, dcap,
+                     "ATOMiK is replica-tracking; unchanged regions stay quiet.");
         }
         break;
     }
     case PERSONALITY_AGENT: {
         const atomik_metric_t *ret = metric_get("agent.ops_issued");
-        snprintf(line1, l1cap, "AGENT is active.");
+        snprintf(title, tcap, "AGENT active");
+        c = ATOMIK_SEM_AGENT;
         if (ret && ret->source != METRIC_WAITING && ret->value > 0) {
-            snprintf(line2, l2cap,
-                     "Hot context: %u regions retained by relevance; "
-                     "cold pruned.",
+            snprintf(detail, dcap,
+                     "%u regions retained by relevance; cold context stays quiet.",
                      (unsigned)ret->value);
         } else {
-            snprintf(line2, l2cap,
-                     "Hot context will be retained by relevance; "
-                     "cold context pruned.");
+            snprintf(detail, dcap,
+                     "Hot context retained by relevance; cold context stays quiet.");
         }
         break;
     }
     default:
-        snprintf(line1, l1cap, "ATOMiK is idle.");
-        snprintf(line2, l2cap, "Waiting for a workload to fire.");
+        snprintf(title, tcap, "ATOMiK idle");
+        snprintf(detail, dcap, "Waiting for a workload to fire.");
         break;
     }
+    if (color_out) *color_out = c;
 }
 
 void assistant_draw(void) {
@@ -210,41 +215,49 @@ void assistant_draw(void) {
         }
     }
 
-    /* Text block — name + 2-line explanation, right of avatar. */
-    char line1[96], line2[160];
-    compose_message(line1, sizeof line1, line2, sizeof line2);
+    /* v0.39-A.5 hierarchy:
+     *   small dim "Atom" label up top (subordinate)
+     *   dominant `<PERSONALITY> active` line in lane color
+     *   supporting detail line (Class A-safe wording)
+     *   "Esc to dismiss" hint
+     * Atom no longer claims the dominant header. */
+    char title[48], detail[160];
+    pixel_t personality_col = accent;
+    compose_message(title, sizeof title, detail, sizeof detail,
+                    &personality_col);
+
     int tx     = av_x + ASSIST_AVATAR_PX + ATOMIK_GRID_L * 2;
-    int text_w = (x + w) - tx - ATOMIK_GRID_L;
-    (void)text_w;
 
-    int row_y = y + ATOMIK_GRID_L + 6;
-    if (font_aa_loaded(FONT_AA_DISPLAY)) {
-        const char *who = "Atom";
-        draw_text_aa(FONT_AA_DISPLAY, tx, row_y, who, accent);
-        row_y += text_height_aa(FONT_AA_DISPLAY) + ATOMIK_GRID_S;
-    } else {
-        draw_text(tx, row_y, "Atom", 3, accent);
-        row_y += text_height(3) + ATOMIK_GRID_S;
-    }
-    /* Line 1 — bold-ish (UI atlas). */
-    if (font_aa_loaded(FONT_AA_UI)) {
-        draw_text_aa(FONT_AA_UI, tx, row_y, line1, ATOMIK_FG);
-        row_y += text_height_aa(FONT_AA_UI) + ATOMIK_GRID_S;
-    } else {
-        draw_text(tx, row_y, line1, 2, ATOMIK_FG);
-        row_y += text_height(2) + ATOMIK_GRID_S;
-    }
-    /* Line 2 — label atlas, dim FG.  Manual wrap at character
-     * boundary — keeps the bubble layout simple. */
+    /* Small "Atom" label — dim slate. */
+    int label_y = y + ATOMIK_GRID_L + 4;
     if (font_aa_loaded(FONT_AA_LABEL)) {
-        draw_text_aa(FONT_AA_LABEL, tx, row_y, line2, ATOMIK_FG_DIM);
-        row_y += text_height_aa(FONT_AA_LABEL) + 6;
+        draw_text_aa(FONT_AA_LABEL, tx, label_y, "Atom",
+                     rgb(0x6A, 0x76, 0x92));
+        label_y += text_height_aa(FONT_AA_LABEL) + 4;
     } else {
-        draw_text(tx, row_y, line2, 1, ATOMIK_FG_DIM);
-        row_y += text_height(1) + 6;
+        draw_text(tx, label_y, "Atom", 1, rgb(0x6A, 0x76, 0x92));
+        label_y += text_height(1) + 4;
     }
 
-    /* Bottom hint — "Esc dismiss · O to cycle personality" small. */
+    /* Dominant personality line in lane color. */
+    int title_y = label_y;
+    if (font_aa_loaded(FONT_AA_DISPLAY)) {
+        draw_text_aa(FONT_AA_DISPLAY, tx, title_y, title,
+                     personality_col);
+        title_y += text_height_aa(FONT_AA_DISPLAY) + ATOMIK_GRID_S;
+    } else {
+        draw_text(tx, title_y, title, 3, personality_col);
+        title_y += text_height(3) + ATOMIK_GRID_S;
+    }
+
+    /* Supporting detail line in dim FG. */
+    if (font_aa_loaded(FONT_AA_UI)) {
+        draw_text_aa(FONT_AA_UI, tx, title_y, detail, ATOMIK_FG_DIM);
+    } else {
+        draw_text(tx, title_y, detail, 2, ATOMIK_FG_DIM);
+    }
+
+    /* "Esc to dismiss" hint, quiet slate. */
     if (font_aa_loaded(FONT_AA_LABEL)) {
         const char *hint = "Esc to dismiss";
         draw_text_aa(FONT_AA_LABEL, tx,

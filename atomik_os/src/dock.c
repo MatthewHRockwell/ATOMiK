@@ -44,7 +44,7 @@ static const struct {
     { "Terminal",  "Terminal",        rgb(0x9D, 0xB7, 0xE8), ACT_OPEN_TERMINAL },
     { "Files",     "Files",           rgb(0xE0, 0xB0, 0x66), ACT_OPEN_FILES    },
     { "Notes",     "Notes",           rgb(0x4F, 0xC3, 0xFF), ACT_OPEN_NOTES    },
-    { "Atom",      "Atom",            rgb(0xB0, 0x8C, 0xFF), ACT_OPEN_ASSISTANT },
+    { "?Atom",     "Atom",            rgb(0xB0, 0x8C, 0xFF), ACT_OPEN_ASSISTANT },
 };
 #define N_ICONS ((int)(sizeof(ICONS) / sizeof(ICONS[0])))
 

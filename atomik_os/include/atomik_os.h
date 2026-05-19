@@ -9,7 +9,7 @@
  * carries a user-visible change. About window, status bar, and the
  * /tmp/atomik_os_version stamp all read from here so the screen output
  * NEVER lies about which build is running. */
-#define AOS_VERSION "v0.39-A"
+#define AOS_VERSION "v0.39-A.5"
 
 /* Display geometry — locked to 1920x1080 XRGB8888 since simplefb is fixed. */
 #define FB_W       1920
@@ -646,14 +646,17 @@ void          state_watch_tick(void);
  * RLE payload: stream of records.  Each record = uint16 count followed
  * by uint32 pixel, meaning "count copies of pixel".  Decode ends when
  * total reconstructed pixel count equals width*height. */
-#define ATOMIK_ASSET_MAGIC      "ATKA"
-#define ATOMIK_ASSET_VERSION    1
-#define ATOMIK_ASSET_FLAG_RLE   0x0001
+#define ATOMIK_ASSET_MAGIC            "ATKA"
+#define ATOMIK_ASSET_VERSION          1
+#define ATOMIK_ASSET_FLAG_RLE         0x0001
+#define ATOMIK_ASSET_FLAG_ALPHA_KEY   0x0002    /* v0.39-A.5 chromakey */
 
 typedef struct {
     uint32_t width;
     uint32_t height;
     pixel_t *pixels;     /* owned, freed via atomik_asset_free */
+    uint32_t flags;
+    pixel_t  alpha_key;  /* valid iff flags & FLAG_ALPHA_KEY */
 } atomik_asset_t;
 
 /* Returns 0 on success; nonzero on any error (file missing, bad magic,

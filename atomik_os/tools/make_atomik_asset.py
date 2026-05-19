@@ -25,10 +25,12 @@ try:
 except ImportError:
     sys.exit("error: PIL/Pillow not installed — pip install Pillow")
 
-MAGIC   = b"ATKA"
-VERSION = 1
-FLAG_RLE = 0x0001
-HEADER_FMT = "<4sHHIIII"          # magic, ver, flags, w, h, payload_bytes, reserved
+MAGIC          = b"ATKA"
+VERSION        = 1
+FLAG_RLE       = 0x0001
+FLAG_ALPHA_KEY = 0x0002          # v0.39-A.5: chromakey transparency
+HEADER_FMT     = "<4sHHIIII"     # magic, ver, flags, w, h, payload_bytes,
+                                  # reserved/alpha_key
 
 
 def to_xrgb_pixels(img: Image.Image) -> list[int]:
@@ -72,9 +74,13 @@ def encode_rle(pixels: list[int]) -> bytes:
     return bytes(out)
 
 
-def write_asset(path: Path, w: int, h: int, flags: int, payload: bytes) -> None:
+def write_asset(path: Path, w: int, h: int, flags: int, payload: bytes,
+                alpha_key: int = 0) -> None:
+    """When FLAG_ALPHA_KEY is set, alpha_key is the XRGB888 chromakey
+    pixel (0x00RRGGBB); board-side blit skips pixels matching it."""
     header = struct.pack(HEADER_FMT,
-                         MAGIC, VERSION, flags, w, h, len(payload), 0)
+                         MAGIC, VERSION, flags, w, h, len(payload),
+                         alpha_key)
     assert len(header) == 24
     path.write_bytes(header + payload)
 
@@ -88,6 +94,10 @@ def main() -> int:
     mode.add_argument("--raw",  action="store_true")
     mode.add_argument("--auto", action="store_true",
                       help="default: pick whichever is smaller")
+    ap.add_argument("--alpha-key", default=None,
+                    help="chromakey RRGGBB hex (e.g. FF00FF). Pixels "
+                         "matching this color are marked transparent at "
+                         "blit time. v0.39-A.5+.")
     args = ap.parse_args()
 
     img = Image.open(args.input)
@@ -111,7 +121,16 @@ def main() -> int:
         else:
             flags, payload, mode_name = 0, raw, "raw (auto)"
 
-    write_asset(out, w, h, flags, payload)
+    alpha_key = 0
+    if args.alpha_key:
+        ak = args.alpha_key.lstrip("#").lower()
+        if len(ak) != 6 or any(c not in "0123456789abcdef" for c in ak):
+            sys.exit(f"error: --alpha-key needs RRGGBB hex, got {args.alpha_key}")
+        alpha_key = int(ak, 16)
+        flags |= FLAG_ALPHA_KEY
+        mode_name += f" +alphakey:{ak}"
+
+    write_asset(out, w, h, flags, payload, alpha_key=alpha_key)
     print(f"wrote {out}  {w}x{h}  {mode_name}  "
           f"raw={len(raw)}  rle={len(rle)}  chosen={len(payload)}  "
           f"ratio={len(payload)/len(raw):.3f}",
