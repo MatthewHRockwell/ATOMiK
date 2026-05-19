@@ -38,13 +38,15 @@
 #define ASSIST_AVATAR_PX          160
 #define ASSIST_MARGIN             ATOMIK_GRID_L
 
-static atomik_asset_t s_avatar;
-static int            s_avatar_loaded = 0;
-static int            s_visible       = 0;
-static unsigned long  s_shown_ms      = 0;
+static atomik_asset_t   s_avatar;
+static int              s_avatar_loaded = 0;
+static int              s_visible       = 0;
+static unsigned long    s_shown_ms      = 0;
+static assistant_mode_t   s_mode          = ASSIST_EXPLAIN;
+static assistant_source_t s_src           = ASSIST_SRC_MANUAL;  /* v0.39-D */
 /* v0.39-B auto-summon state. */
-static unsigned long  s_last_auto_ms     = 0;
-static unsigned long  s_last_dismiss_ms  = 0;
+static unsigned long    s_last_auto_ms     = 0;
+static unsigned long    s_last_dismiss_ms  = 0;
 /* Last frame's bubble rect — used to mark dirty on dismiss so the
  * desktop is repainted cleanly. */
 static int s_last_x, s_last_y, s_last_w, s_last_h;
@@ -63,14 +65,31 @@ int assistant_init(void) {
 }
 
 void assistant_summon(void) {
+    assistant_summon_mode(ASSIST_EXPLAIN);
+}
+
+void assistant_summon_mode(assistant_mode_t m) {
     if (s_visible) {
         /* Toggle off if already showing. */
         assistant_dismiss();
         return;
     }
-    /* Ensure asset is loaded — first summon may happen after assets
-     * landed on the board mid-session. */
     if (!s_avatar_loaded) assistant_init();
+    s_mode     = m;
+    s_src      = ASSIST_SRC_MANUAL;       /* v0.39-D — manual entry */
+    s_visible  = 1;
+    s_shown_ms = anim_now_ms();
+}
+
+void assistant_summon_capture_success(void) {
+    /* v0.39-D capture path — bypasses auto-summon gates so the SUCCESS
+     * halo / "<P> data live" title can be photographed deterministically.
+     * If already visible, hide first so the dirty rect repaints
+     * cleanly (else two halos can overlap during animation). */
+    if (s_visible) { assistant_dismiss(); }
+    if (!s_avatar_loaded) assistant_init();
+    s_mode     = ASSIST_SUCCESS;
+    s_src      = ASSIST_SRC_FIRST_LIVE;
     s_visible  = 1;
     s_shown_ms = anim_now_ms();
 }
@@ -86,15 +105,15 @@ void assistant_dismiss(void) {
     }
 }
 
-/* v0.39-B.1 text-input suppression.  Returns 1 if the topmost window
- * is in a text-input app (terminal / notes / document / files).
- * Match is by title string so we don't need a per-window flag. */
+/* v0.39-B.1 text-input suppression.  v0.39-C: drop Files — browsing
+ * file lists isn't typing.  ChatGPT 2026-05-19: "Suppress only when
+ * its search/filter input owns focus."  TODO: when WM gets a
+ * WM_WINDOW_TEXT_INPUT flag, replace this title-prefix list. */
 static int text_input_focused(void) {
     const window_t *top = wm_topmost();
     if (!top) return 0;
     if (strncmp(top->title, "Terminal", 8)  == 0) return 1;
     if (strncmp(top->title, "Notes",    5)  == 0) return 1;
-    if (strncmp(top->title, "Files",    5)  == 0) return 1;
     if (strncmp(top->title, "Document", 8)  == 0) return 1;
     return 0;
 }
@@ -132,13 +151,15 @@ static int auto_summon_allowed(unsigned long now) {
 void assistant_on_personality_change(personality_t old_p,
                                      personality_t new_p) {
     if (old_p == new_p) return;
-    /* PERSONALITY_NONE → real personality on first activity is what
-     * the audience cares about; the inverse direction is just idle. */
     if (new_p == PERSONALITY_NONE) return;
     unsigned long now = anim_now_ms();
     if (!auto_summon_allowed(now)) return;
     s_last_auto_ms = now;
     if (!s_avatar_loaded) assistant_init();
+    /* v0.39-C: personality switch is an explanation moment.
+     * v0.39-D: title becomes "<P> workload detected". */
+    s_mode     = ASSIST_EXPLAIN;
+    s_src      = ASSIST_SRC_SWITCH;
     s_visible  = 1;
     s_shown_ms = now;
 }
@@ -149,6 +170,10 @@ void assistant_on_first_live(personality_t p) {
     if (!auto_summon_allowed(now)) return;
     s_last_auto_ms = now;
     if (!s_avatar_loaded) assistant_init();
+    /* v0.39-C: data started flowing — good news, success halo.
+     * v0.39-D: title becomes "<P> data live". */
+    s_mode     = ASSIST_SUCCESS;
+    s_src      = ASSIST_SRC_FIRST_LIVE;
     s_visible  = 1;
     s_shown_ms = now;
 }
@@ -170,18 +195,34 @@ void assistant_tick(void) {
  *   - color   : lane color for the title.  ATOMIK_FG_DIM if idle.
  * The "Atom" name is no longer the dominant header — per ChatGPT
  * 2026-05-18 "Atom explains ATOMiK; Atom does not become ATOMiK." */
+static const char *title_suffix_for_src(assistant_source_t src) {
+    /* v0.39-D — title variant per WHY Atom appeared.
+     *   MANUAL     → "<P> active"            (user opened it)
+     *   SWITCH     → "<P> workload detected" (personality changed)
+     *   FIRST_LIVE → "<P> data live"         (lane went LIVE)
+     */
+    switch (src) {
+    case ASSIST_SRC_SWITCH:     return "workload detected";
+    case ASSIST_SRC_FIRST_LIVE: return "data live";
+    case ASSIST_SRC_MANUAL:
+    default:                    return "active";
+    }
+}
+
 static void compose_message(char *title, size_t tcap,
                             char *detail, size_t dcap,
                             pixel_t *color_out) {
     personality_t p = fabric_active();
+    const char *suffix = title_suffix_for_src(s_src);
     title[0] = detail[0] = 0;
     pixel_t c = ATOMIK_FG_DIM;
     switch (p) {
-    /* v0.39-B.1 — support lines shortened to fit within the 640-px
-     * bubble.  Metric leads; narrative trails. */
+    /* v0.39-C — per-personality trailing clauses, less repetition
+     * than B.1's uniform "stays quiet" everywhere.
+     * v0.39-D — title suffix varies with summon source. */
     case PERSONALITY_STATE: {
         const atomik_metric_t *coal = metric_get("state.coalesce_pct");
-        snprintf(title, tcap, "STATE active");
+        snprintf(title, tcap, "STATE %s", suffix);
         c = ATOMIK_SEM_HARDWARE;
         if (coal && coal->source != METRIC_WAITING) {
             snprintf(detail, dcap,
@@ -195,29 +236,31 @@ static void compose_message(char *title, size_t tcap,
     }
     case PERSONALITY_SYNC: {
         const atomik_metric_t *ops = metric_get("sync.ops_issued");
-        snprintf(title, tcap, "SYNC active");
+        snprintf(title, tcap, "SYNC %s", suffix);
         c = ATOMIK_SEM_SAVINGS;
         if (ops && ops->source != METRIC_WAITING && ops->value > 0) {
+            /* v0.39-D — "out of the frame" was too cinematic; collided
+             * with framebuffer / render language.  ChatGPT 2026-05-19. */
             snprintf(detail, dcap,
-                     "%u deltas emitted; unchanged replica state stays quiet.",
+                     "%u deltas emitted; unchanged replicas stay silent.",
                      (unsigned)ops->value);
         } else {
             snprintf(detail, dcap,
-                     "Replica-tracking; unchanged regions stay quiet.");
+                     "Replica-tracking; unchanged replicas stay silent.");
         }
         break;
     }
     case PERSONALITY_AGENT: {
         const atomik_metric_t *ret = metric_get("agent.ops_issued");
-        snprintf(title, tcap, "AGENT active");
+        snprintf(title, tcap, "AGENT %s", suffix);
         c = ATOMIK_SEM_AGENT;
         if (ret && ret->source != METRIC_WAITING && ret->value > 0) {
             snprintf(detail, dcap,
-                     "%u regions retained; cold context stays quiet.",
+                     "%u regions retained; cold context remains parked.",
                      (unsigned)ret->value);
         } else {
             snprintf(detail, dcap,
-                     "Hot context retained; cold context stays quiet.");
+                     "Hot context retained; cold context remains parked.");
         }
         break;
     }
@@ -243,7 +286,10 @@ void assistant_draw(void) {
         if (w < 320) w = 320;
     }
 
-    s_last_x = x; s_last_y = y; s_last_w = w; s_last_h = h;
+    /* v0.39-D: store the EXPANDED rect (including aura) so dismiss
+     * repaints the full breathing halo footprint. */
+    s_last_x = x - 56; s_last_y = y - 28;
+    s_last_w = w + 56 + 12; s_last_h = h + 56;
 
     /* Glass bubble body — same dark navy palette as other chrome. */
     pixel_t body   = rgb(0x10, 0x18, 0x2C);
@@ -270,9 +316,57 @@ void assistant_draw(void) {
     draw_rect(x,              y + radius, 1, h - radius * 2, accent);
     draw_rect(x + w - 1,      y + radius, 1, h - radius * 2, accent);
 
-    /* Avatar — 160 px Atom bust on the left, vertically centered. */
+    /* Avatar — 160 px Atom bust on the left, vertically centered.
+     * v0.39-C: paint a mode-tinted alpha halo behind Atom so the
+     * assistant visibly reflects WHY it appeared.  Same asset, just
+     * a different colored aura.  Halo also pulses with anim_now_ms
+     * so the still-pose character feels alive. */
     int av_x = x + ATOMIK_GRID_L + 4;
     int av_y = y + (h - ASSIST_AVATAR_PX) / 2;
+
+    /* Pick aura color from mode. */
+    pixel_t aura;
+    switch (s_mode) {
+    case ASSIST_SUCCESS:  aura = ATOMIK_SEM_SAVINGS;   break;  /* green  */
+    case ASSIST_THINKING: aura = ATOMIK_SEM_AGENT;     break;  /* violet */
+    case ASSIST_WARNING:  aura = ATOMIK_SEM_WASTE;     break;  /* amber  */
+    case ASSIST_IDLE:     aura = ATOMIK_FG_DIM;        break;
+    case ASSIST_EXPLAIN:
+    default:              aura = ATOMIK_SEM_HARDWARE;  break;  /* cyan   */
+    }
+
+    /* Concentric alpha rings centered on the avatar bounding box.
+     * Three layers: wide soft halo, mid ring, tight inner bloom.
+     * Pulse amplitude driven by anim_now_ms so Atom breathes. */
+    {
+        unsigned long now = anim_now_ms();
+        double phase = (double)(now % 2400) / 2400.0 * 6.2831853;
+        double s = phase;
+        while (s > 3.14159265) s -= 6.2831853;
+        while (s < -3.14159265) s += 6.2831853;
+        double s3 = s*s*s, s5 = s3*s*s;
+        double sn = s - s3/6.0 + s5/120.0;
+        double pulse = 0.7 + 0.3 * sn;
+        int cx = av_x + ASSIST_AVATAR_PX / 2;
+        int cy = av_y + ASSIST_AVATAR_PX / 2;
+        for (int layer = 0; layer < 3; layer++) {
+            int   r_out  = ASSIST_AVATAR_PX / 2 + 18 + layer * 14;
+            int   r_in   = r_out - 12;
+            uint8_t base = (uint8_t)((50 - layer * 14) * pulse);
+            if (base == 0) continue;
+            int r_out2 = r_out * r_out;
+            int r_in2  = r_in  * r_in;
+            for (int dy = -r_out; dy <= r_out; dy++) {
+                for (int dx = -r_out; dx <= r_out; dx++) {
+                    int d2 = dx*dx + dy*dy;
+                    if (d2 <= r_out2 && d2 >= r_in2) {
+                        draw_blend_pixel(cx + dx, cy + dy, aura, base);
+                    }
+                }
+            }
+        }
+    }
+
     if (s_avatar_loaded) {
         atomik_asset_blit(&s_avatar, av_x, av_y);
     } else {
@@ -340,6 +434,11 @@ void assistant_draw(void) {
                      hint, rgb(0x5A, 0x66, 0x82));
     }
 
-    /* Mark the bubble area dirty so the renderer composites it. */
-    dirty_rect(x - 6, y - 6, w + 12, h + 12);
+    /* Mark dirty.  v0.39-D — the aura halo extends ~46 px LEFT of the
+     * bubble (avatar is on the left, outer aura ring radius is 126
+     * pixels around an 80-pixel-radius avatar) and ~20 px above /
+     * below.  6-px pad from v0.39-C left stale pulse pixels on the
+     * upswing.  Use 56 px left, 28 px top/bot, 12 px right to cover
+     * the full breathing aura without painting the whole screen. */
+    dirty_rect(x - 56, y - 28, w + 56 + 12, h + 56);
 }

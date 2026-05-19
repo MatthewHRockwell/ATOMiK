@@ -531,6 +531,12 @@ int main(int argc, char **argv) {
                 /* v0.39-A — 'I' (info) toggles the Atom assistant. */
                 assistant_summon();
                 dirty = 1;
+            } else if (!dirty && (ev.key == 'g' || ev.key == 'G')) {
+                /* v0.39-D capture affordance — force SUCCESS halo so
+                 * the green-aura frame can be screenshotted on demand.
+                 * Hidden / documentation-only key. */
+                assistant_summon_capture_success();
+                dirty = 1;
             } else if (!dirty && (ev.key == 'd' || ev.key == 'D')) {
                 open_document();
                 agent_log(ACT_OPEN_DOCUMENT);

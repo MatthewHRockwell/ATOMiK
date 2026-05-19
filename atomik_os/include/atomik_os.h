@@ -9,7 +9,7 @@
  * carries a user-visible change. About window, status bar, and the
  * /tmp/atomik_os_version stamp all read from here so the screen output
  * NEVER lies about which build is running. */
-#define AOS_VERSION "v0.39-B.1"
+#define AOS_VERSION "v0.39-D"
 
 /* Display geometry — locked to 1920x1080 XRGB8888 since simplefb is fixed. */
 #define FB_W       1920
@@ -690,18 +690,46 @@ void atomik_asset_blit_tiled(const atomik_asset_t *a,
  * personality + one real metric value.  Class B chrome (the
  * character art) driven by Class A state (the active personality
  * and metric values come from the provider). */
-int  assistant_init(void);          /* loads the 160 px asset       */
-void assistant_summon(void);        /* show overlay                  */
-void assistant_dismiss(void);       /* hide overlay                  */
+/* v0.39-C sprite state — same character art, different aura color
+ * so Atom visibly reflects WHY it appeared. */
+typedef enum {
+    ASSIST_IDLE     = 0,
+    ASSIST_EXPLAIN  = 1,    /* default: cyan halo, "explaining" */
+    ASSIST_SUCCESS  = 2,    /* green halo, good-news events     */
+    ASSIST_THINKING = 3,    /* violet, reserved for v0.40       */
+    ASSIST_WARNING  = 4,    /* amber, reserved for STALE / err  */
+} assistant_mode_t;
+
+/* v0.39-D — summon source.  Title variant in the speech bubble keys
+ * off this so the user can see WHY Atom appeared:
+ *   MANUAL     → "SYNC active"           (user hit 'I' or rail cell)
+ *   SWITCH     → "SYNC workload detected" (personality changed)
+ *   FIRST_LIVE → "SYNC data live"         (lane went WAITING→LIVE)
+ * Class A-safe: every variant is deterministic from real signals. */
+typedef enum {
+    ASSIST_SRC_MANUAL     = 0,
+    ASSIST_SRC_SWITCH     = 1,
+    ASSIST_SRC_FIRST_LIVE = 2,
+} assistant_source_t;
+
+int  assistant_init(void);                       /* loads the 160 px asset */
+void assistant_summon(void);                     /* manual: ASSIST_EXPLAIN */
+void assistant_summon_mode(assistant_mode_t m);  /* manual with mode pick  */
+/* v0.39-D capture affordance — force SUCCESS halo + FIRST_LIVE title
+ * so the SUCCESS frame can be screenshotted on demand without waiting
+ * for a real first-LIVE event to fire.  Not user-exposed in the UI
+ * vocabulary; the 'G' hotkey is hidden documentation only. */
+void assistant_summon_capture_success(void);
+void assistant_dismiss(void);                    /* hide overlay           */
 int  assistant_visible(void);
-void assistant_draw(void);          /* paint overlay if visible      */
-void assistant_tick(void);          /* per-frame: auto-dismiss timeout */
+void assistant_draw(void);                       /* paint overlay if visible */
+void assistant_tick(void);                       /* per-frame: auto-dismiss */
 
 /* v0.39-B event-aware hooks.  Both attempt an auto-summon but
  * respect rate-limit (5 s between auto-summons) + dismiss cooldown
  * (30 s after explicit Esc) + an opt-out file /tmp/atomik_assist_auto
- * containing "off".  Manual `assistant_summon()` bypasses all of
- * those checks. */
+ * containing "off" + text-input suppression.  Manual
+ * `assistant_summon()` bypasses all of those checks. */
 void assistant_on_personality_change(personality_t old_p,
                                      personality_t new_p);
 void assistant_on_first_live(personality_t p);
