@@ -9,7 +9,7 @@
  * carries a user-visible change. About window, status bar, and the
  * /tmp/atomik_os_version stamp all read from here so the screen output
  * NEVER lies about which build is running. */
-#define AOS_VERSION "v0.39-A.5"
+#define AOS_VERSION "v0.39-B"
 
 /* Display geometry — locked to 1920x1080 XRGB8888 since simplefb is fixed. */
 #define FB_W       1920
@@ -696,6 +696,15 @@ void assistant_dismiss(void);       /* hide overlay                  */
 int  assistant_visible(void);
 void assistant_draw(void);          /* paint overlay if visible      */
 void assistant_tick(void);          /* per-frame: auto-dismiss timeout */
+
+/* v0.39-B event-aware hooks.  Both attempt an auto-summon but
+ * respect rate-limit (5 s between auto-summons) + dismiss cooldown
+ * (30 s after explicit Esc) + an opt-out file /tmp/atomik_assist_auto
+ * containing "off".  Manual `assistant_summon()` bypasses all of
+ * those checks. */
+void assistant_on_personality_change(personality_t old_p,
+                                     personality_t new_p);
+void assistant_on_first_live(personality_t p);
 
 /* replica_flow.c — v0.37 SYNC personality product story.
  *

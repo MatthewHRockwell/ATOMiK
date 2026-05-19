@@ -14,12 +14,12 @@ Steps per variant:
   2. Detect background by sampling the four corners and flood-fill
      all pixels within Euclidean distance THRESHOLD of the average
      corner color.  Replace them with a single magic key color
-     (#FF00FF magenta) so the asset format's alpha-key feature can
+     (#FE00FE magenta) so the asset format's alpha-key feature can
      treat them as transparent at blit time.
   3. Crop to the character's tight bounding box (non-magenta pixels).
   4. Resize so the longest edge == requested size; preserve aspect.
   5. Save intermediate PNG.
-  6. Invoke make_atomik_asset.py with --alpha-key FF00FF and --auto.
+  6. Invoke make_atomik_asset.py with --alpha-key FE00FE and --auto.
 
 Class B discipline: the assistant art is decorative chrome only.
 Speech / claims still come from the metric provider + event bus.
@@ -37,7 +37,7 @@ HERE         = Path(__file__).resolve().parent
 ATOMIK_OS    = HERE.parent
 DEFAULT_SRC  = ATOMIK_OS / "docs/design/assistant/atomik_assistant_final.png"
 OUT_DIR      = ATOMIK_OS / "assets/assistant"
-MAGIC_KEY    = (255, 0, 255)       # #FF00FF — alpha-key
+MAGIC_KEY    = (0xFE, 0x00, 0xFE)  # #FE00FE — alpha-key (v0.39-B)
 THRESHOLD    = 38                  # background-color tolerance
 SIZES        = [96, 160, 256]
 
@@ -57,7 +57,7 @@ def avg_corner_color(img: Image.Image) -> tuple[int, int, int]:
 
 
 def background_to_magic(img: Image.Image) -> Image.Image:
-    """Replace background-colored pixels with #FF00FF."""
+    """Replace background-colored pixels with #FE00FE."""
     img = img.convert("RGB")
     bg = avg_corner_color(img)
     thresh2 = THRESHOLD * THRESHOLD
@@ -127,9 +127,9 @@ def main() -> int:
 
     raw = Image.open(src).convert("RGB")
     # v0.39-A.5: real alpha cutout via chromakey.  Paint background
-    # pixels with a magic magenta key (#FF00FF) and ship the asset with
-    # --alpha-key FF00FF so the board-side blit skips matching pixels.
-    KEY = (0xFF, 0x00, 0xFF)
+    # pixels with a magic magenta key (#FE00FE) and ship the asset with
+    # --alpha-key FE00FE so the board-side blit skips matching pixels.
+    KEY = (0xFE, 0x00, 0xFE)
     bg = avg_corner_color(raw)
     thresh2 = THRESHOLD * THRESHOLD
     px = raw.load()
@@ -176,7 +176,7 @@ def main() -> int:
         asset_path = out_dir / f"assistant_idle_{sz}.atomik_asset"
         cmd = [sys.executable, str(HERE / "make_atomik_asset.py"),
                str(png_path), str(asset_path), "--auto",
-               "--alpha-key", "FF00FF"]
+               "--alpha-key", "FE00FE"]
         print("  " + " ".join(cmd), flush=True)
         subprocess.check_call(cmd)
         explain_path = out_dir / f"assistant_explain_{sz}.atomik_asset"

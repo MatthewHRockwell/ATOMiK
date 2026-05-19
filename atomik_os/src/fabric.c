@@ -190,6 +190,10 @@ static uint16_t clamp_u16(uint64_t v) {
     return (v > 0xFFFF) ? 0xFFFF : (uint16_t)v;
 }
 
+/* v0.39-B: flip-once flags so Atom can be nudged on the FIRST live
+ * sample per personality lane. */
+static int s_lane_ever_live[PERSONALITY_AGENT + 1] = {0};
+
 static void sample_perf_lane(fabric_lane_t lane, personality_t p,
                              unsigned long now) {
     const perf_sample_t *s = perf_last_for(p);
@@ -197,6 +201,15 @@ static void sample_perf_lane(fabric_lane_t lane, personality_t p,
     /* Only push when a NEW sample has landed since we last looked. */
     if (s->cycles_total == s_last_cycles_total[p]) return;
     s_last_cycles_total[p] = s->cycles_total;
+
+    /* v0.39-B: first sample for this personality lane → nudge Atom
+     * with "lane just went live" explanation, but only for the
+     * currently-active personality (avoid simultaneous nudges from
+     * the seed_metrics_if_empty() bulk warm-up). */
+    if (!s_lane_ever_live[p] && p == s_active) {
+        assistant_on_first_live(p);
+    }
+    s_lane_ever_live[p] = 1;
 
     uint16_t value;
     switch (lane) {
@@ -252,7 +265,16 @@ static void sample_event_lanes(unsigned long now) {
 
 void fabric_tick(void) {
     unsigned long now = anim_now_ms();
+    personality_t prev = s_active;
     s_active = detect(now);
+
+    /* v0.39-B: when the auto-detected (non-override) personality
+     * flips, nudge Atom to explain the new active state.  Manual
+     * override changes already fire EVT_OVERRIDE which can route
+     * separately if we add that path later. */
+    if (s_active != prev && !fabric_override_active()) {
+        assistant_on_personality_change(prev, s_active);
+    }
 
     /* Sample real producers at fixed cadence.  Matches ChatGPT's
      * spec: "Update it whenever a perf sample arrives, a workload

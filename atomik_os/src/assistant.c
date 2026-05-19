@@ -30,16 +30,21 @@
 #include <stdio.h>
 #include <string.h>
 
-#define ASSIST_AUTO_DISMISS_MS  12000
-#define ASSIST_BUBBLE_W         640
-#define ASSIST_BUBBLE_H         220
-#define ASSIST_AVATAR_PX        160
-#define ASSIST_MARGIN           ATOMIK_GRID_L
+#define ASSIST_AUTO_DISMISS_MS    12000
+#define ASSIST_AUTO_RATELIMIT_MS   5000   /* v0.39-B */
+#define ASSIST_DISMISS_COOLDOWN_MS 30000  /* v0.39-B */
+#define ASSIST_BUBBLE_W           640
+#define ASSIST_BUBBLE_H           220
+#define ASSIST_AVATAR_PX          160
+#define ASSIST_MARGIN             ATOMIK_GRID_L
 
 static atomik_asset_t s_avatar;
 static int            s_avatar_loaded = 0;
 static int            s_visible       = 0;
 static unsigned long  s_shown_ms      = 0;
+/* v0.39-B auto-summon state. */
+static unsigned long  s_last_auto_ms     = 0;
+static unsigned long  s_last_dismiss_ms  = 0;
 /* Last frame's bubble rect — used to mark dirty on dismiss so the
  * desktop is repainted cleanly. */
 static int s_last_x, s_last_y, s_last_w, s_last_h;
@@ -73,11 +78,63 @@ void assistant_summon(void) {
 void assistant_dismiss(void) {
     if (!s_visible) return;
     s_visible = 0;
+    s_last_dismiss_ms = anim_now_ms();
     /* Mark the previous bubble rect dirty so the desktop redraws
      * cleanly behind it on the next frame. */
     if (s_last_w > 0 && s_last_h > 0) {
         dirty_rect(s_last_x, s_last_y, s_last_w, s_last_h);
     }
+}
+
+/* v0.39-B auto-summon gating.  Returns 1 if it's OK to fire an
+ * auto-summon right now, 0 otherwise.  Respects three guards:
+ *   - operator opt-out file /tmp/atomik_assist_auto containing "off"
+ *   - 5 s rate-limit between auto-summons
+ *   - 30 s cooldown after an explicit Esc/I dismiss
+ * Manual paths (assistant_summon() called from key router or rail
+ * cell) skip this gate entirely. */
+static int auto_summon_allowed(unsigned long now) {
+    FILE *f = fopen("/tmp/atomik_assist_auto", "r");
+    if (f) {
+        char buf[8] = {0};
+        if (fgets(buf, sizeof buf, f)) {
+            if (strncmp(buf, "off", 3) == 0) { fclose(f); return 0; }
+        }
+        fclose(f);
+    }
+    if (s_last_dismiss_ms > 0 &&
+        (now - s_last_dismiss_ms) < ASSIST_DISMISS_COOLDOWN_MS) {
+        return 0;
+    }
+    if (s_last_auto_ms > 0 &&
+        (now - s_last_auto_ms) < ASSIST_AUTO_RATELIMIT_MS) {
+        return 0;
+    }
+    return 1;
+}
+
+void assistant_on_personality_change(personality_t old_p,
+                                     personality_t new_p) {
+    if (old_p == new_p) return;
+    /* PERSONALITY_NONE → real personality on first activity is what
+     * the audience cares about; the inverse direction is just idle. */
+    if (new_p == PERSONALITY_NONE) return;
+    unsigned long now = anim_now_ms();
+    if (!auto_summon_allowed(now)) return;
+    s_last_auto_ms = now;
+    if (!s_avatar_loaded) assistant_init();
+    s_visible  = 1;
+    s_shown_ms = now;
+}
+
+void assistant_on_first_live(personality_t p) {
+    (void)p;
+    unsigned long now = anim_now_ms();
+    if (!auto_summon_allowed(now)) return;
+    s_last_auto_ms = now;
+    if (!s_avatar_loaded) assistant_init();
+    s_visible  = 1;
+    s_shown_ms = now;
 }
 
 int assistant_visible(void) { return s_visible; }
