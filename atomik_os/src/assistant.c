@@ -86,11 +86,26 @@ void assistant_dismiss(void) {
     }
 }
 
+/* v0.39-B.1 text-input suppression.  Returns 1 if the topmost window
+ * is in a text-input app (terminal / notes / document / files).
+ * Match is by title string so we don't need a per-window flag. */
+static int text_input_focused(void) {
+    const window_t *top = wm_topmost();
+    if (!top) return 0;
+    if (strncmp(top->title, "Terminal", 8)  == 0) return 1;
+    if (strncmp(top->title, "Notes",    5)  == 0) return 1;
+    if (strncmp(top->title, "Files",    5)  == 0) return 1;
+    if (strncmp(top->title, "Document", 8)  == 0) return 1;
+    return 0;
+}
+
 /* v0.39-B auto-summon gating.  Returns 1 if it's OK to fire an
- * auto-summon right now, 0 otherwise.  Respects three guards:
+ * auto-summon right now, 0 otherwise.  Respects four guards:
  *   - operator opt-out file /tmp/atomik_assist_auto containing "off"
  *   - 5 s rate-limit between auto-summons
  *   - 30 s cooldown after an explicit Esc/I dismiss
+ *   - text-input window focused (v0.39-B.1) — don't steal focus
+ *     attention while the operator is typing
  * Manual paths (assistant_summon() called from key router or rail
  * cell) skip this gate entirely. */
 static int auto_summon_allowed(unsigned long now) {
@@ -102,6 +117,7 @@ static int auto_summon_allowed(unsigned long now) {
         }
         fclose(f);
     }
+    if (text_input_focused()) return 0;
     if (s_last_dismiss_ms > 0 &&
         (now - s_last_dismiss_ms) < ASSIST_DISMISS_COOLDOWN_MS) {
         return 0;
@@ -161,13 +177,15 @@ static void compose_message(char *title, size_t tcap,
     title[0] = detail[0] = 0;
     pixel_t c = ATOMIK_FG_DIM;
     switch (p) {
+    /* v0.39-B.1 — support lines shortened to fit within the 640-px
+     * bubble.  Metric leads; narrative trails. */
     case PERSONALITY_STATE: {
         const atomik_metric_t *coal = metric_get("state.coalesce_pct");
         snprintf(title, tcap, "STATE active");
         c = ATOMIK_SEM_HARDWARE;
         if (coal && coal->source != METRIC_WAITING) {
             snprintf(detail, dcap,
-                     "Repeated writes coalesce %.0f%%; unchanged regions stay quiet.",
+                     "%.0f%% coalesced; unchanged regions stay quiet.",
                      coal->value);
         } else {
             snprintf(detail, dcap,
@@ -181,11 +199,11 @@ static void compose_message(char *title, size_t tcap,
         c = ATOMIK_SEM_SAVINGS;
         if (ops && ops->source != METRIC_WAITING && ops->value > 0) {
             snprintf(detail, dcap,
-                     "ATOMiK emitted %u deltas; unchanged replica state stays quiet.",
+                     "%u deltas emitted; unchanged replica state stays quiet.",
                      (unsigned)ops->value);
         } else {
             snprintf(detail, dcap,
-                     "ATOMiK is replica-tracking; unchanged regions stay quiet.");
+                     "Replica-tracking; unchanged regions stay quiet.");
         }
         break;
     }
@@ -195,11 +213,11 @@ static void compose_message(char *title, size_t tcap,
         c = ATOMIK_SEM_AGENT;
         if (ret && ret->source != METRIC_WAITING && ret->value > 0) {
             snprintf(detail, dcap,
-                     "%u regions retained by relevance; cold context stays quiet.",
+                     "%u regions retained; cold context stays quiet.",
                      (unsigned)ret->value);
         } else {
             snprintf(detail, dcap,
-                     "Hot context retained by relevance; cold context stays quiet.");
+                     "Hot context retained; cold context stays quiet.");
         }
         break;
     }
