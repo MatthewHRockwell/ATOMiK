@@ -842,15 +842,27 @@ void status_draw(void) {
         draw_rect(cur_x, pulse_y + pulse_h - 1, pulse_w, 1,
                   ATOMIK_DOCK_BORDER);
 
-        /* 2. Left metric region.  Pull from perf_last_sample so the
-         *    number is honest (Class A).  Color tracks personality. */
+        /* 2. Left metric region.  v0.39-I: bind to the CURRENTLY-ACTIVE
+         *    personality, not the personality recorded in the most
+         *    recent batch.  Previously this used perf_last_sample(),
+         *    which returns the latest sample regardless of personality
+         *    — so a user who flipped from AGENT to SYNC would still
+         *    see "3 HOT" while the rest of the chrome said SYNC active.
+         *    ChatGPT 2026-05-20: "two competing stories in the first
+         *    200 px of chrome."
+         *
+         *    Now: perf_last_for(fabric_active()).  If that personality
+         *    has no batch data yet, skip the readout entirely and let
+         *    the waveform read alone — never borrow another
+         *    personality's number. */
         int metric_w = 64;
-        const perf_sample_t *ps = perf_last_sample();
+        personality_t active = fabric_active();
+        const perf_sample_t *ps = perf_last_for(active);
         if (ps && ps->ops_logical > 0) {
             char mini[24];
             pixel_t mc = ATOMIK_SEM_HARDWARE;
             mini[0] = 0;
-            switch (ps->active_personality) {
+            switch (active) {
             case PERSONALITY_STATE:
                 snprintf(mini, sizeof mini, "%u OPS",
                          (unsigned)ps->ops_logical);
