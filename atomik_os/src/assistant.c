@@ -324,19 +324,41 @@ void assistant_draw(void) {
     int av_x = x + ATOMIK_GRID_L + 4;
     int av_y = y + (h - ASSIST_AVATAR_PX) / 2;
 
-    /* Pick aura color from mode. */
-    pixel_t aura;
+    /* v0.39-E aura palette.
+     * Cyan is the brand identity for Atom; SUCCESS keeps cyan for
+     * the INNER two rings and paints the OUTER ring emerald so the
+     * frame reads "alive with good news" instead of "alert".  Other
+     * modes use a single color across all rings — only SUCCESS gets
+     * the rim-split treatment.  ChatGPT 2026-05-19: "Smallest fix is
+     * not more green everywhere, it is a visible emerald outer rim
+     * while keeping the cyan core."
+     */
+    pixel_t core_aura, rim_aura;
     switch (s_mode) {
-    case ASSIST_SUCCESS:  aura = ATOMIK_SEM_SAVINGS;   break;  /* green  */
-    case ASSIST_THINKING: aura = ATOMIK_SEM_AGENT;     break;  /* violet */
-    case ASSIST_WARNING:  aura = ATOMIK_SEM_WASTE;     break;  /* amber  */
-    case ASSIST_IDLE:     aura = ATOMIK_FG_DIM;        break;
+    case ASSIST_SUCCESS:
+        core_aura = ATOMIK_SEM_HARDWARE;        /* cyan core    */
+        rim_aura  = ATOMIK_SEM_SAVINGS;          /* emerald rim  */
+        break;
+    case ASSIST_THINKING:
+        core_aura = rim_aura = ATOMIK_SEM_AGENT;     /* violet   */
+        break;
+    case ASSIST_WARNING:
+        core_aura = rim_aura = ATOMIK_SEM_WASTE;     /* amber    */
+        break;
+    case ASSIST_IDLE:
+        core_aura = rim_aura = ATOMIK_FG_DIM;
+        break;
     case ASSIST_EXPLAIN:
-    default:              aura = ATOMIK_SEM_HARDWARE;  break;  /* cyan   */
+    default:
+        core_aura = rim_aura = ATOMIK_SEM_HARDWARE;  /* cyan     */
+        break;
     }
 
     /* Concentric alpha rings centered on the avatar bounding box.
      * Three layers: wide soft halo, mid ring, tight inner bloom.
+     * v0.39-E — layer 2 (outermost) uses rim_aura; layers 0/1 use
+     * core_aura.  For EXPLAIN both are cyan, so no visual change.
+     * For SUCCESS the outer ring is emerald, identity stays cyan.
      * Pulse amplitude driven by anim_now_ms so Atom breathes. */
     {
         unsigned long now = anim_now_ms();
@@ -356,11 +378,24 @@ void assistant_draw(void) {
             if (base == 0) continue;
             int r_out2 = r_out * r_out;
             int r_in2  = r_in  * r_in;
+            /* Outer ring (layer 2) takes the rim color; inner rings
+             * take the core color.  v0.39-E split for SUCCESS state. */
+            pixel_t layer_color = (layer == 2) ? rim_aura : core_aura;
+            /* When the rim differs from the core (SUCCESS), give the
+             * outer rim a touch more alpha so green is more visible
+             * than the cyan it sits beside.  Otherwise keep the
+             * gentle fall-off. */
+            uint8_t layer_alpha = base;
+            if (layer == 2 && rim_aura != core_aura) {
+                layer_alpha = (uint8_t)((unsigned)base * 7 / 4);
+                if (layer_alpha > 80) layer_alpha = 80;
+            }
             for (int dy = -r_out; dy <= r_out; dy++) {
                 for (int dx = -r_out; dx <= r_out; dx++) {
                     int d2 = dx*dx + dy*dy;
                     if (d2 <= r_out2 && d2 >= r_in2) {
-                        draw_blend_pixel(cx + dx, cy + dy, aura, base);
+                        draw_blend_pixel(cx + dx, cy + dy, layer_color,
+                                         layer_alpha);
                     }
                 }
             }

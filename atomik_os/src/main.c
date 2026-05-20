@@ -457,6 +457,22 @@ int main(int argc, char **argv) {
                 metric_set_mode(m);
                 dirty = 1;
             }
+            /* v0.39-E capture hotkeys — always-global control codes,
+             * fire BEFORE focused-app dispatch so review captures can
+             * summon Atom even with the Code/Document panel focused.
+             * These are not part of the user-facing UX (printf '\x05'
+             * / printf '\x07' from a deploy script).
+             *   Ctrl+E (0x05) → manual EXPLAIN  (cyan halo)
+             *   Ctrl+G (0x07) → forced SUCCESS (cyan core + emerald rim)
+             */
+            else if (ev.key == 0x05) {
+                assistant_summon();
+                dirty = 1;
+            }
+            else if (ev.key == 0x07) {
+                assistant_summon_capture_success();
+                dirty = 1;
+            }
             /* (3) FOCUSED-APP KEYS — terminal/files/notes/document */
             else if (s_terminal_id) {
                 window_t *top = wm_topmost();
@@ -528,14 +544,12 @@ int main(int argc, char **argv) {
                 agent_log(ACT_OPEN_CHAT);
                 dirty = 1;
             } else if (!dirty && (ev.key == 'i' || ev.key == 'I')) {
-                /* v0.39-A — 'I' (info) toggles the Atom assistant. */
+                /* v0.39-A — 'I' (info) toggles the Atom assistant.
+                 * Note: only fires when no focused app claimed the
+                 * key.  For capture flows that need Atom even with
+                 * a focused window, the Ctrl+E / Ctrl+G hotkeys in
+                 * the always-global section run regardless. */
                 assistant_summon();
-                dirty = 1;
-            } else if (!dirty && (ev.key == 'g' || ev.key == 'G')) {
-                /* v0.39-D capture affordance — force SUCCESS halo so
-                 * the green-aura frame can be screenshotted on demand.
-                 * Hidden / documentation-only key. */
-                assistant_summon_capture_success();
                 dirty = 1;
             } else if (!dirty && (ev.key == 'd' || ev.key == 'D')) {
                 open_document();
