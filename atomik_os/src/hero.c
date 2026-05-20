@@ -230,6 +230,27 @@ static void energy_link(int ax, int ay, int bx, int by,
     }
 }
 
+/* v0.39-J: three-layer alpha rect behind a label heading.
+ * Outer/mid/core rectangles at increasing alpha give a soft semantic
+ * glow without a blur pass.  Active fields get ~2× the alpha of idle
+ * ones so the active personality reads from across the room. */
+static void label_halo(int cx, int y, int tw, int th,
+                       pixel_t color, int active) {
+    uint8_t a0 = active ? 14 :  6;   /* outer */
+    uint8_t a1 = active ? 28 : 12;   /* mid   */
+    uint8_t a2 = active ? 50 : 22;   /* core  */
+    int x = cx - tw / 2;
+    for (int dy = y - 6; dy < y + th + 6; dy++)
+        for (int dx = x - 10; dx < x + tw + 10; dx++)
+            draw_blend_pixel(dx, dy, color, a0);
+    for (int dy = y - 3; dy < y + th + 3; dy++)
+        for (int dx = x - 6; dx < x + tw + 6; dx++)
+            draw_blend_pixel(dx, dy, color, a1);
+    for (int dy = y - 1; dy < y + th + 1; dy++)
+        for (int dx = x - 2; dx < x + tw + 2; dx++)
+            draw_blend_pixel(dx, dy, color, a2);
+}
+
 void hero_draw(void) {
     /* Workspace centerline: midpoint between rail right-edge and
      * Fabric shelf left-edge.  This puts the hero properly centered
@@ -296,9 +317,11 @@ void hero_draw(void) {
      * top of where the three links converge. */
     core_node(core_x, core_y, now);
 
-    /* Labels below the fields — STATE / SYNC / AGENT in scale-2
-     * saturated personality color.  Active personality gets brighter,
-     * idle gets dim. */
+    /* v0.39-J: Labels below the fields — STATE / SYNC / AGENT in
+     * atomik_18 (FONT_AA_UI) with a per-personality semantic halo.
+     * Active field: saturated color heading + full-brightness sublabel.
+     * Idle fields: dim heading + stepped-down sublabel so the contrast
+     * gap is wide enough to read from across the room. */
     int label_y = cy + field_r + ATOMIK_GRID_L * 2;
     const char *names[3] = { "STATE", "SYNC", "AGENT" };
     int        cxs[3]    = { cx_state, cx_sync, cx_agent };
@@ -308,29 +331,35 @@ void hero_draw(void) {
                              ATOMIK_SEM_SAVINGS,
                              ATOMIK_SEM_AGENT };
     for (int i = 0; i < 3; i++) {
+        int is_active = (active == ps[i]);
         const char *n = names[i];
-        pixel_t c = (active == ps[i]) ? cols[i] : ATOMIK_FG_DIM;
+        pixel_t c     = is_active ? cols[i] : ATOMIK_FG_DIM;
+        /* Active sublabel lifts to full foreground; idle steps below
+         * FG_DIM to widen the active/idle contrast gap. */
+        pixel_t sub_c = is_active ? ATOMIK_FG : rgb(0x72, 0x7C, 0x94);
         const char *sub = (i == 0) ? "memory / regions" :
                           (i == 1) ? "replica / skip"   :
                                      "context / prune";
-        int name_h;
+        int name_h, tw;
         if (font_aa_loaded(FONT_AA_UI)) {
-            int tw = text_width_aa(FONT_AA_UI, n);
-            draw_text_aa(FONT_AA_UI, cxs[i] - tw / 2, label_y, n, c);
+            tw     = text_width_aa(FONT_AA_UI, n);
             name_h = text_height_aa(FONT_AA_UI);
+            label_halo(cxs[i], label_y, tw, name_h, cols[i], is_active);
+            draw_text_aa(FONT_AA_UI, cxs[i] - tw / 2, label_y, n, c);
         } else {
-            int tw = text_width(n, 2);
-            draw_text(cxs[i] - tw / 2, label_y, n, 2, c);
+            tw     = text_width(n, 2);
             name_h = text_height(2);
+            label_halo(cxs[i], label_y, tw, name_h, cols[i], is_active);
+            draw_text(cxs[i] - tw / 2, label_y, n, 2, c);
         }
         if (font_aa_loaded(FONT_AA_LABEL)) {
             int sw = text_width_aa(FONT_AA_LABEL, sub);
             draw_text_aa(FONT_AA_LABEL, cxs[i] - sw / 2,
-                         label_y + name_h + 4, sub, ATOMIK_FG_DIM);
+                         label_y + name_h + 4, sub, sub_c);
         } else {
             int sw = text_width(sub, 1);
             draw_text(cxs[i] - sw / 2, label_y + name_h + 4,
-                      sub, 1, ATOMIK_FG_DIM);
+                      sub, 1, sub_c);
         }
     }
 
