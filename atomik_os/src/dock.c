@@ -29,6 +29,16 @@
  *   - Cell taller (80×100) to fit icon + label.
  *   - Rail wider accordingly (112 px).  All other v0.38-L1 behavior
  *     preserved.
+ *
+ * v0.39-G — structure pass:
+ *   - Compact "SYSTEM" header at the top of the rail body (atomik_14,
+ *     dim slate).  Gives the rail a name so it reads as a structured
+ *     capability surface, not an unframed app stack.
+ *   - Thin divider line drawn between the second-to-last and last
+ *     cells (where the Atom cell sits in the agent_score order), so
+ *     the assistant slot visually separates from app slots.
+ *   - Layered-stroke compliant (1 px stroke + alpha halo).
+ *   - All other v0.39-F behavior preserved.
  */
 #include "atomik_os.h"
 #include <string.h>
@@ -44,6 +54,8 @@
 #define RAIL_PADDING     ATOMIK_GRID_L
 #define RAIL_RADIUS      18
 #define LABEL_GAP        ATOMIK_GRID_S
+#define HEADER_H         24      /* v0.39-G: space for "SYSTEM" label  */
+#define HEADER_BELOW_GAP 8       /* v0.39-G: gap between header & first cell */
 
 #define ACTIVE_HALO      3       /* alpha halo around active cell      */
 #define OPEN_DOT_R       4       /* radius of the open-app right dot   */
@@ -74,7 +86,9 @@ static int rail_x(void) { return RAIL_X_MARGIN; }
 static int rail_y(void) { return RAIL_TOP_MARGIN; }
 static int rail_w(void) { return RAIL_PADDING * 2 + ICON_SIZE; }
 static int rail_h(void) {
-    return RAIL_PADDING * 2 + N_ICONS * CELL_HEIGHT + (N_ICONS - 1) * ICON_GAP;
+    /* v0.39-G — extra HEADER_H + HEADER_BELOW_GAP for the SYSTEM header. */
+    return RAIL_PADDING * 2 + HEADER_H + HEADER_BELOW_GAP +
+           N_ICONS * CELL_HEIGHT + (N_ICONS - 1) * ICON_GAP;
 }
 
 static int s_last_order[N_ICONS] = {0,1,2,3,4,5};
@@ -322,8 +336,36 @@ void dock_draw(int hover_index) {
     compute_order(order);
     memcpy(s_last_order, order, sizeof order);
 
+    /* v0.39-G — "SYSTEM" header at the top of the rail body.  Sits
+     * inside the glass slab, above the first cell.  Centered to the
+     * rail width.  Tiny letter-spacing via FONT_AA_LABEL keeps it
+     * quiet — no need to compete with the cell labels below. */
+    const char *hdr = "SYSTEM";
+    pixel_t hdr_col = rgb(0x7A, 0x86, 0xA0);
+    int header_y = ry + RAIL_PADDING + (HEADER_H -
+                       (font_aa_loaded(FONT_AA_LABEL)
+                        ? text_height_aa(FONT_AA_LABEL)
+                        : text_height(1))) / 2;
+    if (font_aa_loaded(FONT_AA_LABEL)) {
+        int tw = text_width_aa(FONT_AA_LABEL, hdr);
+        draw_text_aa(FONT_AA_LABEL,
+                     rx + (rw - tw) / 2,
+                     header_y, hdr, hdr_col);
+    } else {
+        int tw = text_width(hdr, 1);
+        draw_text(rx + (rw - tw) / 2, header_y, hdr, 1, hdr_col);
+    }
+
+    /* v0.39-G — slot index of the Atom cell so we can paint a divider
+     * between the cell ABOVE Atom and Atom itself.  Falls back to -1
+     * (no divider) if not found. */
+    int atom_slot = -1;
+    for (int k = 0; k < N_ICONS; k++) {
+        if (order[k] == 5) { atom_slot = k; break; }   /* 5 = Atom in ICONS[] */
+    }
+
     int ix = rx + RAIL_PADDING;
-    int iy = ry + RAIL_PADDING;
+    int iy = ry + RAIL_PADDING + HEADER_H + HEADER_BELOW_GAP;
     for (int slot = 0; slot < N_ICONS; slot++) {
         int i        = order[slot];
         int hover    = (slot == hover_index);
@@ -334,6 +376,24 @@ void dock_draw(int hover_index) {
         int cw       = ICON_SIZE;
         int ch       = CELL_HEIGHT;
         pixel_t accent = ICONS[i].color;
+
+        /* v0.39-G — thin divider line ABOVE the Atom cell.  Drawn in
+         * the gap between the previous cell and the Atom cell, full
+         * rail-inner width.  Layered-stroke: 1 px solid + alpha-70
+         * halo on each side so it reads as a soft seam, not a hard
+         * border. */
+        if (slot > 0 && slot == atom_slot) {
+            int div_y = icon_y - ICON_GAP / 2;
+            int div_x = rx + RAIL_PADDING + 4;
+            int div_w = cw - 8;
+            draw_rect(div_x, div_y, div_w, 1, ATOMIK_DOCK_BORDER);
+            for (int dx = 0; dx < div_w; dx++) {
+                draw_blend_pixel(div_x + dx, div_y - 1,
+                                 ATOMIK_DOCK_BORDER, 70);
+                draw_blend_pixel(div_x + dx, div_y + 1,
+                                 ATOMIK_DOCK_BORDER, 70);
+            }
+        }
 
         /* === Glass cell body === */
         pixel_t cell_body = rgb(0x14, 0x1E, 0x34);
