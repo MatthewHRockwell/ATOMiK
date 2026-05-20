@@ -804,66 +804,95 @@ void status_draw(void) {
     /* Hairline divider between the two rows for visual separation. */
     draw_rect(0, top_y + row_h + 1, FB_W, 1, ATOMIK_DOCK_BORDER);
 
-    /* === Last-batch headline (mini-readout) ===
+    /* === v0.39-H unified Pulse well — metric + glow waveform ===
      *
-     * v0.34-B: pulls the most recent perf_sample_t and shows the
-     * personality's headline number.  STATE shows ops collapsed,
-     * SYNC shows bytes avoided, AGENT shows hot/cold split.  When no
-     * sample exists (process just started, no batch run) shows nothing
-     * — the personality badge alone is enough chrome.
+     * Previously: a loose "<n> hot / <n>-<n> ops" mini-readout was
+     * drawn BEFORE the pulse, then a "PULSE" label, then a 128 px
+     * well containing a 1 px Bresenham line.  ChatGPT 2026-05-19
+     * called that combo "a small status stub plus an empty dark
+     * well" — neither piece carrying weight on its own.
      *
-     * Honest UI rule (ChatGPT): never fake a number.  When perf_last is
-     * NULL or zero, drop the readout entirely.
+     * Now: a single 200×26 well.  Left ~64 px holds the personality
+     * metric (e.g. "3 HOT", "12-256 OPS", "1024B AVD") rendered in
+     * AA atomik_14 in the personality's semantic color.  Right
+     * ~136 px holds the proper layered-stroke glow waveform from
+     * the investor path (`draw_event_pulse_glow`).
+     *
+     * Class A discipline preserved: metric is only painted when
+     * perf_last_sample() actually has data — no fake numbers.  When
+     * no sample, the metric region is empty and the waveform takes
+     * the whole 200 px.
      */
     {
-        const perf_sample_t *s = perf_last_sample();
-        if (s && s->ops_logical > 0) {
-            char mini[32];
+        int pulse_w = 200;
+        int pulse_h = row_h - 4;
+        int pulse_y = bot_y + 2;
+
+        /* 1. Bed — single soft accent wash so the waveform reads
+         *    embedded in the bar, not pasted on.  Same approach as
+         *    investor v0.38-K2.5A. */
+        pixel_t bed_accent = ATOMIK_SEM_HARDWARE;
+        for (int sy = 0; sy < pulse_h; sy++) {
+            for (int sx = 0; sx < pulse_w; sx++) {
+                draw_blend_pixel(cur_x + sx, pulse_y + sy,
+                                 bed_accent, 8);
+            }
+        }
+        /* Hairline bottom edge so the well has a visible floor. */
+        draw_rect(cur_x, pulse_y + pulse_h - 1, pulse_w, 1,
+                  ATOMIK_DOCK_BORDER);
+
+        /* 2. Left metric region.  Pull from perf_last_sample so the
+         *    number is honest (Class A).  Color tracks personality. */
+        int metric_w = 64;
+        const perf_sample_t *ps = perf_last_sample();
+        if (ps && ps->ops_logical > 0) {
+            char mini[24];
+            pixel_t mc = ATOMIK_SEM_HARDWARE;
             mini[0] = 0;
-            switch (s->active_personality) {
+            switch (ps->active_personality) {
             case PERSONALITY_STATE:
-                snprintf(mini, sizeof mini, "%u-%u ops",
-                         (unsigned)s->ops_logical,
-                         (unsigned)s->ops_issued);
+                snprintf(mini, sizeof mini, "%u OPS",
+                         (unsigned)ps->ops_logical);
+                mc = ATOMIK_SEM_HARDWARE;
                 break;
             case PERSONALITY_SYNC:
-                if (s->bytes_avoided > 0) {
-                    snprintf(mini, sizeof mini, "%uB avoided",
-                             (unsigned)s->bytes_avoided);
+                if (ps->bytes_avoided > 0) {
+                    snprintf(mini, sizeof mini, "%uB AVD",
+                             (unsigned)ps->bytes_avoided);
                 } else {
-                    snprintf(mini, sizeof mini, "%u/%u emitted",
-                             (unsigned)s->ops_issued,
-                             (unsigned)s->regions_unique);
+                    snprintf(mini, sizeof mini, "%u EMIT",
+                             (unsigned)ps->ops_issued);
                 }
+                mc = ATOMIK_SEM_SAVINGS;
                 break;
             case PERSONALITY_AGENT:
-                snprintf(mini, sizeof mini, "%u hot",
-                         (unsigned)s->ops_issued);
+                snprintf(mini, sizeof mini, "%u HOT",
+                         (unsigned)ps->ops_issued);
+                mc = ATOMIK_SEM_AGENT;
                 break;
             default: break;
             }
-            if (mini[0]) {
-                draw_text(cur_x, ty_bot, mini, 1, ATOMIK_FG_DIM);
-                cur_x += text_width(mini, 1) + ATOMIK_GRID_L;
+            if (mini[0] && font_aa_loaded(FONT_AA_LABEL)) {
+                int th = text_height_aa(FONT_AA_LABEL);
+                int my = pulse_y + (pulse_h - th) / 2;
+                draw_text_aa(FONT_AA_LABEL,
+                             cur_x + ATOMIK_GRID_S, my, mini, mc);
+            } else if (mini[0]) {
+                int th = text_height(1);
+                int my = pulse_y + (pulse_h - th) / 2;
+                draw_text(cur_x + ATOMIK_GRID_S, my, mini, 1, mc);
             }
         }
-    }
 
-    /* === Event-pulse mini-waveform — v0.38-C ===
-     *
-     * Sparkline of atomik_event_total() deltas over the last ~5 s
-     * (32 samples × 150 ms).  Real data — the same event ring every
-     * other surface consumes.  Visual signal: "is the system alive
-     * and producing events right now?".  Cyan (HARDWARE) so it reads
-     * as system telemetry, not application state. */
-    {
-        const char *pulse_label = "PULSE";
-        draw_text(cur_x, ty_bot, pulse_label, 1, ATOMIK_FG_DIM);
-        cur_x += text_width(pulse_label, 1) + ATOMIK_GRID_S;
-        int pulse_w = 128;
-        int pulse_h = row_h - 4;
-        int pulse_y = bot_y + 2;
-        draw_event_pulse(cur_x, pulse_y, pulse_w, pulse_h);
+        /* 3. Right waveform region.  Glow waveform (8/4/2 layered
+         *    halo + sine baseline + hot dot at the most recent
+         *    sample).  Reuses the investor-grade renderer. */
+        int wave_x = cur_x + metric_w;
+        int wave_w = pulse_w - metric_w;
+        draw_event_pulse_glow(wave_x, pulse_y, wave_w, pulse_h,
+                              ATOMIK_SEM_HARDWARE);
+
         cur_x += pulse_w + ATOMIK_GRID_L;
     }
 
