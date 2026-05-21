@@ -8,7 +8,7 @@ Paste the contents into a fresh Claude Code session, or just say:
 
 ## WHERE WE ARE
 
-**Latest commit: `aae5ec6` — v0.39-J: Hero Label Lift — semantic halo + sublabel contrast**
+**Latest commit: `b6b8e92` — v0.39-K: Top Rail De-noise (screenshot)**
 
 Working directory: `/home/mattrock/Projects/ATOMiK/atomik_os`
 Branch: `main`
@@ -38,21 +38,21 @@ review → implement next slice.
 - v0.39-I: Pulse Bar semantic alignment (perf_last_for vs perf_last_sample)
 - v0.39-J: Hero Label Lift — 3-layer semantic halo + sublabel contrast
 
-**Current scores (post v0.39-J, deployed — verdict PENDING):**
+**FINAL scores — v0.39-K arc COMPLETE (2026-05-21):**
 
-| Surface     | Score | Status                  |
-|-------------|-------|-------------------------|
-| Pulse Bar   | 93    | PARKED (v0.39-I verdict)|
-| Cap Rail    | 93    | PARKED                  |
-| Hero        | 92→?  | v0.39-J shipped         |
-| Fabric      | 93    | parked                  |
-| Background  | 94    | parked                  |
-| Typography  | 92→?  | v0.39-J shipped         |
-| Composition | 94    | parked                  |
-| Atom        | 95    | PARKED                  |
-| **Overall** | **94→?** | Target: **95**       |
+| Surface     | Score | Status |
+|-------------|-------|--------|
+| Pulse Bar   | 94    | DONE   |
+| Cap Rail    | 93    | DONE   |
+| Hero        | 93    | DONE   |
+| Fabric      | 93    | DONE   |
+| Background  | 94    | DONE   |
+| Typography  | 94    | DONE   |
+| Composition | 95    | DONE   |
+| Atom        | 95    | DONE   |
+| **Overall** | **95** | **TARGET HIT** |
 
-**PENDING:** Deploy v0.39-J to board, capture screenshot, get ChatGPT verdict.
+**Visual polish arc v0.38→v0.39-K is CLOSED. Do not start v0.39-L.**
 
 ---
 
@@ -127,10 +127,21 @@ UART has known byte-duplication bug (~1 in 28k chars).
 
 ## WHAT TO DO NEXT
 
-1. **Deploy v0.39-J to board** — `deploy.py` in `atomik_os/`, binary at `build/atomik_os`
-2. **Capture screenshot** — SIGSTOP + dd /dev/fb0, pull via UART, save as `deploy_v0.39-J_rail.png`
-3. **Get ChatGPT verdict** — use `docs/CODEX_RESUME.md` (already updated for v0.39-J)
-4. **Target: Overall 95** — Hero + Typography both at 92, need one more point
+Visual polish arc is **closed at v0.39-K / Overall 95**.
+
+Next work should be live demo substance — pick one:
+- **Workload switching** — keyboard-driven personality cycling with visible hardware state change
+- **Board-local control** — no laptop, standalone demo flow
+- **New Class A surface** — a new panel or lane that proves the delta-state architecture in a way the current surfaces don't
+- **SD/QSPI persistent boot** — eliminate the 3-5 min cold-boot recovery ritual
+
+Do NOT start cosmetic v0.39-L work. ChatGPT directive: "additional micro-polish risks turning into churn."
+
+## DEPLOY NOTES (post v0.38-D hardening)
+
+Known issue: `deploy.py`'s bare `slow()` nohup launch line fails ~50% of the time due to UART byte duplication.
+Workaround: use `/tmp/launch_v039j_fixed.py` (update EXPECTED version) + `/tmp/shot_v039j.py` (update output filename).
+These use `sh /tmp/launch.sh` (short, safe) + deploy.py's proven `cmd_capture` for pulls.
 
 ---
 
