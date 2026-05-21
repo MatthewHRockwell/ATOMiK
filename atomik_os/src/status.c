@@ -937,33 +937,11 @@ void status_draw(void) {
     }
     int hint_x = (wm_count() > 0) ? dots_x + ATOMIK_GRID_M : cur_x;
 
-    /* Key hints — dim, last in the left segment because they're
-     * informational (which keys exist) not state (which one is
-     * currently happening).  Hidden in investor mode — v0.38-J++ rule:
-     * investors don't need to see what keys exist on the operator's
-     * keyboard. */
-    if (!is_investor) {
-        const char *hint =
-            "[R]es [P]ers   [Tab]/[Esc]/[^W]   "
-            "[D] [W] [S] | [A] [M] [T] [F] [N]";
-        draw_text(hint_x, ty_bot, hint, 1, ATOMIK_FG_DIM);
-    }
-
-    /* Center: agent prediction (violet = AGENT in the semantic grammar).
-     * The previous version used ATOMIK_ACCENT (cyan), which conflicted
-     * with the hardware-meaning of cyan.  Switching to violet makes
-     * "agent reasoning" instantly distinguishable from system-state
-     * chrome at a glance. */
-    action_t pred = agent_predict();
-    if (pred != ACT_NONE) {
-        char buf[80];
-        /* ASCII '>>' instead of '▸' (U+25B8): the bitmap font is 8-bit
-         * single-byte and renders multibyte UTF-8 codepoints as '????'
-         * placeholder boxes — user-confirmed 2026-05-07. */
-        snprintf(buf, sizeof buf, ">> %s", agent_action_name(pred));
-        int tw = text_width(buf, 1);
-        draw_text((FB_W - tw) / 2, ty_top, buf, 1, ATOMIK_SEM_AGENT);
-    }
+    /* v0.39-K: shortcut legend and agent-prediction center text removed.
+     * Both were operator/debug chrome that made the rail feel like a
+     * terminal rather than a finished OS surface.  Keys still work;
+     * the agent prediction surfaces through the Atom assistant instead. */
+    (void)hint_x;
 
     /* Right: wallet/spend (violet — agent activity) || cpu/uptime (cyan
      * — hardware) || version (dim).  Three-segment design lets you read
