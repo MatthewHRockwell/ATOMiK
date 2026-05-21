@@ -1,5 +1,5 @@
 # ATOMiK Desk — Codex/ChatGPT Resume Prompt
-# Updated: 2026-05-20 post v0.39-I
+# Updated: 2026-05-20 post v0.39-J
 
 ---
 
@@ -8,7 +8,7 @@
 Attach all of the following images to your message:
 
 1. **The screenshot to review:**
-   `/home/mattrock/Projects/ATOMiK/atomik_os/docs/screenshots/deploy_v0.39-I_rail.png`
+   `/home/mattrock/Projects/ATOMiK/atomik_os/docs/screenshots/deploy_v0.39-J_rail.png`
 
 2. **Concept reference images (use for fidelity comparison):**
    - `/home/mattrock/Projects/ATOMiK/docs/design/concept_images/07_atomik_desk_landing.png`
@@ -74,38 +74,42 @@ Three personalities:
 
 | Surface     | Score | Status                              |
 |-------------|-------|-------------------------------------|
-| Pulse Bar   | 92    | v0.39-I shipped — **YOUR VERDICT PENDING** |
+| Pulse Bar   | 93    | PARKED (v0.39-I verdict)            |
 | Cap Rail    | 93    | PARKED                              |
-| Hero        | 92    | parked                              |
+| Hero        | 92    | v0.39-J shipped — **YOUR VERDICT PENDING** |
 | Fabric      | 93    | parked                              |
 | Background  | 94    | parked                              |
-| Typography  | 92    | parked                              |
+| Typography  | 92    | v0.39-J shipped — **YOUR VERDICT PENDING** |
 | Composition | 94    | parked                              |
 | Atom        | 95    | PARKED                              |
 | **Overall** | **94** | **Target: 95**                     |
 
 ---
 
-## WHAT CHANGED IN v0.39-I (the screenshot you're reviewing)
+## WHAT CHANGED IN v0.39-J (the screenshot you're reviewing)
 
-**Problem v0.39-I fixed:**
-In v0.39-H, the Pulse Bar's integrated metric readout showed "3 HOT" (violet /
-AGENT personality color) while the top badge and Hero both showed SYNC as the
-active personality. Two competing stories on the same screen.
+**Directive:** Hero Label Lift — raise Hero + Typography together by tightening
+the three personality field labels. Make STATE/SYNC/AGENT readable from across
+the room without moving any geometry.
 
-**The fix:**
-The metric now reads `perf_last_for(fabric_active())` — it pulls from the
-**currently active personality's** batch, not the most-recent-any-personality
-batch. If the active personality has no batch data yet, the metric region is
-left empty (waveform-only). This is Class A: never borrow another
-personality's number.
+**Three changes in `hero.c`:**
 
-**What v0.39-H introduced that carries forward:**
-- 200 px unified pulse well (was 128 px).
-- Left ~64 px: AA `atomik_14` personality metric in semantic color.
-- Right ~136 px: 8/4/2 layered halo glow waveform (`draw_event_pulse_glow`).
-- Waveform color stays **cyan** (system-level event stream, personality-neutral).
-- "PULSE" label + separate mini-readout removed.
+1. **Semantic halo behind each heading** — a 3-layer alpha rect (outer/mid/core
+   at 14/28/50 alpha for active, 6/12/22 for idle) gives each label a soft
+   colored glow in its personality color. The active field glows; idle fields
+   are visibly subordinate.
+
+2. **Sublabel contrast gap widened** — active sublabel lifts from `ATOMIK_FG_DIM`
+   to `ATOMIK_FG` (full brightness). Idle sublabels step DOWN to
+   `rgb(0x72, 0x7C, 0x94)` — darker than the old flat dim — so the active/idle
+   gap is wide enough to read across the room.
+
+3. **Heading font unchanged** — `FONT_AA_UI` (atomik_18) as directed. No
+   geometry moved, no metrics added, no background changes.
+
+**Previous slice context:**
+- v0.39-I (Pulse Bar) scored **93** — PARKED.
+- Hero was at **92**, Typography at **92**, the last two laggards before Overall 95.
 
 ---
 
@@ -153,20 +157,22 @@ Source-aware title above windows: "active" / "workload detected" / "data live".
 
 **1. Score the full rubric** (all 8 surfaces + Overall).
 
-**2. Verdict on Pulse Bar specifically:**
-- Does the metric now match the active personality shown in the top badge?
-- If the metric region is empty (no active-personality batch yet), does the
-  waveform-only well read as "instrument waiting" or "broken / empty"?
-- Should the waveform color track the active personality, or stay cyan?
+**2. Verdict on Hero + Typography specifically:**
+- Do the STATE/SYNC/AGENT headings now read as a clear active/idle hierarchy?
+- Is the semantic halo subtle enough not to fight the energy field glow, or
+  does it add visual noise?
+- Does the active sublabel (full `ATOMIK_FG`) feel legible, or does it
+  compete with the heading color?
+- Does the idle sublabel step-down feel right, or is it now too dim to read?
 
 **3. Next-slice directive:**
-- If Pulse Bar crosses 93, name the smallest change to push Overall from 94 → 95.
-  Remaining laggards: Hero (92), Typography (92).
-- If Pulse Bar is still 92, name v0.39-J as a tight, single-scope fix.
+- If Hero + Typography both cross 93, name the smallest change to push
+  Overall from 94 → 95.
+- If still 92, name v0.39-K as a tight, single-scope fix.
 - Or: is the desktop effectively "done" at 94 and the right move is to
   pivot off cosmetic polish entirely?
 
 **Response format:**
 1. Full rubric scores.
-2. Verdict paragraph on the changed surface.
-3. v0.39-J directive: name, scope (one paragraph), nothing more.
+2. Verdict paragraph on Hero + Typography.
+3. v0.39-K directive: name, scope (one paragraph), nothing more.
