@@ -1,0 +1,6 @@
+the_ROM_image:
+{
+    [bootloader] /home/mattrock/Projects/ATOMiK/hardware/zynq/fsbl_build/minimal_fsbl/fsbl.elf
+    /home/mattrock/Projects/ATOMiK/hardware/zynq/litex-build-nax64-sdboot/gateware/hamgeek_rk7020f.bit
+    [load = 0x10000000, startup = 0x10000000] /home/mattrock/Projects/ATOMiK/hardware/zynq/ps_loader/build/ps_loader.elf
+}
