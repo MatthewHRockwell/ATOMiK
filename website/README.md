@@ -34,3 +34,23 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Lead Alerts
+
+The contact and evaluation forms post to `/api/subscribe`. Production stores leads in Stripe customer metadata when `STRIPE_SECRET_KEY` is configured. For immediate human notification, set `LEAD_WEBHOOK_URL` in Vercel Production.
+
+Supported webhook targets:
+
+- Slack incoming webhook: inferred from `hooks.slack.com`, or set `LEAD_WEBHOOK_FORMAT=slack`.
+- Discord webhook: inferred from `discord.com`, or set `LEAD_WEBHOOK_FORMAT=discord`.
+- Make, Zapier, CRM, or custom endpoint: use `LEAD_WEBHOOK_FORMAT=generic` or omit it.
+
+Useful commands:
+
+```bash
+vercel env add LEAD_WEBHOOK_URL Production
+vercel env add LEAD_WEBHOOK_FORMAT Production
+vercel deploy --prod --yes
+```
+
+If no webhook is configured, submissions still persist to Stripe and emit `[LEAD_ALERT]` plus `[LEAD_ALERT_NO_WEBHOOK]` in Vercel function logs.
