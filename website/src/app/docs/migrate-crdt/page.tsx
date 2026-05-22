@@ -605,7 +605,7 @@ export default function MigrateCrdtPage() {
       <h2 className="text-2xl font-bold mb-4">Performance Comparison</h2>
       <p className="text-sm mb-6" style={{ color: "#8888a0" }}>
         Where CRDTs incur per-node or per-operation overhead for causality tracking,
-        ATOMiK operates with constant-time, constant-space accumulation.
+        ATOMiK uses a compact accumulator path in the model; timing and space claims should be validated against the chosen implementation and workload.
       </p>
       <div
         className="rounded-xl border overflow-x-auto mb-12"

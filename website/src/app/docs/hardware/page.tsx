@@ -10,9 +10,15 @@ export const metadata: Metadata = {
 const artifacts = [
   {
     label: "HARDWARE_VALIDATED",
-    title: "Current v0.38-I live prototype screenshot",
-    href: "https://github.com/MatthewHRockwell/ATOMiK/blob/main/website/public/08-current-live-atomik-desk-v038i.png",
-    body: "ATOMiK Desk v0.38-I prototype UI running on live hardware. UI claims are limited to what the screenshot shows.",
+    title: "Current v0.39-K live prototype screenshot",
+    href: "/09-current-live-atomik-desk-v039k.png",
+    body: "ATOMiK Desk v0.39-K prototype UI running on live Zynq hardware. UI claims are limited to what the screenshot shows.",
+  },
+  {
+    label: "BUILD_ARTIFACT",
+    title: "Standalone SD boot path artifacts",
+    href: "#standalone-boot",
+    body: "Minimal FSBL, fsbl.elf, boot.bif, and BOOT.bin artifacts are local build outputs. Power-on standalone validation remains the next hardware gate before a public GitHub artifact link is used.",
   },
   {
     label: "HARDWARE_VALIDATED",
@@ -54,6 +60,16 @@ export default function HardwarePage() {
           </Link>
         ))}
       </div>
+
+      <section id="standalone-boot" className="mt-8 rounded-lg p-5" style={{ background: "#12121a", border: "1px solid #1d324a" }}>
+        <p className="text-[11px] font-semibold uppercase" style={{ color: "#22d3ee" }}>
+          NEXT HARDWARE GATE
+        </p>
+        <h2 className="mt-2 text-lg font-bold">Standalone SD boot validation</h2>
+        <p className="mt-2 text-sm leading-6" style={{ color: "#9fb1c7" }}>
+          The autoboot bitstream and BOOT.bin path are assembled locally. This page does not link to an unpublished GitHub directory; once power-on validation and public artifacts are both present, the evidence link can be promoted.
+        </p>
+      </section>
     </div>
   );
 }

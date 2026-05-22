@@ -17,32 +17,28 @@ type Release = {
 
 const releases: Release[] = [
   {
-    version: "v0.38-I",
-    title: "ATOMiK Desk Live Prototype UI Proof",
-    date: "2026-05-14",
+    version: "v0.39-K",
+    title: "ATOMiK Desk Current Live Prototype UI Proof",
+    date: "2026-05-21",
     category: "hardware",
     items: [
-      "Recorded live-hardware screenshot captured as a public proof artifact",
-      "Dock polish, Pulse Bar, dark/cyan desktop surface, and Resource Fabric panel visible in the recorded prototype UI",
-      "Classified as HARDWARE_VALIDATED, not as commercial product UI or benchmark evidence",
-      "Public proof asset: 08-current-live-atomik-desk-v038i.png",
+      "Current live-hardware screenshot promoted as the public ATOMiK Desk proof artifact",
+      "Top rail de-noise, v0.39-K visual hierarchy, Pulse Bar, Cap Rail, Hero, and Fabric surfaces visible in the captured prototype UI",
+      "Classified as HARDWARE_VALIDATED for the UI surface, not as a commercial desktop product or performance benchmark",
+      "Public proof asset: 09-current-live-atomik-desk-v039k.png",
     ],
   },
   {
     version: "",
-    title: "Phase 10: Investor Demo System",
+    title: "Phase 10: Internal Investor Demo System",
     date: "2026-04-28",
     category: "hardware",
     items: [
-      "15+ interactive demo screens with attract mode, State Storm, Break It challenge, Dollar-Per-Second Race",
-      "90-second scripted investor demo with Claude auto-narration (demo_claude_drive.py)",
-      "Freeze Frame closing with three proof cards: 456x benchmark, hardware validation, formal verification",
-      "State Storm visualization: software drowns in O(n) scans while ATOMiK stays sparse at O(1)",
-      "Dollar-Per-Second Race: real-time cost counters at 100K acceleration, ATOMiK vs traditional",
-      "Two-tier Claude integration: laptop-side operator + board-side command executor (13/13 commands pass)",
-      "Slide sync (slide_sync.py + slide_advance.sh) for PowerPoint presentation coordination",
-      "Framebuffer screenshot capture (board_selfie.py) for proof artifacts",
-      "Browser control plane with live metrics streaming",
+      "Internal interactive demo screens for explaining state waste, delta accumulation, and hardware proof boundaries",
+      "Scripted operator demo flow with proof cards for hardware validation, formal verification, and benchmark review",
+      "State Storm visualization: software scans are contrasted with delta-state accumulation as a narrative model",
+      "Cost and race visualizations are treated as demo surfaces unless linked to measured artifacts",
+      "Slide sync, framebuffer screenshot capture, and browser control plane built for live presentation operations",
     ],
   },
   {
@@ -54,8 +50,8 @@ const releases: Release[] = [
       "End-to-end workload: track N memory regions, detect changes via ATOMiK vs memcmp",
       "ATOMiK detection: O(1) per region (~262 cycles), independent of buffer size",
       "Software memcmp: O(N \u00d7 size), degrades above 4 KB D-cache boundary",
-      "8\u00d74 KB regions: 5,983\u00d7 speedup | 64\u00d71 KB regions: 251\u00d7 speedup",
-      "ATOMiK monitoring rate: 1.2 million regions/sec at 64 contexts",
+      "Measured results retained in benchmark artifacts; quote exact speedups only from the linked evidence files",
+      "Monitoring-rate claims require the matching board-run artifact and interpretation note",
       "libatomik C runtime with /dev/mem backend and MMIO ordering fences",
     ],
   },
@@ -74,7 +70,7 @@ const releases: Release[] = [
   },
   {
     version: "v0.5.0",
-    title: "Kernel Module — Enterprise Features",
+    title: "Kernel Module — Archived Evaluation Experiments",
     date: "2026-03-16",
     category: "tools",
     items: [
@@ -85,7 +81,7 @@ const releases: Release[] = [
       "Prometheus exporter with health endpoints (/healthz, /ready)",
       "Grafana dashboard (3-row pre-built JSON)",
       "Kubernetes: DaemonSet, Helm chart with RBAC + NetworkPolicy + probes",
-      "License key expiry (YYMM encoding) for subscription enforcement",
+      "License-key experiment archived; public evaluation is now request-based",
     ],
   },
   {
@@ -190,7 +186,7 @@ const releases: Release[] = [
     date: "2025-09",
     category: "hardware",
     items: [
-      "Single-bank ATOMiK @ 81 MHz, 94.5 Mops/s",
+      "Single-bank ATOMiK timing and throughput documented in historical hardware artifacts",
       "PicoRV32 integration, SPI XIP boot",
       "11/11 hardware tests, +23% Fmax margin",
     ],
@@ -256,25 +252,6 @@ export default function ChangelogPage() {
           <p className="text-xl leading-relaxed max-w-3xl" style={{ color: "#8888a0" }}>
             Every release, every improvement.
           </p>
-          <div className="mt-4">
-            <a
-              href="/feeds/changelog.xml"
-              className="inline-flex items-center gap-2 text-sm font-mono px-4 py-2 rounded-lg border transition-colors hover:bg-white/5"
-              style={{ borderColor: "#1e1e2e", color: "#d4a843" }}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-              >
-                <circle cx="6.18" cy="17.82" r="2.18" />
-                <path d="M4 4.44v2.83c7.03 0 12.73 5.7 12.73 12.73h2.83c0-8.59-6.97-15.56-15.56-15.56zm0 5.66v2.83c3.9 0 7.07 3.17 7.07 7.07h2.83c0-5.47-4.43-9.9-9.9-9.9z" />
-              </svg>
-              Subscribe via RSS
-            </a>
-          </div>
         </div>
       </section>
 

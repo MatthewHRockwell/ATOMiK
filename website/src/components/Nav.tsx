@@ -8,10 +8,12 @@ export default function Nav({ active }: { active?: string }) {
   const navRef = useRef<HTMLElement>(null);
 
   const links = [
-    { href: "/docs", label: "Docs" },
+    { href: "/", label: "Product" },
+    { href: "/solutions", label: "Use Cases" },
     { href: "/benchmarks", label: "Proof" },
+    { href: "/investor-brief", label: "Investors" },
     { href: "/pricing", label: "Evaluation" },
-    { href: "/about/roadmap", label: "Roadmap" },
+    { href: "/about", label: "About" },
     { href: "https://github.com/MatthewHRockwell/ATOMiK", label: "GitHub" },
   ];
 
@@ -28,7 +30,7 @@ export default function Nav({ active }: { active?: string }) {
 
   useEffect(() => {
     function handleResize() {
-      if (window.innerWidth >= 768) {
+      if (window.innerWidth >= 1024) {
         setMenuOpen(false);
       }
     }
@@ -42,7 +44,7 @@ export default function Nav({ active }: { active?: string }) {
       className="sticky top-0 z-50 border-b backdrop-blur-md"
       style={{ background: "rgba(7, 11, 18, 0.88)", borderColor: "#1d324a" }}
     >
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
         <Link
           href="/"
           className="text-lg font-bold no-underline transition-opacity hover:opacity-80"
@@ -51,7 +53,7 @@ export default function Nav({ active }: { active?: string }) {
           ATOM<span style={{ color: "#22d3ee" }}>i</span>K
         </Link>
 
-        <div className="hidden items-center gap-6 text-sm md:flex" style={{ color: "#9fb1c7" }}>
+        <div className="hidden items-center gap-4 text-sm lg:flex" style={{ color: "#9fb1c7" }}>
           {links.map((link) =>
             link.label === active ? (
               <span key={link.href} className="font-medium text-white">
@@ -72,12 +74,12 @@ export default function Nav({ active }: { active?: string }) {
             className="rounded-lg px-4 py-2 text-sm font-semibold text-white no-underline transition-opacity hover:opacity-90"
             style={{ background: "#4f8fff" }}
           >
-            Request Evaluation Access
+            Request Technical Evaluation
           </Link>
         </div>
 
         <button
-          className="flex h-8 w-8 flex-col items-center justify-center gap-[5px] md:hidden"
+          className="flex h-8 w-8 flex-col items-center justify-center gap-[5px] lg:hidden"
           onClick={() => setMenuOpen((prev) => !prev)}
           aria-label={menuOpen ? "Close menu" : "Open menu"}
           aria-expanded={menuOpen}
@@ -104,14 +106,14 @@ export default function Nav({ active }: { active?: string }) {
       </div>
 
       <div
-        className="overflow-hidden transition-all duration-300 md:hidden"
+        className="overflow-hidden transition-all duration-300 lg:hidden"
         style={{
           maxHeight: menuOpen ? `${(links.length + 1) * 48 + 24}px` : "0px",
           opacity: menuOpen ? 1 : 0,
           borderTop: menuOpen ? "1px solid #1d324a" : "none",
         }}
       >
-        <div className="mx-auto flex max-w-6xl flex-col px-6 py-2 text-sm">
+        <div className="mx-auto flex max-w-7xl flex-col px-6 py-2 text-sm">
           {links.map((link) =>
             link.label === active ? (
               <span key={link.href} className="px-2 py-2.5 font-medium text-white">
@@ -135,7 +137,7 @@ export default function Nav({ active }: { active?: string }) {
             style={{ background: "#4f8fff" }}
             onClick={() => setMenuOpen(false)}
           >
-            Request Evaluation Access
+            Request Technical Evaluation
           </Link>
         </div>
       </div>

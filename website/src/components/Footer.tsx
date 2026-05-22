@@ -4,9 +4,11 @@ const footerCols: { title: string; links: [string, string][] }[] = [
   {
     title: "Evaluate",
     links: [
+      ["/investor-brief", "Investor Brief"],
       ["/contact?intent=evaluation", "Evaluation Access"],
       ["/contact?intent=demo", "Technical Demo"],
       ["/contact?intent=design-partner", "Design Partnership"],
+      ["/contact?intent=licensing", "Licensing / IP"],
       ["/pricing", "Offer Structure"],
     ],
   },
@@ -23,8 +25,8 @@ const footerCols: { title: string; links: [string, string][] }[] = [
     title: "Company",
     links: [
       ["/about", "About"],
-      ["/about/roadmap", "Roadmap"],
-      ["/solutions", "Workloads"],
+      ["/about/roadmap", "Validation Roadmap"],
+      ["/solutions", "Use Cases"],
       ["mailto:mrockwell@atomik.tech", "Contact"],
     ],
   },
@@ -51,7 +53,7 @@ export default function Footer() {
               ATOM<span style={{ color: "#22d3ee" }}>i</span>K
             </div>
             <p className="text-xs leading-relaxed">
-              State-aware compute for systems that spend too much work rediscovering what changed.
+              Cooler, faster state-aware compute for systems constrained by heat, battery, bandwidth, latency, or hardware footprint.
             </p>
           </div>
 
@@ -95,7 +97,7 @@ export default function Footer() {
               <Link href="/terms" className="no-underline transition-colors hover:text-white" style={{ color: "#9fb1c7" }}>
                 Terms
               </Link>
-              <a href="mailto:support@atomik.tech" className="no-underline transition-colors hover:text-white" style={{ color: "#9fb1c7" }}>
+              <a href="mailto:mrockwell@atomik.tech?subject=ATOMiK%20Investor%20Diligence" className="no-underline transition-colors hover:text-white" style={{ color: "#9fb1c7" }}>
                 Support
               </a>
             </div>

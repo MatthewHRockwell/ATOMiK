@@ -45,7 +45,7 @@ const verdicts: Record<Challenge, Verdict> = {
   change: {
     recommendation: "ATOMiK",
     reason:
-      "Change detection is O(1) — compare the accumulator to the identity element. On FPGA, this takes a single cycle with deterministic timing and zero side channels.",
+      "Change detection is O(1) in the identity-accumulator check. FPGA timing and side-channel claims should be made only against measured implementation artifacts.",
     alternative: "Merkle Trees",
     alternativeReason:
       "you need to efficiently identify which specific subtree changed in a large hierarchical dataset. Merkle Trees give O(log n) localization; ATOMiK tells you that something changed, not where.",

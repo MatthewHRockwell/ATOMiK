@@ -7,6 +7,7 @@ const requestTypes = [
   "Request Evaluation Access",
   "Request Technical Demo",
   "Discuss Design Partnership",
+  "Discuss Licensing / IP Evaluation",
 ];
 
 const roles = [
@@ -15,15 +16,18 @@ const roles = [
   "Infrastructure team",
   "Researcher",
   "Investor / advisor",
+  "Chip partner / strategic",
   "Other",
 ];
 
 const painCategories = [
-  "State sync / replication",
-  "Edge or embedded workload",
-  "Rollback / replay overhead",
-  "Change detection",
-  "Adaptive execution surface",
+  "Heat / cooling / density",
+  "Battery life / power budget",
+  "Bandwidth / state movement",
+  "Latency / local execution",
+  "Smaller hardware profile",
+  "AI context / agent state",
+  "Defense / remote reliability",
   "Technical diligence",
 ];
 
@@ -39,6 +43,8 @@ const requestTypeByIntent: Record<string, string> = {
   demo: "Request Technical Demo",
   "technical-demo": "Request Technical Demo",
   "design-partner": "Discuss Design Partnership",
+  licensing: "Discuss Licensing / IP Evaluation",
+  ip: "Discuss Licensing / IP Evaluation",
 };
 
 export default function ContactPage() {
@@ -127,7 +133,7 @@ export default function ContactPage() {
         </p>
         <h1 className="mt-3 text-4xl font-bold">Tell us what you want to evaluate.</h1>
         <p className="mt-4 leading-7" style={{ color: "#9fb1c7" }}>
-          Use this form for evaluation access, technical demo requests, and design partner conversations. The most useful request includes one real workload or state-heavy path.
+          Use this form for technical evaluation, investor diligence, licensing, and design partner conversations. The most useful request names one real constraint: heat, battery, bandwidth, latency, hardware footprint, or context movement.
         </p>
 
         {status === "sent" ? (
@@ -137,7 +143,7 @@ export default function ContactPage() {
           >
             <h2 className="text-xl font-bold">Request received</h2>
             <p className="mt-3 leading-7" style={{ color: "#9fb1c7" }}>
-              Thanks. The next step is to anchor on the workload, current stack, and desired path: proof review, technical demo, or scoped evaluation conversation.
+              Thanks. The next step is to anchor on the workload, current stack, constraint, and desired path: proof review, technical demo, design partner evaluation, or licensing conversation.
             </p>
             <p className="mt-3 text-sm" style={{ color: "#9fb1c7" }}>
               You can also reach ATOMiK at{" "}
@@ -249,7 +255,7 @@ export default function ContactPage() {
                 rows={4}
                 value={form.useCase}
                 onChange={(e) => update("useCase", e.target.value)}
-                placeholder="Example: sync-heavy edge telemetry, rollback-sensitive state path, distributed cache replay, embedded state tracking..."
+                placeholder="Example: data-center cooling pressure, battery-limited edge telemetry, AI context movement, embedded state tracking, remote/defense reliability..."
                 className="w-full resize-y rounded-lg px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-[#22d3ee]"
                 style={inputStyle}
               />
@@ -261,7 +267,7 @@ export default function ContactPage() {
                 rows={3}
                 value={form.currentStack}
                 onChange={(e) => update("currentStack", e.target.value)}
-                placeholder="Runtime, hardware, state size, update cadence, bandwidth/power/latency constraints..."
+                placeholder="Runtime, hardware, state size, update cadence, cooling, power, bandwidth, latency, or footprint constraints..."
                 className="w-full resize-y rounded-lg px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-[#22d3ee]"
                 style={inputStyle}
               />

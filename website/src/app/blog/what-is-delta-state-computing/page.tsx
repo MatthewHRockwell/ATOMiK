@@ -162,7 +162,7 @@ export default function WhatIsDeltaStateComputingPage() {
             to describe this architecture. It draws from delta-state CRDTs, XOR-based
             error correction, and algebraic group theory, but synthesizes them into
             something new: a universal state primitive that works from Python scripts to
-            custom RISC-V silicon.
+            FPGA-backed prototype hardware.
           </p>
 
           <p>
@@ -708,7 +708,7 @@ print(f"After undo: 0x{node_a.read():08X}")  # 0xCA00BABE (delta 1 removed)`}</C
             <Link href="/blog/fpga-journey-13-dollar-chip" className="underline" style={{ color: "#4f8fff" }}>
               FPGA proof notes
             </Link>.
-            The custom RISC-V CPU includes native LOAD, ACCUM, READ, and SWAP instructions
+            The FPGA prototype CPU path includes LOAD, ACCUM, READ, and SWAP instruction work
             in the ISA prototype path. Treat latency and throughput claims as
             artifact-specific unless a current measured package is linked.
           </p>
@@ -738,7 +738,7 @@ print(f'State: 0x{ctx.read():08X}')  # 0xDEADBE10
 
           <p>
             Or try the{" "}
-            <Link href="/demo" className="underline" style={{ color: "#4f8fff" }}>
+            <Link href="/docs/hardware" className="underline" style={{ color: "#4f8fff" }}>
               interactive browser demo
             </Link>{" "}
             to see delta-state operations in real time. For workload-specific review,

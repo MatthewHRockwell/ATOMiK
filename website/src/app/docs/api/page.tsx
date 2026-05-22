@@ -9,7 +9,7 @@ import {
   typeColor,
   varColor,
 } from "../shared";
-import UpgradeGate from "@/components/UpgradeGate";
+import EvaluationGate from "@/components/EvaluationGate";
 import LangTabs from "@/components/LangTabs";
 
 export const metadata: Metadata = {
@@ -100,11 +100,12 @@ export default function ApiReferencePage() {
         ))}
       </div>
 
-      <UpgradeGate
-        tier="team"
-        title="Generate SDKs in 5 Languages"
-        description="Team tier includes the SDK generation pipeline: Python, Rust, C, JavaScript, and Verilog from a single schema definition."
-        ctaText="Start Team Trial"
+      <EvaluationGate
+        title="Review the SDK generation path"
+        description="Request evaluation access if your workload needs generated Python, Rust, C, JavaScript, or Verilog interfaces from a shared schema definition."
+        ctaText="Request Evaluation Access"
+        intent="evaluation"
+        accent="#22d3ee"
       />
 
       {/* ─────────────── Core Operations Reference ─────────────── */}

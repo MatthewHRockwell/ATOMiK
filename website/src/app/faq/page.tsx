@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import Nav from "@/components/Nav";
-import Footer from "@/components/Footer";
 import { useState } from "react";
 
 const faqCategories = [
@@ -64,7 +63,7 @@ const faqCategories = [
       {
         q: "How does ATOMiK compare to CRDTs?",
         a: "Both address state synchronization problems, but ATOMiK frames state change and delta application as compute primitives. Public comparisons should be read with the evidence labels and artifact links attached to any performance claim.",
-        link: { href: "/compare", label: "View comparison" },
+        link: { href: "/whitepaper", label: "View technical brief" },
       },
       {
         q: "What performance claims are public-safe?",
@@ -302,20 +301,19 @@ export default function FAQPage() {
                 Request Evaluation Access
               </Link>
               <a
-                href="https://github.com/MatthewHRockwell/ATOMiK/discussions"
+                href="https://github.com/MatthewHRockwell/ATOMiK/issues"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="px-5 py-2 rounded-full text-sm font-semibold no-underline transition-colors hover:text-white border"
                 style={{ color: "#8888a0", borderColor: "#1e1e2e" }}
               >
-                GitHub Discussions
+                GitHub Issues
               </a>
             </div>
           </div>
         </div>
       </main>
 
-      <Footer />
     </>
   );
 }

@@ -1,308 +1,120 @@
 import type { Metadata } from "next";
-import {
-  codeBlockStyle,
-  kwColor,
-  fnColor,
-  strColor,
-  numColor,
-  cmtColor,
-  typeColor,
-  varColor,
-} from "../shared";
-import UpgradeGate from "@/components/UpgradeGate";
+import EvaluationGate from "@/components/EvaluationGate";
+import { codeBlockStyle } from "../shared";
 
 export const metadata: Metadata = {
-  title: "Kernel Module — ATOMiK Docs",
+  title: "Kernel Module - ATOMiK Docs",
   description:
-    "Install and use the ATOMiK Linux kernel module. DKMS-managed, supports kernels 5.15+. ioctl and sysfs interface.",
+    "ATOMiK Linux kernel module notes for request-based technical evaluation and proof review.",
 };
+
+const sections = [
+  {
+    title: "Public review path",
+    body:
+      "The public repository exposes the current Linux integration materials for technical review. Treat the kernel module as an evaluation surface until a workload-specific proof plan is agreed.",
+  },
+  {
+    title: "Evidence boundary",
+    body:
+      "Use measured artifacts for performance claims. The website should not infer data-center, Kubernetes, or subscription behavior from illustrative terminal output.",
+  },
+  {
+    title: "Evaluation fit",
+    body:
+      "Best-fit conversations start with a concrete state-heavy workload, expected heat or bandwidth pressure, and the exact success criteria to validate.",
+  },
+];
 
 export default function KernelModulePage() {
   return (
-    <div className="max-w-5xl mx-auto px-6 py-16">
+    <div className="mx-auto max-w-5xl px-6 py-16">
       <p
-        className="text-sm font-mono tracking-widest uppercase mb-4"
+        className="mb-4 text-sm font-mono uppercase tracking-widest"
         style={{ color: "#d4a843" }}
       >
         System Integration
       </p>
-      <h1 className="text-4xl font-bold tracking-tight mb-4">Kernel Module</h1>
-      <p className="text-lg mb-10" style={{ color: "#8888a0" }}>
-        The ATOMiK Linux kernel module exposes delta-state operations via{" "}
-        <code
-          className="text-sm font-mono px-2 py-0.5 rounded"
-          style={{ background: "#1e1e2e", color: "#d4a843" }}
-        >
-          /dev/atomik
-        </code>{" "}
-        and sysfs. DKMS-managed, supports kernels 5.15+.
+      <h1 className="mb-4 text-4xl font-bold tracking-tight">Kernel Module</h1>
+      <p className="mb-10 max-w-3xl text-lg" style={{ color: "#8888a0" }}>
+        The ATOMiK Linux kernel-module path is handled as a request-based
+        technical evaluation surface. Public docs should anchor on install
+        shape, interface review, and evidence boundaries rather than fake
+        subscription, cluster, or savings output.
       </p>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        {/* Install + Load */}
+      <div className="mb-12 grid grid-cols-1 gap-6 lg:grid-cols-3">
+        {sections.map((section) => (
+          <section
+            key={section.title}
+            className="rounded-xl border p-6"
+            style={{ background: "#12121a", borderColor: "#1e1e2e" }}
+          >
+            <h2 className="mb-3 text-lg font-bold text-white">{section.title}</h2>
+            <p className="text-sm leading-6" style={{ color: "#8888a0" }}>
+              {section.body}
+            </p>
+          </section>
+        ))}
+      </div>
+
+      <div className="mb-10 grid grid-cols-1 gap-6 lg:grid-cols-2">
         <div>
-          <p className="text-sm font-mono mb-2" style={{ color: "#8888a0" }}>
-            Install &amp; load
+          <p className="mb-2 text-sm font-mono" style={{ color: "#8888a0" }}>
+            review source
           </p>
           <div style={codeBlockStyle}>
             <pre style={{ margin: 0 }}>
-              <code>
-                <span style={{ color: cmtColor }}># Clone and install via DKMS</span>
-                {"\n"}
-                <span style={{ color: cmtColor }}>$</span>{" "}
-                <span style={{ color: varColor }}>
-                  git clone https://github.com/MatthewHRockwell/ATOMiK
-                </span>
-                {"\n"}
-                <span style={{ color: cmtColor }}>$</span>{" "}
-                <span style={{ color: kwColor }}>cd</span>{" "}
-                <span style={{ color: varColor }}>ATOMiK/software/atomik_kmod</span>
-                {"\n"}
-                <span style={{ color: cmtColor }}>$</span>{" "}
-                <span style={{ color: kwColor }}>sudo</span>{" "}
-                <span style={{ color: varColor }}>./install.sh</span>
-                {"\n\n"}
-                <span style={{ color: cmtColor }}># Verify it loaded</span>
-                {"\n"}
-                <span style={{ color: cmtColor }}>$</span>{" "}
-                <span style={{ color: varColor }}>
-                  cat /sys/class/atomik/atomik0/version
-                </span>
-                {"\n"}
-                <span style={{ color: strColor }}>0.4.0</span>
-              </code>
+              <code>{`git clone https://github.com/MatthewHRockwell/ATOMiK
+cd ATOMiK/software/atomik_kmod
+ls`}</code>
             </pre>
           </div>
         </div>
 
-        {/* Sysfs interface */}
         <div>
-          <p className="text-sm font-mono mb-2" style={{ color: "#8888a0" }}>
-            sysfs interface
+          <p className="mb-2 text-sm font-mono" style={{ color: "#8888a0" }}>
+            interface shape
           </p>
           <div style={codeBlockStyle}>
             <pre style={{ margin: 0 }}>
-              <code>
-                <span style={{ color: cmtColor }}># Runtime status</span>
-                {"\n"}
-                <span style={{ color: cmtColor }}>$</span>{" "}
-                <span style={{ color: varColor }}>
-                  cat /sys/class/atomik/atomik0/backend
-                </span>
-                {"\n"}
-                <span style={{ color: strColor }}>software</span>
-                {"\n\n"}
-                <span style={{ color: cmtColor }}># Operation counters</span>
-                {"\n"}
-                <span style={{ color: cmtColor }}>$</span>{" "}
-                <span style={{ color: varColor }}>
-                  cat /sys/class/atomik/atomik0/ops_total
-                </span>
-                {"\n"}
-                <span style={{ color: numColor }}>0</span>
-                {"\n\n"}
-                <span style={{ color: cmtColor }}># Per-operation: ops_load, ops_accum,</span>
-                {"\n"}
-                <span style={{ color: cmtColor }}># ops_read, ops_swap</span>
-              </code>
+              <code>{`/dev/atomik
+/sys/class/atomik/atomik0/backend
+/sys/class/atomik/atomik0/version
+/sys/class/atomik/atomik0/ops_total`}</code>
             </pre>
           </div>
         </div>
       </div>
 
-      {/* What Pro Looks Like */}
-      <div className="mb-10">
-        <h2 className="text-2xl font-bold tracking-tight mb-2">What Pro Looks Like</h2>
-        <p className="text-sm mb-6" style={{ color: "#8888a0" }}>
-          Real output from the ATOMiK kernel module running on a Kubernetes cluster.
-        </p>
+      <section
+        className="mb-10 rounded-xl border p-6"
+        style={{ background: "#12121a", borderColor: "#1e1e2e" }}
+      >
+        <h2 className="mb-3 text-2xl font-bold tracking-tight">What to validate</h2>
+        <ul className="space-y-3 text-sm leading-6" style={{ color: "#8888a0" }}>
+          <li>
+            <span style={{ color: "#e0e0e8" }}>Workload fit:</span> where repeated
+            writes, sync traffic, or hot/cold context retention create measurable cost.
+          </li>
+          <li>
+            <span style={{ color: "#e0e0e8" }}>Producer path:</span> which counters,
+            traces, or hardware artifacts will be accepted as evidence.
+          </li>
+          <li>
+            <span style={{ color: "#e0e0e8" }}>Success criteria:</span> heat, power,
+            bandwidth, latency, or hardware-footprint thresholds for a real deployment.
+          </li>
+        </ul>
+      </section>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-          {/* atomik-status output */}
-          <div>
-            <p className="text-sm font-mono mb-2" style={{ color: "#8888a0" }}>
-              atomik-status
-            </p>
-            <div style={codeBlockStyle}>
-              <pre style={{ margin: 0 }}>
-                <code>
-                  <span style={{ color: fnColor }}>ATOMiK v0.5.0</span>
-                  {" "}
-                  <span style={{ color: cmtColor }}>[software backend]</span>
-                  {" — "}
-                  <span style={{ color: strColor }}>trial (87 days remaining)</span>
-                  {"\n\n"}
-                  <span style={{ color: varColor }}>Operations:     </span>
-                  <span style={{ color: numColor }}>14,293</span>
-                  <span style={{ color: varColor }}> total (</span>
-                  <span style={{ color: numColor }}>3,821</span>
-                  <span style={{ color: varColor }}> load, </span>
-                  <span style={{ color: numColor }}>6,104</span>
-                  <span style={{ color: varColor }}> accum, </span>
-                  <span style={{ color: numColor }}>3,891</span>
-                  <span style={{ color: varColor }}> read, </span>
-                  <span style={{ color: numColor }}>477</span>
-                  <span style={{ color: varColor }}> swap)</span>
-                  {"\n"}
-                  <span style={{ color: varColor }}>COW Detection:  </span>
-                  <span style={{ color: numColor }}>23.4%</span>
-                  <span style={{ color: varColor }}> redundancy (</span>
-                  <span style={{ color: numColor }}>3,344</span>
-                  <span style={{ color: varColor }}> / 14,293 copies redundant)</span>
-                  {"\n"}
-                  <span style={{ color: varColor }}>Network:        </span>
-                  <span style={{ color: numColor }}>8.7%</span>
-                  <span style={{ color: varColor }}> redundancy (</span>
-                  <span style={{ color: numColor }}>1,243</span>
-                  <span style={{ color: varColor }}> / 14,293 sends redundant)</span>
-                  {"\n"}
-                  <span style={{ color: varColor }}>Bytes Saved:    </span>
-                  <span style={{ color: strColor }}>847 MB</span>
-                  <span style={{ color: varColor }}> (COW: 612 MB, Network: 235 MB)</span>
-                  {"\n\n"}
-                  <span style={{ color: cmtColor }}>Top Waste by Container:</span>
-                  {"\n"}
-                  <span style={{ color: varColor }}>{"  "}api-server-7f8d4    </span>
-                  <span style={{ color: numColor }}>612 MB</span>
-                  <span style={{ color: varColor }}>{"  "}(43.2%)</span>
-                  {"\n"}
-                  <span style={{ color: varColor }}>{"  "}worker-pool-3a2c    </span>
-                  <span style={{ color: numColor }}>189 MB</span>
-                  <span style={{ color: varColor }}>{"  "}(13.4%)</span>
-                  {"\n"}
-                  <span style={{ color: varColor }}>{"  "}redis-cache-9e1b     </span>
-                  <span style={{ color: numColor }}>46 MB</span>
-                  <span style={{ color: varColor }}>{"   "}(3.3%)</span>
-                </code>
-              </pre>
-            </div>
-          </div>
-
-          {/* atomik-report output */}
-          <div>
-            <p className="text-sm font-mono mb-2" style={{ color: "#8888a0" }}>
-              atomik-report --brief
-            </p>
-            <div style={codeBlockStyle}>
-              <pre style={{ margin: 0 }}>
-                <code>
-                  <span style={{ color: fnColor }}>ATOMiK Efficiency Report</span>
-                  {"\n"}
-                  <span style={{ color: cmtColor }}>Generated: 2026-03-16 09:14:22 UTC</span>
-                  {"\n"}
-                  <span style={{ color: cmtColor }}>────────────────────────────────────</span>
-                  {"\n\n"}
-                  <span style={{ color: varColor }}>Cluster:        </span>
-                  <span style={{ color: strColor }}>prod-us-east-1</span>
-                  {"\n"}
-                  <span style={{ color: varColor }}>Nodes:          </span>
-                  <span style={{ color: numColor }}>12</span>
-                  {"\n"}
-                  <span style={{ color: varColor }}>Containers:     </span>
-                  <span style={{ color: numColor }}>87</span>
-                  {"\n"}
-                  <span style={{ color: varColor }}>Uptime:         </span>
-                  <span style={{ color: numColor }}>3d 14h 22m</span>
-                  {"\n\n"}
-                  <span style={{ color: fnColor }}>Savings Summary</span>
-                  {"\n"}
-                  <span style={{ color: varColor }}>  COW copies avoided:   </span>
-                  <span style={{ color: strColor }}>612 MB</span>
-                  {"\n"}
-                  <span style={{ color: varColor }}>  Network sends avoided: </span>
-                  <span style={{ color: strColor }}>235 MB</span>
-                  {"\n"}
-                  <span style={{ color: varColor }}>  Total saved:           </span>
-                  <span style={{ color: strColor }}>847 MB</span>
-                  {"\n"}
-                  <span style={{ color: varColor }}>  Redundancy rate:       </span>
-                  <span style={{ color: numColor }}>18.9%</span>
-                  {"\n\n"}
-                  <span style={{ color: fnColor }}>Top Recommendation</span>
-                  {"\n"}
-                  <span style={{ color: varColor }}>  api-server: </span>
-                  <span style={{ color: numColor }}>43%</span>
-                  <span style={{ color: varColor }}> of waste. Consider</span>
-                  {"\n"}
-                  <span style={{ color: varColor }}>  increasing shared memory pool or</span>
-                  {"\n"}
-                  <span style={{ color: varColor }}>  enabling delta-sync for replicas.</span>
-                </code>
-              </pre>
-            </div>
-          </div>
-        </div>
-
-        <p className="text-sm text-center" style={{ color: "#8888a0" }}>
-          Kernel-module evaluation is request-based and should be scoped against
-          a real workload and evidence plan.
-        </p>
-      </div>
-
-      <UpgradeGate
-        tier="pro"
-        title="Ready to evaluate?"
-        description="Request evaluation access to review whether this kernel-module path fits your workload and deployment constraints."
+      <EvaluationGate
+        title="Ready to evaluate the kernel-module path?"
+        description="Request access with a concrete workload and evidence goal. ATOMiK will scope the review around measurable heat, bandwidth, latency, or footprint outcomes."
         ctaText="Request Evaluation Access"
+        intent="evaluation"
+        accent="#d4a843"
       />
-
-      {/* ioctl example */}
-      <div className="mb-6">
-        <p className="text-sm font-mono mb-2" style={{ color: "#8888a0" }}>
-          ioctl usage (C)
-        </p>
-        <div style={codeBlockStyle}>
-          <pre style={{ margin: 0 }}>
-            <code>
-              <span style={{ color: kwColor }}>#include</span>{" "}
-              <span style={{ color: strColor }}>&lt;uapi/atomik.h&gt;</span>
-              {"\n\n"}
-              <span style={{ color: typeColor }}>int</span>{" "}
-              <span style={{ color: varColor }}>fd</span>{" "}
-              <span style={{ color: kwColor }}>=</span>{" "}
-              <span style={{ color: fnColor }}>open</span>
-              <span style={{ color: varColor }}>(</span>
-              <span style={{ color: strColor }}>{'"'}/dev/atomik{'"'}</span>
-              <span style={{ color: varColor }}>, O_RDWR);</span>
-              {"\n\n"}
-              <span style={{ color: cmtColor }}>{"// Create a table with 256 contexts"}</span>
-              {"\n"}
-              <span style={{ color: kwColor }}>struct</span>{" "}
-              <span style={{ color: typeColor }}>atomik_create_table_args</span>{" "}
-              <span style={{ color: varColor }}>ct</span>{" "}
-              <span style={{ color: kwColor }}>=</span>{" "}
-              <span style={{ color: varColor }}>{"{"}</span>{" "}
-              <span style={{ color: varColor }}>.num_contexts</span>{" "}
-              <span style={{ color: kwColor }}>=</span>{" "}
-              <span style={{ color: numColor }}>256</span>{" "}
-              <span style={{ color: varColor }}>{"}"}</span>
-              <span style={{ color: varColor }}>;</span>
-              {"\n"}
-              <span style={{ color: fnColor }}>ioctl</span>
-              <span style={{ color: varColor }}>(fd, ATOMIK_IOC_CREATE_TABLE, &amp;ct);</span>
-              {"\n\n"}
-              <span style={{ color: cmtColor }}>{"// Core operations via ioctl"}</span>
-              {"\n"}
-              <span style={{ color: kwColor }}>struct</span>{" "}
-              <span style={{ color: typeColor }}>atomik_load_args</span>{" "}
-              <span style={{ color: varColor }}>la</span>{" "}
-              <span style={{ color: kwColor }}>=</span>{" "}
-              <span style={{ color: varColor }}>
-                {"{"} .table_id = ct.table_id,
-              </span>
-              {"\n"}
-              <span style={{ color: varColor }}>
-                {"    "}.addr = <span style={{ color: numColor }}>0</span>, .initial_state ={" "}
-                <span style={{ color: numColor }}>0xDEADBEEF</span> {"}"};
-              </span>
-              {"\n"}
-              <span style={{ color: fnColor }}>ioctl</span>
-              <span style={{ color: varColor }}>(fd, ATOMIK_IOC_LOAD, &amp;la);</span>
-            </code>
-          </pre>
-        </div>
-      </div>
-
     </div>
   );
 }

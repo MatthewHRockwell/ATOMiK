@@ -5,7 +5,7 @@ import Nav from "@/components/Nav";
 export const metadata: Metadata = {
   title: "Evaluation Access - ATOMiK",
   description:
-    "Two public paths for evaluating ATOMiK: request evaluation access or discuss a design partner engagement.",
+    "Request evaluation access, design-partner scoping, or investor/licensing diligence for ATOMiK.",
 };
 
 const colors = {
@@ -26,11 +26,11 @@ const offers = [
     for: "Technical founders, engineers, researchers, infrastructure teams, and early evaluators.",
     includes: [
       "Proof artifact review",
-      "Workload-fit conversation",
+      "Workload-fit conversation around heat, power, bandwidth, latency, or footprint",
       "Technical updates and early demo availability",
       "Path to a scoped benchmark exchange when fit is strong",
     ],
-    body: "Request limited evaluation access and receive technical updates, proof artifacts, and availability for early demos.",
+    body: "Request limited evaluation access and receive proof artifacts, technical updates, and availability for early demos.",
   },
   {
     name: "Design Partner / Paid Technical Evaluation",
@@ -43,7 +43,20 @@ const offers = [
       "Prototype mapping where appropriate",
       "Evaluation deliverables and continue / refine / stop recommendation",
     ],
-    body: "Work with ATOMiK to evaluate whether state-aware execution can improve a real workload.",
+    body: "Work with ATOMiK to evaluate whether state-aware execution creates measurable customer value.",
+  },
+  {
+    name: "Investor / Licensing Diligence",
+    cta: "Request Investor Diligence",
+    href: "/contact?intent=licensing",
+    for: "Investors, chip partners, and strategic teams evaluating ATOMiK as embeddable silicon IP.",
+    includes: [
+      "Investor brief and proof-bound narrative",
+      "Hardware evidence map and current validation gates",
+      "Pre-seed use-of-funds discussion",
+      "ASIC mentorship, patent conversion, and licensing path review",
+    ],
+    body: "Use the investor brief as the starting point for diligence, strategic IP conversations, or funding review.",
   },
 ];
 
@@ -79,11 +92,11 @@ export default function PricingPage() {
           Start with a scoped evaluation, not a subscription plan.
         </h1>
         <p className="mx-auto mt-5 max-w-2xl text-lg leading-8" style={{ color: colors.muted }}>
-          ATOMiK has two public paths: request evaluation access or discuss a design partner / paid technical evaluation. Bring one real workload and define success criteria before making larger commitments.
+          ATOMiK is request-based: evaluation access, design-partner scoping, and investor/licensing diligence all start with one real workload, one constraint, and a clear proof boundary.
         </p>
       </section>
 
-      <section className="mx-auto grid max-w-6xl gap-5 px-6 pb-14 md:grid-cols-2">
+      <section className="mx-auto grid max-w-6xl gap-5 px-6 pb-14 md:grid-cols-3">
         {offers.map((offer) => (
           <article key={offer.name} className="rounded-lg p-6" style={{ background: colors.panel, border: `1px solid ${colors.border}` }}>
             <h2 className="text-2xl font-bold">{offer.name}</h2>

@@ -30,11 +30,11 @@ export default function NotFound() {
             Read the Docs
           </Link>
           <Link
-            href="/demo"
+            href="/investor-brief"
             className="px-6 py-2.5 rounded-lg text-sm font-semibold"
             style={{ background: "transparent", color: "#e0e0e8", border: "1px solid #1e1e2e" }}
           >
-            Try the Demo
+            Investor Brief
           </Link>
         </div>
       </div>

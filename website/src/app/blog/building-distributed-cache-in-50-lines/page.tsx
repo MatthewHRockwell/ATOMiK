@@ -157,7 +157,7 @@ stream.accum(msg.addr, msg.delta)`}</Code>
           <ul className="list-disc pl-6 space-y-2">
             <li><strong>Modeled coordination reduction.</strong> The example avoids leader election inside the toy XOR state path.</li>
             <li><strong>8-byte delta artifact.</strong> The tutorial uses a fixed-width delta representation for its model.</li>
-            <li><strong>O(1) model operations.</strong> The accumulator path is constant-time in this simplified example.</li>
+            <li><strong>O(1) model operations.</strong> The accumulator path is fixed-shape in this simplified example.</li>
             <li><strong>Modeled convergence.</strong> Nodes reach the same state when the assumptions of the tutorial hold.</li>
             <li><strong>Proof-scoped.</strong> 108 Lean4 theorems verify the algebraic properties used by the model.</li>
           </ul>

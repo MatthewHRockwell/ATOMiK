@@ -54,7 +54,7 @@ const stateSyncRows: string[][] = [
   ],
   [
     "Write latency",
-    "Deterministic, constant-time",
+    "Compact accumulator update",
     "Sub-ms (single node), variable (cluster)",
     "~10ms (Raft consensus round)",
     "~10ms (ZAB proposal round)",
@@ -68,7 +68,7 @@ const stateSyncRows: string[][] = [
   ],
   [
     "Formal proofs",
-    "108 Lean4 theorems",
+    "108 Lean4 algebra theorems",
     "No formal verification",
     "TLA+ spec (partial)",
     "No formal verification",
@@ -132,28 +132,28 @@ const changeRows: string[][] = [
   ],
   [
     "Per-page cost",
-    "Single XOR (1 cycle on FPGA)",
+    "Single XOR / compact hardware path",
     "Full hash computation",
     "Full content scan",
     "Hash per node on path",
   ],
   [
     "False negative rate",
-    "Zero (algebraically proven)",
+    "Identity check; workload semantics must be modeled",
     "Negligible (collision probability)",
     "Zero",
     "Negligible (collision probability)",
   ],
   [
     "Deterministic timing",
-    "Yes \u2014 constant-time, no branches",
+    "Fixed-shape core operation in validated designs",
     "No \u2014 data-dependent",
     "No \u2014 data-dependent",
     "Partially \u2014 fixed-depth trees only",
   ],
   [
     "Side channels",
-    "None \u2014 no speculative execution",
+    "No full-content scan in the core operation",
     "Timing varies with input",
     "Timing varies with differences",
     "Path-dependent timing",
@@ -172,17 +172,17 @@ const hwRows: string[][] = [
     "Dev board cost",
     "$13.50 (Tang Nano 9K)",
     "$200+ (entry-level)",
-    "$100K+ (tape-out)",
+    "High NRE; depends on process and scope",
   ],
   [
     "Power consumption",
-    "< 1W (FPGA fabric)",
+    "Low-power fabric path; quote measured board artifacts only",
     "75\u2013350W (typical GPU)",
     "Lowest for given task",
   ],
   [
     "Formal verification",
-    "108 Lean4 theorems + RTL sim",
+    "Lean4 algebra proofs + RTL/synthesis artifacts",
     "Numerical verification only",
     "Full verification possible",
   ],
@@ -198,7 +198,7 @@ const useCases = [
   "Distributed state synchronization where bandwidth is expensive (IoT, edge, satellite)",
   "Real-time change detection across large memory regions or page tables",
   "Lock-free parallel accumulation from multiple producers",
-  "Embedded systems where deterministic, constant-time operations matter",
+  "Embedded systems where compact fixed-shape state operations matter",
   "Applications that need undo/rollback without an event log",
   "Sensor fusion pipelines that merge readings from independent sources",
   "Reducing memory traffic in copy-on-write workloads (containers, VMs)",
@@ -489,7 +489,7 @@ export default function ComparePage() {
         </p>
         <div className="flex items-center justify-center gap-4">
           <Link
-            href="/get-started"
+            href="/contact?intent=evaluation"
             className="inline-block px-6 py-3 rounded-lg text-sm font-semibold transition-opacity hover:opacity-90"
             style={{ background: "#4f8fff", color: "#fff" }}
           >

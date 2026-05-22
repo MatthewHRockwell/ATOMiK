@@ -33,13 +33,13 @@ export default function PrivacyPage() {
           <Section title="2. Information We Collect">
             <ul className="list-disc list-inside space-y-2 text-[#8888a0]">
               <li>
-                <span className="text-[#e0e0e8]">Account information</span> &mdash; email address
-                provided when you sign up or purchase a license.
+                <span className="text-[#e0e0e8]">Contact information</span> &mdash; name, email address, company, and workload details
+                provided through contact, evaluation, or investor-diligence forms.
               </li>
               <li>
                 <span className="text-[#e0e0e8]">Payment information</span> &mdash; processed
-                entirely by Stripe. We do not store credit card numbers or bank details on our
-                servers.
+                by Stripe only when a paid evaluation or commercial engagement requires it. We do
+                not store credit card numbers or bank details on our servers.
               </li>
               <li>
                 <span className="text-[#e0e0e8]">Usage analytics</span> &mdash; anonymized
@@ -47,17 +47,17 @@ export default function PrivacyPage() {
                 the product.
               </li>
               <li>
-                <span className="text-[#e0e0e8]">Support communications</span> &mdash; emails or
-                messages you send to our support team.
+                <span className="text-[#e0e0e8]">Communications</span> &mdash; emails, diligence requests,
+                workload notes, or evaluation questions you send to us.
               </li>
             </ul>
           </Section>
 
           <Section title="3. How We Use Your Data">
             <ul className="list-disc list-inside space-y-2 text-[#8888a0]">
-              <li>Deliver and activate software licenses.</li>
-              <li>Process subscription payments and send billing-related communications.</li>
-              <li>Provide technical support and respond to inquiries.</li>
+              <li>Respond to evaluation, diligence, licensing, and partnership inquiries.</li>
+              <li>Process payments and billing communications where a paid engagement exists.</li>
+              <li>Provide technical support or proof-review follow-up when requested.</li>
               <li>Improve our products, documentation, and user experience.</li>
               <li>Send product updates and security notices (you may opt out at any time).</li>
             </ul>
@@ -67,7 +67,7 @@ export default function PrivacyPage() {
             <p>We use the following third-party services that may process your data:</p>
             <ul className="list-disc list-inside space-y-2 text-[#8888a0] mt-3">
               <li>
-                <span className="text-[#e0e0e8]">Stripe</span> &mdash; payment processing.
+                <span className="text-[#e0e0e8]">Stripe</span> &mdash; payment processing and optional lead/customer records.
                 See{" "}
                 <a
                   href="https://stripe.com/privacy"
@@ -105,9 +105,9 @@ export default function PrivacyPage() {
 
           <Section title="6. Data Retention">
             <p>
-              We retain your account information for as long as your account is active or as needed
-              to provide services. Payment records are retained as required by applicable tax and
-              financial regulations. You may request deletion at any time.
+              We retain contact, inquiry, and evaluation records for as long as needed to respond,
+              support diligence, or manage an active relationship. Payment records are retained as
+              required by applicable tax and financial regulations. You may request deletion at any time.
             </p>
           </Section>
 

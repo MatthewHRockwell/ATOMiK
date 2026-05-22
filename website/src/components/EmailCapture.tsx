@@ -81,11 +81,11 @@ export default function EmailCapture({ variant = "default" }: EmailCaptureProps)
           </div>
           <div className="mt-4">
             <Link
-              href="/demo"
+              href="/docs/hardware"
               className="text-sm font-medium hover:underline"
               style={{ color: "#4f8fff" }}
             >
-              Try the demo &rarr;
+              View hardware proof &rarr;
             </Link>
           </div>
         </div>
@@ -115,7 +115,7 @@ export default function EmailCapture({ variant = "default" }: EmailCaptureProps)
       </h3>
       <p className="text-sm mt-1 mb-4" style={{ color: "#8888a0" }}>
         {isBlog
-          ? "Join 247+ developers building with delta-state algebra"
+          ? "Request updates and evaluation access for delta-state work"
           : "Release notes, technical articles, and hardware updates. No spam."}
       </p>
       <form
@@ -145,7 +145,7 @@ export default function EmailCapture({ variant = "default" }: EmailCaptureProps)
         >
           {status === "loading"
             ? isBlog ? "Registering..." : "Subscribing..."
-            : isBlog ? "Register Free" : "Subscribe"}
+            : isBlog ? "Request Access" : "Subscribe"}
         </button>
       </form>
       {status === "error" && (

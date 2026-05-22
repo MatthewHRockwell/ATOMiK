@@ -4,7 +4,7 @@ import Nav from "@/components/Nav";
 export const metadata: Metadata = {
   title: "ASIC Roadmap | ATOMiK",
   description:
-    "ATOMiK's evidence-labeled path from FPGA validation toward custom silicon and future Resource Fabric hardware.",
+    "ATOMiK's evidence-labeled path from FPGA validation toward silicon IP feasibility and future Resource Fabric hardware.",
 };
 
 /* ------------------------------------------------------------------ */
@@ -71,7 +71,7 @@ const milestones: Milestone[] = [
     bullets: [
       "108 Lean 4 theorems proving delta-state algebra properties",
       "Abelian group: commutative, associative, self-inverse, identity",
-      "Security architecture: no caches, no speculation, deterministic latency",
+      "Reduced cache/speculation exposure is a design target to validate",
     ],
     highlight: "Formally verified correctness",
   },
@@ -101,25 +101,25 @@ const milestones: Milestone[] = [
   },
   {
     phase: "Phase 3",
-    title: "Sky130 Trial Tape-out",
+    title: "ASIC Feasibility Review",
     status: "in-progress",
     bullets: [
-      "Open-source PDK via Efabless / Silicon Catalyst partnership",
-      "Gate-count estimate: ~500 gates for a single ATOMiK core",
-      "Prove delta-state algebra works in custom silicon",
-      "Full open-source toolchain: OpenLane 2, Magic, KLayout",
+      "Open-source PDK review path before any tape-out commitment",
+      "Gate-count, timing, and power estimates require external review",
+      "Review whether delta-state algebra maps cleanly into silicon IP",
+      "Toolchain plan: OpenLane 2, Magic, KLayout, and mentor review",
     ],
     highlight: "First silicon target",
   },
   {
     phase: "Phase 4",
-    title: "Production Foundry Partnership",
+    title: "Strategic Silicon Partner Path",
     status: "future",
     bullets: [
-      "TSMC / Samsung / GlobalFoundries engagement",
+      "Strategic foundry or chip-company diligence when proof gates justify it",
       "SRAM compiler integration for on-die state tables",
       "Multi-bank ASIC with dedicated on-die interconnect",
-      "Projected high-throughput custom silicon target with minimal die area",
+      "High-throughput custom-silicon direction; numbers remain roadmap until measured",
     ],
   },
   {
@@ -130,7 +130,7 @@ const milestones: Milestone[] = [
       "Edge SKU: ultra-low-power, sub-1 mm\u00b2 die for IoT / embedded",
       "Data-center SKU: thousands of parallel banks, PCIe / CXL attach",
       "Hardware root-of-trust direction with reduced data-dependent timing surfaces",
-      "Orders-of-magnitude improvement over FPGA on power and throughput",
+      "Power and throughput targets require post-review projections and measured silicon before public quoting",
     ],
   },
 ];
@@ -264,7 +264,7 @@ const scalingData: ScalingRow[] = [
   { label: "N=1", lut: "302", freq: "444 MHz", throughput: "Synthesis row", barPct: 0.6, color: accent2 },
   { label: "N=16", lut: "941", freq: "267 MHz", throughput: "Synthesis row", barPct: 6.3, color: accent },
   { label: "N=512", lut: "23,542", freq: "136 MHz", throughput: "Synthesis ceiling", barPct: 100, color: green },
-  { label: "ASIC (proj.)", lut: "~25K gates", freq: ">1 GHz", throughput: "Projected", barPct: 100, color: gold },
+  { label: "ASIC path", lut: "TBD", freq: "TBD", throughput: "Feasibility", barPct: 100, color: gold },
 ];
 
 function ScalingChart() {
@@ -327,12 +327,12 @@ export default function ASICRoadmapPage() {
               WebkitTextFillColor: "transparent",
             }}
           >
-            Custom Silicon
+            Silicon IP
           </span>
         </h1>
         <p className="relative mx-auto max-w-2xl text-lg text-gray-400">
           ATOMiK&apos;s delta-state algebra is formally verified, FPGA-backed, and
-          mapped to a synthesis-characterized path toward custom silicon.
+          mapped to a synthesis-characterized path toward silicon IP evaluation.
         </p>
       </section>
 
@@ -342,19 +342,17 @@ export default function ASICRoadmapPage() {
           <MetricCard label="Lean 4 Proofs" value="108" sub="Theorems verified" color={green} />
           <MetricCard label="Peak FPGA" value="Synthesis" sub="Zynq XC7Z020, N=512" color={accent} />
           <MetricCard label="Single Core" value="Synthesis" sub="See evidence labels" color={accent2} />
-          <MetricCard label="ASIC Target" value="Projected" sub="Roadmap, not measured" color={gold} />
+          <MetricCard label="ASIC Path" value="Feasibility" sub="Roadmap, not measured" color={gold} />
         </div>
       </section>
 
       {/* ---- Scaling chart ---- */}
       <section className="mx-auto max-w-5xl px-6 pb-20">
         <h2 className="mb-2 text-2xl font-bold text-white">
-          Throughput Scaling
+          FPGA Scaling Evidence
         </h2>
         <p className="mb-8 text-sm text-gray-500">
-          Sub-linear resource growth: 3.7&times; LUT increase yields 16&times;
-          throughput. ASIC projections assume &gt;1 GHz clock with equivalent
-          bank count.
+          Zynq rows summarize synthesis-characterized FPGA scaling. The ASIC row is a planning placeholder, not a measured or promised result.
         </p>
         <div
           className="rounded-xl p-6"
@@ -370,8 +368,7 @@ export default function ASICRoadmapPage() {
           Development Timeline
         </h2>
         <p className="mb-10 text-sm text-gray-500">
-          Each phase builds on hardware-validated results from the previous one
-          &mdash; no paper designs.
+          Each phase keeps measured hardware, synthesis output, and roadmap work separated.
         </p>
 
         {milestones.map((m, i) => (
@@ -389,22 +386,21 @@ export default function ASICRoadmapPage() {
           }}
         >
           <h2 className="mb-3 text-2xl font-bold text-white">
-            Interested in ATOMiK Silicon?
+            Interested in ATOMiK IP?
           </h2>
           <p className="mb-6 text-gray-400">
-            We&apos;re partnering with foundries and system integrators to bring
-            formally verified delta-state processing to custom silicon. Get in
-            touch to discuss early access, licensing, or integration.
+            ATOMiK is preparing investor, chip-partner, and design-partner diligence around state-aware compute. Get in
+            touch to discuss proof review, licensing, or integration.
           </p>
           <a
-            href="/contact?intent=design-partner"
+            href="/contact?intent=licensing"
             className="inline-flex items-center gap-2 rounded-lg px-8 py-3 text-sm font-semibold text-white transition-shadow hover:shadow-lg"
             style={{
               background: `linear-gradient(135deg, ${accent}, ${accent2})`,
               boxShadow: `0 4px 24px ${accent}33`,
             }}
           >
-            Discuss Design Partnership
+            Discuss Licensing / Evaluation
             <span aria-hidden="true">&rarr;</span>
           </a>
           <p className="mt-4 text-xs text-gray-600">

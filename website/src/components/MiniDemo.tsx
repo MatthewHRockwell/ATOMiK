@@ -132,18 +132,18 @@ export default function MiniDemo() {
       {/* CTA buttons */}
       <div className="flex gap-4 justify-center flex-wrap">
         <Link
-          href="/demo"
+          href="/docs/hardware"
           className="px-7 py-3.5 rounded-lg text-sm font-semibold no-underline transition-all hover:opacity-90"
           style={{ background: "linear-gradient(135deg, #4f8fff, #3a7aee)", color: "#fff", boxShadow: "0 4px 24px rgba(79,143,255,0.2)" }}
         >
-          Full Interactive Demo &rarr;
+          View Hardware Proof &rarr;
         </Link>
         <Link
-          href="/ai-demo"
+          href="/investor-brief"
           className="px-7 py-3.5 rounded-lg text-sm font-semibold no-underline transition-all hover:opacity-90"
           style={{ background: "linear-gradient(135deg, #a855f7, #7c3aed)", color: "#fff", boxShadow: "0 4px 24px rgba(168,85,247,0.2)" }}
         >
-          AI Inference Demo &rarr;
+          Investor Brief &rarr;
         </Link>
       </div>
     </div>

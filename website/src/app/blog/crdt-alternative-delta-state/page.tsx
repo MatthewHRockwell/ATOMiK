@@ -269,7 +269,7 @@ ctx.accum(0x02)  # Undo node B
           <p>
             The G-Counter requires O(n) metadata per node, an O(n) merge function, and
             full vector exchange on every sync. ATOMiK requires 8 bytes of fixed metadata
-            (the accumulator), a constant-time XOR merge, and sends only the 8-byte
+            (the accumulator), a compact XOR merge in the model, and sends only the 8-byte
             delta. As the number of nodes grows, the G-Counter&apos;s overhead grows
             linearly while ATOMiK stays constant.
           </p>

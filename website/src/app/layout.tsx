@@ -15,9 +15,9 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://atomik.tech"),
-  title: "ATOMiK - State-Aware Compute",
+  title: "ATOMiK - Cooler, Faster State-Aware Compute",
   description:
-    "State-aware compute for systems that spend too much work rediscovering what changed.",
+    "ATOMiK targets wasted state movement so devices and infrastructure can run cooler, move less data, and do more useful work per watt.",
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "any" },
@@ -27,20 +27,20 @@ export const metadata: Metadata = {
     apple: "/apple-touch-icon.png",
   },
   openGraph: {
-    title: "ATOMiK - State-Aware Compute",
+    title: "ATOMiK - Cooler, Faster State-Aware Compute",
     description:
-      "State-aware compute for systems that cannot afford to recompute everything.",
+      "Less heat, less bandwidth, and more useful work per watt through state-aware compute.",
     url: "https://atomik.tech",
     siteName: "ATOMiK",
-    images: [{ url: "https://atomik.tech/08-current-live-atomik-desk-v038i.png", width: 1920, height: 1080 }],
+    images: [{ url: "https://atomik.tech/09-current-live-atomik-desk-v039k.png", width: 1920, height: 1080 }],
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "ATOMiK - State-Aware Compute",
+    title: "ATOMiK - Cooler, Faster State-Aware Compute",
     description:
-      "State-aware compute for systems that cannot afford to recompute everything.",
-    images: ["https://atomik.tech/08-current-live-atomik-desk-v038i.png"],
+      "Less heat, less bandwidth, and more useful work per watt through state-aware compute.",
+    images: ["https://atomik.tech/09-current-live-atomik-desk-v039k.png"],
   },
 };
 
@@ -54,7 +54,7 @@ const jsonLd = {
       logo: "https://atomik.tech/logo.png",
       sameAs: ["https://github.com/MatthewHRockwell/ATOMiK"],
       description:
-        "State-aware compute for systems that spend too much work rediscovering what changed.",
+        "State-aware compute for systems constrained by heat, power, bandwidth, latency, or hardware footprint.",
     },
     {
       "@type": "Service",
@@ -65,7 +65,7 @@ const jsonLd = {
         name: "ATOMiK",
       },
       description:
-        "Request-based technical evaluation access for state-heavy edge, embedded, and distributed workloads.",
+        "Request-based technical evaluation access for workloads constrained by heat, power, bandwidth, latency, or hardware footprint.",
       url: "https://atomik.tech/contact",
     },
   ],

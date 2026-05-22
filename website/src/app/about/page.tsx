@@ -5,7 +5,7 @@ import Nav from "@/components/Nav";
 export const metadata: Metadata = {
   title: "About ATOMiK — Delta-State Computing",
   description:
-    "ATOMiK is building the next computing primitive: delta-state algebra that replaces store-and-retrieve with reconstruct-from-deltas.",
+    "ATOMiK is building the next computing primitive: state-aware compute for systems constrained by heat, power, bandwidth, latency, and hardware footprint.",
 };
 
 const timelineItems = [
@@ -76,7 +76,7 @@ const timelineItems = [
     year: "2026",
     title: "ASIC Path Initiated",
     description:
-      "Sky130 shuttle evaluation underway. The goal: a standalone delta-state chip that any system can drop in.",
+      "ASIC feasibility planning is underway. The next step is external review before any tape-out commitment.",
     color: "text-yellow-400",
     border: "border-yellow-500/40",
     bg: "bg-yellow-500/5",
@@ -143,7 +143,7 @@ export default function AboutPage() {
             </span>
           </h1>
           <p className="text-xl leading-relaxed max-w-3xl" style={{ color: "#8888a0" }}>
-            Building the next computing primitive — from mathematical proof to custom silicon.
+            Building state-aware compute from formal proof to FPGA-backed evaluation.
           </p>
         </div>
       </section>
@@ -162,18 +162,16 @@ export default function AboutPage() {
           </h2>
           <div className="space-y-4 text-lg leading-relaxed" style={{ color: "#b0b0c0" }}>
             <p>
-              Every computer built in the last 80 years stores state and retrieves it. ATOMiK
-              replaces that model entirely.{" "}
+              Modern systems spend enormous energy moving, scanning, and reconstructing state. ATOMiK
+              targets that waste directly.{" "}
               <span className="font-semibold text-white">
-                Delta-state algebra reconstructs state from deltas
+                Delta-state algebra reconstructs state from a reference plus deltas
               </span>
-              : small, commutative, self-inverse operations that compose in any order to produce
-              the same result.
+              : compact operations that compose cleanly and can be evaluated across software and hardware paths.
             </p>
             <p>
-              This is not an optimization. It is a new primitive — as fundamental as the
-              transistor or the cache line. The math is formalized (108 Lean4 theorems). The hardware
-              is prototype-validated across FPGA paths. The software packages are available (
+              The math is formalized with 108 Lean4 theorems. The hardware path is
+              prototype-validated across FPGA work and clearly separated from synthesis-only or roadmap claims. The software packages are available (
               <code
                 className="text-sm font-mono px-2 py-0.5 rounded"
                 style={{ background: "#1e1e2e", color: "#22c55e" }}
@@ -183,10 +181,9 @@ export default function AboutPage() {
               ).
             </p>
             <p>
-              The goal is to make delta-state algebra available at{" "}
-              <span className="font-semibold text-white">every layer of the stack</span> —
-              from a Python import to a custom ASIC — so that any engineer can stop moving data
-              and start evolving it.
+              The goal is to make state-aware execution available at{" "}
+              <span className="font-semibold text-white">the layers where it creates measurable value</span> —
+              from software evaluation to embeddable hardware IP when the evidence justifies it.
             </p>
           </div>
         </div>
@@ -196,7 +193,7 @@ export default function AboutPage() {
       <section className="max-w-5xl mx-auto px-6 pb-20">
         <h2 className="text-3xl font-bold mb-4">The Invention</h2>
         <p className="mb-10 text-lg" style={{ color: "#8888a0" }}>
-          From a mathematical insight to working silicon in under a year.
+          From a mathematical insight to software, formal proof, and FPGA-backed prototypes.
         </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -221,7 +218,7 @@ export default function AboutPage() {
             },
             {
               step: "04",
-              title: "The Silicon",
+              title: "The Hardware Path",
               desc: "FPGA prototype paths and synthesis-characterized scaling are documented. ASIC evaluation is roadmap work.",
               color: "#d4a843",
             },
@@ -350,10 +347,10 @@ export default function AboutPage() {
               <p className="leading-relaxed mb-4" style={{ color: "#b0b0c0" }}>
                 Matt Rockwell is a systems engineer and founder of ATOMiK, with deep expertise
                 in embedded systems, FPGA development, and formal verification. He created the
-                delta-state algebra as a fundamental rethinking of how computers handle state
+                delta-state algebra as a rethinking of how computers handle state
                 — proving the core algebra with 108 Lean4 theorems before writing the first line of
                 prototype code. ATOMiK grew from a mathematical insight into a
-                hardware-validated computing architecture running on custom RISC-V silicon.
+                hardware-validated computing architecture running on FPGA-backed hardware prototypes.
               </p>
               <p className="leading-relaxed mb-6" style={{ color: "#b0b0c0" }}>
                 Designed the delta-state algebra, wrote the formal proofs, built the hardware,
@@ -425,8 +422,8 @@ export default function AboutPage() {
               changes, with formal proof work around the core algebra.
             </p>
             <p>
-              From 108 formal proofs to a custom RISC-V CPU running on a $13.50 FPGA, ATOMiK
-              is the result of building from first principles.
+              From 108 formal proofs to FPGA prototype paths and a live Zynq Desk demo, ATOMiK
+              is the result of building from first principles while labeling each proof boundary.
             </p>
           </div>
         </div>
@@ -443,7 +440,7 @@ export default function AboutPage() {
         >
           <h2 className="text-2xl font-bold mb-3">What Comes Next</h2>
           <p className="mb-6" style={{ color: "#8888a0" }}>
-            From FPGA validation to custom silicon. See the path to a dedicated delta-state ASIC.
+            From FPGA validation to ASIC feasibility review. See the evidence-gated path toward silicon IP.
           </p>
           <Link
             href="/about/roadmap"
@@ -452,7 +449,7 @@ export default function AboutPage() {
               background: "linear-gradient(135deg, #8b5cf6, #4f8fff)",
             }}
           >
-            View ASIC Roadmap
+            View Validation Roadmap
             <span className="text-lg">&rarr;</span>
           </Link>
         </div>

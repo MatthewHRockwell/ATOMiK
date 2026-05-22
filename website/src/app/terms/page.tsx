@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Terms of Service - ATOMiK",
-  description: "ATOMiK terms of service. License terms, billing, and usage policies.",
+  description: "ATOMiK terms of service for public review, request-based evaluation, and written commercial agreements.",
 };
 
 export default function TermsPage() {
@@ -79,7 +79,7 @@ export default function TermsPage() {
             <p>
               All ATOMiK software, hardware designs, documentation, trademarks, and related
               intellectual property are owned by ATOMiK. Your license grants you the right to use
-              the software and hardware IP according to your tier&apos;s terms. You do not acquire
+              the software and hardware IP according to the applicable repository license or written agreement. You do not acquire
               any ownership rights.
             </p>
             <ul className="list-disc list-inside space-y-2 mt-3">
@@ -89,11 +89,10 @@ export default function TermsPage() {
               </li>
               <li>
                 You may not sublicense, resell, or redistribute the software except as expressly
-                permitted by your license tier.
+                permitted by your repository license or written agreement.
               </li>
               <li>
-                Open-source components included in the Community tier are governed by their
-                respective open-source licenses.
+                Open-source components are governed by their respective open-source licenses.
               </li>
             </ul>
           </Section>
@@ -107,7 +106,7 @@ export default function TermsPage() {
               </li>
               <li>Interfere with or disrupt the Services or their infrastructure.</li>
               <li>
-                Use paid-tier features (Pro, Team, or Enterprise) without an active subscription.
+                Use non-public evaluation, partner, or licensed materials outside the permission granted in the applicable agreement.
               </li>
             </ul>
           </Section>
@@ -137,16 +136,14 @@ export default function TermsPage() {
           <Section title="8. Termination">
             <ul className="list-disc list-inside space-y-2">
               <li>
-                You may terminate your account at any time by cancelling your subscription and
-                contacting us to request account deletion.
+                You may request deletion of contact, evaluation, or account records by contacting us.
               </li>
               <li>
                 We may suspend or terminate your access if you violate these Terms, with or without
                 notice depending on the severity of the violation.
               </li>
               <li>
-                Upon termination, your license to use paid features ends immediately. You retain
-                the right to use Community-tier features under the applicable open-source license.
+                Upon termination, access to non-public evaluation or licensed materials ends according to the applicable agreement. Public open-source components remain governed by their licenses.
               </li>
               <li>
                 Sections 4, 6, 7, and 9 survive termination.
