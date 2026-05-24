@@ -31,7 +31,11 @@ SDW_BIN  = $(BUILD)/sd_writer.bin
 SDV_OBJS = $(BUILD)/startup.o $(BUILD)/sd_verify.o $(BUILD)/sdhc.o
 SDV_ELF  = $(BUILD)/sd_verify.elf
 
-.PHONY: all disasm clean sd_writer sd_verify
+SDBOOTIMG_OBJS = $(BUILD)/startup.o $(BUILD)/sd_boot_image_writer.o $(BUILD)/sdhc.o
+SDBOOTIMG_ELF  = $(BUILD)/sd_boot_image_writer.elf
+SDBOOTIMG_BIN  = $(BUILD)/sd_boot_image_writer.bin
+
+.PHONY: all disasm clean sd_writer sd_verify sd_boot_image_writer
 
 all: $(ELF) $(BIN)
 	@echo ""
@@ -56,6 +60,17 @@ sd_verify: $(SDV_ELF)
 
 $(SDV_ELF): $(SDV_OBJS) linker.ld
 	$(LD) $(LDFLAGS) -o $@ $(SDV_OBJS) $(LDLIBS)
+
+sd_boot_image_writer: $(SDBOOTIMG_ELF) $(SDBOOTIMG_BIN)
+	@echo ""
+	@echo "=== SD Boot Image Writer Build ==="
+	@$(SIZE) $(SDBOOTIMG_ELF)
+
+$(SDBOOTIMG_ELF): $(SDBOOTIMG_OBJS) linker.ld
+	$(LD) $(LDFLAGS) -o $@ $(SDBOOTIMG_OBJS) $(LDLIBS)
+
+$(SDBOOTIMG_BIN): $(SDBOOTIMG_ELF)
+	$(OBJCOPY) -O binary $< $@
 
 $(BUILD):
 	mkdir -p $@

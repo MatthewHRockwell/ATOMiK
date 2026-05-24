@@ -157,8 +157,12 @@ fat_err_t fat32_mount(fat32_t *fs, sd_card_t *sd)
  * 1..10 (5 chars), 14..25 (6 chars), 28..31 (2 chars).  We only handle
  * ASCII (low byte of each UCS-2 pair). */
 #define LFN_MAX_CHARS  256
+/* buf is sized LFN_MAX_CHARS + 2 (not +1) so that next_ord/valid land on an
+ * even offset. With +1, GCC -Os merges the two trailing byte writes in
+ * lfn_reset() into a single STRH at an odd address — which Cortex-A9 traps
+ * as an unaligned access whenever MMU is off (memory is Strongly Ordered). */
 typedef struct {
-    char     buf[LFN_MAX_CHARS + 1];   /* assembled long name, NUL-terminated */
+    char     buf[LFN_MAX_CHARS + 2];   /* assembled long name, NUL-terminated */
     uint8_t  next_ord;                 /* expected next ordinal (counts down) */
     uint8_t  valid;
 } lfn_state_t;
