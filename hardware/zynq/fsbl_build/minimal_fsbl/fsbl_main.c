@@ -51,7 +51,10 @@ static void sdio_clock_enable_both(void) {
  * Same register sequence as ps7_post_config in JTAG boot TCL. */
 static void do_ps7_post_config(void)
 {
-    /* Enable level shifters A→B (PS→PL) */
+    /* SLCR must be unlocked before LVL_SHFTR_EN write will take effect.
+     * pcap_program re-locks SLCR at the end so we unlock again here. */
+    *(volatile uint32_t *)0xF8000008u = 0x0000DF0Du;  /* SLCR unlock */
+    /* Enable level shifters: bits[3:0] = 0xF enables both directions */
     *(volatile uint32_t *)0xF8000900u = 0x0000000Fu;
     /* Small delay */
     for (volatile int i = 0; i < 100000; i++) {}
@@ -81,10 +84,13 @@ typedef struct {
 } boot_file_t;
 
 static const boot_file_t boot_files[] = {
-    { "fw_jump69.bin",  DDR_OPENSBI,    1u   * 1024u * 1024u },
-    { "linux69.dtb",    DDR_DTB,        256u * 1024u         },
-    { "rootfs69.cpio",  DDR_INITRAMFS,  64u  * 1024u * 1024u },
-    { "Image69",        DDR_KERNEL,     32u  * 1024u * 1024u },
+    /* Nax64 file set (matches the proven JTAG-boot path).
+     * RV32-era *69.bin files are stale; the autoboot bitstream and DTB
+     * here are RV64/NaxRiscv. */
+    { "fw_jump_nax64.bin",   DDR_OPENSBI,    1u  * 1024u * 1024u },
+    { "linux_nax64.dtb",     DDR_DTB,        256u * 1024u         },
+    { "ubuntu_rv64.cpio.gz", DDR_INITRAMFS,  64u * 1024u * 1024u },
+    { "Image_nax64",         DDR_KERNEL,     32u * 1024u * 1024u },
 };
 #define N_BOOT_FILES (sizeof(boot_files) / sizeof(boot_files[0]))
 
