@@ -24,12 +24,38 @@ ELF      = $(BUILD)/ps_loader.elf
 BIN      = $(BUILD)/ps_loader.bin
 DISASM   = $(BUILD)/ps_loader.disasm
 
-.PHONY: all disasm clean
+SDW_OBJS = $(BUILD)/startup.o $(BUILD)/sd_writer.o $(BUILD)/sdhc.o
+SDW_ELF  = $(BUILD)/sd_writer.elf
+SDW_BIN  = $(BUILD)/sd_writer.bin
+
+SDV_OBJS = $(BUILD)/startup.o $(BUILD)/sd_verify.o $(BUILD)/sdhc.o
+SDV_ELF  = $(BUILD)/sd_verify.elf
+
+.PHONY: all disasm clean sd_writer sd_verify
 
 all: $(ELF) $(BIN)
 	@echo ""
 	@echo "=== PS Loader Build ==="
 	@$(SIZE) $(ELF)
+
+sd_writer: $(SDW_ELF) $(SDW_BIN)
+	@echo ""
+	@echo "=== SD Writer Build ==="
+	@$(SIZE) $(SDW_ELF)
+
+$(SDW_ELF): $(SDW_OBJS) linker.ld
+	$(LD) $(LDFLAGS) -o $@ $(SDW_OBJS) $(LDLIBS)
+
+$(SDW_BIN): $(SDW_ELF)
+	$(OBJCOPY) -O binary $< $@
+
+sd_verify: $(SDV_ELF)
+	@echo ""
+	@echo "=== SD Verify Build ==="
+	@$(SIZE) $(SDV_ELF)
+
+$(SDV_ELF): $(SDV_OBJS) linker.ld
+	$(LD) $(LDFLAGS) -o $@ $(SDV_OBJS) $(LDLIBS)
 
 $(BUILD):
 	mkdir -p $@

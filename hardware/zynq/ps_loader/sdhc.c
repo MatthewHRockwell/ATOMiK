@@ -314,3 +314,42 @@ sdhc_err_t sdhc_read_block(sd_card_t *c, uint32_t lba, void *dst)
     w32(c->base + SDHC_INT_STATUS, INT_XFER_COMPLETE);
     return SDHC_OK;
 }
+
+/* Public: write a single 512-byte block by LBA (or byte address on non-SDHC) */
+sdhc_err_t sdhc_write_block(sd_card_t *c, uint32_t lba, const void *src)
+{
+    w16(c->base + SDHC_BLOCK_SIZE, 512);
+    w16(c->base + SDHC_BLOCK_COUNT, 1);
+    uint32_t arg = c->sdhc ? lba : (lba * 512u);
+
+    /* CMD24: WRITE_SINGLE_BLOCK — R1, data present, no DMA, xfer mode = 0 (write) */
+    sdhc_err_t e = issue_cmd(c, 24, arg,
+        CMD_RESP_48 | CMD_CRC_CHECK | CMD_INDEX_CHECK | CMD_DATA_PRESENT, 0);
+    if (e) return e;
+
+    /* Wait for buffer-write-ready (bit 4), then push 128 × 32-bit words */
+    uint32_t tries = 1000000;
+    while (tries--) {
+        uint32_t is = r32(c->base + SDHC_INT_STATUS);
+        if (is & (1u << 4)) break;
+        if (is & INT_ERR_BIT) return SDHC_EDATAERR;
+    }
+    if (tries == 0) return SDHC_ETIMEOUT;
+    w32(c->base + SDHC_INT_STATUS, (1u << 4));
+
+    const uint32_t *p = (const uint32_t *)src;
+    for (int i = 0; i < 128; i++) {
+        w32(c->base + SDHC_BUFFER_DATA, p[i]);
+    }
+
+    /* Wait for xfer complete — write commits via card busy-wait then deasserts */
+    tries = 1000000;
+    while (tries--) {
+        uint32_t is = r32(c->base + SDHC_INT_STATUS);
+        if (is & INT_XFER_COMPLETE) break;
+        if (is & INT_ERR_BIT) return SDHC_EDATAERR;
+    }
+    if (tries == 0) return SDHC_ETIMEOUT;
+    w32(c->base + SDHC_INT_STATUS, INT_XFER_COMPLETE);
+    return SDHC_OK;
+}
