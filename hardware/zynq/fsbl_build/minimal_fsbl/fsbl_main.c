@@ -30,48 +30,48 @@
 /* These helpers are inline/static in ps_loader main.c; replicate here. */
 static inline void slcr_unlock(void) { w32(SLCR_UNLOCK, 0xDF0Du); dsb(); }
 
-/* Bring up PS UART0 on MIO10/11 (115200 8N1) so the LiteX BIOS — running
- * on NaxRiscv after PCAP — can write directly to 0xE0001030 (TXFIFO) via
- * its ps_iop window at NaxRiscv 0x80001030, and the bytes reach the
- * FT2232H ↔ host. The LiteX `serial` pin is on PL pin V12 which is not
- * wired to any host-visible UART; xsdb's JTAG path virtualizes that
- * over JTAG, which SD boot has no equivalent of. */
+/* Bring up PS UART1 on MIO48/49 (the AX7020 actually wires these to its
+ * FT2232H per the ALINX manual: UART_TX=MIO48 pad B12, UART_RX=MIO49 pad
+ * C12). UART0 on MIO10/11 was a misread of the LiteX platform comment;
+ * those pins are not host-visible on this board. */
+#define UART1_BASE 0xE0001000u
+#define UART_CR    (UART1_BASE + 0x00u)
+#define UART_MR    (UART1_BASE + 0x04u)
+#define UART_BAUD  (UART1_BASE + 0x18u)
+#define UART_SR    (UART1_BASE + 0x2Cu)
+#define UART_FIFO  (UART1_BASE + 0x30u)
+#define UART_BDIV  (UART1_BASE + 0x34u)
+
 static void uart0_bringup(void)
 {
     slcr_unlock();
 
-    /* MIO10 = UART0_TX (output): L3_SEL=7, IOTYPE=3 (LVCMOS33), TRI_ENABLE=0 */
-    w32(0xF8000728u, 0x000012E0u);
-    /* MIO11 = UART0_RX (input):  L3_SEL=7, IOTYPE=3, TRI_ENABLE=1 (input) */
-    w32(0xF800072Cu, 0x000012E1u);
+    /* MIO48 = UART1_TX (output): L3_SEL=7 (UART1), IOTYPE=3 (LVCMOS33), TRI_ENABLE=0
+     * MIO49 = UART1_RX (input):  L3_SEL=7, IOTYPE=3, TRI_ENABLE=1
+     * MIO pinmux: bit[0]=TRI, bits[7:5]=L3_SEL=7=0xE0, bits[11:9]=IOTYPE=3=0x600, bit[12]=PULLUP=0x1000.
+     * Value 0x12E0 = output, 0x12E1 = input. */
+    w32(0xF80007C0u, 0x000012E0u);   /* MIO_PIN_48 */
+    w32(0xF80007C4u, 0x000012E1u);   /* MIO_PIN_49 */
 
-    /* Bring UART0 out of reset (SLCR.UART_RST_CTRL @0xF8000228) */
+    /* Bring UART1 out of reset (SLCR.UART_RST_CTRL bits 1, 3 = UART1_REF_RST + UART1_CPU1X_RST) */
     uint32_t rst = r32(0xF8000228u);
-    w32(0xF8000228u, rst & ~0x3u);   /* clear UART0_REF_RST + UART0_CPU1X_RST */
+    w32(0xF8000228u, rst & ~0x0Au);
 
-    /* Enable UART0 AMBA peripheral clock (APER_CLK_CTRL bit 20) */
+    /* Enable UART1 AMBA peripheral clock (APER_CLK_CTRL bit 21) */
     uint32_t aper = r32(SLCR_APER_CLK_CTRL);
-    w32(SLCR_APER_CLK_CTRL, aper | (1u << 20));
+    w32(SLCR_APER_CLK_CTRL, aper | (1u << 21));
 
-    /* UART clock control (SLCR.UART_CLK_CTRL @0xF8000154):
-     *   bit0  UART0 ref clk enable
-     *   bit1  UART1 ref clk enable
-     *   bit5:4 SRCSEL (0 = IO_PLL, default)
-     *   bit13:8 DIVISOR  — IO_PLL / DIVISOR ≈ uart_ref_clk */
-    w32(0xF8000154u, 0x00001401u);   /* DIV=0x14=20, src=IOPLL, UART0_EN=1 */
+    /* UART_CLK_CTRL: enable UART1 ref clock (bit 1 = CLKACT1).
+     * IOPLL is ~1000 MHz; DIVISOR 0x14 = 20 -> uart_ref_clk = 50 MHz. */
+    w32(0xF8000154u, 0x00001402u);   /* DIV=20, src=IOPLL, UART1 enabled */
     dsb();
 
-    /* UART0 controller config @ 0xE0001000+ */
-    /* CR: TX/RX reset */
-    w32(0xE0001000u, 0x00000028u);
-    /* MR: 8 data bits, 1 stop, no parity, no flow */
-    w32(0xE0001004u, 0x00000020u);
-    /* BAUDGEN: 0x7C for 115200 with 50 MHz reference (UART_REF = IOPLL/20 = 50 MHz) */
-    w32(0xE0001018u, 0x0000007Cu);
-    /* BAUDDIV: 6 (CD = (50e6 / (6+1) / 115200) - 1 ≈ approximate divisor) */
-    w32(0xE0001034u, 0x00000006u);
-    /* CR: enable TX + RX, clear resets */
-    w32(0xE0001000u, 0x00000017u);
+    /* UART1 controller config */
+    w32(UART_CR,  0x00000003u);  /* RXRST + TXRST (Xilinx XSDK bit layout) */
+    w32(UART_MR,  0x00000020u);  /* 8N1 */
+    w32(UART_BAUD, 0x0000007Cu); /* BAUDGEN = 124 */
+    w32(UART_BDIV, 0x00000006u); /* BAUDDIV = 6  -> baud = 50e6 / (124 * 7) ≈ 57600 */
+    w32(UART_CR,   0x00000014u); /* TX_EN | RX_EN */
     dsb();
 }
 
@@ -79,8 +79,8 @@ static void uart0_putc(char c)
 {
     /* Wait while TX FIFO full (SR bit 4) */
     int spin = 1000000;
-    while ((r32(0xE000102Cu) & (1u << 4)) && --spin) ;
-    w32(0xE0001030u, (uint32_t)(unsigned char)c);
+    while ((r32(UART_SR) & (1u << 4)) && --spin) ;
+    w32(UART_FIFO, (uint32_t)(unsigned char)c);
 }
 
 static void uart0_puts(const char *s)
