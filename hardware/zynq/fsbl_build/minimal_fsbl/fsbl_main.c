@@ -115,6 +115,10 @@ static int do_ps7_post_config(void)
     w32(0xF8000008u, 0x0000DF0Du);  /* SLCR unlock */
     w32(0xF8000900u, 0x0000000Fu);  /* LVL_SHFTR_EN */
     w32(0xF8000240u, 0x00000000u);  /* FPGA_RST_CTRL */
+    /* Re-force UART_CLK_CTRL = DIV=18 in case generated ps7_post_config
+     * (or any other LiteX init step) restored the LiteX default 0x0A01.
+     * 0x0A01 with our IOPLL FDIV=54 produces 207 kbaud, not 115200. */
+    w32(0xF8000154u, 0x00001201u);
     w32(0xF8000004u, 0x0000767Bu);  /* SLCR lock */
     dsb();
     return rc;
