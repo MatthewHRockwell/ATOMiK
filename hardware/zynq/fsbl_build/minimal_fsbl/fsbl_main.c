@@ -30,47 +30,47 @@
 /* These helpers are inline/static in ps_loader main.c; replicate here. */
 static inline void slcr_unlock(void) { w32(SLCR_UNLOCK, 0xDF0Du); dsb(); }
 
-/* Bring up PS UART1 on MIO48/49 (the AX7020 actually wires these to its
- * FT2232H per the ALINX manual: UART_TX=MIO48 pad B12, UART_RX=MIO49 pad
- * C12). UART0 on MIO10/11 was a misread of the LiteX platform comment;
- * those pins are not host-visible on this board. */
-#define UART1_BASE 0xE0001000u
-#define UART_CR    (UART1_BASE + 0x00u)
-#define UART_MR    (UART1_BASE + 0x04u)
-#define UART_BAUD  (UART1_BASE + 0x18u)
-#define UART_SR    (UART1_BASE + 0x2Cu)
-#define UART_FIFO  (UART1_BASE + 0x30u)
-#define UART_BDIV  (UART1_BASE + 0x34u)
+/* Bring up PS UART0 on MIO10/11 (HamGeek RK-ZYNQ7020-F factory routes
+ * UART0 to a dedicated FT232 chip at USB 0403:6001 → /dev/ttyUSB1 @
+ * 115200). On this board TX is MIO11 (output), RX is MIO10 (input) —
+ * reversed from the typical Xilinx example. Values copied from a
+ * JTAG dump of the running factory image. */
+#define UART0_BASE 0xE0000000u
+#define UART_CR    (UART0_BASE + 0x00u)
+#define UART_MR    (UART0_BASE + 0x04u)
+#define UART_BAUD  (UART0_BASE + 0x18u)
+#define UART_SR    (UART0_BASE + 0x2Cu)
+#define UART_FIFO  (UART0_BASE + 0x30u)
+#define UART_BDIV  (UART0_BASE + 0x34u)
 
 static void uart0_bringup(void)
 {
     slcr_unlock();
 
-    /* MIO48 = UART1_TX (output): L3_SEL=7 (UART1), IOTYPE=3 (LVCMOS33), TRI_ENABLE=0
-     * MIO49 = UART1_RX (input):  L3_SEL=7, IOTYPE=3, TRI_ENABLE=1
-     * MIO pinmux: bit[0]=TRI, bits[7:5]=L3_SEL=7=0xE0, bits[11:9]=IOTYPE=3=0x600, bit[12]=PULLUP=0x1000.
-     * Value 0x12E0 = output, 0x12E1 = input. */
-    w32(0xF80007C0u, 0x000012E0u);   /* MIO_PIN_48 */
-    w32(0xF80007C4u, 0x000012E1u);   /* MIO_PIN_49 */
+    /* MIO10 = UART0_RX (input):  factory has 0x16E1 (TRI_ENABLE=1, L3_SEL=7)
+     * MIO11 = UART0_TX (output): factory has 0x16E0 (TRI_ENABLE=0, L3_SEL=7) */
+    w32(0xF8000728u, 0x000016E1u);   /* MIO_PIN_10 (RX) */
+    w32(0xF800072Cu, 0x000016E0u);   /* MIO_PIN_11 (TX) */
 
-    /* Bring UART1 out of reset (SLCR.UART_RST_CTRL bits 1, 3 = UART1_REF_RST + UART1_CPU1X_RST) */
+    /* UART_RST_CTRL bits 0, 2 = UART0_REF_RST + UART0_CPU1X_RST */
     uint32_t rst = r32(0xF8000228u);
-    w32(0xF8000228u, rst & ~0x0Au);
+    w32(0xF8000228u, rst & ~0x05u);
 
-    /* Enable UART1 AMBA peripheral clock (APER_CLK_CTRL bit 21) */
+    /* APER_CLK_CTRL bit 20 = UART0 AMBA peripheral clock */
     uint32_t aper = r32(SLCR_APER_CLK_CTRL);
-    w32(SLCR_APER_CLK_CTRL, aper | (1u << 21));
+    w32(SLCR_APER_CLK_CTRL, aper | (1u << 20));
 
-    /* UART_CLK_CTRL: enable UART1 ref clock (bit 1 = CLKACT1).
-     * IOPLL is ~1000 MHz; DIVISOR 0x14 = 20 -> uart_ref_clk = 50 MHz. */
-    w32(0xF8000154u, 0x00001402u);   /* DIV=20, src=IOPLL, UART1 enabled */
+    /* This build's IOPLL FDIV = 54 → IOPLL = 33.333 × 54 = 1800 MHz.
+     * For 115200 baud we need UART_REF ≈ 100 MHz → DIV = 18.
+     * (Factory image used FDIV=30 → 1000 MHz with DIV=10 → 100 MHz.) */
+    w32(0xF8000154u, 0x00001201u);   /* DIV=18, src=IOPLL, CLKACT0=1 */
     dsb();
 
-    /* UART1 controller config */
-    w32(UART_CR,  0x00000003u);  /* RXRST + TXRST (Xilinx XSDK bit layout) */
-    w32(UART_MR,  0x00000020u);  /* 8N1 */
-    w32(UART_BAUD, 0x0000007Cu); /* BAUDGEN = 124 */
-    w32(UART_BDIV, 0x00000006u); /* BAUDDIV = 6  -> baud = 50e6 / (124 * 7) ≈ 57600 */
+    /* UART0 controller (Xilinx XSDK CR bit layout) */
+    w32(UART_CR,   0x00000003u); /* RXRST + TXRST */
+    w32(UART_MR,   0x00000020u); /* 8N1 */
+    w32(UART_BAUD, 0x0000007Cu); /* BAUDGEN = 124, factory value */
+    w32(UART_BDIV, 0x00000006u); /* BAUDDIV = 6   → baud = 100e6 / (124*7) ≈ 115207 */
     w32(UART_CR,   0x00000014u); /* TX_EN | RX_EN */
     dsb();
 }
