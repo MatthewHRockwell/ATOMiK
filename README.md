@@ -79,7 +79,7 @@ If you are evaluating ATOMiK, start with one real workload or state-heavy path:
 Public CTAs:
 
 - [Request Evaluation Access](https://atomik.tech/contact?intent=evaluation)
-- [Review Proof](https://atomik.tech/proof)
+- [Review Proof](https://atomik.tech/benchmarks)
 - [Discuss Design Partnership](https://atomik.tech/contact?intent=design-partner)
 
 ## Evidence Hygiene
