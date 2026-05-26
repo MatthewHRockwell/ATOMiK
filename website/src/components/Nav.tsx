@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
+import { contactHref } from "@/lib/tracking";
 
 export default function Nav({ active }: { active?: string }) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -9,12 +10,11 @@ export default function Nav({ active }: { active?: string }) {
 
   const links = [
     { href: "/", label: "Product" },
-    { href: "/solutions", label: "Use Cases" },
-    { href: "/benchmarks", label: "Proof" },
-    { href: "/investor-brief", label: "Investors" },
     { href: "/pricing", label: "Evaluation" },
-    { href: "/about", label: "About" },
-    { href: "https://github.com/MatthewHRockwell/ATOMiK", label: "GitHub" },
+    { href: "/benchmarks", label: "Proof" },
+    { href: "/solutions", label: "Use Cases" },
+    { href: contactHref("licensing", "nav", "discuss-licensing"), label: "Licensing" },
+    { href: "/investor-brief", label: "Investors" },
   ];
 
   useEffect(() => {
@@ -42,18 +42,18 @@ export default function Nav({ active }: { active?: string }) {
     <nav
       ref={navRef}
       className="sticky top-0 z-50 border-b backdrop-blur-md"
-      style={{ background: "rgba(7, 11, 18, 0.88)", borderColor: "#1d324a" }}
+      style={{ background: "rgba(7, 8, 7, 0.9)", borderColor: "#2d3a34" }}
     >
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
         <Link
           href="/"
           className="text-lg font-bold no-underline transition-opacity hover:opacity-80"
-          style={{ color: "#f4f8ff" }}
+          style={{ color: "#f5f7ee" }}
         >
           ATOM<span style={{ color: "#22d3ee" }}>i</span>K
         </Link>
 
-        <div className="hidden items-center gap-4 text-sm lg:flex" style={{ color: "#9fb1c7" }}>
+        <div className="hidden items-center gap-4 text-sm lg:flex" style={{ color: "#b7c4bb" }}>
           {links.map((link) =>
             link.label === active ? (
               <span key={link.href} className="font-medium text-white">
@@ -70,11 +70,11 @@ export default function Nav({ active }: { active?: string }) {
             )
           )}
           <Link
-            href="/contact?intent=evaluation"
-            className="rounded-lg px-4 py-2 text-sm font-semibold text-white no-underline transition-opacity hover:opacity-90"
-            style={{ background: "#4f8fff" }}
+            href={contactHref("evaluation", "nav-desktop", "request-evaluation")}
+            className="rounded px-4 py-2 text-sm font-semibold text-white no-underline transition-opacity hover:opacity-90"
+            style={{ background: "#2563eb" }}
           >
-            Request Technical Evaluation
+            Request Evaluation
           </Link>
         </div>
 
@@ -87,18 +87,18 @@ export default function Nav({ active }: { active?: string }) {
           <span
             className="block h-[2px] w-5 rounded-full transition-all duration-300"
             style={{
-              background: "#9fb1c7",
+              background: "#b7c4bb",
               transform: menuOpen ? "translateY(7px) rotate(45deg)" : "none",
             }}
           />
           <span
             className="block h-[2px] w-5 rounded-full transition-all duration-300"
-            style={{ background: "#9fb1c7", opacity: menuOpen ? 0 : 1 }}
+            style={{ background: "#b7c4bb", opacity: menuOpen ? 0 : 1 }}
           />
           <span
             className="block h-[2px] w-5 rounded-full transition-all duration-300"
             style={{
-              background: "#9fb1c7",
+              background: "#b7c4bb",
               transform: menuOpen ? "translateY(-7px) rotate(-45deg)" : "none",
             }}
           />
@@ -110,7 +110,7 @@ export default function Nav({ active }: { active?: string }) {
         style={{
           maxHeight: menuOpen ? `${(links.length + 1) * 48 + 24}px` : "0px",
           opacity: menuOpen ? 1 : 0,
-          borderTop: menuOpen ? "1px solid #1d324a" : "none",
+          borderTop: menuOpen ? "1px solid #2d3a34" : "none",
         }}
       >
         <div className="mx-auto flex max-w-7xl flex-col px-6 py-2 text-sm">
@@ -124,7 +124,7 @@ export default function Nav({ active }: { active?: string }) {
                 key={link.href}
                 href={link.href}
                 className="px-2 py-2.5 no-underline transition-colors hover:text-white"
-                style={{ color: "#9fb1c7" }}
+                style={{ color: "#b7c4bb" }}
                 onClick={() => setMenuOpen(false)}
               >
                 {link.label}
@@ -132,12 +132,12 @@ export default function Nav({ active }: { active?: string }) {
             )
           )}
           <Link
-            href="/contact?intent=evaluation"
-            className="mx-2 mt-2 rounded-lg py-2.5 text-center text-sm font-semibold text-white no-underline transition-opacity hover:opacity-90"
-            style={{ background: "#4f8fff" }}
+            href={contactHref("evaluation", "nav-mobile", "request-evaluation")}
+            className="mx-2 mt-2 rounded py-2.5 text-center text-sm font-semibold text-white no-underline transition-opacity hover:opacity-90"
+            style={{ background: "#2563eb" }}
             onClick={() => setMenuOpen(false)}
           >
-            Request Technical Evaluation
+            Request Evaluation
           </Link>
         </div>
       </div>

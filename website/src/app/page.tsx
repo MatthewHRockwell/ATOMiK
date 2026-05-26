@@ -1,228 +1,304 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { Metadata } from "next";
+import type { CSSProperties, ReactNode } from "react";
 import Nav from "@/components/Nav";
+import {
+  fitSignals,
+  intakeItems,
+  metricMatrix,
+  offerFormula,
+  positioningStatement,
+  primaryIcp,
+  proofToday,
+  successExamples,
+} from "@/lib/messaging";
 
 export const metadata: Metadata = {
-  title: "ATOMiK - Cooler, Faster State-Aware Compute",
+  title: "ATOMiK - State-Aware Compute Evaluation",
   description:
-    "ATOMiK targets wasted state movement so devices and infrastructure can run cooler, move less data, and do more useful work per watt.",
+    "ATOMiK helps edge and embedded teams evaluate whether state-aware execution can reduce redundant state movement in constrained workloads.",
   openGraph: {
-    title: "ATOMiK - Cooler, Faster State-Aware Compute",
+    title: "ATOMiK - State-Aware Compute Evaluation",
     description:
-      "Less heat, less bandwidth, and more useful work per watt through state-aware compute.",
+      "Request an evidence-bound evaluation for workloads constrained by heat, battery, bandwidth, latency, or hardware footprint.",
     url: "https://atomik.tech",
     images: [{ url: "https://atomik.tech/09-current-live-atomik-desk-v039k.png", width: 1920, height: 1080 }],
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "ATOMiK - Cooler, Faster State-Aware Compute",
+    title: "ATOMiK - State-Aware Compute Evaluation",
     description:
-      "Less heat, less bandwidth, and more useful work per watt through state-aware compute.",
+      "Bring one state-heavy workload, one baseline, and one painful constraint.",
     images: ["https://atomik.tech/09-current-live-atomik-desk-v039k.png"],
   },
 };
 
 const colors = {
-  bg: "#070b12",
-  panel: "#0d1420",
-  panel2: "#101a29",
-  border: "#1d324a",
-  text: "#f4f8ff",
-  muted: "#9fb1c7",
-  faint: "#6f8097",
+  bg: "#070807",
+  panel: "#10130f",
+  panel2: "#17130f",
+  panel3: "#0d1513",
+  border: "#2d3a34",
+  text: "#f5f7ee",
+  muted: "#b7c4bb",
+  faint: "#7f8b81",
   cyan: "#22d3ee",
-  blue: "#4f8fff",
-  green: "#22c55e",
-  violet: "#a78bfa",
-  amber: "#f59e0b",
+  blue: "#2563eb",
+  green: "#2dd36f",
+  amber: "#f5a524",
+  rose: "#fb7185",
+  violet: "#c084fc",
 };
 
-const outcomes = [
+const paidPains = [
   {
-    title: "Less heat",
-    body: "Wasted memory movement and repeated state scans turn into heat. ATOMiK targets the upstream cause: moving and recomputing state that did not materially change.",
+    title: "Battery and duty cycle",
+    body:
+      "If state scans, syncs, or radio wake-ups consume a limited power budget, ATOMiK can evaluate whether meaningful-change tracking may reduce active work.",
     accent: colors.green,
   },
   {
-    title: "Longer battery life",
-    body: "For edge and mobile-class devices, every avoided transfer and recompute cycle can preserve power budget for useful work instead of bookkeeping.",
+    title: "Heat and enclosure limits",
+    body:
+      "If redundant state work contributes to utilization or thermal pressure, ATOMiK can map the workload before any heat claim is made.",
+    accent: colors.amber,
+  },
+  {
+    title: "Bandwidth and link cost",
+    body:
+      "If full-state movement stresses expensive, remote, intermittent, or congested links, ATOMiK evaluates bytes moved and transfers avoided.",
     accent: colors.cyan,
   },
   {
-    title: "Faster state paths",
-    body: "ATOMiK treats change as the work unit, so systems can evaluate what changed instead of repeatedly reconstructing the same state through slow paths.",
-    accent: colors.blue,
-  },
-  {
-    title: "Smaller hardware profiles",
-    body: "If a workload needs less bandwidth, less cooling headroom, and less redundant state machinery, the design space opens for smaller devices and denser deployments.",
+    title: "Latency and local execution",
+    body:
+      "If replay, reconstruction, or sync sits on the response path, ATOMiK evaluates whether state-aware boundaries can lower update cost.",
     accent: colors.violet,
   },
-];
-
-const industries = [
   {
-    name: "Data centers",
-    value: "Reduce cooling pressure",
-    body: "Data centers spend real money and water removing heat. ATOMiK is positioned for workloads where avoiding redundant state movement can reduce the heat created in the first place.",
-  },
-  {
-    name: "Edge devices",
-    value: "Do more inside tight power envelopes",
-    body: "Edge systems are constrained by battery, thermal limits, radio bandwidth, and latency. ATOMiK evaluates whether state-aware execution can keep more work local.",
-  },
-  {
-    name: "AI at the edge",
-    value: "Keep context hot without moving everything",
-    body: "Agent and AI systems constantly manage context. ATOMiK targets the state-management layer around those workloads, especially where moving full context is the bottleneck.",
-  },
-  {
-    name: "Defense and remote operations",
-    value: "Lower weight, lower power, higher reliability",
-    body: "Remote systems care about every ounce, watt, and minute of uptime. ATOMiK is a fit to evaluate where deterministic state handling and reduced data movement matter operationally.",
+    title: "Footprint and weight",
+    body:
+      "If hardware is overbuilt around state movement, cooling, or bandwidth pressure, ATOMiK can test whether that pressure has a state-aware path.",
+    accent: colors.rose,
   },
 ];
 
 const mechanisms = [
-  { title: "LOAD", body: "Start from a known reference state." },
-  { title: "ACCUM", body: "Accumulate meaningful state changes as compact deltas." },
-  { title: "READ", body: "Reconstruct current state from reference plus accumulated change." },
-  { title: "SWAP", body: "Commit a state transition and reset the accumulator boundary." },
-];
-
-const proofItems = [
-  ["HARDWARE_VALIDATED", "ATOMiK Desk v0.39-K is the current live hardware screenshot for the public site."],
-  ["BUILD_ARTIFACT", "Minimal FSBL, generated fsbl.elf, SD-boot bitstream, and BOOT.bin exist in the Zynq boot path. Power-on validation is still pending."],
-  ["HARDWARE_VALIDATED", "Linux userspace to FPGA validation remains a separate hardware proof path."],
-  ["SYNTHESIS_VALIDATED", "Zynq scaling ceilings remain synthesis-characterized unless a matching board-run artifact is published."],
-  ["SOFTWARE_VALIDATED", "Formal proof and SDK work are available for technical diligence in the repository."],
-];
-
-const tractionItems = [
   {
-    label: "LIVE DESK PROOF",
-    title: "Hardware-native UI at v0.39-K",
-    body: "The current Desk surface runs as a single framebuffer process on Zynq hardware and presents the STATE, SYNC, and AGENT personalities visually.",
+    title: "Track meaningful change",
+    body:
+      "ATOMiK starts from a known state and records the state transitions that matter to the workload.",
   },
   {
-    label: "STANDALONE BOOT PATH",
-    title: "BOOT.bin assembled",
-    body: "The SD-boot bitstream, minimal FSBL build, and BOOT.bin artifact are present. Power-on standalone validation is the next gate.",
+    title: "Coalesce repeated work",
+    body:
+      "When many logical operations hit fewer state regions, ATOMiK evaluates whether they can be collapsed safely.",
   },
   {
-    label: "IP PATH",
-    title: "Pre-seed goal: evaluate and de-risk silicon",
-    body: "The near-term funding use is to convert proof into paid evaluations, stronger IP protection, and ASIC feasibility work before any tape-out commitment.",
+    title: "Avoid full-state movement",
+    body:
+      "The goal is not to move everything faster. The goal is to avoid moving, scanning, replaying, or rebuilding state that does not need it.",
+  },
+  {
+    title: "Preserve correctness",
+    body:
+      "Every evaluation needs an expected state, invariant, or output so reduced movement does not become reduced correctness.",
   },
 ];
 
-function Label({ children }: { children: React.ReactNode }) {
+function Label({ children }: { children: ReactNode }) {
   return (
     <span
       className="inline-flex rounded px-2 py-1 text-[11px] font-semibold uppercase"
-      style={{ color: colors.cyan, border: `1px solid ${colors.border}`, background: "#091522" }}
+      style={{ color: colors.cyan, border: `1px solid ${colors.border}`, background: "#07110f" }}
     >
       {children}
     </span>
   );
 }
 
+function EvidenceLink({
+  href,
+  className,
+  style,
+  children,
+}: {
+  href: string;
+  className?: string;
+  style?: CSSProperties;
+  children: ReactNode;
+}) {
+  if (href.startsWith("http")) {
+    return (
+      <a href={href} className={className} style={style}>
+        {children}
+      </a>
+    );
+  }
+  return (
+    <Link href={href} className={className} style={style}>
+      {children}
+    </Link>
+  );
+}
+
 export default function Home() {
+  const homepageMetrics = metricMatrix.filter((item) =>
+    [
+      "Bytes moved",
+      "Full-state transfers avoided",
+      "Operations coalesced",
+      "Unique-region ratio",
+      "Cycles per update",
+      "Update latency",
+      "Power proxy",
+      "Thermal proxy",
+      "Correctness preservation",
+    ].includes(item.metric)
+  );
+
   return (
     <div className="min-h-screen" style={{ background: colors.bg, color: colors.text }}>
       <Nav active="Product" />
 
-      <section className="px-6 pb-16 pt-16 md:pt-20">
-        <div className="mx-auto grid max-w-6xl gap-10 md:grid-cols-[1.02fr_0.98fr] md:items-center">
+      <section className="px-6 pb-14 pt-16 md:pt-20">
+        <div className="mx-auto grid max-w-6xl gap-10 md:grid-cols-[1.05fr_0.95fr] md:items-center">
           <div>
-            <Label>Cooler, faster state-aware compute</Label>
-            <h1 className="mt-5 max-w-3xl text-4xl font-bold leading-[1.06] md:text-6xl">
-              Less heat. Less bandwidth. More useful work per watt.
+            <Label>State-aware compute evaluation</Label>
+            <h1 className="mt-5 max-w-4xl text-4xl font-bold leading-[1.05] md:text-6xl">
+              Stop wasting power, bandwidth, and time moving state your system already knows.
             </h1>
-            <p className="mt-6 max-w-2xl text-lg leading-8" style={{ color: colors.muted }}>
-              ATOMiK attacks a simple systems problem: computers waste energy moving, scanning, and reconstructing state that barely changed. We make state change a first-class hardware/software primitive so devices and infrastructure can target cooler operation, faster state paths, longer battery life, and smaller hardware profiles.
+            <p className="mt-6 max-w-3xl text-lg leading-8" style={{ color: colors.muted }}>
+              ATOMiK helps edge and embedded teams evaluate whether state-aware execution can reduce redundant state movement in workloads constrained by heat, battery, bandwidth, latency, or hardware footprint.
             </p>
-            <div className="mt-8 flex flex-wrap gap-3">
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Link
-                href="/contact?intent=evaluation"
-                className="rounded-lg px-5 py-3 text-sm font-semibold no-underline transition-opacity hover:opacity-90"
+                href="/contact?intent=evaluation&source=homepage-hero&cta=request-evaluation"
+                className="rounded px-5 py-3 text-center text-sm font-semibold no-underline transition-opacity hover:opacity-90"
                 style={{ background: colors.blue, color: "#fff" }}
               >
-                Request Technical Evaluation
+                Request Evaluation
               </Link>
               <Link
-                href="/docs/hardware"
-                className="rounded-lg px-5 py-3 text-sm font-semibold no-underline transition-colors hover:text-white"
+                href="/benchmarks"
+                className="rounded px-5 py-3 text-center text-sm font-semibold no-underline transition-colors hover:text-white"
                 style={{ color: colors.text, border: `1px solid ${colors.border}` }}
               >
-                View Evidence
+                Review Proof
               </Link>
             </div>
-            <div className="mt-8 grid gap-3 text-sm sm:grid-cols-5" style={{ color: colors.muted }}>
-              <span>Lower heat targets</span>
-              <span>Less bandwidth</span>
-              <span>Edge battery fit</span>
-              <span>Live Zynq Desk</span>
-              <span>Silicon IP path</span>
+            <div className="mt-8 grid gap-3 text-sm sm:grid-cols-3" style={{ color: colors.muted }}>
+              <span>One workload</span>
+              <span>One baseline</span>
+              <span>One painful constraint</span>
             </div>
           </div>
 
-          <figure className="overflow-hidden rounded-lg" style={{ border: `1px solid ${colors.border}`, background: colors.panel }}>
+          <figure className="overflow-hidden rounded" style={{ border: `1px solid ${colors.border}`, background: colors.panel }}>
             <Image
               src="/09-current-live-atomik-desk-v039k.png"
               width={1920}
               height={1080}
               priority
-              sizes="(min-width: 768px) 48vw, 100vw"
+              sizes="(min-width: 768px) 46vw, 100vw"
               alt="ATOMiK Desk v0.39-K prototype UI running on live Zynq hardware"
               className="h-auto w-full"
             />
             <figcaption className="px-4 py-3 text-xs" style={{ color: colors.muted }}>
-              <strong style={{ color: colors.text }}>HARDWARE_VALIDATED:</strong> ATOMiK Desk v0.39-K prototype UI running on live Zynq hardware. Not a commercial desktop product.
+              <strong style={{ color: colors.text }}>Hardware-validated prototype image:</strong> ATOMiK Desk v0.39-K running on live Zynq hardware. This image is not a power, thermal, uptime, or production-readiness claim.
             </figcaption>
           </figure>
         </div>
       </section>
 
-      <section className="px-6 py-14" style={{ borderTop: `1px solid ${colors.border}` }}>
+      <section className="px-6 py-12" style={{ borderTop: `1px solid ${colors.border}` }}>
+        <div className="mx-auto max-w-6xl">
+          <Label>ATOMiK is X that helps Y by Z</Label>
+          <div className="mt-5 grid gap-5 md:grid-cols-[1fr_1.05fr]">
+            <div className="rounded p-6" style={{ background: colors.panel2, border: `1px solid ${colors.border}` }}>
+              <h2 className="text-3xl font-bold md:text-4xl">What ATOMiK is.</h2>
+              <p className="mt-4 text-lg leading-8" style={{ color: colors.muted }}>{positioningStatement}</p>
+              <p className="mt-5 text-sm leading-6" style={{ color: colors.faint }}>
+                First ICP: {primaryIcp}
+              </p>
+            </div>
+            <div className="grid gap-3">
+              {[
+                ["Give us X", offerFormula.give],
+                ["We evaluate Y", offerFormula.evaluate],
+                ["You receive Z", offerFormula.receive],
+                ["Success looks like A", offerFormula.success],
+              ].map(([title, body]) => (
+                <article key={title} className="rounded p-5" style={{ background: colors.panel, border: `1px solid ${colors.border}` }}>
+                  <p className="text-[11px] font-semibold uppercase" style={{ color: colors.green }}>{title}</p>
+                  <p className="mt-2 text-sm leading-6" style={{ color: colors.muted }}>{body}</p>
+                </article>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="px-6 py-12" style={{ borderTop: `1px solid ${colors.border}` }}>
         <div className="mx-auto max-w-6xl">
           <div className="max-w-3xl">
-            <Label>Customer outcomes</Label>
-            <h2 className="mt-4 text-3xl font-bold md:text-4xl">The end game is not a new dashboard. It is cheaper, cooler compute.</h2>
+            <Label>Paid pain</Label>
+            <h2 className="mt-4 text-3xl font-bold md:text-4xl">Why wasted state movement becomes a buying conversation.</h2>
             <p className="mt-4 text-lg leading-8" style={{ color: colors.muted }}>
-              ATOMiK is valuable when the customer is constrained by heat, power, bandwidth, latency, or hardware footprint. The architecture is evaluated against those outcomes, not against abstract technical novelty.
+              The first question is not whether ATOMiK is interesting. It is whether redundant state movement is already costing the team power, heat, bandwidth, latency, size, reliability, or engineering time.
             </p>
           </div>
-          <div className="mt-8 grid gap-4 md:grid-cols-4">
-            {outcomes.map((item) => (
-              <div key={item.title} className="rounded-lg p-5" style={{ background: colors.panel, border: `1px solid ${colors.border}` }}>
-                <div className="mb-4 h-1 w-16 rounded" style={{ background: item.accent }} />
+          <div className="mt-8 grid gap-4 md:grid-cols-5">
+            {paidPains.map((item) => (
+              <article key={item.title} className="rounded p-5" style={{ background: colors.panel, border: `1px solid ${colors.border}` }}>
+                <div className="mb-4 h-1 w-14 rounded" style={{ background: item.accent }} />
                 <h3 className="text-lg font-bold">{item.title}</h3>
                 <p className="mt-3 text-sm leading-6" style={{ color: colors.muted }}>{item.body}</p>
-              </div>
+              </article>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="px-6 py-14" style={{ borderTop: `1px solid ${colors.border}` }}>
+      <section className="px-6 py-12" style={{ borderTop: `1px solid ${colors.border}` }}>
+        <div className="mx-auto grid max-w-6xl gap-8 md:grid-cols-[0.92fr_1.08fr]">
+          <div>
+            <Label>Plain English mechanism</Label>
+            <h2 className="mt-4 text-3xl font-bold md:text-4xl">ATOMiK tracks change instead of repeatedly treating all state as new.</h2>
+            <p className="mt-4 text-lg leading-8" style={{ color: colors.muted }}>
+              Many constrained systems spend too much work moving, scanning, syncing, replaying, or rebuilding state. ATOMiK maps those paths and evaluates whether a state-aware architecture can reduce the wasted work.
+            </p>
+            <Link href="/pricing" className="mt-6 inline-flex rounded px-4 py-2 text-sm font-semibold no-underline" style={{ color: colors.cyan, border: `1px solid ${colors.border}` }}>
+              See evaluation process
+            </Link>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {mechanisms.map((item) => (
+              <article key={item.title} className="rounded p-5" style={{ background: colors.panel, border: `1px solid ${colors.border}` }}>
+                <h3 className="font-semibold">{item.title}</h3>
+                <p className="mt-2 text-sm leading-6" style={{ color: colors.muted }}>{item.body}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="px-6 py-12" style={{ borderTop: `1px solid ${colors.border}` }}>
         <div className="mx-auto max-w-6xl">
-          <div className="grid gap-8 md:grid-cols-[0.9fr_1.1fr] md:items-start">
+          <div className="grid gap-8 md:grid-cols-[0.85fr_1.15fr]">
             <div>
-              <Label>Industry use cases</Label>
-              <h2 className="mt-4 text-3xl font-bold md:text-4xl">Show customers their version of the benefit.</h2>
-              <p className="mt-4 text-lg leading-8" style={{ color: colors.muted }}>
-                Different buyers feel the same state-waste problem through different budgets: cooling, battery, network, latency, weight, or compute density.
+              <Label>Best fit</Label>
+              <h2 className="mt-4 text-3xl font-bold md:text-4xl">The first evaluation needs evidence, not a technology tour.</h2>
+              <p className="mt-4 text-sm leading-6" style={{ color: colors.muted }}>
+                ATOMiK is strongest where state movement, repeated scans, full-state sync, replay, or reconstruction dominates the cost.
               </p>
             </div>
-            <div className="grid gap-4 sm:grid-cols-2">
-              {industries.map((item) => (
-                <div key={item.name} className="rounded-lg p-5" style={{ background: colors.panel, border: `1px solid ${colors.border}` }}>
-                  <div className="text-[11px] font-semibold uppercase" style={{ color: colors.green }}>{item.name}</div>
-                  <h3 className="mt-2 text-lg font-bold">{item.value}</h3>
-                  <p className="mt-3 text-sm leading-6" style={{ color: colors.muted }}>{item.body}</p>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {fitSignals.map((signal) => (
+                <div key={signal} className="rounded p-4 text-sm leading-6" style={{ background: colors.panel, border: `1px solid ${colors.border}`, color: colors.muted }}>
+                  <span style={{ color: colors.green }}>-</span> {signal}
                 </div>
               ))}
             </div>
@@ -230,118 +306,120 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="px-6 py-14" style={{ borderTop: `1px solid ${colors.border}` }}>
-        <div className="mx-auto max-w-6xl">
-          <div className="grid gap-8 md:grid-cols-[0.95fr_1.05fr] md:items-start">
-            <div>
-              <Label>How it works</Label>
-              <h2 className="mt-4 text-3xl font-bold md:text-4xl">Make change the unit of compute.</h2>
-              <p className="mt-4 text-lg leading-8" style={{ color: colors.muted }}>
-                Traditional systems keep asking what changed. ATOMiK keeps a reference state, accumulates compact deltas, reconstructs on demand, and commits clean epoch boundaries.
-              </p>
-              <Link
-                href="/docs/hardware"
-                className="mt-6 inline-flex rounded-lg px-4 py-2 text-sm font-semibold no-underline"
-                style={{ color: colors.cyan, border: `1px solid ${colors.border}` }}
-              >
-                View docs and examples
-              </Link>
-            </div>
-            <div className="grid gap-4 sm:grid-cols-2">
-              {mechanisms.map((item) => (
-                <div key={item.title} className="rounded-lg p-5" style={{ background: colors.panel, border: `1px solid ${colors.border}` }}>
-                  <h3 className="font-semibold" style={{ color: colors.text }}>{item.title}</h3>
-                  <p className="mt-2 text-sm leading-6" style={{ color: colors.muted }}>{item.body}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="px-6 py-14" style={{ borderTop: `1px solid ${colors.border}` }}>
+      <section className="px-6 py-12" style={{ borderTop: `1px solid ${colors.border}` }}>
         <div className="mx-auto max-w-6xl">
           <div className="max-w-3xl">
-            <Label>Current traction</Label>
-            <h2 className="mt-4 text-3xl font-bold md:text-4xl">Built enough to evaluate, disciplined enough to trust.</h2>
+            <Label>What to bring to an evaluation</Label>
+            <h2 className="mt-4 text-3xl font-bold md:text-4xl">Bring one real workload, one baseline, and one constraint.</h2>
             <p className="mt-4 text-lg leading-8" style={{ color: colors.muted }}>
-              The current site separates what is live, what is a build artifact, and what is still roadmap. That keeps the investor story compelling without overstating the proof.
+              Customers do not need to expose an entire product. They need to provide enough about one constrained state path to decide whether ATOMiK is relevant.
             </p>
           </div>
-          <div className="mt-8 grid gap-4 md:grid-cols-3">
-            {tractionItems.map((item) => (
-              <div key={item.title} className="rounded-lg p-5" style={{ background: colors.panel, border: `1px solid ${colors.border}` }}>
-                <div className="text-[11px] font-semibold" style={{ color: colors.green }}>{item.label}</div>
-                <h3 className="mt-2 text-lg font-bold">{item.title}</h3>
-                <p className="mt-2 text-sm leading-6" style={{ color: colors.muted }}>{item.body}</p>
+          <div className="mt-8 grid gap-3 md:grid-cols-3">
+            {intakeItems.map((item) => (
+              <div key={item} className="rounded p-4 text-sm leading-6" style={{ background: colors.panel, border: `1px solid ${colors.border}`, color: colors.muted }}>
+                {item}
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="px-6 py-14" style={{ borderTop: `1px solid ${colors.border}` }}>
+      <section className="px-6 py-12" style={{ borderTop: `1px solid ${colors.border}` }}>
         <div className="mx-auto max-w-6xl">
           <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
             <div className="max-w-3xl">
-              <Label>Proof hierarchy</Label>
-              <h2 className="mt-4 text-3xl font-bold md:text-4xl">Live proof, build artifacts, and roadmap are separated.</h2>
+              <Label>What we measure</Label>
+              <h2 className="mt-4 text-3xl font-bold md:text-4xl">Success is agreed before the benchmark starts.</h2>
               <p className="mt-4 text-lg leading-8" style={{ color: colors.muted }}>
-                ATOMiK is ambitious, but public claims stay bounded. The site distinguishes live hardware screenshots, boot-chain artifacts, software proof, synthesis output, and roadmap work.
+                ATOMiK is successful when it improves the pre-agreed metric against the current baseline, preserves correctness, and connects that improvement to a business constraint worth pursuing.
               </p>
             </div>
-            <Link
-              href="/docs/hardware"
-              className="rounded-lg px-4 py-2 text-sm font-semibold no-underline"
-              style={{ color: colors.cyan, border: `1px solid ${colors.border}` }}
-            >
-              Open hardware proof
+            <Link href="/pricing#metrics" className="rounded px-4 py-2 text-sm font-semibold no-underline" style={{ color: colors.cyan, border: `1px solid ${colors.border}` }}>
+              Full metrics matrix
             </Link>
           </div>
-
-          <div className="mt-8 grid gap-4 md:grid-cols-5">
-            {proofItems.map(([label, text]) => (
-              <div key={label} className="rounded-lg p-5" style={{ background: colors.panel, border: `1px solid ${colors.border}` }}>
-                <div className="text-[11px] font-semibold" style={{ color: colors.cyan }}>{label}</div>
-                <p className="mt-3 text-sm leading-6" style={{ color: colors.muted }}>{text}</p>
+          <div className="mt-8 overflow-x-auto rounded" style={{ border: `1px solid ${colors.border}` }}>
+            <table className="w-full min-w-[860px] border-collapse text-left text-sm">
+              <thead style={{ background: colors.panel2 }}>
+                <tr>
+                  <th className="px-4 py-3 font-semibold">Metric</th>
+                  <th className="px-4 py-3 font-semibold">When it matters</th>
+                  <th className="px-4 py-3 font-semibold">Meaningful result</th>
+                  <th className="px-4 py-3 font-semibold">Public safety</th>
+                </tr>
+              </thead>
+              <tbody>
+                {homepageMetrics.map((item) => (
+                  <tr key={item.metric} style={{ borderTop: `1px solid ${colors.border}` }}>
+                    <td className="px-4 py-3 font-semibold" style={{ color: colors.text }}>{item.metric}</td>
+                    <td className="px-4 py-3" style={{ color: colors.muted }}>{item.matters}</td>
+                    <td className="px-4 py-3" style={{ color: colors.muted }}>{item.meaningful}</td>
+                    <td className="px-4 py-3" style={{ color: colors.faint }}>{item.whereSafe}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div className="mt-6 grid gap-3 md:grid-cols-3">
+            {successExamples.map((item) => (
+              <div key={item} className="rounded p-4 text-sm leading-6" style={{ background: colors.panel3, border: `1px solid ${colors.border}`, color: colors.muted }}>
+                {item}
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      <section className="px-6 py-12" style={{ borderTop: `1px solid ${colors.border}` }}>
+        <div className="mx-auto max-w-6xl">
+          <div className="max-w-3xl">
+            <Label>How we know ATOMiK works today</Label>
+            <h2 className="mt-4 text-3xl font-bold md:text-4xl">The proof is real, specific, and workload-bound.</h2>
+            <p className="mt-4 text-lg leading-8" style={{ color: colors.muted }}>
+              ATOMiK is evaluated workload by workload. Current evidence shows the architecture can win in specific coalesced or batched scenarios and lose in others.
+            </p>
+          </div>
+          <div className="mt-8 grid gap-4 md:grid-cols-3">
+            {proofToday.map((item) => (
+              <EvidenceLink key={item.title} href={item.href} className="rounded p-5 no-underline" style={{ background: colors.panel, border: `1px solid ${colors.border}`, color: colors.text }}>
+                <p className="text-[11px] font-semibold uppercase" style={{ color: colors.cyan }}>{item.label}</p>
+                <h3 className="mt-2 text-lg font-bold">{item.title}</h3>
+                <p className="mt-3 text-sm leading-6" style={{ color: colors.muted }}>{item.body}</p>
+              </EvidenceLink>
+            ))}
+          </div>
+          <p className="mt-6 max-w-4xl text-xs leading-6" style={{ color: colors.faint }}>
+            Performance claims must be quoted only with their artifact, context, and caveat. Do not isolate the biggest number without the interpretation.
+          </p>
         </div>
       </section>
 
       <section className="px-6 py-16" style={{ borderTop: `1px solid ${colors.border}` }}>
-        <div className="mx-auto max-w-6xl">
-          <div className="max-w-3xl">
-            <Label>Evaluation and licensing</Label>
-            <h2 className="mt-4 text-3xl font-bold md:text-4xl">Bring one workload. We will map the wasted state.</h2>
-            <p className="mt-4 text-lg leading-8" style={{ color: colors.muted }}>
-              The right first customer is not buying a slogan. They are bringing a workload where heat, battery, latency, bandwidth, or hardware profile is already painful.
-            </p>
-          </div>
-
-          <div className="mt-8 grid gap-5 md:grid-cols-2">
-            <div className="rounded-lg p-6" style={{ background: colors.panel2, border: `1px solid ${colors.border}` }}>
-              <h3 className="text-xl font-bold">Design Partner Evaluation</h3>
-              <p className="mt-3 text-sm leading-6" style={{ color: colors.muted }}><strong style={{ color: colors.text }}>For:</strong> Teams with edge, embedded, data-center, AI-context, defense, or distributed-state workloads.</p>
-              <p className="mt-3 text-sm leading-6" style={{ color: colors.muted }}>Map a real workload to ATOMiK&apos;s evidence stack, define success criteria, and decide whether state-aware execution creates measurable value.</p>
-              <Link href="/contact?intent=evaluation" className="mt-5 inline-flex rounded-lg px-4 py-2 text-sm font-semibold no-underline transition-opacity hover:opacity-90" style={{ background: colors.blue, color: "#fff" }}>
-                Request Evaluation Access
-              </Link>
+        <div className="mx-auto max-w-6xl rounded p-8" style={{ background: colors.panel2, border: `1px solid ${colors.border}` }}>
+          <div className="grid gap-8 md:grid-cols-[1fr_0.9fr] md:items-center">
+            <div>
+              <Label>Next step</Label>
+              <h2 className="mt-4 text-3xl font-bold md:text-4xl">Request an evaluation around one constrained state path.</h2>
+              <p className="mt-4 text-sm leading-6" style={{ color: colors.muted }}>
+                The right next conversation determines whether you need proof review, workload mapping, a benchmark exchange, technical evaluation, licensing diligence, investor diligence, or a no-fit answer.
+              </p>
             </div>
-            <div className="rounded-lg p-6" style={{ background: colors.panel2, border: `1px solid ${colors.border}` }}>
-              <h3 className="text-xl font-bold">IP / ASIC Feasibility Path</h3>
-              <p className="mt-3 text-sm leading-6" style={{ color: colors.muted }}><strong style={{ color: colors.text }}>For:</strong> Investors, chip partners, and teams evaluating ATOMiK as embeddable hardware IP.</p>
-              <p className="mt-3 text-sm leading-6" style={{ color: colors.muted }}>Pre-seed funding de-risks IP protection, paid evaluations, ASIC mentorship, and feasibility work before any production tape-out decision.</p>
-              <Link href="/contact?intent=licensing" className="mt-5 inline-flex rounded-lg px-4 py-2 text-sm font-semibold no-underline transition-opacity hover:opacity-90" style={{ background: colors.blue, color: "#fff" }}>
+            <div className="flex flex-col gap-3">
+              <Link href="/contact?intent=evaluation&source=homepage-final&cta=request-evaluation" className="rounded px-5 py-3 text-center text-sm font-semibold text-white no-underline" style={{ background: colors.blue }}>
+                Request Evaluation
+              </Link>
+              <Link href="/benchmarks" className="rounded px-5 py-3 text-center text-sm font-semibold no-underline" style={{ color: colors.text, border: `1px solid ${colors.border}` }}>
+                Review Proof
+              </Link>
+              <Link href="/contact?intent=licensing&source=homepage-final&cta=discuss-licensing" className="rounded px-5 py-3 text-center text-sm font-semibold no-underline" style={{ color: colors.text, border: `1px solid ${colors.border}` }}>
                 Discuss Licensing
               </Link>
+              <Link href="/investor-brief" className="rounded px-5 py-3 text-center text-sm font-semibold no-underline" style={{ color: colors.text, border: `1px solid ${colors.border}` }}>
+                Investor Diligence
+              </Link>
             </div>
           </div>
-
-          <p className="mt-8 max-w-4xl text-xs leading-6" style={{ color: colors.faint }}>
-            Live screenshots show current prototypes. Build artifacts show readiness for the next validation gate. Cooling, battery, speed, footprint, and bandwidth benefits are evaluation targets unless a linked measured artifact states a specific result. Concept visuals show product direction and are not represented as current commercial functionality.
-          </p>
         </div>
       </section>
     </div>

@@ -15,9 +15,9 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://atomik.tech"),
-  title: "ATOMiK - Cooler, Faster State-Aware Compute",
+  title: "ATOMiK - State-Aware Compute Evaluation",
   description:
-    "ATOMiK targets wasted state movement so devices and infrastructure can run cooler, move less data, and do more useful work per watt.",
+    "ATOMiK helps edge and embedded teams evaluate whether state-aware execution can reduce redundant state movement in constrained workloads.",
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "any" },
@@ -27,9 +27,9 @@ export const metadata: Metadata = {
     apple: "/apple-touch-icon.png",
   },
   openGraph: {
-    title: "ATOMiK - Cooler, Faster State-Aware Compute",
+    title: "ATOMiK - State-Aware Compute Evaluation",
     description:
-      "Less heat, less bandwidth, and more useful work per watt through state-aware compute.",
+      "Bring one state-heavy workload, one current baseline, and one painful constraint.",
     url: "https://atomik.tech",
     siteName: "ATOMiK",
     images: [{ url: "https://atomik.tech/09-current-live-atomik-desk-v039k.png", width: 1920, height: 1080 }],
@@ -37,9 +37,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "ATOMiK - Cooler, Faster State-Aware Compute",
+    title: "ATOMiK - State-Aware Compute Evaluation",
     description:
-      "Less heat, less bandwidth, and more useful work per watt through state-aware compute.",
+      "Proof-bound evaluation for edge and embedded teams constrained by state movement.",
     images: ["https://atomik.tech/09-current-live-atomik-desk-v039k.png"],
   },
 };
@@ -54,19 +54,19 @@ const jsonLd = {
       logo: "https://atomik.tech/logo.png",
       sameAs: ["https://github.com/MatthewHRockwell/ATOMiK"],
       description:
-        "State-aware compute for systems constrained by heat, power, bandwidth, latency, or hardware footprint.",
+        "State-aware compute architecture for teams evaluating constrained state-heavy workloads.",
     },
     {
       "@type": "Service",
-      name: "ATOMiK Evaluation Access",
+      name: "ATOMiK Evaluation",
       serviceType: "Technical evaluation",
       provider: {
         "@type": "Organization",
         name: "ATOMiK",
       },
       description:
-        "Request-based technical evaluation access for workloads constrained by heat, power, bandwidth, latency, or hardware footprint.",
-      url: "https://atomik.tech/contact",
+        "Proof-bound technical evaluation for one state-heavy workload, one baseline, and one measurable constraint.",
+      url: "https://atomik.tech/pricing",
     },
   ],
 };

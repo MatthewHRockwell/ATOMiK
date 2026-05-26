@@ -1,13 +1,16 @@
 "use client";
 
+import Link from "next/link";
 import Nav from "@/components/Nav";
 import { useEffect, useState, FormEvent } from "react";
 
 const requestTypes = [
-  "Request Evaluation Access",
-  "Request Technical Demo",
+  "Request Evaluation",
+  "Request Investor Diligence",
+  "Request Proof Review",
   "Discuss Design Partnership",
   "Discuss Licensing / IP Evaluation",
+  "Ask Proof / Diligence Question",
 ];
 
 const roles = [
@@ -39,13 +42,59 @@ const timelines = [
 ];
 
 const requestTypeByIntent: Record<string, string> = {
-  evaluation: "Request Evaluation Access",
-  demo: "Request Technical Demo",
-  "technical-demo": "Request Technical Demo",
+  evaluation: "Request Evaluation",
+  demo: "Request Proof Review",
+  "technical-demo": "Request Proof Review",
   "design-partner": "Discuss Design Partnership",
+  investor: "Request Investor Diligence",
+  diligence: "Request Investor Diligence",
+  "investor-diligence": "Request Investor Diligence",
   licensing: "Discuss Licensing / IP Evaluation",
   ip: "Discuss Licensing / IP Evaluation",
+  question: "Ask Proof / Diligence Question",
+  proof: "Request Proof Review",
 };
+
+const intentByRequestType: Record<string, string> = {
+  "Request Evaluation": "evaluation",
+  "Request Investor Diligence": "investor",
+  "Request Proof Review": "proof",
+  "Discuss Design Partnership": "design-partner",
+  "Discuss Licensing / IP Evaluation": "licensing",
+  "Ask Proof / Diligence Question": "question",
+};
+
+const roleByIntent: Record<string, string> = {
+  investor: "Investor / advisor",
+  diligence: "Investor / advisor",
+  "investor-diligence": "Investor / advisor",
+  licensing: "Chip partner / strategic",
+  ip: "Chip partner / strategic",
+  "design-partner": "Infrastructure team",
+};
+
+const painCategoryByIntent: Record<string, string> = {
+  investor: "Technical diligence",
+  diligence: "Technical diligence",
+  "investor-diligence": "Technical diligence",
+  licensing: "Technical diligence",
+  ip: "Technical diligence",
+  question: "Technical diligence",
+  proof: "Technical diligence",
+};
+
+function readAttribution() {
+  const params = new URLSearchParams(window.location.search);
+  return {
+    source: params.get("source") || params.get("utm_source") || "public-evaluation-form",
+    cta: params.get("cta") || "",
+    utm_source: params.get("utm_source") || "",
+    utm_medium: params.get("utm_medium") || "",
+    utm_campaign: params.get("utm_campaign") || "",
+    utm_content: params.get("utm_content") || "",
+    utm_term: params.get("utm_term") || "",
+  };
+}
 
 export default function ContactPage() {
   const [form, setForm] = useState({
@@ -54,6 +103,7 @@ export default function ContactPage() {
     company: "",
     role: roles[0],
     requestType: requestTypes[0],
+    intent: "evaluation",
     painCategory: painCategories[0],
     timeline: timelines[0],
     useCase: "",
@@ -71,7 +121,15 @@ export default function ContactPage() {
 
     const timeout = window.setTimeout(() => {
       setForm((current) =>
-        current.requestType === requestType ? current : { ...current, requestType }
+        current.requestType === requestType && current.intent === intent
+          ? current
+          : {
+              ...current,
+              requestType,
+              intent,
+              role: roleByIntent[intent] || current.role,
+              painCategory: painCategoryByIntent[intent] || current.painCategory,
+            }
       );
     }, 0);
 
@@ -80,6 +138,21 @@ export default function ContactPage() {
 
   function update(field: string, value: string) {
     setForm((f) => ({ ...f, [field]: value }));
+    if (status === "error") setStatus("idle");
+  }
+
+  function updateRequestType(value: string) {
+    setForm((f) => {
+      const intent = intentByRequestType[value] || f.intent;
+      return {
+        ...f,
+        requestType: value,
+        intent,
+        role: roleByIntent[intent] || f.role,
+        painCategory: painCategoryByIntent[intent] || f.painCategory,
+      };
+    });
+    if (status === "error") setStatus("idle");
   }
 
   async function handleSubmit(e: FormEvent) {
@@ -87,6 +160,7 @@ export default function ContactPage() {
     setStatus("sending");
 
     try {
+      const attribution = readAttribution();
       const res = await fetch("/api/subscribe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -95,7 +169,16 @@ export default function ContactPage() {
           name: form.name,
           company: form.company,
           role: form.role,
-          source: "public-evaluation-form",
+          source: attribution.source,
+          cta: attribution.cta,
+          intent: form.intent,
+          landing_path: window.location.pathname + window.location.search,
+          referrer: document.referrer,
+          utm_source: attribution.utm_source,
+          utm_medium: attribution.utm_medium,
+          utm_campaign: attribution.utm_campaign,
+          utm_content: attribution.utm_content,
+          utm_term: attribution.utm_term,
           requested_path: form.requestType,
           pain_category: form.painCategory,
           timeline: form.timeline,
@@ -122,20 +205,21 @@ export default function ContactPage() {
     border: "1px solid #1d324a",
     color: "#f4f8ff",
   };
+  const fieldClass = "w-full min-h-11 rounded-lg px-4 py-2.5 text-base outline-none focus:ring-2 focus:ring-[#22d3ee] md:text-sm";
+  const textareaClass = "w-full resize-y rounded-lg px-4 py-2.5 text-base outline-none focus:ring-2 focus:ring-[#22d3ee] md:text-sm";
 
   return (
     <div className="min-h-screen" style={{ background: "#070b12", color: "#f4f8ff" }}>
       <Nav />
 
-      <div className="mx-auto max-w-3xl px-6 pb-24 pt-16">
+      <div className="mx-auto max-w-3xl px-6 pb-24 pt-12 md:pt-16">
         <p className="text-sm font-semibold uppercase" style={{ color: "#22d3ee" }}>
-          Lead request
+          Evaluation request
         </p>
-        <h1 className="mt-3 text-4xl font-bold">Tell us what you want to evaluate.</h1>
-        <p className="mt-4 leading-7" style={{ color: "#9fb1c7" }}>
-          Use this form for technical evaluation, investor diligence, licensing, and design partner conversations. The most useful request names one real constraint: heat, battery, bandwidth, latency, hardware footprint, or context movement.
+        <h1 className="mt-3 text-3xl font-bold leading-tight md:text-4xl">Tell us the constrained state path you want to evaluate.</h1>
+        <p className="mt-4 text-base leading-7" style={{ color: "#9fb1c7" }}>
+          Use this form for technical evaluation, proof review, licensing, investor diligence, and design-partner conversations. The strongest request names one workload, one current baseline, one painful constraint, and the decision the evidence needs to support.
         </p>
-
         {status === "sent" ? (
           <div
             className="mt-10 rounded-lg border p-8"
@@ -143,27 +227,36 @@ export default function ContactPage() {
           >
             <h2 className="text-xl font-bold">Request received</h2>
             <p className="mt-3 leading-7" style={{ color: "#9fb1c7" }}>
-              Thanks. The next step is to anchor on the workload, current stack, constraint, and desired path: proof review, technical demo, design partner evaluation, or licensing conversation.
+              Thanks. The request has been captured for follow-up. The next conversation anchors on one workload, current baseline, painful constraint, success metric, and desired path: proof review, technical evaluation, design-partner evaluation, licensing review, investor diligence, or no-fit.
             </p>
-            <p className="mt-3 text-sm" style={{ color: "#9fb1c7" }}>
-              You can also reach ATOMiK at{" "}
-              <a href="mailto:mrockwell@atomik.tech" style={{ color: "#22d3ee" }}>
-                mrockwell@atomik.tech
+            <p className="mt-3 text-sm leading-6" style={{ color: "#9fb1c7" }}>
+              To reserve review time now, use the proof-review or technical-evaluation options on the{" "}
+              <Link href="/pricing" style={{ color: "#22d3ee" }}>
+                evaluation page
+              </Link>
+              . You can also reach ATOMiK at{" "}
+              <a href="mailto:matthew.h.rockwell@gmail.com" style={{ color: "#22d3ee" }}>
+                matthew.h.rockwell@gmail.com
               </a>
               .
             </p>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="mt-10 space-y-5">
+          <form
+            onSubmit={handleSubmit}
+            className="mt-8 space-y-5 rounded-lg p-4 md:p-6"
+            style={{ background: "#0d1420", border: "1px solid #1d324a" }}
+          >
             <div className="grid gap-5 md:grid-cols-2">
               <div>
                 <label className="mb-1.5 block text-sm font-medium">Name</label>
                 <input
                   type="text"
+                  autoComplete="name"
                   required
                   value={form.name}
                   onChange={(e) => update("name", e.target.value)}
-                  className="w-full rounded-lg px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-[#22d3ee]"
+                  className={fieldClass}
                   style={inputStyle}
                 />
               </div>
@@ -171,10 +264,12 @@ export default function ContactPage() {
                 <label className="mb-1.5 block text-sm font-medium">Work email</label>
                 <input
                   type="email"
+                  autoComplete="email"
+                  inputMode="email"
                   required
                   value={form.email}
                   onChange={(e) => update("email", e.target.value)}
-                  className="w-full rounded-lg px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-[#22d3ee]"
+                  className={fieldClass}
                   style={inputStyle}
                 />
               </div>
@@ -185,9 +280,10 @@ export default function ContactPage() {
                 <label className="mb-1.5 block text-sm font-medium">Company</label>
                 <input
                   type="text"
+                  autoComplete="organization"
                   value={form.company}
                   onChange={(e) => update("company", e.target.value)}
-                  className="w-full rounded-lg px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-[#22d3ee]"
+                  className={fieldClass}
                   style={inputStyle}
                 />
               </div>
@@ -196,7 +292,7 @@ export default function ContactPage() {
                 <select
                   value={form.role}
                   onChange={(e) => update("role", e.target.value)}
-                  className="w-full rounded-lg px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-[#22d3ee]"
+                  className={fieldClass}
                   style={inputStyle}
                 >
                   {roles.map((role) => (
@@ -211,8 +307,8 @@ export default function ContactPage() {
                 <label className="mb-1.5 block text-sm font-medium">Request</label>
                 <select
                   value={form.requestType}
-                  onChange={(e) => update("requestType", e.target.value)}
-                  className="w-full rounded-lg px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-[#22d3ee]"
+                  onChange={(e) => updateRequestType(e.target.value)}
+                  className={fieldClass}
                   style={inputStyle}
                 >
                   {requestTypes.map((item) => (
@@ -225,7 +321,7 @@ export default function ContactPage() {
                 <select
                   value={form.painCategory}
                   onChange={(e) => update("painCategory", e.target.value)}
-                  className="w-full rounded-lg px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-[#22d3ee]"
+                  className={fieldClass}
                   style={inputStyle}
                 >
                   {painCategories.map((item) => (
@@ -238,7 +334,7 @@ export default function ContactPage() {
                 <select
                   value={form.timeline}
                   onChange={(e) => update("timeline", e.target.value)}
-                  className="w-full rounded-lg px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-[#22d3ee]"
+                  className={fieldClass}
                   style={inputStyle}
                 >
                   {timelines.map((item) => (
@@ -255,8 +351,8 @@ export default function ContactPage() {
                 rows={4}
                 value={form.useCase}
                 onChange={(e) => update("useCase", e.target.value)}
-                placeholder="Example: data-center cooling pressure, battery-limited edge telemetry, AI context movement, embedded state tracking, remote/defense reliability..."
-                className="w-full resize-y rounded-lg px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-[#22d3ee]"
+                placeholder="Example: battery-limited edge telemetry, AI-at-the-edge context movement, embedded state tracking, robotics or industrial control, remote reliability, or data-center state movement..."
+                className={textareaClass}
                 style={inputStyle}
               />
             </div>
@@ -267,8 +363,8 @@ export default function ContactPage() {
                 rows={3}
                 value={form.currentStack}
                 onChange={(e) => update("currentStack", e.target.value)}
-                placeholder="Runtime, hardware, state size, update cadence, cooling, power, bandwidth, latency, or footprint constraints..."
-                className="w-full resize-y rounded-lg px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-[#22d3ee]"
+                placeholder="Runtime, target hardware, state size, update cadence, current baseline, battery, heat, bandwidth, latency, footprint, reliability, cost, or decision threshold..."
+                className={textareaClass}
                 style={inputStyle}
               />
             </div>
@@ -279,22 +375,22 @@ export default function ContactPage() {
                 rows={3}
                 value={form.message}
                 onChange={(e) => update("message", e.target.value)}
-                className="w-full resize-y rounded-lg px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-[#22d3ee]"
+                className={textareaClass}
                 style={inputStyle}
               />
             </div>
 
             {status === "error" && (
               <p className="text-sm" style={{ color: "#fca5a5" }}>
-                Something went wrong. Email mrockwell@atomik.tech directly if the form does not submit.
+                Something went wrong. Email matthew.h.rockwell@gmail.com directly if the form does not submit.
               </p>
             )}
 
             <button
               type="submit"
               disabled={status === "sending"}
-              className="w-full rounded-lg py-3 text-sm font-semibold transition-opacity hover:opacity-90 disabled:opacity-50"
-              style={{ background: "#4f8fff", color: "#fff" }}
+              className="min-h-11 w-full rounded-lg py-3 text-sm font-semibold transition-opacity hover:opacity-90 disabled:opacity-50"
+              style={{ background: "#2563eb", color: "#fff" }}
             >
               {status === "sending" ? "Sending..." : form.requestType}
             </button>
