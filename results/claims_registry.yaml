@@ -1,5 +1,5 @@
 schema_version: 1
-last_updated: "2026-05-15"
+last_updated: "2026-05-23"
 disclaimer: "Live screenshots show current prototypes. Concept visuals show product direction and are not represented as current commercial functionality. Performance claims are only stated when backed by measured artifacts."
 
 evidence_labels:
@@ -7,6 +7,7 @@ evidence_labels:
   HARDWARE_VALIDATED: "Demonstrated on physical hardware, but not necessarily accompanied by full benchmark artifacts."
   SOFTWARE_VALIDATED: "Shown in software prototype, simulation, local runtime, or non-hardware environment."
   SYNTHESIS_VALIDATED: "Validated through synthesis, build, compile, or toolchain output."
+  BUILD_ARTIFACT: "Concrete local build outputs exist, but the end-to-end hardware path has not yet been promoted as a live result."
   PROJECTED: "A model, estimate, or expected economic/performance outcome. Must not be phrased as a result."
   CONCEPTUAL: "Used to explain product direction, UX, architecture, or design intent. Not current proof."
   ROADMAP: "Planned work that may change."
@@ -40,6 +41,16 @@ claims:
     public_safe: true
     notes: "Use as current UI proof image. Do not represent as commercial product. Do not infer benchmark, uptime, allocation, maturity, or performance claims from the screenshot."
 
+
+  - id: live-desk-ui-v039k-2026-05-21
+    label: HARDWARE_VALIDATED
+    claim: "ATOMiK Desk v0.39-K prototype UI screenshot shows the current live UI/UX direction running on Zynq hardware."
+    artifact: "website/public/09-current-live-atomik-desk-v039k.png"
+    source_artifact: "atomik_os/docs/screenshots/deploy_v0.39-K_rail.png"
+    date: "2026-05-21"
+    public_safe: true
+    notes: "Use as current UI proof image. Do not represent as commercial product. Do not infer benchmark, uptime, allocation, maturity, performance, power, thermal, water, battery, or footprint claims from the screenshot."
+
   - id: ax7020-perf-matrix-2026-05-09
     label: LIVE_MEASURED
     claim: "AX7020 board run produced a four-way software / direct / batched / profiled performance matrix."
@@ -72,6 +83,16 @@ claims:
     date: "2026-01-27"
     public_safe: true
     notes: "Must be labeled as synthesis-validated wherever used."
+
+
+  - id: zynq-standalone-boot-build-artifacts-2026-05-23
+    label: BUILD_ARTIFACT
+    claim: "The Zynq standalone SD boot path has local build artifacts, including BOOT.bin and the SD-boot bitstream."
+    artifact: "hardware/zynq/fsbl_build/BOOT.bin"
+    related_artifact: "hardware/zynq/litex-build-nax64-sdboot/gateware/"
+    date: "2026-05-23"
+    public_safe: true
+    notes: "May say assembled or built locally. Do not say standalone SD boot is validated until a recorded power-on boot artifact exists."
 
   - id: formal-proof-work
     label: SOFTWARE_VALIDATED

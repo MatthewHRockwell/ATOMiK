@@ -37,7 +37,7 @@ sw = draw.textlength(subtitle, font=subtitle_font)
 draw.text(((WIDTH - sw) / 2, y_title + 140), subtitle, fill=GRAY, font=subtitle_font)
 
 # --- Tagline ---
-tagline = "O(1) state reconstruction  |  99% bandwidth reduction  |  108 formal proofs"
+tagline = "State-aware compute  |  Evidence-labeled proof  |  Workload-specific evaluation"
 tw = draw.textlength(tagline, font=tagline_font)
 draw.text(((WIDTH - tw) / 2, y_title + 200), tagline, fill=CYAN, font=tagline_font)
 

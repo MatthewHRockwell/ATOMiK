@@ -41,7 +41,7 @@ let runState = {
 const ACT_NARRATIONS = {
     1: { start: "Delta algebra in action - the foundation of lock-free computing", end: "Single-cycle operations verified - 10.6ns per operation" },
     2: { start: "Instant undo with zero overhead - critical for regulatory compliance", end: "Self-inverse property proven - no transaction logs needed" },
-    3: { start: "Linear scaling: 4-8-16 banks, proportional throughput gains", end: "1 Gops/s achieved - linear scaling on $10 hardware" },
+    3: { start: "Linear scaling: 4-8-16 banks, artifact-specific throughput", end: "Throughput artifacts require workload and caveat" },
     4: { start: "Real applications: finance ticks, sensor fusion, burst processing", end: "Domain-specific workloads validated across all nodes" },
     5: { start: "Distributed computing without locks - the holy grail achieved", end: "Lock-free merge proven - enables true horizontal scaling" }
 };
@@ -489,7 +489,7 @@ function initChart() {
                         }
                     }
                 },
-                // 1 Gops/s target line annotation
+                // Artifact-specific target line annotation
                 annotation: {
                     annotations: {
                         targetLine: {
@@ -501,7 +501,7 @@ function initChart() {
                             borderDash: [6, 4],
                             label: {
                                 display: true,
-                                content: '1 Gops/s',
+                                content: 'artifact target',
                                 position: 'end',
                                 backgroundColor: 'transparent',
                                 color: COLORS.red,
@@ -558,7 +558,7 @@ function updateChart(snapshots) {
     throughputChart.data.labels = snapshots.map(s => `N=${s.n_banks} ${s.domain}`);
     throughputChart.data.datasets[0].data = snapshots.map(s => s.throughput_mops);
 
-    // Keep fixed max at 1200 for consistent scale (1 Gops/s line always visible)
+    // Keep fixed max at 1200 for consistent scale in this legacy dashboard
     // Only expand if a value exceeds 1200
     const maxValue = Math.max(...snapshots.map(s => s.throughput_mops));
     if (maxValue > 1200) {
@@ -676,7 +676,7 @@ function generateReport() {
         provenance: {
             platform: 'ATOMiK Delta-State Computing',
             version: '1.0',
-            formalProofs: 108,
+            formalProofs: 'see_current_proof_packet',
             hardwarePlatform: 'Tang Nano 9K (Gowin GW1NR-9)',
         },
     };

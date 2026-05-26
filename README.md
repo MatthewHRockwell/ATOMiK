@@ -7,11 +7,11 @@ The current public materials document the live hardware prototype direction,
 technical proof artifacts, developer adoption path, and roadmap toward ATOMiK
 Desk and Resource Fabric.
 
-![ATOMiK Desk v0.38-I prototype UI running on live hardware](website/public/08-current-live-atomik-desk-v038i.png)
+![ATOMiK Desk v0.39-K prototype UI running on live Zynq hardware](website/public/09-current-live-atomik-desk-v039k.png)
 
-**HARDWARE_VALIDATED:** ATOMiK Desk v0.38-I prototype UI running on live
+**HARDWARE_VALIDATED:** ATOMiK Desk v0.39-K prototype UI running on live Zynq
 hardware. This screenshot is proof of current prototype progress, not a
-polished commercial product.
+polished commercial product, benchmark, uptime claim, or power/thermal result.
 
 ## Current Status
 
@@ -27,7 +27,7 @@ polished commercial product.
 - Hardware-backed ATOMiK prototype work is present in the repository and proof
   docs.
 - ATOMiK Desk has live prototype screenshots from running hardware, including
-  the v0.38-I UI/UX proof image now closer to the concept direction.
+  the v0.39-K UI/UX proof image now closest to the current concept direction.
 - Linux userspace validation, hardware synthesis documentation, and board-run
   performance artifacts are tracked with evidence labels.
 - Public software, formal proof, and SDK material remain available for technical
@@ -79,7 +79,7 @@ If you are evaluating ATOMiK, start with one real workload or state-heavy path:
 Public CTAs:
 
 - [Request Evaluation Access](https://atomik.tech/contact?intent=evaluation)
-- [Request Technical Demo](https://atomik.tech/contact?intent=demo)
+- [Review Proof](https://atomik.tech/proof)
 - [Discuss Design Partnership](https://atomik.tech/contact?intent=design-partner)
 
 ## Evidence Hygiene
@@ -94,6 +94,7 @@ Every public claim should use one of these labels:
 - `HARDWARE_VALIDATED`
 - `SOFTWARE_VALIDATED`
 - `SYNTHESIS_VALIDATED`
+- `BUILD_ARTIFACT`
 - `PROJECTED`
 - `CONCEPTUAL`
 - `ROADMAP`

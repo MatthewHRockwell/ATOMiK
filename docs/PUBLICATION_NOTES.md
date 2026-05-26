@@ -28,6 +28,9 @@ draft-positioning, or generated site material:
 - `site/` (now carries visible legacy-warning banners in the static pages)
 - `PRODUCTION_DEPLOYMENT.md`
 - `SDK_ORCHESTRATION.md`
+- `WORKLOAD_PROOF.md` unless quoted with workload-specific artifact context
+- `YC_DEMO_SUMMARY.md` historical demo summary
+- `INTEGRATION_RESULTS.md` historical integration notes
 - older reference guides under `reference/`
 - older brief/demo/session files not linked from `technical-proof.md`
 

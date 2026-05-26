@@ -7,11 +7,18 @@ and roadmap work.
 
 | Artifact | Label | Notes |
 |---|---|---|
-| `website/public/08-current-live-atomik-desk-v038i.png` | `HARDWARE_VALIDATED` | Current ATOMiK Desk v0.38-I prototype UI running on live hardware. |
+| `website/public/09-current-live-atomik-desk-v039k.png` | `HARDWARE_VALIDATED` | Current ATOMiK Desk v0.39-K prototype UI running on live Zynq hardware. |
+| `website/public/08-current-live-atomik-desk-v038i.png` | `HARDWARE_VALIDATED` | Earlier ATOMiK Desk v0.38-I prototype UI running on live hardware. |
 | `website/public/07-current-live-atomik-desk-v038g.png` | `HARDWARE_VALIDATED` | Earlier ATOMiK Desk v0.38-G prototype UI running on live hardware. |
 | `website/public/01-current-live-atomik-desk.jpg` | `HARDWARE_VALIDATED` | Earlier ATOMiK Desk prototype running on live hardware. |
 | `docs/LINUX_USERSPACE_PROOF.md` | `HARDWARE_VALIDATED` | Linux userspace to FPGA accelerator validation path. |
 | `results/perf_matrix_ax7020_20260509.txt` | `LIVE_MEASURED` | Raw AX7020 board run output with interpretation caveats in `docs/perf/`. |
+
+## Current Boot Milestone
+
+The Zynq SD-boot bitstream, minimal FSBL build, and BOOT.bin artifacts exist in
+the local standalone boot path. Treat this as a `BUILD_ARTIFACT` until a recorded
+power-on SD-card boot validates the full chain.
 
 ## Synthesis / Toolchain Output
 
@@ -40,14 +47,10 @@ Examples:
 
 Use:
 
-> Current ATOMiK Desk prototype running on live hardware.
+> ATOMiK Desk v0.39-K prototype UI running on live Zynq hardware.
 
-For the current UI upgrade track, use:
-
-> ATOMiK Desk v0.38-I prototype UI running on live hardware.
-
-Do not infer benchmark, uptime, allocation, maturity, or commercial product
-claims from the screenshot.
+Do not infer benchmark, uptime, allocation, maturity, commercial product, power,
+thermal, water, battery, or performance claims from the screenshot.
 
 Avoid:
 
@@ -55,4 +58,5 @@ Avoid:
 - production deployment
 - customer validated
 - unqualified speedup
+- measured power or thermal savings without artifact links
 - hardware verified for synthesis-only claims

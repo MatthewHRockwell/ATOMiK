@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ATOMiK — Delta-State Computing</title>
-    <meta name="description" content="ATOMiK: O(1) state reconstruction, 95-99.9% bandwidth reduction, formally proven with 108 Lean4 theorems. Software library + FPGA hardware.">
+    <meta name="description" content="Archived ATOMiK landing draft. Use atomik.tech, the claims registry, and evidence labels for current public claims.">
 
     <!-- Open Graph -->
     <meta property="og:type" content="website">
     <meta property="og:title" content="ATOMiK — Stop moving data. Start evolving it.">
-    <meta property="og:description" content="O(1) state reconstruction. 99% less bandwidth. 333,333x less memory. Formally proven with 108 Lean4 theorems. pip install atomik-core">
+    <meta property="og:description" content="Archived ATOMiK landing draft. Current public claims are evidence-labeled and workload-specific.">
     <meta property="og:url" content="https://atomik.tech/">
     <meta property="og:image" content="https://atomik.tech/og-image.jpg">
     <meta property="og:image:width" content="1200">
@@ -18,7 +18,7 @@
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="ATOMiK — Stop moving data. Start evolving it.">
-    <meta name="twitter:description" content="O(1) state reconstruction. 99% less bandwidth. 333,333x less memory. Formally proven with 108 Lean4 theorems.">
+    <meta name="twitter:description" content="Archived ATOMiK landing draft. Use current evidence labels and claims registry for public proof.">
     <meta name="twitter:image" content="https://atomik.tech/og-image.jpg">
 
     <!-- Favicon -->
@@ -61,6 +61,15 @@
             z-index: -1;
         }
         .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+        .legacy-warning {
+            background: rgba(245, 158, 11, 0.12);
+            border: 1px solid rgba(245, 158, 11, 0.45);
+            color: #f9ca67;
+            padding: 14px 24px;
+            text-align: center;
+            font-size: 14px;
+        }
+        .legacy-warning strong { color: #fff; }
 
         /* ========== Animations ========== */
         @keyframes fadeUp {
@@ -666,6 +675,8 @@
 </head>
 <body>
 
+<div class="legacy-warning"><strong>Archived landing draft.</strong> Historical claims on this page require evidence review. Use atomik.tech, the current claims registry, and evidence labels for public claims.</div>
+
 <nav>
     <div class="container">
         <div class="logo">ATOM<span>i</span>K</div>
@@ -687,9 +698,9 @@
     <div class="container">
         <h1>Stop moving data.<br><span class="highlight">Start evolving it.</span></h1>
         <p class="subtitle">
-            ATOMiK replaces snapshots, event replay, and full-state replication
-            with a 4-operation algebra. 99% less bandwidth. O(1) reconstruction.
-            Formally proven. Hardware-accelerated.
+            ATOMiK evaluates whether state-aware execution can reduce wasted state movement
+            in workloads constrained by bandwidth, latency, power, heat, or footprint.
+            Claims require workload, artifact, context, and caveat.
         </p>
         <div class="cta-row">
             <a href="#pricing" class="btn btn-primary">Get Started</a>
@@ -710,7 +721,7 @@
             </a>
             <a href="https://github.com/MatthewHRockwell/ATOMiK" class="badge">
                 <span class="badge-dot" style="background: var(--green);"></span>
-                Proofs <span class="badge-val">108 verified</span>
+                Proof <span class="badge-val">labeled</span>
             </a>
             <a href="https://github.com/MatthewHRockwell/ATOMiK" class="badge">
                 <span class="badge-dot" style="background: var(--orange);"></span>
@@ -753,20 +764,20 @@
 <div class="container">
     <div class="metrics">
         <div class="metric animate-on-scroll">
-            <div class="value">99.9%</div>
-            <div class="label">Bandwidth Reduction</div>
+            <div class="value">Target</div>
+            <div class="label">Bandwidth Evaluation</div>
         </div>
         <div class="metric animate-on-scroll">
-            <div class="value">108</div>
-            <div class="label">Lean4 Formal Proofs</div>
+            <div class="value">Proof</div>
+            <div class="label">Formal Work</div>
         </div>
         <div class="metric animate-on-scroll">
-            <div class="value">333,333x</div>
-            <div class="label">Memory Savings (Rollback)</div>
+            <div class="value">Case</div>
+            <div class="label">Memory Evaluation</div>
         </div>
         <div class="metric animate-on-scroll">
-            <div class="value">1,291x</div>
-            <div class="label">Faster Change Detection</div>
+            <div class="value">Measured</div>
+            <div class="label">Artifact Required</div>
         </div>
     </div>
 </div>
@@ -876,15 +887,15 @@
 <section id="features" style="border-top: 1px solid var(--border);">
     <div class="container">
         <h2>Why ATOMiK</h2>
-        <p class="section-sub">Four operations. Zero dependencies. Formally proven correctness.</p>
+        <p class="section-sub">Four operations. Evidence-labeled proof path.</p>
         <div class="features">
             <div class="feature animate-on-scroll">
                 <div class="feature-icon">
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4f8fff" stroke-width="2" stroke-linecap="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
                 </div>
                 <div class="tag">BANDWIDTH</div>
-                <h3>95-99.9% Less Traffic</h3>
-                <p>Send 8-byte deltas instead of full state copies. A 64KB state with 10,000 updates: ATOMiK sends 80KB. Full replication sends 655MB.</p>
+                <h3>Traffic Reduction Target</h3>
+                <p>Evaluate whether meaningful deltas can reduce full-state movement for a specific workload, baseline, and decision metric.</p>
             </div>
             <div class="feature animate-on-scroll">
                 <div class="feature-icon">
@@ -907,16 +918,16 @@
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
                 </div>
                 <div class="tag">CORRECTNESS</div>
-                <h3>108 Lean4 Proofs</h3>
-                <p>Every algebraic property is formally proven: commutativity, associativity, self-inverse, identity. Not tested -- proven.</p>
+                <h3>Formal Proof Work</h3>
+                <p>Formal proof work exists for the algebraic model. Quote proof counts only from the current proof packet or claims registry.</p>
             </div>
             <div class="feature animate-on-scroll">
                 <div class="feature-icon">
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
                 </div>
                 <div class="tag">DETECTION</div>
-                <h3>1,291x Faster Changes</h3>
-                <p>Incremental fingerprinting in O(1) per field update. SHA-256 rescans the entire buffer every time.</p>
+                <h3>Measured Change Detection</h3>
+                <p>Change-detection results are workload-specific and must be quoted with the measured artifact, baseline, and caveat.</p>
             </div>
             <div class="feature animate-on-scroll">
                 <div class="feature-icon">
@@ -924,7 +935,7 @@
                 </div>
                 <div class="tag">UPGRADE PATH</div>
                 <h3>Software &rarr; Hardware</h3>
-                <p>Same API, same algebra. C library (100x), FPGA (14,000x), ASIC path. No code changes required.</p>
+                <p>Same operation vocabulary across software and hardware paths. Quote speedups only from current proof artifacts.</p>
             </div>
         </div>
     </div>
@@ -996,7 +1007,7 @@
                 </div>
                 <div class="compare-row">
                     <span class="cr-label">Correctness</span>
-                    <span class="cr-value">108 Lean4 proofs</span>
+                    <span class="cr-value">Proof work present</span>
                 </div>
             </div>
         </div>
@@ -1062,7 +1073,7 @@ a.<span class="fn">merge</span>(b)  <span class="cmt"># a now has both deltas</s
 <section id="benchmarks" class="bench-section">
     <div class="container">
         <h2>Benchmarks</h2>
-        <p class="section-sub">Measured on x86 (Python 3.12). C library is 100x faster. FPGA hardware is 14,000x faster.</p>
+        <p class="section-sub">Review current benchmark artifacts before quoting speedups. Implementation tier, workload shape, and evidence label matter.</p>
 
         <div class="bench-grid">
             <!-- Bandwidth -->
@@ -1116,7 +1127,7 @@ a.<span class="fn">merge</span>(b)  <span class="cmt"># a now has both deltas</s
                     </div>
                 </div>
                 <div class="bench-result">
-                    <span class="result-badge">333,333x less memory</span>
+                    <span class="result-badge">case-specific memory comparison</span>
                     <span class="result-text">Constant regardless of history</span>
                 </div>
             </div>
@@ -1144,7 +1155,7 @@ a.<span class="fn">merge</span>(b)  <span class="cmt"># a now has both deltas</s
                     </div>
                 </div>
                 <div class="bench-result">
-                    <span class="result-badge">1,291x faster</span>
+                    <span class="result-badge">artifact-specific result</span>
                     <span class="result-text">O(1) incremental vs O(n) rescan</span>
                 </div>
             </div>
@@ -1172,7 +1183,7 @@ a.<span class="fn">merge</span>(b)  <span class="cmt"># a now has both deltas</s
                     </div>
                 </div>
                 <div class="bench-result">
-                    <span class="result-badge">No consensus needed</span>
+                    <span class="result-badge">order-independent algebra</span>
                     <span class="result-text">XOR commutativity = order-free</span>
                 </div>
             </div>
@@ -1197,12 +1208,12 @@ a.<span class="fn">merge</span>(b)  <span class="cmt"># a now has both deltas</s
                 </div>
                 <div class="tp-tier">
                     <div class="tp-bar"></div>
-                    <div class="tp-speed">69.7B</div>
+                    <div class="tp-speed">Artifact</div>
                     <div class="tp-impl">FPGA</div>
-                    <div class="tp-detail">Xilinx XC7Z020, 512 banks</div>
+                    <div class="tp-detail">Quote only from current proof packet</div>
                 </div>
             </div>
-            <p style="color: var(--muted); font-size: 13px; margin-top: 24px;">Operations per second. FPGA is 14,000x faster than Python. Same proofs guarantee correctness at every tier.</p>
+            <p style="color: var(--muted); font-size: 13px; margin-top: 24px;">Illustrative throughput tiers. Proof artifacts and implementation-specific validation are required before quoting performance or correctness claims.</p>
         </div>
     </div>
 </section>
@@ -1211,7 +1222,7 @@ a.<span class="fn">merge</span>(b)  <span class="cmt"># a now has both deltas</s
 <section id="specs" class="specs-section">
     <div class="container">
         <h2>Performance & Security</h2>
-        <p class="section-sub">Deterministic. Constant-time. Architecturally immune.</p>
+        <p class="section-sub">Deterministic model. Security claims require a reviewed threat model.</p>
 
         <div class="specs-grid">
             <!-- Software Performance Table -->
@@ -1243,7 +1254,7 @@ a.<span class="fn">merge</span>(b)  <span class="cmt"># a now has both deltas</s
                             <td class="metric">Memory per rollback</td>
                             <td class="spec-val-atomik">24 bytes (constant)</td>
                             <td class="spec-val-trad">8B × history depth</td>
-                            <td class="spec-advantage">333,333× less</td>
+                            <td class="spec-advantage">Case-specific</td>
                         </tr>
                         <tr>
                             <td class="metric">Bandwidth per update</td>
@@ -1253,7 +1264,7 @@ a.<span class="fn">merge</span>(b)  <span class="cmt"># a now has both deltas</s
                         </tr>
                         <tr>
                             <td class="metric">Time complexity</td>
-                            <td class="spec-val-atomik">O(1) all operations</td>
+                            <td class="spec-val-atomik">Workload-dependent</td>
                             <td class="spec-val-trad">O(n) replay/scan</td>
                             <td class="spec-advantage">Constant</td>
                         </tr>
@@ -1282,32 +1293,32 @@ a.<span class="fn">merge</span>(b)  <span class="cmt"># a now has both deltas</s
                         <tr>
                             <td class="metric">State tampering</td>
                             <td class="spec-vuln">Undetected</td>
-                            <td class="spec-immune">Detected — accumulator integrity check</td>
+                            <td class="spec-detect">Requires measurement and threat model</td>
                         </tr>
                         <tr>
                             <td class="metric">Replay attacks</td>
                             <td class="spec-vuln">Must track sequence numbers</td>
-                            <td class="spec-immune">Self-cancelling — XOR is its own inverse</td>
+                            <td class="spec-detect">Algebraic cancellation; security use needs review</td>
                         </tr>
                         <tr>
                             <td class="metric">Data corruption</td>
                             <td class="spec-vuln">Silent unless checksummed</td>
-                            <td class="spec-detect">Detected — XOR fingerprint catches bit flips</td>
+                            <td class="spec-detect">Can be evaluated with an integrity model</td>
                         </tr>
                         <tr>
                             <td class="metric">Convergence</td>
                             <td class="spec-vuln">Requires consensus protocol</td>
-                            <td class="spec-immune">Automatic — order-independent (XOR commutativity)</td>
+                            <td class="spec-detect">Order-independent algebra for applicable deltas</td>
                         </tr>
                         <tr>
                             <td class="metric">Determinism</td>
                             <td class="spec-vuln">Implementation-dependent</td>
-                            <td class="spec-immune">Proven — 108 Lean4 theorems</td>
+                            <td class="spec-detect">Formal proof work present</td>
                         </tr>
                         <tr>
                             <td class="metric">Operation timing</td>
                             <td class="spec-vuln">Variable (data-dependent)</td>
-                            <td class="spec-immune">Constant — no timing side channels</td>
+                            <td class="spec-detect">Security claim requires threat-model review</td>
                         </tr>
                     </tbody>
                 </table>
@@ -1340,11 +1351,11 @@ a.<span class="fn">merge</span>(b)  <span class="cmt"># a now has both deltas</s
 <!-- ==================== Pricing ==================== -->
 <section id="pricing" style="border-top: 1px solid var(--border);">
     <div class="container">
-        <h2>Pricing</h2>
-        <p class="section-sub">Start free. Scale when ready.</p>
+        <h2>Evaluation Access</h2>
+        <p class="section-sub">Start with a scoped evaluation, not a generic subscription plan.</p>
         <div class="pricing">
             <div class="price-card animate-on-scroll">
-                <h3>Community</h3>
+                <h3>Public Repository</h3>
                 <div class="price">Free</div>
                 <ul>
                     <li>Full atomik-core library</li>
@@ -1357,30 +1368,30 @@ a.<span class="fn">merge</span>(b)  <span class="cmt"># a now has both deltas</s
                 <a href="https://github.com/MatthewHRockwell/ATOMiK" class="btn btn-secondary" style="width:100%;text-align:center;">Get Started</a>
             </div>
             <div class="price-card featured animate-on-scroll">
-                <h3>Professional</h3>
-                <div class="price">$99<span>/mo per seat</span></div>
+                <h3>Design Partner Evaluation</h3>
+                <div class="price">Scoped<span>paid evaluation</span></div>
                 <ul>
-                    <li>Everything in Community</li>
-                    <li>Production license</li>
-                    <li>Priority email support (48hr SLA)</li>
-                    <li>Benchmarking suite</li>
-                    <li>Integration guides</li>
-                    <li>Rust + JavaScript libraries</li>
+                    <li>Technical discovery and workload mapping</li>
+                    <li>Success criteria and evaluation plan</li>
+                    <li>Proof artifact review</li>
+                    <li>Benchmark exchange when fit is strong</li>
+                    <li>Continue / refine / stop recommendation</li>
+                    <li>Evidence-bounded deliverables</li>
                 </ul>
-                <button onclick="checkout('professional')" class="btn btn-primary" style="width:100%;text-align:center;border:none;cursor:pointer;">Subscribe Now</button>
+                <a href="mailto:matthew.h.rockwell@gmail.com?subject=ATOMiK Design Partner Evaluation" class="btn btn-primary" style="width:100%;text-align:center;border:none;cursor:pointer;">Request Evaluation</a>
             </div>
             <div class="price-card animate-on-scroll">
-                <h3>Enterprise</h3>
-                <div class="price">$499<span>/mo per seat</span></div>
+                <h3>Investor / Licensing Diligence</h3>
+                <div class="price">Request-based<span>strategic review</span></div>
                 <ul>
-                    <li>Everything in Professional</li>
-                    <li>4-hour response SLA</li>
-                    <li>Dedicated support channel</li>
-                    <li>Custom integration consulting</li>
-                    <li>Formal verification certificate</li>
-                    <li>Hardware acceleration path</li>
+                    <li>Investor brief and proof-bound narrative</li>
+                    <li>Hardware evidence map</li>
+                    <li>Current validation gates</li>
+                    <li>ASIC feasibility path</li>
+                    <li>IP and licensing discussion</li>
+                    <li>Partner diligence support</li>
                 </ul>
-                <button onclick="checkout('enterprise')" class="btn btn-secondary" style="width:100%;text-align:center;border:1px solid var(--border);cursor:pointer;">Subscribe Now</button>
+                <a href="mailto:matthew.h.rockwell@gmail.com?subject=ATOMiK Investor Diligence" class="btn btn-secondary" style="width:100%;text-align:center;border:1px solid var(--border);cursor:pointer;">Request Diligence</a>
             </div>
         </div>
     </div>
@@ -1392,37 +1403,37 @@ a.<span class="fn">merge</span>(b)  <span class="cmt"># a now has both deltas</s
         <div class="investor-section animate-on-scroll">
             <h2>For Investors</h2>
             <p style="color: var(--muted); font-size: 18px; margin-bottom: 16px;">
-                ATOMiK is a fundamentally new approach to state management --
-                proven mathematically, validated in hardware, ready for market.
+                ATOMiK is a state-aware compute architecture moving from proof artifacts
+                toward evaluated customer, design-partner, and licensing opportunities.
             </p>
             <div class="investor-stats">
                 <div class="investor-stat">
-                    <div class="val">92</div>
-                    <div class="lbl">Lean4 Formal Proofs</div>
+                    <div class="val">Proof</div>
+                    <div class="lbl">Formal Work</div>
                 </div>
                 <div class="investor-stat">
-                    <div class="val">417+</div>
-                    <div class="lbl">Tests (SW + HW)</div>
+                    <div class="val">Artifacts</div>
+                    <div class="lbl">SW + HW Evidence</div>
                 </div>
                 <div class="investor-stat">
-                    <div class="val">3</div>
-                    <div class="lbl">FPGA Platforms</div>
+                    <div class="val">Labeled</div>
+                    <div class="lbl">Hardware Evidence</div>
                 </div>
                 <div class="investor-stat">
-                    <div class="val">69.7B</div>
-                    <div class="lbl">Ops/s Peak (FPGA)</div>
+                    <div class="val">Scoped</div>
+                    <div class="lbl">Performance Claims</div>
                 </div>
                 <div class="investor-stat">
-                    <div class="val">$50B</div>
-                    <div class="lbl">Serviceable Market</div>
+                    <div class="val">ICP</div>
+                    <div class="lbl">Edge / Embedded First</div>
                 </div>
             </div>
             <p style="color: var(--muted); font-size: 14px; margin: 24px 0;">
-                Patent pending. Software + hardware IP licensing model.
-                ARM-comparable business model with 85-95% gross margins.
+                Business model: proof reviews, technical evaluations, design partnerships,
+                and licensing/IP diligence. Pricing and margins require current business review.
             </p>
             <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
-                <a href="mailto:mrockwell@atomik.tech?subject=ATOMiK Investment Inquiry" class="btn btn-primary">Contact Founder</a>
+                <a href="mailto:matthew.h.rockwell@gmail.com?subject=ATOMiK Investment Inquiry" class="btn btn-primary">Contact Founder</a>
                 <a href="https://github.com/MatthewHRockwell/ATOMiK" class="btn btn-secondary">Technical Deep Dive</a>
             </div>
         </div>
@@ -1434,11 +1445,9 @@ a.<span class="fn">merge</span>(b)  <span class="cmt"># a now has both deltas</s
     <div class="container" style="max-width: 800px;">
         <h2 style="font-size: 32px; font-weight: 700; letter-spacing: -1px; margin-bottom: 20px;">Our Mission</h2>
         <p style="font-size: 18px; color: var(--muted); line-height: 1.8;">
-            We believe the world moves too much data. Every full-state replication, every snapshot stack, every consensus round
-            is wasted energy, wasted bandwidth, wasted time. ATOMiK exists to prove there is a better way &mdash;
-            a mathematically proven algebra that lets systems <em style="color: var(--accent2);">evolve</em> state
-            instead of copying it. From a Python library to custom silicon, we are building the infrastructure
-            for a world that stops moving data and starts evolving it.
+            We believe many constrained systems pay for unnecessary state movement. ATOMiK exists to evaluate where
+            repeated scans, syncs, replay, and reconstruction create waste, then measure whether a
+            state-aware architecture can reduce that waste for one workload, one baseline, and one constraint.
         </p>
         <div style="margin-top: 32px;">
             <a href="https://github.com/MatthewHRockwell/ATOMiK" class="btn btn-secondary" style="margin: 0 8px;">
@@ -1454,7 +1463,7 @@ a.<span class="fn">merge</span>(b)  <span class="cmt"># a now has both deltas</s
         <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 40px; margin-bottom: 40px;">
             <div>
                 <div style="font-size: 20px; font-weight: 700; color: var(--text); margin-bottom: 16px;">ATOM<span style="color: var(--accent);">i</span>K</div>
-                <p style="line-height: 1.7;">Delta-state computing infrastructure. Stop moving data. Start evolving it.</p>
+                <p style="line-height: 1.7;">State-aware compute evaluation for constrained systems.</p>
             </div>
             <div>
                 <h4 style="color: var(--text); font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 16px;">Product</h4>
@@ -1468,9 +1477,9 @@ a.<span class="fn">merge</span>(b)  <span class="cmt"># a now has both deltas</s
             <div>
                 <h4 style="color: var(--text); font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 16px;">Company</h4>
                 <div style="display: flex; flex-direction: column; gap: 10px;">
-                    <a href="mailto:mrockwell@atomik.tech" style="color: var(--muted); text-decoration: none;">Contact</a>
-                    <a href="mailto:press@atomik.tech" style="color: var(--muted); text-decoration: none;">Press Inquiries</a>
-                    <a href="mailto:sales@atomik.tech" style="color: var(--muted); text-decoration: none;">Sales</a>
+                    <a href="mailto:matthew.h.rockwell@gmail.com" style="color: var(--muted); text-decoration: none;">Contact</a>
+                    <a href="mailto:matthew.h.rockwell@gmail.com" style="color: var(--muted); text-decoration: none;">Press Inquiries</a>
+                    <a href="mailto:matthew.h.rockwell@gmail.com" style="color: var(--muted); text-decoration: none;">Sales</a>
                     <a href="#investors" style="color: var(--muted); text-decoration: none;">Investors</a>
                 </div>
             </div>
@@ -1489,7 +1498,7 @@ a.<span class="fn">merge</span>(b)  <span class="cmt"># a now has both deltas</s
             <div style="display: flex; gap: 20px;">
                 <a href="/privacy" style="color: var(--muted); text-decoration: none;">Privacy</a>
                 <a href="/terms" style="color: var(--muted); text-decoration: none;">Terms</a>
-                <a href="mailto:support@atomik.tech" style="color: var(--muted); text-decoration: none;">Support</a>
+                <a href="mailto:matthew.h.rockwell@gmail.com" style="color: var(--muted); text-decoration: none;">Support</a>
             </div>
         </div>
     </div>
@@ -1508,33 +1517,8 @@ const observer = new IntersectionObserver((entries) => {
 
 document.querySelectorAll('.animate-on-scroll').forEach(el => observer.observe(el));
 
-// Stripe checkout
-async function checkout(tier) {
-    const btn = event.target;
-    const originalText = btn.textContent;
-    btn.textContent = 'Redirecting...';
-    btn.disabled = true;
+// Self-serve checkout removed; evaluation requests route through direct contact.
 
-    try {
-        const res = await fetch('/api/checkout', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ tier }),
-        });
-        const data = await res.json();
-        if (data.url) {
-            window.location.href = data.url;
-        } else {
-            alert('Failed to create checkout session. Please try again or contact sales@atomik.tech');
-            btn.textContent = originalText;
-            btn.disabled = false;
-        }
-    } catch (err) {
-        alert('Connection error. Please try again.');
-        btn.textContent = originalText;
-        btn.disabled = false;
-    }
-}
 </script>
 
 </body>

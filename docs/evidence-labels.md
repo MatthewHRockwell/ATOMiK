@@ -17,6 +17,7 @@ are only stated when backed by measured artifacts.
 | `HARDWARE_VALIDATED` | Demonstrated on physical hardware, but not necessarily accompanied by full benchmark artifacts. | May say hardware-backed or hardware-validated. Do not imply full production readiness. |
 | `SOFTWARE_VALIDATED` | Shown in a software prototype, simulation, local runtime, or non-hardware environment. | May say software-validated. Do not imply board execution. |
 | `SYNTHESIS_VALIDATED` | Validated through synthesis, build, compile, or toolchain output. | Must be separated from live-board results. |
+| `BUILD_ARTIFACT` | A concrete local build output exists, but the end-to-end hardware path has not yet been promoted as a live result. | May say built or assembled locally. Must not say booted, validated, or working end to end until a run artifact exists. |
 | `PROJECTED` | A model, estimate, or expected economic/performance outcome. | Must not be phrased as a result. |
 | `CONCEPTUAL` | Used to explain product direction, UX, architecture, or design intent. Not current proof. | Must be labeled as concept visual or design target. |
 | `ROADMAP` | Planned work that may change. | Must be phrased as planned or future work. |
@@ -27,8 +28,8 @@ are only stated when backed by measured artifacts.
 - Concept visuals must never appear as proof of current product maturity.
 - Synthesis ceilings and modeled economics must not be blended with live
   measurements.
-- Public customer, production, uptime, power, thermal, savings, and traction
-  claims require artifact-backed approval before publication.
+- Public customer, production, uptime, power, thermal, savings, water, battery,
+  and traction claims require artifact-backed approval before publication.
 - If a claim cannot be traced to an artifact, soften it, label it as roadmap or
   conceptual, or remove it.
 
