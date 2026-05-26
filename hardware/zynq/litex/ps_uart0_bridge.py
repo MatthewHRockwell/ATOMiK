@@ -64,7 +64,7 @@ class PSUart0Bridge(LiteXModule, AutoCSR):
         character time (~87 µs), so software never sees stale state.
     """
 
-    def __init__(self, poll_period: int = 64):
+    def __init__(self, poll_period: int = 10_000):
         # ------------------------------------------------------------------
         # Software-visible CSRs — match upstream LiteUART exactly so the
         # existing BIOS, Linux liteuart driver, and OpenSBI litex_console
@@ -140,8 +140,21 @@ class PSUart0Bridge(LiteXModule, AutoCSR):
         sr_addr   = (_PS_UART0_BASE + _PS_UART_OFF_SR)   >> 2
         fifo_addr = (_PS_UART0_BASE + _PS_UART_OFF_FIFO) >> 2
 
+        # Software triggers: a CSR read on _rxtx consumes the cached byte and
+        # signals "go check if there's another byte waiting"; a CSR write on
+        # _rxtx queues TX. Both should wake the FSM out of IDLE immediately.
+        # Otherwise IDLE counts down a slow heartbeat (~100 µs at 100 MHz)
+        # so that unsolicited RX bytes are detected eventually without
+        # contending with NaxRiscv on every cycle.
+        wake = Signal()
+        self.comb += wake.eq(tx_pending | self._rxtx.we | self._rxtx.re)
+
         fsm.act("IDLE",
-            If(poll_ctr == 0,
+            If(wake,
+                NextValue(poll_ctr, poll_period - 1),
+                NextState("POLL_SR"),
+            ).Elif(poll_ctr == 0,
+                NextValue(poll_ctr, poll_period - 1),
                 NextState("POLL_SR"),
             ).Else(
                 NextValue(poll_ctr, poll_ctr - 1),

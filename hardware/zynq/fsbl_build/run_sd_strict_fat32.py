@@ -21,7 +21,7 @@ SDBI_ELF = f"{ZYNQ_DIR}/ps_loader/build/sd_boot_image_writer.elf"
 MBR_BIN  = "/tmp/sd_meta_strict_mbr.bin"
 PART_BIN = os.environ.get(
     "STRICT_PART_BIN",
-    "/tmp/fat_uartbridge/strict_partition.bin")
+    "/tmp/fat_quietbridge/strict_partition.bin")
 
 DDR_MBR  = 0x14000000
 DDR_PART = 0x14001000  # 5.14 MB → ends at ~0x144E7000
