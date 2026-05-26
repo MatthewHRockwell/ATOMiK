@@ -29,6 +29,7 @@ from litex.soc.cores.clock import S7MMCM
 # equivalent of LiteX's VideoFrameBuffer, for SoCs without LiteDRAM.
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from wb_framebuffer import WishboneVideoFrameBuffer
+from ps_uart0_bridge import PSUart0Bridge
 
 # Phase 9.2: framebuffer lives 128 MiB into main_ram, well clear of kernel
 # (0x40000000-0x408xxxxx), trampoline (0x40A00000), DTB (0x40EF0000),
@@ -73,6 +74,11 @@ class BaseSoC(SoCCore):
 
         # Force NaxRiscv — parser default is VexRiscv, setdefault won't override.
         kwargs["cpu_type"] = "naxriscv"
+        # Disable the default LiteX UART (LiteUART on PL pin V12, not host-
+        # visible on this board).  We replace it below with PSUart0Bridge,
+        # which exposes the same CSR layout but writes through to Zynq PS
+        # UART0 on MIO10/11 → FT232 → /dev/ttyUSB1.
+        kwargs["uart_name"] = "stub"
         SoCCore.__init__(self, platform, sys_clk_freq,
             ident       = "ATOMiK NaxRiscv RV64 SoC on HamGeek RK-ZYNQ7020-F",
             **kwargs,
@@ -149,6 +155,22 @@ class BaseSoC(SoCCore):
             src_regions=[iop_src], dst_regions=[iop_dst],
         )
         self.bus.add_slave("ps_iop", remap_iop, iop_src)
+
+        # PS UART0 bridge — replaces the disabled LiteX UART.  Presents the
+        # standard LiteUART CSR layout at the "uart" CSR slot so the BIOS,
+        # Linux liteuart driver, and OpenSBI litex_console work unchanged,
+        # but internally proxies writes/reads to Zynq PS UART0 (MIO10/11 →
+        # FT232 → /dev/ttyUSB1) via a wishbone master on the SoC bus.
+        # Wishbone accesses target NaxRiscv 0x8000_002C / 0x8000_0030 which
+        # the ps_iop remapper above translates to ARM 0xE000_002C / 0x30.
+        self.uart = PSUart0Bridge()
+        self.csr.add("uart", use_loc_if_exists=True)
+        self.bus.add_master("psuart_bridge", master=self.uart.bus)
+        # UART interrupt — keep the slot so software that references
+        # CONFIG_UART_INTERRUPT (LiteX BIOS, Linux liteuart driver) still
+        # builds.  The bridge drives ev.tx / ev.rx triggers based on the
+        # cached PS-side status.
+        self.irq.add("uart", use_loc_if_exists=True)
 
         # USB0 interrupt from PS to NaxRiscv PLIC
         # PS7 IRQ_P2F_USB0 output mirrors the USB0 interrupt to PL fabric.
