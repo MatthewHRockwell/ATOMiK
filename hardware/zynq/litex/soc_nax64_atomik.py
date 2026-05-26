@@ -48,9 +48,12 @@ NaxRiscv.linker_output_format = "elf64-littleriscv"
 NaxRiscv.no_netlist_cache     = False
 NaxRiscv.with_fpu             = True
 NaxRiscv.with_rvc             = True
-# Reduce L2 cache to save LUTs on the XC7Z020
-NaxRiscv.l2_bytes             = 32 * 1024  # 32KB (default 128KB too large)
-NaxRiscv.l2_ways              = 4
+# L2 OFF for DDR corruption diagnostic (Test B).
+# NaxSoc.scala: `def withL2 = l2Bytes > 0` — 0 disables L2 entirely.
+# Forces NaxRiscv to issue single-word accesses instead of 64-byte burst refills;
+# if memtest errors disappear the burst path through 32-bit GP0 is the cause.
+NaxRiscv.l2_bytes             = 0          # L2 disabled
+NaxRiscv.l2_ways              = 4          # ignored when l2_bytes==0
 
 # CRG ------------------------------------------------------------------------------------
 
@@ -476,8 +479,8 @@ def main():
     NaxRiscv.jtag_tap             = False
     NaxRiscv.jtag_instruction     = False
     NaxRiscv.with_dma             = False
-    NaxRiscv.l2_bytes             = 32 * 1024
-    NaxRiscv.l2_ways              = 4
+    NaxRiscv.l2_bytes             = 0           # L2 disabled (DDR diagnostic)
+    NaxRiscv.l2_ways              = 4           # ignored when l2_bytes==0
 
     soc = BaseSoC(
         sys_clk_freq=args.sys_clk_freq,

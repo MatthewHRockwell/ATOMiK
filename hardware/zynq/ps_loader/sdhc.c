@@ -220,13 +220,23 @@ sdhc_err_t sdhc_card_init(sd_card_t *c)
     if (e == SDHC_OK) {
         uint32_t r = r32(c->base + SDHC_RESPONSE);
         if ((r & 0xFF) == 0xAA) c->version2 = 1;
-        else                    return SDHC_ENOSUPPORT;
+        else {
+            /* Wrong echo — stale response reg after controller re-init.
+             * Treat as v2+ (SDHC) since ps_loader confirmed SDHC card. */
+            c->version2 = 1;
+            cmd_line_reset(c->base);
+            /* cmd_line_reset kills CLOCK_CTRL — restore clock before ACMD41 */
+            { sdhc_err_t ce = set_sdclk(c->base, 50000000u, 25000000u);
+              if (ce) return ce; }
+        }
     } else if (e == SDHC_ECMDERR) {
         /* Card likely v1.x — acceptable if OCR matches below.
          * After command error SDHC spec mandates CMD-line reset or the next
          * command will see CMD_INHIBIT_CMD stuck at 1. */
         c->version2 = 0;
         cmd_line_reset(c->base);
+        { sdhc_err_t ce = set_sdclk(c->base, 50000000u, 25000000u);
+          if (ce) return ce; }
     } else {
         return e;
     }
@@ -270,6 +280,33 @@ sdhc_err_t sdhc_card_init(sd_card_t *c)
     e = issue_cmd(c, 7, c->rca, CMD_RESP_48_BUSY | CMD_CRC_CHECK | CMD_INDEX_CHECK, 0);
     if (e) return e;
 
+    return SDHC_OK;
+}
+
+/* Reselect an already-initialized card using a known RCA (e.g. from ps_loader).
+ * Skips CMD0/CMD8/ACMD41/CMD2/CMD3; just sets clock to 25MHz and sends CMD7. */
+sdhc_err_t sdhc_card_reselect(sd_card_t *c, uint32_t rca)
+{
+    c->rca      = rca;
+    c->version2 = 1;
+    c->sdhc     = 1;
+    /* Use ps_loader's clean controller state directly — no reset.
+     * SW_RESET_CMD|DAT clears CLOCK_CTRL (kills INTCLK), causing ECMDERR.
+     * Clock is already at 25MHz, INT_ENABLE already correct from ps_loader. */
+    /* CMD_INHIBIT_CMD is stuck from prior failed commands; SW_RESET_CMD clears it.
+     * This also kills CLOCK_CTRL, so restore it.
+     * The card is still in Transfer state from ps_loader — skip CMD7 entirely. */
+    w8(c->base + SDHC_SW_RESET, 0x02u);   /* SW_RESET_CMD */
+    { uint32_t t = 100000; while (t-- && (r8(c->base + SDHC_SW_RESET) & 0x02u)) {} }
+    w32(c->base + SDHC_INT_STATUS, 0xFFFFFFFFu);
+
+    /* Restore clock if SW_RESET_CMD killed it */
+    if (!(r16(c->base + SDHC_CLOCK_CTRL) & 0x0001u)) {
+        sdhc_err_t clke = set_sdclk(c->base, 50000000u, 25000000u);
+        if (clke) return clke;
+    }
+
+    /* Card is already selected (Transfer state from ps_loader). Skip CMD7. */
     return SDHC_OK;
 }
 

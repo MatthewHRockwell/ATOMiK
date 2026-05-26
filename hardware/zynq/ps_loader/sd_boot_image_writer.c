@@ -157,8 +157,7 @@ int main(void)
 
     SCRATCH_PHASE = PHASE_CONTROLLER;
     int err = sdhc_controller_init_default();
-    if (err)
-        fail(ERR_CONTROLLER, err);
+    if (err) fail(ERR_CONTROLLER, err);
 
     SCRATCH_PHASE = PHASE_CARD;
     err = sdhc_card_init_default();

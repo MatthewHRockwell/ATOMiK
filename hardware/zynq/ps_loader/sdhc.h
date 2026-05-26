@@ -90,6 +90,7 @@ typedef struct {
 /* ---- public API ---- */
 sdhc_err_t sdhc_controller_init(sd_card_t *c, uint32_t base);
 sdhc_err_t sdhc_card_init      (sd_card_t *c);
+sdhc_err_t sdhc_card_reselect  (sd_card_t *c, uint32_t rca);
 sdhc_err_t sdhc_read_block     (sd_card_t *c, uint32_t lba, void *dst_512);
 sdhc_err_t sdhc_write_block    (sd_card_t *c, uint32_t lba, const void *src_512);
 
