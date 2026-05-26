@@ -1,19 +1,20 @@
-import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/siteMetadata";
 import Link from "next/link";
 import Nav from "@/components/Nav";
 
-export const metadata: Metadata = {
-  title: "About ATOMiK — Delta-State Computing",
-  description:
-    "ATOMiK is building the next computing primitive: state-aware compute for systems constrained by heat, power, bandwidth, latency, and hardware footprint.",
-};
+export const metadata = pageMetadata({
+  title: 'About ATOMiK — Delta-State Computing',
+  description: 'ATOMiK is building the next computing primitive: state-aware compute for systems constrained by heat, power, bandwidth, latency, and hardware footprint.',
+  path: '/about',
+  openGraphTitle: 'About ATOMiK',
+});
 
 const timelineItems = [
   {
     year: "2025",
     title: "Mathematical Formalization",
     description:
-      "108 Lean4 theorems proving Abelian group properties: commutativity, associativity, self-inverse, identity. The math that makes delta-state algebra work.",
+      "Lean4 proof work covering core Abelian group properties: commutativity, associativity, self-inverse, identity. Implementation and workload claims remain evidence-labeled.",
     color: "text-purple-400",
     border: "border-purple-500/40",
     bg: "bg-purple-500/5",
@@ -22,7 +23,7 @@ const timelineItems = [
     year: "2025",
     title: "Software SDK",
     description:
-      "Python and C libraries with 218+ tests. Pipeline orchestration, delta generators, and agentic scheduling. Available via pip install atomik-core.",
+      "Python and C software paths with public test artifacts, pipeline orchestration, delta generators, and evaluation-oriented tooling.",
     color: "text-blue-400",
     border: "border-blue-500/40",
     bg: "bg-blue-500/5",
@@ -31,7 +32,7 @@ const timelineItems = [
     year: "2025",
     title: "FPGA v1 -- PicoRV32 + ATOMiK",
     description:
-      "First silicon proof: ATOMiK core integrated with PicoRV32 RISC-V on a Tang Nano 9K. Repeat clock and throughput figures only from the linked hardware-validation artifacts.",
+      "First FPGA proof: ATOMiK core integrated with PicoRV32 RISC-V on a Tang Nano 9K. Repeat clock and throughput figures only from the linked hardware-validation artifacts.",
     color: "text-green-400",
     border: "border-green-500/40",
     bg: "bg-green-500/5",
@@ -49,7 +50,7 @@ const timelineItems = [
     year: "2025",
     title: "FPGA v3 -- HD Video + Multi-Node",
     description:
-      "1280x720@60Hz HDMI output on a $13.50 FPGA. Delta-driven display pipeline. Multi-node convergence proven: two SoCs streaming deltas reach identical state.",
+      "1280x720@60Hz HDMI output on a $13.50 FPGA. Delta-driven display pipeline. Multi-node convergence demonstrated in historical hardware artifacts.",
     color: "text-green-400",
     border: "border-green-500/40",
     bg: "bg-green-500/5",
@@ -67,7 +68,7 @@ const timelineItems = [
     year: "2026",
     title: "Software Licensing Launch",
     description:
-      "atomik-core on PyPI. Commercial licensing for enterprise integration. Making delta-state algebra accessible to every developer.",
+      "atomik-core on PyPI. Commercial licensing and design-partner evaluation are scoped around real workloads and evidence boundaries.",
     color: "text-blue-400",
     border: "border-blue-500/40",
     bg: "bg-blue-500/5",
@@ -85,15 +86,15 @@ const timelineItems = [
 
 const proofPoints = [
   {
-    value: "108",
-    label: "Lean4 Theorems",
-    sublabel: "Formally verified",
+    value: "Lean4",
+    label: "Proof Work",
+    sublabel: "Software validated",
     gradient: "from-purple-400 to-purple-600",
   },
   {
-    value: "500+",
-    label: "Tests Passing",
-    sublabel: "SDK + hardware",
+    value: "Public",
+    label: "Test Artifacts",
+    sublabel: "Software + hardware",
     gradient: "from-green-400 to-green-600",
   },
   {
@@ -170,7 +171,7 @@ export default function AboutPage() {
               : compact operations that compose cleanly and can be evaluated across software and hardware paths.
             </p>
             <p>
-              The math is formalized with 108 Lean4 theorems. The hardware path is
+              The algebra has Lean4 formal proof work. The hardware path is
               prototype-validated across FPGA work and clearly separated from synthesis-only or roadmap claims. The software packages are available (
               <code
                 className="text-sm font-mono px-2 py-0.5 rounded"
@@ -201,19 +202,19 @@ export default function AboutPage() {
             {
               step: "01",
               title: "The Math",
-              desc: "Delta-state algebra forms an Abelian group under XOR. 108 theorems formalized and machine-verified in Lean4.",
+              desc: "Delta-state algebra forms an Abelian group under XOR. Lean4 proof work formalizes core algebraic properties.",
               color: "#8b5cf6",
             },
             {
               step: "02",
               title: "The Proofs",
-              desc: "Commutativity, associativity, self-inverse, identity. Every property formally proven — no assumptions, no hand-waving.",
+              desc: "Commutativity, associativity, self-inverse, identity. Machine-checked algebra properties; implementation and workload claims remain evidence-labeled.",
               color: "#4f8fff",
             },
             {
               step: "03",
               title: "The Software",
-              desc: "Python and C SDKs with pipeline orchestration, delta generators, and 218+ passing tests. Available on PyPI.",
+              desc: "Python and C SDK paths with pipeline orchestration, delta generators, and public test artifacts. Available on PyPI.",
               color: "#22c55e",
             },
             {
@@ -348,24 +349,23 @@ export default function AboutPage() {
                 Matt Rockwell is a systems engineer and founder of ATOMiK, with deep expertise
                 in embedded systems, FPGA development, and formal verification. He created the
                 delta-state algebra as a rethinking of how computers handle state
-                — proving the core algebra with 108 Lean4 theorems before writing the first line of
+                - formalizing the core algebra in Lean4 before writing the first line of
                 prototype code. ATOMiK grew from a mathematical insight into a
                 hardware-validated computing architecture running on FPGA-backed hardware prototypes.
               </p>
               <p className="leading-relaxed mb-6" style={{ color: "#b0b0c0" }}>
                 Designed the delta-state algebra, wrote the formal proofs, built the hardware,
-                and published the software tooling. ATOMiK is a solo-founder deep-tech company —
-                every theorem, every RTL module, and every line of SDK code traces back to one
-                engineer with a conviction that computing has a better primitive waiting to be
-                found.
+                and published the software tooling. ATOMiK is currently founder-led, with the next
+                diligence phase expanding around finance, ASIC review, customer evaluation, and
+                partner validation.
               </p>
               <div className="flex flex-wrap items-center gap-3">
                 <a
-                  href="mailto:mrockwell@atomik.tech"
+                  href="mailto:matthew.h.rockwell@gmail.com"
                   className="inline-flex items-center gap-2 text-sm font-mono px-4 py-2 rounded-lg border transition-colors hover:bg-white/5"
                   style={{ borderColor: "#1e1e2e", color: "#4f8fff" }}
                 >
-                  mrockwell@atomik.tech
+                  matthew.h.rockwell@gmail.com
                 </a>
                 <a
                   href="https://www.linkedin.com/in/matthewhrockwell/"
@@ -422,7 +422,7 @@ export default function AboutPage() {
               changes, with formal proof work around the core algebra.
             </p>
             <p>
-              From 108 formal proofs to FPGA prototype paths and a live Zynq Desk demo, ATOMiK
+              From formal proof work to FPGA prototype paths and a live Zynq Desk demo, ATOMiK
               is the result of building from first principles while labeling each proof boundary.
             </p>
           </div>
