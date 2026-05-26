@@ -1,51 +1,77 @@
-# ATOMiK — Hardware-Accelerated State Change Detection
+# ATOMiK - Hardware-Accelerated State Change Detection
+
+**Status:** Historical demo summary. Use this only with the current evidence
+labels, claims registry, and proof packet. Do not quote this file as a universal
+performance claim.
 
 ## Problem
 
-Every system that tracks mutable state — agents, edge nodes, databases, security monitors — needs to detect what changed. Today that means rescanning memory: **O(N x size)**, scaling with both the number of tracked regions and their size. As state grows, detection becomes the bottleneck.
+Systems that track mutable state often need to detect what changed. In the
+workload below, the software baseline rescans memory, so cost scales with both
+the number of tracked regions and region size. As tracked state grows, detection
+can become the bottleneck.
 
 ## Solution
 
-ATOMiK is a hardware accelerator that makes change detection **O(N)** — scaling only with region count, not region size. Deltas accumulate in hardware at write time. Detection is a single register read per region: did anything change? Yes or no. Constant time.
+ATOMiK evaluates a different path: keep a reference state, accumulate meaningful
+changes, and check change state without repeatedly rescanning full regions. In
+this benchmark, detection scales with region count rather than region size.
 
 ## Live Hardware Result
 
-Measured on a $50 Zynq FPGA running Linux 6.9:
+**Evidence label:** `LIVE_MEASURED` for the listed workload measurements when
+quoted with artifact, platform, and caveat.
 
-```
+Measured on a Zynq FPGA running Linux 6.9:
+
+```text
                           Software        ATOMiK       Speedup
 8 regions x 4KB:         6,955,438 cy     1,223 cy     5,687x
 64 regions x 4KB:       55,125,636 cy    11,837 cy     4,657x
 64 regions x 1KB:        1,392,901 cy     5,881 cy       237x
 ```
 
-**Software gets 5,500x slower going from 256B to 4KB regions. ATOMiK stays flat.**
+These numbers are specific to the measured change-detection workload. They do
+not establish universal speedup, battery, cooling, water, footprint, or product
+readiness claims.
 
 ## How It Works
 
+```text
+current_state = initial_state XOR accumulator
 ```
-current_state = initial_state ⊕ accumulator
-```
 
-- **LOAD**: set initial state for a tracked region
-- **ACCUM**: XOR each write delta into the accumulator (happens at write time)
-- **DETECT**: read one flag — is the accumulator zero? (O(1))
+- **LOAD**: set initial state for a tracked region.
+- **ACCUM**: XOR each write delta into the accumulator.
+- **DETECT**: read whether the accumulator is zero.
 
-The math is an Abelian group (XOR): commutative, associative, self-inverse. 108 Lean4 theorems prove the algebra. Order of writes doesn't matter. Deltas cancel automatically.
+The algebraic model uses XOR properties including commutativity,
+associativity, identity, and self-inverse cancellation. Formal proof work is
+present in `math/proofs/`; public proof counts should only be quoted from an
+audited proof packet or current claims registry.
 
-## What We've Built
+## What We Have Built
 
-- **Hardware**: ATOMiK core on FPGA ($13.50 Tang Nano 9K standalone, Zynq for Linux)
-- **Runtime**: libatomik C library — `atomik_load()`, `atomik_accum()`, `atomik_read()`
-- **Validation**: 16/16 Linux userspace PASS, 9/9 adapter PASS, 20/20 simulation PASS
-- **Formal proof**: 108 Lean4 theorems on the delta-state algebra
+- **Hardware path:** ATOMiK core on FPGA, with Zynq used for the Linux-integrated
+  validation path.
+- **Runtime:** libatomik C library interfaces for load, accumulate, and read
+  operations.
+- **Validation:** Linux userspace-to-FPGA proof artifacts, adapter validation,
+  and simulation artifacts are tracked separately by evidence label.
+- **Formal proof work:** Public proof files exist, but theorem counts are not a
+  public headline unless reconciled across the site, README, deck, and registry.
 
 ## Why Now
 
-Hardware acceleration is moving to the edge. ATOMiK is the first architecture that makes state-change detection a hardware primitive instead of a software scan. Every agent, every edge device, every security monitor that tracks state pays this cost today in software. We eliminate it.
+Hardware acceleration is moving toward the edge, and state-heavy workloads can
+pay a real cost for repeated scans, syncs, replay, and reconstruction. ATOMiK's
+commercial path starts by measuring one workload, one baseline, and one painful
+constraint before making broader claims.
 
 ## Ask
 
-We're looking for design partners in edge computing, agent infrastructure, and security monitoring who need faster state tracking on constrained hardware.
+We are looking for design partners in edge computing, embedded systems, agent
+infrastructure, and monitoring workloads that need faster state tracking on
+constrained hardware.
 
-**ATOMiK Project** — [atomik.tech](https://atomik.tech)
+**ATOMiK Project** - [atomik.tech](https://atomik.tech)

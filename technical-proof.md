@@ -8,13 +8,14 @@ together.
 
 | Claim area | Label | Artifact |
 |---|---|---|
-| Current ATOMiK Desk v0.38-I UI proof screenshot | `HARDWARE_VALIDATED` | `website/public/08-current-live-atomik-desk-v038i.png` |
-| Earlier ATOMiK Desk v0.38-G UI proof screenshot | `HARDWARE_VALIDATED` | `website/public/07-current-live-atomik-desk-v038g.png` |
+| Current ATOMiK Desk v0.39-K UI proof screenshot | `HARDWARE_VALIDATED` | `website/public/09-current-live-atomik-desk-v039k.png` |
+| Earlier ATOMiK Desk v0.38-I UI proof screenshot | `HARDWARE_VALIDATED` | `website/public/08-current-live-atomik-desk-v038i.png` |
 | Earlier ATOMiK Desk prototype screenshot | `HARDWARE_VALIDATED` | `website/public/01-current-live-atomik-desk.jpg` |
 | AX7020 performance matrix board run | `LIVE_MEASURED` | `results/perf_matrix_ax7020_20260509.txt` |
 | AX7020 matrix interpretation and caveats | `LIVE_MEASURED` | `docs/perf/20260509_matrix_interpretation.md` |
 | Linux userspace validation path | `HARDWARE_VALIDATED` | `docs/LINUX_USERSPACE_PROOF.md` |
 | Parallel accumulator bank hardware and synthesis notes | `HARDWARE_VALIDATED` / `SYNTHESIS_VALIDATED` | `docs/HARDWARE_SYNTHESIS.md` |
+| Standalone Zynq SD boot build artifacts | `BUILD_ARTIFACT` | `hardware/zynq/fsbl_build/BOOT.bin`, `hardware/zynq/litex-build-nax64-sdboot/gateware/` |
 | Formal proof work | `SOFTWARE_VALIDATED` | `math/proofs/` |
 | Concept visuals | `CONCEPTUAL` / `ROADMAP` | `docs/visual-asset-manifest.md` |
 
@@ -25,22 +26,24 @@ together.
   if the complete benchmark package is not yet published.
 - `SYNTHESIS_VALIDATED` means toolchain output supports the result, not live
   board execution.
+- `BUILD_ARTIFACT` means the files or binaries exist locally, but the full
+  hardware path is not yet promoted as a live result.
 - `CONCEPTUAL` and `ROADMAP` explain product direction. They are not current
   commercial functionality.
 
 ## Current Live Proof
 
-The current ATOMiK Desk v0.38-I screenshot is a live hardware prototype proof
-image. It is appropriate for the homepage, README, pitch deck, technical docs,
-and one-pager when labeled as:
+The current ATOMiK Desk v0.39-K screenshot is a live hardware prototype proof
+image. It is appropriate for the homepage, investor brief, README, pitch deck,
+technical docs, and one-pager when labeled as:
 
-> ATOMiK Desk v0.38-I prototype UI running on live hardware.
+> ATOMiK Desk v0.39-K prototype UI running on live Zynq hardware.
 
-It should not be described as a polished commercial product. The earlier
-`01-current-live-atomik-desk.jpg` artifact remains useful as historical live
-proof, and the v0.38-G screenshot remains useful as a historical UI upgrade
-artifact. Do not infer benchmark, uptime, allocation, maturity, or commercial
-product claims from the screenshot.
+It should not be described as a polished commercial product. The older
+`01-current-live-atomik-desk.jpg`, v0.38-G, and v0.38-I artifacts remain useful
+as historical live proof. Do not infer benchmark, uptime, allocation, maturity,
+commercial product, power, thermal, water, battery, or performance claims from
+any screenshot.
 
 ## Benchmark Artifact Guidance
 

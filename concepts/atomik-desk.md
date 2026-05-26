@@ -12,20 +12,22 @@ commercial desktop product.
 
 ## Current Live UI Proof
 
-![ATOMiK Desk v0.38-I prototype UI running on live hardware](../../website/public/08-current-live-atomik-desk-v038i.png)
+![ATOMiK Desk v0.39-K prototype UI running on live Zynq hardware](../../website/public/09-current-live-atomik-desk-v039k.png)
 
-**HARDWARE_VALIDATED:** ATOMiK Desk v0.38-I prototype UI running on live
+**HARDWARE_VALIDATED:** ATOMiK Desk v0.39-K prototype UI running on live Zynq
 hardware.
 
-The v0.38-I UI track materially narrows the distance between the live prototype
-and the concept visuals: dark/cyan palette, top status bar, left app rail, Pulse
-Bar, live Resource Fabric panel, and a desktop-like visual surface are now
-present in the recorded prototype screenshot.
+The v0.39-K UI track is the current public live proof image for ATOMiK Desk. It
+shows the prototype UI/UX direction running on Zynq hardware, including the dark
+technical surface, top status bar, app rail, Pulse Bar, live Resource Fabric
+panel, and desktop-like visual structure.
 
 Keep the proof boundary explicit:
 
-- v0.38-I is represented by a recorded live prototype screenshot.
-- v0.38-G remains a historical UI upgrade proof artifact.
+- v0.39-K is represented by a recorded live prototype screenshot.
+- v0.38-I and v0.38-G remain historical UI proof artifacts.
+- Screenshots prove prototype progress, not benchmark, uptime, allocation,
+  commercial product, power, thermal, battery, water, or footprint outcomes.
 - Concept visuals remain product direction, not current commercial UI.
 
 ## Concept
@@ -37,7 +39,7 @@ current live UI.
 
 The concept visual shows the desired public quality bar and product direction.
 It is suitable for product vision pages, pitch decks, and roadmap discussions
-when paired with the live hardware screenshot.
+when paired with the live hardware screenshot and evidence label.
 
 ## Roadmap
 
@@ -48,13 +50,13 @@ when paired with the live hardware screenshot.
 
 ## Caption Rule
 
-Use the live screenshot caption:
+Use the earlier live screenshot caption:
 
 > Earlier ATOMiK Desk prototype running on live hardware.
 
-Use the current UI upgrade caption:
+Use the current UI proof caption:
 
-> ATOMiK Desk v0.38-I prototype UI running on live hardware.
+> ATOMiK Desk v0.39-K prototype UI running on live Zynq hardware.
 
 Use the concept caption:
 
