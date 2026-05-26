@@ -2,11 +2,21 @@
 
 ## 1. One sentence
 
-ATOMiK is a state-aware compute architecture that helps edge and embedded teams reduce wasted state movement by tracking meaningful change instead of repeatedly moving or rebuilding full state.
+ATOMiK is a state-aware compute architecture that helps constrained edge and embedded teams do less unnecessary state work by tracking meaningful changes instead of repeatedly moving, scanning, syncing, replaying, or rebuilding full state.
+
+## 1A. Buyer Narrative
+
+The strongest buyer story is not "new computing architecture" first. It is "we are paying for unnecessary work" first. Lead with the paid pain: battery budget, heat, bandwidth, latency, reliability, and hardware footprint. Explain the architecture only after the prospect understands the waste ATOMiK is evaluating.
+
+## 1B. How ATOMiK Works
+
+CEO-safe answer: traditional systems often keep moving or rechecking whole state even when only a small part changed. ATOMiK starts from a known state, records the meaningful changes, and rebuilds only the state needed when it is needed. In the right workload, that can reduce unnecessary data movement and repeated work, which may improve performance or reduce power, heat, and bandwidth pressure.
+
+Technical answer: LOAD sets a reference state, ACCUM XORs each new delta into an accumulator, READ reconstructs current state as reference XOR accumulator, and SWAP checkpoints the result. Because XOR deltas are commutative and associative, multiple logical updates can be batched or coalesced before they are applied; because they are self-inverse, duplicate or undo-style operations can be handled algebraically.
 
 ## 2. X/Y/Z/A positioning
 
-ATOMiK is a state-aware compute architecture that helps edge and embedded teams reduce wasted state movement by tracking meaningful change instead of repeatedly moving or rebuilding full state.
+ATOMiK is a state-aware compute architecture that helps constrained edge and embedded teams do less unnecessary state work by tracking meaningful changes instead of repeatedly moving, scanning, syncing, replaying, or rebuilding full state.
 
 Give us one state-heavy workload, your current baseline, and the constraint that already hurts.
 We will evaluate where state movement creates waste and whether ATOMiK can improve the path.
@@ -16,6 +26,10 @@ Success looks like a measured improvement against one agreed metric while preser
 ## 3. Primary ICP
 
 The first ICP is edge and embedded teams that can provide one representative state-heavy workload, one current baseline, and one painful constraint expensive enough to evaluate. Strong categories include AI at the edge, robotics, industrial systems, IoT, remote or field systems, defense-adjacent systems, and hardware-constrained teams where battery, heat, bandwidth, latency, size, weight, reliability, or cost is already measurable.
+
+Direct first-order pains: battery or power budget, heat in sealed or fanless systems, bandwidth pressure, update/reconstruction latency, reliability, field-service, size, weight, and hardware-footprint pressure.
+
+Derived or expansion pains: data-center power bills, cooling and water pressure, sustainability reporting, rack density, and infrastructure overbuild. Treat these as evaluation targets unless measured for the specific workload.
 
 ## 4. Evaluation offer
 
@@ -107,6 +121,8 @@ ATOMiK differs by testing whether the paid pain comes from wasted state movement
 ## 11. Language to use
 
 Use: targets, evaluates, may reduce, designed to reduce, maps, measures, helps identify, workload-specific, evidence-bound, evaluation target, fit/no-fit, current baseline, preserves correctness, public proof packet, evidence tier.
+
+Word-choice rule: use "does" only for artifact-backed facts, "can" for workload-specific capability ATOMiK is prepared to evaluate, and "may" for downstream business outcomes such as battery, thermal, cooling, water, and footprint.
 
 ## 12. Language to avoid
 

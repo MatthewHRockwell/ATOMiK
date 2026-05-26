@@ -4,7 +4,22 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "Hardware Proof - ATOMiK Docs",
   description:
-    "ATOMiK hardware proof map separating live measurements, hardware validation, and synthesis output.",
+    "ATOMiK hardware proof map separating live measurements, hardware validation, build artifacts, and synthesis output.",
+  openGraph: {
+    title: "ATOMiK Hardware Proof Map",
+    description:
+      "Live prototype, hardware validation, board-run measurements, synthesis output, and current standalone boot build artifacts.",
+    url: "https://atomik.tech/docs/hardware",
+    images: [{ url: "https://atomik.tech/09-current-live-atomik-desk-v039k.png", width: 1920, height: 1080 }],
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "ATOMiK Hardware Proof Map",
+    description:
+      "Hardware validation and synthesis artifacts kept separate from roadmap claims.",
+    images: ["https://atomik.tech/09-current-live-atomik-desk-v039k.png"],
+  },
 };
 
 const artifacts = [
@@ -16,9 +31,9 @@ const artifacts = [
   },
   {
     label: "BUILD_ARTIFACT",
-    title: "Standalone SD boot path artifacts",
+    title: "Standalone SD boot build artifacts",
     href: "#standalone-boot",
-    body: "Minimal FSBL, fsbl.elf, boot.bif, and BOOT.bin artifacts are local build outputs. Power-on standalone validation remains the next hardware gate before a public GitHub artifact link is used.",
+    body: "Local BOOT.bin and probe notes exist for the standalone SD boot path. Keep this as a build artifact until public power-on logs support a stronger claim.",
   },
   {
     label: "HARDWARE_VALIDATED",
@@ -48,13 +63,13 @@ export default function HardwarePage() {
       </p>
       <h1 className="mt-4 text-4xl font-bold">Hardware validation map</h1>
       <p className="mt-4 max-w-3xl text-lg leading-8" style={{ color: "#8888a0" }}>
-        This page separates hardware validation from synthesis output and roadmap language. Use exact performance numbers only when the linked artifact supports them.
+        This page separates hardware validation, build artifacts, synthesis output, and roadmap language. Use exact performance numbers only when the linked artifact supports them.
       </p>
 
       <div className="mt-8 grid gap-4 md:grid-cols-2">
         {artifacts.map((artifact) => (
           <Link key={artifact.title} href={artifact.href} className="rounded-lg p-5 no-underline" style={{ background: "#12121a", border: "1px solid #1d324a", color: "#f4f8ff" }}>
-            <p className="text-[11px] font-semibold uppercase" style={{ color: "#22d3ee" }}>{artifact.label}</p>
+            <p className="text-[11px] font-semibold uppercase" style={{ color: "#22d3ee" }}>{artifact.label.replace(/_/g, " ")}</p>
             <h2 className="mt-2 text-lg font-bold">{artifact.title}</h2>
             <p className="mt-2 text-sm leading-6" style={{ color: "#9fb1c7" }}>{artifact.body}</p>
           </Link>
@@ -63,11 +78,11 @@ export default function HardwarePage() {
 
       <section id="standalone-boot" className="mt-8 rounded-lg p-5" style={{ background: "#12121a", border: "1px solid #1d324a" }}>
         <p className="text-[11px] font-semibold uppercase" style={{ color: "#22d3ee" }}>
-          NEXT HARDWARE GATE
+          CURRENT HARDWARE GATE
         </p>
-        <h2 className="mt-2 text-lg font-bold">Standalone SD boot validation</h2>
+        <h2 className="mt-2 text-lg font-bold">Standalone SD boot artifact boundary</h2>
         <p className="mt-2 text-sm leading-6" style={{ color: "#9fb1c7" }}>
-          The autoboot bitstream and BOOT.bin path are assembled locally. This page does not link to an unpublished GitHub directory; once power-on validation and public artifacts are both present, the evidence link can be promoted.
+          Local build output and probe notes exist for the standalone SD boot path. This public page does not link to unpublished probe logs; once power-on logs, FSBL exception handling, final autonomous handoff, and public artifacts are all present, the evidence link can be promoted.
         </p>
       </section>
     </div>

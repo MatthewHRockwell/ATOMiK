@@ -38,4 +38,4 @@ Proof review reservations, technical evaluation reservations, scoped design-part
 
 ## What is the ask?
 
-Use placeholder until Matt locks it: raising/seeking $[X] to convert proof into paid evaluations, design partners, ASIC/IP diligence, and commercial licensing readiness.
+The working ask is a $2.0M target pre-seed to convert proof into paid evaluations, design partners, ASIC/IP diligence, and commercial licensing readiness. Minimum viable close is $1.25M; stretch plan is $2.75M; final SAFE terms require CFO/counsel approval.

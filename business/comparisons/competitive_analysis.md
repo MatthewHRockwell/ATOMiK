@@ -1,128 +1,56 @@
-# ATOMiK Competitive Analysis
+# ATOMiK Competitive / Status Quo Analysis
 
 > **Publication status: INTERNAL COMPETITIVE MEMO / REVIEW REQUIRED.**
-> Do not publish competitor comparisons or performance rows without current
-> source checking, evidence labels, and counsel review where appropriate.
+> Use this as positioning input, not publishable competitor copy. Third-party
+> claims, performance comparisons, and legal/IP statements require current source
+> checking and counsel review before external use.
 
-## Summary Matrix
+## Current Positioning Rule
 
-| Dimension | ATOMiK | Event Sourcing | CRDTs | Traditional FPGA Accel. | Ubitium |
-|-----------|--------|---------------|-------|------------------------|---------|
-| **State Reconstruction** | O(1) single XOR | O(N) replay | O(1) merge | Varies | Unknown |
-| **Operation Latency** | 10.6 ns (1 cycle) | Microseconds+ | Microseconds+ | Varies (multi-cycle) | Unknown (no silicon) |
-| **Parallelism** | Lock-free (proven) | Requires ordering | Lock-free | Application-dependent | Claimed universal |
-| **Undo/Rollback** | Free (self-inverse) | Log replay | Not built-in | Not built-in | Not discussed |
-| **Formal Proofs** | 108 Lean4 theorems | None | Paper proofs | None | None disclosed |
-| **Hardware Accel.** | Native (2 SoCs deployed) | Software only | Software only | Application-specific | Pre-silicon |
-| **Scaling** | Linear (16x proven) | Vertical only | Horizontal | Design-dependent | Claimed linear |
-| **Memory Overhead** | 64 bits (accumulator) | O(N) event log | O(state) per replica | Varies | Unknown |
-| **Working Hardware** | ✅ v2 + v3 deployed | N/A | N/A | Yes (custom) | ❌ No public demos |
+ATOMiK should not be framed as "faster than every alternative." The safe claim is
+that ATOMiK evaluates whether less state needs to move for one constrained
+workload, then compares that path against the customer's current baseline.
 
----
+## Status Quo Alternatives
 
-## Detailed Comparisons
+| Alternative | What it solves | What it does not solve | Why teams choose it | Where it becomes insufficient | How ATOMiK differs | Proof required |
+|---|---|---|---|---|---|---|
+| More compute | Adds headroom for slow paths | May leave redundant state movement intact | Familiar procurement path | Battery, heat, size, and cost budgets tighten | Evaluates whether less state work is needed | Baseline cycles/update, latency, operations avoided |
+| Bigger batteries | Extends runtime | Adds size, weight, charge time, and cost | Direct fix for field runtime | Hardware envelope or weight cannot grow | Targets the work that drains budget first | Power proxy or instrumented workload measurement |
+| More cooling | Handles thermal load | Does not remove the work producing heat | Operationally straightforward in infrastructure | Fanless, sealed, remote, or dense systems lack cooling margin | Treats thermal pressure as a downstream metric | Thermal proxy or measured power path |
+| More bandwidth | Moves full state faster | Keeps recurring transfer cost | Easiest network-side upgrade | Remote links, radio budgets, or cloud egress costs bind | Evaluates bytes moved and full-state transfers avoided | Bytes moved/avoided vs baseline |
+| Compression | Reduces payload size | Adds encode/decode cost and may miss semantic change | Mature and cheap | State churn or latency dominates | Tracks meaningful state change before payload movement | Payload size, CPU cost, latency, correctness |
+| Caching | Avoids repeated fetches | Can go stale and may not reduce update churn | Common performance pattern | Invalidations dominate or state changes frequently | Maps state transition boundaries and deltas | Cache invalidation cost, updates avoided |
+| Deduplication | Removes repeated identical data | May not catch repeated reconstruction or scans | Useful for storage/network redundancy | Workload has many small state transitions | Coalesces logical changes when the model fits | Duplicate transfers avoided, operations coalesced |
+| Sync protocols | Coordinate distributed state | May still move large state or metadata | Established systems practice | Metadata, replay, or full-state repair dominates | Evaluates the constrained state path underneath sync | Sync payload, replay/reconstruction cost |
+| Specialized accelerators | Speeds a known kernel | Often application-specific and integration-heavy | Strong when the kernel is stable | State movement around the kernel dominates | Targets state movement as the unit of work | End-to-end workload metric, not isolated kernel metric |
+| Cloud offload | Moves compute off device | Adds latency, bandwidth, privacy, and availability dependencies | Reduces local hardware burden | Link or autonomy constraints matter | Keeps evaluation centered on local state path | Local latency, bandwidth, reliability constraints |
+| Overbuilt hardware | Buys schedule margin | Increases BOM, power, size, and thermal load | Fastest path to ship | Unit economics or physical envelope fail | Finds whether architecture removes overbuild pressure | BOM/thermal/power pressure tied to metric |
+| Manual optimization | Squeezes known bottlenecks | Expensive, fragile, and hard to repeat | Engineers can start immediately | Diminishing returns and maintenance cost | Provides a repeatable evaluation of state movement waste | Engineering time, metric moved, correctness preserved |
+| Feature cuts | Reduces workload | Reduces product value | Last resort under constraints | Customers need the feature | Evaluates whether state-aware execution keeps the feature viable | Metric threshold tied to product decision |
 
-### ATOMiK vs. Event Sourcing
+## Direct Competitor Language
 
-**Event sourcing** (Kafka, EventStore, Axon) stores an append-only log of events and reconstructs state by replaying them.
+Direct competitors and named startups should be discussed carefully. For external
+materials, avoid claiming another company has no working hardware, no proof, or a
+specific funding status unless that statement is source-checked immediately
+before use.
 
-| Aspect | ATOMiK | Event Sourcing |
-|--------|--------|---------------|
-| Reconstruction cost | O(1) — single XOR operation | O(N) — replay all events |
-| Storage | Single 64-bit accumulator | Growing event log |
-| Ordering | Not required (commutative) | Strictly ordered |
-| Undo | Apply same delta (free) | Compensating events or log truncation |
-| Snapshots | Not needed | Required for performance |
-| Hardware acceleration | Native | Not applicable |
-| Consistency | Mathematically guaranteed | Eventual (requires careful design) |
+Safe external contrast:
 
-**Key advantage**: As event counts grow, event sourcing slows down linearly (or requires periodic snapshotting). ATOMiK state reconstruction is always O(1), regardless of how many deltas have been accumulated.
+> Many alternatives buy more margin: more compute, more cooling, more bandwidth,
+> bigger batteries, or more manual optimization. ATOMiK asks whether the workload
+> can move less state in the first place.
 
-### ATOMiK vs. CRDTs
+Avoid:
 
-**CRDTs** (Conflict-free Replicated Data Types) are distributed data structures that allow concurrent updates without coordination.
+- unverified third-party performance or funding claims
+- "ATOMiK replaces CPUs/GPUs/accelerators"
+- unaudited theorem counts as moat language
+- universal latency, scaling, memory, power, heat, or security claims
 
-| Aspect | ATOMiK | CRDTs |
-|--------|--------|-------|
-| Merge function | Universal XOR | Custom per data type |
-| Implementation | Hardware (silicon) | Software (libraries) |
-| Latency | 10.6 ns | Microseconds to milliseconds |
-| Formal verification | 108 Lean4 machine proofs | Academic paper proofs |
-| Data types | 64-bit delta states | G-Counter, PN-Counter, LWW, OR-Set, etc. |
-| Complexity | Single operation | Complex merge logic per type |
-| State space | Compact (accumulator) | Can grow unbounded (tombstones) |
+## Buyer Proof Standard
 
-**Key advantage**: CRDTs are software constructs with variable performance and per-type design requirements. ATOMiK provides a single, hardware-accelerated primitive that handles the most common case (state accumulation/merge) at silicon speed.
-
-### ATOMiK vs. Traditional FPGA Accelerators
-
-**Traditional FPGA accelerators** (Xilinx Vitis, Intel oneAPI, HLS) target specific computations like matrix multiply, encryption, or network processing.
-
-| Aspect | ATOMiK | Traditional FPGA |
-|--------|--------|-----------------|
-| Design approach | Fixed algebra, parameterised | Application-specific |
-| Carry chains | Zero (pure XOR) | Common (arithmetic) |
-| Scaling | Linear (proven) | Diminishing returns |
-| Time to deploy | Schema-driven generation | Months of RTL design |
-| Utilization | 7-20% LUTs | Often 50-90% |
-| Generality | Any state management task | Single application |
-| Formal guarantees | 108 proofs | Simulation-based testing |
-
-**Key advantage**: Traditional FPGA accelerators require months of custom RTL design per application. ATOMiK provides a reusable, formally verified primitive that applies across many domains. The zero-carry-chain architecture also allows higher clock frequencies and lower LUT utilization than arithmetic-heavy designs.
-
-### ATOMiK vs. Memcached/Redis (In-Memory State)
-
-**In-memory stores** provide fast state access but still use traditional read-modify-write patterns.
-
-| Aspect | ATOMiK | In-Memory Store |
-|--------|--------|----------------|
-| Update model | XOR accumulate (additive) | Read-modify-write (destructive) |
-| Latency | 10.6 ns | 1-100 microseconds (network) |
-| Concurrency | Lock-free (commutative) | Requires locking or CAS |
-| Undo | Free (self-inverse) | Not supported natively |
-| Memory | 64-bit accumulator | Full state objects |
-| Network | Not required (on-chip) | Client-server protocol |
-
-**Key advantage**: ATOMiK eliminates the read-modify-write cycle entirely. State updates are accumulative, not destructive, eliminating the need for locks, CAS operations, or optimistic concurrency.
-
----
-
-### ATOMiK vs. Ubitium (Universal Processor)
-
-**Ubitium** is developing a "universal processor" that aims to replace CPUs, GPUs, and DSPs with a single unified architecture. They raised $3.7M in seed funding (2024) and claim their architecture can execute any workload type on the same silicon.
-
-| Aspect | ATOMiK | Ubitium |
-|--------|--------|--------|
-| Architecture type | Delta-state accelerator (XOR algebra) | Universal processor (unified ISA) |
-| Core thesis | Eliminate data movement via delta accumulation | Eliminate chip diversity via universal compute |
-| Formal proofs | 108 Lean4 machine-verified theorems | None publicly disclosed |
-| Working silicon | ✅ Two SoC generations deployed on FPGA | No public hardware demos |
-| Hardware validation | 80/80 sweep + v3: 25/25 tests | Pre-silicon (as of early 2026) |
-| Business model | IP licensing (ARM-style) | Chip sales |
-| Power envelope | ~20 mW (FPGA prototype) | Unknown (no silicon data) |
-| Cost to date | ~$225 (AI-augmented) | $3.7M raised |
-| IP protection | Patent pending + 108 formal proofs barrier | Patent applications (claimed) |
-
-**Key differentiators vs. Ubitium:**
-1. **ATOMiK has working hardware; Ubitium does not** (as of March 2026). Two deployed SoC generations with HDMI output and comprehensive test suites.
-2. **Different problem domains**: Ubitium tries to replace all processor types (extremely ambitious, unproven). ATOMiK solves a specific, well-defined problem (state management) with mathematical proof of correctness.
-3. **Formal verification moat**: ATOMiK's 108 Lean4 proofs provide a verification barrier that cannot be shortcut. Ubitium has no comparable formal foundation.
-4. **Capital efficiency**: ATOMiK achieved production hardware deployment for ~$225 in AI token costs. Ubitium has raised $3.7M with no public hardware demonstration.
-5. **Complementary positioning**: ATOMiK can integrate *into* a Ubitium processor (or any processor) as the state management layer. Ubitium must replace the entire compute stack.
-
-**Investor implication**: Ubitium's "universal processor" thesis requires replacing the entire CPU/GPU/DSP stack — a multi-billion-dollar bet with no hardware validation. ATOMiK's delta-state approach is additive: it improves any existing architecture without requiring replacement. Lower risk, faster path to revenue.
-
----
-
-## Positioning
-
-ATOMiK occupies a unique position: **hardware-accelerated, formally verified state management**. No existing technology combines all of:
-
-1. Single-cycle hardware operations
-2. Formal mathematical proofs
-3. Lock-free parallelism by construction
-4. Free undo/rollback
-5. Linear scaling with parallel banks
-6. Schema-driven multi-language SDK
-
-This combination creates a defensible moat that is difficult to replicate without both deep mathematical expertise (Lean4 theorem proving) and hardware design capability (FPGA RTL, timing closure, synthesis optimization).
+A prospect should be persuaded only when ATOMiK improves the pre-agreed metric
+against the current baseline, preserves correctness, and connects that
+improvement to a business constraint worth pursuing.

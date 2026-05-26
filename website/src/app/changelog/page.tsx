@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import Nav from "@/components/Nav";
-import EmailCapture from "@/components/EmailCapture";
 
 /* ── Release data ────────────────────────────────────────────────── */
 
@@ -12,10 +11,33 @@ type Release = {
   date: string;
   category: "software" | "hardware" | "tools";
   items: string[];
-  blogLink?: string;
+  links?: { label: string; href: string }[];
 };
 
+const evidenceLinks = {
+  deskProof: "/09-current-live-atomik-desk-v039k.png",
+  perfMatrix: "https://github.com/MatthewHRockwell/ATOMiK/blob/main/results/perf_matrix_ax7020_20260509.txt",
+  perfInterpretation: "https://github.com/MatthewHRockwell/ATOMiK/blob/main/docs/perf/20260509_matrix_interpretation.md",
+  linuxUserspace: "https://github.com/MatthewHRockwell/ATOMiK/blob/main/docs/LINUX_USERSPACE_PROOF.md",
+  hardwareSynthesis: "https://github.com/MatthewHRockwell/ATOMiK/blob/main/docs/HARDWARE_SYNTHESIS.md",
+  kernelEvaluation: "/docs/kernel-module",
+  hardwareProof: "/docs/hardware",
+} as const;
+
 const releases: Release[] = [
+  {
+    version: "bring-up",
+    title: "Standalone SD Boot Reached Minimal FSBL",
+    date: "2026-05-24",
+    category: "hardware",
+    items: [
+      "Strict-FAT32 SD boot now reaches the minimal FSBL from BootROM",
+      "PL bitstream programming completes; PCFG_DONE is observed high",
+      "Remaining gate is FSBL exception handling and final autonomous handoff",
+      "Classified as BUILD_ARTIFACT until public power-on logs support a stronger claim",
+    ],
+    links: [{ label: "Open hardware proof map", href: evidenceLinks.hardwareProof }],
+  },
   {
     version: "v0.39-K",
     title: "ATOMiK Desk Current Live Prototype UI Proof",
@@ -27,6 +49,7 @@ const releases: Release[] = [
       "Classified as HARDWARE_VALIDATED for the UI surface, not as a commercial desktop product or performance benchmark",
       "Public proof asset: 09-current-live-atomik-desk-v039k.png",
     ],
+    links: [{ label: "Open proof image", href: evidenceLinks.deskProof }],
   },
   {
     version: "",
@@ -48,11 +71,15 @@ const releases: Release[] = [
     category: "hardware",
     items: [
       "End-to-end workload: track N memory regions, detect changes via ATOMiK vs memcmp",
-      "ATOMiK detection: O(1) per region (~262 cycles), independent of buffer size",
-      "Software memcmp: O(N \u00d7 size), degrades above 4 KB D-cache boundary",
+      "ATOMiK accumulator-path detection: ~262 cycles per region in the linked AX7020 benchmark artifact",
+      "Software memcmp comparison retained in the linked benchmark artifact and interpretation note",
       "Measured results retained in benchmark artifacts; quote exact speedups only from the linked evidence files",
       "Monitoring-rate claims require the matching board-run artifact and interpretation note",
       "libatomik C runtime with /dev/mem backend and MMIO ordering fences",
+    ],
+    links: [
+      { label: "Benchmark artifact", href: evidenceLinks.perfMatrix },
+      { label: "Interpretation note", href: evidenceLinks.perfInterpretation },
     ],
   },
   {
@@ -62,11 +89,12 @@ const releases: Release[] = [
     category: "hardware",
     items: [
       "ATOMiK 16/16 PASS from Linux 6.9 userspace (S-mode, MMU enabled, /dev/mem mmap)",
-      "Full stack validated: user process \u2192 kernel \u2192 Wishbone CSR \u2192 ATOMiK core",
+      "HARDWARE_VALIDATED stack path: user process -> kernel -> Wishbone CSR -> ATOMiK core",
       "Linux 6.9 + OpenSBI 1.3.1 booting on VexRiscv SMP (Zynq XC7Z020)",
       "MMIO ordering: fence iorw,iorw + STATUS readback required for Wishbone CSR correctness",
       "Frozen baseline with SHA-256 manifest (tag: zynq-linux-v1)",
     ],
+    links: [{ label: "Linux userspace proof", href: evidenceLinks.linuxUserspace }],
   },
   {
     version: "v0.5.0",
@@ -128,7 +156,7 @@ const releases: Release[] = [
       "DKMS packaging, systemd service, udev rules",
       "Request-based evaluation access and evidence review",
     ],
-    blogLink: "/blog/announcing-atomik-kernel-module",
+    links: [{ label: "Kernel evaluation notes", href: evidenceLinks.kernelEvaluation }],
   },
   {
     version: "v0.2.0",
@@ -165,8 +193,9 @@ const releases: Release[] = [
     items: [
       "6 configs (N=1 to N=512), 4 synthesis strategies",
       "N=512 peak synthesis configuration documented for XC7Z020",
-      "Sub-linear LUT scaling confirmed (~34 LUT per additional bank)",
+      "SYNTHESIS_VALIDATED LUT scaling is documented in the linked synthesis artifact",
     ],
+    links: [{ label: "Synthesis artifact", href: evidenceLinks.hardwareSynthesis }],
   },
   {
     version: "v3.1.0",
@@ -250,7 +279,7 @@ export default function ChangelogPage() {
             </span>
           </h1>
           <p className="text-xl leading-relaxed max-w-3xl" style={{ color: "#8888a0" }}>
-            Every release, every improvement.
+            Evidence-labeled updates across software, hardware, and roadmap work.
           </p>
         </div>
       </section>
@@ -386,17 +415,20 @@ export default function ChangelogPage() {
                       ))}
                     </ul>
 
-                    {/* Blog link */}
-                    {release.blogLink && (
-                      <div className="mt-5 pt-4" style={{ borderTop: "1px solid #1e1e2e" }}>
-                        <Link
-                          href={release.blogLink}
-                          className="inline-flex items-center gap-2 text-sm font-medium transition-colors hover:opacity-80"
-                          style={{ color: cfg.color }}
-                        >
-                          Read the announcement
-                          <span>&rarr;</span>
-                        </Link>
+                    {/* Evidence links */}
+                    {release.links && (
+                      <div className="mt-5 flex flex-wrap gap-2 pt-4" style={{ borderTop: "1px solid #1e1e2e" }}>
+                        {release.links.map((link) => (
+                          <Link
+                            key={link.href}
+                            href={link.href}
+                            className="inline-flex items-center gap-2 rounded px-2.5 py-1 text-xs font-semibold no-underline transition-colors hover:opacity-80"
+                            style={{ color: cfg.color, border: `1px solid ${cfg.border}`, background: cfg.bg }}
+                          >
+                            {link.label}
+                            <span>&rarr;</span>
+                          </Link>
+                        ))}
                       </div>
                     )}
                   </div>
@@ -407,7 +439,7 @@ export default function ChangelogPage() {
         </div>
       </section>
 
-      {/* Subscribe for release updates */}
+      {/* Diligence CTA */}
       <section className="max-w-5xl mx-auto px-6 pb-24">
         <div
           className="rounded-2xl p-8 sm:p-12 border text-center"
@@ -416,12 +448,25 @@ export default function ChangelogPage() {
             borderColor: "#8b5cf630",
           }}
         >
-          <h2 className="text-2xl font-bold mb-3">Subscribe for Release Updates</h2>
-          <p className="mb-6" style={{ color: "#8888a0" }}>
-            Get notified when we ship new versions. No spam, just releases.
+          <h2 className="text-2xl font-bold mb-3">Turn the release trail into a proof review.</h2>
+          <p className="mx-auto mb-6 max-w-2xl" style={{ color: "#8888a0" }}>
+            The useful next step is not a generic release list. Bring one workload or diligence question and map the relevant hardware, software, synthesis, and roadmap artifacts to an evidence boundary.
           </p>
-          <div className="max-w-md mx-auto">
-            <EmailCapture />
+          <div className="flex flex-col justify-center gap-3 sm:flex-row">
+            <Link
+              href="/contact?intent=investor"
+              className="rounded-lg px-5 py-3 text-sm font-semibold text-white no-underline transition-opacity hover:opacity-90"
+              style={{ background: "#2563eb" }}
+            >
+              Request Investor Diligence
+            </Link>
+            <Link
+              href="/docs/hardware"
+              className="rounded-lg px-5 py-3 text-sm font-semibold no-underline transition-colors hover:text-white"
+              style={{ color: "#e0e0e8", border: "1px solid #1e1e2e" }}
+            >
+              Review Hardware Proof
+            </Link>
           </div>
         </div>
       </section>

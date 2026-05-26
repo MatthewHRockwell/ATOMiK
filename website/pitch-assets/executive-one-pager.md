@@ -6,7 +6,7 @@ Subhead: State-aware compute evaluation for edge and embedded teams constrained 
 
 ## What ATOMiK Is
 
-ATOMiK is a state-aware compute architecture that helps edge and embedded teams reduce wasted state movement by tracking meaningful change instead of repeatedly moving or rebuilding full state.
+ATOMiK is a state-aware compute architecture that helps constrained edge and embedded teams do less unnecessary state work by tracking meaningful changes instead of repeatedly moving, scanning, syncing, replaying, or rebuilding full state.
 
 ## Who It Is For First
 
@@ -32,4 +32,4 @@ Proof reviews -> technical evaluations -> design partnerships -> licensing/IP.
 
 ## Ask
 
-Raising / seeking: $[X] to convert prototype proof into paid evaluations, design partners, ASIC/IP diligence, and commercial licensing readiness.
+Raising / seeking: $2.0M target pre-seed to convert prototype proof into paid evaluations, design partners, ASIC/IP diligence, and commercial licensing readiness. Minimum viable close is $1.25M; stretch plan is $2.75M; final SAFE terms require CFO/counsel approval.

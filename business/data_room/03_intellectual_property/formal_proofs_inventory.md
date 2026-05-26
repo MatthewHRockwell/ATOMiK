@@ -1,35 +1,40 @@
-# Formal Proofs Inventory
+# Formal Proof Work Inventory
 
-*Generated: 2026-02-03*
+> Current diligence draft: 2026-05-26. Do not quote a public theorem count from
+> this file until the count is audited across the repo, website, deck, papers,
+> and proof packet.
 
 ## Overview
 
-ATOMiK's mathematical foundations are verified by **108 theorems** in
-Lean4, covering the complete delta-state algebra.
+ATOMiK's mathematical foundation includes Lean4 proof work for the delta-state
+algebra. The safe public claim is that formal proof work exists for the algebraic
+foundation. Public materials should not quote a theorem count unless the current
+proof packet, repo, website, and investor deck all agree.
 
-## Proof Categories
+## What The Proof Work Supports
 
-| Category | Count | Directory |
-|----------|-------|-----------|
-| Core algebra (group axioms) | 12 | `math/proofs/ATOMiK/` |
-| Commutativity & associativity | 8 | `math/proofs/ATOMiK/` |
-| Self-inverse properties | 6 | `math/proofs/ATOMiK/` |
-| Parallel merge correctness | 10 | `math/proofs/ATOMiK/` |
-| State reconstruction | 8 | `math/proofs/ATOMiK/` |
-| Turing completeness | 15 | `math/proofs/ATOMiK/` |
-| Hardware correspondence | 12 | `math/proofs/ATOMiK/` |
-| Edge cases & boundaries | 21 | `math/proofs/ATOMiK/` |
+| Area | Public-safe meaning | Boundary |
+|---|---|---|
+| XOR algebra | The proof work covers properties such as identity, self-inverse, commutativity, and associativity. | Does not prove customer workload savings. |
+| State reconstruction | The model supports `current_state = reference_state XOR accumulator`. | Integration behavior still needs artifact-specific validation. |
+| Merge/coalescing reasoning | Algebraic properties explain why some deltas can be grouped or reordered. | Does not mean every workload benefits. |
+| Correctness assurance | Machine-checked proof work is a strong technical assurance input. | Avoid unaudited counts and avoid claiming all commercial outcomes are formally proven. |
 
-## Verification
+## Verification Command
 
 ```bash
-cd math/proofs && lake build
-# All 108 theorems verified, 0 sorry statements
+cd math/proofs
+lake build
 ```
 
-## Key Theorems
+Use the current build output for internal audit. Do not convert it into public
+copy without updating the claims registry, proof packet, website, and deck.
 
-1. **delta_self_inverse**: For all d, d XOR d = 0
-2. **accumulate_commutative**: For all a b, a XOR b = b XOR a
-3. **merge_tree_correct**: N-bank merge produces same result as sequential
-4. **turing_complete**: Counter machine simulation via delta-state ops
+## Public Language
+
+Approved: "Formal proof work exists for the algebraic foundation; implementation
+and workload claims remain separately evidence-labeled."
+
+Avoid: theorem counts, "all commercial outcomes proven," "guaranteed savings,"
+or claims that proof of algebra proves battery, heat, cooling, water, footprint,
+or production readiness.

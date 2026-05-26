@@ -7,5 +7,5 @@ Parallel bank validation,HARDWARE_VALIDATED,docs/HARDWARE_SYNTHESIS.md,"Parallel
 Formal proof work,SOFTWARE_VALIDATED,math/proofs/,"Formal proof work exists for the algebraic foundation.","Avoid public proof counts until reconciled across repo site and deck.",Matt,Public-safe if count omitted
 Concept visuals,CONCEPTUAL,website/public/02-atomik-desk-hero-concept.png,"Concept visual shows product direction.","Not proof of current product functionality.",Allison/Matt,Public-safe with label
 Roadmap visuals,ROADMAP,website/public/03-adaptive-mode-mixed-workload-concept.png,"Roadmap concept for future product direction.","Do not imply current adaptive allocation behavior.",Allison/Matt,Public-safe with label
-Power thermal battery water improvements,EVALUATION_TARGET,TBD,"ATOMiK may reduce pressure when state movement is the constraint.","Needs workload-specific measurement or proxy; not a current universal result.",Matt,Use carefully
+Power thermal battery water improvements,PROJECTED,TBD,"ATOMiK may reduce pressure when state movement is the constraint.","Evaluation target until workload-specific measurement or proxy exists; not a current universal result.",Matt,Use carefully
 Production ASIC readiness,ROADMAP,TBD,"ASIC/IP diligence is a planned commercial path.","Do not claim production-ready ASIC without artifact.",Matt,Internal/roadmap

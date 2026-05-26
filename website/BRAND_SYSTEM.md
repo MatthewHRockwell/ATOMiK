@@ -64,9 +64,8 @@ Use uppercase proof stamps:
 - PROJECTED
 - CONCEPTUAL
 - ROADMAP
-- EVALUATION_TARGET
 
-Proof labels should be visually sober: mono type, 1px border, small uppercase, no hype language.
+Proof labels should be visually sober: mono type, 1px border, small uppercase, no hype language. Use evaluation target as explanatory copy, not as an evidence-label stamp.
 
 ## Slide Design Rules
 

@@ -14,7 +14,7 @@ Title: ATOMiK
 
 Headline: Make change the unit of compute.
 
-Body: State-aware compute evaluation for systems constrained by heat, battery, bandwidth, latency, reliability, or hardware footprint.
+Body: State-aware compute evaluation for edge and embedded teams constrained by battery, heat, bandwidth, latency, reliability, or hardware footprint.
 
 Visual direction: Dark technical background. Use the Atom AI assistant concept visual large on the right with subtle cyan, violet, and amber state traces. Label assistant use as conceptual if shown outside brand context.
 
@@ -170,13 +170,13 @@ Evidence/caveat notes: Roadmap items must be labeled as planned work.
 
 Headline: We are raising to turn proof into evaluated commercial opportunity.
 
-Body: Raise: $[X]. Runway: [Y] months. Use of funds: design partner evaluations, technical validation, ASIC/IP diligence, engineering support, GTM/customer development, and IP/legal. Milestones: [N] paid evaluations, [N] design partners, [N] external proof reviews, licensing-ready package.
+Body: Raise: $2.0M target pre-seed; $1.25M minimum viable close; $2.75M stretch plan. Planned runway: about 18 months. Use of funds: design-partner evaluations, technical validation, ASIC/IP diligence, engineering support, GTM/customer development, and IP/legal. Milestones: 2-3 design-partner evaluations, one sanitized measured workload artifact, external ASIC/IP feasibility review, and a licensing-ready package.
 
 Visual direction: Four use-of-funds blocks tied to measurable milestones.
 
 Speaker notes: ATOMiK is not asking the market to accept a broad compute claim. We are asking the right customers to bring one constrained state path, measure the waste, and decide with evidence.
 
-Evidence/caveat notes: Fill numbers only when Matt locks raise amount, runway, and milestones.
+Evidence/caveat notes: Final SAFE terms, valuation cap, discount, and close mechanics require CFO/counsel approval.
 
 ## Appendix Slides
 

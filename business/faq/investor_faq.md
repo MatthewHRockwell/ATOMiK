@@ -1,112 +1,142 @@
-# ATOMiK — Investor FAQ
+# ATOMiK - Investor FAQ
 
-> **Publication status: LEGACY INVESTOR FAQ / REVIEW REQUIRED.**
-> Use `business/faq/public_gtm_faq.md` for current external answers. Claims in
-> this file must be evidence-labeled or rewritten before use.
+> Current external-use draft: 2026-05-26. Answers are written for the Aggie
+> Angel Network pitch narrative and must stay aligned with
+> `docs/evidence-labels.md`.
 
-## Technology
+## What does the customer get out of ATOMiK?
 
-### "How is this different from event sourcing?"
+A way to evaluate whether a constrained state path is wasting work. The first
+customer-facing value is evidence around bytes moved, full-state transfers
+avoided, operations coalesced, latency, bandwidth pressure, power/thermal proxy,
+and correctness preservation. Battery, heat, cooling, water, and smaller
+hardware outcomes are not claimed as measured results until a workload artifact
+proves them.
 
-Event sourcing stores a log of all events and replays them to reconstruct state. Reconstruction cost is **O(N)** — it grows linearly with the number of events. ATOMiK accumulates deltas via XOR, so reconstruction is always **O(1)** — a single operation regardless of history length. Event sourcing also requires ordered replay; ATOMiK's commutativity means order doesn't matter, enabling lock-free parallelism.
+## What is ATOMiK in one sentence?
 
-### "Why XOR and not addition or multiplication?"
+ATOMiK is a state-aware compute architecture that helps constrained edge and
+embedded teams do less unnecessary state work by tracking meaningful changes
+instead of repeatedly moving, scanning, syncing, replaying, or rebuilding full
+state.
 
-XOR has unique properties that make it ideal for delta-state computation:
-- **No carry chains**: Addition requires carry propagation across all 64 bits (O(N) gate delay). XOR operates on each bit independently (O(1) gate delay).
-- **Self-inverse**: `a XOR a = 0`. Addition requires a separate subtraction operation for undo.
-- **Formally proven**: The XOR Abelian group properties are machine-verified in Lean4.
-- **Hardware efficiency**: A 64-bit XOR uses 64 LUTs. A 64-bit adder uses 64 LUTs + 64 ALU carry chains.
+## Why does that matter commercially?
 
-### "Can you really do useful computation with just XOR?"
+Many systems repeatedly move, scan, replay, and synchronize full state even when
+only a small delta matters. That waste can become battery drain, heat, latency,
+bandwidth cost, reliability risk, and hardware complexity. ATOMiK targets
+workloads where avoiding that state movement can create measurable customer
+value.
 
-Yes. ATOMiK doesn't replace all computation with XOR — it uses XOR specifically for **state accumulation and reconstruction**, which is the bottleneck in state-heavy systems. The delta algebra handles:
-- State tracking (accumulate changes)
-- State reconstruction (initial XOR accumulated)
-- Undo/rollback (re-apply the same delta)
-- Distributed merge (XOR partial results)
-- Equality checking (accumulator == 0 means no changes)
+## Is ATOMiK a CPU replacement?
 
-Application-specific logic (parsing, decision-making, I/O) runs alongside, feeding deltas into the accumulator.
+No. ATOMiK is not pitched as a general-purpose CPU replacement. It is a
+state-aware architecture / accelerator path for sparse-change, update-heavy,
+bandwidth-constrained, latency-sensitive workloads.
 
-### "How does this compare to CRDTs?"
+## Why XOR?
 
-CRDTs (Conflict-free Replicated Data Types) also enable distributed merge without coordination. Key differences:
-- **Hardware acceleration**: ATOMiK runs at silicon speed (10.6 ns per operation). CRDTs are software-only.
-- **Formal verification**: 108 Lean4 proofs vs. correctness arguments in academic papers.
-- **Generality**: CRDTs require designing specific merge functions per data type. ATOMiK's XOR algebra is universal for any 64-bit state.
-- **Performance**: CRDTs have variable merge cost. ATOMiK merge is always single-cycle.
+XOR is compact, self-inverse, and maps cleanly to hardware. It supports a simple
+state equation, cheap accumulation, clean undo behavior, and parallel merge
+patterns. The investor explanation should stop there unless the room asks for
+the technical detail.
 
-### "What about quantum computing?"
+## What is live today?
 
-Delta algebra maps naturally to quantum gate composition. Quantum gates are unitary transformations — composable, invertible, order-sensitive in general but with important commutative subgroups. ATOMiK's proven commutativity results could extend to quantum state tracking, making it a potential bridge technology.
+ATOMiK Desk v0.39-K is a framebuffer-native prototype UI running on live Zynq
+hardware. It is `HARDWARE_VALIDATED` proof of the current demo surface. The repo
+also contains Linux userspace-to-FPGA validation, AX7020 board-run artifacts,
+formal proof work, synthesis artifacts, and standalone SD boot build artifacts.
 
-### "Does this work on GPUs?"
+## What should we not claim yet?
 
-Yes. XOR commutativity means delta accumulation is a **parallel reduction** — the same pattern GPUs excel at. A 64-bit XOR reduction across thousands of CUDA cores would achieve massive throughput. The FPGA implementation proves the concept; GPU and ASIC implementations would scale further.
+Do not claim measured heat reduction, water reduction, battery-life extension,
+commercial product maturity, production readiness, or end-to-end standalone SD
+boot until the corresponding artifact exists. Those are evaluation targets or
+next gates.
 
-### "What about larger state sizes (beyond 64 bits)?"
+## What are the first customer segments?
 
-The architecture is parametric. The RTL supports configurable `DATA_WIDTH`. 128-bit and 256-bit versions are straightforward — the math is identical, only the wire width changes. The domain schemas already define widths up to 256 bits (video H.264 deltas).
+- Edge / embedded devices: battery life, enclosure heat, intermittent links, local latency, reliability.
+- AI at the edge: context movement, state pressure, memory pressure, response time.
+- Remote / industrial / robotics / defense-adjacent systems: weight, wattage, packet budget, field runtime.
+- Data center / infrastructure: power bill, cooling, water pressure, rack density as a strategic expansion path.
 
-## Business
+## How will customers evaluate ATOMiK?
 
-### "What's the TAM?"
+Start with one workload, one current baseline, one painful constraint, and one
+success metric. Examples: bytes moved, full-state transfers avoided, operations
+coalesced, cycles per update, update latency, bandwidth avoided, power/thermal
+proxy, field runtime, or packet budget. If ATOMiK does not move the agreed
+metric while preserving correctness, it is not the right wedge.
 
-$500B+ across several markets:
-- **Database infrastructure**: $100B+ (state management is core to every database)
-- **Financial technology**: $150B+ (HFT, risk management, settlement)
-- **IoT and edge computing**: $100B+ (sensor fusion, state sync)
-- **Video processing**: $50B+ (streaming, encoding, surveillance)
-- **Real-time systems**: $100B+ (gaming, simulation, digital twins)
+## What is the business model?
 
-ATOMiK addresses the **state management layer** common to all of these — not the full application stack.
+Near term: paid technical evaluations and design-partner engagements.
 
-### "What's your patent strategy?"
+Mid term: IP licensing, integration partnerships, and support for customers who
+have a validated workload fit.
 
-Patent application filed covering:
-1. The delta-state accumulation architecture (XOR-based parallel banks)
-2. The execution model (round-robin distribution + binary merge tree)
-3. The schema-driven code generation pipeline
+Long term: strategic licensing, partnership, or acquisition by a chip or
+platform company that can scale the architecture.
 
-The 108 Lean4 proofs provide additional protection — they document the mathematical novelty and prior art establishment.
+## Why not compete directly with Intel, NVIDIA, AMD, or ARM?
 
-### "What's the revenue model?"
+The current strategic goal is not to outspend incumbents. The better path is to
+build proof, protect IP, validate customer workloads, and become a strategic
+asset that a major chip or platform company wants to license, partner with, or
+acquire.
 
-Three tiers:
-1. **IP licensing** (high margin): License RTL IP blocks to SoC/ASIC designers
-2. **Platform subscription** (recurring): SDK + code generation + support
-3. **Professional services** (relationship): Custom integration for enterprise accounts
+## How much are you raising?
 
-### "Who are potential acquirers?"
+The current working ask is a $2.0M target pre-seed. The minimum viable close is
+$1.25M; the stretch plan is $2.75M. The recommended default instrument is a
+post-money SAFE, with valuation cap, discount, pro-rata rights, and close
+mechanics to be finalized by the fractional CFO and counsel.
 
-- **FPGA companies** (AMD/Xilinx, Intel/Altera, Lattice): Novel IP architecture
-- **Database companies** (Snowflake, Databricks, MongoDB): State management acceleration
-- **Fintech infrastructure** (LSEG, CME, Nasdaq): HFT acceleration
-- **Cloud providers** (AWS, Azure, GCP): Accelerated state services
-- **EDA companies** (Synopsys, Cadence): IP block portfolio
+## What does pre-seed capital fund?
 
-### "What's the competitive response risk?"
+The $2.0M target budget funds:
 
-Low, because:
-1. **Patent protection** on the architecture
-2. **Formal proofs** create a "proof moat" — replicating 108 Lean4 theorems requires significant mathematical expertise
-3. **Full-stack integration** (proofs + RTL + SDK + pipeline) is hard to replicate piecemeal
-4. **First-mover** on hardware-validated delta-state computation
+- $600K engineering and demo hardening.
+- $400K customer workload proof.
+- $300K IP and legal.
+- $300K ASIC feasibility.
+- $250K finance, GTM, and operations.
+- $150K reserve.
 
-### "What's the team's background?"
+The round funds feasibility and measured proof, not tape-out.
 
-The project demonstrates deep expertise across:
-- Formal verification (Lean4 theorem proving)
-- FPGA/RTL design (Gowin synthesis, timing closure, parallel architectures)
-- Software engineering (Python SDK, 5-language code generation, agentic orchestration)
-- Hardware validation (UART protocols, multi-board testing)
+## What financial benchmarks are safe to discuss?
 
-### "What are the key risks?"
+Use benchmarks as context, not as ATOMiK-specific claims. Current source-backed
+references include IEA/LBNL for data-center energy, cooling, and water pressure;
+SIA/WSTS for semiconductor market backdrop; Carta and PitchBook/NVCA for current
+pre-seed/seed market context; and YC/Techstars for accelerator-term dilution
+context. The working ask is now $2.0M; the CFO still needs to approve final SAFE
+terms, valuation cap, discount, and closing mechanics.
 
-1. **Market adoption**: Novel computational paradigm requires developer education
-2. **Hardware scaling**: Larger FPGAs and ASICs require additional engineering
-3. **Competition**: Established FPGA IP vendors could develop similar architectures
-4. **Patent prosecution**: Timeline and scope of granted claims
+## Does pre-seed fund a chip tape-out?
 
-**Mitigants**: Open-source SDK builds community. Formal proofs establish novelty. Full demo validates real-world applicability.
+No. The current pre-seed story funds customer proof, IP strengthening, demo
+hardening, and ASIC feasibility. Tape-out should remain a later, quote-backed
+milestone after workload value and ASIC economics are validated.
+
+## Is the patent filed?
+
+The data room records provisional IP protection and patent-pending positioning.
+The near-term funding goal is to strengthen and convert that coverage on the
+right schedule with legal support.
+
+## What are the biggest risks?
+
+- Battery, power, thermal, cooling, water, and footprint savings still need workload-specific measurement.
+- Customer validation is pending.
+- ASIC feasibility needs expert review before tape-out economics are promoted.
+- Incumbents could respond quickly if the architecture proves valuable.
+
+## Why is this fundable now?
+
+Because there is enough proof to justify the next diligence step, but the
+company is still early enough that pre-seed capital can materially change the
+trajectory. The strongest next milestone is measured customer-value proof.

@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/siteMetadata";
 import {
   codeBlockStyle,
   kwColor,
@@ -9,26 +9,12 @@ import {
   varColor,
 } from "../shared";
 
-export const metadata: Metadata = {
-  title: "Migrate from CRDTs to ATOMiK — Docs",
-  description:
-    "Step-by-step migration guide from CRDTs to ATOMiK delta-state algebra. Conceptual mapping, code examples, performance comparison, and checklist.",
-  keywords: [
-    "CRDT migration",
-    "CRDT alternative",
-    "delta-state algebra",
-    "conflict-free replication",
-    "ATOMiK migration guide",
-    "CRDT vs ATOMiK",
-    "distributed state sync",
-  ],
-  openGraph: {
-    title: "Migrate from CRDTs to ATOMiK — ATOMiK Docs",
-    description:
-      "Replace join-semilattice CRDTs with Abelian group delta-state algebra. Migration guide with code examples and performance comparison.",
-    type: "website",
-  },
-};
+export const metadata = pageMetadata({
+  title: 'Migrate from CRDTs to ATOMiK — Docs',
+  description: 'Evaluate where CRDT-style state can fit ATOMiK delta-state algebra. Conceptual mapping, code examples, trade-offs, and validation checklist.',
+  path: '/docs/migrate-crdt',
+  openGraphTitle: 'Migrate from CRDTs to ATOMiK — ATOMiK Docs',
+});
 
 /* ------------------------------------------------------------------ */
 /*  Data                                                               */
@@ -71,37 +57,37 @@ const perfComparison = [
   {
     dimension: "Merge complexity",
     crdt: "O(n) -- depends on state size",
-    atomik: "O(1) -- single XOR operation",
+    atomik: "O(1) in the accumulator model -- one XOR for fixed-width deltas",
   },
   {
     dimension: "Metadata overhead",
     crdt: "Vector clocks: O(nodes), Dot stores: O(ops)",
-    atomik: "Zero -- no causality metadata",
+    atomik: "No vector clock inside the XOR accumulator; protocol causality is workload-specific",
   },
   {
     dimension: "Sync bandwidth",
     crdt: "Full state (state-based) or op + context (op-based)",
-    atomik: "8-byte delta only",
+    atomik: "64-bit delta in current examples; validate the protocol envelope per workload",
   },
   {
     dimension: "State reconstruction",
     crdt: "O(1) if materialized, O(n) if from ops",
-    atomik: "O(1) always -- initial XOR accumulator",
+    atomik: "O(1) in the accumulator model -- initial XOR accumulator",
   },
   {
     dimension: "Undo / rollback",
     crdt: "Not supported (lattice is monotonic)",
-    atomik: "Free -- apply same delta again (self-inverse)",
+    atomik: "Algebraic for fit XOR deltas -- apply the same delta again",
   },
   {
     dimension: "Formal guarantees",
     crdt: "SEC (Strong Eventual Consistency)",
-    atomik: "SEC + self-inverse + 108 Lean4 proofs",
+    atomik: "Formal proof work covers the algebra; protocol guarantees remain workload-specific",
   },
   {
     dimension: "Implementation complexity",
     crdt: "High -- many CRDT types, each with edge cases",
-    atomik: "Minimal -- 4 operations, one algebraic structure",
+    atomik: "Small core API; integration remains workload-specific",
   },
 ];
 
@@ -121,7 +107,7 @@ const migrationChecklist = [
       "Install atomik-core: pip install atomik-core",
       "Replace one simple CRDT (G-Counter or LWW-Register) with AtomikContext",
       "Validate convergence: feed the same deltas in different orders, confirm identical read()",
-      "Measure bandwidth reduction: compare CRDT sync payload vs 8-byte ATOMiK delta",
+      "Measure bandwidth reduction: compare CRDT sync payload vs the current ATOMiK delta representation",
     ],
   },
   {
@@ -138,7 +124,7 @@ const migrationChecklist = [
     items: [
       "Run convergence tests: all replicas must reach identical state regardless of delta order",
       "Verify self-inverse property: double-applying any delta returns to previous state",
-      "Load test: confirm O(1) merge performance holds under production traffic",
+      "Load test: confirm accumulator-path performance under production traffic",
       "Monitor bandwidth: measure actual reduction vs CRDT baseline",
     ],
   },
@@ -202,7 +188,7 @@ export default function MigrateCrdtPage() {
               </li>
               <li className="flex gap-2">
                 <span style={{ color: "#22c55e" }} className="shrink-0">{"\u2713"}</span>
-                You want formal verification (108 Lean4 proofs vs informal CRDT specs)
+                You want machine-checked algebra properties as one technical assurance input
               </li>
             </ul>
           </div>
@@ -378,7 +364,7 @@ export default function MigrateCrdtPage() {
                 <span style={{ color: fnColor }}>accum</span>
                 <span style={{ color: varColor }}>(delta_value)</span>
                 {"\n\n"}
-                <span style={{ color: cmtColor }}># Read: O(1), no merge needed</span>
+                <span style={{ color: cmtColor }}># Read: accumulator-model O(1), no CRDT merge</span>
                 {"\n"}
                 <span style={{ color: varColor }}>current = counter.</span>
                 <span style={{ color: fnColor }}>read</span>
@@ -391,11 +377,11 @@ export default function MigrateCrdtPage() {
                 <span style={{ color: varColor }}>(delta_value)</span>
                 <span style={{ color: cmtColor }}> # self-inverse</span>
                 {"\n\n"}
-                <span style={{ color: cmtColor }}># Sync: send 8-byte delta, not full state</span>
+                <span style={{ color: cmtColor }}># Sync: send a compact delta, not full state</span>
                 {"\n"}
-                <span style={{ color: cmtColor }}># No node IDs. No vector clocks.</span>
+                <span style={{ color: cmtColor }}># No vector clock inside the accumulator.</span>
                 {"\n"}
-                <span style={{ color: cmtColor }}># No O(n) merge. Just XOR.</span>
+                <span style={{ color: cmtColor }}># No O(n) CRDT merge inside this path.</span>
               </code>
             </pre>
           </div>
@@ -508,9 +494,9 @@ export default function MigrateCrdtPage() {
       {/* Pattern 3: OR-Set */}
       <h2 className="text-2xl font-bold mb-4">Pattern 3: Distributed State Sync</h2>
       <p className="text-sm mb-6" style={{ color: "#8888a0" }}>
-        Multi-node state synchronization using CRDTs requires transmitting full state or
-        operation logs with causal metadata. ATOMiK transmits only the delta and converges
-        regardless of delivery order.
+        Multi-node state synchronization using CRDTs often requires transmitting full state
+        or operation logs with causal metadata. In a fit XOR model, ATOMiK can transmit a
+        compact delta and converge when replicas receive the same delta set.
       </p>
       <div className="grid md:grid-cols-2 gap-4 mb-12">
         <div>
@@ -566,7 +552,7 @@ export default function MigrateCrdtPage() {
           <div style={codeBlockStyle}>
             <pre style={{ margin: 0 }}>
               <code>
-                <span style={{ color: cmtColor }}># Node A sends 8-byte delta to Node B</span>
+                <span style={{ color: cmtColor }}># Node A sends a 64-bit example delta to Node B</span>
                 {"\n"}
                 <span style={{ color: kwColor }}>def</span>
                 <span style={{ color: fnColor }}> sync_to_peer</span>
@@ -575,7 +561,7 @@ export default function MigrateCrdtPage() {
                 <span style={{ color: varColor }}>{"    "}peer.</span>
                 <span style={{ color: fnColor }}>send</span>
                 <span style={{ color: varColor }}>(delta)</span>
-                <span style={{ color: cmtColor }}> # 8 bytes, always</span>
+                <span style={{ color: cmtColor }}> # 8 bytes in this representation</span>
                 {"\n\n"}
                 <span style={{ color: kwColor }}>def</span>
                 <span style={{ color: fnColor }}> on_receive</span>
@@ -584,17 +570,17 @@ export default function MigrateCrdtPage() {
                 <span style={{ color: varColor }}>{"    "}ctx.</span>
                 <span style={{ color: fnColor }}>accum</span>
                 <span style={{ color: varColor }}>(delta)</span>
-                <span style={{ color: cmtColor }}> # O(1), done</span>
+                <span style={{ color: cmtColor }}> # accumulator update</span>
                 {"\n\n"}
-                <span style={{ color: cmtColor }}># No serialization overhead</span>
+                <span style={{ color: cmtColor }}># No full-state serialization in this model</span>
                 {"\n"}
-                <span style={{ color: cmtColor }}># No vector clocks</span>
+                <span style={{ color: cmtColor }}># No vector clocks inside the accumulator</span>
                 {"\n"}
-                <span style={{ color: cmtColor }}># No tombstone garbage collection</span>
+                <span style={{ color: cmtColor }}># No tombstone garbage collection in this model</span>
                 {"\n"}
-                <span style={{ color: cmtColor }}># No merge conflicts</span>
+                <span style={{ color: cmtColor }}># Application conflicts remain model-specific</span>
                 {"\n"}
-                <span style={{ color: cmtColor }}># Order-independent convergence</span>
+                <span style={{ color: cmtColor }}># Order-independent for the same delta multiset</span>
               </code>
             </pre>
           </div>
@@ -700,8 +686,8 @@ export default function MigrateCrdtPage() {
           CRDTs form a <strong>join-semilattice</strong>: merge is commutative, associative,
           and idempotent, but not invertible. State can only grow. ATOMiK forms an{" "}
           <strong>Abelian group</strong>: merge (XOR) is commutative, associative, has an
-          identity element, and every element is its own inverse. This gives you free undo,
-          constant-size state and lower metadata pressure -- at the cost of lattice
+          identity element, and every element is its own inverse. In a fit model this gives you algebraic undo,
+          fixed-width accumulator state, and lower metadata pressure -- at the cost of lattice
           monotonicity. If your application needs monotonic convergence (e.g., grow-only sets),
           CRDTs remain the right choice.
         </p>

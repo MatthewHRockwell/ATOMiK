@@ -25,7 +25,7 @@ XOR (exclusive OR) is a bitwise operation: for each bit position, the output is 
   A XOR B:   1 0 1 0 0 0 1 1
 ```
 
-This operation has four algebraic properties (all 108 Lean4 theorems derive from these):
+This operation has four algebraic properties covered by the formal proof work:
 
 | Property | Meaning | Consequence |
 |----------|---------|-------------|
@@ -135,7 +135,7 @@ All data types produce identical cycle counts on the v3 SoC (21.6 MHz RV64I + AT
 | `ATOMIK.READ` (reconstruct state) | 99 | 8.5 nJ |
 | **Full roundtrip** | **192** | **16.4 nJ** |
 
-Jitter: ≤ 2 cycles across all data patterns. No cache, no branch prediction, no data-dependent timing — this is a security property as well as a performance guarantee.
+Jitter: ≤ 2 cycles across all data patterns. No cache or branch-prediction mechanism is modeled in this path; do not convert this into a public security or side-channel guarantee without a reviewed threat model.
 
 ---
 
@@ -152,4 +152,4 @@ Being transparent about limitations:
 
 ---
 
-*ATOMiK's type-agnostic property is mathematically guaranteed by the 108 Lean4 theorems: XOR forms an Abelian group over arbitrary bit vectors. The proofs are machine-checked with zero axioms (`sorry`-free).*
+*ATOMiK's type-agnostic property is supported by the formal proof work for XOR over arbitrary bit vectors. Keep theorem counts out of public materials until the current proof packet, repo, website, and deck have been audited together.*

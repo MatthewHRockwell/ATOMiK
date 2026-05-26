@@ -1,11 +1,13 @@
-import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/siteMetadata";
+import Link from "next/link";
 import Nav from "@/components/Nav";
 
-export const metadata: Metadata = {
-  title: "ASIC Roadmap | ATOMiK",
-  description:
-    "ATOMiK's evidence-labeled path from FPGA validation toward silicon IP feasibility and future Resource Fabric hardware.",
-};
+export const metadata = pageMetadata({
+  title: 'ASIC Roadmap | ATOMiK',
+  description: "ATOMiK's evidence-labeled path from FPGA validation toward silicon IP feasibility and future Resource Fabric hardware.",
+  path: '/about/roadmap',
+  openGraphTitle: 'ATOMiK ASIC Roadmap',
+});
 
 /* ------------------------------------------------------------------ */
 /*  Color tokens (Tailwind arbitrary values matching the dark theme)   */
@@ -18,6 +20,13 @@ const accent = "#8b5cf6";
 const accent2 = "#4f8fff";
 const green = "#22c55e";
 const gold = "#d4a843";
+
+const evidenceLinks = {
+  technicalProof: "https://github.com/MatthewHRockwell/ATOMiK/blob/main/docs/technical-proof.md",
+  hardwareValidation: "https://github.com/MatthewHRockwell/ATOMiK/blob/main/docs/hardware-validation.md",
+  hardwareSynthesis: "https://github.com/MatthewHRockwell/ATOMiK/blob/main/docs/HARDWARE_SYNTHESIS.md",
+  linuxUserspace: "https://github.com/MatthewHRockwell/ATOMiK/blob/main/docs/LINUX_USERSPACE_PROOF.md",
+} as const;
 
 /* ------------------------------------------------------------------ */
 /*  Tiny helpers                                                       */
@@ -55,12 +64,18 @@ function StatusBadge({ status }: { status: Status }) {
 /* ------------------------------------------------------------------ */
 /*  Data                                                               */
 /* ------------------------------------------------------------------ */
+interface EvidenceLink {
+  label: string;
+  href: string;
+}
+
 interface Milestone {
   phase: string;
   title: string;
   status: Status;
   bullets: string[];
   highlight?: string;
+  proofLinks?: EvidenceLink[];
 }
 
 const milestones: Milestone[] = [
@@ -69,11 +84,12 @@ const milestones: Milestone[] = [
     title: "Mathematical Foundation",
     status: "completed",
     bullets: [
-      "108 Lean 4 theorems proving delta-state algebra properties",
+      "Formal proof work covering delta-state algebra properties; public counts require current proof-packet audit",
       "Abelian group: commutative, associative, self-inverse, identity",
       "Reduced cache/speculation exposure is a design target to validate",
     ],
-    highlight: "Formally verified correctness",
+    highlight: "Proof-labeled algebra foundation",
+    proofLinks: [{ label: "SOFTWARE_VALIDATED proof map", href: evidenceLinks.technicalProof }],
   },
   {
     phase: "Phase 1",
@@ -82,22 +98,27 @@ const milestones: Milestone[] = [
     bullets: [
       "Custom RV64I CPU + ATOMiK ISA extensions on GW1NR-9K",
       "1280\u00d7720 @60 Hz HDMI output from a $13.50 FPGA",
-      "Multi-node delta streaming: dual-SoC convergence proven",
-      "53/54 compliance, 9/9 ATOMiK, 10/10 integration, 6/6 display tests",
+      "Multi-node delta streaming: dual-SoC convergence demonstrated in historical hardware artifacts",
+      "Historical validation matrix: 53/54 compliance, 9/9 ATOMiK, 10/10 integration, 6/6 display tests",
     ],
     highlight: "Prototype firmware running today",
+    proofLinks: [{ label: "HARDWARE_VALIDATED proof boundary", href: evidenceLinks.hardwareValidation }],
   },
   {
     phase: "Phase 2",
     title: "Xilinx Zynq XC7Z020 \u2014 Parallel Scaling + Linux",
     status: "completed",
     bullets: [
-      "N=512 synthesis config: 23,542 LUT at 136 MHz",
-      "Sub-linear scaling: 3.7\u00d7 LUT growth for 16\u00d7 throughput",
+      "SYNTHESIS_VALIDATED N=512 config: 23,542 LUT at 136 MHz",
+      "SYNTHESIS_VALIDATED scaling: 3.7x LUT growth for 16x throughput",
       "Linux 6.9 userspace validation: 16/16 PASS via /dev/mem mmap (S-mode, MMU)",
-      "Full OS stack proven: user process \u2192 kernel \u2192 Wishbone CSR \u2192 ATOMiK core",
+      "HARDWARE_VALIDATED Linux userspace path: user process -> kernel -> Wishbone CSR -> ATOMiK core",
     ],
     highlight: "Synthesis scaling + Linux userspace validated",
+    proofLinks: [
+      { label: "SYNTHESIS_VALIDATED artifact", href: evidenceLinks.hardwareSynthesis },
+      { label: "HARDWARE_VALIDATED Linux proof", href: evidenceLinks.linuxUserspace },
+    ],
   },
   {
     phase: "Phase 3",
@@ -243,6 +264,21 @@ function MilestoneCard({ m, index }: { m: Milestone; index: number }) {
             {m.highlight}
           </div>
         )}
+
+        {m.proofLinks && (
+          <div className="mt-4 flex flex-wrap gap-2">
+            {m.proofLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="rounded px-2.5 py-1 text-xs font-semibold no-underline"
+                style={{ color: accent2, border: `1px solid ${accent2}33`, background: `${accent2}10` }}
+              >
+                {link.label}
+              </Link>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -258,13 +294,14 @@ interface ScalingRow {
   throughput: string;
   barPct: number;
   color: string;
+  evidenceHref?: string;
 }
 
 const scalingData: ScalingRow[] = [
-  { label: "N=1", lut: "302", freq: "444 MHz", throughput: "Synthesis row", barPct: 0.6, color: accent2 },
-  { label: "N=16", lut: "941", freq: "267 MHz", throughput: "Synthesis row", barPct: 6.3, color: accent },
-  { label: "N=512", lut: "23,542", freq: "136 MHz", throughput: "Synthesis ceiling", barPct: 100, color: green },
-  { label: "ASIC path", lut: "TBD", freq: "TBD", throughput: "Feasibility", barPct: 100, color: gold },
+  { label: "N=1", lut: "302", freq: "444 MHz", throughput: "Synthesis row", barPct: 0.6, color: accent2, evidenceHref: evidenceLinks.hardwareSynthesis },
+  { label: "N=16", lut: "941", freq: "267 MHz", throughput: "Synthesis row", barPct: 6.3, color: accent, evidenceHref: evidenceLinks.hardwareSynthesis },
+  { label: "N=512", lut: "23,542", freq: "136 MHz", throughput: "Synthesis ceiling", barPct: 100, color: green, evidenceHref: evidenceLinks.hardwareSynthesis },
+  { label: "ASIC path", lut: "Not quoted", freq: "Not quoted", throughput: "Feasibility review", barPct: 100, color: gold },
 ];
 
 function ScalingChart() {
@@ -288,6 +325,15 @@ function ScalingChart() {
           <div className="col-span-4 text-xs text-gray-400">
             <span className="font-semibold text-white">{row.throughput}</span>{" "}
             &middot; {row.freq} &middot; {row.lut} LUT
+            {row.evidenceHref && (
+              <Link
+                href={row.evidenceHref}
+                className="ml-2 text-xs font-semibold no-underline"
+                style={{ color: accent2 }}
+              >
+                Evidence
+              </Link>
+            )}
           </div>
         </div>
       ))}
@@ -352,7 +398,7 @@ export default function ASICRoadmapPage() {
           FPGA Scaling Evidence
         </h2>
         <p className="mb-8 text-sm text-gray-500">
-          Zynq rows summarize synthesis-characterized FPGA scaling. The ASIC row is a planning placeholder, not a measured or promised result.
+          Zynq rows summarize synthesis-characterized FPGA scaling. The ASIC row is a feasibility review target, not a measured or promised result.
         </p>
         <div
           className="rounded-xl p-6"
