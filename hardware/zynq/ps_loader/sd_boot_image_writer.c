@@ -156,11 +156,21 @@ int main(void)
     SCRATCH_ERR = 0u;
 
     SCRATCH_PHASE = PHASE_CONTROLLER;
-    int err = sdhc_controller_init_default();
-    if (err) fail(ERR_CONTROLLER, err);
-
-    SCRATCH_PHASE = PHASE_CARD;
-    err = sdhc_card_init_default();
+    /* ps_loader writes the card's RCA to SCRATCH_BASE+0x1C after init.
+     * If present, use the reselect path (card already initialized by ps_loader).
+     * This avoids full controller re-init (which kills the clock and causes
+     * ACMD41 ETIMEOUT on this board). */
+    uint32_t psld_rca = *(volatile uint32_t *)(SCRATCH_BASE + 0x1Cu);
+    int err;
+    if (psld_rca != 0u) {
+        g_card.base = SD0_BASE;
+        err = (int)sdhc_card_reselect(&g_card, psld_rca);
+    } else {
+        err = sdhc_controller_init_default();
+        if (err) fail(ERR_CONTROLLER, err);
+        SCRATCH_PHASE = PHASE_CARD;
+        err = sdhc_card_init_default();
+    }
     if (err)
         fail(ERR_CARD, err);
 

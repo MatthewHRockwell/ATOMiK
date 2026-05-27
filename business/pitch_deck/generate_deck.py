@@ -153,7 +153,7 @@ def accent_bar(slide, x, y, w, color):
     return s
 
 
-def header(slide, n, label="Investor deck | May 2026"):
+def header(slide, n, label="Investor deck | May 2026 | matthew.h.rockwell@gmail.com"):
     text_box(slide, Inches(0.42), Inches(0.23), Inches(1.4), Inches(0.25),
              "ATOMiK", 14, CYAN, True)
     text_box(slide, Inches(1.82), Inches(0.24), Inches(6.0), Inches(0.25),
@@ -209,30 +209,32 @@ def add_deck():
 
     # 1
     s = prs.slides.add_slide(prs.slide_layouts[6]); set_bg(s); header(s, 1)
-    title(s, "Pre-seed pitch", "Make change the unit of compute",
-          "State-aware compute evaluation for edge and embedded teams constrained by battery, heat, bandwidth, latency, reliability, or hardware footprint.")
-    pill(s, Inches(0.77), Inches(2.86), "HARDWARE_VALIDATED", GREEN, Inches(2.25))
-    text_box(s, Inches(0.77), Inches(3.34), Inches(5.0), Inches(0.75),
-             "ATOMiK evaluates whether tracking meaningful change can reduce wasted state movement in one constrained workload.", 18, MUTED)
+    title(s, "Pre-seed  ·  $2.0M  ·  Post-money SAFE", "Make change the unit of compute",
+          "State-aware compute architecture that reduces wasted state movement for constrained edge, embedded, and AI workloads.")
+    pill(s, Inches(0.77), Inches(2.86), "HARDWARE_VALIDATED on Zynq FPGA", GREEN, Inches(2.75))
+    pill(s, Inches(3.7), Inches(2.86), "16/16 algebraic proofs pass", CYAN, Inches(2.35))
+    text_box(s, Inches(0.77), Inches(3.4), Inches(5.0), Inches(0.65),
+             "Every constrained system wastes resources rediscovering what changed. ATOMiK tracks meaningful change instead — reducing bytes moved, operations repeated, and state scanned.", 15, MUTED)
     image_fit(s, LIVE_SCREENSHOT, Inches(6.15), Inches(1.2), Inches(6.55), Inches(3.7))
-    card(s, Inches(0.75), Inches(5.15), Inches(3.85), Inches(1.15), "Architecture", "state = reference_state XOR accumulated_delta", CYAN, 11)
-    card(s, Inches(4.88), Inches(5.15), Inches(3.85), Inches(1.15), "Current proof", "v0.39-K Zynq Desk prototype UI running on live hardware", GREEN, 11)
-    card(s, Inches(9.01), Inches(5.15), Inches(3.7), Inches(1.15), "Next gate", "measured customer-value proof", VIOLET, 11)
+    card(s, Inches(0.75), Inches(4.9), Inches(3.85), Inches(1.4), "IP thesis", "Architecture + implementation + workload evidence → licensing or strategic acquisition", CYAN, 10)
+    card(s, Inches(4.88), Inches(4.9), Inches(3.85), Inches(1.4), "Live proof", "ATOMiK Desk v0.39-K running on Zynq hardware today", GREEN, 10)
+    card(s, Inches(9.01), Inches(4.9), Inches(3.7), Inches(1.4), "18-month gate", "$2M funds measured customer proof + IP diligence + ASIC feasibility", VIOLET, 10)
 
     # 2
     s = prs.slides.add_slide(prs.slide_layouts[6]); set_bg(s); header(s, 2)
-    title(s, "Hidden tax", "Constrained systems waste resources rediscovering what changed")
+    title(s, "The problem", "Constrained systems pay a hidden tax on unchanged state")
     bullets = [
-        "Edge devices spend limited battery on scans, copies, sync, and replay.",
-        "Sealed or fanless systems turn redundant state work into heat.",
-        "AI and agent systems move context even when only a small delta matters.",
-        "Remote systems are constrained by every watt, ounce, packet, and minute.",
+        "Data-center energy: 415 TWh in 2024 → projected 945 TWh by 2030. (IEA)",
+        "U.S. alone: 176 TWh in 2023 → 325–580 TWh projected by 2028. (LBNL)",
+        "66 billion liters of direct cooling water consumed in U.S. data centers in 2023.",
+        "Edge and embedded teams hit hard limits on battery, heat, and bandwidth — before data center scale.",
+        "In every case: the system processes state it already knows. Most of it didn't change.",
     ]
-    add_paragraphs(s, Inches(0.9), Inches(2.15), Inches(6.1), Inches(2.8), bullets, 17, MUTED, True, 7, AMBER)
-    card(s, Inches(7.35), Inches(2.0), Inches(4.9), Inches(1.15), "Heat", "State movement becomes power draw and thermal load.", GREEN, 12)
-    card(s, Inches(7.35), Inches(3.35), Inches(4.9), Inches(1.15), "Bandwidth", "Full-state updates move more than the useful change.", BLUE, 12)
-    card(s, Inches(7.35), Inches(4.7), Inches(4.9), Inches(1.15), "Latency", "Repeated reconstruction adds delay where local response matters.", VIOLET, 12)
-    source_note(s, "Sources: IEA Energy and AI; LBNL 2024 US data-center report. Market framing only; not an ATOMiK savings claim.")
+    add_paragraphs(s, Inches(0.9), Inches(2.1), Inches(6.5), Inches(3.2), bullets, 15.5, MUTED, True, 7, AMBER)
+    card(s, Inches(7.6), Inches(2.0), Inches(4.65), Inches(1.15), "Battery / heat", "Redundant state movement burns power and generates thermal load in sealed devices.", GREEN, 11)
+    card(s, Inches(7.6), Inches(3.35), Inches(4.65), Inches(1.15), "Bandwidth", "Full-state sync over constrained links moves more than necessary, every tick.", BLUE, 11)
+    card(s, Inches(7.6), Inches(4.7), Inches(4.65), Inches(1.15), "Latency", "Rebuilding or replaying state instead of tracking delta adds delay where it hurts.", VIOLET, 11)
+    source_note(s, "IEA Energy and AI (2024); LBNL 2024 US Data Center Report. Market framing only — not an ATOMiK savings claim.")
 
     # 3
     s = prs.slides.add_slide(prs.slide_layouts[6]); set_bg(s); header(s, 3)
@@ -321,19 +323,22 @@ def add_deck():
 
     # 9
     s = prs.slides.add_slide(prs.slide_layouts[6]); set_bg(s); header(s, 9)
-    title(s, "Business path", "Do not outspend incumbents. Become strategic IP.")
+    title(s, "Return path", "Don't outspend incumbents. Become their strategic acquisition.")
     path = [
-        ("1", "Customer evaluations", "Prove one painful workload and one metric."),
-        ("2", "IP strengthening", "Convert proof into defensible diligence materials."),
-        ("3", "ASIC feasibility", "Review tape-out path before committing capital."),
-        ("4", "Strategic outcome", "License, partner, or be acquired by a chip/platform company."),
+        ("1", "Measured proof\n(0–12 mo)", "One workload. One baseline. One metric. Artifact-backed, correctness-verified.", CYAN),
+        ("2", "IP & diligence\n(6–18 mo)", "Patent conversion, prior-art review, counsel-reviewed packet.", GREEN),
+        ("3", "Design partners\n(12–24 mo)", "Paid evaluations → design-partner agreements → IP licensing value.", BLUE),
+        ("4", "Strategic outcome\n(18–36 mo)", "License, partner, or be acquired by a chip/platform company at IP premium.", VIOLET),
     ]
-    for i, (num,head,body) in enumerate(path):
-        x = Inches(0.85 + i * 3.05)
-        rect(s, x, Inches(2.25), Inches(2.55), Inches(2.6), PANEL2)
-        text_box(s, x + Inches(0.18), Inches(2.48), Inches(0.5), Inches(0.35), num, 22, CYAN, True)
-        text_box(s, x + Inches(0.18), Inches(3.05), Inches(2.05), Inches(0.38), head, 14, TEXT, True)
-        text_box(s, x + Inches(0.18), Inches(3.58), Inches(2.1), Inches(0.9), body, 10.5, MUTED)
+    for i, (num, head, body, color) in enumerate(path):
+        x = Inches(0.75 + i * 3.1)
+        rect(s, x, Inches(2.1), Inches(2.7), Inches(3.05), PANEL2)
+        accent_bar(s, x + Inches(0.18), Inches(2.26), Inches(2.15), color)
+        text_box(s, x + Inches(0.18), Inches(2.5), Inches(2.3), Inches(0.48), head, 13.5, TEXT, True)
+        text_box(s, x + Inches(0.18), Inches(3.1), Inches(2.25), Inches(0.95), body, 10.5, MUTED)
+    text_box(s, Inches(0.9), Inches(5.45), Inches(11.5), Inches(0.42),
+             "Comparable IP architecture acquisitions in semiconductor history: $50M–$400M+ for validated compute primitives. ATOMiK's path: proof → IP value → strategic partner.", 13, FAINT, align=PP_ALIGN.CENTER)
+    source_note(s, "Strategic outcome framing only. No acquisition is guaranteed or implied. Returns are speculative and subject to risk.")
 
     # 10
     s = prs.slides.add_slide(prs.slide_layouts[6]); set_bg(s); header(s, 10)
@@ -366,19 +371,22 @@ def add_deck():
 
     # 12
     s = prs.slides.add_slide(prs.slide_layouts[6]); set_bg(s); header(s, 12)
-    title(s, "The ask", "Raising $2.0M to reach measured proof")
+    title(s, "The ask", "Raising $2.0M to become a strategic acquisition target")
     asks = [
-        "$2.0M target pre-seed",
-        "$1.25M minimum close; $2.75M stretch plan",
-        "post-money SAFE recommended; final terms by CFO/counsel",
-        "design-partner introductions and customer workloads",
-        "ASIC and IP diligence support",
+        "$2.0M target pre-seed  ·  $1.25M minimum close  ·  $2.75M stretch",
+        "Post-money SAFE  ·  final terms require CFO/counsel review",
+        "18 months of runway to measured proof, IP diligence, and ASIC feasibility",
+        "Design-partner introductions and customer workload access",
     ]
-    add_paragraphs(s, Inches(0.95), Inches(2.35), Inches(7.7), Inches(2.7), asks, 17.5, MUTED, True, 8, GREEN)
-    rect(s, Inches(8.8), Inches(2.25), Inches(3.4), Inches(2.55), PANEL2)
-    text_box(s, Inches(9.15), Inches(2.62), Inches(2.7), Inches(0.3), "18-month milestone", 13.5, CYAN, True, align=PP_ALIGN.CENTER)
-    text_box(s, Inches(9.08), Inches(3.08), Inches(2.85), Inches(1.0), "Measured workload proof + IP/ASIC diligence", 18.5, TEXT, True, align=PP_ALIGN.CENTER)
-    text_box(s, Inches(1.0), Inches(5.75), Inches(11.25), Inches(0.45), "Not another abstract demo.", 24, GREEN, True, align=PP_ALIGN.CENTER)
+    add_paragraphs(s, Inches(0.9), Inches(2.2), Inches(7.7), Inches(2.2), asks, 16, MUTED, True, 9, GREEN)
+    rect(s, Inches(8.75), Inches(2.1), Inches(3.55), Inches(2.8), PANEL2)
+    text_box(s, Inches(9.05), Inches(2.38), Inches(2.95), Inches(0.3), "Why invest now?", 13, CYAN, True, align=PP_ALIGN.CENTER)
+    text_box(s, Inches(8.95), Inches(2.82), Inches(3.2), Inches(1.7),
+             "Proof is achievable at pre-seed scale. The gap between current hardware validation and defensible IP is $2M, not $20M. That gap is the entry point.", 13.5, TEXT, False, align=PP_ALIGN.CENTER)
+    card(s, Inches(0.9), Inches(4.72), Inches(3.75), Inches(0.95), "Money in", "$2.0M pre-seed", CYAN, 13)
+    card(s, Inches(4.85), Inches(4.72), Inches(3.75), Inches(0.95), "18-month output", "Measured proof + IP packet + ASIC feasibility", GREEN, 11)
+    card(s, Inches(8.8), Inches(4.72), Inches(3.5), Inches(0.95), "Strategic upside", "Acquisition by chip/platform company at IP premium", VIOLET, 11)
+    text_box(s, Inches(1.0), Inches(5.88), Inches(11.25), Inches(0.35), "matthew.h.rockwell@gmail.com  ·  First round still open  ·  Aggie Angel Network pitch  ·  May 2026", 9.5, FAINT, align=PP_ALIGN.CENTER)
 
     prs.save(OUT_MAIN)
     OUT_AGGIE.write_bytes(OUT_MAIN.read_bytes())
