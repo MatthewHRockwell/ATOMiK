@@ -1,165 +1,224 @@
-# ATOMiK Investor Pitch — Talking Points & Script
+# ATOMiK Investor Pitch - Talking Points & Time Boxes
 ## Friday Meeting Prep | Pre-Seed $2.0M Ask
 
----
+Purpose: keep the room focused on the investable claim. ATOMiK is not asking investors to accept a broad compute thesis. ATOMiK is asking them to fund the next evidence gates: measured workload proof, IP diligence, ASIC feasibility, and design-partner evaluation.
 
-## THE ONE-LINE HOOK (say this first, then stop talking)
+## Core Sentence
 
-> "Every constrained system in the world has the same problem: it wastes energy, time, and bandwidth rediscovering things that haven't changed. ATOMiK makes change the unit of compute."
+> ATOMiK makes change the unit of compute. We help constrained edge and embedded teams find wasted state movement, measure it against a real baseline, and decide whether state-aware execution belongs in their architecture.
 
----
+If time gets cut, repeat this sentence and move to proof plus ask.
 
-## OPENING — The Problem They Already Know (2 minutes)
+## The Three Things The Room Must Remember
 
-**Script:**
+1. **Pain:** constrained systems waste battery, bandwidth, time, and thermal margin moving or rebuilding state they already know.
+2. **Proof:** ATOMiK has hardware-backed primitive proof, Linux userspace-to-FPGA validation, and live-measured AX7020 artifacts with honest caveats.
+3. **Business:** $2.0M funds measured customer workload proof, IP diligence, ASIC feasibility, and licensing-ready materials. It does not fund tape-out.
 
-"Think about every battery-powered device, every edge sensor, every embedded controller in the field. They're all running the same pattern: read the full state, scan it, compare it, decide what changed, transmit or act on that. Every tick. Even when nothing meaningful changed.
+## 5-Minute Version
 
-That's not a software bug. That's how computing is architected. And the cost of that pattern is real — it shows up as shortened battery life, unnecessary heat, wasted bandwidth, and systems that need to be physically larger than they otherwise would.
+Use this if the meeting is rushed or you are interrupted early. Skip use-case detail and most market context.
 
-Here's the punchline: in most constrained systems, the ratio of state that *actually* changed versus state being processed is tiny. But the system processes everything, every time.
+| Time | Slide | Say |
+|---:|---|---|
+| 0:00-0:30 | 1 - Cover | ATOMiK makes change the unit of compute. We start with one constrained workload, one baseline, and one painful metric. |
+| 0:30-1:10 | 2 - Problem | The hidden tax is repeated state work: scans, syncs, replay, reconstruction, and full-state movement when only a compact change matters. |
+| 1:10-1:50 | 3 - Mechanism | The primitive is reference state plus accumulated delta. LOAD, ACCUM, READ, SWAP. Plain English: track meaningful change and reconstruct only when needed. |
+| 1:50-2:50 | 4 - Proof Today | Proof today is evidence-labeled: Zynq UI, Linux userspace-to-FPGA path, AX7020 measured matrix, formal proof work, SD boot build artifacts. We do not claim universal speedups or battery/heat savings. |
+| 2:50-3:40 | 5 - Commercial Path | Commercial path: proof review, technical evaluation, design partner, then licensing/IP diligence if proof supports it. |
+| 3:40-4:35 | 6 - Ask | We are raising $2.0M. The round funds one measured workload artifact, IP packet, ASIC feasibility, and design-partner access. No tape-out. |
+| 4:35-5:00 | Close | The ask is capital plus introductions to qualified workloads and design partners. |
 
-ATOMiK changes that."
+5-minute close:
 
-**Investor appeal:** You're not pitching a feature. You're pitching a fundamental waste that costs their portfolio companies money.
+> We are not claiming ATOMiK solves every compute problem. We are funding the evidence step: bring one constrained state path, measure the waste, and decide with proof whether state-aware compute belongs there.
 
----
+## 10-Minute Version
 
-## THE SOLUTION — Make It Real, Make It Simple (2 minutes)
+This is the default investor pitch if you have a tight room. Speak to the slide headline, not every bullet.
 
-**Script:**
+| Time | Slide | Required point |
+|---:|---|---|
+| 0:00-0:35 | 1 | Category and ask: change-first compute, $2.0M pre-seed. |
+| 0:35-1:20 | 2 | Repeated state work creates paid pain in battery, heat, bandwidth, latency, and reliability. |
+| 1:20-2:00 | 3 | Customers buy measurable outcomes: bytes avoided, latency, operations coalesced, correctness. Battery/thermal remain evaluation targets. |
+| 2:00-2:45 | 4 | ATOMiK mechanism: reference state plus accumulated delta. |
+| 2:45-3:20 | 5 | Fit discipline: strongest where updates, sparse changes, sync, replay, or context movement dominate. Not a CPU replacement. |
+| 3:20-3:55 | 6 | Lead wedge: edge/embedded first; data center/infrastructure later as measured expansion path. |
+| 3:55-5:30 | 7-8 | Proof stack: show what is real today and what each proof does not prove. Be explicit about labels. |
+| 5:30-6:45 | 9 | Commercial path: proof review -> technical evaluation -> design partner -> licensing/IP diligence if proof holds. No promised acquisition. |
+| 6:45-7:35 | 10 | Use of funds: $600K engineering, $400K customer proof, $300K IP/legal, $300K ASIC feasibility, $400K ops/reserve. |
+| 7:35-8:20 | 11 | Risks: customer validation, ASIC economics, downstream outcome measurement, incumbents. Show discipline. |
+| 8:20-9:30 | 12 | Ask: $2.0M target, SAFE pending counsel/CFO, design-partner introductions, workload access. |
+| 9:30-10:00 | Close | Repeat the evidence-first wedge. |
 
-"ATOMiK is a state-aware compute architecture. At its core is a dead-simple idea: instead of tracking everything, track only what changed. Instead of moving full state, move delta.
+10-minute close:
 
-The math is XOR — self-inverse, commutative, associative. You can run it in parallel, in hardware, at wire speed. It's not ML, it's not new silicon, it's a better way to structure computation around the unit that actually matters: change.
+> The next milestone is not a bigger claim. It is a measured customer workload artifact with correctness preserved. That is what this round buys.
 
-What that means for a customer: you bring us one state-heavy workload, one baseline, one painful constraint. We evaluate whether ATOMiK reduces wasted state movement for that specific workload. We measure bytes moved, operations coalesced, latency, and we verify correctness. If we can help you, we tell you how. If we can't, we tell you that too.
+## Friday Default Run-of-Show
 
-That's the evaluation offer. That's how we build revenue."
+| Time | Segment | Goal |
+|---:|---|---|
+| 0:00-0:30 | Frame the meeting | Set the agenda: 10-minute pitch, Q&A, then AAN background and feedback. |
+| 0:30-10:00 | 10-minute pitch | Use the repaired 12-slide investor deck and speak to the headline, not every detail. |
+| 10:00-[time available] | Q&A | Pressure-test proof, fit, commercialization, funding plan, and claim boundaries. |
+| Final segment | AAN Background & Feedback | Capture reactions, proof gaps, and specific intro opportunities. |
 
-**Investor appeal:** Simple, testable, honest. You're not promising miracles — you're offering a measurement.
+Transition to Q&A:
 
----
+> That's the 10-minute version. I'd like to use Q&A to pressure-test proof, fit, and commercialization.
 
-## THE PROOF — What We Can Actually Show Today (3 minutes)
+Transition to AAN feedback:
 
-**Script:**
+> We'd like to use the remaining time to get your reaction to three things: whether the buyer framing lands, whether the proof package feels credible, and who you think the first design-partner audience should be.
 
-"Let me be precise about what we've validated and what we haven't, because I don't want you writing down a number I'm not standing behind.
+## Backup Expanded Run-of-Show - Use Only If They Ask for More Detail
 
-What's hardware-validated today:
+Use this only if the room explicitly asks for a deeper walkthrough or extends the pitch portion. If questions start early, answer directly, then return to slide 8 or slide 12.
 
-First — the algebraic foundation. Sixteen algebraic property tests passing on physical Zynq FPGA hardware. XOR self-inverse, identity, commutativity, parallel accumulation — all confirmed on real silicon. That's the math of the architecture, proven in hardware.
+| Time | Segment | Slides | Goal |
+|---:|---|---|---|
+| 0:00-1:00 | Hook | 1 | Establish category, ICP, and ask. |
+| 1:00-3:00 | Pain | 2-3 | Make the buyer pain concrete and measurable. |
+| 3:00-5:00 | Mechanism | 4-5 | Explain how ATOMiK works without drowning the room in algebra. |
+| 5:00-6:30 | Wedge | 6 | Show edge/embedded first, data center later. |
+| 6:30-10:00 | Proof | 7-8 | Show evidence labels and claim boundaries. This is the trust section. |
+| 10:00-12:30 | Business path | 9 | Connect proof gates to IP value and strategic options. |
+| 12:30-14:30 | Funding plan | 10 | Show the budget is milestone-driven. |
+| 14:30-16:00 | Risk discipline | 11 | Show what is unproven and how the round attacks it. |
+| 16:00-18:00 | Ask | 12 | Ask for money, design-partner intros, workload access, and diligence help. |
+| 18:00-30:00 | Q&A | Appendix/data room | Lead with proof boundaries; do not improvise unsupported claims. |
 
-Second — the Linux userspace path. A process running on Linux can reach the ATOMiK hardware core through the standard memory interface. We've validated that full path end-to-end.
+## Slide-By-Slide Speaker Notes
 
-Third — the AX7020 board run. We ran a four-way performance matrix comparing software baseline, direct hardware, batched hardware, and profiled hardware access. Results are workload-dependent — small coalesced state workloads win, naive per-operation hardware can lose, batching matters. That nuance is intentional. We don't cherry-pick. We measure.
+### Slide 1 - Make change the unit of compute
 
-Fourth — the desktop prototype. ATOMiK Desk v0.39-K is a framebuffer-native UI running live on Zynq hardware. That's not a rendering, not a simulator — it's live silicon.
+Say:
+"ATOMiK is for constrained edge and embedded teams. They bring one workload, one baseline, and one painful constraint. We measure whether state-aware execution can reduce wasted state movement while preserving correctness."
 
-What I'm NOT claiming: I cannot tell you we've measured heat reduction, battery extension, or water savings. Those are evaluation targets. They require workload-specific measurement per customer environment. The mechanism that would produce those outcomes has been validated. The outcomes themselves need customer workloads."
+Skip if rushed:
+Detailed explanation of all proof labels. Save it for slide 8.
 
-**Why this framing wins:** Investors who've been burned by overpromised hardware startups will respect this. You're the rare founder who knows the difference between "the mechanism works" and "the outcome is guaranteed."
+### Slide 2 - The hidden tax is repeated state work
 
----
+Say:
+"The paid pain is not abstract. It is battery budget, enclosure heat, bandwidth, latency, reliability, and hardware margin. We are looking for the state path behind that pain."
 
-## THE MARKET — Keep It Tight, Keep It Sourced (2 minutes)
+Do not say:
+"ATOMiK reduces data-center power" or "ATOMiK saves water." Those are market context and evaluation targets.
 
-**Script:**
+### Slide 3 - Customers do not buy delta-state algebra
 
-"Why does this matter at scale?
+Say:
+"The evaluation starts with a metric: bytes moved, operations coalesced, update latency, reconstruction cost, or correctness preservation. Downstream power and thermal claims require responsible measurement."
 
-Data centers consumed 415 terawatt-hours globally in 2024. IEA projects that doubles to nearly 945 by 2030. U.S. alone projects 325 to 580 terawatt-hours by 2028. Those aren't our projections — those are IEA and Lawrence Berkeley National Lab.
+### Slide 4 - The primitive
 
-The semiconductor market hit $772 billion in 2025. NXP, Qualcomm, TI, Renesas, Microchip — every major chip company serving edge and embedded markets has a customer base that is screaming about power budgets, thermal limits, and bandwidth constraints.
+Say:
+"ATOMiK keeps a reference state plus accumulated change. LOAD sets the reference. ACCUM adds changes. READ reconstructs. SWAP commits a boundary. That is the CEO-safe explanation."
 
-Our first wedge isn't 'fix data centers.' Our first wedge is the embedded team with one specific state-heavy workload that's hitting a wall. Battery life. Heat. Link budget. That's a sale we can close, measure, and defend.
+### Slide 5 - Fit discipline
 
-The strategic path is: prove it works for specific workloads, build IP, get acquired by the company that needs this for their platform."
+Say:
+"ATOMiK has a wedge, not a universal claim. If state movement is not the cost, or if coalescing cannot beat interface overhead, the workload may be no-fit."
 
-**Investor appeal:** You're not boiling the ocean. You have a wedge, a market, and a monetization thesis.
+### Slide 6 - Use cases
 
----
+Say:
+"Edge and embedded are first because the pain is local, measurable, and expensive: battery, heat, links, latency, reliability. Infrastructure is an expansion narrative after measured workload proof."
 
-## BUSINESS MODEL — The Path to Revenue (2 minutes)
+### Slide 7 - Live proof
 
-**Script:**
+Say:
+"This is proof of the current live Zynq demo surface. It is not a production-readiness or performance claim."
 
-"We're not selling chips. We're selling measured proof first, IP second.
+### Slide 8 - Proof stack
 
-Near term: paid technical evaluations. A customer brings us a state-heavy workload, we evaluate fit, we run the comparison, we deliver a map of where state movement creates waste and whether ATOMiK can improve the path. That's a consulting fee with IP attached.
+Say:
+"Every proof has a label. Hardware-validated means demonstrated on physical hardware. Live-measured means raw measurement artifacts exist. Build artifact means a build exists but the end-to-end run is not yet promoted."
 
-Medium term: design partnerships and IP licensing. Once we have two or three workloads validated, we have something to license. Chip companies and platform companies that need this for their edge stack don't want to build it from scratch.
+Must include:
+"The AX7020 matrix is honest about overhead: direct hardware access adds latency when workloads are small. The important signal is the profiling path — 4 hardware operations where the software emits 64 on the 8-register case, a 16x ops reduction. That signal is what we fund to validate at customer workload scale."
 
-Long term: strategic acquisition. The architecture is patentable, the implementation is proven, the customer workload evidence is defensible. That's the kind of thing a Qualcomm or NXP buys to strengthen their edge AI or automotive portfolio.
+Do NOT say "wins and losses" — the matrix shows cycle overhead on all rows. Focus on the ops reduction signal from the profiling path and the funded workload gate.
 
-Pre-seed doesn't fund tape-out. It funds the evidence that makes the IP worth something."
+### Slide 9 - Commercial path
 
-**Investor appeal:** Clear path, no fantasy numbers, acquisition thesis is believable for this stage.
+Say:
+"The commercial path is deliberately staged: proof review, technical evaluation, scoped design partner, then licensing or IP diligence if the evidence supports it. The investor return logic is evidence compounding, not a promised acquisition."
 
----
+Do not say:
+"We will be acquired" or cite unsourced transaction multiples.
 
-## THE ASK — Specific, Justified, Confident (1 minute)
+### Slide 10 - Use of funds
 
-**Script:**
+Say:
+"This budget buys proof gates. The most important line is customer proof. The second most important is ASIC feasibility, because it prevents premature tape-out spending."
 
-"We're raising two million dollars in pre-seed. Minimum viable close is one-point-two-five million for twelve months. Target is two million for eighteen months. Stretch is two-point-seven-five.
+### Slide 11 - Risks and gates
 
-How it's allocated: six hundred thousand for engineering and demo hardening. Four hundred thousand for customer workload evaluations — that's the most important number, because that's the proof that everything else depends on. Three hundred thousand for IP and legal. Three hundred thousand for ASIC feasibility. The rest for operations and reserve.
+Say:
+"The risks are exactly why the round exists. Battery, thermal, water, and footprint outcomes are not claimed until measured. Customer validation is pending. ASIC economics need expert review."
 
-The instrument is a post-money SAFE. Terms are being finalized with our fractional CFO.
+### Slide 12 - The ask
 
-What you get at two million dollars: a measured customer proof, a defensible IP package, ASIC feasibility data, and a company positioned for a Series A or strategic acquisition with real artifacts behind every claim."
+Say:
+"We are raising a $2.0M target pre-seed. We also need design-partner introductions and constrained workloads where the pain is already expensive."
 
----
+Close:
+"ATOMiK is asking the right customers to bring one constrained state path, measure the waste, and decide with evidence whether state-aware compute belongs in their architecture."
 
-## HANDLING COMMON OBJECTIONS
+## Q&A Answers To Keep Tight
 
-**"Why hasn't someone done this before?"**
-> "The math has been known. The question was always whether the hardware implementation could be made small enough and fast enough to justify the approach. We've answered that question on FPGA. The next question is whether the workload evidence is compelling enough for IP licensing or acquisition. That's what this round funds."
+**Where does ATOMiK lose?**
+Where state movement is not the binding cost, where changes are not sparse or coalescable, or where interface overhead overwhelms the saved work. The AX7020 matrix already shows that naive hardware access can lose.
 
-**"What if a big company just builds this themselves?"**
-> "They could. But we'll have workload-specific evidence, filed IP, and design partners before they move. The architecture is patentable. Speed of proof matters more than raw engineering at this stage."
+**What is proven today?**
+Hardware-backed primitive checks through Linux userspace-to-FPGA, a live Zynq prototype UI, and live-measured AX7020 matrix artifacts with caveats. Formal proof work exists in the repo. SD boot remains build-artifact until promoted by a recorded run.
 
-**"When do you make money?"**
-> "First revenue is a paid technical evaluation. We need one customer with one painful workload and a baseline. We're building toward that now. We don't forecast revenue without signed agreements — that's a discipline we're enforcing from day one."
+**What is not proven?**
+Customer workload value, battery extension, heat reduction, cooling reduction, water savings, footprint reduction, production readiness, and universal speedup.
 
-**"What's the team?"**
-> [Answer honestly based on current team. Don't overclaim.]
+**What does $2.0M buy?**
+One or more measured workload artifacts, a stronger IP packet, external ASIC/IP feasibility review, customer evaluation tooling, and licensing-ready diligence materials.
 
-**"What if it doesn't work for a customer's workload?"**
-> "Then we tell them that. The evaluation offer is honest: fit or no-fit, with measurement. That's how you build a reputation worth paying for. And frankly, it's how we stay credible when we find the workloads where it does work."
+**What do you need besides capital?**
+Qualified workloads, design-partner introductions, ASIC/IP diligence support, and reviewers who can pressure-test proof artifacts.
 
----
+## If CFO Is Not In The Room
 
-## CLOSING — End With The Vision, Not The Numbers
+Use these guardrails. Do not improvise terms.
 
-**Script:**
+- **Round size:** $2.0M target pre-seed; $1.25M minimum viable close; $2.75M stretch.
+- **Runway:** target plan is roughly 18 months; minimum is roughly 12 months; stretch accelerates capacity rather than funding tape-out.
+- **Monthly budget:** target plan averages about $111K/month gross, or about $103K/month excluding reserve.
+- **Valuation cap:** do not give one. Say final cap, discount, pro-rata, side letters, and close mechanics require CFO/counsel approval.
+- **Dilution sensitivity:** at an illustrative $10M SAFE cap, a $2.0M raise implies 20% SAFE ownership before option-pool and later-round effects. This is sensitivity math, not a cap recommendation.
+- **Revenue:** no forecast yet. Public $750 and $2,500 reservations are qualification signals; material revenue requires signed SOWs or licensing terms.
 
-"Here's the real opportunity: computing has been building on the assumption that state is cheap to move. It's not. Every device that needs to run longer, run cooler, send less, or decide faster — that device has a state-movement problem. 
+## Forbidden Phrases
 
-We're not claiming to fix all of it. We're claiming to measure it, reduce it where the workload fits, and build defensible evidence that the mechanism works. That's enough to build something worth acquiring.
+- guaranteed savings
+- universal speedup
+- production-ready
+- commercial product
+- replaces CPU/GPU/NPU
+- proven battery improvement
+- proven heat reduction
+- water savings
+- data-center savings
+- acquired at an IP premium
 
-Two million dollars to prove it. That's the ask."
+## Safe Phrases
 
----
+- workload-specific
+- measured against baseline
+- correctness-preserving
+- evidence-bound
+- evaluation target
+- hardware-validated for this artifact
+- live-measured with raw artifacts
+- build artifact until promoted by run evidence
 
-## PRE-MEETING CHECKLIST
-
-- [ ] Confirm Zynq hardware is running or have JTAG fallback demo ready
-- [ ] Screenshot of ATOMiK Desk v0.39-K saved and accessible for showing
-- [ ] AX7020 performance matrix results (results/perf_matrix_ax7020_20260509.txt) reviewed
-- [ ] SAFE terms reviewed with CFO before meeting
-- [ ] Know your 12-month budget milestone: first paid evaluation
-- [ ] Do NOT say: "guaranteed," "production-ready," "replaces GPU," "measured heat savings"
-- [ ] DO say: "hardware-validated," "workload-specific," "measured against baseline," "preserves correctness"
-
----
-
-## THE 30-SECOND VERSION (for hallway pitch)
-
-"ATOMiK is a state-aware compute architecture for edge and embedded systems. The problem: constrained systems waste energy, bandwidth, and time processing state that hasn't meaningfully changed. Our approach: track change instead of tracking everything. We've validated the mathematical foundation on Zynq FPGA hardware, and we're raising two million pre-seed to prove it works for specific customer workloads. The exit thesis is IP licensing or strategic acquisition by a major chip company."
-
----
-
-*Last updated: 2026-05-27 | Do not distribute beyond pitch meetings*
+*Last updated: 2026-05-27 | Do not distribute beyond controlled pitch meetings*

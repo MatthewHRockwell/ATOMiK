@@ -107,7 +107,7 @@ It is not positioned as a general-purpose CPU replacement.
 | Remote / industrial / robotics | weight, wattage, packet budget, field runtime | runtime proxy, packet budget, update cost |
 | Data center / infrastructure | power bill, cooling, water pressure, rack density | measured bytes moved, power/thermal path |
 
-Each use case needs one measured workload before ATOMiK claims savings.
+Each use case needs one measured workload before ATOMiK claims customer outcomes.
 
 ---
 
@@ -127,8 +127,8 @@ product maturity or performance.
 |---|---|---|
 | v0.39-K Zynq Desk UI | `HARDWARE_VALIDATED` | current public proof image |
 | Linux userspace to FPGA path | `HARDWARE_VALIDATED` | documented path through OS and bus |
-| AX7020 board run matrix | `LIVE_MEASURED` | raw artifact with caveats and wins/losses |
-| Formal algebra | `SOFTWARE_VALIDATED` | proof work in repo; avoid public counts until audited |
+| AX7020 board run matrix | `LIVE_MEASURED` | raw artifact: profiling path shows 16x ops reduction (4 vs 64) on 8-reg case; direct-access overhead documented |
+| Formal algebra foundation | `FORMAL_PROOF` where directly audited; otherwise `SOFTWARE_VALIDATED` | proof work in repo; avoid public counts until reconciled |
 | Synthesis and bank scaling | `SYNTHESIS_VALIDATED` | toolchain/hardware validation, not production silicon |
 | Zynq standalone boot artifacts | `BUILD_ARTIFACT` | local build output exists; public power-on artifact still gated |
 
@@ -142,9 +142,9 @@ The near-term plan is focused and capital-efficient.
 
 1. Convert proof into measured customer evaluations.
 2. Strengthen IP and diligence materials.
-3. Use design partners to identify workloads where savings are measurable.
+3. Use design partners to identify workloads where value is measurable.
 4. De-risk ASIC feasibility before any tape-out commitment.
-5. Position ATOMiK for strategic licensing, partnership, or acquisition.
+5. Position ATOMiK for strategic licensing or platform partnership readiness if proof supports it.
 
 ATOMiK is not trying to outspend chip incumbents.
 
@@ -186,10 +186,10 @@ ATOMiK is raising a **$2.0M target pre-seed** to reach measured proof.
 
 - $1.25M minimum viable close; $2.75M stretch plan
 - about 18 months of planned runway
-- post-money SAFE recommended; final terms by CFO/counsel
+- planned SAFE; final terms by CFO/counsel
 - 2-3 design-partner evaluations
 - one sanitized measured workload artifact
 - external ASIC/IP feasibility review
 - licensing-ready package
 
-The next milestone is measured proof, not another abstract demo.
+The next milestone is measured customer-value proof, not another abstract demo.
