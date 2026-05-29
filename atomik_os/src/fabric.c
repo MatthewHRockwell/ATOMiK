@@ -339,6 +339,34 @@ static personality_t lane_to_personality(fabric_lane_t lane) {
     }
 }
 
+/* v0.40: real 0..100 ratio for the per-lane progress bar, or -1 when the
+ * lane's primary signal isn't a percentage (SYNC=deltas, EVENT=counts) —
+ * those lanes get the waveform only.  Every value traces to a real producer. */
+static int lane_pct(fabric_lane_t lane) {
+    personality_t p = lane_to_personality(lane);
+    const perf_sample_t *s = (p != PERSONALITY_NONE) ? perf_last_for(p) : NULL;
+    switch (lane) {
+    case FABRIC_LANE_STATE:
+        if (s && s->ops_logical)
+            return (int)(100u * (s->ops_logical - s->ops_issued) / s->ops_logical);
+        return -1;
+    case FABRIC_LANE_AGENT:
+        if (s) {
+            unsigned cold  = s->bytes_avoided / 4;
+            unsigned total = s->regions_unique + cold;
+            return total ? (int)(s->ops_issued * 100u / total) : -1;
+        }
+        return -1;
+    case FABRIC_LANE_VISUAL: {
+        const atomik_metric_t *a = metric_get("visual.frame_pct_avoided");
+        if (a && a->source != METRIC_WAITING) return (int)a->value;
+        return -1;
+    }
+    default:
+        return -1;
+    }
+}
+
 /* === mini-waveform render ===
  *
  * Polyline through the buffered history, oldest-first, normalized to
@@ -856,7 +884,7 @@ void fabric_draw(window_t *w, int x, int y, int wd, int ht) {
          *   4. ACTIVE-rim: 2-px saturated outer border in lane color
          *      drawn AROUND the card (one px outside each edge) so the
          *      currently-active personality lane glows. */
-        draw_rect(lane_x, ly, lane_w, LANE_ROW_H, wm_card_bg());
+        draw_rect_rounded(lane_x, ly, lane_w, LANE_ROW_H, 10, wm_card_bg());
 
         /* Tinted shoulder — top band gets the lane's accent color at
          * low alpha so the lane reads as colored even without active. */
@@ -1031,6 +1059,25 @@ void fabric_draw(window_t *w, int x, int y, int wd, int ht) {
         }
 
         /* (Waveform is drawn earlier as a card-spanning background.) */
+
+        /* v0.40: thin progress bar at the card floor for lanes whose
+         * primary metric is a real percentage (STATE/AGENT/VISUAL).  The
+         * fill width = the real %, in lane color; SYNC/EVENT (counts, not
+         * %) get no bar — honest, the waveform carries them. */
+        int pct = lane_pct(lane);
+        if (pct >= 0) {
+            if (pct > 100) pct = 100;
+            int pb_h = 4;
+            int pb_x = tx;
+            int pb_w = inner_w;
+            int pb_y = ly + LANE_ROW_H - ATOMIK_GRID_M - pb_h;
+            draw_rect_rounded(pb_x, pb_y, pb_w, pb_h, 2, rgb(0x22, 0x2C, 0x40));
+            int fill_w = pb_w * pct / 100;
+            if (fill_w < pb_h) fill_w = pb_h;
+            draw_rect_rounded(pb_x, pb_y, fill_w, pb_h, 2, lc);
+            for (int sx = 0; sx < fill_w; sx++)
+                draw_blend_pixel(pb_x + sx, pb_y - 1, lc, 40);
+        }
     }
 }
 
@@ -1069,7 +1116,9 @@ void fabric_open(void) {
         wm_focus(s_window_id);
         return;
     }
-    window_t *w = wm_open("Resource Fabric",
+    /* Empty title => chromeless pinned panel (no WM titlebar/close dot).
+     * The Fabric renders its own "RESOURCE FABRIC" header. */
+    window_t *w = wm_open("",
                           FABRIC_SHELF_X, FABRIC_SHELF_Y,
                           FABRIC_SHELF_W, FABRIC_SHELF_H,
                           fabric_draw, NULL);

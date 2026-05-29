@@ -142,47 +142,51 @@ static void draw_one(const window_t *win, int focused) {
     draw_rect(rx,                ry + 12,           1,       rh - 24, WM_BORDER_COL);
     draw_rect(rx + rw - 1,       ry + 12,           1,       rh - 24, WM_BORDER_COL);
 
-    /* Title bar — flat tone differentiated by focus.  Same rounded
-     * radius as the card body so the top corners read continuously. */
-    pixel_t title_bg = focused ? WM_TITLE_BG_FOC : WM_TITLE_BG_IDLE;
-    draw_rect_rounded(rx, ry, rw, WM_TITLE_H, 12, title_bg);
+    /* v0.40: CHROMELESS convention — a window opened with an empty title
+     * ("") is a pinned system panel (e.g. the Resource Fabric shelf): keep
+     * the glass body + border, but skip the title bar, focus underline, and
+     * close dot, and hand the FULL inner rect to the content callback so the
+     * panel renders its own header.  Removes the "window-in-a-window" look
+     * the concept doesn't have. */
+    int chromeless = (win->title[0] == '\0');
+    int cx, cy, cw, ch;
+    if (!chromeless) {
+        /* Title bar — flat tone differentiated by focus.  Same rounded
+         * radius as the card body so the top corners read continuously. */
+        pixel_t title_bg = focused ? WM_TITLE_BG_FOC : WM_TITLE_BG_IDLE;
+        draw_rect_rounded(rx, ry, rw, WM_TITLE_H, 12, title_bg);
 
-    /* Title text — full FG when focused, dim when idle.  Left-padded
-     * 16 px so it has visual breathing room from the card edge. */
-    int ty = ry + (WM_TITLE_H - text_height(1)) / 2;
-    draw_text(rx + 16, ty, win->title, 1,
-              focused ? ATOMIK_FG : ATOMIK_FG_DIM);
+        /* Title text — full FG when focused, dim when idle. */
+        int ty = ry + (WM_TITLE_H - text_height(1)) / 2;
+        draw_text(rx + 16, ty, win->title, 1,
+                  focused ? ATOMIK_FG : ATOMIK_FG_DIM);
 
-    /* Focus indicator: 1-row cyan underline beneath the title bar of
-     * the focused window.  Linear's "don't compete for attention you
-     * haven't earned" rule — blurred windows get nothing, focused gets
-     * the cyan signal in our semantic grammar. */
-    if (focused) {
-        draw_rect(rx + WM_BORDER, ry + WM_TITLE_H,
-                  rw - 2 * WM_BORDER, 1, ATOMIK_SEM_HARDWARE);
+        /* Focus indicator: 1-row cyan underline beneath the title bar. */
+        if (focused) {
+            draw_rect(rx + WM_BORDER, ry + WM_TITLE_H,
+                      rw - 2 * WM_BORDER, 1, ATOMIK_SEM_HARDWARE);
+        }
+
+        /* Close affordance — small overload-red dot at the top-right. */
+        int cb_size = 10;
+        int cb_x = rx + rw - cb_size - 14;
+        int cb_y = ry + (WM_TITLE_H - cb_size) / 2;
+        draw_rect_rounded(cb_x, cb_y, cb_size, cb_size, 5,
+                          focused ? ATOMIK_SEM_OVERLOAD
+                                  : rgb(0x55, 0x35, 0x42));
+
+        cx = rx + WM_BORDER;
+        cy = ry + WM_TITLE_H;
+        cw = rw - 2 * WM_BORDER;
+        ch = rh - WM_TITLE_H - WM_BORDER;
+    } else {
+        cx = rx + WM_BORDER;
+        cy = ry + WM_BORDER;
+        cw = rw - 2 * WM_BORDER;
+        ch = rh - 2 * WM_BORDER;
     }
 
-    /* Close affordance — small overload-red dot at the top-right.
-     * Was a red square with X glyph; v0.34-C dims it to a 10-px circle
-     * approximation so it doesn't dominate the title bar.  Hit-test
-     * still works (we don't have mouse yet anyway; close happens via
-     * Esc / Ctrl-W global hotkeys). */
-    int cb_size = 10;
-    int cb_x = rx + rw - cb_size - 14;
-    int cb_y = ry + (WM_TITLE_H - cb_size) / 2;
-    draw_rect_rounded(cb_x, cb_y, cb_size, cb_size, 5,
-                      focused ? ATOMIK_SEM_OVERLOAD
-                              : rgb(0x55, 0x35, 0x42));
-
-    /* Content area — call the app's draw callback with a clean
-     * rectangle.  Apps SHOULD trust WM_CARD_BG; older apps that
-     * paint their own background tone will keep working but their
-     * inner color may not perfectly match the rest of the chrome
-     * until they're refactored to use wm_card_bg(). */
-    int cx = rx + WM_BORDER;
-    int cy = ry + WM_TITLE_H;
-    int cw = rw - 2 * WM_BORDER;
-    int ch = rh - WM_TITLE_H - WM_BORDER;
+    /* Content area — call the app's draw callback with a clean rectangle. */
     if (win->draw_content) win->draw_content((window_t *)win, cx, cy, cw, ch);
 }
 
