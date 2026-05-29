@@ -33,7 +33,14 @@
    export, now fixed. The **glass-panel chrome** half is still partly real: concept panels
    have translucent fills + inner-glow rims; current panels are flatter. Fold that into the
    hero/surface work rather than a palette pass.
-2. **Fabric lane waveforms** — concept Fabric cards show live sparkline waveforms behind numerics; v0.39-K shows only numbers. Add per-lane scrolling waveform. (Sine-pulse source already exists — see "Do Not Regress".)
+2. ~~**Fabric lane waveforms**~~ — ADDRESSED 2026-05-29 (v0.40, `src/fabric.c`). The
+   waveform renderer already existed (`draw_filled_waveform`, 5-pass glow) but was a thin
+   bottom strip that read as flat because idle lanes have <2 samples. Reworked into a
+   **card-spanning background behind the metric** (concept-01 composition), and the
+   idle/WAITING branch now draws a **calm ambient sine trace** (pure decorative chrome,
+   no telemetry — same discipline as the Pulse Bar idle baseline) instead of a flat band.
+   Live lanes still render the real curve. Compiles clean; **visual confirmation pending a
+   board deploy** (no fb2png capture taken yet).
 3. **Home-surface center hero** — concept anchors on "ATOMiK Desk / Idle-Ready / twin glass panels"; v0.39-K idle is a 3-orb scene. Reframe idle to introduce the system before showing activity.
 4. **Surface routing for Document / Replica Flow / Build Lane** — three full-frame surfaces need to render inside the desk shell rather than as separate windows or not at all.
 5. **Pulse Bar telemetry pills** — concept top bar has 4 distinctly compartmentalized + labeled glass pills; v0.39-K bar lacks the compartments + glow rims.

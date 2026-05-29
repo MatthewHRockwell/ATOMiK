@@ -56,6 +56,7 @@
 #include "atomik_os.h"
 #include <stdio.h>
 #include <string.h>
+#include <math.h>
 
 #define AGENT_HOLD_MS    10000   /* AGENT stays "active" for 10s after last LLM call */
 #define STATE_HOLD_MS    3000    /* STATE stays "active" for 3s after last delta */
@@ -559,17 +560,44 @@ static void draw_filled_waveform(const fabric_lane_history_t *h,
      * dead-flat empty lane.  Stays honest (no fake telemetry) — this is
      * pure visual chrome, no number is rendered from it. */
     if (h->count < 2) {
-        for (int gy = 0; gy < 3; gy++) {
-            uint8_t a = (uint8_t)(36 + gy * 30);
-            for (int sx = 0; sx < w; sx++) {
-                draw_blend_pixel(x + sx, y + hgt - 3 + gy, line, a);
+        /* v0.40 — idle/WAITING lanes render a calm card-spanning ambient
+         * sine trace instead of a flat bottom band, matching the concept-
+         * image instrument look.  PURE DECORATIVE CHROME (Class B): it
+         * writes NO number and is never read as telemetry — the same
+         * discipline as the Pulse Bar idle baseline (status.c
+         * draw_event_pulse_glow).  Phase derives from the band's y so each
+         * lane rests at a different point in the wave; STATIC (no time
+         * term) to stay inside the dirty-render motion budget across 5
+         * simultaneous lanes.  When >=2 real samples land, the live
+         * waveform below replaces this. */
+        int baseline = y + hgt / 2;
+        int amp      = hgt / 5;
+        double pha   = (double)(y & 0xFF) * 0.05;
+        int prev_cy = -1, prev_px = -1;
+        for (int sx = 0; sx < w; sx++) {
+            double u  = (double)sx / (double)(w > 1 ? w - 1 : 1);
+            int cy = baseline + (int)(amp * sin(u * 6.2831853 * 1.6 + pha));
+            if (cy < y)             cy = y;
+            if (cy > y + hgt - 1)   cy = y + hgt - 1;
+            int px = x + sx;
+            for (int g = 1; g <= 5; g++) {          /* soft fill below line */
+                int gy = cy + g;
+                if (gy > y + hgt - 1) break;
+                draw_blend_pixel(px, gy, fill, (uint8_t)(40 - g * 6));
             }
-        }
-        for (int g = 1; g <= 4; g++) {
-            uint8_t a = (uint8_t)(20 - g * 4);
-            for (int sx = 0; sx < w; sx++) {
-                draw_blend_pixel(x + sx, y + hgt - 3 - g, line, a);
+            for (int g = 1; g <= 4; g++) {          /* glow above line */
+                int gy = cy - g;
+                if (gy < y) break;
+                draw_blend_pixel(px, gy, line, (uint8_t)(16 - (g - 1) * 4));
             }
+            draw_blend_pixel(px, cy, line, 110);    /* resting trace */
+            if (prev_px >= 0 && prev_cy != cy) {    /* connect segments */
+                int lo = prev_cy < cy ? prev_cy : cy;
+                int hi = prev_cy < cy ? cy : prev_cy;
+                for (int yy = lo; yy <= hi; yy++)
+                    draw_blend_pixel(px, yy, line, 90);
+            }
+            prev_px = px; prev_cy = cy;
         }
         return;
     }
@@ -883,6 +911,25 @@ void fabric_draw(window_t *w, int x, int y, int wd, int ht) {
         int tx    = lane_x + pad_x;
         int inner_w = lane_w - pad_x * 2;
 
+        /* v0.40: waveform is now a card-spanning BACKGROUND behind the
+         * metric (concept-01 instrument look), not a thin bottom strip.
+         * Drawn FIRST so the lane name, big number, and unit render on
+         * top of it.  Spans from the big-number row down to the card
+         * floor.  Honest: live data → real curve; idle → ambient sine
+         * chrome (see draw_filled_waveform WAITING branch). */
+        {
+            int name_h0 = font_aa_loaded(FONT_AA_UI)
+                          ? text_height_aa(FONT_AA_UI) : text_height(2);
+            int sub_h0  = font_aa_loaded(FONT_AA_LABEL)
+                          ? text_height_aa(FONT_AA_LABEL) : text_height(1);
+            int wf_y = ly + ATOMIK_GRID_M + name_h0 + sub_h0 + ATOMIK_GRID_S;
+            int wf_h = LANE_ROW_H - (wf_y - ly) - ATOMIK_GRID_M;
+            if (wf_h < 12) wf_h = 12;
+            uint8_t fr = (lc >> 16) & 0xFF, fgc = (lc >> 8) & 0xFF, fbc = lc & 0xFF;
+            pixel_t fill_dim = rgb(fr / 3, fgc / 3, fbc / 3);
+            draw_filled_waveform(h, tx, wf_y, inner_w, wf_h, fill_dim, lc);
+        }
+
         /* Row 1: lane NAME in saturated lane color + dim semantic
          * subtitle below + freshness chip right-aligned.
          * v0.38-K: lane name uses AA UI atlas; subtitle uses AA LABEL
@@ -983,19 +1030,7 @@ void fabric_draw(window_t *w, int x, int y, int wd, int ht) {
             draw_text(tx, unit_y, unit, 1, ATOMIK_FG_DIM);
         }
 
-        /* Row 3: FILLED area waveform across inner width. */
-        int wf_y = ty2 + big_h + ATOMIK_GRID_S;
-        int wf_x = tx;
-        int wf_w = inner_w;
-        int wf_h = LANE_ROW_H - (wf_y - ly) - ATOMIK_GRID_M;
-        if (wf_h < 12) wf_h = 12;
-        /* Build a darker fill color (lane color at half intensity) so the
-         * filled band reads as glow body, with brighter line on top. */
-        uint8_t fr = (lc >> 16) & 0xFF;
-        uint8_t fg_ = (lc >>  8) & 0xFF;
-        uint8_t fb = (lc      ) & 0xFF;
-        pixel_t fill_dim = rgb(fr / 3, fg_ / 3, fb / 3);
-        draw_filled_waveform(h, wf_x, wf_y, wf_w, wf_h, fill_dim, lc);
+        /* (Waveform is drawn earlier as a card-spanning background.) */
     }
 }
 
