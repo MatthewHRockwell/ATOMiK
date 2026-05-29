@@ -1,0 +1,436 @@
+1
+00:00:00,100 --> 00:00:04,162
+# Atomik Investor Deck 10-Minute Rehearsal Script
+
+2
+00:00:04,112 --> 00:00:07,737
+Pronunciation note: say Atomik naturally.
+
+3
+00:00:07,737 --> 00:00:10,350
+Do not spell it letter by letter.
+
+4
+00:00:10,350 --> 00:00:13,450
+Before slide one, remember the frame.
+
+5
+00:00:13,450 --> 00:00:29,275
+Matt presents the deck itself: opening, market, competition, mechanism, proof posture, financial model, ask, and technical Q&A. Allison is not expected to present the technical deck; she may support buyer pain, positioning, commercialization, and feedback where comfortable.
+
+6
+00:00:29,275 --> 00:00:31,000
+Slide 1.
+
+7
+00:00:31,000 --> 00:00:33,737
+Make change the unit of compute.
+
+8
+00:00:33,737 --> 00:00:37,262
+Atomik is for constrained edge and embedded teams.
+
+9
+00:00:37,262 --> 00:00:41,825
+They bring one workload, one baseline, and one painful constraint.
+
+10
+00:00:41,825 --> 00:00:45,637
+The live ask is a five million dollar target pre-seed.
+
+11
+00:00:45,637 --> 00:00:49,475
+Final SAFE mechanics are CFO and counsel pending.
+
+12
+00:00:49,475 --> 00:00:52,725
+This is a proof round, not tape-out funding.
+
+13
+00:00:52,725 --> 00:00:54,500
+Slide 2.
+
+14
+00:00:54,500 --> 00:00:57,225
+Customers already know the pain.
+
+15
+00:00:57,225 --> 00:00:59,525
+Use Allison's language.
+
+16
+00:00:59,525 --> 00:01:01,962
+Batteries die too quickly.
+
+17
+00:01:01,962 --> 00:01:04,287
+Hardware is maxed out.
+
+18
+00:01:04,287 --> 00:01:06,500
+Systems run hot.
+
+19
+00:01:06,500 --> 00:01:09,425
+Devices are too big or too heavy.
+
+20
+00:01:09,425 --> 00:01:11,700
+Costs keep increasing.
+
+21
+00:01:11,700 --> 00:01:14,075
+More performance is needed.
+
+22
+00:01:14,075 --> 00:01:24,787
+Before they spend more money on bigger hardware, larger batteries, cooling, bandwidth, or redesign, Atomik checks whether a constrained state path can get more out of the system they already have.
+
+23
+00:01:24,787 --> 00:01:26,650
+Slide 3.
+
+24
+00:01:26,650 --> 00:01:30,000
+Customers do not buy delta-state algebra.
+
+25
+00:01:30,000 --> 00:01:32,425
+The customer buys evidence.
+
+26
+00:01:32,425 --> 00:01:41,025
+The evaluation starts with a metric: bytes moved, operations coalesced, update latency, reconstruction cost, or correctness preservation.
+
+27
+00:01:41,025 --> 00:01:47,075
+Customer ROI is measured only after the workload shows reduced state movement while correctness holds.
+
+28
+00:01:47,075 --> 00:01:48,925
+Slide 4.
+
+29
+00:01:48,925 --> 00:01:51,187
+Market opportunity.
+
+30
+00:01:51,187 --> 00:01:56,350
+The semiconductor backdrop is above one trillion dollars in 2026.
+
+31
+00:01:56,350 --> 00:02:00,775
+Embedded systems are a hundred-billion-dollar-plus adjacent pool.
+
+32
+00:02:00,775 --> 00:02:08,575
+The ten to forty million dollar entry wedge is an early path from paid evaluations, design partners, and licensing if proof converts.
+
+33
+00:02:08,575 --> 00:02:11,962
+It is not a forecast, and it is not a ceiling.
+
+34
+00:02:11,962 --> 00:02:13,787
+Slide 5.
+
+35
+00:02:13,787 --> 00:02:15,800
+Focus markets.
+
+36
+00:02:15,800 --> 00:02:23,787
+The focus segments are edge AI, robotics and industrial systems, drones and remote autonomy, and smallsat or remote sensing.
+
+37
+00:02:23,787 --> 00:02:33,812
+The growth trajectories are the reason investors should care, but the customer trigger is still the same: battery, heat, size, weight, latency, performance, or hardware limits.
+
+38
+00:02:33,812 --> 00:02:37,775
+The target-account names are examples only, not traction.
+
+39
+00:02:37,775 --> 00:02:39,637
+Slide 6.
+
+40
+00:02:39,637 --> 00:02:41,887
+Competitive landscape.
+
+41
+00:02:41,887 --> 00:02:57,675
+The alternatives are real: NVIDIA Jetson, Qualcomm, Ambarella, Hailo, Google Coral, FPGA upgrades, Arm, Synopsys ARC, Cadence Tensilica, CEVA, Andes, compression, caching, delta sync, hand optimization, bigger batteries, and more cooling.
+
+42
+00:02:57,675 --> 00:03:01,200
+Atomik is not claiming to replace the whole stack.
+
+43
+00:03:01,200 --> 00:03:11,900
+The defensibility wedge is proof-bound IP: Lean4-checked formal algebra, FPGA hardware validation, and a claims registry that ties formal statements to exact audited properties.
+
+44
+00:03:11,900 --> 00:03:13,750
+Slide 7.
+
+45
+00:03:13,750 --> 00:03:16,487
+Make change the unit of compute.
+
+46
+00:03:16,487 --> 00:03:20,375
+The primitive is reference state plus accumulated change.
+
+47
+00:03:20,375 --> 00:03:22,612
+LOAD sets the reference.
+
+48
+00:03:22,612 --> 00:03:24,825
+ACCUM adds changes.
+
+49
+00:03:24,825 --> 00:03:26,962
+READ reconstructs.
+
+50
+00:03:26,962 --> 00:03:29,400
+SWAP commits a boundary.
+
+51
+00:03:29,400 --> 00:03:32,250
+Do not over-explain the algebra.
+
+52
+00:03:32,250 --> 00:03:33,950
+Slide 8.
+
+53
+00:03:33,950 --> 00:03:35,862
+Fit discipline.
+
+54
+00:03:35,862 --> 00:03:39,487
+Atomik has a wedge, not a universal claim.
+
+55
+00:03:39,487 --> 00:03:49,400
+It fits best where updates dominate reads, changes are sparse, bandwidth or latency is expensive, power budget or hardware margin is tight, or sync and replay create overhead.
+
+56
+00:03:49,400 --> 00:03:51,150
+Slide 9.
+
+57
+00:03:51,150 --> 00:03:53,062
+Use cases.
+
+58
+00:03:53,062 --> 00:04:02,287
+Potential customers include robotics, edge AI, industrial systems, remote systems such as drones and satellites, and defense-adjacent environments.
+
+59
+00:04:02,287 --> 00:04:05,687
+What they share is expensive constraint pressure.
+
+60
+00:04:05,687 --> 00:04:07,462
+Slide 10.
+
+61
+00:04:07,462 --> 00:04:09,212
+Live proof.
+
+62
+00:04:09,212 --> 00:04:13,287
+This is the current Zynq hardware UI artifact.
+
+63
+00:04:13,287 --> 00:04:24,812
+The callouts are the point: it shows the UI/demo surface, it should be quoted as a caption-bound hardware-validated artifact, and the on-screen telemetry should not be treated as a customer benchmark.
+
+64
+00:04:24,812 --> 00:04:26,662
+Slide 11.
+
+65
+00:04:26,662 --> 00:04:28,412
+Proof stack.
+
+66
+00:04:28,564 --> 00:04:30,939
+Every proof has a label.
+
+67
+00:04:30,889 --> 00:04:37,214
+Zynq Desk v0.39-K is hardware-validated as a current UI proof image.
+
+68
+00:04:37,214 --> 00:04:43,164
+Linux userspace-to-FPGA is hardware-validated as a documented OS-to-bus path.
+
+69
+00:04:43,164 --> 00:04:48,439
+The AX7020 matrix is live-measured and has wins and losses with caveats.
+
+70
+00:04:48,439 --> 00:04:55,164
+Formal proof only applies to specifically audited properties; it does not imply workload or customer outcomes.
+
+71
+00:04:55,164 --> 00:04:59,514
+Standalone boot is a build artifact until run proof promotes it.
+
+72
+00:04:59,514 --> 00:05:01,351
+Slide 12.
+
+73
+00:05:01,351 --> 00:05:03,351
+Commercial path.
+
+74
+00:05:03,351 --> 00:05:06,864
+The commercial path starts in customer language.
+
+75
+00:05:06,864 --> 00:05:10,101
+They show us the constrained part of the system.
+
+76
+00:05:10,101 --> 00:05:14,364
+We evaluate whether Atomik can help against the current baseline.
+
+77
+00:05:14,364 --> 00:05:19,926
+If there is an opportunity, we show where it is, what was measured, and the potential impact.
+
+78
+00:05:19,926 --> 00:05:22,764
+If there is no fit, we say so.
+
+79
+00:05:22,764 --> 00:05:28,589
+Design partner work and licensing diligence only happen after measured proof supports the path.
+
+80
+00:05:28,589 --> 00:05:30,539
+Slide 13.
+
+81
+00:05:30,539 --> 00:05:32,576
+Financial model.
+
+82
+00:05:32,576 --> 00:05:36,264
+This is founder-prepared planning, not a forecast.
+
+83
+00:05:36,264 --> 00:05:45,064
+Planning ranges show how the business can move from proof reviews to paid evaluations, design-partner SOWs, and licensing only if proof converts.
+
+84
+00:05:45,064 --> 00:05:59,739
+The use of funds is milestone-based: one point five million for engineering, one million for customer proof, seven hundred fifty thousand for IP and legal, seven hundred fifty thousand for ASIC feasibility, and one million for finance, GTM, ops, and reserve.
+
+85
+00:05:59,739 --> 00:06:01,689
+Slide 14.
+
+86
+00:06:01,689 --> 00:06:03,739
+Risks and gates.
+
+87
+00:06:03,739 --> 00:06:07,076
+Trust comes from saying what is still unproven.
+
+88
+00:06:07,076 --> 00:06:09,814
+Customer validation is pending.
+
+89
+00:06:09,814 --> 00:06:14,726
+Battery, heat, water, footprint, and ROI need end-to-end measurement.
+
+90
+00:06:14,726 --> 00:06:19,189
+ASIC economics need external feasibility review before tape-out.
+
+91
+00:06:19,189 --> 00:06:21,239
+Incumbents are real.
+
+92
+00:06:21,239 --> 00:06:23,201
+Slide 15.
+
+93
+00:06:23,201 --> 00:06:24,639
+Team.
+
+94
+00:06:24,639 --> 00:06:35,914
+Matt owns the deck, proof, roadmap, financial model, ask, and technical Q&A. Allison supports messaging, positioning, buyer-language, commercialization, and feedback where comfortable.
+
+95
+00:06:35,914 --> 00:06:43,401
+Advisor priorities are ASIC/EDA feasibility, formal-methods review, and semiconductor IP/licensing.
+
+96
+00:06:43,401 --> 00:06:45,389
+Slide 16.
+
+97
+00:06:45,389 --> 00:06:46,939
+The ask.
+
+98
+00:06:46,939 --> 00:06:53,064
+The ask is five million dollars target pre-seed, with final SAFE terms CFO and counsel pending.
+
+99
+00:06:53,064 --> 00:06:59,839
+The round buys measured workload proof, the IP packet, ASIC feasibility, and licensing-ready materials.
+
+100
+00:06:59,839 --> 00:07:05,476
+The meeting-specific ask from Keaton is design-partner introductions and investor feedback.
+
+101
+00:07:05,476 --> 00:07:10,626
+Keep Keaton-specific language in presenter notes, not in the circulating deck.
+
+102
+00:07:10,626 --> 00:07:12,126
+Close.
+
+103
+00:07:12,126 --> 00:07:15,164
+The next milestone is not a bigger claim.
+
+104
+00:07:15,164 --> 00:07:19,739
+It is a measured customer workload artifact with correctness preserved.
+
+105
+00:07:19,739 --> 00:07:29,089
+Atomik is asking the right customers to bring one constrained state path, measure the waste, and decide with evidence whether state-aware compute belongs in their architecture.
+
+106
+00:07:29,089 --> 00:07:31,264
+Q&A guardrails.
+
+107
+00:07:31,264 --> 00:07:43,289
+If they ask what is proven, say hardware-backed primitive checks, Linux userspace-to-FPGA validation, a live Zynq UI artifact, and live-measured AX7020 matrix artifacts with caveats.
+
+108
+00:07:43,289 --> 00:07:55,051
+If they ask what is not proven, say customer workload value, battery extension, heat reduction, cooling reduction, water savings, footprint reduction, production readiness, and universal speedup.
+
+109
+00:07:55,051 --> 00:08:00,739
+If they ask for valuation cap, say final SAFE mechanics are CFO and counsel pending.
+

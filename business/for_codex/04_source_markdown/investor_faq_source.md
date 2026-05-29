@@ -77,33 +77,29 @@ Near term: paid technical evaluations and design-partner engagements.
 Mid term: IP licensing, integration partnerships, and support for customers who
 have a validated workload fit.
 
-Long term: strategic licensing, partnership, or acquisition by a chip or
-platform company that can scale the architecture.
+Long term: strategic licensing or platform partnership optionality if workload proof and IP diligence justify it.
 
 ## Why not compete directly with Intel, NVIDIA, AMD, or ARM?
 
 The current strategic goal is not to outspend incumbents. The better path is to
 build proof, protect IP, validate customer workloads, and become a strategic
-asset that a major chip or platform company wants to license, partner with, or
-acquire.
+asset that a major chip or platform company can evaluate for licensing or platform
+partnership.
 
 ## How much are you raising?
 
-The current working ask is a $2.0M target pre-seed. The minimum viable close is
-$1.25M; the stretch plan is $2.75M. The recommended default instrument is a
-post-money SAFE, with valuation cap, discount, pro-rata rights, and close
-mechanics to be finalized by the fractional CFO and counsel.
+The current Aggie-facing ask is a $5M target pre-seed to match the number already shared in preparation for the meeting. Final SAFE mechanics, valuation cap, discount, pro-rata rights, staged close structure, and Delaware C-Corp conversion mechanics require CFO/counsel review.
 
 ## What does pre-seed capital fund?
 
-The $2.0M target budget funds:
+The $5M target budget funds:
 
-- $600K engineering and demo hardening.
-- $400K customer workload proof.
-- $300K IP and legal.
-- $300K ASIC feasibility.
-- $250K finance, GTM, and operations.
-- $150K reserve.
+- $1.5M engineering and demo hardening.
+- $1.0M customer workload proof.
+- $750K IP and legal.
+- $750K ASIC feasibility.
+- $600K finance, GTM, and operations.
+- $400K reserve.
 
 The round funds feasibility and measured proof, not tape-out.
 
@@ -113,7 +109,7 @@ Use benchmarks as context, not as ATOMiK-specific claims. Current source-backed
 references include IEA/LBNL for data-center energy, cooling, and water pressure;
 SIA/WSTS for semiconductor market backdrop; Carta and PitchBook/NVCA for current
 pre-seed/seed market context; and YC/Techstars for accelerator-term dilution
-context. The working ask is now $2.0M; the CFO still needs to approve final SAFE
+context. The working ask is now $5M; the CFO still needs to approve final SAFE
 terms, valuation cap, discount, and closing mechanics.
 
 ## Does pre-seed fund a chip tape-out?
@@ -137,6 +133,4 @@ right schedule with legal support.
 
 ## Why is this fundable now?
 
-Because there is enough proof to justify the next diligence step, but the
-company is still early enough that pre-seed capital can materially change the
-trajectory. The strongest next milestone is measured customer-value proof.
+Because there is enough proof to justify the next diligence step, but not enough to overclaim downstream customer outcomes. Pre-seed capital should buy the measured workload proof, IP diligence, and ASIC feasibility that make the next financing or strategic conversation concrete.

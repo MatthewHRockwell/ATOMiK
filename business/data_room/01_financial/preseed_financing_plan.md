@@ -1,6 +1,6 @@
 # Pre-Seed Financing Plan And Use Of Funds
 
-> Current CFO-ready draft: 2026-05-23. This is the investor-facing working plan
+> Current CFO-ready draft: 2026-05-27. This is the investor-facing working plan
 > for the Aggie Angel pitch. Final instrument, valuation cap, discount, pro-rata
 > rights, close mechanics, and legal wording require fractional CFO and counsel
 > approval before signatures.
@@ -11,7 +11,7 @@
 |---|---:|---|---|
 | Minimum viable close | $1.25M | ~12 months | Keeps the company alive long enough to finish IP conversion, harden the demo, and run the first measured workload evaluation. |
 | Target raise | $2.0M | ~18 months | Recommended investor-facing ask. Funds customer proof, IP strengthening, ASIC feasibility, first technical capacity, and financing operations. |
-| Stretch plan | $2.75M | 18+ months | Adds faster technical hiring, deeper evaluation support, and more complete ASIC feasibility without funding tape-out. |
+| Stretch plan | $2.75M | ~18 months at accelerated spend | Adds faster technical hiring, deeper evaluation support, and more complete ASIC feasibility without funding tape-out; longer only if spend is not accelerated. |
 
 Suggested default instrument: post-money SAFE. The valuation cap and discount
 should be set by the fractional CFO after reviewing current cap table, dilution,
@@ -64,6 +64,30 @@ an early hardware/IP company:
 | Finance, GTM, and ops | $300K | Stronger investor reporting and partner pipeline operations. |
 | Reserve | $150K | Same discipline; avoid letting stretch become overbuild. |
 | **Total** | **$2.75M** |  |
+
+## Runway And Burn Arithmetic
+
+| Scenario | Raise | Reserve | Spendable cash | Planning runway | Gross monthly budget | Ex-reserve monthly budget |
+|---|---:|---:|---:|---:|---:|---:|
+| Minimum | $1.25M | $100K | $1.15M | 12 months | ~$104K/mo | ~$96K/mo |
+| Target | $2.0M | $150K | $1.85M | 18 months | ~$111K/mo | ~$103K/mo |
+| Stretch | $2.75M | $150K | $2.60M | 18 months | ~$153K/mo | ~$144K/mo |
+
+These are planning averages, not permission to spend evenly every month. Spend should be staged behind proof gates: demo reliability, workload definition, customer proof, IP/legal conversion, ASIC feasibility, and next-financing readiness.
+
+## Dilution Sensitivity
+
+Simple post-money SAFE ownership sold before option-pool, prior-instrument, side-letter, or priced-round effects:
+
+| Post-money cap | $1.25M min | $2.0M target | $2.75M stretch |
+|---:|---:|---:|---:|
+| $8M | 15.6% | 25.0% | 34.4% |
+| $10M | 12.5% | 20.0% | 27.5% |
+| $12M | 10.4% | 16.7% | 22.9% |
+| $15M | 8.3% | 13.3% | 18.3% |
+| $18M | 6.9% | 11.1% | 15.3% |
+
+This table is not a valuation recommendation. It exists so Matt and Allison do not improvise cap math in the room. The right answer remains: final cap, discount, pro-rata rights, and closing mechanics require CFO/counsel approval.
 
 ## 18-Month Milestone Plan
 

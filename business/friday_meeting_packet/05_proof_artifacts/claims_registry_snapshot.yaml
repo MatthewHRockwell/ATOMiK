@@ -1,0 +1,164 @@
+schema_version: 1
+last_updated: "2026-05-28"
+disclaimer: "Live screenshots show current prototypes. Concept visuals show product direction and are not represented as current commercial functionality. Performance claims are only stated when backed by measured artifacts."
+
+evidence_labels:
+  LIVE_MEASURED: "Observed on a running system with recorded measurement artifacts."
+  HARDWARE_VALIDATED: "Demonstrated on physical hardware, but not necessarily accompanied by full benchmark artifacts."
+  SOFTWARE_VALIDATED: "Shown in software prototype, simulation, local runtime, or non-hardware environment."
+  FORMAL_PROOF: "A directly audited formal proof artifact or formal statement; use only for the exact property proven."
+  SYNTHESIS_VALIDATED: "Validated through synthesis, build, compile, or toolchain output."
+  BUILD_ARTIFACT: "Concrete local build outputs exist, but the end-to-end hardware path has not yet been promoted as a live result."
+  PROJECTED: "A model, estimate, or expected economic/performance outcome. Must not be phrased as a result."
+  CONCEPTUAL: "Used to explain product direction, UX, architecture, or design intent. Not current proof."
+  ROADMAP: "Planned work that may change."
+
+claims:
+  - id: live-desk-screenshot-2026-05-10
+    label: HARDWARE_VALIDATED
+    claim: "Current ATOMiK Desk prototype running on live hardware."
+    artifact: "website/public/01-current-live-atomik-desk.jpg"
+    date: "2026-05-10"
+    public_safe: true
+    notes: "Use as proof image. Do not represent as polished commercial product."
+
+  - id: live-desk-ui-v038g-2026-05-12
+    label: HARDWARE_VALIDATED
+    claim: "ATOMiK Desk v0.38-G prototype UI screenshot is a historical hardware UI proof artifact."
+    artifact: "website/public/07-current-live-atomik-desk-v038g.png"
+    source_artifact: "atomik_os/docs/screenshots/deploy_20260512_092422_v0.38-G.png"
+    date: "2026-05-12"
+    public_safe: true
+    notes: "Historical UI proof image. Do not represent as current proof image. Do not infer benchmark, uptime, allocation, maturity, performance, power, thermal, water, battery, or footprint claims from the screenshot."
+
+  - id: live-desk-ui-v038i-2026-05-14
+    label: HARDWARE_VALIDATED
+    claim: "ATOMiK Desk v0.38-I prototype UI screenshot is a historical hardware UI proof artifact."
+    artifact: "website/public/08-current-live-atomik-desk-v038i.png"
+    source_artifact: "atomik_os/docs/screenshots/deploy_20260514_223935_v0.38-I.png"
+    review_artifact: "atomik_os/docs/screenshots/for_chatgpt/v0.38-I_for_review.png"
+    source_commit: "e063dba"
+    date: "2026-05-14"
+    public_safe: true
+    notes: "Historical UI proof image. Do not represent as current proof image. Do not infer benchmark, uptime, allocation, maturity, performance, power, thermal, water, battery, or footprint claims from the screenshot."
+
+
+  - id: live-desk-ui-v039k-2026-05-21
+    label: HARDWARE_VALIDATED
+    claim: "ATOMiK Desk v0.39-K prototype UI screenshot shows the current live UI/UX direction running on Zynq hardware."
+    artifact: "website/public/09-current-live-atomik-desk-v039k.png"
+    packaged_artifact: "09-current-live-atomik-desk-v039k.png"
+    friday_send_artifact: "business/friday_send/04_proof_artifacts/09-current-live-atomik-desk-v039k.png"
+    meeting_packet_artifact: "business/friday_meeting_packet/05_proof_artifacts/09-current-live-atomik-desk-v039k.png"
+    caption_artifact: "09-current-live-atomik-desk-v039k.caption.md"
+    source_artifact: "atomik_os/docs/screenshots/deploy_v0.39-K_rail.png"
+    date: "2026-05-21"
+    public_safe: true
+    notes: "Current UI proof image for v0.39-K. Do not represent as commercial product. Do not infer benchmark, uptime, allocation, maturity, performance, power, thermal, water, battery, or footprint claims from the screenshot."
+
+  - id: ax7020-perf-matrix-2026-05-09
+    label: LIVE_MEASURED
+    claim: "AX7020 board run produced a four-way software / direct / batched / profiled performance matrix."
+    artifact: "results/perf_matrix_ax7020_20260509.txt"
+    packaged_artifact: "perf_matrix_ax7020_20260509.txt"
+    packaged_csv: "perf_matrix_ax7020_20260509.csv"
+    packaged_summary_json: "perf_matrix_ax7020_20260509.summary.json"
+    interpretation: "docs/perf/20260509_matrix_interpretation.md"
+    packaged_interpretation: "20260509_matrix_interpretation.md"
+    packaged_summary: "AX7020_SUMMARY.md"
+    date: "2026-05-09"
+    public_safe: true
+    notes: "Publish with interpretation caveats: naive hardware access can lose; batching/coalescing is workload-dependent; SYNC row has known measurement limitation."
+
+  - id: linux-userspace-validation-2026-04-06
+    label: HARDWARE_VALIDATED
+    claim: "ATOMiK algebraic property checks passed through a Linux userspace to FPGA accelerator path."
+    artifact: "docs/LINUX_USERSPACE_PROOF.md"
+    packaged_artifact: "LINUX_USERSPACE_PROOF.md"
+    packaged_summary: "LINUX_USERSPACE_PROOF_SUMMARY.md"
+    packaged_baseline: "ZYNQ_BASELINE.md"
+    date: "2026-04-06"
+    public_safe: true
+    notes: "The source document records 16 algebraic checks and environment details."
+
+  - id: parallel-bank-hardware-validation-2026-01-27
+    label: HARDWARE_VALIDATED
+    claim: "Parallel accumulator bank configurations were programmed to Tang Nano 9K hardware and tested."
+    artifact: "docs/HARDWARE_SYNTHESIS.md"
+    external_repo_artifact: "docs/HARDWARE_SYNTHESIS.md"
+    packaged_status: "Referenced external repo artifact; not included in this proof folder. See README_EXTERNAL_REFERENCES.md."
+    date: "2026-01-27"
+    public_safe: true
+    notes: "Use exact counts only when quoting directly from the source artifact."
+
+  - id: xc7z020-synthesis-ceiling
+    label: SYNTHESIS_VALIDATED
+    claim: "XC7Z020 high-bank throughput ceilings are synthesis-derived, not live-board measurements."
+    artifact: "docs/HARDWARE_SYNTHESIS.md"
+    external_repo_artifact: "docs/HARDWARE_SYNTHESIS.md"
+    packaged_status: "Referenced external repo artifact; not included in this proof folder. See README_EXTERNAL_REFERENCES.md."
+    date: "2026-01-27"
+    public_safe: true
+    notes: "Must be labeled as synthesis-validated wherever used."
+
+
+  - id: zynq-standalone-boot-build-artifacts-2026-05-23
+    label: BUILD_ARTIFACT
+    claim: "The Zynq standalone SD boot path has local build artifacts, including BOOT.bin and the SD-boot bitstream."
+    artifact: "hardware/zynq/fsbl_build/BOOT.bin"
+    external_repo_artifact: "hardware/zynq/fsbl_build/BOOT.bin"
+    packaged_status: "Referenced external local build artifact; not included in this proof folder. See README_EXTERNAL_REFERENCES.md."
+    related_artifact: "hardware/zynq/litex-build-nax64-sdboot/gateware/"
+    date: "2026-05-23"
+    public_safe: true
+    notes: "May say assembled or built locally. Do not say standalone SD boot is validated until a recorded power-on boot artifact exists."
+
+  - id: formal-proof-work
+    label: SOFTWARE_VALIDATED
+    claim: "Formal proof work is present in the public repository."
+    artifact: "math/proofs/"
+    external_repo_artifact: "math/proofs/"
+    packaged_status: "Referenced external repo path; not included in this proof folder. See README_EXTERNAL_REFERENCES.md."
+    date: null
+    public_safe: true
+    notes: "Avoid public proof counts until the count is audited across website, README, and deck."
+
+  - id: atomik-desk-hero-concept
+    label: CONCEPTUAL
+    claim: "ATOMiK Desk concept visual shows target product direction, not current live UI."
+    artifact: "website/public/02-atomik-desk-hero-concept.png"
+    date: "2026-05-10"
+    public_safe: true
+    notes: "Use only with concept/design-target caption."
+
+  - id: resource-fabric-adaptive-concept
+    label: ROADMAP
+    claim: "Resource Fabric adaptive workload reallocation image is a roadmap concept visual."
+    artifact: "website/public/03-adaptive-mode-mixed-workload-concept.png"
+    date: "2026-05-10"
+    public_safe: true
+    notes: "Do not imply current adaptive allocation behavior."
+
+  - id: build-lane-gcc-concept
+    label: ROADMAP
+    claim: "Standard-C / GCC adoption lane image is a roadmap concept visual."
+    artifact: "website/public/04-build-lane-gcc-concept.png"
+    date: "2026-05-10"
+    public_safe: true
+    notes: "Only label as hardware-validated if an end-to-end recorded compiler path exists."
+
+  - id: replica-flow-concept
+    label: ROADMAP
+    claim: "Replica Flow image is a roadmap concept visual for delta propagation."
+    artifact: "website/public/05-replica-flow-sync-concept.png"
+    date: "2026-05-10"
+    public_safe: true
+    notes: "Pair with live proof if used in public materials."
+
+  - id: memory-weave-agent-concept
+    label: ROADMAP
+    claim: "Memory Weave / Agent image is a longer-term concept visual."
+    artifact: "website/public/06-memory-weave-agent-concept.png"
+    date: "2026-05-10"
+    public_safe: true
+    notes: "Avoid homepage hero and README proof zones."

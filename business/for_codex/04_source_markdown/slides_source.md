@@ -107,11 +107,11 @@ It is not positioned as a general-purpose CPU replacement.
 | Remote / industrial / robotics | weight, wattage, packet budget, field runtime | runtime proxy, packet budget, update cost |
 | Data center / infrastructure | power bill, cooling, water pressure, rack density | measured bytes moved, power/thermal path |
 
-Each use case needs one measured workload before ATOMiK claims savings.
+Each use case needs one measured workload before ATOMiK claims customer outcomes.
 
 ---
 
-# Live Proof Today
+# Hardware-Validated UI Proof
 
 ![ATOMiK Desk v0.39-K prototype UI running on live Zynq hardware](../../website/public/09-current-live-atomik-desk-v039k.png)
 
@@ -128,7 +128,7 @@ product maturity or performance.
 | v0.39-K Zynq Desk UI | `HARDWARE_VALIDATED` | current public proof image |
 | Linux userspace to FPGA path | `HARDWARE_VALIDATED` | documented path through OS and bus |
 | AX7020 board run matrix | `LIVE_MEASURED` | raw artifact with caveats and wins/losses |
-| Formal algebra | `SOFTWARE_VALIDATED` | proof work in repo; avoid public counts until audited |
+| Lean4-checked formal algebra | `FORMAL_PROOF` where directly audited; otherwise `SOFTWARE_VALIDATED` | exact formal claims remain bounded to audited properties |
 | Synthesis and bank scaling | `SYNTHESIS_VALIDATED` | toolchain/hardware validation, not production silicon |
 | Zynq standalone boot artifacts | `BUILD_ARTIFACT` | local build output exists; public power-on artifact still gated |
 
@@ -142,9 +142,9 @@ The near-term plan is focused and capital-efficient.
 
 1. Convert proof into measured customer evaluations.
 2. Strengthen IP and diligence materials.
-3. Use design partners to identify workloads where savings are measurable.
+3. Use design partners to identify workloads where value is measurable.
 4. De-risk ASIC feasibility before any tape-out commitment.
-5. Position ATOMiK for strategic licensing, partnership, or acquisition.
+5. Position ATOMiK for strategic licensing or platform partnership readiness if proof supports it.
 
 ATOMiK is not trying to outspend chip incumbents.
 
@@ -152,17 +152,17 @@ ATOMiK is not trying to outspend chip incumbents.
 
 # Use Of Funds
 
-Target ask: **$2.0M pre-seed**.
+Target ask: **$5M pre-seed**.
 
 | Category | Amount | Proof gate |
 |---|---:|---|
-| Engineering + demo hardening | $600K | repeatable Zynq proof system |
-| Customer proof | $400K | measured workload artifact |
-| IP + legal | $300K | counsel-reviewed IP packet |
-| ASIC feasibility | $300K | mentor-reviewed go/no-go path |
-| Finance/GTM/ops + reserve | $400K | runway, reporting, partner pipeline |
+| Engineering + demo hardening | $1.5M | repeatable Zynq proof system |
+| Customer proof | $1.0M | measured workload artifact |
+| IP + legal | $750K | counsel-reviewed IP packet |
+| ASIC feasibility | $750K | mentor-reviewed go/no-go path |
+| Finance/GTM/ops + reserve | $1.0M | runway, reporting, partner pipeline |
 
-Minimum viable close: $1.25M. Stretch plan: $2.75M. Final SAFE terms require
+Final SAFE mechanics, staged close structure, valuation cap, discount, and pro-rata require
 CFO/counsel approval. This round does not fund tape-out.
 
 ---
@@ -182,14 +182,13 @@ The pitch is intentionally evidence-bounded.
 
 # The Ask
 
-ATOMiK is raising a **$2.0M target pre-seed** to reach measured proof.
+ATOMiK is raising a **$5M target pre-seed** to reach measured proof.
 
-- $1.25M minimum viable close; $2.75M stretch plan
-- about 18 months of planned runway
-- post-money SAFE recommended; final terms by CFO/counsel
+- 18-24 month proof round
+- final SAFE mechanics and staged close structure by CFO/counsel
 - 2-3 design-partner evaluations
 - one sanitized measured workload artifact
 - external ASIC/IP feasibility review
 - licensing-ready package
 
-The next milestone is measured proof, not another abstract demo.
+The next milestone is measured customer-value proof, not another abstract demo.

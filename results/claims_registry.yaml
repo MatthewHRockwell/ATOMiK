@@ -1,11 +1,12 @@
 schema_version: 1
-last_updated: "2026-05-23"
+last_updated: "2026-05-28"
 disclaimer: "Live screenshots show current prototypes. Concept visuals show product direction and are not represented as current commercial functionality. Performance claims are only stated when backed by measured artifacts."
 
 evidence_labels:
   LIVE_MEASURED: "Observed on a running system with recorded measurement artifacts."
   HARDWARE_VALIDATED: "Demonstrated on physical hardware, but not necessarily accompanied by full benchmark artifacts."
   SOFTWARE_VALIDATED: "Shown in software prototype, simulation, local runtime, or non-hardware environment."
+  FORMAL_PROOF: "A directly audited formal proof artifact or formal statement; use only for the exact property proven."
   SYNTHESIS_VALIDATED: "Validated through synthesis, build, compile, or toolchain output."
   BUILD_ARTIFACT: "Concrete local build outputs exist, but the end-to-end hardware path has not yet been promoted as a live result."
   PROJECTED: "A model, estimate, or expected economic/performance outcome. Must not be phrased as a result."
@@ -23,23 +24,23 @@ claims:
 
   - id: live-desk-ui-v038g-2026-05-12
     label: HARDWARE_VALIDATED
-    claim: "ATOMiK Desk v0.38-G prototype UI screenshot shows the live UI/UX direction running on hardware."
+    claim: "ATOMiK Desk v0.38-G prototype UI screenshot is a historical hardware UI proof artifact."
     artifact: "website/public/07-current-live-atomik-desk-v038g.png"
     source_artifact: "atomik_os/docs/screenshots/deploy_20260512_092422_v0.38-G.png"
     date: "2026-05-12"
     public_safe: true
-    notes: "Historical UI proof image. Do not represent as commercial product."
+    notes: "Historical UI proof image. Do not represent as current proof image. Do not infer benchmark, uptime, allocation, maturity, performance, power, thermal, water, battery, or footprint claims from the screenshot."
 
   - id: live-desk-ui-v038i-2026-05-14
     label: HARDWARE_VALIDATED
-    claim: "ATOMiK Desk v0.38-I prototype UI screenshot shows the live UI/UX direction running on hardware."
+    claim: "ATOMiK Desk v0.38-I prototype UI screenshot is a historical hardware UI proof artifact."
     artifact: "website/public/08-current-live-atomik-desk-v038i.png"
     source_artifact: "atomik_os/docs/screenshots/deploy_20260514_223935_v0.38-I.png"
     review_artifact: "atomik_os/docs/screenshots/for_chatgpt/v0.38-I_for_review.png"
     source_commit: "e063dba"
     date: "2026-05-14"
     public_safe: true
-    notes: "Use as current UI proof image. Do not represent as commercial product. Do not infer benchmark, uptime, allocation, maturity, or performance claims from the screenshot."
+    notes: "Historical UI proof image. Do not represent as current proof image. Do not infer benchmark, uptime, allocation, maturity, performance, power, thermal, water, battery, or footprint claims from the screenshot."
 
 
   - id: live-desk-ui-v039k-2026-05-21
@@ -49,7 +50,7 @@ claims:
     source_artifact: "atomik_os/docs/screenshots/deploy_v0.39-K_rail.png"
     date: "2026-05-21"
     public_safe: true
-    notes: "Use as current UI proof image. Do not represent as commercial product. Do not infer benchmark, uptime, allocation, maturity, performance, power, thermal, water, battery, or footprint claims from the screenshot."
+    notes: "Current UI proof image for v0.39-K. Do not represent as commercial product. Do not infer benchmark, uptime, allocation, maturity, performance, power, thermal, water, battery, or footprint claims from the screenshot."
 
   - id: ax7020-perf-matrix-2026-05-09
     label: LIVE_MEASURED

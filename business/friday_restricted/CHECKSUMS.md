@@ -1,0 +1,6 @@
+# ATOMiK Restricted Materials Checksums
+
+Generated: 2026-05-28
+
+aa31eaca41c78176654e853a09ec238fa23b49b7b54c7a669290ceadbdbe1fe0  README_RESTRICTED.md
+fab70c427fd66d51b8f10f16b825258e0eaa3795acd718d0b3ba31e16c891e84  product_tech/ATOMiK_Provisional_Patent.pdf

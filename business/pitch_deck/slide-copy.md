@@ -1,80 +1,51 @@
-# ATOMiK Slide Copy
+# ATOMiK Investor Deck Slide Copy
 
-## 1. ATOMiK
+Current generated Friday investor deck: 16 slides. `generate_deck.py` controls the PPTX/PDF output.
 
-Make change the unit of compute.
+## 1. Cover
+Make change the unit of compute. `$5M` target pre-seed. One workload, one baseline, one constraint.
 
-State-aware compute evaluation for edge and embedded teams constrained by
-battery, heat, bandwidth, latency, reliability, or hardware footprint.
+## 2. Problem
+Customers already know the pain: batteries die too quickly, hardware is maxed out, systems run hot, devices get too big/heavy, costs rise, and more performance is needed.
 
-Evidence label: `HARDWARE_VALIDATED` v0.39-K live Zynq Desk screenshot.
+## 3. End-Game Value
+Customers buy measured outcomes: bytes avoided, latency reduced, operations coalesced, correctness preserved, and measured workload ROI where supported.
 
-## 2. The Hidden Tax
+## 4. Market Opportunity
+TAM context: `$1T+` 2026 semiconductor revenue backdrop. SAM context: `$112B-$169B` embedded systems market range. Entry wedge: `$10M-$40M` early annual revenue path if proof converts through paid evaluations, design partners, and licensing; not a ceiling.
 
-Many constrained systems waste energy, bandwidth, and time rediscovering what
-changed. That waste shows up as battery drain, enclosure heat, local latency,
-bandwidth pressure, reliability risk, and hardware overbuild. Data-center power,
-cooling, water, and sustainability pressure are important expansion themes, but
-ATOMiK savings still require workload measurement.
+## 5. Focus Markets
+Edge AI, robotics/industrial, drones/remote autonomy, and smallsat/remote sensing. Includes growth trajectories and target-account examples. Target examples are hypotheses only; no relationship or traction implied.
 
-## 3. The First Wedge
+## 6. Competitive Landscape
+Named buyer alternatives/status quo: NVIDIA Jetson, Qualcomm, Ambarella, Hailo, Google Coral, FPGA upgrades, Arm, Synopsys ARC, Cadence Tensilica, CEVA, Andes/RISC-V, compression, caching, delta sync, custom optimization, bigger batteries, and more cooling. Defensibility wedge: Lean4-checked formal algebra, FPGA hardware validation, and IP/proof registry; exact formal claims stay tied to audited properties.
 
-The first customer has one state-heavy workload, one current baseline, and one
-painful constraint expensive enough to evaluate. The lead ICP is edge and
-embedded teams; data center and infrastructure are strategic paths.
+## 7. Primitive
+`state = reference_state XOR accumulated_delta`. LOAD, ACCUM, READ, SWAP.
 
-## 4. The Primitive
+## 8. Fit
+ATOMiK has a wedge, not a universal claim. Strongest where state movement, sparse updates, sync, replay, or context pressure dominate cost.
 
-ATOMiK makes change the unit of compute: `state = reference_state XOR
-accumulated_delta`.
+## 9. Use Cases
+Robotics, edge AI, industrial systems, drones/satellites, and defense-adjacent environments. The buyer trigger is expensive pressure from battery, heat, size, weight, hardware limits, latency, performance, reliability, or rising cost.
 
-## 5. Why It Can Matter
+## 10. Hardware-Validated UI Proof
+Current Zynq hardware UI artifact with callouts. Must travel with caption. Do not quote on-screen telemetry as a customer workload benchmark.
 
-ATOMiK is designed for workloads where writes or updates dominate reads, state
-changes are sparse, bandwidth is expensive, and latency or power budgets are
-tight. It is not positioned as a general-purpose CPU replacement.
+## 11. Proof Stack
+Zynq UI, Linux userspace-to-FPGA validation, AX7020 matrix, formal proof only where audited, and standalone boot build artifacts. Quote proof with artifact, context, and caveat.
 
-## 6. Customer Use Cases
+## 12. Commercial Path
+Show us the constrained path, evaluate fit against the current baseline, show measured evidence or call no-fit. Design-partner work and licensing diligence only after proof.
 
-Edge/embedded devices, AI at the edge, and remote/industrial/defense-adjacent
-systems are the lead paths. Data center and infrastructure are expansion paths
-when a workload can be measured. Each use case gets a specific evaluation target:
-bytes moved, full-state transfers avoided, operations coalesced, latency,
-bandwidth, power/thermal proxy, runtime, or packet budget.
+## 13. Financial Model
+Founder-prepared planning ranges, not a forecast. Use of funds: `$1.5M` engineering, `$1.0M` customer proof, `$750K` IP/legal, `$750K` ASIC feasibility, `$1.0M` finance/GTM/ops plus reserve.
 
-## 7. Live Proof Today
+## 14. Risks And Gates
+Customer validation, downstream outcome measurement, ASIC economics, and incumbents remain the core gates.
 
-ATOMiK Desk v0.39-K is the current live hardware proof image. It shows the Zynq
-demo surface, not commercial product maturity, performance, power, thermal,
-battery, water, or footprint outcomes.
+## 15. Team
+Matthew H. Rockwell: Founder & CEO, proof/product/finance/ask/technical Q&A. Allison Rossi: CMO, messaging/buyer-language/commercialization/go-to-market support. Advisor priorities: ASIC/EDA feasibility, formal-methods review, semiconductor IP/licensing counsel.
 
-## 8. Proof Stack
-
-Current proof includes the v0.39-K Zynq Desk UI, Linux userspace-to-FPGA path,
-AX7020 board-run artifacts, formal proof work, synthesis artifacts, and
-standalone SD boot build artifacts. Public claims stay tied to label, artifact,
-context, and caveat.
-
-## 9. Business Path
-
-Convert proof into measured customer evaluations, strengthen IP and diligence,
-use design partners to identify measurable workloads, de-risk ASIC feasibility,
-and position ATOMiK for strategic licensing, partnership, or acquisition.
-
-## 10. Use Of Funds
-
-Target ask: $2.0M pre-seed. Budget: $600K engineering/demo hardening, $400K
-customer proof, $300K IP/legal, $300K ASIC feasibility, $250K finance/GTM/ops,
-and $150K reserve. Minimum viable close is $1.25M; stretch plan is $2.75M.
-
-## 11. Risks And Gates
-
-Battery, power, thermal, cooling, water, and footprint improvements remain
-evaluation targets until measured. Customer validation is pending. ASIC economics
-require expert review. The pitch is evidence-bounded by design.
-
-## 12. The Ask
-
-ATOMiK is raising a $2.0M target pre-seed to reach measured proof, plus
-design-partner introductions, ASIC/IP support, and workloads where battery,
-heat, power, bandwidth, latency, reliability, or footprint are painful.
+## 16. Ask
+`$5M` target pre-seed. Need capital, qualified workloads, design-partner introductions, investor feedback, and diligence support. This round does not fund tape-out.

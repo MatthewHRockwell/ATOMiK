@@ -1,0 +1,4 @@
+Scenario,Raise,Reserve,Spendable cash,Planning months,Gross monthly budget,Ex-reserve monthly budget
+Staged close,3000000,250000,2750000,18,166667,152778
+Target,5000000,400000,4600000,24,208333,191667
+Expanded,7500000,600000,6900000,24,312500,287500

@@ -1,38 +1,41 @@
-# Development Cost Breakdown — $225 Total
+# Development Cost And Capital Efficiency
 
-*Generated: 2026-02-03*
+> **Publication status: INTERNAL DATA ROOM / REVIEW REQUIRED.**
+> Do not quote historical low-development-cost numbers externally unless the
+> number is re-audited, dated, and paired with the exact artifacts it produced.
 
-## Itemised Costs
+## Current Position
 
-| Item | Cost | Purpose |
-|------|------|---------|
-| Tang Nano 9K FPGA (x3) | $30 | Hardware validation (3-node demo) |
-| USB cables | $15 | UART communication |
-| Cloud compute (CI) | $0 | GitHub Actions free tier |
-| EDA tools | $0 | Gowin EDA (free for GW1N) |
-| Lean4 | $0 | Open-source theorem prover |
-| Python/SDK | $0 | Open-source toolchain |
-| Domain registration | $0 | Using GitHub Pages |
-| **Total** | **$225** | |
+ATOMiK has a credible capital-efficiency story: meaningful formal, software,
+FPGA, Zynq, and framebuffer-UI proof work has been built before institutional
+funding. That is useful for investors, but it should not replace a real
+financing plan.
 
-## What $225 Produced
+Use this framing externally:
 
-- 108 formally verified theorems (Lean4)
-- Working FPGA implementation (94.5 MHz, 80/80 tests)
-- 5-language SDK with 353 tests
-- 25-configuration synthesis sweep
-- 3-node live demo system
-- 2 research papers (draft)
-- Complete investor materials
+> "ATOMiK has reached hardware-validated prototype proof with unusually low
+> capital spend. The pre-seed round funds the next professional proof gates:
+> customer measurements, IP strengthening, ASIC feasibility, and investor-grade
+> demo packaging."
 
-## Capital Efficiency Narrative
+## What Not To Quote Without Re-Audit
 
-ATOMiK demonstrates exceptional capital efficiency: a complete computing
-architecture — from mathematical proof to silicon validation — built for
-less than the cost of a single engineering hour at market rates.
+- A single all-in development-cost number.
+- Historical board-only costs as if they were company development costs.
+- Old proof counts, SDK test counts, or performance numbers without evidence
+  labels and source artifacts.
+- Claims that capital efficiency alone proves commercial readiness.
 
-This was enabled by:
-1. AI-augmented development (Claude for code generation and verification)
-2. Open-source toolchains (Lean4, Gowin EDA, Python ecosystem)
-3. Low-cost FPGA hardware ($13.50/board)
-4. Solo founder with full-stack capability (math → hardware → software)
+## Investor-Relevant Use Of This Story
+
+| Point | Safe framing |
+|---|---|
+| Founder leverage | The founder has moved across math, software, FPGA, Zynq integration, and direct framebuffer UI work. |
+| Capital discipline | The next round is milestone-based and avoids premature tape-out spend. |
+| Proof discipline | Current claims are tied to `results/claims_registry.yaml` and `docs/evidence-labels.md`. |
+| Next spend | Funds should buy measured customer-value proof, not vanity demo polish. |
+
+## CFO Follow-Up
+
+The fractional CFO should build the actual pre-seed budget from current quotes,
+runway, hiring, legal, customer-evaluation, and ASIC-feasibility assumptions.

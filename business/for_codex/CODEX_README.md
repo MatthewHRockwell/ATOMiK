@@ -18,11 +18,20 @@ Codex: review each document and make improvements listed below.
 - **ATOMiK_Talking_Points.md** — Pitch script. Review for natural speech, not corporate speak.
 
 ### 02_financial/
-- **ATOMiK_Financial_Model.xlsx** — Review all 4 sheets:
-  - Use of Funds: verify numbers sum correctly
-  - Revenue Scenarios: flag any cells that need real data before investor meeting
+- **ATOMiK_Financial_Due_Diligence_Memo.docx** — Founder-prepared financial diligence memo pending CFO/counsel review: safe Friday language, runway math, dilution sensitivity, revenue caveats, and remaining human-review gates.
+- **ATOMiK_Financial_Model.xlsx** — Review all 12 sheets:
+  - README Model Map: intended use, assumptions, investor-facing/internal sheet map
+  - Use of Funds: formula-backed totals and proof-gated categories
+  - Runway & Burn: monthly budget and reserve sensitivity
+  - 18-Month Cash Plan: monthly target-plan burn by spend line
+  - Evaluation Pricing: reservation prices as qualification signals, not forecast revenue
+  - Evaluation SOW Economics: planning-only SOW economics, not forecast revenue
+  - Milestone Gates: 18-month proof gates tied to investor evidence
+  - Dilution Sensitivity: illustrative SAFE cap math, not a cap recommendation
   - Market Context: verify all source citations are accurate
-  - Cap Table: clearly mark as DRAFT and ensure it doesn't create false impressions
+  - Cap Table Draft: clearly mark as DRAFT and avoid false precision
+  - Unmodeled CFO Needs: taxes, benefits, insurance, legal close, tooling, travel, contingency
+  - Caveats: ensure CFO/counsel review boundaries are explicit
 - Flag any numbers that need CFO approval before sharing
 
 ### 03_data_room/
@@ -51,7 +60,8 @@ Codex: review each document and make improvements listed below.
 ## Evidence Labels Currently Active
 - HARDWARE_VALIDATED: v0.39-K UI, algebraic tests, Linux userspace path
 - LIVE_MEASURED: AX7020 board run matrix
-- SOFTWARE_VALIDATED: Formal algebraic proofs
+- FORMAL_PROOF: directly audited formal algebra properties
+- SOFTWARE_VALIDATED: proof work present where not independently audited
 - BUILD_ARTIFACT: SD boot artifacts
 
 ## Source Files

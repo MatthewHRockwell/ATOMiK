@@ -1,24 +1,20 @@
 # ATOMiK Deck Outline
 
-1. **ATOMiK** - Make change the unit of compute. State-aware compute evaluation
-   for edge and embedded teams constrained by battery, heat, bandwidth, latency,
-   reliability, or hardware footprint. Visual: v0.39-K live Zynq screenshot.
-2. **The hidden tax** - Constrained systems waste energy, bandwidth, and time
-   moving, scanning, syncing, replaying, or rebuilding state they already know.
-3. **The first wedge** - One state-heavy workload, one current baseline, and one
-   painful constraint expensive enough to evaluate.
-4. **The primitive** - `state = reference_state XOR accumulated_delta`.
-5. **Why it can matter** - ATOMiK fits sparse-change, update-heavy, bandwidth-
-   constrained, latency-sensitive workloads; it is not a general CPU replacement.
-6. **Customer use cases** - Edge/embedded first, AI at the edge, remote/industrial
-   systems, and data center/infrastructure as a strategic expansion path.
-7. **Live proof today** - ATOMiK Desk v0.39-K running on live Zynq hardware,
-   clearly labeled as prototype proof.
-8. **Proof stack** - Hardware UI proof, Linux userspace validation, AX7020 board
-   artifacts, formal proof work, synthesis artifacts, and standalone boot build artifacts.
-9. **Business path** - Paid evaluations, IP strengthening, design partners, ASIC
-   feasibility review, and strategic licensing / acquisition positioning.
-10. **Use of funds** - $2.0M target pre-seed budget across engineering/demo hardening, customer proof, IP/legal, ASIC feasibility, finance/GTM/ops, and reserve.
-11. **Risks and gates** - Battery, power, thermal, cooling, water, and footprint
-    outcomes are evaluation targets until measured; customer validation and ASIC economics are next gates.
-12. **Ask** - $2.0M target pre-seed, $1.25M minimum close, $2.75M stretch, design-partner introductions, ASIC/IP diligence, and customer workloads where battery, heat, power, bandwidth, latency, reliability, or footprint are painful.
+Current generated Friday investor deck: 16 slides. Use `generate_deck.py` as the PPTX source of truth.
+
+1. **Cover** - Make change the unit of compute. `$5M` target pre-seed; one workload, one baseline, one constraint.
+2. **Problem** - Customer-language pain: batteries die too quickly, hardware is maxed out, systems run hot, devices get too big/heavy, costs rise, and more performance is needed.
+3. **End-game value** - Customers buy measured ROI signals: bytes avoided, latency reduced, operations coalesced, correctness preserved.
+4. **Market opportunity** - large pressure pool, focused entry wedge, and licensing/strategic optionality if proof converts.
+5. **Focus markets** - Edge AI, robotics/industrial, drones/remote autonomy, and smallsat/remote sensing growth trajectories with target-account examples.
+6. **Competitive landscape** - named alternatives plus formal-verification / hardware-proof / IP-registry defensibility wedge.
+7. **Primitive** - `state = reference_state XOR accumulated_delta`; LOAD, ACCUM, READ, SWAP.
+8. **Fit** - ATOMiK has a wedge, not a universal claim.
+9. **Use cases** - Robotics, edge AI, industrial systems, remote systems, and defense-adjacent buyers share expensive constraint pressure.
+10. **Live proof** - v0.39-K Zynq hardware UI proof image with callouts; caption-bound and not a customer workload benchmark.
+11. **Proof stack** - Zynq UI, Linux userspace-to-FPGA proof, AX7020 matrix, FORMAL_PROOF footnote, standalone boot build artifact.
+12. **Commercial path** - Show constrained path -> evaluate fit -> show measured evidence -> call no-fit when ATOMiK does not help; design partner/licensing only after proof.
+13. **Financial model** - founder-prepared planning ranges and `$5M` use of funds; finance/GTM/ops plus reserve shown as `$1.0M`; not forecast, booked revenue, or guaranteed ROI.
+14. **Risks and gates** - Customer validation, downstream outcome measurement, ASIC economics, incumbents.
+15. **Team** - Matthew H. Rockwell owns proof, product, finance/ask, and technical Q&A. Allison Rossi supports messaging, buyer-language, commercialization, and go-to-market. Advisor priorities are ASIC/EDA, formal-methods, and semiconductor IP/licensing.
+16. **Ask** - `$5M` target pre-seed, final SAFE mechanics CFO/counsel pending, design-partner introductions, workload access, and investor feedback.

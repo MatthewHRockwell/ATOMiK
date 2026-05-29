@@ -2,8 +2,7 @@
 
 ## Is ATOMiK available today?
 
-There are live demos, public code, and hardware-backed proof artifacts available
-today. Product surfaces and roadmap concepts are labeled separately.
+There are live demos, reviewable source/artifacts under appropriate access, and hardware-backed proof artifacts available today. Product surfaces and roadmap concepts are labeled separately.
 
 ## Do I need custom hardware to evaluate it?
 

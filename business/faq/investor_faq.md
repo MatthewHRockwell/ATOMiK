@@ -77,15 +77,14 @@ Near term: paid technical evaluations and design-partner engagements.
 Mid term: IP licensing, integration partnerships, and support for customers who
 have a validated workload fit.
 
-Long term: strategic licensing, partnership, or acquisition by a chip or
-platform company that can scale the architecture.
+Long term: strategic licensing or platform partnership optionality if workload proof and IP diligence justify it.
 
 ## Why not compete directly with Intel, NVIDIA, AMD, or ARM?
 
 The current strategic goal is not to outspend incumbents. The better path is to
 build proof, protect IP, validate customer workloads, and become a strategic
-asset that a major chip or platform company wants to license, partner with, or
-acquire.
+asset that a major chip or platform company can evaluate for licensing or platform
+partnership.
 
 ## How much are you raising?
 
@@ -137,6 +136,4 @@ right schedule with legal support.
 
 ## Why is this fundable now?
 
-Because there is enough proof to justify the next diligence step, but the
-company is still early enough that pre-seed capital can materially change the
-trajectory. The strongest next milestone is measured customer-value proof.
+Because there is enough proof to justify the next diligence step, but not enough to overclaim downstream customer outcomes. Pre-seed capital should buy the measured workload proof, IP diligence, and ASIC feasibility that make the next financing or strategic conversation concrete.

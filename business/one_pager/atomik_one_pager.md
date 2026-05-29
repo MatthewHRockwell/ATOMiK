@@ -16,7 +16,7 @@ measurement in that environment.
 
 ## What Customers Get
 
-ATOMiK is evaluated where avoided state work can create business value:
+ATOMiK is evaluated where avoided state work may create business value:
 
 - **Lower state-movement cost:** fewer bytes moved, transfers avoided, or scans skipped.
 - **Faster constrained state paths:** lower update or reconstruction latency where the path fits.
@@ -41,7 +41,7 @@ state-heavy workloads where repeated scans, sync, replay, reconstruction, or
 full-state movement dominate the cost; it is not positioned as a general-purpose
 CPU replacement.
 
-## Live Proof
+## Hardware-Validated UI Proof
 
 ![ATOMiK Desk v0.39-K prototype UI running on live Zynq hardware](../../website/public/09-current-live-atomik-desk-v039k.png)
 
@@ -84,13 +84,12 @@ improvement against one agreed metric while preserving correctness.
 Near term: paid proof reviews, technical evaluations, design partners, IP
 strengthening, and ASIC feasibility review.
 
-Longer term: strategic licensing, integration partnerships, and potential
-acquisition by a chip or platform company that can scale the architecture.
+Longer term: strategic licensing or integration partnership optionality only if workload proof and IP diligence justify it.
 
 ## Pre-Seed Use Of Funds
 
 - Convert provisional IP protection into stronger patent coverage.
-- Run customer workload evaluations around battery, heat, power, bandwidth, latency, and footprint pressure.
+- Run customer workload evaluations around state paths tied to battery, heat, power, bandwidth, latency, and footprint pressure.
 - Bring in fractional CFO support for valuation and financing structure.
 - Add ASIC mentorship before any tape-out decision.
 - Package the Zynq demo into a lower-friction investor and customer proof system.

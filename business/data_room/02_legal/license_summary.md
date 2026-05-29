@@ -1,26 +1,32 @@
 # License Summary
 
-*Generated: 2026-02-03*
+> **Publication status: INTERNAL LEGAL SUMMARY / COUNSEL REVIEW REQUIRED.**
+> Do not treat this as legal advice or final commercial licensing language.
 
-## Open Source License
+## Repository License
 
-- **License**: Apache License 2.0
-- **Scope**: Source code in this repository
-- **Purpose**: Evaluation, testing, and benchmarking
+Confirm the active repository license before external distribution. If code is
+made available for evaluation, the scope should be clearly limited to review,
+testing, and benchmarking unless counsel approves broader terms.
 
-### Key Terms
+## Commercial Licensing Direction
 
-- Free to use, modify, and distribute for evaluation
-- Includes explicit patent grant (Section 3) with retaliation clause
-- Does NOT grant rights to the underlying architecture or patents
+Commercial use should be described conservatively until counsel prepares the
+actual license package:
 
-## Commercial License
+- hardware integration;
+- production deployment;
+- derivative architecture work;
+- customer evaluation or support terms;
+- IP licensing or strategic partnership terms.
 
-- **Required for**: Hardware integration, production deployment, derivative architectures
-- **Contact**: Repository owner for licensing terms
-- **Model**: Per-core licensing (ARM-comparable)
+Avoid using "ARM-comparable" as a legal or financial claim. It is acceptable to
+say ATOMiK may pursue an IP-licensing model if customer workload proof and legal
+packaging support it.
 
 ## Patent Status
 
-The ATOMiK architecture and execution model are **Patent Pending**.
-See [patent_status.md](../03_intellectual_property/patent_status.md).
+The current IP status is tracked in
+[patent_status.md](../03_intellectual_property/patent_status.md). Counsel should
+confirm all patent-pending language, conversion timing, IP assignment, and public
+disclosure posture before investor distribution.

@@ -1,0 +1,8 @@
+Window,Milestone,Evidence gate
+0-30 days,"Lock financing structure, counsel plan, design-partner target list",CFO/counsel reviewed plan
+30-60 days,Harden Zynq demo into repeatable package,Demo checklist and current artifact bundle
+60-90 days,Define first customer workload and baseline plan,Evaluation SOW and one success metric
+90-180 days,Produce first measured workload artifact,Correctness-preserving workload result
+6-9 months,"Convert artifact into paid evaluation, LOI, or no-fit decision",Customer decision record
+9-12 months,Complete ASIC feasibility scope and IP diligence packet,Mentor-reviewed feasibility and counsel-reviewed IP memo
+12-18 months,Prepare next financing or strategic partner process,"Measured proof, partner pipeline, IP packet"

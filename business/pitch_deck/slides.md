@@ -9,62 +9,71 @@ date: May 2026
 
 ## Make change the unit of compute
 
-State-aware compute evaluation for edge and embedded teams constrained by
-battery, heat, bandwidth, latency, reliability, or hardware footprint.
+State-aware compute evaluation for edge and embedded teams constrained by battery, heat, bandwidth, latency, reliability, size, weight, or hardware footprint.
 
-`HARDWARE_VALIDATED` ATOMiK Desk v0.39-K runs as a framebuffer-native
-prototype UI on Zynq hardware.
+Pre-seed target: **$5M**. Final SAFE mechanics, valuation cap, discount, and close structure require CFO/counsel review.
 
 ---
 
-# The Hidden Tax
+# Customers Already Know The Pain
 
-Many constrained systems waste energy, bandwidth, and time rediscovering what
-changed.
+- Batteries die too quickly.
+- Hardware is maxed out.
+- Systems run hot.
+- Devices are too big or too heavy.
+- Costs keep increasing.
+- More performance is needed.
 
-- Edge devices spend limited battery on repeated scans, copies, sync, and replay.
-- Sealed or fanless systems turn redundant state work into heat.
-- AI and agent systems move context even when only a small delta matters.
-- Remote systems are constrained by every watt, ounce, packet, and minute.
-- Data-center power, cooling, water, and sustainability are expansion themes that still need workload-specific measurement.
-
-Source context: IEA and LBNL support the broader energy, cooling, and water
-pressure around modern compute. These are market-context facts, not ATOMiK
-savings claims.
+Before customers spend more money on bigger hardware, larger batteries, cooling, bandwidth, or redesign, ATOMiK checks whether a constrained state path can get more out of the system they already have.
 
 ---
 
-# The First Wedge
+# End-Game Value
 
-The first customer is not everyone.
+Customers do not buy delta-state algebra. They buy measured evidence that a constrained state path can improve.
 
-It is the team with:
+Evaluation metrics can include bytes moved, full-state transfers avoided, operations coalesced, update latency, reconstruction cost, power or thermal proxy where responsibly measured, and correctness preservation.
 
-- one state-heavy workload
-- one current baseline
-- one painful constraint expensive enough to evaluate
-
-Lead ICP: edge and embedded systems, AI at the edge, remote/field systems,
-robotics, industrial control, IoT, and defense-adjacent hardware-constrained
-teams.
+Battery, cooling, water, power-bill, and footprint outcomes remain evaluation targets until workload-specific measurement exists.
 
 ---
 
-# The Customer Value
+# Market Opportunity
 
-Customers do not buy "delta-state algebra."
+TAM context: **$1T+** 2026 semiconductor revenue backdrop.
 
-They buy evidence that a constrained state path may improve:
+SAM context: **$112B-$169B** embedded systems market range from 2024 estimate to 2030 forecast, with edge AI as adjacent pressure.
 
-- bytes moved or avoided
-- update/reconstruction latency
-- bandwidth pressure
-- operations coalesced
-- power or thermal proxy where measured responsibly
-- correctness preservation
+Entry wedge: **$10M-$40M** early annual revenue path from paid evaluations, design partners, and licensing if proof converts; not a ceiling.
 
-Battery, cooling, water, and smaller hardware outcomes remain evaluation targets
-until measured on the workload.
+Semiconductor IP context: **$8.14B 2025 to $11.2B 2029**.
+
+These are market context and founder-prepared planning targets, not ATOMiK forecasts or guaranteed revenue.
+
+---
+
+# Focus Markets
+
+Expected growth trajectories for focus segments:
+
+- Edge AI: $24.9B in 2025 to $118.7B in 2033, 21.7% CAGR.
+- Smart robots / robotics: $33.8B in 2024 to $131.5B in 2030, 26.5% CAGR.
+- Commercial drones / remote autonomy: $30.0B in 2024 to $54.6B in 2030, 10.6% CAGR.
+- Nanosatellite and microsatellite / remote sensing: $4.0B in 2024 to $14.0B in 2030, 22.8% CAGR.
+
+Potential target-account examples only, with no customer relationship implied: NVIDIA Jetson ecosystem, Qualcomm, Ambarella, Hailo, Advantech; Rockwell Automation, Siemens, ABB, FANUC, Universal Robots; Skydio, AeroVironment, Anduril, Shield AI, Teledyne FLIR; Planet, Spire, BlackSky, Maxar, Rocket Lab.
+
+---
+
+# Competitive Landscape
+
+Buyer alternatives and status quo references:
+
+- More silicon / accelerators: NVIDIA Jetson, Qualcomm, Ambarella, Hailo, Google Coral, FPGA upgrades from AMD/Xilinx, Intel/Altera, Lattice.
+- Processor and IP incumbents: Arm, Synopsys ARC, Cadence Tensilica, CEVA, Andes/RISC-V ecosystem, Imagination.
+- Software/status quo: compression, caching, dedup, delta sync, CRDT/event sourcing, hand optimization, bigger batteries, more cooling.
+
+Defensibility wedge: Lean4-checked formal algebra + FPGA hardware validation + IP/proof registry. Exact formal claims stay tied to audited properties.
 
 ---
 
@@ -76,48 +85,35 @@ ATOMiK makes change the unit of compute.
 state = reference_state XOR accumulated_delta
 ```
 
-Load a known state. Accumulate compact changes. Reconstruct only when needed.
-Commit clean epoch boundaries.
+LOAD sets the reference. ACCUM adds changes. READ reconstructs. SWAP commits a boundary.
 
 ---
 
-# Why It Can Matter
+# Fit Discipline
 
-Traditional systems often move or rebuild full state to answer a smaller
-question: "what changed?"
+ATOMiK has a wedge, not a universal claim.
 
-ATOMiK is designed for workloads where:
+Best-fit signals: updates dominate reads, state changes are sparse, bandwidth or latency is expensive, power budget or hardware margin is tight, and sync/replay/context retention creates overhead.
 
-- writes or updates dominate reads
-- state changes are sparse or coalescable
-- bandwidth is expensive
-- latency and power budgets are tight
-- rollback, sync, replay, or context retention create overhead
-
-It is not positioned as a general-purpose CPU replacement.
+Not the claim: CPU/GPU/NPU replacement, universal speedup, or battery/thermal result before measurement.
 
 ---
 
-# Customer Use Cases
+# Use Cases
 
-| Buyer | Pain | Evaluation target |
-|---|---|---|
-| Edge / embedded | battery, enclosure heat, intermittent links, reliability | bytes moved, update latency, bandwidth, power proxy |
-| AI at the edge | context/state movement, memory pressure | context retained, transfer avoided, response time |
-| Remote / industrial / robotics | weight, wattage, packet budget, field runtime | runtime proxy, packet budget, update cost |
-| Data center / infrastructure | power bill, cooling, water pressure, rack density | measured bytes moved, power/thermal path |
+Potential buyers include robotics, edge AI, industrial systems, remote systems such as drones and satellites, and defense-adjacent environments.
 
-Each use case needs one measured workload before ATOMiK claims customer outcomes.
+The common trigger is expensive pressure from battery life, heat, size, weight, hardware limits, latency, performance, reliability, or rising cost.
 
 ---
 
-# Live Proof Today
+# Hardware-Validated UI Proof
 
-![ATOMiK Desk v0.39-K prototype UI running on live Zynq hardware](../../website/public/09-current-live-atomik-desk-v039k.png)
+![ATOMiK Desk v0.39-K prototype UI running on Zynq hardware](../../website/public/09-current-live-atomik-desk-v039k.png)
 
-`HARDWARE_VALIDATED` ATOMiK Desk v0.39-K prototype UI running on live Zynq
-hardware. This screenshot proves the current live demo surface, not commercial
-product maturity or performance.
+`HARDWARE_VALIDATED` recorded prototype screenshot of ATOMiK Desk v0.39-K running on Zynq hardware. Not a real-time demo and not customer workload proof.
+
+This screenshot is not customer workload proof, production-readiness proof, battery proof, thermal proof, water proof, or footprint proof.
 
 ---
 
@@ -125,71 +121,79 @@ product maturity or performance.
 
 | Proof | Label | Status |
 |---|---|---|
-| v0.39-K Zynq Desk UI | `HARDWARE_VALIDATED` | current public proof image |
-| Linux userspace to FPGA path | `HARDWARE_VALIDATED` | documented path through OS and bus |
-| AX7020 board run matrix | `LIVE_MEASURED` | raw artifact: profiling path shows 16x ops reduction (4 vs 64) on 8-reg case; direct-access overhead documented |
-| Formal algebra foundation | `FORMAL_PROOF` where directly audited; otherwise `SOFTWARE_VALIDATED` | proof work in repo; avoid public counts until reconciled |
-| Synthesis and bank scaling | `SYNTHESIS_VALIDATED` | toolchain/hardware validation, not production silicon |
-| Zynq standalone boot artifacts | `BUILD_ARTIFACT` | local build output exists; public power-on artifact still gated |
+| Zynq Desk v0.39-K | `HARDWARE_VALIDATED` | current UI proof image |
+| Linux userspace to FPGA path | `HARDWARE_VALIDATED` | documented OS-to-bus validation path |
+| AX7020 board matrix | `LIVE_MEASURED` | raw artifact with wins and losses |
+| Lean4-checked formal algebra | `FORMAL_PROOF` where directly audited | exact audited properties only |
+| Standalone SD boot artifacts | `BUILD_ARTIFACT` | local build output exists; public run proof still gated |
 
-Public claims stay tied to these labels.
-
----
-
-# Business Path
-
-The near-term plan is focused and capital-efficient.
-
-1. Convert proof into measured customer evaluations.
-2. Strengthen IP and diligence materials.
-3. Use design partners to identify workloads where value is measurable.
-4. De-risk ASIC feasibility before any tape-out commitment.
-5. Position ATOMiK for strategic licensing or platform partnership readiness if proof supports it.
-
-ATOMiK is not trying to outspend chip incumbents.
+Every proof claim requires artifact, context, and caveat.
 
 ---
 
-# Use Of Funds
+# Where We Are / What v0.40 Funds
 
-Target ask: **$2.0M pre-seed**.
+**Today (v0.39-K, `HARDWARE_VALIDATED`):** the ATOMiK Desk shell runs on real silicon — Capability Rail, 5-lane Resource Fabric (STATE / SYNC / AGENT / EVENT / VISUAL), semantic Pulse Bar, personality hero — captured from `/dev/fb0` on a Zynq AX7020. Shell scores 95% against its V-phase target.
 
-| Category | Amount | Proof gate |
+**Active bring-up, not yet validated:** standalone SD boot is `BUILD_ARTIFACT` only. The currently validated path is JTAG-assisted; public power-on boot artifact remains gated.
+
+**v0.40 funds the move from proof artifacts to repeatable demo and productization:**
+
+- Document, Replica Flow, Agent, and Build Lane surfaces lifted into the desk shell as full-frame routes (substrate already ships in `atomik_os` v1.0)
+- Palette and per-lane waveform pass against the ATOMiK Desk concept art
+- Standalone SD boot promoted from build artifact to validated power-on
+- Recorded video proof for website and investor leave-behinds
+
+**The substrate exists. v0.40 is composition, not invention.**
+
+---
+
+# Commercial Path
+
+1. Customer shows the constrained part of the system causing problems.
+2. ATOMiK evaluates whether it can run faster, use less power, reduce hardware requirements, or improve efficiency against the current baseline.
+3. If there is an opportunity, ATOMiK shows where it is, what was measured, and the potential impact.
+4. If there is no fit, ATOMiK says so and stops before wasting customer time.
+
+Design-partner work and licensing diligence come only after measured proof supports the path.
+
+---
+
+# Financial Model
+
+Founder-prepared planning scenario, not a forecast.
+
+| Period | Planning range | Meaning |
 |---|---:|---|
-| Engineering + demo hardening | $600K | repeatable Zynq proof system |
-| Customer proof | $400K | measured workload artifact |
-| IP + legal | $300K | counsel-reviewed IP packet |
-| ASIC feasibility | $300K | mentor-reviewed go/no-go path |
-| Finance/GTM/ops + reserve | $400K | runway, reporting, partner pipeline |
+| 0-6 months | $0-$150K | qualified proof reviews / technical evals |
+| 6-12 months | $250K-$750K | paid evaluation or design-partner SOWs |
+| 12-24 months | $1M-$3M | potential contracted value if proof converts |
+| 24-36 months | $3M-$8M | annualized potential if proof and economics hold |
 
-Minimum viable close: $1.25M. Stretch plan: $2.75M. Final SAFE terms require
-CFO/counsel approval. This round does not fund tape-out.
+Use of funds: `$1.5M` engineering, `$1.0M` customer proof, `$750K` IP/legal, `$750K` ASIC feasibility, `$1.0M` finance/GTM/ops plus reserve.
 
 ---
 
 # Risks And Gates
 
-| Risk | Current answer |
-|---|---|
-| Battery, power, thermal, cooling, water, or footprint savings are not yet measured end-to-end | Treat as evaluation targets until artifacts exist |
-| Customer validation is pending | Paid evaluations and design partners are the validation wedge |
-| ASIC economics require expert review | Fund feasibility review before tape-out |
-| Incumbents can move quickly | Protect IP, build proof, and pursue strategic conversations |
+Customer validation is pending. Battery, heat, cooling, water, power-bill, and footprint outcomes need end-to-end workload measurement. ASIC economics require external feasibility review before tape-out. Incumbents are real.
 
-The pitch is intentionally evidence-bounded.
+These risks are why this is a proof round, not a tape-out round.
+
+---
+
+# Team
+
+Matthew H. Rockwell, Founder & CEO: architecture, live proof, product direction, financial model, ask, and technical Q&A.
+
+Allison Rossi, CMO: messaging, positioning, buyer-language, commercialization, and go-to-market support.
 
 ---
 
 # The Ask
 
-ATOMiK is raising a **$2.0M target pre-seed** to reach measured proof.
+ATOMiK is raising a **$5M target pre-seed** to reach measured workload proof.
 
-- $1.25M minimum viable close; $2.75M stretch plan
-- about 18 months of planned runway
-- planned SAFE; final terms by CFO/counsel
-- 2-3 design-partner evaluations
-- one sanitized measured workload artifact
-- external ASIC/IP feasibility review
-- licensing-ready package
+Need: capital, qualified workloads, design-partner introductions, investor feedback, and diligence support.
 
-The next milestone is measured customer-value proof, not another abstract demo.
+This round funds measured workload proof, IP packet, ASIC feasibility, and licensing-ready materials. It does not fund tape-out.

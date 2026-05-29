@@ -87,6 +87,8 @@ ATOMiK's change detection against software memcmp across tracked memory
 regions. ATOMiK detection uses a single register read (O(1) per region);
 memcmp scans the full buffer (O(n) per region).
 
+Claim boundary: these numbers apply to this multi-buffer change-detection benchmark and this hardware/software path. Do not present them as universal ATOMiK speedups, customer workload savings, battery improvement, heat reduction, or production-readiness evidence.
+
 | Workload | Software (memcmp) | ATOMiK (detect) | Speedup |
 |----------|-------------------|-----------------|---------|
 | 8 x 256B, 25% changed | 16,572 cy | 1,107 cy | 15x |
@@ -104,7 +106,7 @@ ATOMiK monitoring rate: **1.2 million regions/second** at 64 contexts.
 
 ## Significance
 
-This result proves ATOMiK's delta-state algebra survives the full
+This result demonstrates ATOMiK's delta-state algebra survives the full
 hardware/software stack: user process → kernel virtual memory → physical bus
-→ FPGA accelerator, and delivers measurable performance advantages on a
-real change-detection workload.
+→ FPGA accelerator, and can deliver measurable performance advantages on this
+change-detection workload.

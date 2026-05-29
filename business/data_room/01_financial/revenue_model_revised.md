@@ -1,173 +1,119 @@
-# Revised Revenue Model — Bottoms-Up with Three Scenarios
+# Revenue Model - Scenario Planning Draft
 
 > **Publication status: INTERNAL FINANCIAL MODEL / PROJECTED.**
-> This is planning material, not a result. Revenue, customer, and pricing
-> assumptions require founder and counsel review before external use.
+> This file is not investor copy. It is a worksheet for the founder and
+> fractional CFO. Revenue, pricing, sales-cycle, and valuation assumptions must
+> be reviewed before external use.
 
-*Prepared for due diligence — March 2026*
+*Current reset: 2026-05-27. This replaces older bottoms-up projections that used
+unsupported customer counts, return multiples, and implied Series A valuations.*
 
----
+## Why This File Was Reset
 
-## Why the Original Model Needed Revision
+The prior version included specific IP-license pricing, customer counts,
+Series A timing, and investor return multiples without source-backed ATOMiK
+customer evidence. That is not defensible for the Aggie Angel pitch.
 
-The original projection (Y1 $0 → Y5 $80M) was top-down: TAM × market share = revenue. Chris correctly identified that it lacks bottoms-up math — specifically, customer acquisition timelines, realistic sales cycles, and per-deal economics.
+The current model should answer a narrower question:
 
-This revision builds from the unit: one IP license deal.
+> What proof must pre-seed capital buy before ATOMiK can credibly forecast
+> revenue?
 
----
+## Current Revenue Stage
 
-## Unit Economics: One IP License Deal
+| Stream | Status | External wording |
+|---|---|---|
+| Paid technical evaluations | Planned | "Near-term revenue path, pending design-partner conversations." |
+| Sponsored proof work | Planned | "Possible if a partner has a painful workload and wants measured evidence." |
+| IP licensing | Future | "Mid-term path after workload proof and legal packaging." |
+| Integration / support | Future | "Follows validated workload fit." |
+| Strategic licensing / platform partnership | Long-term thesis | "Potential strategic outcome; not a promised exit." |
 
-Based on ARM, CEVA, and Imagination Technologies comparable licensing structures:
+## Customer-Value Wedge
 
-| Component | Range | Notes |
-|-----------|-------|-------|
-| **Upfront license fee** | $250K–$2M | Per-design, depends on customer size and use case |
-| **Annual maintenance** | 15–20% of license | Updates, support, new IP revisions |
-| **Per-unit royalty** | $0.01–$1.00 | Scales with device ASP; starts at $0.10 typical |
-| **Integration support (NRE)** | $50K–$200K | One-time, first deployment only |
+The revenue model should start with a buyer pain, not with a broad TAM:
 
-**Blended ACV (Annual Contract Value) at steady state:**
-- Small customer (IoT/edge): $300K–$500K/year (license + maintenance + royalty)
-- Mid-market (industrial, automotive): $500K–$1M/year
-- Large customer (HFT, data center): $1M–$3M/year
+| Segment | Buyer pain | First measurable proof |
+|---|---|---|
+| Edge / embedded devices | battery budget, enclosure heat, intermittent links | bytes moved, full-state transfers avoided, update latency, bandwidth pressure, power proxy if instrumented |
+| AI at the edge | context/state movement, memory pressure, local response | context retained, transfers avoided, response latency, correctness preservation |
+| Defense / remote / robotics | weight, wattage, packet budget, reliability | packet budget, update cost, runtime proxy, field constraint mapping |
+| Data centers / infrastructure | heat, cooling cost, water pressure, rack density | measured bytes moved, power/thermal path, energy measurement only when instrumented |
 
----
+Until a segment produces a design partner or paid evaluation, revenue should be
+shown as a scenario, not a forecast.
 
-## Sales Cycle Reality
+## Scenario Gates
 
-IP licensing has long sales cycles. Being honest about this:
+| Gate | Evidence needed | Why it matters financially |
+|---|---|---|
+| Evaluation-ready demo | Repeatable Zynq demo package and claim-safe proof artifacts. | Reduces friction in investor and design-partner meetings. |
+| Workload definition | One customer workload with a measurable pain metric. | Prevents generic "faster/cooler" selling. |
+| Paid evaluation offer | Scoped statement of work, success metric, and price range. | Creates first non-dilutive validation path. |
+| IP diligence package | Patent status, claim registry, and proof boundaries aligned. | Makes licensing or strategic discussions more credible. |
+| ASIC feasibility scope | Mentor-reviewed study plan and quote-backed budget. | Avoids premature tape-out commitments. |
 
-| Customer Type | Sales Cycle | Why |
-|---------------|-------------|-----|
-| **HFT firms** | 3–6 months | Fast procurement for latency-critical infrastructure. Budget holders are technical. Decision by CTO/infrastructure lead. |
-| **Edge AI / IoT OEMs** | 9–15 months | Hardware design cycles are 12–18 months. IP evaluation happens early in design phase. |
-| **Automotive / Industrial** | 12–24 months | Qualification cycles, safety certification, multi-vendor evaluation. |
-| **Data center / Cloud** | 6–12 months | Large procurement teams, but strategic investments can move fast. |
+## Planning Scenarios
 
-**Implication:** First revenue is realistic at **Month 12–15** (HFT beachhead), not Month 6. The $0 in Y1 is correct.
+These scenarios are deliberately qualitative until the CFO adds pricing and
+pipeline assumptions.
 
----
+| Scenario | What happens | Financial posture |
+|---|---|---|
+| Conservative | One segment engages, but conversion to paid evaluation is slow. | Extend runway, keep burn low, avoid hardware overbuild. |
+| Base | One paid evaluation and one design-partner path emerge. | Fund proof work and IP packaging; delay tape-out decisions. |
+| Upside | Multiple painful workloads surface and a strategic partner engages. | Prepare licensing diligence and strategic options while keeping claims evidence-bound. |
 
-## Customer Acquisition Funnel
+## Financial Benchmarks For CFO Use
 
-Realistic conversion rates for semiconductor IP:
+- Carta reports roughly 3,000 U.S. startups on Carta raised pre-seed funding in
+  Q1 2026, totaling over $2.3B with an expected final total around $2.9B.
+- PitchBook/NVCA Q1 2026 reports a median U.S. VC seed pre-money valuation of
+  $18.4M. This is a benchmark, not a target.
+- YC's standard deal invests $500K as $125K for 7% plus $375K uncapped MFN SAFE.
+  Techstars' 2025 offer is $220K with $20K for 5% common equity plus $200K
+  uncapped MFN SAFE. These are accelerator structures, not angel-round comps.
 
-| Stage | Count | Conversion | Timeline |
-|-------|-------|------------|----------|
-| **Prospects identified** | 50 | — | Month 1–3 |
-| **Initial contact** | 30 | 60% response | Month 3–6 |
-| **Technical evaluation** | 12 | 40% proceed | Month 6–9 |
-| **Pilot / proof-of-concept** | 6 | 50% proceed | Month 9–12 |
-| **Design win (signed license)** | 3 | 50% close | Month 12–18 |
+## Evaluation Pricing Worksheet - 2026-05-27
 
-This assumes one salesperson (founder initially, then application engineer). The funnel produces **3 design wins in 18 months** — aggressive but achievable for a novel IP with clear differentiation.
+Current public reservation prices should be treated as qualification and scoping signals, not as a revenue forecast.
 
----
+| Offer | Public / planning price | What it means financially | What it does not mean |
+|---|---:|---|---|
+| Proof review reservation | $750 | Small proof-review commitment and lead-qualification signal. | Not material revenue and not proof of customer willingness to license. |
+| Technical evaluation reservation | $2,500 | Scoping commitment that may convert into written evaluation work. | Not the full evaluation price and not a commercial license. |
+| Scoped design-partner evaluation | Request-based | First plausible material customer-funded proof path after written SOW. | Do not forecast until a partner signs scope, deliverables, and terms. |
+| Licensing / IP diligence | Request-based | Future path after workload proof, IP readiness, and integration diligence. | Not near-term forecast revenue. |
 
-## Three Scenarios
+Illustrative reservation cash should not underwrite the round. For example, two proof-review reservations and one technical-evaluation reservation would produce only $4,000 of reservation cash. The financial value is the validated workload access and proof artifact, not the cash itself.
 
-### Conservative: $15M in Year 5
+## Revenue Model Diligence Position
 
-*Assumes: slow adoption, HFT-only for first 3 years, no royalty ramp*
+The defensible investor answer is:
 
-| Year | New Customers | Cumulative | Avg ACV | Revenue | Cumulative |
-|------|--------------|------------|---------|---------|------------|
-| Y1 | 0 | 0 | — | **$0** | $0 |
-| Y2 | 2 | 2 | $400K | **$800K** | $800K |
-| Y3 | 4 | 6 | $500K | **$3M** | $3.8M |
-| Y4 | 6 | 12 | $600K | **$7.2M** | $11M |
-| Y5 | 8 | 20 | $750K | **$15M** | $26M |
+> We are not forecasting revenue yet. We are funding the evidence gates that make revenue forecastable: paid evaluation demand, scoped design-partner work, workload proof, IP diligence, and ASIC feasibility.
 
-**Assumptions:**
-- HFT beachhead only for Y2–Y3, edge/IoT expansion in Y4
-- ACV grows as product matures and royalties begin
-- 90% gross margin (IP licensing)
-- No ASIC revenue
-- 20 customers by Y5 (all FPGA-based deployments)
+Before any revenue forecast is shown externally, ATOMiK needs at least one signed SOW or signed design-partner agreement with price, deliverables, timeline, ownership, and success criteria.
 
-### Base Case: $35M in Year 5
+## Explicit Non-Claims
 
-*Assumes: HFT + edge expansion, moderate royalty ramp, 1 large deal in Y4*
+- No current revenue forecast.
+- No current valuation recommendation.
+- No current customer count projection.
+- No claimed investor return multiple.
+- No claim that pre-seed funds a tape-out.
+- No heat, water, power, battery, or footprint savings until measured for a
+  specific workload.
 
-| Year | New Customers | Cumulative | Avg ACV | Revenue | Cumulative |
-|------|--------------|------------|---------|---------|------------|
-| Y1 | 0 | 0 | — | **$0** | $0 |
-| Y2 | 3 | 3 | $500K | **$1.5M** | $1.5M |
-| Y3 | 7 | 10 | $600K | **$6M** | $7.5M |
-| Y4 | 12 | 22 | $750K | **$16.5M** | $24M |
-| Y5 | 15 | 37 | $950K | **$35M** | $59M |
+## CFO / Advisor Work To Complete
 
-**Assumptions:**
-- HFT (Y2), edge/IoT (Y3), automotive/industrial (Y4)
-- 1 large deal ($2M+) in Y4 from data center or automotive
-- Royalty stream begins Y3 as first deployments ship product
-- ACV rises with maturity and vertical-specific modules
-- 37 customers by Y5 across 3 verticals
+1. Approve or revise the target round size, reserve policy, and 18-month cash plan.
+2. Choose final instrument terms: cap, discount, pro-rata, side letters, and close mechanics.
+3. Convert the dilution sensitivity table into counsel/CFO-approved financing terms.
+4. Finalize evaluation price bands and SOW language after founder/counsel review.
+5. Build revenue scenarios only after the first signed SOW, design-partner agreement, or licensing discussion creates real customer assumptions.
 
-### Bull Case: $80M in Year 5
+## Source Register
 
-*Assumes: ARM-trajectory adoption, ASIC licensing begins Y4, platform standard*
-
-| Year | New Customers | Cumulative | Avg ACV | Revenue | Cumulative |
-|------|--------------|------------|---------|---------|------------|
-| Y1 | 0 | 0 | — | **$0** | $0 |
-| Y2 | 5 | 5 | $500K | **$2.5M** | $2.5M |
-| Y3 | 15 | 20 | $700K | **$14M** | $16.5M |
-| Y4 | 25 | 45 | $900K | **$40M** | $56.5M |
-| Y5 | 30 | 75 | $1.1M | **$80M** | $136.5M |
-
-**Assumptions:**
-- Rapid multi-vertical adoption (HFT + edge + streaming + automotive)
-- ASIC IP licensing begins Y4 ($2M–$5M per design)
-- Developer ecosystem creates pull (SDK community 500+ by month 18)
-- 2+ large deals ($3M+) per year starting Y4
-- 75 customers by Y5 — approaching platform-standard status
-
----
-
-## What Each Scenario Implies for Series A
-
-| Scenario | Y2 Revenue | Series A Timing | Series A Size | Implied Valuation |
-|----------|-----------|-----------------|---------------|-------------------|
-| Conservative | $800K | Month 18–24 | $10M–$15M | $40M–$60M |
-| Base | $1.5M | Month 15–18 | $15M–$25M | $60M–$100M |
-| Bull | $2.5M | Month 12–15 | $25M–$40M | $100M+ |
-
-**The seed investment thesis:** Even the conservative scenario returns 3–5x at Series A (entry at $16M–$20M pre-money, Series A at $40M–$60M). The base case returns 5–8x. The bull case is a venture-scale outcome.
-
----
-
-## Key Assumptions Requiring Validation (Seed Period)
-
-These are the specific hypotheses the seed capital tests:
-
-| Hypothesis | Validation Metric | Timeline |
-|-----------|-------------------|----------|
-| HFT firms will pay for delta-state IP | 1 signed LOI | Month 9–12 |
-| IP licensing model works for this category | 1 completed deal | Month 12–18 |
-| Edge/IoT is a viable second vertical | 3 technical evaluations initiated | Month 12–15 |
-| Developer adoption creates pull | SDK community reaches 200+ | Month 12 |
-| Team can scale with AI-augmented model | 3-person team ships on schedule | Month 6 |
-
-**If all 5 validate → base case or better.**
-**If 3 of 5 validate → conservative case (still a good seed return).**
-**If <3 validate → pivot or wind down (seed capital preserved for 18 months).**
-
----
-
-## Comparison to Original Model
-
-| | Original | Revised (Base) | Change |
-|--|---------|---------------|--------|
-| Y2 | $500K | $1.5M | More aggressive (added NRE revenue) |
-| Y3 | $5M | $6M | Similar |
-| Y4 | $20M | $16.5M | More conservative (longer sales cycles) |
-| Y5 | $80M | $35M | Significantly more conservative |
-| Customers Y5 | 100+ | 37 | Realistic funnel math |
-
-The base case is less dramatic than the original but more defensible. The bull case ($80M) is preserved as an upside scenario, not the baseline.
-
----
-
-*Revenue projections are estimates based on comparable IP licensing companies (ARM, CEVA, Imagination). Actual results depend on market adoption, sales execution, and competitive dynamics. All scenarios assume successful Zynq deployment and at least 2 design wins in the first 18 months.*
+See `financial_model.md` for the current financing, data-center, semiconductor,
+and ASIC source register.

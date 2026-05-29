@@ -1,118 +1,102 @@
-# ASIC Strategy Clarification — Seed Funds Feasibility, Not Tapeout
+# ASIC Strategy Clarification - Feasibility First
 
-*Prepared for due diligence — March 2026*
-
----
+> Current diligence draft: 2026-05-23. This is a planning document, not a
+> tape-out budget. ASIC costs must be quote-backed by an ASIC mentor, design
+> services partner, foundry shuttle program, or packaging/test partner before
+> being used externally.
 
 ## Key Point
 
-The seed round does **not** fund an ASIC tapeout. It funds an ASIC **feasibility study** — a design exercise that produces the economic model for Series A. Revenue begins on FPGA, not custom silicon.
+The pre-seed story should not be a tape-out round. The credible story is:
 
----
+> Pre-seed funds customer proof, IP strengthening, and ASIC feasibility. A
+> tape-out decision comes later, only if measured workload value and expert cost
+> review justify it.
 
-## What the Seed Buys (ASIC-Related)
+This is important because the customer benefit narrative depends on lower heat,
+power, bandwidth, latency, and hardware pressure. Those benefits have to be
+measured before the company can responsibly commit to custom silicon economics.
 
-Of the $1.2M–$1.6M Hardware R&D budget (40% of raise):
+## What Pre-Seed Can Buy
 
-| Item | Cost | Deliverable |
-|------|------|-------------|
-| Zynq FPGA port (in progress) | ~$50K | Production-grade Xilinx deployment, customer-facing |
-| Mid-range FPGA (N=64+ banks) | ~$100K | >4 Gops/s demonstrator for customer pilots |
-| **ASIC feasibility study** | **$150K–$300K** | Die size estimate, power/perf projections, foundry selection, cost model |
-| Dev boards, lab equipment | ~$50K | Engineering infrastructure |
-
-The feasibility study is a paper-and-simulation exercise with a foundry partner. It produces:
-- Gate-level synthesis results (area, power, timing) at target node
-- Die size and yield estimate
-- Per-unit cost projection at volume (10K, 100K, 1M units)
-- Foundry recommendation (TSMC, GlobalFoundries, Samsung)
-- Go/no-go recommendation for Series A ASIC investment
-
----
+| Workstream | Purpose | Output |
+|---|---|---|
+| Zynq demo hardening | Make the live proof repeatable and lower-friction. | Investor/design-partner demo package. |
+| Customer workload evaluation | Measure one painful use case at a time. | Heat, power, bandwidth, latency, or footprint artifact. |
+| RTL / architecture review | Identify what is reusable IP and what needs cleanup. | ASIC-readiness gap list. |
+| ASIC feasibility study | Explore node, die area, power, timing, verification, packaging, and test strategy. | Go/no-go and next-budget recommendation. |
+| IP and legal packaging | Align technical proof with patent and licensing posture. | Diligence-ready IP packet. |
 
 ## ASIC Cost Reality
 
-| Stage | Cost | When | Funded By |
-|-------|------|------|-----------|
-| **Feasibility study** (RTL → gate-level synthesis) | $150K–$300K | Seed (month 9–18) | This raise |
-| **Shuttle run** (multi-project wafer, limited dies) | $200K–$500K | Series A (month 18–24) | Series A |
-| **Full tapeout** (28nm, production mask set) | $2M–$5M | Series A/B (month 24–36) | Series A/growth |
-| **Advanced node** (7nm, if warranted) | $30M+ | Series B+ | Not relevant at seed |
+ASIC cost is not one number. Public ASIC-cost references consistently treat it
+as a stack of:
 
-The seed raise covers step 1 only. Steps 2–3 are Series A decisions informed by step 1's results.
+- architecture and RTL work;
+- verification and testbench coverage;
+- EDA tools and IP licensing;
+- physical design, layout, and signoff;
+- MPW shuttle or mask set;
+- wafer fabrication, yield, packaging, test, qualification, and production
+  support.
 
----
+Because each component depends on node, die size, interfaces, package, volume,
+and verification scope, ATOMiK should talk in phases rather than unsupported
+dollar figures.
 
-## Why FPGA-First Is the Revenue Strategy
+## Stage Gates
 
-ATOMiK follows the ARM model: license IP that runs on **customer silicon**, not our own.
+| Stage | Decision | Funding posture |
+|---|---|---|
+| Feasibility | Is a custom silicon path technically and economically rational? | Pre-seed can fund this. |
+| MPW / shuttle prototype | Is first silicon worth pursuing after workload proof? | Later financing or strategic partner. |
+| Full mask / production | Is volume, yield, packaging, and test economics justified? | Not a pre-seed claim. |
+| Advanced-node implementation | Does the workload require it and can economics support it? | Future strategic decision only. |
 
-```
-Revenue Path:
+## Why FPGA-First Is The Revenue Strategy
 
-  Seed (Y0–Y1.5)          Series A (Y1.5–Y3)         Growth (Y3+)
-  ─────────────           ──────────────────         ──────────────
-  FPGA IP licensing  ──→  FPGA + ASIC IP       ──→  ASIC IP at scale
-  $0 → $500K              $500K → $5M                $5M → $80M
+ATOMiK can pursue revenue before manufacturing a chip if a customer has an
+FPGA, embedded, or system workload where the architecture measurably reduces a
+painful cost. That path is more credible than claiming an ASIC is immediately
+required.
 
-  No ASIC needed          Shuttle validates           Production ASIC
-  for first revenue       economics                   if market warrants
-```
+FPGA-first means:
 
-**FPGA IP licensing starts generating revenue in Y2** — no custom silicon required. Customers integrate the ATOMiK IP core into their existing FPGA designs. This is identical to how ARM licenses Cortex cores to chip designers.
+- faster external evaluation;
+- less capital risk before customer pull is proven;
+- clearer evidence for whether ASIC economics are worth pursuing;
+- stronger strategic licensing posture if the proof is compelling.
 
-The ASIC path is a **cost optimization**, not a revenue gate:
-- FPGA: ~$0.50–$5.00 per unit (ATOMiK IP portion)
-- ASIC: ~$0.01–$0.10 per unit at volume
-- ASIC makes sense when unit volumes exceed ~100K/year
+## What ASIC Feasibility Must Answer
 
----
+| Question | Why it matters |
+|---|---|
+| What is the minimal viable ASIC scope? | Prevents overbuilding. |
+| What verification scope is required? | Verification is often the hidden cost driver. |
+| Which process node fits the workload? | Mature nodes may be more practical than advanced nodes. |
+| What die size, package, and test strategy are plausible? | Drives unit economics and yield risk. |
+| What IP blocks are required? | IP can reduce schedule risk but adds licensing and integration cost. |
+| Does FPGA-only or FPGA-plus-IP licensing remain better? | A valid outcome may be "do not tape out yet." |
 
-## Current FPGA Progress (Already Done)
+## Public-Safe Wording
 
-| Platform | Status | Utilization |
-|----------|--------|-------------|
-| **Gowin GW1NR-9** (Tang Nano 9K) | Production deployed, all tests passing | 477 LUT (5.5%) single-bank |
-| **Xilinx Zynq-7020** (AX7020) | Synthesis validated, awaiting board | 287 LUT (0.54%) |
+Use:
 
-The Zynq port demonstrates that ATOMiK IP is **vendor-portable** — a key requirement for IP licensing. The core synthesized on Xilinx with zero RTL changes, using only 0.54% of the target FPGA's resources.
+> "Pre-seed funds ASIC feasibility, not a tape-out. The next silicon milestone
+> is an expert-reviewed feasibility study tied to measured customer workloads."
 
-### Zynq Software Stack (Ready)
-- libatomik C library: 33/33 tests passing
-- Python bindings: 35/35 tests passing
-- UIO device tree overlay for Linux integration
-- Build system: `vivado -mode batch -source vivado/build.tcl`
+Avoid:
 
----
+- exact tape-out cost claims without quotes;
+- claims that seed/pre-seed funds production silicon;
+- unqualified comparisons to ARM, Cadence, Synopsys, or CEVA revenue;
+- power, thermal, or battery claims without workload measurements;
+- "10x-100x ASIC performance" language until an expert-reviewed model exists.
 
-## What ASIC Feasibility Answers
+## Source Register
 
-The $150K–$300K study produces specific answers for the Series A pitch:
-
-| Question | Why It Matters |
-|----------|---------------|
-| What is the die size at 28nm? | Determines unit cost and yield |
-| What is the power at 28nm? | Key for edge/IoT market (battery life) |
-| What is the max frequency? | Performance ceiling (10x–100x over FPGA) |
-| What is the NRE for a shuttle? | Series A budget planning |
-| Which foundry? | Risk assessment, lead time, minimum order |
-| Is a dedicated ASIC warranted? | Or is FPGA-only the right model? |
-
-The answer might be "ASIC isn't worth it — stay FPGA-only." That's a valid outcome. The feasibility study de-risks the Series A decision, not the seed.
-
----
-
-## Comparable IP Companies
-
-| Company | Model | Revenue | Custom Silicon? |
-|---------|-------|---------|-----------------|
-| **ARM** | License CPU IP cores | $4.0B (FY2025) | No — runs on customer silicon |
-| **Imagination Technologies** | License GPU IP cores | ~$200M | No |
-| **Cadence/Synopsys** | License EDA + IP | $6B+ each | No |
-| **CEVA** | License DSP/AI IP | ~$150M | No |
-
-None of these companies manufacture chips. They license designs. ATOMiK follows the same model — the ASIC path is an option for power/cost optimization, not a requirement for the business.
-
----
-
-*The seed round retires commercial risk (first design wins) and initiates ASIC feasibility. It does not commit to a tapeout. That decision is made at Series A with data from the feasibility study.*
+- AnySilicon, *Semiconductor Manufacturing Cost Breakdown*, accessed
+  2026-05-23:
+  https://anysilicon.com/semiconductor-manufacturing-cost-breakdown/
+- AnySilicon, *ASIC NRE Explained*, accessed 2026-05-23:
+  https://anysilicon.com/asic-nre-explained/
