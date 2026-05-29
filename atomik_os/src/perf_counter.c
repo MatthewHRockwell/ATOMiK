@@ -22,6 +22,9 @@
  */
 #include "atomik_os.h"
 #include <string.h>
+#if !defined(__riscv)
+#include <time.h>      /* host preview: clock_gettime pseudo-cycle source */
+#endif
 
 /* Last-completed sample, global + per-personality.  Used by the live
  * Resource Fabric metrics surface (v0.33-E).  Sized small (one struct
@@ -43,9 +46,18 @@ static uint64_t s_begin_cycle_for(perf_sample_t *s) {
 }
 
 uint64_t perf_rdcycle(void) {
+#if defined(__riscv)
     uint64_t v;
     __asm__ volatile("csrr %0, cycle" : "=r"(v));
     return v;
+#else
+    /* Host preview build: no RV64 cycle CSR.  Monotonic ns as a pseudo-cycle
+     * source — plausible relative timing for LAYOUT preview only, never
+     * published as a hardware measurement. */
+    struct timespec ts;
+    clock_gettime(CLOCK_MONOTONIC, &ts);
+    return (uint64_t)ts.tv_sec * 1000000000ull + (uint64_t)ts.tv_nsec;
+#endif
 }
 
 void perf_begin(perf_sample_t *s, personality_t p) {

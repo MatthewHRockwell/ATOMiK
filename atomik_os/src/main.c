@@ -337,6 +337,15 @@ int main(int argc, char **argv) {
     fabric_open();
     redraw_frame();    /* second paint so Fabric is visible immediately */
 
+    /* Host preview build: redraw_frame() above already wrote the PNG via the
+     * host fb backend.  Exit instead of entering the interactive input loop
+     * so `make host-shot` dumps a faithful frame of the REAL renderer in
+     * seconds.  Gated on ATOMIK_PREVIEW so the binary could still loop. */
+    if (getenv("ATOMIK_PREVIEW")) {
+        fb_close();
+        return 0;
+    }
+
     while (s_running) {
         /* Frame-loop: when an animation is active or the terminal is
          * focused (async pty output), poll fast (16ms = ~60Hz). Otherwise
