@@ -22,56 +22,121 @@ static int      s_cached = 0;
 
 void wallpaper_invalidate(void) { s_cached = 0; }
 
-/* v0.36-A: tile a SMALL (480×270) asset across the full framebuffer,
- * then let the procedural overlay handle vignette/glow/wordmark.
- * Smaller asset → ~9 MB heap peak instead of the ~17 MB that hung
- * v0.36 #1 on AX7020.  Tile dimensions (480×270) divide 1920×1080
- * evenly (4×4) so there are no partial-tile edges. */
-static int try_tile_asset(void) {
-    const char *paths[] = {
-        "/tmp/atomik_assets/topology_tile.atomik_asset",
-        "/root/atomik_assets/topology_tile.atomik_asset",
-        "/usr/share/atomik_os/topology_tile.atomik_asset",
-        NULL
-    };
-    atomik_asset_t a;
-    for (int i = 0; paths[i]; i++) {
-        if (atomik_asset_load(paths[i], &a) == 0) {
-            atomik_asset_blit_tiled(&a, 0, 0, FB_W, FB_H);
-            atomik_asset_free(&a);
-            return 1;
-        }
+/* --- v0.40 layered procedural background helpers (concept-01 depth) --- */
+static void bg_line(int x0, int y0, int x1, int y1, pixel_t c, uint8_t a) {
+    int dx = x1 > x0 ? x1 - x0 : x0 - x1;
+    int dy = y1 > y0 ? y1 - y0 : y0 - y1;
+    int sx = x0 < x1 ? 1 : -1, sy = y0 < y1 ? 1 : -1, err = dx - dy;
+    for (;;) {
+        draw_blend_pixel(x0, y0, c, a);
+        if (x0 == x1 && y0 == y1) break;
+        int e2 = err * 2;
+        if (e2 > -dy) { err -= dy; x0 += sx; }
+        if (e2 <  dx) { err += dx; y0 += sy; }
     }
-    return 0;
+}
+static void bg_circle(int cx, int cy, int r, pixel_t c, uint8_t a) {
+    int x = r, y = 0, err = 1 - r;
+    while (x >= y) {
+        draw_blend_pixel(cx+x, cy+y, c, a); draw_blend_pixel(cx-x, cy+y, c, a);
+        draw_blend_pixel(cx+x, cy-y, c, a); draw_blend_pixel(cx-x, cy-y, c, a);
+        draw_blend_pixel(cx+y, cy+x, c, a); draw_blend_pixel(cx-y, cy+x, c, a);
+        draw_blend_pixel(cx+y, cy-x, c, a); draw_blend_pixel(cx-y, cy-x, c, a);
+        y++;
+        if (err < 0) err += 2*y + 1; else { x--; err += 2*(y - x) + 1; }
+    }
 }
 
+/* Layered hero background (concept-01): deep gradient -> perspective particle
+ * terrain + horizon glow -> concentric rings + soft radial center glow behind
+ * the hero -> edge vignette.  Rendered ONCE into the wallpaper cache (no per-
+ * frame cost) with a FIXED seed so the scene is screenshot-stable.  Pure
+ * decorative Class B chrome — no telemetry. */
 static void wallpaper_full_render(void) {
-    /* v0.36-A: tile the small (480×270) topology asset across the full
-     * screen.  If the asset isn't present, draw the procedural gradient
-     * as a fallback.  Either way, the vignette, accent glow, and
-     * wordmark are layered on top procedurally — they're cheap and
-     * keep the wordmark sharp regardless of asset presence. */
-    if (!try_tile_asset()) {
-        draw_gradient_v(0, 0, FB_W, FB_H, ATOMIK_BG_TOP, ATOMIK_BG_BOT);
+    uint32_t seed = 0xA70A1CBAu;
+#define BG_RND (seed ^= seed << 13, seed ^= seed >> 17, seed ^= seed << 5, seed)
+
+    /* Hero center: workspace midpoint (rail .. Fabric) so the rings/glow sit
+     * behind the hero, not the screen center. */
+    int rr = dock_right_edge(), fs = fabric_shelf_x();
+    int cx = (rr > 0 && fs > rr) ? (rr + fs) / 2 : FB_W / 2;
+    int cy_glow = (FB_H * 30) / 100;
+    int horizon = (FB_H * 60) / 100;
+    pixel_t cyan = ATOMIK_ACCENT;
+
+    /* 1. base gradient — very dark navy, deepening downward. */
+    draw_gradient_v(0, 0, FB_W, FB_H, rgb(0x06, 0x09, 0x12), rgb(0x0B, 0x10, 0x1E));
+
+    /* 2. perspective floor grid below the horizon (data-fabric plane). */
+    for (int i = -12; i <= 12; i++)
+        bg_line(cx, horizon, cx + i * (FB_W / 10), FB_H, cyan, 22);
+    for (int k = 1; k <= 16; k++) {
+        int yy = horizon + (FB_H - horizon) * k * k / (16 * 16);
+        uint8_t a = (uint8_t)(38 - k * 2); if (a < 7) a = 7;
+        for (int x = 0; x < FB_W; x++) draw_blend_pixel(x, yy, cyan, a);
     }
 
-    /* v0.40: the old "soft accent vignette" (concentric ellipses sampled
-     * sparsely for speed) produced visible CONCENTRIC RING BANDING in the
-     * screen center — clutter the concept-01 background (a clean dot-grid)
-     * does not have, and now directly behind the home hero.  Removed: the
-     * topology tile + gradient carry the background; the hero owns the
-     * center focus.  Cleaner composition, closer to concept. */
+    /* 3. horizon glow band — soft bright line where the plane meets space. */
+    for (int g = -6; g <= 6; g++) {
+        int gg = g < 0 ? -g : g;
+        uint8_t a = (uint8_t)(64 - 9 * gg);
+        for (int x = 0; x < FB_W; x++) draw_blend_pixel(x, horizon + g, cyan, a);
+    }
 
-    /* v0.38-F: wallpaper wordmark + tagline removed.
-     *
-     * The big "ATOMiK / Delta-State Desktop" text used to print at
-     * screen center, but it overlapped with src/hero.c's procedural
-     * centerpiece and competed with the Class B iridescent background
-     * for visual attention.  Per the v0.38 concept-fidelity audit
-     * (memory project_v038_concept_fidelity_audit.md), the hero
-     * owns the center now; ATOMiK identity lives in the Pulse Bar's
-     * scale-2 wordmark only.  Cleaner composition, closer to the
-     * concept-image macro hierarchy. */
+    /* 4. particle terrain — dense near the horizon, fading downward. */
+    int band = FB_H - horizon;
+    for (int p = 0; p < 1100; p++) {
+        int x = (int)(BG_RND % (uint32_t)FB_W);
+        int depth = (int)(BG_RND % (uint32_t)band);   /* 0 at horizon */
+        int y = horizon + depth;
+        uint8_t a = (uint8_t)(150 - depth * 132 / band); if (a < 12) a = 12;
+        pixel_t c = (BG_RND & 3u) ? cyan : rgb(0x80, 0x6C, 0xFF); /* mostly cyan, some violet */
+        draw_blend_pixel(x, y, c, a);
+        draw_blend_pixel(x + 1, y, c, a / 2);
+        draw_blend_pixel(x, y + 1, c, a / 2);
+    }
+
+    /* 5. sparse micro-particles in the upper field. */
+    for (int p = 0; p < 160; p++) {
+        int x = (int)(BG_RND % (uint32_t)FB_W);
+        int y = (int)(BG_RND % (uint32_t)horizon);
+        draw_blend_pixel(x, y, cyan, (uint8_t)(18 + (BG_RND % 38u)));
+    }
+
+    /* 6. concentric rings behind the hero — thin, smooth, low alpha. */
+    for (int r = 120; r <= 360; r += 48)
+        bg_circle(cx, cy_glow, r, cyan, 15);
+
+    /* 7. soft radial center glow behind the hero (bounded box, additive). */
+    int R = 360; long R2 = (long)R * R;
+    for (int dy = -R; dy <= R; dy++) {
+        int y = cy_glow + dy; if (y < 0 || y >= FB_H) continue;
+        for (int dx = -R; dx <= R; dx++) {
+            int x = cx + dx; if (x < 0 || x >= FB_W) continue;
+            long d2 = (long)dx * dx + (long)dy * dy;
+            if (d2 >= R2) continue;
+            uint8_t a = (uint8_t)(42 * (R2 - d2) / R2);
+            if (a) draw_blend_pixel(x, y, cyan, a);
+        }
+    }
+
+    /* 8. edge vignette — darken toward all four edges. */
+    int vb = 230;
+    for (int b = 0; b < vb; b++) {
+        uint8_t a = (uint8_t)(72 * (vb - b) / vb);
+        for (int x = 0; x < FB_W; x++) {
+            draw_blend_pixel(x, b, 0, a);
+            draw_blend_pixel(x, FB_H - 1 - b, 0, a);
+        }
+    }
+    for (int b = 0; b < vb; b++) {
+        uint8_t a = (uint8_t)(72 * (vb - b) / vb);
+        for (int y = 0; y < FB_H; y++) {
+            draw_blend_pixel(b, y, 0, a);
+            draw_blend_pixel(FB_W - 1 - b, y, 0, a);
+        }
+    }
+#undef BG_RND
 }
 
 void wallpaper_draw(void) {
