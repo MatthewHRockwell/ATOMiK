@@ -456,7 +456,14 @@ void hero_draw(void) {
     personality_t act = fabric_active();
 
     /* ---- title block ---- */
-    int y = top + 36;
+    /* Atom mark above the wordmark (concept-01): concentric cyan rings +
+     * bright core, echoing the Pulse Bar logo orb. */
+    int icon_cy = top + 26;
+    ring(ws_cx, icon_cy, 17, 2, ATOMIK_ACCENT, 70);
+    ring(ws_cx, icon_cy, 16, 1, ATOMIK_ACCENT, 150);
+    ring(ws_cx, icon_cy,  9, 2, ATOMIK_ACCENT, 150);
+    disk(ws_cx, icon_cy, 4, ATOMIK_FG, 240);
+    int y = icon_cy + 24;
     const char *wm = "ATOMiK Desk";
     if (font_aa_loaded(FONT_AA_BRAND)) {
         int tw = text_width_aa(FONT_AA_BRAND, wm);
@@ -467,7 +474,7 @@ void hero_draw(void) {
         draw_text(ws_cx - tw / 2, y, wm, 3, ATOMIK_FG);
         y += text_height(3) + 6;
     }
-    const char *tag = "INTELLIGENT    ADAPTIVE    SUBSTRATE";
+    const char *tag = "Intelligent.   Adaptive.   Autonomous.";
     if (font_aa_loaded(FONT_AA_LABEL)) {
         int tw = text_width_aa(FONT_AA_LABEL, tag);
         draw_text_aa(FONT_AA_LABEL, ws_cx - tw / 2, y, tag, ATOMIK_ACCENT_DIM);
@@ -488,20 +495,34 @@ void hero_draw(void) {
             (t3 && now - t3 < 3000)) busy = 1;
     }
     char status[48];
-    if (busy) snprintf(status, sizeof status, "%s   /   ACTIVE",
+    if (busy) snprintf(status, sizeof status, "%s  /  Active",
                        fabric_personality_name(act));
-    else      snprintf(status, sizeof status, "IDLE   /   READY");
+    else      snprintf(status, sizeof status, "Idle  /  Ready");
     pixel_t st_c = busy ? ATOMIK_SEM_SAVINGS : ATOMIK_ACCENT;
+    int sh = font_aa_loaded(FONT_AA_UI) ? text_height_aa(FONT_AA_UI)
+                                        : text_height(2);
     if (font_aa_loaded(FONT_AA_UI)) {
         int tw = text_width_aa(FONT_AA_UI, status);
-        int sh = text_height_aa(FONT_AA_UI);
         label_halo(ws_cx, y, tw, sh, st_c, busy);
         draw_text_aa(FONT_AA_UI, ws_cx - tw / 2, y, status, st_c);
-        y += sh + ATOMIK_GRID_L * 2;
     } else {
         int tw = text_width(status, 2);
         draw_text(ws_cx - tw / 2, y, status, 2, st_c);
-        y += text_height(2) + ATOMIK_GRID_L * 2;
+    }
+    y += sh + 6;
+
+    /* Subtitle — honest idle/active phrasing (concept: "System calm. All
+     * functions nominal."). Reflects real activity, not a fixed string. */
+    const char *subt = busy ? "Workload active on the fabric."
+                            : "System calm. All functions nominal.";
+    if (font_aa_loaded(FONT_AA_LABEL)) {
+        int tw = text_width_aa(FONT_AA_LABEL, subt);
+        draw_text_aa(FONT_AA_LABEL, ws_cx - tw / 2, y, subt, ATOMIK_FG_DIM);
+        y += text_height_aa(FONT_AA_LABEL) + ATOMIK_GRID_L * 2;
+    } else {
+        int tw = text_width(subt, 1);
+        draw_text(ws_cx - tw / 2, y, subt, 1, ATOMIK_FG_DIM);
+        y += text_height(1) + ATOMIK_GRID_L * 2;
     }
 
     /* ---- twin glass panels ---- */
@@ -609,6 +630,24 @@ void hero_draw(void) {
         }
     }
 
-    dirty_rect(left_edge, top, ws_w, (py + ph) - top);
+    /* Footer caption (concept-01) — quiet brand line under the surface. */
+    {
+        const char *foot = "ATOMiK Desk   -   Adaptive Operating Environment";
+        int fh = font_aa_loaded(FONT_AA_LABEL) ? text_height_aa(FONT_AA_LABEL)
+                                               : text_height(1);
+        int fy = FB_H - ATOMIK_GRID_L * 2 - fh;
+        pixel_t fc = rgb(0x6A, 0x76, 0x90);
+        if (fy > py + ph + ATOMIK_GRID_M) {       /* only if it clears the cards */
+            if (font_aa_loaded(FONT_AA_LABEL)) {
+                int tw = text_width_aa(FONT_AA_LABEL, foot);
+                draw_text_aa(FONT_AA_LABEL, ws_cx - tw / 2, fy, foot, fc);
+            } else {
+                int tw = text_width(foot, 1);
+                draw_text(ws_cx - tw / 2, fy, foot, 1, fc);
+            }
+        }
+    }
+
+    dirty_rect(left_edge, top, ws_w, FB_H - top);
     anim_tick();
 }
