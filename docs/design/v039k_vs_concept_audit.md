@@ -1,24 +1,39 @@
 # ATOMiK Desk — v0.39-K vs Concept Coherence Audit
 
-**Date:** 2026-05-28
+**Date:** 2026-05-28 (CORRECTED 2026-05-29)
 **Compared:** `atomik_os/docs/screenshots/deploy_v0.39-K_rail.png` against `docs/design/concept_images/01-06`
 **Purpose:** identify specific deltas between current hardware UI and the ATOMiK Desk concept art; feeds v0.40 roadmap.
+
+> **2026-05-29 CORRECTION — the "warm palette" finding was an artifact, not a real gap.**
+> This audit was performed against `deploy_v0.39-K_rail.png`, which had its **R and B
+> channels swapped** by a broken manual screenshot export (verified: the rail PNG was the
+> raw `deploy_20260521_031311_v0.39-K.png` with R↔B swapped, mean per-channel diff 0.20).
+> The OS actually renders the **correct cool navy/cyan palette** — confirmed end-to-end:
+> code palette is `0x00RRGGBB` (cyan `0x6EDDFF`), assets are cool, the LiteX framebuffer
+> unpacks `r=word[16:24] g=[8:16] b=[0:8]` (XRGB), and the *raw* fb2png capture is cool.
+> The swap made cyan→gold, violet→pink, navy→brown. The rail thumbnails and the published
+> website image have been un-swapped. **Palette is NOT a v0.40 gap** — strike item #1 below.
+> The remaining items (waveforms, hero, surface routing, pulse pills) stand.
 
 ## Per-Concept Gap Analysis
 
 | Concept | Current state | Fidelity (0-100) | Net-new work |
 |---|---|---:|---|
-| 01 atomik_desk_home | Shell present (Cap Rail, Fabric, Pulse Bar); missing centered hero, twin glass panels, cool palette | 42 | palette pass, hero composition |
+| 01 atomik_desk_home | Shell present (Cap Rail, Fabric, Pulse Bar), palette already cool/correct; missing centered hero + twin glass panels | 42 | hero composition (palette = DONE, was a capture artifact) |
 | 02 document_surface | Document app exists as window per README; not lifted into shell as full surface | 15 | route Document through shell |
 | 03 replica_flow | Delta-log + cross-device sync ship per README v1.0; no Replica Flow surface | 8 | net-new surface (reuses substrate) |
 | 04 agent_surface | Adaptive dock + Markov agent ship; no Agent surface rendered | 10 | net-new surface (reuses substrate) |
 | 05 build_lane | Terminal app exists; no Build Lane surface | 5 | net-new surface (reuses terminal) |
 | 06 adaptive_mode | 3-orb STATE/SYNC/AGENT hero present; missing triptych, mode-card stack, Adaptive Balance ledger | 22 | hero composition + balance ledger |
 
-## Top 5 Highest-Impact Gaps for v0.40
+## Top Highest-Impact Gaps for v0.40 (palette struck — see correction above)
 
-1. **Palette + glass-panel chrome** — current is warm amber/brown, concept is cool navy/cyan with translucent glass panels and inner glow rims. Single highest-leverage change; touches every surface.
-2. **Fabric lane waveforms** — concept Fabric cards show live sparkline waveforms behind numerics; v0.39-K shows only numbers. Add per-lane scrolling waveform.
+1. ~~**Palette + glass-panel chrome**~~ — STRUCK. The OS palette is already cool/correct
+   (`0x00RRGGBB`, cyan `0x6EDDFF`); the "warm" look was an R↔B swap in a broken screenshot
+   export, now fixed. The **glass-panel chrome** half is still partly real: concept panels
+   have translucent fills + inner-glow rims; current panels are flatter. Fold that into the
+   hero/surface work rather than a palette pass.
+2. **Fabric lane waveforms** — concept Fabric cards show live sparkline waveforms behind numerics; v0.39-K shows only numbers. Add per-lane scrolling waveform. (Sine-pulse source already exists — see "Do Not Regress".)
 3. **Home-surface center hero** — concept anchors on "ATOMiK Desk / Idle-Ready / twin glass panels"; v0.39-K idle is a 3-orb scene. Reframe idle to introduce the system before showing activity.
 4. **Surface routing for Document / Replica Flow / Build Lane** — three full-frame surfaces need to render inside the desk shell rather than as separate windows or not at all.
 5. **Pulse Bar telemetry pills** — concept top bar has 4 distinctly compartmentalized + labeled glass pills; v0.39-K bar lacks the compartments + glow rims.
