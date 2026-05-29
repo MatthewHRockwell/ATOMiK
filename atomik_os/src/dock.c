@@ -56,6 +56,7 @@
 #define LABEL_GAP        ATOMIK_GRID_S
 #define HEADER_H         24      /* v0.39-G: space for "SYSTEM" label  */
 #define HEADER_BELOW_GAP 8       /* v0.39-G: gap between header & first cell */
+#define FOOTER_H         28      /* v0.40: bottom mini-control (diamond + seam) */
 
 #define ACTIVE_HALO      3       /* alpha halo around active cell      */
 #define OPEN_DOT_R       4       /* radius of the open-app right dot   */
@@ -88,7 +89,7 @@ static int rail_w(void) { return RAIL_PADDING * 2 + ICON_SIZE; }
 static int rail_h(void) {
     /* v0.39-G — extra HEADER_H + HEADER_BELOW_GAP for the SYSTEM header. */
     return RAIL_PADDING * 2 + HEADER_H + HEADER_BELOW_GAP +
-           N_ICONS * CELL_HEIGHT + (N_ICONS - 1) * ICON_GAP;
+           N_ICONS * CELL_HEIGHT + (N_ICONS - 1) * ICON_GAP + FOOTER_H;
 }
 
 static int s_last_order[N_ICONS] = {0,1,2,3,4,5};
@@ -331,6 +332,15 @@ void dock_draw(int hover_index) {
               ATOMIK_DOCK_BORDER);
     draw_rect(rx + RAIL_RADIUS / 2, ry + rh - 1, rw - RAIL_RADIUS, 1,
               ATOMIK_DOCK_BORDER);
+    /* v0.40 glass polish — side borders + top sheen + inner accent rim so
+     * the rail reads as the same glass system as the Pulse Bar / panels. */
+    draw_rect(rx,          ry + RAIL_RADIUS / 2, 1, rh - RAIL_RADIUS, ATOMIK_DOCK_BORDER);
+    draw_rect(rx + rw - 1, ry + RAIL_RADIUS / 2, 1, rh - RAIL_RADIUS, ATOMIK_DOCK_BORDER);
+    for (int sy = 0; sy < 10; sy++)
+        for (int sx = RAIL_RADIUS; sx < rw - RAIL_RADIUS; sx++)
+            draw_blend_pixel(rx + sx, ry + 1 + sy, ATOMIK_FG, (uint8_t)(10 - sy));
+    for (int sx = RAIL_RADIUS; sx < rw - RAIL_RADIUS; sx++)
+        draw_blend_pixel(rx + sx, ry + 2, ATOMIK_ACCENT, 20);
 
     int order[N_ICONS];
     compute_order(order);
@@ -340,7 +350,7 @@ void dock_draw(int hover_index) {
      * inside the glass slab, above the first cell.  Centered to the
      * rail width.  Tiny letter-spacing via FONT_AA_LABEL keeps it
      * quiet — no need to compete with the cell labels below. */
-    const char *hdr = "SYSTEM";
+    const char *hdr = "CAPABILITY";
     pixel_t hdr_col = rgb(0x7A, 0x86, 0xA0);
     int header_y = ry + RAIL_PADDING + (HEADER_H -
                        (font_aa_loaded(FONT_AA_LABEL)
@@ -399,10 +409,13 @@ void dock_draw(int hover_index) {
         pixel_t cell_body = rgb(0x14, 0x1E, 0x34);
         draw_rect_rounded(icon_x, icon_y, cw, ch, 14, cell_body);
 
-        /* === Focused glow (subtle outer halo) === */
+        /* === Focused/active glow — outer halo + inner accent wash so the
+         * active tile glows from within (concept active DASHBOARD tile). === */
         if (focused) {
-            halo_ring(icon_x, icon_y, cw, ch, ACTIVE_HALO,
-                      accent, 60);
+            halo_ring(icon_x, icon_y, cw, ch, ACTIVE_HALO + 1, accent, 100);
+            for (int sy = 2; sy < ch - 2; sy++)
+                for (int sx = 2; sx < cw - 2; sx++)
+                    draw_blend_pixel(icon_x + sx, icon_y + sy, accent, 14);
         }
 
         /* === Hover lift === */
@@ -501,6 +514,26 @@ void dock_draw(int hover_index) {
         }
 
         iy += CELL_HEIGHT + ICON_GAP;
+    }
+
+    /* v0.40 bottom mini-control — cyan diamond + cyan→violet gradient seam
+     * (concept rail footer).  Pure decorative chrome, no state. */
+    {
+        int fy  = ry + rh - FOOTER_H / 2 - 4;
+        int fcx = rx + rw / 2;
+        for (int dy = -4; dy <= 4; dy++) {
+            int wdt = 4 - (dy < 0 ? -dy : dy);
+            for (int dx = -wdt; dx <= wdt; dx++)
+                draw_blend_pixel(fcx + dx, fy + dy, ATOMIK_ACCENT, 200);
+        }
+        int lw = rw - RAIL_PADDING * 2;
+        int lx = rx + RAIL_PADDING;
+        for (int sx = 0; sx < lw; sx++) {
+            double t = (double)sx / (double)lw;
+            uint8_t r = (uint8_t)(0x6E * (1 - t) + 0xB0 * t);
+            uint8_t g = (uint8_t)(0xDD * (1 - t) + 0x8C * t);
+            draw_blend_pixel(lx + sx, fy + 9, rgb(r, g, 0xFF), 150);
+        }
     }
 }
 
