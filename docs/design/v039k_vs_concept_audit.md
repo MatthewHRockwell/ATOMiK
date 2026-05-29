@@ -41,7 +41,15 @@
    no telemetry — same discipline as the Pulse Bar idle baseline) instead of a flat band.
    Live lanes still render the real curve. Compiles clean; **visual confirmation pending a
    board deploy** (no fb2png capture taken yet).
-3. **Home-surface center hero** — concept anchors on "ATOMiK Desk / Idle-Ready / twin glass panels"; v0.39-K idle is a 3-orb scene. Reframe idle to introduce the system before showing activity.
+3. ~~**Home-surface center hero**~~ — ADDRESSED 2026-05-29 (v0.40, `src/hero.c`).
+   `hero_draw()` is now the concept-01 home composition: centered "ATOMiK Desk" wordmark
+   + tagline + honest "IDLE / READY" status, over twin glass panels — SYSTEM OVERVIEW
+   (real facts: RV64 NaxRiscv, RV64GC, adapter 0xF0020000, active personality, uptime)
+   and DELTA COALESCING (a REAL gauge from perf_last_for(STATE) ops_logical→ops_issued —
+   NOT the concept's banned "Predictive Accuracy 92%"). The 3-orb scene is preserved as
+   `hero_draw_adaptive()` for the Adaptive-Mode surface (concept-06). Also removed the
+   banded center wallpaper vignette (concentric-ring artifact). Verified via host preview
+   (`docs/design/hero_home_v040_vs_concept01_HOSTPREVIEW.png`); board capture pending.
 4. **Surface routing for Document / Replica Flow / Build Lane** — three full-frame surfaces need to render inside the desk shell rather than as separate windows or not at all.
 5. **Pulse Bar telemetry pills** — concept top bar has 4 distinctly compartmentalized + labeled glass pills; v0.39-K bar lacks the compartments + glow rims.
 

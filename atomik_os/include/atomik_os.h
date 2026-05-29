@@ -182,7 +182,8 @@ void wallpaper_draw(void);
  * workspace center.  Draws AFTER wallpaper, BEFORE windows.  Acts
  * as the OS's identity statement, not as a window.  About moves
  * to A-key only. */
-void hero_draw(void);
+void hero_draw(void);            /* v0.40 home surface: title + twin glass panels */
+void hero_draw_adaptive(void);   /* 3-orb energy scene — Adaptive Mode (concept-06) */
 
 /* agent.c — agentic usage logger + adaptive surfacing.
  *

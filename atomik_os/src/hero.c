@@ -25,6 +25,8 @@
  * UI still flows through the v0.38 provider; hero is pure identity. */
 #include "atomik_os.h"
 #include <math.h>
+#include <stdio.h>
+#include <string.h>
 
 extern pixel_t *fb_back(void);
 
@@ -251,7 +253,7 @@ static void label_halo(int cx, int y, int tw, int th,
             draw_blend_pixel(dx, dy, color, a2);
 }
 
-void hero_draw(void) {
+void hero_draw_adaptive(void) {
     /* Workspace centerline: midpoint between rail right-edge and
      * Fabric shelf left-edge.  This puts the hero properly centered
      * regardless of chrome changes. */
@@ -371,6 +373,242 @@ void hero_draw(void) {
     int dw = ws_w;
     int dh = (label_y + text_height(2) + text_height(1) + 8) - dy;
     dirty_rect(dx, dy, dw, dh);
+    /* NOTE: anim_tick() is called once per frame by hero_draw() (the home
+     * surface that redraw_frame actually invokes).  When Adaptive Mode wires
+     * this scene in, its per-frame caller must ensure exactly one anim_tick(). */
+}
 
+/* ====================================================================
+ * v0.40 HOME surface — concept-01 "ATOMiK Desk" composition.
+ *
+ * Centered wordmark + tagline + honest status line, over twin glass
+ * panels (System Overview + a real coalescing gauge).  The 3-orb energy
+ * scene above (hero_draw_adaptive) is concept-06's Adaptive Mode and is
+ * preserved for that surface.
+ *
+ * HONEST DATA ONLY (feedback_no_class_c_metrics): System Overview shows
+ * real system facts; the right gauge is the REAL STATE coalesce ratio
+ * (perf_last_for).  We deliberately do NOT reproduce the concept's
+ * "Predictive Accuracy 92%" panel — that exact phrasing is the banned
+ * fake-metric example.
+ * ==================================================================== */
+
+/* Translucent glass card: rounded body + top sheen + accent inner rim. */
+static void glass_panel(int x, int y, int w, int h) {
+    draw_rect_rounded(x, y, w, h, 10, wm_card_bg());
+    for (int sy = 0; sy < 10; sy++)
+        for (int sx = 2; sx < w - 2; sx++)
+            draw_blend_pixel(x + sx, y + 1 + sy, ATOMIK_FG, (uint8_t)(11 - sy));
+    draw_rect(x + 10, y,         w - 20, 1, wm_card_border());
+    draw_rect(x + 10, y + h - 1, w - 20, 1, wm_card_border());
+    draw_rect(x,         y + 10, 1, h - 20, wm_card_border());
+    draw_rect(x + w - 1, y + 10, 1, h - 20, wm_card_border());
+    for (int sx = 12; sx < w - 12; sx++)
+        draw_blend_pixel(x + sx, y + 2, ATOMIK_ACCENT, 22);   /* inner glow rim */
+}
+
+/* label (dim, left) + value (fg, right) on one row. */
+static void hero_stat(int x, int y, int w, const char *label, const char *val) {
+    if (font_aa_loaded(FONT_AA_LABEL)) {
+        draw_text_aa(FONT_AA_LABEL, x, y, label, ATOMIK_FG_DIM);
+        int vw = text_width_aa(FONT_AA_LABEL, val);
+        draw_text_aa(FONT_AA_LABEL, x + w - vw, y, val, ATOMIK_FG);
+    } else {
+        draw_text(x, y, label, 1, ATOMIK_FG_DIM);
+        int vw = text_width(val, 1);
+        draw_text(x + w - vw, y, val, 1, ATOMIK_FG);
+    }
+}
+
+/* Circular gauge: dim track + bright filled arc (pct, clockwise from top). */
+static void hero_gauge(int cx, int cy, int r, int pct, pixel_t color) {
+    if (pct < 0) pct = 0;
+    if (pct > 100) pct = 100;
+    pixel_t track = rgb(0x24, 0x2E, 0x42);
+    for (int a = 0; a < 360; a++) {
+        double rad = (a - 90) * M_PI / 180.0;
+        int    on  = (a * 100 / 360) < pct;
+        pixel_t c  = on ? color : track;
+        for (int t = 0; t < 4; t++) {
+            int px = cx + (int)((r - t) * cos(rad));
+            int py = cy + (int)((r - t) * sin(rad));
+            if (on) draw_pixel(px, py, c);
+            else    draw_blend_pixel(px, py, c, 120);
+        }
+    }
+    ring(cx, cy, r - 6, 2, color, 30);
+}
+
+static double hero_uptime(void) {
+    FILE *f = fopen("/proc/uptime", "r");
+    double up = 0;
+    if (f) { if (fscanf(f, "%lf", &up) != 1) up = 0; fclose(f); }
+    return up;
+}
+
+void hero_draw(void) {
+    int left_edge  = dock_right_edge() + ATOMIK_GRID_L * 2;
+    int right_edge = fabric_shelf_x() - ATOMIK_GRID_L * 2;
+    int ws_w  = right_edge - left_edge;
+    int ws_cx = (left_edge + right_edge) / 2;
+    int top   = ATOMIK_SAFE_TOP + ATOMIK_PULSE_BAR_H + ATOMIK_GRID_L * 3;
+    unsigned long now = anim_now_ms();
+    personality_t act = fabric_active();
+
+    /* ---- title block ---- */
+    int y = top + 36;
+    const char *wm = "ATOMiK Desk";
+    if (font_aa_loaded(FONT_AA_BRAND)) {
+        int tw = text_width_aa(FONT_AA_BRAND, wm);
+        draw_text_aa(FONT_AA_BRAND, ws_cx - tw / 2, y, wm, ATOMIK_FG);
+        y += text_height_aa(FONT_AA_BRAND) + 6;
+    } else {
+        int tw = text_width(wm, 3);
+        draw_text(ws_cx - tw / 2, y, wm, 3, ATOMIK_FG);
+        y += text_height(3) + 6;
+    }
+    const char *tag = "INTELLIGENT    ADAPTIVE    SUBSTRATE";
+    if (font_aa_loaded(FONT_AA_LABEL)) {
+        int tw = text_width_aa(FONT_AA_LABEL, tag);
+        draw_text_aa(FONT_AA_LABEL, ws_cx - tw / 2, y, tag, ATOMIK_ACCENT_DIM);
+        y += text_height_aa(FONT_AA_LABEL) + 16;
+    } else {
+        int tw = text_width(tag, 1);
+        draw_text(ws_cx - tw / 2, y, tag, 1, ATOMIK_ACCENT_DIM);
+        y += text_height(1) + 16;
+    }
+
+    /* status line — honest: ACTIVE only when a workload event is recent. */
+    int busy = 0;
+    if (atomik_event_total() > 0) {
+        unsigned long t1 = atomik_event_last_ts(EVT_STATE_DELTA);
+        unsigned long t2 = atomik_event_last_ts(EVT_SYNC_REPLICA);
+        unsigned long t3 = atomik_event_last_ts(EVT_AGENT_CONTEXT);
+        if ((t1 && now - t1 < 3000) || (t2 && now - t2 < 3000) ||
+            (t3 && now - t3 < 3000)) busy = 1;
+    }
+    char status[48];
+    if (busy) snprintf(status, sizeof status, "%s   /   ACTIVE",
+                       fabric_personality_name(act));
+    else      snprintf(status, sizeof status, "IDLE   /   READY");
+    pixel_t st_c = busy ? ATOMIK_SEM_SAVINGS : ATOMIK_ACCENT;
+    if (font_aa_loaded(FONT_AA_UI)) {
+        int tw = text_width_aa(FONT_AA_UI, status);
+        int sh = text_height_aa(FONT_AA_UI);
+        label_halo(ws_cx, y, tw, sh, st_c, busy);
+        draw_text_aa(FONT_AA_UI, ws_cx - tw / 2, y, status, st_c);
+        y += sh + ATOMIK_GRID_L * 2;
+    } else {
+        int tw = text_width(status, 2);
+        draw_text(ws_cx - tw / 2, y, status, 2, st_c);
+        y += text_height(2) + ATOMIK_GRID_L * 2;
+    }
+
+    /* ---- twin glass panels ---- */
+    int gap   = ATOMIK_GRID_L;
+    int pw    = (ws_w - gap) / 2;
+    int avail = (FB_H - ATOMIK_GRID_L * 2) - y;   /* vertical space below title */
+    int ph    = avail - ATOMIK_GRID_L * 2;
+    if (ph > 340) ph = 340;
+    if (ph < 160) ph = 160;
+    int py    = y + (avail - ph) / 2;             /* center in lower workspace */
+    if (py < y) py = y;
+    int lx = left_edge;
+    int rx = left_edge + pw + gap;
+
+    /* Left — SYSTEM OVERVIEW (real facts). */
+    glass_panel(lx, py, pw, ph);
+    {
+        int ix = lx + ATOMIK_GRID_L, iw = pw - ATOMIK_GRID_L * 2;
+        int ty = py + ATOMIK_GRID_M;
+        if (font_aa_loaded(FONT_AA_UI)) {
+            draw_text_aa(FONT_AA_UI, ix, ty, "SYSTEM OVERVIEW", ATOMIK_FG);
+            ty += text_height_aa(FONT_AA_UI) + ATOMIK_GRID_M;
+        } else {
+            draw_text(ix, ty, "SYSTEM OVERVIEW", 2, ATOMIK_FG);
+            ty += text_height(2) + ATOMIK_GRID_M;
+        }
+        int rowh = (font_aa_loaded(FONT_AA_LABEL) ? text_height_aa(FONT_AA_LABEL)
+                                                  : text_height(1)) + 9;
+        double u = hero_uptime();
+        char up[24];
+        snprintf(up, sizeof up, "%02d:%02d:%02d",
+                 (int)u / 3600, ((int)u % 3600) / 60, (int)u % 60);
+        hero_stat(ix, ty, iw, "CORE",    "RV64 NaxRiscv"); ty += rowh;
+        hero_stat(ix, ty, iw, "ISA",     "RV64GC");        ty += rowh;
+        hero_stat(ix, ty, iw, "ADAPTER", "0xF0020000");    ty += rowh;
+        hero_stat(ix, ty, iw, "ACTIVE",  fabric_personality_name(act)); ty += rowh;
+        hero_stat(ix, ty, iw, "UPTIME",  up);              ty += rowh;
+        /* Fill the lower panel with the ATOMiK orbital motif (concept-01's
+         * System-Overview circular viz) + a divider above it. */
+        if (py + ph - ty > 130) {
+            draw_rect(ix, ty + ATOMIK_GRID_S, iw, 1, wm_card_border());
+            core_node(lx + pw / 2, ty + (py + ph - ty) / 2 + 8, now);
+        }
+    }
+
+    /* Right — DELTA COALESCING gauge (REAL perf_last_for STATE). */
+    glass_panel(rx, py, pw, ph);
+    {
+        int ix = rx + ATOMIK_GRID_L;
+        int ty = py + ATOMIK_GRID_M;
+        const char *title = "DELTA COALESCING";
+        if (font_aa_loaded(FONT_AA_UI)) {
+            draw_text_aa(FONT_AA_UI, ix, ty, title, ATOMIK_FG);
+        } else {
+            draw_text(ix, ty, title, 2, ATOMIK_FG);
+        }
+        const perf_sample_t *s = perf_last_for(PERSONALITY_STATE);
+        int have = (s && s->ops_logical > 0);
+        int pct  = have ? (int)(100u * (s->ops_logical - s->ops_issued)
+                                 / s->ops_logical) : 0;
+        /* real raw counts under the title (honest provenance for the gauge) */
+        char sub[28];
+        if (have) snprintf(sub, sizeof sub, "%u -> %u ops",
+                           (unsigned)s->ops_logical, (unsigned)s->ops_issued);
+        else      snprintf(sub, sizeof sub, "awaiting workload");
+        int sty = py + ATOMIK_GRID_M +
+                  (font_aa_loaded(FONT_AA_UI) ? text_height_aa(FONT_AA_UI)
+                                              : text_height(2)) + 4;
+        if (font_aa_loaded(FONT_AA_LABEL))
+            draw_text_aa(FONT_AA_LABEL, ix, sty, sub, ATOMIK_FG_DIM);
+        else
+            draw_text(ix, sty, sub, 1, ATOMIK_FG_DIM);
+        int gcx = rx + pw / 2;
+        int gcy = py + ph / 2 + 10;
+        int gr  = (ph < 170) ? 44 : 54;
+        hero_gauge(gcx, gcy, gr, pct, ATOMIK_SEM_HARDWARE);
+        /* center value */
+        char pc[8];
+        if (have) snprintf(pc, sizeof pc, "%d", pct);
+        else      snprintf(pc, sizeof pc, "--");
+        if (font_aa_loaded(FONT_AA_DISPLAY)) {
+            int nw = text_width_aa(FONT_AA_DISPLAY, pc);
+            int nh = text_height_aa(FONT_AA_DISPLAY);
+            draw_text_aa(FONT_AA_DISPLAY, gcx - nw / 2, gcy - nh / 2, pc,
+                         ATOMIK_SEM_HARDWARE);
+        } else {
+            int nw = text_width(pc, 3);
+            draw_text(gcx - nw / 2, gcy - text_height(3) / 2, pc, 3,
+                      ATOMIK_SEM_HARDWARE);
+        }
+        /* unit + honest source tag under the gauge */
+        const char *unit = "% ops coalesced";
+        const char *src  = have ? "live perf-bench" : "waiting for workload";
+        if (font_aa_loaded(FONT_AA_LABEL)) {
+            int uw = text_width_aa(FONT_AA_LABEL, unit);
+            draw_text_aa(FONT_AA_LABEL, gcx - uw / 2, gcy + gr + 6, unit,
+                         ATOMIK_FG_DIM);
+            int sw = text_width_aa(FONT_AA_LABEL, src);
+            draw_text_aa(FONT_AA_LABEL, gcx - sw / 2,
+                         gcy + gr + 6 + text_height_aa(FONT_AA_LABEL) + 2, src,
+                         have ? ATOMIK_SEM_SAVINGS : ATOMIK_FG_DIM);
+        } else {
+            int uw = text_width(unit, 1);
+            draw_text(gcx - uw / 2, gcy + gr + 6, unit, 1, ATOMIK_FG_DIM);
+        }
+    }
+
+    dirty_rect(left_edge, top, ws_w, (py + ph) - top);
     anim_tick();
 }
