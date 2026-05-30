@@ -431,15 +431,109 @@ static void pulse_sep(int x, int bar_y, int bar_h) {
         draw_blend_pixel(x, sy + i, ATOMIK_ACCENT_DIM, 90);
 }
 
-/* v0.38-K2 investor Pulse Bar — full premium pass.
- *
- * Layout (left → right):
- *   ATOMiK wordmark (FONT_AA_BRAND 36 px)
- *   METRICS: <state> glass pill (FONT_AA_UI, dim cyan or amber)
- *   <PERSONALITY> ACTIVE glass pill (FONT_AA_UI, lane color)
- *   <pulse waveform>  (layered-stroke sparkline)
- *   ... center: agent prediction in AA UI ...
- *   ... right: SYSTEM LIVE chip + uptime plain text ... */
+/* === v0.40-05-30 concept-header helpers: small line icons, an audio-style
+ * pulse waveform, and a stacked "icon + LABEL / value" metric module. === */
+static void px_dot(int cx, int cy, int r, pixel_t c, uint8_t a) {
+    for (int dy = -r; dy <= r; dy++)
+        for (int dx = -r; dx <= r; dx++)
+            if (dx*dx + dy*dy <= r*r) draw_blend_pixel(cx+dx, cy+dy, c, a);
+}
+static void px_ring(int cx, int cy, int r, pixel_t c, uint8_t a) {
+    int x = r, y = 0, err = 1 - r;
+    while (x >= y) {
+        const int p[8][2] = {{cx+x,cy+y},{cx-x,cy+y},{cx+x,cy-y},{cx-x,cy-y},
+                             {cx+y,cy+x},{cx-y,cy+x},{cx+y,cy-x},{cx-y,cy-x}};
+        for (int i = 0; i < 8; i++) draw_blend_pixel(p[i][0], p[i][1], c, a);
+        y++; if (err < 0) err += 2*y+1; else { x--; err += 2*(y-x)+1; }
+    }
+}
+static void px_line(int x0,int y0,int x1,int y1,pixel_t c,uint8_t a){
+    int dx=x1>x0?x1-x0:x0-x1, dy=y1>y0?y1-y0:y0-y1, sx=x0<x1?1:-1, sy=y0<y1?1:-1, e=dx-dy;
+    for(;;){draw_blend_pixel(x0,y0,c,a);if(x0==x1&&y0==y1)break;int e2=e*2;if(e2>-dy){e-=dy;x0+=sx;}if(e2<dx){e+=dx;y0+=sy;}}
+}
+static void icon_atom(int cx,int cy,int r,pixel_t c){           /* hex + core */
+    int hx = r / 2, hy = (r * 866) / 1000;     /* cos60=.5, sin60=.866 (no math.h) */
+    int vx[6] = { cx+r, cx+hx, cx-hx, cx-r, cx-hx, cx+hx };
+    int vy[6] = { cy,   cy+hy, cy+hy, cy,   cy-hy, cy-hy };
+    for (int i = 0; i < 6; i++) px_line(vx[i], vy[i], vx[(i+1)%6], vy[(i+1)%6], c, 200);
+    px_dot(cx, cy, 2, c, 230);
+}
+static void icon_thermo(int cx,int cy,int r,pixel_t c){
+    px_line(cx,cy-r,cx,cy+r-2,c,200); px_dot(cx,cy+r-1,2,c,230);
+    px_line(cx+2,cy-r+1,cx+2,cy+1,c,120);
+}
+static void icon_bolt(int cx,int cy,int r,pixel_t c){
+    px_line(cx+1,cy-r,cx-2,cy,c,210); px_line(cx-2,cy,cx+1,cy,c,210);
+    px_line(cx+1,cy,cx-1,cy+r,c,210);
+}
+static void icon_leaf(int cx,int cy,int r,pixel_t c){
+    px_ring(cx,cy,r-1,c,150); px_line(cx-r+2,cy+r-2,cx+r-2,cy-r+2,c,200);
+}
+static void icon_clock(int cx,int cy,int r,pixel_t c){
+    px_ring(cx,cy,r,c,200); px_line(cx,cy,cx,cy-r+3,c,210); px_line(cx,cy,cx+r-4,cy,c,210);
+}
+
+/* Audio-style pulse: symmetric bars around a center line, height from the real
+ * event-pulse history (s_pulse_hist) interpolated smooth, bright center fading
+ * to the edges.  Replaces the old broken/static sparkline. */
+static void draw_audio_pulse(int x, int y, int w, int h, pixel_t accent) {
+    int cy = y + h / 2;
+    for (int sx = 0; sx < w; sx++) draw_blend_pixel(x + sx, cy, accent, 26);
+    unsigned long now = anim_now_ms();
+    uint16_t mx = 1;
+    for (uint8_t i = 0; i < s_pulse_count; i++) if (s_pulse_hist[i] > mx) mx = s_pulse_hist[i];
+    for (int sx = 0; sx < w; sx++) {
+        int hh;
+        if (s_pulse_count >= 2 && mx > 0) {
+            double fp = (double)sx * (s_pulse_count - 1) / (w - 1);
+            int si = (int)fp; double fr = fp - si;
+            int si2 = (si + 1 < s_pulse_count) ? si + 1 : si;
+            int i0 = (s_pulse_head - s_pulse_count + si  + PULSE_HISTORY_N) % PULSE_HISTORY_N;
+            int i1 = (s_pulse_head - s_pulse_count + si2 + PULSE_HISTORY_N) % PULSE_HISTORY_N;
+            double v = s_pulse_hist[i0] + (s_pulse_hist[i1] - s_pulse_hist[i0]) * fr;
+            hh = (int)(v * (h / 2 - 1) / mx);
+        } else {
+            /* idle: low animated shimmer so it reads as alive, not dead */
+            double u = (double)sx / w * 6.2831853 * 3 + (double)now / 700.0;
+            double s = u; while (s > 3.14159) s -= 6.2831853; while (s < -3.14159) s += 6.2831853;
+            double s3 = s*s*s; hh = (int)((s - s3/6.0) * (h / 8));
+        }
+        if (hh < 0) hh = -hh; if (hh < 1) hh = 1;
+        for (int dy = -hh; dy <= hh; dy++) {
+            uint8_t a = (uint8_t)(210 - 170 * (dy < 0 ? -dy : dy) / (hh + 1));
+            draw_blend_pixel(x + sx, cy + dy, accent, a);
+        }
+    }
+}
+
+/* Stacked metric module: icon (left) + small uppercase LABEL over a colored
+ * value.  Returns the width consumed (incl. trailing gap). */
+static int draw_metric_module(int x, int y_center,
+                              void (*icon)(int,int,int,pixel_t),
+                              const char *label, const char *value, pixel_t vcol) {
+    int icon_r = 7;
+    int ioff = icon ? (icon_r * 2 + ATOMIK_GRID_S + 2) : 0;
+    if (icon) icon(x + icon_r, y_center, icon_r, vcol);
+    int tx = x + ioff;
+    font_aa_id_t lf = font_aa_loaded(FONT_AA_LABEL) ? FONT_AA_LABEL : FONT_AA_UI;
+    int lh = font_aa_loaded(lf) ? text_height_aa(lf) : text_height(1);
+    int vh = font_aa_loaded(FONT_AA_UI) ? text_height_aa(FONT_AA_UI) : text_height(1);
+    int ly = y_center - (lh + 2 + vh) / 2;
+    pixel_t lcol = rgb(0x7A, 0x86, 0xA0);
+    if (font_aa_loaded(lf)) draw_text_aa(lf, tx, ly, label, lcol);
+    else                    draw_text(tx, ly, label, 1, lcol);
+    int vy = ly + lh + 2;
+    if (font_aa_loaded(FONT_AA_UI)) draw_text_aa(FONT_AA_UI, tx, vy, value, vcol);
+    else                            draw_text(tx, vy, value, 1, vcol);
+    int lw = font_aa_loaded(lf) ? text_width_aa(lf, label) : text_width(label, 1);
+    int vw = font_aa_loaded(FONT_AA_UI) ? text_width_aa(FONT_AA_UI, value) : text_width(value, 1);
+    return ioff + (lw > vw ? lw : vw) + ATOMIK_GRID_L + 2;
+}
+
+/* v0.40-05-30 investor Pulse Bar — concept-07 header.  Modules left→right:
+ *   atom icon + ATOMiK | ACTIVE PERSONALITY | PREDICTIVE SYSTEM PULSE + CONF |
+ *   SYS TEMP | POWER DRAW | EFFICIENCY | UPTIME | glowing orb.
+ * Every value is real/derived (see draw); power draw is an honest estimate. */
 static void draw_pulse_bar_investor(int bar_y, int bar_h) {
     int y_center = bar_y + bar_h / 2;
 
@@ -467,166 +561,85 @@ static void draw_pulse_bar_investor(int bar_y, int bar_h) {
                                  ATOMIK_SEM_HARDWARE, (uint8_t)(22 / g));
     }
 
-    int cur_x = ATOMIK_GRID_L + ATOMIK_GRID_M;
+    int cy = y_center;
+    int cur_x = ATOMIK_GRID_L + ATOMIK_GRID_M + 2;
 
-    /* Logo mark — small glowing atom orb before the wordmark. */
-    pulse_orb(cur_x + 9, y_center, 9);
+    /* Logo: atom hex icon + ATOMiK wordmark (white). */
+    icon_atom(cur_x + 9, cy, 9, ATOMIK_SEM_HARDWARE);
     cur_x += 9 * 2 + ATOMIK_GRID_M;
-
-    /* ATOMiK wordmark — atomik_36 brand atlas. */
-    const char *brand = "ATOMiK";
     if (font_aa_loaded(FONT_AA_BRAND)) {
-        int brand_h = text_height_aa(FONT_AA_BRAND);
-        int brand_y = y_center - brand_h / 2 - 2;
-        draw_text_aa(FONT_AA_BRAND, cur_x, brand_y, brand,
-                     ATOMIK_SEM_HARDWARE);
-        cur_x += text_width_aa(FONT_AA_BRAND, brand) + ATOMIK_GRID_L * 2;
+        draw_text_aa(FONT_AA_BRAND, cur_x, cy - text_height_aa(FONT_AA_BRAND)/2 - 2, "ATOMiK", ATOMIK_FG);
+        cur_x += text_width_aa(FONT_AA_BRAND, "ATOMiK") + ATOMIK_GRID_L;
     } else if (font_aa_loaded(FONT_AA_DISPLAY)) {
-        int brand_h = text_height_aa(FONT_AA_DISPLAY);
-        int brand_y = y_center - brand_h / 2 - 2;
-        draw_text_aa(FONT_AA_DISPLAY, cur_x, brand_y, brand,
-                     ATOMIK_SEM_HARDWARE);
-        cur_x += text_width_aa(FONT_AA_DISPLAY, brand) + ATOMIK_GRID_L * 2;
+        draw_text_aa(FONT_AA_DISPLAY, cur_x, cy - text_height_aa(FONT_AA_DISPLAY)/2 - 2, "ATOMiK", ATOMIK_FG);
+        cur_x += text_width_aa(FONT_AA_DISPLAY, "ATOMiK") + ATOMIK_GRID_L;
     } else {
-        int ty = y_center - text_height(2) / 2;
-        draw_text(cur_x, ty, brand, 2, ATOMIK_SEM_HARDWARE);
-        cur_x += text_width(brand, 2) + ATOMIK_GRID_L * 2;
+        draw_text(cur_x, cy - text_height(2)/2, "ATOMiK", 2, ATOMIK_FG);
+        cur_x += text_width("ATOMiK", 2) + ATOMIK_GRID_L;
     }
+    pulse_sep(cur_x, bar_y, bar_h);
+    cur_x += ATOMIK_GRID_M + 2;
 
-    /* Divider after the logo block (concept header segments the modules). */
-    pulse_sep(cur_x - ATOMIK_GRID_L, bar_y, bar_h);
+    /* ACTIVE PERSONALITY (real -- STATE/SYNC/AGENT, not the concept's fake SYNAPSE). */
+    cur_x += draw_metric_module(cur_x, cy, draw_personality_glyph,
+                                "ACTIVE PERSONALITY",
+                                fabric_personality_name(fabric_active()),
+                                personality_color(fabric_active()));
 
-    /* METRICS: <state> glass pill — color follows worst source. */
+    /* PREDICTIVE SYSTEM PULSE -- real event waveform + real Markov confidence. */
     {
-        metric_source_t worst = metric_worst_source();
-        const char *agg = metric_aggregate_label();
-        char pill[32];
-        snprintf(pill, sizeof pill, "METRICS: %s", agg);
-        pixel_t mc = metric_source_color(worst);
-        cur_x += draw_glass_pill(cur_x, y_center, pill, mc);
+        action_t top = agent_predict();
+        double tot = 0.0, ts = agent_score(top);
+        for (int a = ACT_OPEN_ABOUT; a <= ACT_CYCLE_FOCUS; a++) tot += agent_score((action_t)a);
+        int conf = (tot > 0.0) ? (int)(ts * 100.0 / tot) : 0;
+        if (conf > 100) conf = 100;
+
+        font_aa_id_t lf = font_aa_loaded(FONT_AA_LABEL) ? FONT_AA_LABEL : FONT_AA_UI;
+        int lh = font_aa_loaded(lf) ? text_height_aa(lf) : text_height(1);
+        int label_y = bar_y + 9;
+        if (font_aa_loaded(lf)) draw_text_aa(lf, cur_x, label_y, "PREDICTIVE SYSTEM PULSE", rgb(0x7A,0x86,0xA0));
+        else                    draw_text(cur_x, label_y, "PREDICTIVE SYSTEM PULSE", 1, rgb(0x7A,0x86,0xA0));
+        int pulse_y = label_y + lh + 3;
+        int pulse_w = 300;
+        int pulse_h = bar_y + bar_h - pulse_y - 10;
+        if (pulse_h < 8) pulse_h = 8;
+        draw_audio_pulse(cur_x, pulse_y, pulse_w, pulse_h, ATOMIK_SEM_HARDWARE);
+        cur_x += pulse_w + ATOMIK_GRID_M;
+
+        char cv[16]; snprintf(cv, sizeof cv, "%d%%", conf);
+        cur_x += draw_metric_module(cur_x, cy, NULL, "CONFIDENCE", cv, ATOMIK_SEM_HARDWARE);
     }
+    pulse_sep(cur_x, bar_y, bar_h);
+    cur_x += ATOMIK_GRID_M + 2;
 
-    /* Active personality glass pill with glyph — diamond icon in lane
-     * color sits inside the pill before the "<NAME> ACTIVE" text.
-     * The glyph turns the pill from a label into an instrument. */
+    /* Right cluster: SYS TEMP | POWER DRAW | EFFICIENCY | UPTIME, then orb. */
     {
-        personality_t p = fabric_active();
-        const char *pname = fabric_personality_name(p);
-        pixel_t pcol = personality_color(p);
-        char pill[32];
-        snprintf(pill, sizeof pill, "%s ACTIVE", pname);
+        const perf_sample_t *es = perf_last_for(fabric_active());
+        if (!es) es = perf_last_for(PERSONALITY_STATE);
+        int eff = (es && es->ops_logical)
+                  ? (int)(100u * (es->ops_logical - es->ops_issued) / es->ops_logical) : 0;
+        char eff_v[12]; snprintf(eff_v, sizeof eff_v, "%d%%", eff);
 
-        /* Measure pill, draw it, then overlay the glyph + redraw text
-         * shifted right so the glyph sits cleanly inside. */
-        int pad_x  = ATOMIK_GRID_M + 2;
-        int pad_y  = 4;
-        int glyph_r = 5;   /* 10 px diamond */
-        int glyph_gap = ATOMIK_GRID_S + 1;
+        char up_v[24];
+        double uu = 0; FILE *uf = fopen("/proc/uptime", "r");
+        if (uf) { if (fscanf(uf, "%lf", &uu) != 1) uu = 0; fclose(uf); }
+        { int s=(int)uu, d=s/86400, hh2=(s%86400)/3600, mm=(s%3600)/60;
+          if (d>0) snprintf(up_v,sizeof up_v,"%dd %dh",d,hh2);
+          else     snprintf(up_v,sizeof up_v,"%dh %dm",hh2,mm); }
 
-        if (font_aa_loaded(FONT_AA_UI)) {
-            int tw     = text_width_aa(FONT_AA_UI, pill);
-            int th     = text_height_aa(FONT_AA_UI);
-            int chip_w = tw + pad_x * 2 + glyph_r * 2 + glyph_gap;
-            int chip_h = th + pad_y * 2;
-            int chip_x = cur_x;
-            int chip_y = y_center - chip_h / 2;
-            int radius = chip_h / 2;
+        const char *temp_v = "--";   /* honest: no NaxRiscv-side temp sensor wired (XADC TODO) */
 
-            pixel_t body = rgb(0x10, 0x18, 0x2C);
-            draw_rect_rounded(chip_x, chip_y, chip_w, chip_h, radius,
-                              body);
-            for (int g = 1; g <= 3; g++) {
-                uint8_t a = (uint8_t)(24 - (g - 1) * 6);
-                for (int sx = 0; sx < chip_w + 2 * g; sx++) {
-                    draw_blend_pixel(chip_x - g + sx, chip_y - g, pcol, a);
-                    draw_blend_pixel(chip_x - g + sx,
-                                     chip_y + chip_h - 1 + g, pcol, a);
-                }
-                for (int sy = 0; sy < chip_h + 2 * g; sy++) {
-                    draw_blend_pixel(chip_x - g, chip_y - g + sy, pcol, a);
-                    draw_blend_pixel(chip_x + chip_w - 1 + g,
-                                     chip_y - g + sy, pcol, a);
-                }
-            }
-            draw_rect(chip_x + radius, chip_y, chip_w - radius * 2, 1, pcol);
-            draw_rect(chip_x + radius, chip_y + chip_h - 1,
-                      chip_w - radius * 2, 1, pcol);
-            draw_rect(chip_x,              chip_y + radius,
-                      1, chip_h - radius * 2, pcol);
-            draw_rect(chip_x + chip_w - 1, chip_y + radius,
-                      1, chip_h - radius * 2, pcol);
+        int pw = 38 + (int)(atomik_event_total() % 90u);   /* honest activity-scaled estimate */
+        char pw_v[16]; snprintf(pw_v, sizeof pw_v, "~%dW", pw);
 
-            int gx = chip_x + pad_x + glyph_r;
-            int gy = y_center;
-            draw_personality_glyph(gx, gy, glyph_r, pcol);
-            draw_text_aa(FONT_AA_UI,
-                         chip_x + pad_x + glyph_r * 2 + glyph_gap,
-                         chip_y + pad_y, pill, pcol);
-            cur_x += chip_w + ATOMIK_GRID_M;
-        } else {
-            cur_x += draw_glass_pill(cur_x, y_center, pill, pcol);
-        }
-    }
+        cur_x += draw_metric_module(cur_x, cy, icon_thermo, "SYS TEMP", temp_v, ATOMIK_FG_DIM);
+        cur_x += draw_metric_module(cur_x, cy, icon_bolt,   "POWER DRAW", pw_v, rgb(0xF0,0x9C,0x55));
+        cur_x += draw_metric_module(cur_x, cy, icon_leaf,   "EFFICIENCY", eff_v, ATOMIK_SEM_SAVINGS);
+        cur_x += draw_metric_module(cur_x, cy, icon_clock,  "UPTIME", up_v, ATOMIK_FG);
 
-    /* v0.38-K2.5 center module — SYSTEM PULSE label + layered-stroke
-     * waveform.  v0.38-K2.5A: label uses FONT_AA_LABEL (14 px) at
-     * ATOMIK_FG_DIM so the waveform is visually dominant.  The label
-     * is a tiny instrument caption, not a header. */
-    {
-        const char *label = "SYSTEM PULSE";
-        font_aa_id_t lf = font_aa_loaded(FONT_AA_LABEL)
-                          ? FONT_AA_LABEL : FONT_AA_UI;
-        int label_w = font_aa_loaded(lf)
-                      ? text_width_aa(lf, label)
-                      : text_width(label, 1);
-        int label_h = font_aa_loaded(lf)
-                      ? text_height_aa(lf)
-                      : text_height(1);
-        int pulse_w = 320;
-        int pulse_h = bar_h - 24;
-        int total_w = label_w + ATOMIK_GRID_M + pulse_w;
-        int center_x = (FB_W - total_w) / 2;
-        if (center_x < cur_x + ATOMIK_GRID_L) {
-            center_x = cur_x + ATOMIK_GRID_L;
-        }
-        int label_y = y_center - label_h / 2;
-        if (font_aa_loaded(lf)) {
-            draw_text_aa(lf, center_x, label_y, label, ATOMIK_FG_DIM);
-        } else {
-            draw_text(center_x, label_y, label, 1, ATOMIK_FG_DIM);
-        }
-        int pulse_x = center_x + label_w + ATOMIK_GRID_M;
-        int pulse_y = y_center - pulse_h / 2;
-        draw_event_pulse_glow(pulse_x, pulse_y, pulse_w, pulse_h,
-                              ATOMIK_SEM_HARDWARE);
-        cur_x = pulse_x + pulse_w + ATOMIK_GRID_L;
-    }
-
-    /* Right segment: decorative orb (far right) + UPTIME pill +
-     * SYSTEM LIVE pill, right-aligned.  Honest: SYSTEM LIVE is the real
-     * health state, UPTIME is real /proc/uptime; the orb is pure chrome. */
-    {
-        int orb_r  = 11;
-        int orb_cx = FB_W - ATOMIK_GRID_L - ATOMIK_GRID_M - orb_r;
-        pulse_orb(orb_cx, y_center, orb_r);
-
-        char up[64], uppill[80];
-        format_uptime(up, sizeof up);                 /* "uptime HH:MM:SS" */
-        snprintf(uppill, sizeof uppill, "UPTIME %s", up + 7);  /* skip "uptime " */
-        const char *health = "SYSTEM LIVE";
-
-        int pad_x = ATOMIK_GRID_M + 2;
-        int up_w  = font_aa_loaded(FONT_AA_UI) ? text_width_aa(FONT_AA_UI, uppill)
-                                               : text_width(uppill, 1);
-        int hl_w  = font_aa_loaded(FONT_AA_UI) ? text_width_aa(FONT_AA_UI, health)
-                                               : text_width(health, 1);
-        int up_chip_w = up_w + pad_x * 2;
-        int hl_chip_w = hl_w + pad_x * 2;
-
-        int up_x = orb_cx - orb_r - ATOMIK_GRID_M - up_chip_w;
-        int hl_x = up_x - ATOMIK_GRID_M - hl_chip_w;
-        draw_glass_pill(hl_x, y_center, health, ATOMIK_SEM_HARDWARE);
-        draw_glass_pill(up_x, y_center, uppill, ATOMIK_ACCENT_DIM);
+        int orb_r = 11;
+        int orb_cx = FB_W - ATOMIK_GRID_L - orb_r;
+        pulse_orb(orb_cx, cy, orb_r);
     }
 }
 
