@@ -264,8 +264,41 @@ static void sample_event_lanes(unsigned long now) {
     }
 }
 
+/* v0.40 self-driving DEMO WORKLOAD — replaces the fragile UART keystroke
+ * injection.  When enabled, every ~1.4 s it runs ONE real perf-bench workload
+ * for the next personality (STATE -> SYNC -> AGENT, round-robin) and emits that
+ * lane's event.  Effect: lanes go ACTIVE in turn, the big metrics refresh from
+ * REAL on-board measurements (rdcycle + the ATOMiK adapter), and the waveforms
+ * build from real samples.  Honest: this is a load generator exercising the
+ * real delta-state pipeline — the numbers are measured, not fabricated; it is
+ * never on by default (explicit /tmp/atomik_demo flag or 'L' toggle). */
+static int           s_demo_on    = 0;
+static unsigned long s_demo_last   = 0;
+static int           s_demo_phase  = 0;
+
+void fabric_demo_enable(int on) { s_demo_on = on ? 1 : 0; }
+int  fabric_demo_enabled(void)  { return s_demo_on; }
+
+static void fabric_demo_step(unsigned long now) {
+    if (!s_demo_on) return;
+    if (s_demo_last && now - s_demo_last < 1400) return;
+    s_demo_last = now;
+    atomik_profile_t   prof;
+    atomik_event_kind_t ev;
+    switch (s_demo_phase % 3) {
+    case 0:  prof = ATOMIK_PROFILE_STATE; ev = EVT_STATE_DELTA;   break;
+    case 1:  prof = ATOMIK_PROFILE_SYNC;  ev = EVT_SYNC_REPLICA;  break;
+    default: prof = ATOMIK_PROFILE_AGENT; ev = EVT_AGENT_CONTEXT; break;
+    }
+    s_demo_phase++;
+    perf_bench_result_t r;
+    perf_bench_run(8, 64, prof, &r);   /* real workload -> updates perf_last_for() */
+    atomik_event_emit(ev, s_demo_phase);  /* signal: this lane's workload just ran */
+}
+
 void fabric_tick(void) {
     unsigned long now = anim_now_ms();
+    fabric_demo_step(now);
     personality_t prev = s_active;
     s_active = detect(now);
 

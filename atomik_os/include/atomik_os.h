@@ -527,6 +527,8 @@ void          fabric_open(void);    /* opens / focuses the Resource Fabric windo
 void          fabric_draw(window_t *w, int x, int y, int wd, int ht);
 personality_t fabric_active(void);  /* current detected personality */
 const char   *fabric_personality_name(personality_t p);
+void          fabric_demo_enable(int on);  /* v0.40 self-driving demo workload */
+int           fabric_demo_enabled(void);
 /* Tick the fabric on every frame so detection state has a chance to
  * reclassify based on recent activity. */
 void          fabric_tick(void);

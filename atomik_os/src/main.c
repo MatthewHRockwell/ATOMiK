@@ -298,6 +298,15 @@ int main(int argc, char **argv) {
         }
     }
 
+    /* v0.40: /tmp/atomik_demo present => start the self-driving demo workload
+     * so a deploy capture shows live Fabric activity (lanes cycling ACTIVE with
+     * real on-board perf-bench data) without fragile UART keystroke injection.
+     * 'L' toggles it at runtime. */
+    {
+        FILE *df = fopen("/tmp/atomik_demo", "r");
+        if (df) { fabric_demo_enable(1); fclose(df); }
+    }
+
     if (fb_open() < 0) { fprintf(stderr, "fb_open failed\n"); return 1; }
     fb_clear(0);
     fb_present();
@@ -342,6 +351,19 @@ int main(int argc, char **argv) {
      * so `make host-shot` dumps a faithful frame of the REAL renderer in
      * seconds.  Gated on ATOMIK_PREVIEW so the binary could still loop. */
     if (getenv("ATOMIK_PREVIEW")) {
+        /* Optional warm-up: run N frames (ticking fabric/status each) before
+         * the final dump so time-evolving surfaces — the self-driving demo
+         * workload, building waveforms — are visible in the capture.  Default
+         * 1 keeps the plain preview unchanged. */
+        const char *nf = getenv("ATOMIK_PREVIEW_FRAMES");
+        int frames = nf ? atoi(nf) : 1;
+        if (frames < 1) frames = 1;
+        for (int i = 0; i < frames; i++) {
+            status_tick();
+            fabric_tick();
+            redraw_frame();                 /* host fb_present() dumps the PNG */
+            if (i + 1 < frames) usleep(120000);  /* real-time advance for timers */
+        }
         fb_close();
         return 0;
     }
@@ -440,6 +462,12 @@ int main(int argc, char **argv) {
              * letter shortcut. */
             else if (ev.key == '!') {
                 perf_bench_matrix();
+                dirty = 1;
+            }
+            /* v0.40: 'L' toggles the self-driving demo workload (lanes cycle
+             * ACTIVE with real perf-bench data + building waveforms). */
+            else if (ev.key == 'l' || ev.key == 'L') {
+                fabric_demo_enable(!fabric_demo_enabled());
                 dirty = 1;
             }
             /* v0.35: 'V' opens the State Watch surface — the time-
