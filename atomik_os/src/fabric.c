@@ -290,10 +290,15 @@ static void fabric_demo_step(unsigned long now) {
     case 1:  prof = ATOMIK_PROFILE_SYNC;  ev = EVT_SYNC_REPLICA;  break;
     default: prof = ATOMIK_PROFILE_AGENT; ev = EVT_AGENT_CONTEXT; break;
     }
+    /* Gently vary the workload SIZE each tick so the lane metrics (and the
+     * waveforms built from them) move instead of flatlining — still REAL
+     * measurements, just of different-size real workloads. */
+    static const int reg_lut[8] = { 8, 11, 9, 13, 10, 7, 12, 9 };
+    int regs = reg_lut[s_demo_phase % 8];
     s_demo_phase++;
     perf_bench_result_t r;
-    perf_bench_run(8, 64, prof, &r);   /* real workload -> updates perf_last_for() */
-    atomik_event_emit(ev, s_demo_phase);  /* signal: this lane's workload just ran */
+    perf_bench_run(regs, regs * 8, prof, &r);  /* real workload -> perf_last_for() */
+    atomik_event_emit(ev, s_demo_phase);       /* signal: this lane's workload ran */
 }
 
 void fabric_tick(void) {
@@ -369,34 +374,6 @@ static personality_t lane_to_personality(fabric_lane_t lane) {
     case FABRIC_LANE_SYNC:  return PERSONALITY_SYNC;
     case FABRIC_LANE_AGENT: return PERSONALITY_AGENT;
     default:                return PERSONALITY_NONE;
-    }
-}
-
-/* v0.40: real 0..100 ratio for the per-lane progress bar, or -1 when the
- * lane's primary signal isn't a percentage (SYNC=deltas, EVENT=counts) —
- * those lanes get the waveform only.  Every value traces to a real producer. */
-static int lane_pct(fabric_lane_t lane) {
-    personality_t p = lane_to_personality(lane);
-    const perf_sample_t *s = (p != PERSONALITY_NONE) ? perf_last_for(p) : NULL;
-    switch (lane) {
-    case FABRIC_LANE_STATE:
-        if (s && s->ops_logical)
-            return (int)(100u * (s->ops_logical - s->ops_issued) / s->ops_logical);
-        return -1;
-    case FABRIC_LANE_AGENT:
-        if (s) {
-            unsigned cold  = s->bytes_avoided / 4;
-            unsigned total = s->regions_unique + cold;
-            return total ? (int)(s->ops_issued * 100u / total) : -1;
-        }
-        return -1;
-    case FABRIC_LANE_VISUAL: {
-        const atomik_metric_t *a = metric_get("visual.frame_pct_avoided");
-        if (a && a->source != METRIC_WAITING) return (int)a->value;
-        return -1;
-    }
-    default:
-        return -1;
     }
 }
 
@@ -679,47 +656,60 @@ static void draw_filled_waveform(const fabric_lane_history_t *h,
     int col_h[256];
     int n_cols = (w < 256) ? w : 256;
     for (int col = 0; col < n_cols; col++) {
-        int   sample_i = (int)((long)col * (h->count - 1) / (n_cols - 1));
-        int   idx      = (h->head - h->count + sample_i + FABRIC_HISTORY_N)
-                          % FABRIC_HISTORY_N;
-        uint16_t v     = h->values[idx];
-        int      hh    = (int)((long)(v - mn) * (hgt - 2) / span);
+        /* v0.40-05-30: LINEAR-interpolate between adjacent history samples so
+         * the waveform is a smooth flowing curve (concept Fabric), not the
+         * blocky step function nearest-sampling produced. */
+        long num    = (long)col * (h->count - 1);
+        int  si     = (int)(num / (n_cols - 1));
+        long frac_n = num - (long)si * (n_cols - 1);     /* 0 .. (n_cols-1) */
+        int  si2    = (si + 1 < h->count) ? si + 1 : si;
+        int  idx0   = (h->head - h->count + si  + FABRIC_HISTORY_N) % FABRIC_HISTORY_N;
+        int  idx1   = (h->head - h->count + si2 + FABRIC_HISTORY_N) % FABRIC_HISTORY_N;
+        long v0     = h->values[idx0], v1 = h->values[idx1];
+        long v      = v0 + (v1 - v0) * frac_n / (n_cols - 1);
+        int  hh     = (int)((v - mn) * (hgt - 2) / span);
         if (hh < 1) hh = 1;
         if (hh > hgt - 2) hh = hgt - 2;
         col_h[col] = hh;
     }
 
-    /* Pass 1: dim body fill from baseline up to the wave height.
-     * Uses `fill` (lane color at ~1/3 intensity) for low-glow body. */
+    /* Pass 1: TRANSLUCENT gradient fill — bright at the wave edge, fading to
+     * the card floor.  v0.40-05-30: reads as a glowing band (concept Fabric),
+     * never a solid block, even when the curve is near full height.  `fill`
+     * (dim lane color) tints the deep floor so it doesn't read pure black. */
     for (int col = 0; col < n_cols; col++) {
         int px    = x + col;
         int top_y = y + hgt - 1 - col_h[col];
-        for (int yy = top_y; yy < y + hgt - 1; yy++) {
-            draw_pixel(px, yy, fill);
+        int floor = y + hgt - 1;
+        int span  = floor - top_y; if (span < 1) span = 1;
+        for (int yy = top_y; yy < floor; yy++) {
+            int d = yy - top_y;                          /* 0 at the edge */
+            uint8_t a = (uint8_t)(56 - 48 * d / span);   /* 56 -> ~8 downward */
+            draw_blend_pixel(px, yy, line, a);
         }
+        (void)fill;
     }
 
-    /* Pass 2: outer glow halo — 8 px wide above the wave top edge.
-     * Per-column alpha-blended strokes; falls off with distance. */
+    /* Pass 2: outer glow halo above the edge — soft, 9 px. */
     for (int col = 0; col < n_cols; col++) {
         int px    = x + col;
         int top_y = y + hgt - 1 - col_h[col];
-        for (int g = 1; g <= 8; g++) {
+        for (int g = 1; g <= 9; g++) {
             int gy = top_y - g;
             if (gy < y) break;
-            uint8_t a = (uint8_t)(18 - (g - 1) * 2);
+            uint8_t a = (uint8_t)(22 - (g - 1) * 2);
             draw_blend_pixel(px, gy, line, a);
         }
     }
 
-    /* Pass 3: mid glow — 4 px wide above the wave top edge, brighter. */
+    /* Pass 3: mid glow above the edge — 4 px, brighter. */
     for (int col = 0; col < n_cols; col++) {
         int px    = x + col;
         int top_y = y + hgt - 1 - col_h[col];
         for (int g = 1; g <= 4; g++) {
             int gy = top_y - g;
             if (gy < y) break;
-            uint8_t a = (uint8_t)(38 - (g - 1) * 6);
+            uint8_t a = (uint8_t)(46 - (g - 1) * 9);
             draw_blend_pixel(px, gy, line, a);
         }
     }
@@ -1091,26 +1081,10 @@ void fabric_draw(window_t *w, int x, int y, int wd, int ht) {
             draw_text(tx, unit_y, unit, 1, ATOMIK_FG_DIM);
         }
 
-        /* (Waveform is drawn earlier as a card-spanning background.) */
-
-        /* v0.40: thin progress bar at the card floor for lanes whose
-         * primary metric is a real percentage (STATE/AGENT/VISUAL).  The
-         * fill width = the real %, in lane color; SYNC/EVENT (counts, not
-         * %) get no bar — honest, the waveform carries them. */
-        int pct = lane_pct(lane);
-        if (pct >= 0) {
-            if (pct > 100) pct = 100;
-            int pb_h = 4;
-            int pb_x = tx;
-            int pb_w = inner_w;
-            int pb_y = ly + LANE_ROW_H - ATOMIK_GRID_M - pb_h;
-            draw_rect_rounded(pb_x, pb_y, pb_w, pb_h, 2, rgb(0x22, 0x2C, 0x40));
-            int fill_w = pb_w * pct / 100;
-            if (fill_w < pb_h) fill_w = pb_h;
-            draw_rect_rounded(pb_x, pb_y, fill_w, pb_h, 2, lc);
-            for (int sx = 0; sx < fill_w; sx++)
-                draw_blend_pixel(pb_x + sx, pb_y - 1, lc, 40);
-        }
+        /* (Waveform is drawn earlier as a card-spanning background.)
+         * v0.40 (2026-05-30): progress bars REMOVED per design direction —
+         * the Resource Fabric is a glowing-waveform instrument, not a bar
+         * chart.  The waveform carries every lane. */
     }
 }
 
