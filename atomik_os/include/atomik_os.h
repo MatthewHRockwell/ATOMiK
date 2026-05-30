@@ -272,6 +272,33 @@ void atomik_close(void);
 /* Read each slot's accumulator. Fills `out[ATOMIK_N_SLOTS]`. */
 int  atomik_read_slots(uint32_t *out);
 
+/* bench.c — LIVE parallel-bank throughput, measured on the parallel-bank
+ * bench engine @0xF0021000 (separate region from the single-bank adapter).
+ * Drives the engine over /dev/mem (O_RDWR), measures hardware cycles for a
+ * fixed-count accumulation at 1/2/4/8 active banks, and verifies the HW XOR
+ * result against an independent software recompute.  Every number here is
+ * METRIC_LIVE — it came from the silicon's own cycle counter this session. */
+#define BENCH_BASE_PS   0xF0021000UL
+#define BENCH_SYS_HZ    100000000.0     /* sys_clk_freq the engine runs at   */
+#define BENCH_N_POINTS  4               /* the 1/2/4/8-bank sweep            */
+typedef struct {
+    uint32_t banks;        /* active bank count for this point   */
+    uint32_t cycles;       /* HW cycles measured                 */
+    double   mdeltas_s;    /* throughput at BENCH_SYS_HZ          */
+    double   speedup;      /* vs the 1-bank point                */
+    int      verified;     /* HW result == SW reference          */
+} bench_point_t;
+
+int  bench_open(void);                  /* map engine; 0 ok, -1 unavailable  */
+void bench_close(void);
+int  bench_available(void);             /* 1 if engine mapped + responding   */
+int  bench_nbanks(void);               /* N_BANKS reported by STATUS         */
+void bench_tick(void);                  /* refresh cached sweep (~2s) + alloc */
+const bench_point_t *bench_sweep_points(int *n); /* cached 1/2/4/8 sweep      */
+int  bench_active_banks(void);          /* current (demo-cycled) allocation   */
+int  bench_source(void);                /* metric_source_t: METRIC_LIVE/WAITING */
+void bench_register_metrics(void);      /* register bench.* LIVE metrics      */
+
 /* perf_counter.c declarations live below the personality_t enum.
  * (See the fabric.c declaration block further down.) */
 

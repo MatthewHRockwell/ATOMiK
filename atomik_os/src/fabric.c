@@ -822,10 +822,153 @@ static void lane_big_metric(fabric_lane_t lane,
 
 /* === main draw === */
 
-#define LANE_ROW_H        158    /* v0.38-G: was 76; taller panels = instrument feel */
+#define LANE_ROW_H        138    /* v0.40: 158->138 to free ~100px for the live
+                                  * PARALLEL BANKS panel below the lanes */
 #define LANE_GAP          ATOMIK_GRID_M
 #define LANE_ACCENT_W     3      /* v0.38-J: thicker active rim (was 2) */
 #define LANE_ACTIVE_HALO  6      /* v0.38-J: outer alpha halo px */
+
+/* v0.40: PARALLEL BANKS panel — the live, self-verifying parallel-bank
+ * throughput measured on the engine @0xF0021000 (bench.c).  Drawn below the
+ * 5 lanes.  Bars are throughput per active-bank-count (1/2/4/8); the bar for
+ * the currently-allocated count glows; the chip reports VERIFIED only when
+ * the hardware XOR result matched the software recompute this measurement.
+ * No fabricated values: if the engine is absent the panel dims to WAITING. */
+static void draw_banks_panel(int x, int y, int wd, int h) {
+    pixel_t accent = ATOMIK_SEM_HARDWARE;           /* cyan: silicon */
+    /* card */
+    draw_rect_rounded(x, y, wd, h, 10, wm_card_bg());
+    draw_rect(x, y, wd, 1, wm_card_border());
+    draw_rect(x, y + h - 1, wd, 1, wm_card_border());
+    draw_rect(x, y, 1, h, wm_card_border());
+    draw_rect(x + wd - 1, y, 1, h, wm_card_border());
+    /* tinted top shoulder */
+    for (int sy = 0; sy < 10; sy++) {
+        uint8_t a = (uint8_t)(55 - sy * 5);
+        for (int sx = 0; sx < wd; sx++) draw_blend_pixel(x + sx, y + sy, accent, a);
+    }
+
+    int pad = ATOMIK_GRID_L;
+    int tx  = x + pad;
+    int ty  = y + ATOMIK_GRID_M;
+
+    /* title */
+    int title_h;
+    if (font_aa_loaded(FONT_AA_UI)) {
+        draw_text_aa(FONT_AA_UI, tx, ty, "PARALLEL BANKS", accent);
+        title_h = text_height_aa(FONT_AA_UI);
+    } else {
+        draw_text(tx, ty, "PARALLEL BANKS", 2, accent);
+        title_h = text_height(2);
+    }
+
+    int src = bench_source();
+    const char *chip; pixel_t chipc;
+    if      (src == METRIC_LIVE)  { chip = "VERIFIED";  chipc = ATOMIK_SEM_SAVINGS; }
+    else if (src == METRIC_STALE) { chip = "MEASURING"; chipc = ATOMIK_SEM_WASTE;  }
+    else                          { chip = "WAITING";   chipc = ATOMIK_FG_DIM;     }
+    int cu = font_aa_loaded(FONT_AA_LABEL);
+    int cw = cu ? text_width_aa(FONT_AA_LABEL, chip) : text_width(chip, 1);
+    int chh = (cu ? text_height_aa(FONT_AA_LABEL) : text_height(1)) + 4;
+    int cwp = cw + ATOMIK_GRID_M;
+    int cxp = x + wd - cwp - pad;
+    int cyp = ty + (title_h - chh) / 2;
+    draw_rect_rounded(cxp, cyp, cwp, chh, chh / 2, wm_card_bg() & 0x0F0F0F);
+    draw_rect(cxp + chh / 2, cyp, cwp - chh, 1, chipc);
+    draw_rect(cxp + chh / 2, cyp + chh - 1, cwp - chh, 1, chipc);
+    if (cu) draw_text_aa(FONT_AA_LABEL, cxp + ATOMIK_GRID_S, cyp + 2, chip, chipc);
+    else    draw_text(cxp + ATOMIK_GRID_S, cyp + 2, chip, 1, chipc);
+
+    /* bar chart region (left ~58%), readout (right) */
+    int npts = 0;
+    const bench_point_t *pts = bench_sweep_points(&npts);
+    int chart_x = tx;
+    int chart_w = (wd - pad * 2) * 58 / 100;
+    int bars_top = ty + title_h + ATOMIK_GRID_M;
+    int label_h  = cu ? text_height_aa(FONT_AA_LABEL) : text_height(1);
+    int bars_h   = (y + h - ATOMIK_GRID_M) - bars_top - label_h - 2;
+    if (bars_h < 16) bars_h = 16;
+
+    double vmax = 0.0;
+    for (int i = 0; i < npts; i++) if (pts[i].mdeltas_s > vmax) vmax = pts[i].mdeltas_s;
+
+    int slots = (npts > 0) ? npts : BENCH_N_POINTS;
+    int active = bench_active_banks();
+    int bw = chart_w / (slots * 2);            /* bar width; gaps between */
+    if (bw < 6) bw = 6;
+    for (int i = 0; i < slots; i++) {
+        int bx = chart_x + (chart_w * (2 * i + 1)) / (slots * 2) - bw / 2;
+        int banks = (npts > 0) ? (int)pts[i].banks : (1 << i);
+        int bh; pixel_t fill;
+        if (npts > 0 && vmax > 0.0) {
+            bh = (int)(pts[i].mdeltas_s / vmax * bars_h);
+            int is_active = (pts[i].banks == (uint32_t)active);
+            fill = is_active ? accent : ATOMIK_ACCENT_DIM;
+            if (bh < 2) bh = 2;
+            int by = bars_top + bars_h - bh;
+            draw_rect_rounded(bx, by, bw, bh, 3, fill);
+            if (is_active) {                    /* glow rim on the live allocation */
+                for (int g = 1; g <= 4; g++) {
+                    uint8_t a = (uint8_t)(40 - (g - 1) * 9);
+                    for (int sx = -g; sx < bw + g; sx++) {
+                        draw_blend_pixel(bx + sx, by - g, accent, a);
+                    }
+                    for (int sy = -g; sy < bh + g; sy++) {
+                        draw_blend_pixel(bx - g, by + sy, accent, a);
+                        draw_blend_pixel(bx + bw - 1 + g, by + sy, accent, a);
+                    }
+                }
+            }
+        } else {
+            /* WAITING: ambient dim stub bars, no data */
+            bh = bars_h / 6 + i * 3;
+            int by = bars_top + bars_h - bh;
+            draw_rect_rounded(bx, by, bw, bh, 3, rgb(0x2A, 0x34, 0x48));
+        }
+        /* bank-count label under each bar */
+        char bl[8]; snprintf(bl, sizeof bl, "%d", banks);
+        int blw = cu ? text_width_aa(FONT_AA_LABEL, bl) : text_width(bl, 1);
+        int blx = bx + bw / 2 - blw / 2;
+        int bly = bars_top + bars_h + 1;
+        pixel_t lcol = (npts > 0 && pts[i].banks == (uint32_t)active) ? accent
+                                                                      : ATOMIK_FG_DIM;
+        if (cu) draw_text_aa(FONT_AA_LABEL, blx, bly, bl, lcol);
+        else    draw_text(blx, bly, bl, 1, lcol);
+    }
+
+    /* right-side readout: big speedup + throughput-at-current-allocation */
+    int rx = chart_x + chart_w + ATOMIK_GRID_L;
+    int ry = bars_top;
+    if (npts > 0) {
+        double max_spd = pts[npts - 1].speedup;
+        char big[16]; snprintf(big, sizeof big, "%.2f", max_spd);
+        /* draw the "x" suffix in dim after the big number */
+        if (font_aa_loaded(FONT_AA_DISPLAY)) {
+            draw_text_aa(FONT_AA_DISPLAY, rx, ry, big, accent);
+            int nbw = text_width_aa(FONT_AA_DISPLAY, big);
+            draw_text_aa(FONT_AA_LABEL, rx + nbw + 2,
+                         ry + text_height_aa(FONT_AA_DISPLAY)
+                            - text_height_aa(FONT_AA_LABEL),
+                         "x", ATOMIK_FG_DIM);
+            ry += text_height_aa(FONT_AA_DISPLAY) + 2;
+        } else {
+            draw_text(rx, ry, big, 3, accent);
+            ry += text_height(3) + 2;
+        }
+        /* throughput at the CURRENT allocation */
+        int ai = 0;
+        for (int i = 0; i < npts; i++) if (pts[i].banks == (uint32_t)active) ai = i;
+        char sub[40];
+        snprintf(sub, sizeof sub, "%.0f Md/s @ %d banks",
+                 pts[ai].mdeltas_s, (int)pts[ai].banks);
+        if (cu) draw_text_aa(FONT_AA_LABEL, rx, ry, sub, ATOMIK_FG_DIM);
+        else    draw_text(rx, ry, sub, 1, ATOMIK_FG_DIM);
+    } else {
+        const char *msg = "engine @0xF0021000 — waiting";
+        if (cu) draw_text_aa(FONT_AA_LABEL, rx, ry, msg, ATOMIK_FG_DIM);
+        else    draw_text(rx, ry, msg, 1, ATOMIK_FG_DIM);
+    }
+}
 
 void fabric_draw(window_t *w, int x, int y, int wd, int ht) {
     (void)w; (void)ht;
@@ -1085,6 +1228,16 @@ void fabric_draw(window_t *w, int x, int y, int wd, int ht) {
          * v0.40 (2026-05-30): progress bars REMOVED per design direction —
          * the Resource Fabric is a glowing-waveform instrument, not a bar
          * chart.  The waveform carries every lane. */
+    }
+
+    /* v0.40: live PARALLEL BANKS panel below the 5 lanes.  Real measured
+     * bank-allocation throughput from the engine @0xF0021000 (bench.c). */
+    {
+        int panel_y = lanes_y + FABRIC_N_LANES_V2 * (LANE_ROW_H + LANE_GAP)
+                      + ATOMIK_GRID_S;
+        int panel_h = (y + ht) - panel_y - ATOMIK_GRID_M;
+        if (panel_h > 70)
+            draw_banks_panel(lane_x, panel_y, lane_w, panel_h);
     }
 }
 

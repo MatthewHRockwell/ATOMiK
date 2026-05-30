@@ -71,6 +71,7 @@ class BaseSoC(SoCCore):
                  with_video_framebuffer=False,
                  with_video_phy_only=False,
                  with_video_framebuffer_hp=False,
+                 video_1080p60=False,
                  **kwargs):
         platform = hamgeek_rk7020f.Platform()
         self.crg = _CRG(platform, sys_clk_freq)
@@ -225,6 +226,34 @@ class BaseSoC(SoCCore):
             self.bus.add_slave("atomik_adapter", adapter_bus,
                 region=SoCRegion(origin=0xf0020000, size=0x20, cached=False))
 
+            # ── ATOMiK parallel-bank throughput bench (separate region) ──
+            # Makes the N-bank parallel XOR accumulator REAL on hardware:
+            # accumulates `count` deterministic deltas across `active_banks`
+            # banks and reports the exact HW cycles taken, so a 1->8 bank
+            # sweep yields a measured throughput curve. Does NOT touch the
+            # validated single-bank adapter above.
+            rtl_dir   = os.path.join(os.path.dirname(zynq_dir), "rtl")
+            bench_v   = os.path.join(zynq_dir, "rtl", "atomik_parallel_bench.v")
+            platform.add_source(bench_v)
+            platform.add_source(os.path.join(rtl_dir, "atomik_parallel_acc.v"))
+            platform.add_source(os.path.join(rtl_dir, "atomik_delta_acc.v"))
+
+            bench_bus = wishbone.Interface(data_width=32, address_width=32, addressing="word")
+            self.specials += Instance("atomik_parallel_bench",
+                p_N_BANKS = 8,
+                i_clk     = ClockSignal("sys"),
+                i_rst     = ResetSignal("sys"),
+                i_adr     = bench_bus.adr[:5],
+                i_dat_w   = bench_bus.dat_w,
+                o_dat_r   = bench_bus.dat_r,
+                i_we      = bench_bus.we,
+                i_cyc     = bench_bus.cyc,
+                i_stb     = bench_bus.stb,
+                o_ack     = bench_bus.ack,
+            )
+            self.bus.add_slave("atomik_bench", bench_bus,
+                region=SoCRegion(origin=0xf0021000, size=0x80, cached=False))
+
         # ------------------------------------------------------------------
         # Phase 9.2 "cheap confirmation" variant: --with-video-phy-only
         #
@@ -241,13 +270,23 @@ class BaseSoC(SoCCore):
             self.video_pll = video_pll = S7MMCM(speedgrade=-2)
             self.comb += video_pll.reset.eq(ResetSignal("sys"))
             video_pll.register_clkin(ClockSignal("sys"), sys_clk_freq)
-            video_pll.create_clkout(self.cd_hdmi,   25.175e6)
-            video_pll.create_clkout(self.cd_hdmi5x, 5*25.175e6)
+            # --video-1080p60 TEST PATH: drive the OSERDES at the full
+            # 1080p60 rate (148.5 MHz pixel → 742.5 MHz serializer) to get a
+            # first-party timing verdict on whether OSERDES2 -2 can close it.
+            # Default phy-only stays at the proven 640x480.
+            if video_1080p60:
+                _phy_pix_clk = 148.5e6
+                _phy_timings = "1920x1080@60Hz"
+            else:
+                _phy_pix_clk = 25.175e6
+                _phy_timings = "640x480@60Hz"
+            video_pll.create_clkout(self.cd_hdmi,   _phy_pix_clk)
+            video_pll.create_clkout(self.cd_hdmi5x, 5*_phy_pix_clk)
 
             self.videophy = VideoS7HDMIPHY(platform.request("hdmi_out"),
                                            clock_domain="hdmi")
 
-            video_vtg = VideoTimingGenerator(default_video_timings="640x480@60Hz")
+            video_vtg = VideoTimingGenerator(default_video_timings=_phy_timings)
             video_vtg = ClockDomainsRenamer("hdmi")(video_vtg)
             self.add_module(name="video_vtg", module=video_vtg)
 
@@ -257,11 +296,14 @@ class BaseSoC(SoCCore):
             self.comb += video_vtg.source.connect(self.videophy.sink,
                 keep={"valid", "ready", "last", "de", "hsync", "vsync"})
 
-            # Same XDC pre-placement false-path fix as the FB variant.
+            # Use the SAME proven false-path form as the HP framebuffer build
+            # (the MMCME2-pin-filter form in the old phy-only diagnostic was
+            # never exercised through P&R and errors out with "only one
+            # non-empty group remains"). clkout0=hdmi, clkout1=hdmi5x.
             platform.toolchain.pre_placement_commands.add(
                 "set_clock_groups -asynchronous "
                 "-group [get_clocks clk_fpga_0] "
-                "-group [get_clocks -include_generated_clocks -of_objects [get_pins -hierarchical -filter {{NAME =~ */MMCME2_ADV/CLKOUT*}}]]"
+                "-group [get_clocks {{{{clkout0 clkout1}}}}]"
             )
             # Intentionally no bus.add_master call. No wishbone arbiter.
 
@@ -464,6 +506,9 @@ def main():
     parser.add_target_argument("--with-video-framebuffer-hp", action="store_true",
                                help="Enable HDMI framebuffer via AXI HP0 (Path B — "
                                     "dedicated DMA master, no SoC bus arbiter)")
+    parser.add_target_argument("--video-1080p60", action="store_true",
+                               help="TEST ONLY: drive PHY at 1080p60 (742.5 MHz serializer) "
+                                    "to empirically check the OSERDES2 -2 timing ceiling")
     args = parser.parse_args()
 
     # Force NaxRiscv config AFTER parse_args (which resets class attrs).
@@ -487,6 +532,7 @@ def main():
         with_video_framebuffer=args.with_video_framebuffer,
         with_video_phy_only=args.with_video_phy_only,
         with_video_framebuffer_hp=args.with_video_framebuffer_hp,
+        video_1080p60=args.video_1080p60,
         **parser.soc_argdict,
     )
     builder = Builder(soc, **parser.builder_argdict)

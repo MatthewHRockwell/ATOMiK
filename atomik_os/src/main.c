@@ -341,6 +341,11 @@ int main(int argc, char **argv) {
      * provider.  Surfaces can now consume by ID through metric_get(),
      * and the Pulse Bar's "DATA:" badge reads metric_worst_source(). */
     metric_init();
+    /* v0.40: live parallel-bank throughput producer.  Maps the bench engine
+     * @0xF0021000 (O_RDWR) and registers bench.* LIVE metrics.  Non-fatal:
+     * if the engine/mem is absent it stays WAITING and the surface dims. */
+    bench_open();
+    bench_register_metrics();
     /* v0.38-A: tile-based dirty-region tracker.  Components declare
      * their dirty rects each frame; redraw_frame() finalizes per-
      * frame stats so the VISUAL Resource Fabric lane reflects real
@@ -413,6 +418,11 @@ int main(int argc, char **argv) {
          * personality auto-detection re-classifies based on recent
          * LLM/state activity.  Cheap (no I/O, no allocation). */
         fabric_tick();
+        /* v0.40: re-measure the parallel-bank sweep on the engine.
+         * Self-rate-limits to BENCH_REFRESH_MS (4 sub-ms HW runs), so
+         * calling it every frame is fine; advances the demo's bank
+         * allocation cursor so the Fabric surface visibly reallocates. */
+        bench_tick();
         /* v0.35: tick the State Watch sampler.  Self-rate-limits to
          * 200 ms per sample, so calling it every frame is fine.
          * Passive observer — reads existing producers + maintains
