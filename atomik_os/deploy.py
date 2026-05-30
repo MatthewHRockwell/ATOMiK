@@ -222,6 +222,10 @@ def main():
                     help="Don't re-transfer the binary; just chmod +x the one "
                          "already on the board (use after a partial deploy or "
                          "a UART-corrupted chmod)")
+    ap.add_argument("--demo", action="store_true",
+                    help="Start the self-driving demo workload (touch "
+                         "/tmp/atomik_demo) so the captured frame shows live "
+                         "Fabric activity with real perf-bench data")
     ap.add_argument("--no-shot", action="store_true",
                     help="Skip post-launch screenshot verification")
     ap.add_argument("--mode", choices=["DEV", "DEMO", "INVESTOR"],
@@ -320,6 +324,14 @@ def main():
           "rm -f /tmp/aos_fifo_writer.pid /tmp/aos_keys", log=False)
     # Wipe stale version stamp so we KNOW the next read is from the new run.
     cmd(s, "rm -f /tmp/atomik_os_version /tmp/aos.err /tmp/aos.out", log=False)
+    # v0.40: --demo writes /tmp/atomik_demo so atomik_os starts the self-driving
+    # demo workload (lanes cycle ACTIVE with real perf-bench data) — for a live
+    # capture without UART keystroke injection.  Otherwise clear any stale flag.
+    if getattr(args, "demo", False):
+        cmd(s, "touch /tmp/atomik_demo", log=False)
+        print("[deploy] demo workload ENABLED (/tmp/atomik_demo)", flush=True)
+    else:
+        cmd(s, "rm -f /tmp/atomik_demo", log=False)
     # v0.38-J++ mode hint: write /tmp/atomik_mode so atomik_os reads it
     # at startup and skips the DEV default.
     print(f"[deploy] initial mode = {args.mode}", flush=True)
