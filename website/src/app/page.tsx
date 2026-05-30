@@ -85,6 +85,24 @@ const paidPains = [
   },
 ];
 
+const roiSignals = [
+  {
+    title: "Less redundant work",
+    body:
+      "If the workload fit is real, the first measurable value is fewer bytes moved, fewer full-state transfers, fewer repeated scans, or lower update cost.",
+  },
+  {
+    title: "Lower constraint pressure",
+    body:
+      "Those measured improvements can translate into battery, thermal, bandwidth, latency, footprint, or engineering-time pressure only when the customer workload proves it.",
+  },
+  {
+    title: "Faster investment decision",
+    body:
+      "The evaluation path is designed to produce a fit/no-fit answer, a baseline comparison, and the next evidence gate before a team commits to a larger design-partner or licensing path.",
+  },
+];
+
 const mechanisms = [
   {
     title: "Track meaningful change",
@@ -198,16 +216,16 @@ export default function Home() {
 
           <figure className="overflow-hidden rounded" style={{ border: `1px solid ${colors.border}`, background: colors.panel }}>
             <Image
-              src="/09-current-live-atomik-desk-v039k.png"
+              src="/10-current-live-atomik-desk-v040a.png"
               width={1920}
               height={1080}
               priority
               sizes="(min-width: 768px) 46vw, 100vw"
-              alt="ATOMiK Desk v0.39-K prototype UI running on live Zynq hardware"
+              alt="ATOMiK Desk v0.40-A UI captured live from the framebuffer on Zynq hardware"
               className="h-auto w-full"
             />
             <figcaption className="px-4 py-3 text-xs" style={{ color: colors.muted }}>
-              <strong style={{ color: colors.text }}>Hardware-validated prototype image:</strong> ATOMiK Desk v0.39-K running on live Zynq hardware. This image is not a power, thermal, uptime, or production-readiness claim.
+              <strong style={{ color: colors.text }}>Hardware-validated capture:</strong> ATOMiK Desk v0.40-A captured live from <code>/dev/fb0</code> on Zynq hardware. This image is not a power, thermal, uptime, or production-readiness claim.
             </figcaption>
           </figure>
         </div>
@@ -255,6 +273,26 @@ export default function Home() {
               <article key={item.title} className="rounded p-5" style={{ background: colors.panel, border: `1px solid ${colors.border}` }}>
                 <div className="mb-4 h-1 w-14 rounded" style={{ background: item.accent }} />
                 <h3 className="text-lg font-bold">{item.title}</h3>
+                <p className="mt-3 text-sm leading-6" style={{ color: colors.muted }}>{item.body}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="px-6 py-12" style={{ borderTop: `1px solid ${colors.border}` }}>
+        <div className="mx-auto max-w-6xl">
+          <div className="max-w-3xl">
+            <Label>ROI path</Label>
+            <h2 className="mt-4 text-3xl font-bold md:text-4xl">The value story is not a bigger claim. It is a shorter path from waste to decision.</h2>
+            <p className="mt-4 text-lg leading-8" style={{ color: colors.muted }}>
+              ATOMiK turns a vague compute problem into an evidence question: where is state movement creating cost, what metric proves the waste, and does reducing it justify a larger customer or licensing step?
+            </p>
+          </div>
+          <div className="mt-8 grid gap-4 md:grid-cols-3">
+            {roiSignals.map((item) => (
+              <article key={item.title} className="rounded p-5" style={{ background: colors.panel, border: `1px solid ${colors.border}` }}>
+                <p className="text-[11px] font-semibold uppercase" style={{ color: colors.green }}>{item.title}</p>
                 <p className="mt-3 text-sm leading-6" style={{ color: colors.muted }}>{item.body}</p>
               </article>
             ))}
