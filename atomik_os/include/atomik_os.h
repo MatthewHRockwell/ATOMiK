@@ -130,6 +130,9 @@ pixel_t *fb_back(void);   /* writeable back buffer (FB_W*FB_H pixels) */
 void fb_present(void);    /* memcpy back buffer to /dev/fb0 mmap */
 void fb_clear(pixel_t color);
 void fb_enable_scanout(int enable);  /* drives the LiteX VTG/DMA CSRs */
+void fb_write_png(const char *path); /* v0.40 in-OS auto-capture: back buffer -> PNG */
+/* png_write.c — dependency-free XRGB8888 -> PNG (shared by fb/fb_host/main). */
+int  png_write_xrgb(const char *path, const uint32_t *px, int w, int h);
 
 /* draw.c — primitives. All operate on the back buffer. */
 void draw_rect(int x, int y, int w, int h, pixel_t color);

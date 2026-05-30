@@ -307,6 +307,17 @@ int main(int argc, char **argv) {
         if (df) { fabric_demo_enable(1); fclose(df); }
     }
 
+    /* v0.40 in-OS AUTO-CAPTURE: /tmp/atomik_autoshot => after AUTOSHOT_MS of
+     * runtime, atomik_os snapshots its OWN screen to /tmp/atomik_autoshot.png
+     * and writes /tmp/atomik_autoshot.done — no host/UART command touches the
+     * OS during render, so the capture is clean (no console-input bleed, no
+     * window clutter). The deploy host just waits silently then pulls the PNG. */
+    int autoshot = 0, autoshot_done = 0;
+    {
+        FILE *as = fopen("/tmp/atomik_autoshot", "r");
+        if (as) { autoshot = 1; fclose(as); }
+    }
+
     if (fb_open() < 0) { fprintf(stderr, "fb_open failed\n"); return 1; }
     fb_clear(0);
     fb_present();
@@ -368,7 +379,21 @@ int main(int argc, char **argv) {
         return 0;
     }
 
+    unsigned long autoshot_start = anim_now_ms();
     while (s_running) {
+        /* v0.40 in-OS auto-capture: once the demo workload has had time to
+         * cycle the lanes + build waveforms, snapshot our own screen.  Force a
+         * fresh frame so the back buffer is current, write the PNG + done flag,
+         * and only do it once. */
+        if (autoshot && !autoshot_done &&
+            anim_now_ms() - autoshot_start > 18000UL) {
+            redraw_frame();
+            fb_write_png("/tmp/atomik_autoshot.png");
+            FILE *adf = fopen("/tmp/atomik_autoshot.done", "w");
+            if (adf) { fputs("ok\n", adf); fclose(adf); }
+            autoshot_done = 1;
+        }
+
         /* Frame-loop: when an animation is active or the terminal is
          * focused (async pty output), poll fast (16ms = ~60Hz). Otherwise
          * idle at 100ms to save CPU. */

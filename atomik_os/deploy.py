@@ -207,6 +207,43 @@ def capture_and_save(s, expected_ver):
     print(f"[deploy]  screenshot saved: {path}", flush=True)
     return path
 
+def autoshot_capture_and_save(s, ver):
+    """Pull the in-OS auto-captured PNG.  atomik_os writes
+    /tmp/atomik_autoshot.png + .done ~18s after launch, entirely on its own —
+    so we send NOTHING for ~24s (any keystroke bleeds into the OS via the
+    shared console and clutters the frame), then pull the already-captured PNG."""
+    os.makedirs(SHOTS_DIR, exist_ok=True)
+    print("[deploy] AUTOSHOT: silent wait ~24s for the in-OS capture "
+          "(no commands => clean frame) …", flush=True)
+    time.sleep(24)   # boot (~5s) + demo cycles + capture fires at 18s
+    done = ""
+    for _ in range(8):
+        done = (cmd_capture(s, "cat /tmp/atomik_autoshot.done 2>/dev/null", t=8) or "").strip()
+        if "ok" in done:
+            break
+        time.sleep(3)
+    if "ok" not in done:
+        print("[deploy]  AUTOSHOT: no /tmp/atomik_autoshot.done — atomik_os "
+              "didn't reach the capture (chmod/launch failure?). Re-run with "
+              "--no-binary --autoshot to chmod-fix the on-board binary.",
+              flush=True)
+        return None
+    sz = (cmd_capture(s, "stat -c%s /tmp/atomik_autoshot.png 2>/dev/null", t=8) or "").strip()
+    print(f"[deploy]  AUTOSHOT captured ({sz} bytes) — pulling", flush=True)
+    cmd(s, "pkill -STOP atomik_os && echo P || echo N", t=8, log=False)
+    raw = pull_file(s, "/tmp/atomik_autoshot.png", "autoshot")
+    cmd(s, "pkill -CONT atomik_os && echo R || echo N", t=8, log=False)
+    if not raw:
+        print("[deploy]  AUTOSHOT pull FAILED", flush=True)
+        return None
+    ts = time.strftime("%Y%m%d_%H%M%S")
+    path = os.path.join(SHOTS_DIR, f"autoshot_{ts}_{ver}.png")
+    with open(path, "wb") as f:
+        f.write(raw)
+    print(f"[deploy]  AUTOSHOT saved: {path}", flush=True)
+    return path
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--no-launch", action="store_true")
@@ -226,6 +263,11 @@ def main():
                     help="Start the self-driving demo workload (touch "
                          "/tmp/atomik_demo) so the captured frame shows live "
                          "Fabric activity with real perf-bench data")
+    ap.add_argument("--autoshot", action="store_true",
+                    help="In-OS auto-capture: atomik_os snapshots its own "
+                         "screen ~18s in (no shell/UART during render => a "
+                         "clean frame, no console-input bleed). Host waits "
+                         "silently then pulls the self-captured PNG.")
     ap.add_argument("--no-shot", action="store_true",
                     help="Skip post-launch screenshot verification")
     ap.add_argument("--mode", choices=["DEV", "DEMO", "INVESTOR"],
@@ -332,6 +374,11 @@ def main():
         print("[deploy] demo workload ENABLED (/tmp/atomik_demo)", flush=True)
     else:
         cmd(s, "rm -f /tmp/atomik_demo", log=False)
+    if getattr(args, "autoshot", False):
+        cmd(s, "rm -f /tmp/atomik_autoshot.done; touch /tmp/atomik_autoshot", log=False)
+        print("[deploy] in-OS auto-capture ENABLED (/tmp/atomik_autoshot)", flush=True)
+    else:
+        cmd(s, "rm -f /tmp/atomik_autoshot /tmp/atomik_autoshot.done", log=False)
     # v0.38-J++ mode hint: write /tmp/atomik_mode so atomik_os reads it
     # at startup and skips the DEV default.
     print(f"[deploy] initial mode = {args.mode}", flush=True)
@@ -367,6 +414,16 @@ def main():
             f"< /tmp/aos_keys &\n")
     time.sleep(0.6)
     s.read(8192)
+
+    # v0.40 AUTOSHOT: atomik_os snapshots its OWN screen ~18s in.  To keep that
+    # frame CLEAN we must send NO commands during render (any keystroke bleeds
+    # into atomik_os via the shared console).  So skip the version/health probes
+    # entirely, wait silently, then pull the self-captured PNG.
+    if getattr(args, "autoshot", False):
+        autoshot_capture_and_save(s, expected or "unknown")
+        print("[deploy] done — autoshot pulled (or reported failure above).")
+        return
+
     cmd(s, "sleep 2; pgrep atomik_os && echo OS_RUNNING || echo OS_NOT_RUNNING")
     cmd(s, "cat /tmp/aos.err 2>/dev/null | head -20")
     cmd(s, "cat /tmp/aos.out 2>/dev/null | head -20")
