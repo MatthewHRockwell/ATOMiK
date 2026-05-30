@@ -15,7 +15,8 @@ Usage:
 import argparse, base64, gzip, os, re, sys, time
 import serial
 
-PORT, BAUD = "/dev/ttyUSB2", 115200
+PORT = os.environ.get("ATOMIK_PORT", "/dev/ttyUSB2")  # BIOS/console port varies per session
+BAUD = 115200
 HERE   = os.path.dirname(os.path.abspath(__file__))
 LOCAL  = os.path.join(HERE, "build", "atomik_os")
 REMOTE = "/tmp/atomik_os"
@@ -213,6 +214,14 @@ def main():
                     help="Skip transferring the fb2png screenshot tool")
     ap.add_argument("--no-assets", action="store_true",
                     help="Skip shipping atomik_os/assets/*.atomik_asset")
+    ap.add_argument("--no-fonts", action="store_true",
+                    help="Skip shipping the .atomik_font atlases (decoupled "
+                         "from --no-assets; fonts are the premium-typography "
+                         "essential)")
+    ap.add_argument("--no-binary", action="store_true",
+                    help="Don't re-transfer the binary; just chmod +x the one "
+                         "already on the board (use after a partial deploy or "
+                         "a UART-corrupted chmod)")
     ap.add_argument("--no-shot", action="store_true",
                     help="Skip post-launch screenshot verification")
     ap.add_argument("--mode", choices=["DEV", "DEMO", "INVESTOR"],
@@ -246,8 +255,14 @@ def main():
     print(f"[deploy] upload @ {FAST_RATE_S*1000:.1f} ms/char "
           f"(atomik_os killed; safe to push fast)", flush=True)
 
-    transfer(s, LOCAL, REMOTE, "aos")
-    if (not args.no_fb2png) and os.path.exists(FB2PNG_LOCAL):
+    if args.no_binary:
+        # Binary already on the board — just (re)assert +x.  Fixes the case
+        # where a UART byte-doubling corrupted the chmod target during the
+        # original transfer (e.g. /tmp/atomiik_os) and left it non-executable.
+        cmd(s, f"chmod +x {REMOTE}; ls -la {REMOTE} | head -1")
+    else:
+        transfer(s, LOCAL, REMOTE, "aos")
+    if (not args.no_binary) and (not args.no_fb2png) and os.path.exists(FB2PNG_LOCAL):
         transfer(s, FB2PNG_LOCAL, FB2PNG_REMOTE, "fb2png")
 
     # v0.36: ship .atomik_asset files so the board can blit pre-rendered
@@ -274,10 +289,11 @@ def main():
                     print(f"[deploy] shipping asset: {name}", flush=True)
                     transfer(s, local, remote, label)
 
-        # v0.38-K: ship .atomik_font atlases to /tmp/atomik_fonts/.
-        # font_aa.c probes that directory at startup; missing fonts
-        # fall back to the pixel font.  Ship-once cost — atlases don't
-        # change between deploys unless tools/font_pack.py output does.
+    # v0.38-K: ship .atomik_font atlases to /tmp/atomik_fonts/ — DECOUPLED
+    # from --no-assets (v0.40): fonts are the premium-typography essential,
+    # assets are optional Class B art.  font_aa.c probes that dir; missing
+    # fonts fall back to the pixel font.
+    if not args.no_fonts:
         fonts_dir = os.path.join(HERE, "assets", "fonts")
         if os.path.isdir(fonts_dir):
             font_files = sorted([f for f in os.listdir(fonts_dir)
