@@ -713,44 +713,44 @@ static void draw_filled_waveform(const fabric_lane_history_t *h,
         int span  = floor - top_y; if (span < 1) span = 1;
         for (int yy = top_y; yy < floor; yy++) {
             int d = yy - top_y;                          /* 0 at the edge */
-            uint8_t a = (uint8_t)(56 - 48 * d / span);   /* 56 -> ~8 downward */
+            uint8_t a = (uint8_t)(84 - 70 * d / span);   /* brighter body fill */
             draw_blend_pixel(px, yy, line, a);
         }
         (void)fill;
     }
 
-    /* Pass 2: outer glow halo above the edge — soft, 9 px. */
+    /* Pass 2: outer glow halo above the edge — soft, 11 px, brighter. */
     for (int col = 0; col < n_cols; col++) {
         int px    = x + col;
         int top_y = y + hgt - 1 - col_h[col];
-        for (int g = 1; g <= 9; g++) {
+        for (int g = 1; g <= 11; g++) {
             int gy = top_y - g;
             if (gy < y) break;
-            uint8_t a = (uint8_t)(22 - (g - 1) * 2);
+            uint8_t a = (uint8_t)(38 - (g - 1) * 3);
             draw_blend_pixel(px, gy, line, a);
         }
     }
 
-    /* Pass 3: mid glow above the edge — 4 px, brighter. */
+    /* Pass 3: mid glow above the edge — 5 px, brighter. */
     for (int col = 0; col < n_cols; col++) {
         int px    = x + col;
         int top_y = y + hgt - 1 - col_h[col];
-        for (int g = 1; g <= 4; g++) {
+        for (int g = 1; g <= 5; g++) {
             int gy = top_y - g;
             if (gy < y) break;
-            uint8_t a = (uint8_t)(46 - (g - 1) * 9);
+            uint8_t a = (uint8_t)(72 - (g - 1) * 12);
             draw_blend_pixel(px, gy, line, a);
         }
     }
 
-    /* Pass 4: core line — 2 px thick at the wave top.  Bright. */
+    /* Pass 4: core line — bright, 2 px thick at the wave top + soft underline. */
     for (int col = 0; col < n_cols; col++) {
         int px    = x + col;
         int top_y = y + hgt - 1 - col_h[col];
         draw_pixel(px, top_y, line);
-        if (top_y - 1 >= y) {
-            draw_blend_pixel(px, top_y - 1, line, 220);
-        }
+        if (top_y - 1 >= y)        draw_blend_pixel(px, top_y - 1, line, 255);
+        if (top_y - 2 >= y)        draw_blend_pixel(px, top_y - 2, line, 150);
+        if (top_y + 1 < y + hgt)   draw_blend_pixel(px, top_y + 1, line, 130);
     }
 
     /* Pass 5: hot points — 3 px square highlights at local maxima.
@@ -851,8 +851,8 @@ static void lane_big_metric(fabric_lane_t lane,
 
 /* === main draw === */
 
-#define LANE_ROW_H        166    /* v0.40: 5 tall lanes fill the shelf (concept-01);
-                                  * PARALLEL BANKS moved to the SYSTEM surface */
+#define LANE_ROW_H        156    /* v0.40: 5 tall lanes + header subtitle + bottom
+                                  * capacity line fit the shelf (concept-01) */
 #define LANE_GAP          ATOMIK_GRID_M
 #define LANE_ACCENT_W     3      /* v0.38-J: thicker active rim (was 2) */
 #define LANE_ACTIVE_HALO  6      /* v0.38-J: outer alpha halo px */
@@ -1017,6 +1017,13 @@ void fabric_draw(window_t *w, int x, int y, int wd, int ht) {
         draw_text(x + ATOMIK_GRID_L, y + ATOMIK_GRID_M,
                   "RESOURCE FABRIC", 2, ATOMIK_FG);
     }
+    /* concept subtitle */
+    if (font_aa_loaded(FONT_AA_LABEL)) {
+        int sy = y + ATOMIK_GRID_M + (font_aa_loaded(FONT_AA_UI)
+                 ? text_height_aa(FONT_AA_UI) : text_height(2)) + 2;
+        draw_text_aa(FONT_AA_LABEL, x + ATOMIK_GRID_L, sy,
+                     "ATOMIK COMPUTE BANKS", rgb(0x76, 0x82, 0x98));
+    }
 
     pixel_t badge_color;
     switch (s_active) {
@@ -1060,7 +1067,8 @@ void fabric_draw(window_t *w, int x, int y, int wd, int ht) {
     int header_h = font_aa_loaded(FONT_AA_UI)
                    ? text_height_aa(FONT_AA_UI)
                    : text_height(2);
-    int lanes_y = y + ATOMIK_GRID_M + header_h + ATOMIK_GRID_L;
+    int sub_hh   = font_aa_loaded(FONT_AA_LABEL) ? text_height_aa(FONT_AA_LABEL) : 0;
+    int lanes_y = y + ATOMIK_GRID_M + header_h + sub_hh + 2 + ATOMIK_GRID_M;
     int lane_x  = x + ATOMIK_GRID_L;
     int lane_w  = wd - ATOMIK_GRID_L * 2;
 
@@ -1182,79 +1190,26 @@ void fabric_draw(window_t *w, int x, int y, int wd, int ht) {
         }
         (void)sub_h;
 
-        /* v0.38-K3 — freshness chip AA + WAITING dimmed further.
-         * v0.38-K3A — when this lane IS the active personality,
-         * override the label to "ACTIVE" and force the bright
-         * lane-color bordered capsule so the top bar doesn't
-         * contradict the panel. Inactive lanes keep LIVE/WAITING/
-         * STALE based on metric source. ChatGPT 2026-05-16:
-         * "Active means active. Waiting means waiting. Never let
-         * the UI contradict itself." */
-        int is_active_lane = (lp != PERSONALITY_NONE &&
-                              lp == s_active);
-        const char *fl = is_active_lane ? "ACTIVE"
-                                         : fresh_label(h->fresh);
-        int chip_use_aa = font_aa_loaded(FONT_AA_LABEL);
-        int fw = chip_use_aa ? text_width_aa(FONT_AA_LABEL, fl)
-                             : text_width(fl, 1);
-        pixel_t fcol = is_active_lane ? lc : fresh_color(h->fresh);
-        int chip_h = (chip_use_aa ? text_height_aa(FONT_AA_LABEL)
-                                  : text_height(1)) + 4;
-        int chip_w = fw + ATOMIK_GRID_M;
-        int chip_x = lane_x + lane_w - chip_w - pad_x;
-        int chip_y = ty1 + (name_h - chip_h) / 2;
-        if (is_active_lane || h->fresh == FABRIC_FRESH_LIVE) {
-            int radius = chip_h / 2;
-            draw_rect_rounded(chip_x, chip_y, chip_w, chip_h, radius,
-                              wm_card_bg() & 0x0F0F0F);
-            draw_rect(chip_x + radius, chip_y, chip_w - radius * 2, 1, fcol);
-            draw_rect(chip_x + radius, chip_y + chip_h - 1,
-                      chip_w - radius * 2, 1, fcol);
-            if (chip_use_aa) {
-                draw_text_aa(FONT_AA_LABEL,
-                             chip_x + ATOMIK_GRID_S, chip_y + 2,
-                             fl, fcol);
-            } else {
-                draw_text(chip_x + ATOMIK_GRID_S, chip_y + 2,
-                          fl, 1, fcol);
-            }
-        } else {
-            /* Quiet: tiny dim text right-aligned at the same baseline,
-             * no body, no border. */
-            pixel_t quiet = rgb(0x5A, 0x66, 0x82);
-            if (chip_use_aa) {
-                draw_text_aa(FONT_AA_LABEL,
-                             chip_x + ATOMIK_GRID_S, chip_y + 2,
-                             fl, quiet);
-            } else {
-                draw_text(chip_x + ATOMIK_GRID_S, chip_y + 2,
-                          fl, 1, quiet);
-            }
-        }
+        /* v0.40: LIVE/ACTIVE chip removed — the concept puts the big metric
+         * figure in this top-right space, not a freshness badge.  (void) the
+         * now-unused per-lane personality so -Wunused stays quiet.) */
+        (void)lp;
 
-        /* Row 2: stacked metric layout — BIG NUMBER above DIM UNIT
-         * (v0.38-K3, ChatGPT 2026-05-16: "stacked is cleaner than
-         * baseline-aligning a tiny unit to a giant number").
-         * Number in AA DISPLAY, unit on its own line in AA LABEL. */
-        int ty2 = ty1 + name_h + sub_h + ATOMIK_GRID_S;
+        /* Big metric (real telemetry) — concept-01 layout: top-RIGHT, right-
+         * aligned in lane color, with the dim unit below it. */
         char big[16], unit[24];
         lane_big_metric(lane, big, sizeof big, unit, sizeof unit);
-        int big_h, unit_h;
-        if (font_aa_loaded(FONT_AA_DISPLAY)) {
-            draw_text_aa(FONT_AA_DISPLAY, tx, ty2, big, lc);
-            big_h = text_height_aa(FONT_AA_DISPLAY);
-        } else {
-            draw_text(tx, ty2, big, 3, lc);
-            big_h = text_height(3);
-        }
-        int unit_y = ty2 + big_h + 2;
-        if (font_aa_loaded(FONT_AA_LABEL)) {
-            unit_h = text_height_aa(FONT_AA_LABEL);
-            draw_text_aa(FONT_AA_LABEL, tx, unit_y, unit,
-                         ATOMIK_FG_DIM);
-        } else {
-            unit_h = text_height(1);
-            draw_text(tx, unit_y, unit, 1, ATOMIK_FG_DIM);
+        int disp  = font_aa_loaded(FONT_AA_DISPLAY);
+        int big_h = disp ? text_height_aa(FONT_AA_DISPLAY) : text_height(3);
+        int nw    = disp ? text_width_aa(FONT_AA_DISPLAY, big) : text_width(big, 3);
+        if (disp) draw_text_aa(FONT_AA_DISPLAY, lane_x + lane_w - pad_x - nw, ty1, big, lc);
+        else      draw_text(lane_x + lane_w - pad_x - nw, ty1, big, 3, lc);
+        {
+            int ulab = font_aa_loaded(FONT_AA_LABEL);
+            int uw   = ulab ? text_width_aa(FONT_AA_LABEL, unit) : text_width(unit, 1);
+            int uy   = ty1 + big_h + 1;
+            if (ulab) draw_text_aa(FONT_AA_LABEL, lane_x + lane_w - pad_x - uw, uy, unit, rgb(0x86,0x92,0xA8));
+            else      draw_text(lane_x + lane_w - pad_x - uw, uy, unit, 1, rgb(0x86,0x92,0xA8));
         }
 
         /* (Waveform is drawn earlier as a card-spanning background.)
@@ -1264,6 +1219,21 @@ void fabric_draw(window_t *w, int x, int y, int wd, int ht) {
     }
     /* v0.40: PARALLEL BANKS moved to the SYSTEM surface (system_surface.c) so
      * the Fabric is the concept's 5 tall lanes. */
+
+    /* bottom: TOTAL FABRIC CAPACITY — concept's summary line.  Per-bank GB is
+     * not wired yet, so this is a clearly-labeled PLACEHOLDER (dim, no live
+     * implication) until real memory accounting exists. */
+    if (font_aa_loaded(FONT_AA_LABEL)) {
+        int cap_y = lanes_y + FABRIC_N_LANES_V2 * (LANE_ROW_H + LANE_GAP) + 2;
+        if (cap_y + text_height_aa(FONT_AA_LABEL) < y + ht) {
+            draw_rect(lane_x, cap_y - 4, lane_w, 1, wm_card_border());
+            const char *cl = "TOTAL FABRIC CAPACITY";
+            draw_text_aa(FONT_AA_LABEL, lane_x, cap_y, cl, rgb(0x76, 0x82, 0x98));
+            const char *cv = "-- / -- GB  (placeholder)";
+            int cvw = text_width_aa(FONT_AA_LABEL, cv);
+            draw_text_aa(FONT_AA_LABEL, lane_x + lane_w - cvw, cap_y, cv, ATOMIK_FG_DIM);
+        }
+    }
 }
 
 /* === shelf geometry — unchanged from v0.34-C === */
