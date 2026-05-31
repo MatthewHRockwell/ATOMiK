@@ -316,7 +316,7 @@ int main(int argc, char **argv) {
      * 'L' toggles it at runtime. */
     {
         FILE *df = fopen("/tmp/atomik_demo", "r");
-        if (df) { fabric_demo_enable(1); seed_demo_usage(); fclose(df); }
+        if (df) { fabric_demo_enable(1); seed_demo_usage(); fabric_seed_waveforms(); fclose(df); }
     }
 
     /* v0.40 in-OS AUTO-CAPTURE: /tmp/atomik_autoshot => after AUTOSHOT_MS of
@@ -380,6 +380,7 @@ int main(int argc, char **argv) {
      * seconds.  Gated on ATOMIK_PREVIEW so the binary could still loop. */
     if (getenv("ATOMIK_PREVIEW")) {
         seed_demo_usage();   /* representative usage so PREDICTIVE INSIGHTS populates */
+        fabric_seed_waveforms();   /* lively Resource Fabric waves for the capture */
         /* Optional warm-up: run N frames (ticking fabric/status each) before
          * the final dump so time-evolving surfaces — the self-driving demo
          * workload, building waveforms — are visible in the capture.  Default
@@ -657,7 +658,7 @@ int main(int argc, char **argv) {
                 s_dock_hover = slot;
                 action_t a = dock_action_for_slot(slot);
                 if      (a == ACT_OPEN_ABOUT)     open_about();
-                else if (a == ACT_OPEN_MONITOR)   open_monitor();
+                else if (a == ACT_OPEN_MONITOR)   system_surface_open();  /* SYSTEM rail */
                 else if (a == ACT_OPEN_TERMINAL)  open_terminal();
                 else if (a == ACT_OPEN_FILES)     open_files();
                 else if (a == ACT_OPEN_NOTES)     open_notes();

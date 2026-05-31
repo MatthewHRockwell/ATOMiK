@@ -559,6 +559,7 @@ personality_t fabric_active(void);  /* current detected personality */
 const char   *fabric_personality_name(personality_t p);
 void          fabric_demo_enable(int on);  /* v0.40 self-driving demo workload */
 int           fabric_demo_enabled(void);
+void          fabric_seed_waveforms(void); /* lively decorative lane history    */
 /* Tick the fabric on every frame so detection state has a chance to
  * reclassify based on recent activity. */
 void          fabric_tick(void);
@@ -653,6 +654,12 @@ const char                  *fabric_lane_name(fabric_lane_t lane);
 
 void          state_watch_open(void);
 void          state_watch_draw(window_t *w, int x, int y, int wd, int ht);
+
+/* system_surface.c — the SYSTEM capability surface (2026 task-manager):
+ * compute & resource allocation, with the real PARALLEL BANKS bench as its
+ * centerpiece (moved out of the Resource Fabric). */
+void          system_surface_open(void);
+void          system_surface_draw(window_t *w, int x, int y, int wd, int ht);
 void          state_watch_tick(void);
 
 /* atomik_asset.c — board-side asset loader, v0.36 (Class B foundation).

@@ -170,6 +170,34 @@ static void history_push(fabric_lane_t lane, unsigned long now,
     h->v_max = (h->count > 0) ? mx : 0;
 }
 
+/* v0.40: seed each lane's waveform history with a lively flowing pattern so the
+ * Resource Fabric reads like the concept (bold bright waves) on first paint and
+ * in the host preview, before live workload data accumulates.  The waveform is
+ * DECORATIVE chrome (Class B) — the lane's real telemetry is the big NUMBER,
+ * not this shape; on the board the demo's real varied workload supersedes it. */
+void fabric_seed_waveforms(void) {
+    unsigned long now = anim_now_ms();
+    for (int L = 0; L < FABRIC_N_LANES_V2; L++) {
+        fabric_lane_history_t *h = &s_history[L];
+        uint16_t mn = 0xFFFF, mx = 0;
+        double base = 34 + L * 5, amp = 30 + (L % 3) * 7, ph = L * 1.27;
+        for (int i = 0; i < FABRIC_HISTORY_N; i++) {
+            double u = (double)i / FABRIC_HISTORY_N * 6.2831853;
+            double v = base + amp * sin(u * 1.6 + ph)
+                            + amp * 0.45 * sin(u * 3.3 + ph * 1.7)
+                            + (double)((i * 7 + L * 13) % 9);
+            if (v < 3) v = 3;
+            uint16_t vi = (uint16_t)v;
+            h->values[i] = vi;
+            if (vi < mn) mn = vi;
+            if (vi > mx) mx = vi;
+        }
+        h->head = 0; h->count = FABRIC_HISTORY_N;
+        h->v_min = mn; h->v_max = mx;
+        h->fresh = FABRIC_FRESH_LIVE; h->last_update_ms = now;
+    }
+}
+
 static void freshness_decay(unsigned long now) {
     for (int i = 0; i < FABRIC_N_LANES_V2; i++) {
         fabric_lane_history_t *h = &s_history[i];
@@ -333,11 +361,12 @@ void fabric_tick(void) {
 
 static pixel_t lane_color(fabric_lane_t lane) {
     switch (lane) {
-    case FABRIC_LANE_STATE:  return ATOMIK_SEM_HARDWARE;     /* cyan   */
-    case FABRIC_LANE_SYNC:   return ATOMIK_SEM_SAVINGS;      /* green  */
-    case FABRIC_LANE_AGENT:  return ATOMIK_SEM_AGENT;        /* violet */
-    case FABRIC_LANE_EVENT:  return rgb(0xF0, 0x9C, 0x55);   /* amber-warm: cross-cutting bus */
-    case FABRIC_LANE_VISUAL: return rgb(0xE5, 0x6E, 0xC0);   /* magenta: pixel/render */
+    /* concept-01 grouping: STATE/SYNC cyan, AGENT/EVENT violet-magenta, VISUAL green */
+    case FABRIC_LANE_STATE:  return ATOMIK_SEM_HARDWARE;     /* cyan          */
+    case FABRIC_LANE_SYNC:   return rgb(0x52, 0xC4, 0xF0);   /* lighter cyan  */
+    case FABRIC_LANE_AGENT:  return ATOMIK_SEM_AGENT;        /* violet        */
+    case FABRIC_LANE_EVENT:  return rgb(0xCE, 0x72, 0xE6);   /* magenta-violet*/
+    case FABRIC_LANE_VISUAL: return ATOMIK_SEM_SAVINGS;      /* green         */
     default:                 return ATOMIK_FG_DIM;
     }
 }
@@ -359,11 +388,11 @@ static const char *lane_oneliner(fabric_lane_t lane) {
  * without making the panel text-heavy again. */
 static const char *lane_subtitle(fabric_lane_t lane) {
     switch (lane) {
-    case FABRIC_LANE_STATE:  return "coalesce writes";
-    case FABRIC_LANE_SYNC:   return "skip unchanged";
-    case FABRIC_LANE_AGENT:  return "retain hot context";
-    case FABRIC_LANE_EVENT:  return "event bus activity";
-    case FABRIC_LANE_VISUAL: return "render deltas";
+    case FABRIC_LANE_STATE:  return "Memory & Context";
+    case FABRIC_LANE_SYNC:   return "Determinism & Time";
+    case FABRIC_LANE_AGENT:  return "Execution & Reasoning";
+    case FABRIC_LANE_EVENT:  return "Signals & Triggers";
+    case FABRIC_LANE_VISUAL: return "Render & Visualization";
     default:                 return "";
     }
 }
@@ -822,8 +851,8 @@ static void lane_big_metric(fabric_lane_t lane,
 
 /* === main draw === */
 
-#define LANE_ROW_H        138    /* v0.40: 158->138 to free ~100px for the live
-                                  * PARALLEL BANKS panel below the lanes */
+#define LANE_ROW_H        166    /* v0.40: 5 tall lanes fill the shelf (concept-01);
+                                  * PARALLEL BANKS moved to the SYSTEM surface */
 #define LANE_GAP          ATOMIK_GRID_M
 #define LANE_ACCENT_W     3      /* v0.38-J: thicker active rim (was 2) */
 #define LANE_ACTIVE_HALO  6      /* v0.38-J: outer alpha halo px */
@@ -1233,16 +1262,8 @@ void fabric_draw(window_t *w, int x, int y, int wd, int ht) {
          * the Resource Fabric is a glowing-waveform instrument, not a bar
          * chart.  The waveform carries every lane. */
     }
-
-    /* v0.40: live PARALLEL BANKS panel below the 5 lanes.  Real measured
-     * bank-allocation throughput from the engine @0xF0021000 (bench.c). */
-    {
-        int panel_y = lanes_y + FABRIC_N_LANES_V2 * (LANE_ROW_H + LANE_GAP)
-                      + ATOMIK_GRID_S;
-        int panel_h = (y + ht) - panel_y - ATOMIK_GRID_M;
-        if (panel_h > 70)
-            draw_banks_panel(lane_x, panel_y, lane_w, panel_h);
-    }
+    /* v0.40: PARALLEL BANKS moved to the SYSTEM surface (system_surface.c) so
+     * the Fabric is the concept's 5 tall lanes. */
 }
 
 /* === shelf geometry — unchanged from v0.34-C === */
