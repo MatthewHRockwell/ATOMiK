@@ -377,6 +377,7 @@ int main(int argc, char **argv) {
         for (int i = 0; i < frames; i++) {
             status_tick();
             fabric_tick();
+            bench_tick();                   /* parse the live sweep file too   */
             redraw_frame();                 /* host fb_present() dumps the PNG */
             if (i + 1 < frames) usleep(120000);  /* real-time advance for timers */
         }
