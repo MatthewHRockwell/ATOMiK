@@ -36,26 +36,35 @@ def main():
     print("[demo] uploading proven sweep tool -> /tmp/abench")
     deploy.transfer(s, TINY, "/tmp/abench", "abench")
 
-    # kill any prior demo bits
-    deploy.cmd(s, "pkill -9 atomik_os 2>/dev/null; pkill -f abench_loop 2>/dev/null; "
+    # device nodes the engine + framebuffer need (fresh boots have neither)
+    deploy.cmd(s, "pkill -9 atomik_os 2>/dev/null; pkill -f abench_loop 2>/dev/null; sleep 1; "
+                  "[ -e /dev/mem ] || mknod /dev/mem c 1 1; "
+                  "[ -e /dev/fb0 ] || mknod /dev/fb0 c 29 0; "
                   "rm -f /tmp/atomik_bench_live.txt /tmp/atomik_bench_dbg.txt; true", log=False)
 
-    # daemon: measure every 2s into the file atomik_os reads
+    # one verified run populates the file (deterministic data); confirm engine
+    print("[demo] one verified measurement:")
+    print(deploy.cmd_capture(s, f"/tmp/abench {COUNT} {SEED} > /tmp/atomik_bench_live.txt 2>&1; "
+                                "grep -c 'ALL MATCH' /tmp/atomik_bench_live.txt; echo __2__", t=40))
+
+    # daemon: re-measure every 2s into the file atomik_os reads (built earlier
+    # by hand or here).  Launch via slow() — deploy.cmd's sentinel-wait does
+    # not reliably spawn backgrounded jobs over this UART.
     deploy.cmd(s, "printf '%s\\n' '#!/bin/sh' > /tmp/abench_loop.sh", log=False)
     deploy.cmd(s, f"printf '%s\\n' 'while true; do /tmp/abench {COUNT} {SEED} "
                   ">/tmp/atomik_bench_live.txt 2>&1; sleep 2; done' >> /tmp/abench_loop.sh", log=False)
-    deploy.cmd(s, "nohup sh /tmp/abench_loop.sh >/dev/null 2>&1 &", log=False)
-    time.sleep(3)
-    print("[demo] daemon wrote live file? ->")
-    print(deploy.cmd_capture(s, "head -7 /tmp/atomik_bench_live.txt 2>/dev/null; echo __2__", t=12))
+    deploy.slow(s, "nohup sh /tmp/abench_loop.sh >/dev/null 2>&1 < /dev/null &\n")
+    time.sleep(0.8); s.read(8192); time.sleep(4)
+    print("[demo] daemon up?:",
+          deploy.cmd_capture(s, "pgrep -f abench_loop >/dev/null && echo UP || echo DOWN; echo __3__", t=10))
 
-    # framebuffer env + DETACHED launch (stdin /dev/null, no fifo)
-    deploy.cmd(s, "[ -e /dev/fb0 ]||mknod /dev/fb0 c 29 0; "
-                  "echo 0 > /sys/class/vtconsole/vtcon1/bind 2>/dev/null; "
+    # framebuffer env + DETACHED launch (slow() spawns it; stdin /dev/null)
+    deploy.cmd(s, "echo 0 > /sys/class/vtconsole/vtcon1/bind 2>/dev/null; "
                   "echo DEMO > /tmp/atomik_mode; rm -f /tmp/atomik_demo; true", log=False)
     time.sleep(1); s.read(4000)
-    deploy.cmd(s, "nohup /tmp/atomik_os </dev/null >/tmp/aos.out 2>/tmp/aos.err & ", log=False)
-    time.sleep(8)
+    deploy.slow(s, "nohup /tmp/atomik_os </dev/null >/tmp/aos.out 2>/tmp/aos.err &\n")
+    time.sleep(0.8); s.read(8192)
+    time.sleep(10)
 
     print("[demo] alive?")
     print(deploy.cmd_capture(s, "pgrep atomik_os >/dev/null && echo ALIVE || echo DEAD; echo __3__", t=10))
