@@ -531,19 +531,19 @@ static void constellation_sphere(int cx, int cy, int r, unsigned long now) {
 /* PREDICTIVE INSIGHTS "pebble" gauge: a dashed ring of short radial ticks;
  * the leading `pct`% are bright, the rest dim.  `pct` 0..100. */
 static void dashed_ring_gauge(int cx, int cy, int r, int pct, pixel_t color) {
-    const int N = 48;
+    const int N = 62;                                     /* fine dense ticks  */
     int lit = N * pct / 100;
     for (int i = 0; i < N; i++) {
         double a = -1.5707963 + (double)i / N * 6.28318531;  /* from top, CW */
         double co = cos(a), si = sin(a);
         int on = (i < lit);
-        uint8_t al = on ? 230 : 40;
-        pixel_t c = on ? color : ATOMIK_FG_DIM;
-        int r0 = r - 4, r1 = r + 2;
+        uint8_t al = on ? 240 : 26;
+        pixel_t c = on ? color : rgb(0x36, 0x44, 0x5E);
+        int r0 = r - 3, r1 = r + 1;                       /* short thin dash   */
         hero_line(cx + (int)(co * r0), cy + (int)(si * r0),
                   cx + (int)(co * r1), cy + (int)(si * r1), c, al);
-        if (on)   /* small bloom on lit ticks */
-            draw_blend_pixel(cx + (int)(co * r), cy + (int)(si * r), color, 120);
+        if (on)   /* faint inner bloom on lit ticks */
+            draw_blend_pixel(cx + (int)(co * (r - 2)), cy + (int)(si * (r - 2)), color, 80);
     }
 }
 
@@ -776,15 +776,15 @@ void hero_draw(void) {
 
         int list_w = (int)(iw * 0.56);
         pixel_t dotc[3] = { ATOMIK_ACCENT, rgb(0x58,0xAE,0xF0), rgb(0x46,0x84,0xDA) };
-        int rowh2 = lab_h + 12;
+        int rowh2 = lab_h + 18;                 /* more breathing room (concept) */
         for (int k = 0; k < 3; k++) {
             int ry = ty + k * rowh2;
-            disk(ix + 4, ry + lab_h/2, 4, dotc[k], 230);
+            disk(ix + 3, ry + lab_h/2, 3, dotc[k], 235);   /* smaller dot       */
             const char *nm = have_pred ? agent_action_name((action_t)top[k]) : "learning";
             char pct[8];
             if (have_pred) snprintf(pct, sizeof pct, "%d%%", (int)(topv[k]*100.0/tot + 0.5));
             else           snprintf(pct, sizeof pct, "--");
-            int nx = ix + 14;
+            int nx = ix + 16;
             if (font_aa_loaded(FONT_AA_LABEL)) {
                 draw_text_aa(FONT_AA_LABEL, nx, ry, nm, ATOMIK_FG);
                 int pw2 = text_width_aa(FONT_AA_LABEL, pct);

@@ -579,6 +579,9 @@ static void draw_pulse_bar_investor(int bar_y, int bar_h) {
     }
     pulse_sep(cur_x, bar_y, bar_h);
     cur_x += ATOMIK_GRID_M + 2;
+    /* concept-01: airy spread — push the personality module well right of the
+     * logo so the bar breathes instead of packing left. */
+    if (cur_x < FB_W * 19 / 100) cur_x = FB_W * 19 / 100;
 
     /* ACTIVE PERSONALITY (real -- STATE/SYNC/AGENT, not the concept's fake SYNAPSE). */
     cur_x += draw_metric_module(cur_x, cy, draw_personality_glyph,
@@ -610,7 +613,9 @@ static void draw_pulse_bar_investor(int bar_y, int bar_h) {
         cur_x += draw_metric_module(cur_x, cy, NULL, "CONFIDENCE", cv, ATOMIK_SEM_HARDWARE);
     }
     pulse_sep(cur_x, bar_y, bar_h);
-    cur_x += ATOMIK_GRID_M + 2;
+    /* concept-01: the SYS-TEMP..UPTIME cluster sits in the right third of the
+     * bar (near the orb), with even gaps — not packed against the pulse. */
+    cur_x = FB_W * 605 / 1000;
 
     /* Right cluster: SYS TEMP | POWER DRAW | EFFICIENCY | UPTIME, then orb. */
     {
@@ -634,9 +639,10 @@ static void draw_pulse_bar_investor(int bar_y, int bar_h) {
         const char *temp_v = "~37.4C";   /* placeholder (ASCII-safe; no degree glyph) */
         char pw_v[16]; snprintf(pw_v, sizeof pw_v, "~%dW", 98);  /* placeholder */
 
-        cur_x += draw_metric_module(cur_x, cy, icon_thermo, "SYS TEMP", temp_v, ATOMIK_FG_DIM);
-        cur_x += draw_metric_module(cur_x, cy, icon_bolt,   "POWER DRAW", pw_v, ATOMIK_FG_DIM);
-        cur_x += draw_metric_module(cur_x, cy, icon_leaf,   "EFFICIENCY", eff_v, ATOMIK_SEM_SAVINGS);
+        int mgap = ATOMIK_GRID_L + 6;   /* even, generous inter-module gap */
+        cur_x += draw_metric_module(cur_x, cy, icon_thermo, "SYS TEMP", temp_v, ATOMIK_FG_DIM) + mgap;
+        cur_x += draw_metric_module(cur_x, cy, icon_bolt,   "POWER DRAW", pw_v, ATOMIK_FG_DIM) + mgap;
+        cur_x += draw_metric_module(cur_x, cy, icon_leaf,   "EFFICIENCY", eff_v, ATOMIK_SEM_SAVINGS) + mgap;
         cur_x += draw_metric_module(cur_x, cy, icon_clock,  "UPTIME", up_v, ATOMIK_FG);
 
         int orb_r = 11;
