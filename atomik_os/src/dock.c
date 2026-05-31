@@ -46,11 +46,11 @@
 /* === geometry === */
 #define RAIL_X_MARGIN    ATOMIK_GRID_L
 #define RAIL_TOP_MARGIN  (ATOMIK_SAFE_TOP + ATOMIK_PULSE_BAR_H + ATOMIK_GRID_L * 2)
-#define ICON_SIZE        80      /* cell width  (v0.39-F: 72 → 80) */
-#define CELL_HEIGHT      100     /* cell height (v0.39-F: square → tall) */
-#define GLYPH_REGION_H   52      /* upper portion holds the icon       */
-#define LABEL_REGION_H   28      /* lower portion holds the AA label   */
-#define ICON_GAP         18      /* v0.39-F: 24 → 18, taller cells already breathe */
+#define ICON_SIZE        96      /* v0.40 agentic rail: small glyphs, room for labels */
+#define CELL_HEIGHT      80      /* concept capability-rail proportions          */
+#define GLYPH_REGION_H   46      /* upper portion holds the icon       */
+#define LABEL_REGION_H   24      /* lower portion holds the AA label   */
+#define ICON_GAP         12
 #define RAIL_PADDING     ATOMIK_GRID_L
 #define RAIL_RADIUS      18
 #define LABEL_GAP        ATOMIK_GRID_S
@@ -67,12 +67,16 @@ static const struct {
     pixel_t     color;
     action_t    action;
 } ICONS[] = {
-    { "About",     "About ATOMiK OS", rgb(0xA8, 0xB2, 0xC4), ACT_OPEN_ABOUT    },
-    { "Monitor",   "ATOMiK Monitor",  rgb(0x6E, 0xC4, 0x6E), ACT_OPEN_MONITOR  },
-    { "Terminal",  "Terminal",        rgb(0x9D, 0xB7, 0xE8), ACT_OPEN_TERMINAL },
-    { "Files",     "Files",           rgb(0xE0, 0xB0, 0x66), ACT_OPEN_FILES    },
-    { "Notes",     "Notes",           rgb(0x4F, 0xC3, 0xFF), ACT_OPEN_NOTES    },
-    { "?Atom",     "Atom",            rgb(0xB0, 0x8C, 0xFF), ACT_OPEN_ASSISTANT },
+    /* v0.40 agentic CAPABILITY RAIL (concept-01).  Monochrome cyan line-art;
+     * fixed order (no adaptive reorder).  Surfaces that don't exist yet map to
+     * ACT_NONE (no-op until built); DASHBOARD is the home/idle active state. */
+    { "DASHBOARD", "ATOMiK Desk",     ATOMIK_ACCENT, ACT_NONE          },
+    { "AGENTS",    "Atom",            ATOMIK_ACCENT, ACT_OPEN_ASSISTANT },
+    { "WORKFLOWS", "Workflows",       ATOMIK_ACCENT, ACT_NONE          },
+    { "KNOWLEDGE", "Knowledge",       ATOMIK_ACCENT, ACT_NONE          },
+    { "STUDIO",    "Studio",          ATOMIK_ACCENT, ACT_NONE          },
+    { "TERMINAL",  "Terminal",        ATOMIK_ACCENT, ACT_OPEN_TERMINAL },
+    { "SYSTEM",    "ATOMiK Monitor",  ATOMIK_ACCENT, ACT_OPEN_MONITOR  },
 };
 #define N_ICONS ((int)(sizeof(ICONS) / sizeof(ICONS[0])))
 
@@ -92,25 +96,12 @@ static int rail_h(void) {
            N_ICONS * CELL_HEIGHT + (N_ICONS - 1) * ICON_GAP + FOOTER_H;
 }
 
-static int s_last_order[N_ICONS] = {0,1,2,3,4,5};
+static int s_last_order[N_ICONS] = {0,1,2,3,4,5,6};
 
+/* Fixed agentic-rail order (concept capability rail is stable nav, not an
+ * adaptively-reordered app dock). */
 static void compute_order(int order[N_ICONS]) {
-    double scores[N_ICONS];
-    for (int i = 0; i < N_ICONS; i++) {
-        order[i]  = i;
-        scores[i] = ICONS[i].action == ACT_NONE ? 0.0
-                                                : agent_score(ICONS[i].action);
-    }
-    for (int i = 1; i < N_ICONS; i++) {
-        int    cur_i = order[i];
-        double cur_s = scores[cur_i];
-        int    j     = i - 1;
-        while (j >= 0 && scores[order[j]] < cur_s) {
-            order[j + 1] = order[j];
-            j--;
-        }
-        order[j + 1] = cur_i;
-    }
+    for (int i = 0; i < N_ICONS; i++) order[i] = i;
 }
 
 static int find_window_by_title(const char *title) {
@@ -286,16 +277,94 @@ static void icon_atom(int cx, int cy, pixel_t color) {
     }
 }
 
+/* === v0.40 agentic line-art helpers === */
+static void stroke_line(int x0, int y0, int x1, int y1, pixel_t c) {
+    int dx = x1 > x0 ? x1 - x0 : x0 - x1;
+    int dy = y1 > y0 ? y1 - y0 : y0 - y1;
+    int sx = x0 < x1 ? 1 : -1, sy = y0 < y1 ? 1 : -1, err = dx - dy;
+    for (;;) {
+        draw_pixel(x0, y0, c);
+        if (x0 == x1 && y0 == y1) break;
+        int e2 = err * 2;
+        if (e2 > -dy) { err -= dy; x0 += sx; }
+        if (e2 <  dx) { err += dx; y0 += sy; }
+    }
+}
+/* pointy-top hexagon outline, "radius" r */
+static void stroke_hex(int cx, int cy, int r, pixel_t c) {
+    int hx = r * 866 / 1000, hy = r / 2;
+    int vx[6] = { cx,      cx + hx, cx + hx, cx,      cx - hx, cx - hx };
+    int vy[6] = { cy - r,  cy - hy, cy + hy, cy + r,  cy + hy, cy - hy };
+    for (int i = 0; i < 6; i++)
+        stroke_line(vx[i], vy[i], vx[(i+1)%6], vy[(i+1)%6], c);
+}
+
+/* === v0.40 agentic capability glyphs (monochrome line-art, ~36px box) === */
+static void icon_dashboard(int cx, int cy, pixel_t c) {
+    stroke_hex(cx, cy, 15, c);
+    stroke_disk(cx, cy, 2, c);
+    stroke_disk(cx, cy - 8, 1, c); stroke_disk(cx + 7, cy + 4, 1, c);
+    stroke_disk(cx - 7, cy + 4, 1, c);
+    stroke_line(cx, cy, cx, cy - 7, c);
+    stroke_line(cx, cy, cx + 6, cy + 4, c);
+    stroke_line(cx, cy, cx - 6, cy + 4, c);
+}
+static void icon_agents(int cx, int cy, pixel_t c) {   /* share / network */
+    int tx = cx, ty = cy - 11, blx = cx - 11, bly = cy + 9, brx = cx + 11, bry = cy + 9;
+    stroke_line(tx, ty, blx, bly, c);
+    stroke_line(tx, ty, brx, bry, c);
+    stroke_line(blx, bly, brx, bry, c);
+    stroke_circle(tx, ty, 4, c);
+    stroke_circle(blx, bly, 4, c);
+    stroke_circle(brx, bry, 4, c);
+}
+static void icon_workflows(int cx, int cy, pixel_t c) {  /* branching flow */
+    int ny = cy - 11;
+    stroke_circle(cx, ny, 3, c);
+    stroke_line(cx, ny + 3, cx, cy, c);
+    stroke_line(cx, cy, cx - 10, cy, c);
+    stroke_line(cx, cy, cx + 10, cy, c);
+    stroke_line(cx - 10, cy, cx - 10, cy + 7, c);
+    stroke_line(cx + 10, cy, cx + 10, cy + 7, c);
+    stroke_circle(cx - 10, cy + 10, 3, c);
+    stroke_circle(cx + 10, cy + 10, 3, c);
+}
+static void icon_knowledge(int cx, int cy, pixel_t c) {  /* iso cube */
+    int r = 11, h = r * 866 / 1000;
+    int top_x = cx, top_y = cy - r;
+    int rgt_x = cx + h, rgt_y = cy - r/2;
+    int rb_x  = cx + h, rb_y  = cy + r/2;
+    int bot_x = cx, bot_y = cy + r;
+    int lb_x  = cx - h, lb_y  = cy + r/2;
+    int lt_x  = cx - h, lt_y  = cy - r/2;
+    stroke_line(top_x,top_y, rgt_x,rgt_y, c); stroke_line(rgt_x,rgt_y, rb_x,rb_y, c);
+    stroke_line(rb_x,rb_y, bot_x,bot_y, c);   stroke_line(bot_x,bot_y, lb_x,lb_y, c);
+    stroke_line(lb_x,lb_y, lt_x,lt_y, c);     stroke_line(lt_x,lt_y, top_x,top_y, c);
+    stroke_line(top_x,top_y, cx,cy, c); stroke_line(cx,cy, rb_x,rb_y, c);
+    stroke_line(cx,cy, lb_x,lb_y, c);
+}
+static void icon_studio(int cx, int cy, pixel_t c) {     /* 3x3 app grid */
+    for (int r = -1; r <= 1; r++)
+        for (int q = -1; q <= 1; q++)
+            stroke_disk(cx + q * 9, cy + r * 9, 2, c);
+}
+static void icon_system(int cx, int cy, pixel_t c) {     /* nested hexagons */
+    stroke_hex(cx, cy, 15, c);
+    stroke_hex(cx, cy, 7, c);
+    stroke_disk(cx, cy, 1, c);
+}
+
 /* Dispatch table — by icon_idx (matches ICONS[] order). */
 static void draw_icon(int icon_idx, int cx, int cy, pixel_t color) {
     switch (icon_idx) {
-    case 0: icon_about(cx, cy, color);    break;
-    case 1: icon_monitor(cx, cy, color);  break;
-    case 2: icon_terminal(cx, cy, color); break;
-    case 3: icon_files(cx, cy, color);    break;
-    case 4: icon_notes(cx, cy, color);    break;
-    case 5: icon_atom(cx, cy, color);     break;
-    default:                              break;
+    case 0: icon_dashboard(cx, cy, color); break;
+    case 1: icon_agents(cx, cy, color);    break;
+    case 2: icon_workflows(cx, cy, color); break;
+    case 3: icon_knowledge(cx, cy, color); break;
+    case 4: icon_studio(cx, cy, color);    break;
+    case 5: icon_terminal(cx, cy, color);  break;
+    case 6: icon_system(cx, cy, color);    break;
+    default:                               break;
     }
 }
 
@@ -350,7 +419,7 @@ void dock_draw(int hover_index) {
      * inside the glass slab, above the first cell.  Centered to the
      * rail width.  Tiny letter-spacing via FONT_AA_LABEL keeps it
      * quiet — no need to compete with the cell labels below. */
-    const char *hdr = "CAPABILITY";
+    const char *hdr = "CAPABILITY RAIL";
     pixel_t hdr_col = rgb(0x7A, 0x86, 0xA0);
     int header_y = ry + RAIL_PADDING + (HEADER_H -
                        (font_aa_loaded(FONT_AA_LABEL)
@@ -366,44 +435,24 @@ void dock_draw(int hover_index) {
         draw_text(rx + (rw - tw) / 2, header_y, hdr, 1, hdr_col);
     }
 
-    /* v0.39-G — slot index of the Atom cell so we can paint a divider
-     * between the cell ABOVE Atom and Atom itself.  Falls back to -1
-     * (no divider) if not found. */
-    int atom_slot = -1;
-    for (int k = 0; k < N_ICONS; k++) {
-        if (order[k] == 5) { atom_slot = k; break; }   /* 5 = Atom in ICONS[] */
-    }
+    /* DASHBOARD (slot 0) is the active capability when no app window is
+     * focused — i.e. the home/idle state (concept's glowing DASHBOARD tile). */
+    int any_app_focused = 0;
+    for (int k = 0; k < N_ICONS; k++)
+        if (app_is_focused(k)) { any_app_focused = 1; break; }
 
     int ix = rx + RAIL_PADDING;
     int iy = ry + RAIL_PADDING + HEADER_H + HEADER_BELOW_GAP;
     for (int slot = 0; slot < N_ICONS; slot++) {
         int i        = order[slot];
         int hover    = (slot == hover_index);
-        int focused  = app_is_focused(i);
+        int focused  = app_is_focused(i) || (i == 0 && !any_app_focused);
         int open     = app_is_open(i);
         int icon_x   = ix;
         int icon_y   = iy;
         int cw       = ICON_SIZE;
         int ch       = CELL_HEIGHT;
         pixel_t accent = ICONS[i].color;
-
-        /* v0.39-G — thin divider line ABOVE the Atom cell.  Drawn in
-         * the gap between the previous cell and the Atom cell, full
-         * rail-inner width.  Layered-stroke: 1 px solid + alpha-70
-         * halo on each side so it reads as a soft seam, not a hard
-         * border. */
-        if (slot > 0 && slot == atom_slot) {
-            int div_y = icon_y - ICON_GAP / 2;
-            int div_x = rx + RAIL_PADDING + 4;
-            int div_w = cw - 8;
-            draw_rect(div_x, div_y, div_w, 1, ATOMIK_DOCK_BORDER);
-            for (int dx = 0; dx < div_w; dx++) {
-                draw_blend_pixel(div_x + dx, div_y - 1,
-                                 ATOMIK_DOCK_BORDER, 70);
-                draw_blend_pixel(div_x + dx, div_y + 1,
-                                 ATOMIK_DOCK_BORDER, 70);
-            }
-        }
 
         /* === Glass cell body === */
         pixel_t cell_body = rgb(0x14, 0x1E, 0x34);
