@@ -608,14 +608,30 @@ void hero_draw(void) {
     personality_t act = fabric_active();
 
     /* ---- title block ---- */
-    /* Atom mark above the wordmark (concept-01): concentric cyan rings +
-     * bright core, echoing the Pulse Bar logo orb. */
-    int icon_cy = top + 26;
-    ring(ws_cx, icon_cy, 17, 2, ATOMIK_ACCENT, 70);
-    ring(ws_cx, icon_cy, 16, 1, ATOMIK_ACCENT, 150);
-    ring(ws_cx, icon_cy,  9, 2, ATOMIK_ACCENT, 150);
-    disk(ws_cx, icon_cy, 4, ATOMIK_FG, 240);
-    int y = icon_cy + 24;
+    /* ATOMiK hex mark above the wordmark (concept-01): a glowing cyan hexagon
+     * with the atom-node glyph inside. */
+    int icon_cy = top + 28;
+    int hr = 22, hxr = hr * 866 / 1000, hyr = hr / 2;
+    /* soft glow behind the mark */
+    for (int gr = hr + 9; gr > 4; gr -= 2)
+        ring(ws_cx, icon_cy, gr, 1, ATOMIK_ACCENT,
+             (uint8_t)(3 + 12 * (hr + 9 - gr) / (hr + 9)));
+    int vx[6] = { ws_cx, ws_cx + hxr, ws_cx + hxr, ws_cx, ws_cx - hxr, ws_cx - hxr };
+    int vy[6] = { icon_cy - hr, icon_cy - hyr, icon_cy + hyr,
+                  icon_cy + hr, icon_cy + hyr, icon_cy - hyr };
+    for (int i = 0; i < 6; i++) {
+        hero_line(vx[i], vy[i], vx[(i+1)%6], vy[(i+1)%6], ATOMIK_ACCENT, 235);
+        hero_line(vx[i], vy[i] + 1, vx[(i+1)%6], vy[(i+1)%6] + 1, ATOMIK_ACCENT, 70);
+    }
+    /* atom-node glyph: center + 3 satellites with connectors */
+    disk(ws_cx, icon_cy, 2, ATOMIK_FG, 245);
+    disk(ws_cx, icon_cy - 8, 1, ATOMIK_ACCENT, 210);
+    disk(ws_cx + 7, icon_cy + 4, 1, ATOMIK_ACCENT, 210);
+    disk(ws_cx - 7, icon_cy + 4, 1, ATOMIK_ACCENT, 210);
+    hero_line(ws_cx, icon_cy, ws_cx, icon_cy - 7, ATOMIK_ACCENT, 150);
+    hero_line(ws_cx, icon_cy, ws_cx + 6, icon_cy + 4, ATOMIK_ACCENT, 150);
+    hero_line(ws_cx, icon_cy, ws_cx - 6, icon_cy + 4, ATOMIK_ACCENT, 150);
+    int y = icon_cy + 28;
     const char *wm = "ATOMiK Desk";
     if (font_aa_loaded(FONT_AA_BRAND)) {
         int tw = text_width_aa(FONT_AA_BRAND, wm);
@@ -637,9 +653,12 @@ void hero_draw(void) {
         y += text_height(1) + 16;
     }
 
-    /* status line — honest: ACTIVE only when a workload event is recent. */
+    /* status line — ACTIVE only when a real workload is RUNNING (the
+     * self-driving demo), not merely from seeded usage history (agent_log
+     * emits EVT_STATE_DELTA, which would otherwise read as "busy").  Idle
+     * home reads "Idle / Ready" like concept-01. */
     int busy = 0;
-    if (atomik_event_total() > 0) {
+    if (fabric_demo_enabled()) {
         unsigned long t1 = atomik_event_last_ts(EVT_STATE_DELTA);
         unsigned long t2 = atomik_event_last_ts(EVT_SYNC_REPLICA);
         unsigned long t3 = atomik_event_last_ts(EVT_AGENT_CONTEXT);
@@ -655,8 +674,7 @@ void hero_draw(void) {
                                         : text_height(2);
     if (font_aa_loaded(FONT_AA_UI)) {
         int tw = text_width_aa(FONT_AA_UI, status);
-        label_halo(ws_cx, y, tw, sh, st_c, busy);
-        draw_text_aa(FONT_AA_UI, ws_cx - tw / 2, y, status, st_c);
+        draw_text_aa(FONT_AA_UI, ws_cx - tw / 2, y, status, st_c);  /* plain, concept-01 */
     } else {
         int tw = text_width(status, 2);
         draw_text(ws_cx - tw / 2, y, status, 2, st_c);
