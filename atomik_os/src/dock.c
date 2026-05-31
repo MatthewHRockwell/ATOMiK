@@ -454,32 +454,36 @@ void dock_draw(int hover_index) {
         int ch       = CELL_HEIGHT;
         pixel_t accent = ICONS[i].color;
 
-        /* === Glass cell body === */
-        pixel_t cell_body = rgb(0x14, 0x1E, 0x34);
-        draw_rect_rounded(icon_x, icon_y, cw, ch, 14, cell_body);
-
-        /* === Focused/active glow — outer halo + inner accent wash so the
-         * active tile glows from within (concept active DASHBOARD tile). === */
+        /* === concept-01 clean rail: NO per-cell box or border.  Icons + labels
+         * float in the rail; only the ACTIVE item gets a soft glow behind the
+         * glyph + a small cyan indicator dot on the right rail edge.  Hover gets
+         * a faint glow only. === */
+        int gcx0 = icon_x + cw / 2;
+        int gcy0 = icon_y + GLYPH_REGION_H / 2 + 4;
+        if (focused || hover) {
+            int R = focused ? 28 : 22; long R2 = (long)R * R;
+            uint8_t peak = focused ? 34 : 14;
+            for (int dy = -R; dy <= R; dy++) {
+                int yy = gcy0 + dy; if (yy < 0 || yy >= FB_H) continue;
+                for (int dx = -R; dx <= R; dx++) {
+                    int xx = gcx0 + dx; if (xx < 0 || xx >= FB_W) continue;
+                    long d2 = (long)dx*dx + (long)dy*dy; if (d2 >= R2) continue;
+                    uint8_t a = (uint8_t)((long)peak * (R2 - d2) / R2);
+                    if (a) draw_blend_pixel(xx, yy, accent, a);
+                }
+            }
+        }
         if (focused) {
-            halo_ring(icon_x, icon_y, cw, ch, ACTIVE_HALO + 1, accent, 100);
-            for (int sy = 2; sy < ch - 2; sy++)
-                for (int sx = 2; sx < cw - 2; sx++)
-                    draw_blend_pixel(icon_x + sx, icon_y + sy, accent, 14);
+            int dot_x = rx + rw - 5;
+            for (int dy = -2; dy <= 2; dy++)
+                for (int dx = -2; dx <= 2; dx++)
+                    if (dx*dx + dy*dy <= 4) draw_blend_pixel(dot_x + dx, gcy0 + dy, accent, 235);
+            for (int g = 1; g <= 4; g++) {
+                uint8_t a = (uint8_t)(70 - (g - 1) * 16);
+                draw_blend_pixel(dot_x, gcy0 - 2 - g, accent, a);
+                draw_blend_pixel(dot_x, gcy0 + 2 + g, accent, a);
+            }
         }
-
-        /* === Hover lift === */
-        if (hover && !focused) {
-            halo_ring(icon_x, icon_y, cw, ch, 2, accent, 36);
-        }
-
-        /* === Cell border (1 px) — focused gets the bright accent;
-         * idle gets a quiet slate that still reads as a cell. */
-        pixel_t border = focused ? accent : rgb(0x2C, 0x36, 0x52);
-        int radius = 14;
-        draw_rect(icon_x + radius, icon_y,              cw - radius * 2, 1, border);
-        draw_rect(icon_x + radius, icon_y + ch - 1,     cw - radius * 2, 1, border);
-        draw_rect(icon_x,              icon_y + radius, 1, ch - radius * 2, border);
-        draw_rect(icon_x + cw - 1,     icon_y + radius, 1, ch - radius * 2, border);
 
         /* === v0.39-F: line-art icon centred in the upper portion
          * of the cell.  Replaces the v0.38-L1 single-letter
