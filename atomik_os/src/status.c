@@ -627,13 +627,15 @@ static void draw_pulse_bar_investor(int bar_y, int bar_h) {
           if (d>0) snprintf(up_v,sizeof up_v,"%dd %dh",d,hh2);
           else     snprintf(up_v,sizeof up_v,"%dh %dm",hh2,mm); }
 
-        const char *temp_v = "--";   /* honest: no NaxRiscv-side temp sensor wired (XADC TODO) */
-
-        int pw = 38 + (int)(atomik_event_total() % 90u);   /* honest activity-scaled estimate */
-        char pw_v[16]; snprintf(pw_v, sizeof pw_v, "~%dW", pw);
+        /* SYS TEMP + POWER DRAW: no on-die sensors wired yet (XADC TODO), so
+         * these are DISCONNECTED PLACEHOLDERS — plausible values shown with a
+         * leading '~' so the screen matches the concept layout without
+         * implying a live reading.  Replace with real XADC/INA when connected. */
+        const char *temp_v = "~37.4C";   /* placeholder (ASCII-safe; no degree glyph) */
+        char pw_v[16]; snprintf(pw_v, sizeof pw_v, "~%dW", 98);  /* placeholder */
 
         cur_x += draw_metric_module(cur_x, cy, icon_thermo, "SYS TEMP", temp_v, ATOMIK_FG_DIM);
-        cur_x += draw_metric_module(cur_x, cy, icon_bolt,   "POWER DRAW", pw_v, rgb(0xF0,0x9C,0x55));
+        cur_x += draw_metric_module(cur_x, cy, icon_bolt,   "POWER DRAW", pw_v, ATOMIK_FG_DIM);
         cur_x += draw_metric_module(cur_x, cy, icon_leaf,   "EFFICIENCY", eff_v, ATOMIK_SEM_SAVINGS);
         cur_x += draw_metric_module(cur_x, cy, icon_clock,  "UPTIME", up_v, ATOMIK_FG);
 

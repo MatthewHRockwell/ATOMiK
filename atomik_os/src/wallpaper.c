@@ -47,90 +47,92 @@ static void bg_circle(int cx, int cy, int r, pixel_t c, uint8_t a) {
     }
 }
 
-/* Layered hero background (concept-01): deep gradient -> perspective particle
- * terrain + horizon glow -> concentric rings + soft radial center glow behind
- * the hero -> edge vignette.  Rendered ONCE into the wallpaper cache (no per-
- * frame cost) with a FIXED seed so the scene is screenshot-stable.  Pure
- * decorative Class B chrome — no telemetry. */
-static void wallpaper_full_render(void) {
-    uint32_t seed = 0xA70A1CBAu;
-#define BG_RND (seed ^= seed << 13, seed ^= seed >> 17, seed ^= seed << 5, seed)
-
-    /* Hero center: workspace midpoint (rail .. Fabric) so the rings/glow sit
-     * behind the hero, not the screen center. */
-    int rr = dock_right_edge(), fs = fabric_shelf_x();
-    int cx = (rr > 0 && fs > rr) ? (rr + fs) / 2 : FB_W / 2;
-    int cy_glow = (FB_H * 30) / 100;
-    int horizon = (FB_H * 60) / 100;
-    pixel_t cyan = ATOMIK_ACCENT;
-
-    /* 1. base gradient — very dark navy, deepening downward. */
-    draw_gradient_v(0, 0, FB_W, FB_H, rgb(0x06, 0x09, 0x12), rgb(0x0B, 0x10, 0x1E));
-
-    /* 2. perspective floor grid below the horizon (data-fabric plane). */
-    for (int i = -12; i <= 12; i++)
-        bg_line(cx, horizon, cx + i * (FB_W / 10), FB_H, cyan, 22);
-    for (int k = 1; k <= 16; k++) {
-        int yy = horizon + (FB_H - horizon) * k * k / (16 * 16);
-        uint8_t a = (uint8_t)(38 - k * 2); if (a < 7) a = 7;
-        for (int x = 0; x < FB_W; x++) draw_blend_pixel(x, yy, cyan, a);
-    }
-
-    /* 3. horizon glow band — soft bright line where the plane meets space. */
-    for (int g = -6; g <= 6; g++) {
-        int gg = g < 0 ? -g : g;
-        uint8_t a = (uint8_t)(64 - 9 * gg);
-        for (int x = 0; x < FB_W; x++) draw_blend_pixel(x, horizon + g, cyan, a);
-    }
-
-    /* 4. particle terrain — dense near the horizon, fading downward. */
-    int band = FB_H - horizon;
-    for (int p = 0; p < 1100; p++) {
-        int x = (int)(BG_RND % (uint32_t)FB_W);
-        int depth = (int)(BG_RND % (uint32_t)band);   /* 0 at horizon */
-        int y = horizon + depth;
-        uint8_t a = (uint8_t)(150 - depth * 132 / band); if (a < 12) a = 12;
-        pixel_t c = (BG_RND & 3u) ? cyan : rgb(0x80, 0x6C, 0xFF); /* mostly cyan, some violet */
-        draw_blend_pixel(x, y, c, a);
-        draw_blend_pixel(x + 1, y, c, a / 2);
-        draw_blend_pixel(x, y + 1, c, a / 2);
-    }
-
-    /* 5. sparse micro-particles in the upper field. */
-    for (int p = 0; p < 160; p++) {
-        int x = (int)(BG_RND % (uint32_t)FB_W);
-        int y = (int)(BG_RND % (uint32_t)horizon);
-        draw_blend_pixel(x, y, cyan, (uint8_t)(18 + (BG_RND % 38u)));
-    }
-
-    /* 6. concentric rings behind the hero — thin, smooth, low alpha. */
-    for (int r = 120; r <= 360; r += 48)
-        bg_circle(cx, cy_glow, r, cyan, 15);
-
-    /* 7. soft radial center glow behind the hero (bounded box, additive). */
-    int R = 360; long R2 = (long)R * R;
+/* Soft additive radial glow with quadratic falloff (a = peak*(1 - d^2/R^2)).
+ * Bounded box; only blends inside the disc.  The workhorse for the nebula. */
+static void soft_glow(int cx, int cy, int R, pixel_t c, uint8_t peak) {
+    if (R <= 0) return;
+    long R2 = (long)R * R;
     for (int dy = -R; dy <= R; dy++) {
-        int y = cy_glow + dy; if (y < 0 || y >= FB_H) continue;
+        int y = cy + dy; if (y < 0 || y >= FB_H) continue;
         for (int dx = -R; dx <= R; dx++) {
             int x = cx + dx; if (x < 0 || x >= FB_W) continue;
             long d2 = (long)dx * dx + (long)dy * dy;
             if (d2 >= R2) continue;
-            uint8_t a = (uint8_t)(42 * (R2 - d2) / R2);
-            if (a) draw_blend_pixel(x, y, cyan, a);
+            uint8_t a = (uint8_t)((long)peak * (R2 - d2) / R2);
+            if (a) draw_blend_pixel(x, y, c, a);
         }
     }
+}
 
-    /* 8. edge vignette — darken toward all four edges. */
-    int vb = 230;
+/* Atmospheric "deep space / nebula" background (concept-01): smooth dark navy
+ * with a soft blue central glow behind the hero, off-center nebula clouds for
+ * asymmetric depth, faint rings, and a sparse star field — NO perspective
+ * grid.  Rendered ONCE into the wallpaper cache (no per-frame cost) with a
+ * FIXED seed so it is screenshot-stable.  Pure decorative Class B chrome. */
+static void wallpaper_full_render(void) {
+    uint32_t seed = 0xA70A1CBAu;
+#define BG_RND (seed ^= seed << 13, seed ^= seed >> 17, seed ^= seed << 5, seed)
+
+    /* Hero center: workspace midpoint (rail .. Fabric) so the glow sits behind
+     * the hero, not the screen center. */
+    int rr = dock_right_edge(), fs = fabric_shelf_x();
+    int cx = (rr > 0 && fs > rr) ? (rr + fs) / 2 : FB_W / 2;
+    int cy = (FB_H * 38) / 100;
+    pixel_t cyan = ATOMIK_ACCENT;
+
+    /* 1. base gradient — deep navy, very slightly lifted up top (where the
+     * nebula core sits), deepening toward the bottom. */
+    draw_gradient_v(0, 0, FB_W, FB_H, rgb(0x07, 0x0C, 0x18), rgb(0x04, 0x07, 0x10));
+
+    /* 2. off-center nebula clouds — large, very soft, low alpha, for an
+     * asymmetric "asteroid field / deep space" depth (blue + a hint of
+     * violet).  Drawn before the core so the core reads brightest. */
+    soft_glow((FB_W * 22) / 100, (FB_H * 72) / 100, 520, rgb(0x10, 0x22, 0x4C), 20);
+    soft_glow((FB_W * 82) / 100, (FB_H * 22) / 100, 460, rgb(0x22, 0x1A, 0x44), 16);
+    soft_glow((FB_W * 70) / 100, (FB_H * 80) / 100, 420, rgb(0x0E, 0x26, 0x46), 14);
+
+    /* 3. nebula core behind the hero — a wide blue halo + a tighter cyan core,
+     * additive, smooth quadratic falloff.  This is the concept's central glow. */
+    soft_glow(cx, cy, 600, rgb(0x14, 0x34, 0x60), 30);
+    soft_glow(cx, cy, 340, rgb(0x2A, 0x6A, 0xA8), 30);
+    soft_glow(cx, cy, 180, cyan, 22);
+
+    /* 4. faint concentric rings behind the hero (the concept's subtle halo). */
+    bg_circle(cx, cy, 232, cyan, 12);
+    bg_circle(cx, cy, 318, cyan, 8);
+    bg_circle(cx, cy, 404, cyan, 5);
+
+    /* 5. star field — sparse points across the WHOLE field, varied brightness,
+     * mostly cool white with occasional cyan/violet.  A handful of brighter
+     * "hero" stars get a 1px cross bloom. */
+    for (int p = 0; p < 280; p++) {
+        int x = (int)(BG_RND % (uint32_t)FB_W);
+        int y = (int)(BG_RND % (uint32_t)FB_H);
+        uint8_t a = (uint8_t)(10 + (BG_RND % 46u));
+        uint32_t pick = BG_RND % 10u;
+        pixel_t c = pick < 7u ? rgb(0xC8, 0xD6, 0xF0)
+                  : pick < 9u ? cyan : rgb(0x9A, 0x86, 0xFF);
+        draw_blend_pixel(x, y, c, a);
+    }
+    for (int p = 0; p < 26; p++) {
+        int x = (int)(BG_RND % (uint32_t)FB_W);
+        int y = (int)(BG_RND % (uint32_t)FB_H);
+        draw_blend_pixel(x, y, rgb(0xE6, 0xEE, 0xFF), 200);
+        draw_blend_pixel(x - 1, y, cyan, 60); draw_blend_pixel(x + 1, y, cyan, 60);
+        draw_blend_pixel(x, y - 1, cyan, 60); draw_blend_pixel(x, y + 1, cyan, 60);
+    }
+
+    /* 6. soft edge vignette — darken toward all four edges, gentle. */
+    int vb = 260;
     for (int b = 0; b < vb; b++) {
-        uint8_t a = (uint8_t)(72 * (vb - b) / vb);
+        uint8_t a = (uint8_t)(60 * (vb - b) / vb);
         for (int x = 0; x < FB_W; x++) {
             draw_blend_pixel(x, b, 0, a);
             draw_blend_pixel(x, FB_H - 1 - b, 0, a);
         }
     }
     for (int b = 0; b < vb; b++) {
-        uint8_t a = (uint8_t)(72 * (vb - b) / vb);
+        uint8_t a = (uint8_t)(60 * (vb - b) / vb);
         for (int y = 0; y < FB_H; y++) {
             draw_blend_pixel(b, y, 0, a);
             draw_blend_pixel(FB_W - 1 - b, y, 0, a);
