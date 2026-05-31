@@ -893,7 +893,12 @@ static void draw_banks_panel(int x, int y, int wd, int h) {
     for (int i = 0; i < npts; i++) if (pts[i].mdeltas_s > vmax) vmax = pts[i].mdeltas_s;
 
     int slots = (npts > 0) ? npts : BENCH_N_POINTS;
-    int active = bench_active_banks();
+    /* Highlight the MAX-bank bar (the headline result).  We deliberately do
+     * NOT animate a "currently allocated" cursor here: atomik_os doesn't yet
+     * control the allocation (the tool measures all bank counts each cycle),
+     * so a moving cursor would imply a live reallocation that isn't happening.
+     * The bars + live re-measurement carry the dynamism honestly. */
+    int active = (npts > 0) ? (int)pts[npts - 1].banks : 8;
     int bw = chart_w / (slots * 2);            /* bar width; gaps between */
     if (bw < 6) bw = 6;
     for (int i = 0; i < slots; i++) {
@@ -955,12 +960,11 @@ static void draw_banks_panel(int x, int y, int wd, int h) {
             draw_text(rx, ry, big, 3, accent);
             ry += text_height(3) + 2;
         }
-        /* throughput at the CURRENT allocation */
-        int ai = 0;
-        for (int i = 0; i < npts; i++) if (pts[i].banks == (uint32_t)active) ai = i;
-        char sub[40];
-        snprintf(sub, sizeof sub, "%.0f Md/s @ %d banks",
-                 pts[ai].mdeltas_s, (int)pts[ai].banks);
+        /* headline throughput: the measured MAX (matches the speedup above) */
+        int mi = npts - 1;
+        char sub[48];
+        snprintf(sub, sizeof sub, "up to %.0f Md/s @ %d banks",
+                 pts[mi].mdeltas_s, (int)pts[mi].banks);
         if (cu) draw_text_aa(FONT_AA_LABEL, rx, ry, sub, ATOMIK_FG_DIM);
         else    draw_text(rx, ry, sub, 1, ATOMIK_FG_DIM);
     } else {

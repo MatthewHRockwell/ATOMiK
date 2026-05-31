@@ -104,7 +104,7 @@ void bench_tick(void) {
     if (npts > 0) {
         s_npts   = npts;
         s_source = all_match ? METRIC_LIVE : METRIC_STALE;
-        s_active_idx = (s_active_idx + 1) % s_npts;   /* animate allocation */
+        s_active_idx = s_npts - 1;   /* headline = max-bank point (no fake cursor) */
     } else {
         /* file missing or unparseable -> honest WAITING (keep last good data
          * dim by leaving s_pts but downgrading the source). */
