@@ -18,6 +18,18 @@ void about_draw(window_t *w, int x, int y, int wd, int ht);    /* about.c */
 void monitor_draw(window_t *w, int x, int y, int wd, int ht);  /* monitor.c */
 /* terminal_draw, terminal_send_key, terminal_start declared in atomik_os.h */
 
+/* Representative recent-usage history so PREDICTIVE INSIGHTS shows real,
+ * differentiated predictions.  The predictor is real (agent_score); this is a
+ * demo warm-start, analogous to the Fabric's perf-sample seed. */
+static void seed_demo_usage(void) {
+    static const action_t seq[] = {
+        ACT_OPEN_CHAT, ACT_OPEN_CODE, ACT_OPEN_TERMINAL, ACT_OPEN_DOCUMENT,
+        ACT_OPEN_DOCUMENT, ACT_OPEN_CODE, ACT_OPEN_DOCUMENT, ACT_OPEN_DOCUMENT,
+        ACT_OPEN_CODE, ACT_OPEN_DOCUMENT, ACT_OPEN_DOCUMENT, ACT_OPEN_DOCUMENT,
+    };
+    for (unsigned i = 0; i < sizeof(seq) / sizeof(seq[0]); i++) agent_log(seq[i]);
+}
+
 static void redraw_frame(void) {
     /* v0.38-A: tile-based dirty tracking.  Each visible surface
      * declares the rect it touches via dirty_rect() during its draw
@@ -304,7 +316,7 @@ int main(int argc, char **argv) {
      * 'L' toggles it at runtime. */
     {
         FILE *df = fopen("/tmp/atomik_demo", "r");
-        if (df) { fabric_demo_enable(1); fclose(df); }
+        if (df) { fabric_demo_enable(1); seed_demo_usage(); fclose(df); }
     }
 
     /* v0.40 in-OS AUTO-CAPTURE: /tmp/atomik_autoshot => after AUTOSHOT_MS of
@@ -367,6 +379,7 @@ int main(int argc, char **argv) {
      * so `make host-shot` dumps a faithful frame of the REAL renderer in
      * seconds.  Gated on ATOMIK_PREVIEW so the binary could still loop. */
     if (getenv("ATOMIK_PREVIEW")) {
+        seed_demo_usage();   /* representative usage so PREDICTIVE INSIGHTS populates */
         /* Optional warm-up: run N frames (ticking fabric/status each) before
          * the final dump so time-evolving surfaces — the self-driving demo
          * workload, building waveforms — are visible in the capture.  Default
@@ -381,6 +394,8 @@ int main(int argc, char **argv) {
             redraw_frame();                 /* host fb_present() dumps the PNG */
             if (i + 1 < frames) usleep(120000);  /* real-time advance for timers */
         }
+        /* clean idle home for concept comparison — no transient assistant */
+        if (getenv("ATOMIK_PREVIEW_CLEAN")) { assistant_dismiss(); redraw_frame(); }
         fb_close();
         return 0;
     }

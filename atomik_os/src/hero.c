@@ -460,64 +460,70 @@ static void hero_line(int x0, int y0, int x1, int y1, pixel_t c, uint8_t a) {
     }
 }
 
-/* SYSTEM OVERVIEW "constellation sphere" (concept-01): nodes on a rotating
- * sphere, meshed with faint edges, glowing brighter on the front hemisphere.
+/* SYSTEM OVERVIEW glowing particle sphere (concept-01): a dense globe of light
+ * particles — hundreds of surface dots (front bright, back dim), dotted
+ * meridian arcs for structure, and a bright radial core glow.  Rotates slowly.
  * Decorative chrome — no telemetry. */
-#define HERO_NSPH 28
+#define HERO_NSPH 320
 static void constellation_sphere(int cx, int cy, int r, unsigned long now) {
-    double px[HERO_NSPH], py[HERO_NSPH], pz[HERO_NSPH];
-    const double ga = 2.39996323;                 /* golden angle */
+    double ang = (double)(now % 22000) / 22000.0 * 6.28318531;
+    double ca = cos(ang), sa = sin(ang);
+
+    /* core glow: 3 stacked radial passes (wide halo -> mid -> hot core) so the
+     * orb reads as luminous, like the concept.  Additive. */
+    struct { int rad; pixel_t c; uint8_t peak; } glow[3] = {
+        { r * 8 / 5, rgb(0x1A, 0x4C, 0x80),  62 },
+        { r * 9 / 10, rgb(0x3C, 0x8A, 0xCC),  86 },
+        { r * 2 / 5, rgb(0x9A, 0xD2, 0xF6),  96 },
+    };
+    for (int g = 0; g < 3; g++) {
+        int gg = glow[g].rad; long g2 = (long)gg * gg;
+        for (int dy = -gg; dy <= gg; dy++) {
+            int yy = cy + dy; if (yy < 0 || yy >= FB_H) continue;
+            for (int dx = -gg; dx <= gg; dx++) {
+                int xx = cx + dx; if (xx < 0 || xx >= FB_W) continue;
+                long d2 = (long)dx*dx + (long)dy*dy; if (d2 >= g2) continue;
+                uint8_t a = (uint8_t)((long)glow[g].peak * (g2 - d2) / g2);
+                if (a) draw_blend_pixel(xx, yy, glow[g].c, a);
+            }
+        }
+    }
+
+    /* dense surface particles (fibonacci sphere) — bright on the front face */
+    const double ga = 2.39996323;
     for (int i = 0; i < HERO_NSPH; i++) {
-        double t = (double)i / (HERO_NSPH - 1);
-        double y = 1.0 - 2.0 * t;                 /* 1 .. -1  */
+        double t  = (i + 0.5) / HERO_NSPH;
+        double y  = 1.0 - 2.0 * t;
         double rr = sqrt(1.0 - y * y);
         double th = ga * i;
-        px[i] = rr * cos(th); py[i] = y; pz[i] = rr * sin(th);
-    }
-    /* slow rotation about the vertical axis */
-    double ang = (double)(now % 16000) / 16000.0 * 6.28318531;
-    double ca = cos(ang), sa = sin(ang);
-    int sx[HERO_NSPH], sy[HERO_NSPH]; double sz[HERO_NSPH];
-    for (int i = 0; i < HERO_NSPH; i++) {
-        double x = px[i], z = pz[i];
+        double x = rr * cos(th), z = rr * sin(th);
         double xr = x * ca - z * sa, zr = x * sa + z * ca;
-        sx[i] = cx + (int)(xr * r);
-        sy[i] = cy + (int)(py[i] * r);
-        sz[i] = zr;                               /* -1 back .. +1 front */
-    }
-    /* soft radial core glow (quadratic falloff) so the sphere reads as a
-     * glowing orb, not just scattered dots. */
-    int gr = r + r / 3; long gr2 = (long)gr * gr;
-    for (int dy = -gr; dy <= gr; dy++) {
-        int yy = cy + dy; if (yy < 0 || yy >= FB_H) continue;
-        for (int dx = -gr; dx <= gr; dx++) {
-            int xx = cx + dx; if (xx < 0 || xx >= FB_W) continue;
-            long d2 = (long)dx*dx + (long)dy*dy; if (d2 >= gr2) continue;
-            uint8_t a = (uint8_t)(34 * (gr2 - d2) / gr2);
-            if (a) draw_blend_pixel(xx, yy, rgb(0x18, 0x4A, 0x78), a);
+        int px = cx + (int)(xr * r), py2 = cy + (int)(y * r);
+        double f = (zr + 1.0) * 0.5;              /* 0 back .. 1 front */
+        uint8_t a = (uint8_t)(40 + 215 * f * f);
+        pixel_t c = f > 0.66 ? rgb(0xE8, 0xF4, 0xFF)
+                  : f > 0.38 ? rgb(0x7C, 0xD8, 0xFF) : rgb(0x34, 0x70, 0xA4);
+        draw_blend_pixel(px, py2, c, a);
+        if (f > 0.6) {   /* 2px + bloom on front particles */
+            draw_blend_pixel(px+1, py2, c, (uint8_t)(a*3/5));
+            draw_blend_pixel(px, py2+1, c, (uint8_t)(a*3/5));
+            if (f > 0.86) { draw_blend_pixel(px-1, py2, c, a/2);
+                            draw_blend_pixel(px, py2-1, c, a/2); }
         }
     }
-    /* meshed edges between near nodes (3D distance threshold) */
-    for (int i = 0; i < HERO_NSPH; i++)
-        for (int j = i + 1; j < HERO_NSPH; j++) {
-            double dx = px[i]-px[j], dy = py[i]-py[j], dz = pz[i]-pz[j];
-            if (dx*dx + dy*dy + dz*dz > 0.42) continue;   /* neighbors only */
-            double depth = (sz[i] + sz[j]) * 0.5;         /* -1..1 */
-            uint8_t a = (uint8_t)(40 + 70 * (depth + 1.0) * 0.5);
-            hero_line(sx[i], sy[i], sx[j], sy[j], ATOMIK_ACCENT, a);
-        }
-    /* nodes — brighter/larger on the front hemisphere */
-    for (int i = 0; i < HERO_NSPH; i++) {
-        double f = (sz[i] + 1.0) * 0.5;               /* 0 back .. 1 front */
-        uint8_t a = (uint8_t)(110 + 145 * f);
-        pixel_t c = f > 0.55 ? rgb(0xE6, 0xF2, 0xFF) : ATOMIK_ACCENT;
-        int rad = f > 0.55 ? 3 : 2;
-        disk(sx[i], sy[i], rad, c, a);
-        if (f > 0.65) {   /* cross bloom on front nodes */
-            draw_blend_pixel(sx[i]-3, sy[i], ATOMIK_ACCENT, 90);
-            draw_blend_pixel(sx[i]+3, sy[i], ATOMIK_ACCENT, 90);
-            draw_blend_pixel(sx[i], sy[i]-3, ATOMIK_ACCENT, 90);
-            draw_blend_pixel(sx[i], sy[i]+3, ATOMIK_ACCENT, 90);
+
+    /* dotted meridian arcs (great circles through the poles) for globe depth */
+    for (int L = 0; L < 5; L++) {
+        double lon = ang * 0.6 + L * 0.6283185;
+        double cl = cos(lon), sl = sin(lon);
+        for (int k = 0; k < 54; k++) {
+            double phi = (double)k / 54.0 * 6.28318531;
+            double cp = cos(phi);
+            double x = cp * cl, y = sin(phi), z = cp * sl;
+            double f = (z + 1.0) * 0.5;
+            int px = cx + (int)(x * r), py2 = cy + (int)(y * r);
+            uint8_t a = (uint8_t)(14 + 120 * f);
+            draw_blend_pixel(px, py2, f > 0.5 ? ATOMIK_ACCENT : rgb(0x24, 0x52, 0x80), a);
         }
     }
 }
@@ -572,11 +578,31 @@ static void hero_row(int x, int y, int w, const char *label,
     else        draw_text(x + w - vw, y, value, 1, vcol);
 }
 
+/* small panel header (concept-01): a node icon + a 14px muted-white title.
+ * Returns the y below the header. */
+static int hero_panel_header(int x, int y, const char *label) {
+    int lab = font_aa_loaded(FONT_AA_LABEL);
+    int h = lab ? text_height_aa(FONT_AA_LABEL) : text_height(1);
+    int icy = y + h / 2;
+    disk(x + 4, icy, 2, ATOMIK_ACCENT, 230);
+    ring(x + 4, icy, 5, 1, ATOMIK_ACCENT, 120);
+    pixel_t tc = rgb(0xC6, 0xD2, 0xE6);
+    if (lab) draw_text_aa(FONT_AA_LABEL, x + 16, y, label, tc);
+    else     draw_text(x + 16, y, label, 1, tc);
+    return y + h + ATOMIK_GRID_M;
+}
+
 void hero_draw(void) {
     int left_edge  = dock_right_edge() + ATOMIK_GRID_L * 2;
     int right_edge = fabric_shelf_x() - ATOMIK_GRID_L * 2;
-    int ws_w  = right_edge - left_edge;
-    int ws_cx = (left_edge + right_edge) / 2;
+    (void)left_edge; (void)right_edge;
+    /* concept-01 proportions: the hero + twin-panel group is centered around
+     * screen x~0.484, with the twin panels spanning x 0.255..0.712 (each ~21%),
+     * NOT filling the rail..fabric workspace.  Background shows on both sides. */
+    int panel_left  = FB_W * 255 / 1000;
+    int panel_right = FB_W * 712 / 1000;
+    int ws_w  = panel_right - panel_left;
+    int ws_cx = (panel_left + panel_right) / 2;
     int top   = ATOMIK_SAFE_TOP + ATOMIK_PULSE_BAR_H + ATOMIK_GRID_L * 3;
     unsigned long now = anim_now_ms();
     personality_t act = fabric_active();
@@ -651,17 +677,15 @@ void hero_draw(void) {
         y += text_height(1) + ATOMIK_GRID_L * 2;
     }
 
-    /* ---- twin glass panels ---- */
+    /* ---- twin glass panels (concept-01 bounds) ---- */
     int gap   = ATOMIK_GRID_L;
     int pw    = (ws_w - gap) / 2;
-    int avail = (FB_H - ATOMIK_GRID_L * 2) - y;   /* vertical space below title */
-    int ph    = avail - ATOMIK_GRID_L * 2;
-    if (ph > 340) ph = 340;
-    if (ph < 160) ph = 160;
-    int py    = y + (avail - ph) / 2;             /* center in lower workspace */
-    if (py < y) py = y;
-    int lx = left_edge;
-    int rx = left_edge + pw + gap;
+    int ph    = FB_H * 315 / 1000;                /* ~340 px, concept height    */
+    int py    = FB_H * 560 / 1000;                /* ~605 px, concept top        */
+    if (py < y + ATOMIK_GRID_M) py = y + ATOMIK_GRID_M;   /* never overlap title */
+    if (py + ph > FB_H - ATOMIK_GRID_L * 2) ph = FB_H - ATOMIK_GRID_L * 2 - py;
+    int lx = panel_left;
+    int rx = panel_left + pw + gap;
 
     int lab_h  = font_aa_loaded(FONT_AA_LABEL) ? text_height_aa(FONT_AA_LABEL)
                                                : text_height(1);
@@ -672,13 +696,7 @@ void hero_draw(void) {
     {
         int ix = lx + ATOMIK_GRID_L, iw = pw - ATOMIK_GRID_L * 2;
         int ty = py + ATOMIK_GRID_M;
-        if (font_aa_loaded(FONT_AA_UI)) {
-            draw_text_aa(FONT_AA_UI, ix, ty, "SYSTEM OVERVIEW", ATOMIK_FG);
-            ty += text_height_aa(FONT_AA_UI) + ATOMIK_GRID_M;
-        } else {
-            draw_text(ix, ty, "SYSTEM OVERVIEW", 2, ATOMIK_FG);
-            ty += text_height(2) + ATOMIK_GRID_M;
-        }
+        ty = hero_panel_header(ix, ty, "SYSTEM OVERVIEW");
         int body_bot = py + ph - cta_h;
 
         /* constellation sphere on the left ~30% */
@@ -718,13 +736,7 @@ void hero_draw(void) {
     {
         int ix = rx + ATOMIK_GRID_L, iw = pw - ATOMIK_GRID_L * 2;
         int ty = py + ATOMIK_GRID_M;
-        if (font_aa_loaded(FONT_AA_UI)) {
-            draw_text_aa(FONT_AA_UI, ix, ty, "PREDICTIVE INSIGHTS", ATOMIK_FG);
-            ty += text_height_aa(FONT_AA_UI) + ATOMIK_GRID_M;
-        } else {
-            draw_text(ix, ty, "PREDICTIVE INSIGHTS", 2, ATOMIK_FG);
-            ty += text_height(2) + ATOMIK_GRID_M;
-        }
+        ty = hero_panel_header(ix, ty, "PREDICTIVE INSIGHTS");
         int body_bot = py + ph - cta_h;
 
         /* real top-3 predicted actions */
@@ -745,7 +757,7 @@ void hero_draw(void) {
         ty += lab_h + ATOMIK_GRID_M;
 
         int list_w = (int)(iw * 0.56);
-        pixel_t dotc[3] = { ATOMIK_ACCENT, rgb(0x5A,0xA8,0xF0), ATOMIK_SEM_AGENT };
+        pixel_t dotc[3] = { ATOMIK_ACCENT, rgb(0x58,0xAE,0xF0), rgb(0x46,0x84,0xDA) };
         int rowh2 = lab_h + 12;
         for (int k = 0; k < 3; k++) {
             int ry = ty + k * rowh2;
