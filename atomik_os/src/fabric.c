@@ -618,8 +618,8 @@ static pixel_t fresh_color(fabric_fresh_t f) {
 static void draw_filled_waveform(const fabric_lane_history_t *h,
                                  int x, int y, int w, int hgt,
                                  pixel_t fill, pixel_t line) {
-    pixel_t bed = rgb(0x1F, 0x27, 0x38);
-    draw_rect(x, y + hgt - 1, w, 1, bed);
+    /* v0.40 (2026-05-31): centered flowing-ribbon style (concept-01 Fabric).
+     * No bottom floor line — the trace oscillates around the band center. */
 
     /* v0.38-J+ WAITING baseline glow — when the lane has no data, paint
      * a calm low-amplitude glow band in lane color instead of nothing.
@@ -670,24 +670,32 @@ static void draw_filled_waveform(const fabric_lane_history_t *h,
     }
 
     uint16_t mn = h->v_min, mx = h->v_max;
+    int center = y + hgt / 2;
+    int amp    = (hgt - 6) / 2; if (amp < 4) amp = 4;
+
     if (mx <= mn) {
-        /* Constant series — flat glow band near the bottom. */
-        for (int gy = 0; gy < 4; gy++) {
-            uint8_t a = (uint8_t)(40 + gy * 25);
-            for (int sx = 0; sx < w; sx++) {
-                draw_blend_pixel(x + sx, y + hgt - 4 + gy, line, a);
+        /* Constant series — calm bright trace through the band center with a
+         * soft symmetric glow (never a dead bottom band). */
+        for (int sx = 0; sx < w; sx++) {
+            int px = x + sx;
+            draw_blend_pixel(px, center, line, 170);
+            for (int g = 1; g <= 4; g++) {
+                uint8_t a = (uint8_t)(60 - (g - 1) * 14);
+                draw_blend_pixel(px, center - g, line, a);
+                draw_blend_pixel(px, center + g, line, a);
             }
         }
         return;
     }
     uint16_t span = mx - mn;
 
-    int col_h[256];
+    /* Center-relative trace: each value maps to a vertical OFFSET from the
+     * band center, so the waveform reads as a flowing oscilloscope ribbon
+     * (concept-01 Fabric) rather than a bottom-anchored area chart.  Linear
+     * interpolation between adjacent history samples keeps the curve smooth. */
+    int cy_arr[256];
     int n_cols = (w < 256) ? w : 256;
     for (int col = 0; col < n_cols; col++) {
-        /* v0.40-05-30: LINEAR-interpolate between adjacent history samples so
-         * the waveform is a smooth flowing curve (concept Fabric), not the
-         * blocky step function nearest-sampling produced. */
         long num    = (long)col * (h->count - 1);
         int  si     = (int)(num / (n_cols - 1));
         long frac_n = num - (long)si * (n_cols - 1);     /* 0 .. (n_cols-1) */
@@ -696,76 +704,53 @@ static void draw_filled_waveform(const fabric_lane_history_t *h,
         int  idx1   = (h->head - h->count + si2 + FABRIC_HISTORY_N) % FABRIC_HISTORY_N;
         long v0     = h->values[idx0], v1 = h->values[idx1];
         long v      = v0 + (v1 - v0) * frac_n / (n_cols - 1);
-        int  hh     = (int)((v - mn) * (hgt - 2) / span);
-        if (hh < 1) hh = 1;
-        if (hh > hgt - 2) hh = hgt - 2;
-        col_h[col] = hh;
+        int  off    = (int)(((v - mn) * 2 - span) * amp / span);  /* -amp..+amp */
+        cy_arr[col] = center - off;                               /* high => up */
     }
 
-    /* Pass 1: TRANSLUCENT gradient fill — bright at the wave edge, fading to
-     * the card floor.  v0.40-05-30: reads as a glowing band (concept Fabric),
-     * never a solid block, even when the curve is near full height.  `fill`
-     * (dim lane color) tints the deep floor so it doesn't read pure black. */
+    /* Pass 1: translucent ribbon body — fill between the trace and the band
+     * center, fading toward center.  Reads as a luminous flowing band. */
     for (int col = 0; col < n_cols; col++) {
-        int px    = x + col;
-        int top_y = y + hgt - 1 - col_h[col];
-        int floor = y + hgt - 1;
-        int span  = floor - top_y; if (span < 1) span = 1;
-        for (int yy = top_y; yy < floor; yy++) {
-            int d = yy - top_y;                          /* 0 at the edge */
-            uint8_t a = (uint8_t)(84 - 70 * d / span);   /* brighter body fill */
+        int px = x + col;
+        int cy = cy_arr[col];
+        int lo = cy < center ? cy : center;
+        int hi = cy < center ? center : cy;
+        int sp = hi - lo; if (sp < 1) sp = 1;
+        for (int yy = lo; yy <= hi; yy++) {
+            int d = (cy < center) ? (yy - lo) : (hi - yy);  /* 0 at trace edge */
+            uint8_t a = (uint8_t)(66 - 58 * d / sp);
             draw_blend_pixel(px, yy, line, a);
         }
         (void)fill;
     }
 
-    /* Pass 2: outer glow halo above the edge — soft, 11 px, brighter. */
+    /* Pass 2: symmetric soft glow around the trace (above + below). */
     for (int col = 0; col < n_cols; col++) {
-        int px    = x + col;
-        int top_y = y + hgt - 1 - col_h[col];
-        for (int g = 1; g <= 11; g++) {
-            int gy = top_y - g;
-            if (gy < y) break;
-            uint8_t a = (uint8_t)(38 - (g - 1) * 3);
-            draw_blend_pixel(px, gy, line, a);
+        int px = x + col;
+        int cy = cy_arr[col];
+        for (int g = 1; g <= 7; g++) {
+            uint8_t a = (uint8_t)(46 - (g - 1) * 6);
+            if (cy - g >= y)        draw_blend_pixel(px, cy - g, line, a);
+            if (cy + g <  y + hgt)  draw_blend_pixel(px, cy + g, line, a);
         }
     }
 
-    /* Pass 3: mid glow above the edge — 5 px, brighter. */
+    /* Pass 3: bright core trace, 2 px, with segment connectors so the line
+     * stays continuous on steep slopes. */
+    int prev_cy = -1;
     for (int col = 0; col < n_cols; col++) {
-        int px    = x + col;
-        int top_y = y + hgt - 1 - col_h[col];
-        for (int g = 1; g <= 5; g++) {
-            int gy = top_y - g;
-            if (gy < y) break;
-            uint8_t a = (uint8_t)(72 - (g - 1) * 12);
-            draw_blend_pixel(px, gy, line, a);
+        int px = x + col;
+        int cy = cy_arr[col];
+        draw_pixel(px, cy, line);
+        if (cy + 1 < y + hgt) draw_blend_pixel(px, cy + 1, line, 150);
+        if (cy - 1 >= y)      draw_blend_pixel(px, cy - 1, line, 150);
+        if (prev_cy >= 0 && prev_cy != cy) {
+            int lo = prev_cy < cy ? prev_cy : cy;
+            int hi = prev_cy < cy ? cy : prev_cy;
+            for (int yy = lo; yy <= hi; yy++)
+                draw_blend_pixel(px, yy, line, 205);
         }
-    }
-
-    /* Pass 4: core line — bright, 2 px thick at the wave top + soft underline. */
-    for (int col = 0; col < n_cols; col++) {
-        int px    = x + col;
-        int top_y = y + hgt - 1 - col_h[col];
-        draw_pixel(px, top_y, line);
-        if (top_y - 1 >= y)        draw_blend_pixel(px, top_y - 1, line, 255);
-        if (top_y - 2 >= y)        draw_blend_pixel(px, top_y - 2, line, 150);
-        if (top_y + 1 < y + hgt)   draw_blend_pixel(px, top_y + 1, line, 130);
-    }
-
-    /* Pass 5: hot points — 3 px square highlights at local maxima.
-     * Local max = column whose col_h exceeds both neighbors by 2+. */
-    for (int col = 1; col < n_cols - 1; col++) {
-        if (col_h[col] >= col_h[col - 1] + 2 &&
-            col_h[col] >= col_h[col + 1] + 2) {
-            int px    = x + col;
-            int top_y = y + hgt - 1 - col_h[col];
-            for (int dy = -1; dy <= 1; dy++) {
-                for (int dx = -1; dx <= 1; dx++) {
-                    draw_pixel(px + dx, top_y + dy, line);
-                }
-            }
-        }
+        prev_cy = cy;
     }
 }
 
@@ -854,8 +839,8 @@ static void lane_big_metric(fabric_lane_t lane,
 #define LANE_ROW_H        156    /* v0.40: 5 tall lanes + header subtitle + bottom
                                   * capacity line fit the shelf (concept-01) */
 #define LANE_GAP          ATOMIK_GRID_M
-#define LANE_ACCENT_W     3      /* v0.38-J: thicker active rim (was 2) */
-#define LANE_ACTIVE_HALO  6      /* v0.38-J: outer alpha halo px */
+#define LANE_ACCENT_W     1      /* v0.40-05-31: thin active rim (concept: subtle, not a box) */
+#define LANE_ACTIVE_HALO  7      /* outer alpha halo px — soft glow carries the active state */
 
 /* v0.40: PARALLEL BANKS panel — the live, self-verifying parallel-bank
  * throughput measured on the engine @0xF0021000 (bench.c).  Drawn below the
@@ -1125,7 +1110,7 @@ void fabric_draw(window_t *w, int x, int y, int wd, int ht) {
              * falling off with distance.  Reads as luminous spill from
              * the lane border, mirrors concept-image instrument glow. */
             for (int g = 1; g <= LANE_ACTIVE_HALO; g++) {
-                uint8_t a = (uint8_t)(48 - (g - 1) * 7);
+                uint8_t a = (uint8_t)(34 - (g - 1) * 4);
                 int hx = lane_x - g;
                 int hy = ly - g;
                 int hw = lane_w + 2 * g;
