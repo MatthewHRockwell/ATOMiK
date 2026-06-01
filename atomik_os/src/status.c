@@ -175,164 +175,112 @@ static void draw_personality_glyph(int cx, int cy, int r,
  *   - 2 px bright core line
  * Plus a hot dot at the most recent sample so the eye locks onto
  * "right now."  Reads as instrument, not debug trace. */
+/* Taylor sine (no math.h in this TU) — reduces to [-pi,pi] then evaluates.
+ * Returns ~[-1,1].  Used only for decorative pulse motion. */
+static double pulse_sin(double s) {
+    while (s >  3.14159265) s -= 6.2831853;
+    while (s < -3.14159265) s += 6.2831853;
+    double s3 = s * s * s, s5 = s3 * s * s, s7 = s5 * s * s;
+    return s - s3 / 6.0 + s5 / 120.0 - s7 / 5040.0;
+}
+
+/* v0.40-05-31 SYMMETRIC AUDIO-EQUALIZER pulse (concept-01 "PREDICTIVE SYSTEM
+ * PULSE").  Replaces the single up/down trace with vertical bars mirrored
+ * about a horizontal center line — bright core at center fading to the tips,
+ * a faint center spine, and a hot node on the most-recent (rightmost) bar.
+ * Live event history (s_pulse_hist) drives the overall envelope; a fast
+ * per-bar modulation gives the EQ striation.  When idle, a low traveling
+ * shimmer keeps it alive.  Class B decorative chrome — writes NO metric. */
 static void draw_event_pulse_glow(int x, int y, int w, int h,
                                   pixel_t accent) {
-    /* v0.38-K2.5A — soften the bed so the waveform is the visual
-     * hero instead of an opaque dark rectangle sitting under it.
-     * Previous bed was a solid rgb(0x10,0x18,0x28) fill; ChatGPT
-     * 2026-05-16 flagged that as "an empty status slot" — too
-     * visually dominant. Now: just a very subtle accent-tinted
-     * alpha wash so the strip reads as embedded in the glass bar.
-     * No hard bottom hairline either — the bar's own glass edge
-     * is the boundary. */
-    for (int sy = 0; sy < h; sy++) {
-        for (int sx = 0; sx < w; sx++) {
+    /* Subtle accent-tinted bed wash so the strip reads as embedded glass. */
+    for (int sy = 0; sy < h; sy++)
+        for (int sx = 0; sx < w; sx++)
             draw_blend_pixel(x + sx, y + sy, accent, 8);
-        }
-    }
 
-    /* v0.38-K3 — baseline is now a low-amplitude SINE WAVE traveling
-     * across the strip, not a flat glow band.  ChatGPT 2026-05-16:
-     * "the baseline is too flat. It looks like a powered strip,
-     * not a waveform. ... give it a shallow sinusoidal contour."
-     * Class B discipline preserved: still never writes to the
-     * metric ring; pure decorative chrome saying "instrument alive."
-     *
-     * Distinguishes waiting from active:
-     *   - waiting: low amplitude, low alpha, no hot point, no peaks
-     *   - active (data branch below): bright core, peaks, hot point
-     */
-    unsigned long now = anim_now_ms();
-    int   baseline_y = y + h * 3 / 4;
-    int   amp        = h / 6;                       /* shallow */
-    int   col_y[1024];
-    int   n_cols     = (w < 1024) ? w : 1024;
-    /* Two-component sine for organic motion. */
-    double t = (double)now / 1000.0;
-    for (int col = 0; col < n_cols; col++) {
-        double u = (double)col / (double)(n_cols - 1);
-        double phase = u * 6.2831853 * 1.5 + t * 1.2;
-        /* Taylor sin to avoid pulling math.h in here. */
-        double s  = phase;
-        while (s > 3.14159265) s -= 6.2831853;
-        while (s < -3.14159265) s += 6.2831853;
-        double s3 = s*s*s, s5 = s3*s*s;
-        double sn = s - s3/6.0 + s5/120.0;
-        col_y[col] = baseline_y + (int)(sn * amp);
-    }
-    /* Soft fill + 2 px line — quieter than the active waveform. */
-    for (int col = 0; col < n_cols; col++) {
-        int px = x + col;
-        int cy = col_y[col];
-        /* Halo above the line. */
-        for (int g = 1; g <= 4; g++) {
-            int gy = cy - g;
-            if (gy < y) break;
-            uint8_t a = (uint8_t)(18 - (g - 1) * 4);
-            draw_blend_pixel(px, gy, accent, a);
-        }
-        /* Soft fill below the line into the bar floor. */
-        for (int g = 1; g <= 6; g++) {
-            int gy = cy + g;
-            if (gy > y + h - 2) break;
-            uint8_t a = (uint8_t)(14 - (g - 1) * 2);
-            draw_blend_pixel(px, gy, accent, a);
-        }
-        /* The line itself — soft, no hot point. */
-        draw_blend_pixel(px, cy,     accent, 120);
-        draw_blend_pixel(px, cy - 1, accent, 60);
-    }
+    int center_y = y + h / 2;
+    int max_half = h / 2 - 2; if (max_half < 3) max_half = 3;
 
-    if (s_pulse_count < 2) {
-        /* No event history yet — return after baseline animation. */
-        return;
-    }
-
-    /* Compute per-column heights so we can apply the layered stack
-     * uniformly across the visible width. */
+    /* Live envelope source. */
+    int      have_data = 0;
     uint16_t mx = 0;
-    for (uint8_t i = 0; i < s_pulse_count; i++)
-        if (s_pulse_hist[i] > mx) mx = s_pulse_hist[i];
-    if (mx == 0) {
-        /* All-zero history — the procedural baseline above already
-         * painted the idle line; nothing more to render. */
-        return;
+    if (s_pulse_count >= 2) {
+        for (uint8_t i = 0; i < s_pulse_count; i++)
+            if (s_pulse_hist[i] > mx) mx = s_pulse_hist[i];
+        if (mx > 0) have_data = 1;
     }
 
-    /* Reuse col_y array — same scope as baseline above.  Overwrite
-     * with data-driven heights for the active waveform. */
-    for (int col = 0; col < n_cols; col++) {
-        int sample_i = (int)((long)col * (s_pulse_count - 1) /
-                              (n_cols - 1));
-        int idx = (s_pulse_head - s_pulse_count + sample_i
-                   + PULSE_HISTORY_N) % PULSE_HISTORY_N;
-        uint16_t v = s_pulse_hist[idx];
-        int py = y + h - 2 - (int)((long)v * (h - 3) / mx);
-        if (py < y + 1)     py = y + 1;
-        if (py > y + h - 2) py = y + h - 2;
-        col_y[col] = py;
+    unsigned long now = anim_now_ms();
+    double t = (double)now / 1000.0;
+
+    const int bar_step = 3;                 /* 2 px bar + 1 px gap → EQ striation */
+    int n_bars = w / bar_step;
+    if (n_bars < 1) n_bars = 1;
+
+    for (int b = 0; b < n_bars; b++) {
+        int    bx = x + b * bar_step;
+        double u  = (double)b / (double)(n_bars > 1 ? n_bars - 1 : 1);
+
+        /* Audio texture: BURST lobes (two beating low freqs → loud/quiet
+         * regions) × fine per-bar striation, squared for high dynamic range
+         * (deep valleys, sharp peaks) like a real signal — not a regular wave. */
+        double burst = (0.5 + 0.5 * pulse_sin(u * 8.5  + t * 0.8))
+                     * (0.5 + 0.5 * pulse_sin(u * 21.0 - t * 0.5));
+        double fine  = 0.40 + 0.60 * (0.5 + 0.5 * pulse_sin(u * 61.0 + t * 3.0));
+        double shape = burst * fine;
+        shape = shape * shape;                       /* contrast → dynamic range */
+
+        int half;
+        if (have_data) {
+            int sample_i = (int)((long)b * (s_pulse_count - 1)
+                                 / (n_bars > 1 ? n_bars - 1 : 1));
+            int idx = (s_pulse_head - s_pulse_count + sample_i
+                       + PULSE_HISTORY_N) % PULSE_HISTORY_N;
+            uint16_t v = s_pulse_hist[idx];
+            int base   = (int)((long)v * max_half / mx);
+            /* Blend the real per-sample level with the audio texture so the
+             * envelope tracks live events but still reads as a dynamic EQ. */
+            half = (int)(0.40 * base + 0.85 * max_half * shape);
+        } else {
+            /* idle: pure texture at a calmer overall level. */
+            half = (int)(max_half * (0.18 + 0.82 * shape));
+        }
+        if (half < 1)         half = 1;
+        if (half > max_half)  half = max_half;
+
+        /* Mirrored vertical bar: bright at center, fading to the tips. */
+        for (int dy = 0; dy <= half; dy++) {
+            uint8_t a = (uint8_t)(215 - 150 * dy / (half ? half : 1));
+            draw_blend_pixel(bx, center_y - dy, accent, a);
+            draw_blend_pixel(bx, center_y + dy, accent, a);
+            uint8_t a2 = (uint8_t)(a * 5 / 8);     /* 2nd column → 2 px bar */
+            draw_blend_pixel(bx + 1, center_y - dy, accent, a2);
+            draw_blend_pixel(bx + 1, center_y + dy, accent, a2);
+        }
+        /* Soft tip glow just beyond each end. */
+        if (center_y - half - 1 >= y)
+            draw_blend_pixel(bx, center_y - half - 1, accent, 70);
+        if (center_y + half + 1 <  y + h)
+            draw_blend_pixel(bx, center_y + half + 1, accent, 70);
     }
 
-    /* v0.38-K2.5A — brighter halo stack so the wave anchors the
-     * center module instead of getting lost.  Outer halo widened
-     * 8 → 10 with a flatter falloff; mid glow brightened; core
-     * 2 px thick at full intensity. */
-    for (int col = 0; col < n_cols; col++) {
-        int px = x + col;
-        for (int g = 1; g <= 10; g++) {
-            int gy = col_y[col] - g;
-            if (gy < y) break;
-            uint8_t a = (uint8_t)(28 - (g - 1) * 2);
-            draw_blend_pixel(px, gy, accent, a);
-        }
-        for (int g = 1; g <= 6; g++) {
-            int gy = col_y[col] + g;
-            if (gy > y + h - 2) break;
-            uint8_t a = (uint8_t)(26 - (g - 1) * 3);
-            draw_blend_pixel(px, gy, accent, a);
-        }
-    }
-    /* Mid glow — 5 px wide, brighter. */
-    for (int col = 0; col < n_cols; col++) {
-        int px = x + col;
-        for (int g = 1; g <= 5; g++) {
-            int gy = col_y[col] - g;
-            if (gy < y) break;
-            uint8_t a = (uint8_t)(60 - (g - 1) * 9);
-            draw_blend_pixel(px, gy, accent, a);
-        }
-    }
-    /* Bright core: 2 hard px + 1 px alpha 240 below. */
-    for (int col = 0; col < n_cols; col++) {
-        int px = x + col;
-        draw_pixel(px, col_y[col], accent);
-        draw_pixel(px, col_y[col] - 1, accent);
-        draw_blend_pixel(px, col_y[col] + 1, accent, 240);
-    }
+    /* Faint center spine across the whole strip. */
+    for (int sx = 0; sx < w; sx++)
+        draw_blend_pixel(x + sx, center_y, accent, 55);
 
-    /* Hot point at the most-recent sample — small, bright. */
-    int hot_col = n_cols - 1;
-    int hot_x   = x + hot_col;
-    int hot_y   = col_y[hot_col];
-    int hr      = 3;
-    for (int dy = -hr; dy <= hr; dy++) {
-        for (int dx = -hr; dx <= hr; dx++) {
-            if (dx*dx + dy*dy <= hr*hr) {
-                draw_pixel(hot_x + dx, hot_y + dy, accent);
+    /* Hot node on the most-recent (rightmost) bar when live. */
+    if (have_data) {
+        int hx = x + (n_bars - 1) * bar_step;
+        for (int dy = -2; dy <= 2; dy++)
+            for (int dx = -2; dx <= 2; dx++)
+                if (dx * dx + dy * dy <= 4)
+                    draw_blend_pixel(hx + dx, center_y + dy, accent, 190);
+        for (int dy = -4; dy <= 4; dy++)
+            for (int dx = -4; dx <= 4; dx++) {
+                int d2 = dx * dx + dy * dy;
+                if (d2 > 4 && d2 <= 16)
+                    draw_blend_pixel(hx + dx, center_y + dy, accent, 40);
             }
-        }
-    }
-    /* Hot point outer halo — 5 px alpha ring. */
-    int hr2 = 6;
-    for (int dy = -hr2; dy <= hr2; dy++) {
-        for (int dx = -hr2; dx <= hr2; dx++) {
-            int d2 = dx*dx + dy*dy;
-            if (d2 > hr*hr && d2 <= hr2*hr2) {
-                int dist = hr2 - (int)(d2 / (hr2 + 1));
-                uint8_t a = (uint8_t)(dist * 18);
-                draw_blend_pixel(hot_x + dx, hot_y + dy, accent, a);
-            }
-        }
     }
 }
 
@@ -473,39 +421,6 @@ static void icon_clock(int cx,int cy,int r,pixel_t c){
     px_ring(cx,cy,r,c,200); px_line(cx,cy,cx,cy-r+3,c,210); px_line(cx,cy,cx+r-4,cy,c,210);
 }
 
-/* Audio-style pulse: symmetric bars around a center line, height from the real
- * event-pulse history (s_pulse_hist) interpolated smooth, bright center fading
- * to the edges.  Replaces the old broken/static sparkline. */
-static void draw_audio_pulse(int x, int y, int w, int h, pixel_t accent) {
-    int cy = y + h / 2;
-    for (int sx = 0; sx < w; sx++) draw_blend_pixel(x + sx, cy, accent, 26);
-    unsigned long now = anim_now_ms();
-    uint16_t mx = 1;
-    for (uint8_t i = 0; i < s_pulse_count; i++) if (s_pulse_hist[i] > mx) mx = s_pulse_hist[i];
-    for (int sx = 0; sx < w; sx++) {
-        int hh;
-        if (s_pulse_count >= 2 && mx > 0) {
-            double fp = (double)sx * (s_pulse_count - 1) / (w - 1);
-            int si = (int)fp; double fr = fp - si;
-            int si2 = (si + 1 < s_pulse_count) ? si + 1 : si;
-            int i0 = (s_pulse_head - s_pulse_count + si  + PULSE_HISTORY_N) % PULSE_HISTORY_N;
-            int i1 = (s_pulse_head - s_pulse_count + si2 + PULSE_HISTORY_N) % PULSE_HISTORY_N;
-            double v = s_pulse_hist[i0] + (s_pulse_hist[i1] - s_pulse_hist[i0]) * fr;
-            hh = (int)(v * (h / 2 - 1) / mx);
-        } else {
-            /* idle: low animated shimmer so it reads as alive, not dead */
-            double u = (double)sx / w * 6.2831853 * 3 + (double)now / 700.0;
-            double s = u; while (s > 3.14159) s -= 6.2831853; while (s < -3.14159) s += 6.2831853;
-            double s3 = s*s*s; hh = (int)((s - s3/6.0) * (h / 8));
-        }
-        if (hh < 0) hh = -hh; if (hh < 1) hh = 1;
-        for (int dy = -hh; dy <= hh; dy++) {
-            uint8_t a = (uint8_t)(210 - 170 * (dy < 0 ? -dy : dy) / (hh + 1));
-            draw_blend_pixel(x + sx, cy + dy, accent, a);
-        }
-    }
-}
-
 /* Stacked metric module: icon (left) + small uppercase LABEL over a colored
  * value.  Returns the width consumed (incl. trailing gap). */
 static int draw_metric_module(int x, int y_center,
@@ -606,7 +521,7 @@ static void draw_pulse_bar_investor(int bar_y, int bar_h) {
         int pulse_w = 300;
         int pulse_h = bar_y + bar_h - pulse_y - 10;
         if (pulse_h < 8) pulse_h = 8;
-        draw_audio_pulse(cur_x, pulse_y, pulse_w, pulse_h, ATOMIK_SEM_HARDWARE);
+        draw_event_pulse_glow(cur_x, pulse_y, pulse_w, pulse_h, ATOMIK_SEM_HARDWARE);
         cur_x += pulse_w + ATOMIK_GRID_M;
 
         char cv[16]; snprintf(cv, sizeof cv, "%d%%", conf);
