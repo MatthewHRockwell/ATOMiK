@@ -14,6 +14,7 @@
 #include "atomik_os.h"
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 extern pixel_t *fb_back(void);
 
@@ -101,6 +102,57 @@ static void wallpaper_full_render(void) {
     bg_circle(cx, cy, 232, cyan, 12);
     bg_circle(cx, cy, 318, cyan, 8);
     bg_circle(cx, cy, 404, cyan, 5);
+
+    /* 4.5 AURORA particle-flow field (concept-01): fine cyan dots strung
+     * along gently-curving streamlines that sweep across the field — denser
+     * and brighter near the hero core, dimmer toward the edges.  This is the
+     * concept's signature "flowing dot stream" texture.  Rendered ONCE into
+     * the cache (no per-frame cost) so we can afford the per-dot work; pure
+     * decorative Class B chrome (writes no number, never read as telemetry).
+     * Core-weighted alpha via the same quadratic falloff as soft_glow, so no
+     * sqrt is needed per dot. */
+    {
+        const long R  = 940;
+        const long R2 = R * R;
+        const int  sp = 9;                 /* dot-matrix spacing */
+        for (int gy = 0; gy < FB_H; gy += sp) {
+            for (int gx = 0; gx < FB_W; gx += sp) {
+                /* Flow displacement — warp the regular lattice along a smooth
+                 * vector field so the dots read as a flowing current, not a
+                 * static grid. */
+                double fx = (double)gx, fy = (double)gy;
+                int dx = (int)(7.0 * sin(fy * 0.020 + fx * 0.0045));
+                int dy = (int)(6.0 * cos(fx * 0.015 + fy * 0.010));
+                int x  = gx + dx, y = gy + dy;
+                if (x < 0 || x >= FB_W || y < 0 || y >= FB_H) continue;
+
+                /* Core-weighted base brightness (quadratic falloff). */
+                long ddx = x - cx, ddy = y - cy;
+                long d2  = ddx * ddx + ddy * ddy;
+                int  core = (d2 < R2) ? (int)((long)70 * (R2 - d2) / R2) : 0;
+
+                /* Diagonal flowing bands: brightness crests sweep up-right so
+                 * the field has visible aurora ribbons, like the concept. */
+                double band = 0.5 + 0.5 * sin(fx * 0.0052 - fy * 0.0090);
+                int a = (int)((10 + core) * (0.45 + 0.55 * band));
+
+                /* A touch of per-dot variance so the lattice isn't sterile. */
+                a += (int)(BG_RND % 7u) - 3;
+                if (a <= 3) continue;
+                if (a > 200) a = 200;
+
+                pixel_t c = (BG_RND % 7u == 0) ? rgb(0xDC, 0xF2, 0xFF) : cyan;
+                draw_blend_pixel(x, y, c, (uint8_t)a);
+
+                /* Sparse bright nodes with a tiny cross glow on the crests. */
+                if (band > 0.92 && core > 30 && (BG_RND % 5u == 0)) {
+                    draw_blend_pixel(x, y, rgb(0xE0, 0xF6, 0xFF), 200);
+                    draw_blend_pixel(x + 1, y, cyan, 70);
+                    draw_blend_pixel(x, y + 1, cyan, 70);
+                }
+            }
+        }
+    }
 
     /* 5. star field — sparse points across the WHOLE field, varied brightness,
      * mostly cool white with occasional cyan/violet.  A handful of brighter
