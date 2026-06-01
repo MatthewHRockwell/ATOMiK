@@ -201,6 +201,11 @@ static void draw_event_pulse_glow(int x, int y, int w, int h,
     int center_y = y + h / 2;
     int max_half = h / 2 - 2; if (max_half < 3) max_half = 3;
 
+    /* Cyan→violet horizontal gradient across the strip (concept-01): left end
+     * is the passed accent (cyan), right end is a violet. */
+    int ar = (accent >> 16) & 0xFF, ag = (accent >> 8) & 0xFF, ab = accent & 0xFF;
+    const int vr = 0xA6, vg = 0x6E, vb = 0xF2;     /* violet right end */
+
     /* Live envelope source. */
     int      have_data = 0;
     uint16_t mx = 0;
@@ -220,6 +225,9 @@ static void draw_event_pulse_glow(int x, int y, int w, int h,
     for (int b = 0; b < n_bars; b++) {
         int    bx = x + b * bar_step;
         double u  = (double)b / (double)(n_bars > 1 ? n_bars - 1 : 1);
+        pixel_t bc = rgb((uint8_t)(ar + (int)((vr - ar) * u)),
+                         (uint8_t)(ag + (int)((vg - ag) * u)),
+                         (uint8_t)(ab + (int)((vb - ab) * u)));
 
         /* Audio texture: BURST lobes (two beating low freqs → loud/quiet
          * regions) × fine per-bar striation, squared for high dynamic range
@@ -251,35 +259,37 @@ static void draw_event_pulse_glow(int x, int y, int w, int h,
         /* Mirrored vertical bar: bright at center, fading to the tips. */
         for (int dy = 0; dy <= half; dy++) {
             uint8_t a = (uint8_t)(215 - 150 * dy / (half ? half : 1));
-            draw_blend_pixel(bx, center_y - dy, accent, a);
-            draw_blend_pixel(bx, center_y + dy, accent, a);
+            draw_blend_pixel(bx, center_y - dy, bc, a);
+            draw_blend_pixel(bx, center_y + dy, bc, a);
             uint8_t a2 = (uint8_t)(a * 5 / 8);     /* 2nd column → 2 px bar */
-            draw_blend_pixel(bx + 1, center_y - dy, accent, a2);
-            draw_blend_pixel(bx + 1, center_y + dy, accent, a2);
+            draw_blend_pixel(bx + 1, center_y - dy, bc, a2);
+            draw_blend_pixel(bx + 1, center_y + dy, bc, a2);
         }
         /* Soft tip glow just beyond each end. */
         if (center_y - half - 1 >= y)
-            draw_blend_pixel(bx, center_y - half - 1, accent, 70);
+            draw_blend_pixel(bx, center_y - half - 1, bc, 70);
         if (center_y + half + 1 <  y + h)
-            draw_blend_pixel(bx, center_y + half + 1, accent, 70);
+            draw_blend_pixel(bx, center_y + half + 1, bc, 70);
     }
 
     /* Faint center spine across the whole strip. */
     for (int sx = 0; sx < w; sx++)
         draw_blend_pixel(x + sx, center_y, accent, 55);
 
-    /* Hot node on the most-recent (rightmost) bar when live. */
+    /* Hot node on the most-recent (rightmost) bar when live — uses the violet
+     * gradient end so it matches the bars under it. */
     if (have_data) {
+        pixel_t hot = rgb((uint8_t)vr, (uint8_t)vg, (uint8_t)vb);
         int hx = x + (n_bars - 1) * bar_step;
         for (int dy = -2; dy <= 2; dy++)
             for (int dx = -2; dx <= 2; dx++)
                 if (dx * dx + dy * dy <= 4)
-                    draw_blend_pixel(hx + dx, center_y + dy, accent, 190);
+                    draw_blend_pixel(hx + dx, center_y + dy, hot, 190);
         for (int dy = -4; dy <= 4; dy++)
             for (int dx = -4; dx <= 4; dx++) {
                 int d2 = dx * dx + dy * dy;
                 if (d2 > 4 && d2 <= 16)
-                    draw_blend_pixel(hx + dx, center_y + dy, accent, 40);
+                    draw_blend_pixel(hx + dx, center_y + dy, hot, 40);
             }
     }
 }
