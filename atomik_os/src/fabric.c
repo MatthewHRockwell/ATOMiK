@@ -671,7 +671,9 @@ static void draw_filled_waveform(const fabric_lane_history_t *h,
 
     uint16_t mn = h->v_min, mx = h->v_max;
     int center = y + hgt / 2;
-    int amp    = (hgt - 6) / 2; if (amp < 4) amp = 4;
+    /* v0.40-06: gentler amplitude (0.4·h vs 0.5·h) for the concept's calm,
+     * low-amplitude flowing ribbon rather than a dramatic EKG. */
+    int amp    = (hgt - 6) * 2 / 5; if (amp < 4) amp = 4;
 
     if (mx <= mn) {
         /* Constant series — calm bright trace through the band center with a
@@ -708,6 +710,23 @@ static void draw_filled_waveform(const fabric_lane_history_t *h,
         cy_arr[col] = center - off;                               /* high => up */
     }
 
+    /* v0.40-06: smooth the trace (7-wide moving average) so it reads as a
+     * gentle flowing ribbon (concept-01), not a jagged EKG.  Applied twice
+     * for a softer curve. */
+    for (int pass = 0; pass < 2; pass++) {
+        int tmp[256];
+        for (int col = 0; col < n_cols; col++) {
+            int acc = 0, cnt = 0;
+            for (int k = -3; k <= 3; k++) {
+                int c = col + k;
+                if (c < 0 || c >= n_cols) continue;
+                acc += cy_arr[c]; cnt++;
+            }
+            tmp[col] = acc / cnt;
+        }
+        for (int col = 0; col < n_cols; col++) cy_arr[col] = tmp[col];
+    }
+
     /* Pass 1: translucent ribbon body — fill between the trace and the band
      * center, fading toward center.  Reads as a luminous flowing band. */
     for (int col = 0; col < n_cols; col++) {
@@ -724,31 +743,34 @@ static void draw_filled_waveform(const fabric_lane_history_t *h,
         (void)fill;
     }
 
-    /* Pass 2: symmetric soft glow around the trace (above + below). */
+    /* Pass 2: BROAD symmetric soft glow around the trace (above + below) —
+     * v0.40-06 widened 7→11 with a gentler falloff for the concept's
+     * luminous, atmospheric ribbon. */
     for (int col = 0; col < n_cols; col++) {
         int px = x + col;
         int cy = cy_arr[col];
-        for (int g = 1; g <= 7; g++) {
-            uint8_t a = (uint8_t)(46 - (g - 1) * 6);
+        for (int g = 1; g <= 11; g++) {
+            uint8_t a = (uint8_t)(40 - (g - 1) * 3);
             if (cy - g >= y)        draw_blend_pixel(px, cy - g, line, a);
             if (cy + g <  y + hgt)  draw_blend_pixel(px, cy + g, line, a);
         }
     }
 
-    /* Pass 3: bright core trace, 2 px, with segment connectors so the line
-     * stays continuous on steep slopes. */
+    /* Pass 3: SOFT core trace with segment connectors — v0.40-06 softened
+     * (no hard 255-px line / 205 connectors) so the ribbon glows rather than
+     * cutting a sharp EKG line. */
     int prev_cy = -1;
     for (int col = 0; col < n_cols; col++) {
         int px = x + col;
         int cy = cy_arr[col];
-        draw_pixel(px, cy, line);
-        if (cy + 1 < y + hgt) draw_blend_pixel(px, cy + 1, line, 150);
-        if (cy - 1 >= y)      draw_blend_pixel(px, cy - 1, line, 150);
+        draw_blend_pixel(px, cy, line, 205);
+        if (cy + 1 < y + hgt) draw_blend_pixel(px, cy + 1, line, 95);
+        if (cy - 1 >= y)      draw_blend_pixel(px, cy - 1, line, 95);
         if (prev_cy >= 0 && prev_cy != cy) {
             int lo = prev_cy < cy ? prev_cy : cy;
             int hi = prev_cy < cy ? cy : prev_cy;
             for (int yy = lo; yy <= hi; yy++)
-                draw_blend_pixel(px, yy, line, 205);
+                draw_blend_pixel(px, yy, line, 140);
         }
         prev_cy = cy;
     }
