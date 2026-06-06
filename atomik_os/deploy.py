@@ -411,7 +411,7 @@ def main():
     cmd(s, "echo $! > /tmp/aos_fifo_writer.pid", log=False)
     # Bash rejects `cmd &; echo marker`, so launch on its own line.
     slow(s, f"nohup {REMOTE} > /tmp/aos.out 2> /tmp/aos.err "
-            f"< /tmp/aos_keys &\n")
+            f"< /dev/null &\n")
     time.sleep(0.6)
     s.read(8192)
 
