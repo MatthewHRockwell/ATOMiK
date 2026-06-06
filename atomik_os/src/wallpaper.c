@@ -126,15 +126,22 @@ static void wallpaper_full_render(void) {
                 int x  = gx + dx, y = gy + dy;
                 if (x < 0 || x >= FB_W || y < 0 || y >= FB_H) continue;
 
-                /* Core-weighted base brightness (quadratic falloff). */
+                /* Core-weighted base brightness (quadratic falloff).
+                 * v0.40-06: boosted for real HDMI — the AX7020 panel's gamma
+                 * crushes low alpha, so the dim mid-field dots vanished on
+                 * hardware (board capture 2026-06-05).  Raise the core weight
+                 * and the per-dot floor so the whole flow survives the panel
+                 * while the crests stay capped (no blow-out). */
                 long ddx = x - cx, ddy = y - cy;
                 long d2  = ddx * ddx + ddy * ddy;
-                int  core = (d2 < R2) ? (int)((long)70 * (R2 - d2) / R2) : 0;
+                int  core = (d2 < R2) ? (int)((long)95 * (R2 - d2) / R2) : 0;
 
                 /* Diagonal flowing bands: brightness crests sweep up-right so
-                 * the field has visible aurora ribbons, like the concept. */
+                 * the field has visible aurora ribbons, like the concept.  The
+                 * band floor (0.62) is lifted so off-crest dots don't fall
+                 * below the HDMI visibility threshold. */
                 double band = 0.5 + 0.5 * sin(fx * 0.0052 - fy * 0.0090);
-                int a = (int)((10 + core) * (0.45 + 0.55 * band));
+                int a = (int)((22 + core) * (0.62 + 0.38 * band));
 
                 /* A touch of per-dot variance so the lattice isn't sterile. */
                 a += (int)(BG_RND % 7u) - 3;
