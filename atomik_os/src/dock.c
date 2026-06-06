@@ -474,6 +474,18 @@ void dock_draw(int hover_index) {
             }
         }
         if (focused) {
+            /* concept-01 ACTIVE TILE: a rounded-square frame around the glyph
+             * with a subtle glass fill + accent border (the DASHBOARD tile).
+             * The soft radial glow above becomes its outer halo. */
+            int ts  = 46;
+            int tlx = gcx0 - ts / 2, tly = gcy0 - ts / 2;
+            draw_rect_rounded(tlx - 1, tly - 1, ts + 2, ts + 2, 13, accent);
+            draw_rect_rounded(tlx, tly, ts, ts, 12, rgb(0x12, 0x1E, 0x36));
+            for (int dy2 = 3; dy2 < ts - 3; dy2++)
+                for (int dx2 = 3; dx2 < ts - 3; dx2++)
+                    draw_blend_pixel(tlx + dx2, tly + dy2, accent, 9);
+
+            /* right-edge active indicator dot. */
             int dot_x = rx + rw - 5;
             for (int dy = -2; dy <= 2; dy++)
                 for (int dx = -2; dx <= 2; dx++)
@@ -569,23 +581,26 @@ void dock_draw(int hover_index) {
         iy += CELL_HEIGHT + ICON_GAP;
     }
 
-    /* v0.40 bottom mini-control — cyan diamond + cyan→violet gradient seam
-     * (concept rail footer).  Pure decorative chrome, no state. */
+    /* v0.40-06 bottom control — rounded cyan→violet GRADIENT PILL (concept
+     * rail footer).  Pure decorative chrome, no state. */
     {
-        int fy  = ry + rh - FOOTER_H / 2 - 4;
-        int fcx = rx + rw / 2;
-        for (int dy = -4; dy <= 4; dy++) {
-            int wdt = 4 - (dy < 0 ? -dy : dy);
-            for (int dx = -wdt; dx <= wdt; dx++)
-                draw_blend_pixel(fcx + dx, fy + dy, ATOMIK_ACCENT, 200);
-        }
-        int lw = rw - RAIL_PADDING * 2;
-        int lx = rx + RAIL_PADDING;
-        for (int sx = 0; sx < lw; sx++) {
-            double t = (double)sx / (double)lw;
+        int ph = 7;                              /* pill height */
+        int pw = rw - RAIL_PADDING * 2;
+        int px = rx + RAIL_PADDING;
+        int py = ry + rh - FOOTER_H / 2 - ph / 2;
+        int rad = ph / 2;
+        for (int sx = 0; sx < pw; sx++) {
+            double t = (double)sx / (double)(pw > 1 ? pw - 1 : 1);
             uint8_t r = (uint8_t)(0x6E * (1 - t) + 0xB0 * t);
             uint8_t g = (uint8_t)(0xDD * (1 - t) + 0x8C * t);
-            draw_blend_pixel(lx + sx, fy + 9, rgb(r, g, 0xFF), 150);
+            pixel_t col = rgb(r, g, 0xFF);
+            int inset = 0;                        /* rounded ends */
+            if (sx < rad)            inset = rad - sx;
+            else if (sx >= pw - rad) inset = sx - (pw - rad - 1);
+            for (int sy = inset; sy < ph - inset; sy++)
+                draw_blend_pixel(px + sx, py + sy, col, 215);
+            draw_blend_pixel(px + sx, py - 1,  col, 55);   /* soft vertical glow */
+            draw_blend_pixel(px + sx, py + ph, col, 55);
         }
     }
 }
