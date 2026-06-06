@@ -30,6 +30,50 @@ static void seed_demo_usage(void) {
     for (unsigned i = 0; i < sizeof(seq) / sizeof(seq[0]); i++) agent_log(seq[i]);
 }
 
+/* v0.41 pointer cursor — classic tilted arrow, white fill + dark edge so it
+ * reads on any background.  Hotspot at the top-left tip (mx,my).  Drawn LAST
+ * each frame (above all chrome).  No-op until a mouse device is present. */
+static void cursor_draw(void) {
+    int cx_ovr = -1, cy_ovr = -1;
+    const char *pc = getenv("ATOMIK_PREVIEW_CURSOR");  /* "x,y" for host shots */
+    if (pc && *pc) { int a = -1, b = -1; if (sscanf(pc, "%d,%d", &a, &b) == 2) { cx_ovr = a; cy_ovr = b; } }
+    if (!input_mouse_present() && cx_ovr < 0) return;
+    static const char *CUR[18] = {
+        "E         ",
+        "EE        ",
+        "EFE       ",
+        "EFFE      ",
+        "EFFFE     ",
+        "EFFFFE    ",
+        "EFFFFFE   ",
+        "EFFFFFFE  ",
+        "EFFFFFFFE ",
+        "EFFFFFFFFE",
+        "EFFFFEEEEE",
+        "EFFEFFE   ",
+        "EFE EFFE  ",
+        "EE  EFFE  ",
+        "E    EFFE ",
+        "     EFFE ",
+        "      EFFE",
+        "      EEEE",
+    };
+    int x0 = cx_ovr >= 0 ? cx_ovr : input_mouse_x();
+    int y0 = cy_ovr >= 0 ? cy_ovr : input_mouse_y();
+    pixel_t fillc = rgb(0xF0, 0xF6, 0xFF);
+    pixel_t edge  = rgb(0x06, 0x0A, 0x14);
+    for (int r = 0; r < 18; r++) {
+        for (int c = 0; c < 10; c++) {
+            char ch = CUR[r][c];
+            if (ch == ' ') continue;
+            int px = x0 + c, py = y0 + r;
+            if (px < 0 || px >= FB_W || py < 0 || py >= FB_H) continue;
+            draw_pixel(px, py, ch == 'F' ? fillc : edge);
+        }
+    }
+    dirty_rect(x0, y0, 10, 18);
+}
+
 static void redraw_frame(void) {
     /* v0.38-A: tile-based dirty tracking.  Each visible surface
      * declares the rect it touches via dirty_rect() during its draw
@@ -53,6 +97,7 @@ static void redraw_frame(void) {
     assistant_tick();   /* v0.39-A: auto-dismiss timeout check */
     assistant_draw();   /* v0.39-A: summoned Atom overlay on top of chrome */
     notify_draw();
+    cursor_draw();      /* v0.41: pointer cursor — topmost layer */
     fb_present();
     dirty_finalize_frame();
 }
@@ -682,6 +727,26 @@ int main(int argc, char **argv) {
             }
 
             if (dirty) redraw_frame();
+        } else if (ev.kind == EV_MOUSE_MOVE || ev.kind == EV_MOUSE_DOWN ||
+                   ev.kind == EV_MOUSE_UP) {
+            /* v0.41 pointer: motion moves the cursor + updates rail hover;
+             * a left-click on a rail cell activates that capability (same
+             * dispatch as the number-key launcher). */
+            int slot = dock_hit_test(ev.mx, ev.my);
+            if (ev.kind == EV_MOUSE_DOWN && slot >= 0) {
+                s_dock_hover = slot;
+                action_t a = dock_action_for_slot(slot);
+                if      (a == ACT_OPEN_ABOUT)     open_about();
+                else if (a == ACT_OPEN_MONITOR)   system_surface_open();
+                else if (a == ACT_OPEN_TERMINAL)  open_terminal();
+                else if (a == ACT_OPEN_FILES)     open_files();
+                else if (a == ACT_OPEN_NOTES)     open_notes();
+                else if (a == ACT_OPEN_ASSISTANT) assistant_summon();
+                if (a != ACT_NONE) agent_log(a); else agent_log(ACT_DOCK_HOVER);
+            } else {
+                s_dock_hover = slot;   /* hover highlight follows the cursor */
+            }
+            redraw_frame();            /* reflect the new cursor / hover */
         } else {
             /* No event arrived. Redraw a frame if an animation is in
              * progress (window fade-in, predicted-icon pulse, etc.) OR if

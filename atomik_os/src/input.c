@@ -22,6 +22,7 @@
 #include <unistd.h>
 
 #define MAX_KBDS 4
+#define MAX_MICE 4
 
 static struct termios s_old_term;
 static int            s_have_old   = 0;
@@ -29,6 +30,18 @@ static int            s_kbd_fd[MAX_KBDS];
 static int            s_n_kbd      = 0;
 static int            s_shift_held = 0;
 static int            s_ctrl_held  = 0;    /* v0.31 patch 8: Ctrl-W close support */
+
+/* v0.41 mouse: relative-pointer devices (EV_REL). We accumulate REL_X/REL_Y
+ * into an absolute cursor clamped to the framebuffer, and surface BTN_LEFT as
+ * EV_MOUSE_DOWN/UP.  Cursor starts at screen center. */
+static int s_mouse_fd[MAX_MICE];
+static int s_n_mouse    = 0;
+static int s_mx         = FB_W / 2;
+static int s_my         = FB_H / 2;
+
+int input_mouse_x(void)       { return s_mx; }
+int input_mouse_y(void)       { return s_my; }
+int input_mouse_present(void) { return s_n_mouse > 0; }
 
 /* Linux keycode → ASCII. Sparse table; unmapped codes return 0.
  * Numbers, letters, and the most common punctuation/control. */
@@ -86,6 +99,35 @@ static void scan_keyboards(void) {
     closedir(d);
 }
 
+/* Open a /dev/input/eventN as a mouse: it must report EV_REL (relative
+ * pointer).  Keyboards declare EV_KEY without EV_REL, so this cleanly
+ * separates the two even for combo devices. */
+static int try_open_mouse(const char *path) {
+    int fd = open(path, O_RDONLY | O_NONBLOCK);
+    if (fd < 0) return -1;
+    unsigned long evbits = 0;
+    if (ioctl(fd, EVIOCGBIT(0, sizeof evbits), &evbits) < 0 ||
+        !(evbits & (1UL << EV_REL))) {
+        close(fd);
+        return -1;
+    }
+    return fd;
+}
+
+static void scan_mice(void) {
+    DIR *d = opendir("/dev/input");
+    if (!d) return;
+    struct dirent *e;
+    while ((e = readdir(d)) && s_n_mouse < MAX_MICE) {
+        if (strncmp(e->d_name, "event", 5) != 0) continue;
+        char path[64];
+        snprintf(path, sizeof path, "/dev/input/%s", e->d_name);
+        int fd = try_open_mouse(path);
+        if (fd >= 0) s_mouse_fd[s_n_mouse++] = fd;
+    }
+    closedir(d);
+}
+
 int input_open(void) {
     /* stdin path — still used for UART relay (atomik_ai_daemon writes
      * to /tmp/aos_keys, the launching shell or fifo feeds stdin). */
@@ -98,8 +140,9 @@ int input_open(void) {
     int fl = fcntl(0, F_GETFL, 0);
     fcntl(0, F_SETFL, fl | O_NONBLOCK);
 
-    /* USB HID path — find the keyboard. */
+    /* USB HID path — find the keyboard(s) and mouse/mice. */
     scan_keyboards();
+    scan_mice();
     return 0;
 }
 
@@ -107,15 +150,21 @@ void input_close(void) {
     if (s_have_old) tcsetattr(0, TCSANOW, &s_old_term);
     for (int i = 0; i < s_n_kbd; i++) close(s_kbd_fd[i]);
     s_n_kbd = 0;
+    for (int i = 0; i < s_n_mouse; i++) close(s_mouse_fd[i]);
+    s_n_mouse = 0;
 }
 
 event_t input_poll(int timeout_ms) {
-    event_t ev = { EV_NONE, 0 };
-    struct pollfd pfd[1 + MAX_KBDS];
+    event_t ev = { EV_NONE, 0, 0, 0 };
+    struct pollfd pfd[1 + MAX_KBDS + MAX_MICE];
     int nfd = 0;
     pfd[nfd].fd = 0; pfd[nfd].events = POLLIN; nfd++;
     for (int i = 0; i < s_n_kbd; i++) {
         pfd[nfd].fd = s_kbd_fd[i]; pfd[nfd].events = POLLIN; nfd++;
+    }
+    int mouse_base = nfd;
+    for (int i = 0; i < s_n_mouse; i++) {
+        pfd[nfd].fd = s_mouse_fd[i]; pfd[nfd].events = POLLIN; nfd++;
     }
     int n = poll(pfd, nfd, timeout_ms);
     if (n <= 0) return ev;
@@ -171,6 +220,31 @@ event_t input_poll(int timeout_ms) {
             ev.key  = (int)(unsigned char)c;
         }
         return ev;
+    }
+
+    /* USB mouse: drain each ready fd, accumulating relative motion into the
+     * absolute cursor and capturing a left-button transition.  A button event
+     * takes priority over motion (the caller dispatches a click at the current
+     * cursor); otherwise motion emits EV_MOUSE_MOVE.  Cursor is clamped to the
+     * framebuffer. */
+    for (int i = 0; i < s_n_mouse; i++) {
+        if (!(pfd[mouse_base + i].revents & POLLIN)) continue;
+        struct input_event ie;
+        int moved = 0, btn_evt = 0, btn_val = 0;
+        while (read(s_mouse_fd[i], &ie, sizeof ie) == (ssize_t)sizeof ie) {
+            if (ie.type == EV_REL) {
+                if (ie.code == REL_X) { s_mx += ie.value; moved = 1; }
+                else if (ie.code == REL_Y) { s_my += ie.value; moved = 1; }
+            } else if (ie.type == EV_KEY &&
+                       (ie.code == BTN_LEFT || ie.code == BTN_TOUCH)) {
+                btn_evt = 1; btn_val = ie.value;
+            }
+        }
+        if (s_mx < 0) s_mx = 0; if (s_mx >= FB_W) s_mx = FB_W - 1;
+        if (s_my < 0) s_my = 0; if (s_my >= FB_H) s_my = FB_H - 1;
+        ev.mx = s_mx; ev.my = s_my;
+        if (btn_evt) { ev.kind = btn_val ? EV_MOUSE_DOWN : EV_MOUSE_UP; return ev; }
+        if (moved)   { ev.kind = EV_MOUSE_MOVE; return ev; }
     }
     return ev;
 }

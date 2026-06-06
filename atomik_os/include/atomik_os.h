@@ -1187,13 +1187,22 @@ typedef enum {
     EV_NONE = 0,
     EV_KEY,
     EV_QUIT,
+    EV_MOUSE_MOVE,    /* cursor moved; mx,my hold the new absolute position   */
+    EV_MOUSE_DOWN,    /* left button pressed at mx,my                          */
+    EV_MOUSE_UP,      /* left button released at mx,my                         */
 } event_kind_t;
 typedef struct {
     event_kind_t kind;
-    int key;          /* ASCII for now */
+    int key;          /* ASCII for now                          */
+    int mx, my;       /* absolute cursor position (mouse events) */
 } event_t;
 int  input_open(void);
 void input_close(void);
 event_t input_poll(int timeout_ms);
+/* Current absolute cursor position (clamped to the framebuffer). Valid once a
+ * mouse device has been seen; defaults to screen center. */
+int  input_mouse_x(void);
+int  input_mouse_y(void);
+int  input_mouse_present(void);   /* 1 if at least one mouse device is open */
 
 #endif /* ATOMIK_OS_H */
