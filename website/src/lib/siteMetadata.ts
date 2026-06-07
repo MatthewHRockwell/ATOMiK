@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 const siteUrl = "https://atomik.tech";
-const defaultImage = "/09-current-live-atomik-desk-v039k.png";
+const defaultImage = "/10-current-live-atomik-desk-v040a.png";
 
 type PageMetadataInput = {
   title: string;

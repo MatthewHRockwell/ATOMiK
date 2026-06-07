@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     description:
       "How we know ATOMiK works today, what each artifact proves, and what it does not prove.",
     url: "https://atomik.tech/benchmarks",
-    images: [{ url: "https://atomik.tech/09-current-live-atomik-desk-v039k.png", width: 1920, height: 1080 }],
+    images: [{ url: "https://atomik.tech/10-current-live-atomik-desk-v040a.png", width: 1920, height: 1080 }],
     type: "website",
   },
   twitter: {
@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     title: "ATOMiK Proof and Benchmarks",
     description:
       "Quote the artifact, context, and caveat. Do not isolate the biggest number.",
-    images: ["https://atomik.tech/09-current-live-atomik-desk-v039k.png"],
+    images: ["https://atomik.tech/10-current-live-atomik-desk-v040a.png"],
   },
 };
 
@@ -45,13 +45,61 @@ const evidenceLabels = [
   ["HARDWARE_VALIDATED", "Demonstrated on physical hardware without implying production readiness."],
   ["SOFTWARE_VALIDATED", "Shown in software prototype, simulation, local runtime, or formal work."],
   ["SYNTHESIS_VALIDATED", "Supported by toolchain output, separate from live-board measurements."],
+  ["FORMAL_PROOF", "Directly audited formal statements only; do not use as workload, customer, or production proof."],
   ["BUILD_ARTIFACT", "Concrete local build output exists, but the full path is not promoted as live proof."],
   ["PROJECTED", "A model or estimate. It must not be phrased as an observed result."],
   ["CONCEPTUAL", "Explains direction or UX. It is not current functionality."],
   ["ROADMAP", "Planned work that may change."],
 ];
 
+const proofDownloads = [
+  ["Proof cards", "/proof-artifacts/PROOF_CARDS.md", "Nontechnical digest: what each artifact proves, what it does not prove, and safe language."],
+  ["Version map", "/proof-artifacts/VERSION_MAP.md", "Prevents blending v0.40-A UI proof, AX7020 matrix proof, parallel-bank throughput, Linux validation, SD boot, and formal proof."],
+  ["AX7020 summary", "/proof-artifacts/AX7020_SUMMARY.md", "Compact workload-specific readout of the live-measured AX7020 matrix."],
+  ["Linux proof summary", "/proof-artifacts/LINUX_USERSPACE_PROOF_SUMMARY.md", "One-page summary of Linux userspace-to-FPGA validation and boundaries."],
+  ["AX7020 CSV", "/proof-artifacts/perf_matrix_ax7020_20260509.csv", "Machine-readable CSV export for technical review."],
+  ["AX7020 summary JSON", "/proof-artifacts/perf_matrix_ax7020_20260509.summary.json", "Machine-readable summary and caveat file."],
+  ["Screenshot caption", "/proof-artifacts/10-current-live-atomik-desk-v040a.caption.md", "Required caption for the v0.40-A hardware UI artifact."],
+  ["Proof checksums", "/proof-artifacts/CHECKSUMS.md", "SHA-256 hashes for downloadable public proof artifacts."],
+];
+
 const artifactInterpretations = [
+  {
+    title: "ATOMiK Desk v0.40-A UI artifact",
+    href: "/10-current-live-atomik-desk-v040a.png",
+    label: "HARDWARE_VALIDATED",
+    proves:
+      "The current ATOMiK Desk UI image was captured live from /dev/fb0 on Zynq hardware, with on-screen metrics driven by real measured on-board data.",
+    doesNotProve:
+      "It is not a customer workload benchmark and does not prove power, thermal, battery, uptime, footprint, or production maturity outcomes.",
+  },
+  {
+    title: "ATOMiK Desk v0.40-A workload surface",
+    href: "/11-current-live-atomik-desk-v040a-workload.png",
+    label: "HARDWARE_VALIDATED",
+    proves:
+      "A live framebuffer capture of ATOMiK Desk on Zynq hardware with apps open and the Resource Fabric showing on-board metric values driven by the real measured metric-provider layer.",
+    doesNotProve:
+      "It is a static capture, not an interactive session: it does not prove the in-flight interactive Workloads demo or USB keyboard/mouse input, and it is not a customer workload, power, thermal, or production-maturity claim.",
+  },
+  {
+    title: "Parallel-bank throughput on AX7020",
+    href: "https://github.com/MatthewHRockwell/ATOMiK/blob/main/hardware/zynq/results/PARALLEL_BANKS_HARDWARE_VALIDATED.md",
+    label: "LIVE_MEASURED",
+    proves:
+      "An 8-bank XOR accumulator on the AX7020 scaled linearly with allocated banks (1/2/4/8x fewer cycles, about 100 to 800 Mdeltas/s at the 100 MHz sys clock), measured with an on-chip cycle counter, with a byte-identical result across every bank count that matched a software recompute. This is the literal embodiment of the order-independent, lock-free shared accumulator.",
+    doesNotProve:
+      "It is the measurement bench engine, not the production application adapter, and not a customer-workload speedup, power, or thermal claim. Quote figures at the 100 MHz sys clock.",
+  },
+  {
+    title: "Zynq HDMI display (1080p30)",
+    href: "https://github.com/MatthewHRockwell/ATOMiK/blob/main/hardware/zynq/results/HDMI_1080P60_IMPOSSIBLE.md",
+    label: "HARDWARE_VALIDATED",
+    proves:
+      "The ATOMiK Desk UI renders at 1080p30 over HDMI on the AX7020.",
+    doesNotProve:
+      "1080p60 is physically impossible on this board: the OSERDES2 minimum-pulse-width limit fails on the 737.5 MHz serializer. Claim 1080p30 only; 720p60 is the achievable true-60Hz path.",
+  },
   {
     title: "AX7020 performance matrix",
     href: "https://github.com/MatthewHRockwell/ATOMiK/blob/main/results/perf_matrix_ax7020_20260509.txt",
@@ -100,9 +148,9 @@ const artifactInterpretations = [
   {
     title: "Formal proof work",
     href: "https://github.com/MatthewHRockwell/ATOMiK/tree/main/math/proofs",
-    label: "SOFTWARE_VALIDATED",
+    label: "FORMAL_PROOF",
     proves:
-      "Formal proof work is present in the repository and can be reviewed in technical diligence.",
+      "Formal proof work is present in the repository and can be reviewed in technical diligence where a directly audited statement is identified.",
     doesNotProve:
       "Public pages should not repeat unaudited proof counts unless the count is verified across repo, site, and deck.",
   },
@@ -163,7 +211,7 @@ export default function BenchmarksPage() {
           <p className="text-sm font-semibold uppercase" style={{ color: colors.cyan }}>Public proof packet</p>
           <h2 className="mt-3 text-3xl font-bold md:text-4xl">Current evidence is useful because it is labeled.</h2>
           <p className="mt-4 text-sm leading-6" style={{ color: colors.muted }}>
-            The important interpretation is that ATOMiK is evaluated workload by workload. The architecture is strongest where state movement, repeated scans, full-state sync, replay, or reconstruction dominate the cost.
+            The current proof stack is artifact-bound: a Zynq UI proof image, Linux userspace-to-FPGA validation, and a live-measured AX7020 workload matrix with wins, losses, and caveats. The next evidence gate is customer-representative Zynq workload validation.
           </p>
         </div>
         <div className="mt-8 grid gap-4 md:grid-cols-3">
@@ -173,6 +221,25 @@ export default function BenchmarksPage() {
               <h3 className="mt-2 text-lg font-bold">{item.title}</h3>
               <p className="mt-3 text-sm leading-6" style={{ color: colors.muted }}>{item.body}</p>
             </EvidenceLink>
+          ))}
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-6 py-12" style={{ borderTop: `1px solid ${colors.border}` }}>
+        <div className="max-w-3xl">
+          <p className="text-sm font-semibold uppercase" style={{ color: colors.cyan }}>Downloadable technical packet</p>
+          <h2 className="mt-3 text-3xl font-bold md:text-4xl">Technical reviewers can go deeper without changing the main story.</h2>
+          <p className="mt-4 text-sm leading-6" style={{ color: colors.muted }}>
+            These are public-safe proof digest files and machine-readable exports. They support diligence without turning the public homepage into a raw artifact dump.
+          </p>
+        </div>
+        <div className="mt-8 grid gap-4 md:grid-cols-4">
+          {proofDownloads.map(([title, href, body]) => (
+            <a key={title} href={href} download className="rounded p-5 no-underline" style={{ background: colors.panel, border: `1px solid ${colors.border}`, color: colors.text }}>
+              <p className="text-[11px] font-semibold uppercase" style={{ color: colors.green }}>Download</p>
+              <h3 className="mt-2 text-lg font-bold">{title}</h3>
+              <p className="mt-3 text-sm leading-6" style={{ color: colors.muted }}>{body}</p>
+            </a>
           ))}
         </div>
       </section>

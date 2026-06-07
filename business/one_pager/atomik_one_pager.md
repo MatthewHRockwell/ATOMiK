@@ -43,17 +43,19 @@ CPU replacement.
 
 ## Hardware-Validated UI Proof
 
-![ATOMiK Desk v0.39-K prototype UI running on live Zynq hardware](../../website/public/09-current-live-atomik-desk-v039k.png)
+![ATOMiK Desk v0.40-A prototype UI captured live from the framebuffer on Zynq hardware](../../website/public/10-current-live-atomik-desk-v040a.png)
 
-**HARDWARE_VALIDATED:** ATOMiK Desk v0.39-K prototype UI running on live Zynq
-hardware. This proves the current live demo surface, not commercial product
+**HARDWARE_VALIDATED:** ATOMiK Desk v0.40-A prototype UI captured from `/dev/fb0`
+on live Zynq hardware, with on-screen metrics driven by real measured on-board
+data. This proves the current live demo surface, not commercial product
 maturity, performance, power, thermal, battery, water, or footprint outcomes.
 
 ## Proof Stack
 
 | Proof | Label | Status |
 |---|---|---|
-| Zynq Desk v0.39-K | `HARDWARE_VALIDATED` | current public proof image |
+| Zynq Desk v0.40-A | `HARDWARE_VALIDATED` | current public proof image, captured from /dev/fb0 |
+| Parallel-bank throughput on AX7020 | `LIVE_MEASURED` | 8-bank accumulator scales 1/2/4/8x, byte-identical to software |
 | Linux userspace to FPGA path | `HARDWARE_VALIDATED` | documented OS-to-bus validation path |
 | AX7020 board run matrix | `LIVE_MEASURED` | raw artifact with interpretation caveats and workload-specific wins/losses |
 | Formal proof work | `SOFTWARE_VALIDATED` | algebraic proof work in repo; avoid public counts until audited across materials |

@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     description:
       "Request an evidence-bound evaluation for workloads constrained by heat, battery, bandwidth, latency, or hardware footprint.",
     url: "https://atomik.tech",
-    images: [{ url: "https://atomik.tech/09-current-live-atomik-desk-v039k.png", width: 1920, height: 1080 }],
+    images: [{ url: "https://atomik.tech/10-current-live-atomik-desk-v040a.png", width: 1920, height: 1080 }],
     type: "website",
   },
   twitter: {
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     title: "ATOMiK - State-Aware Compute Evaluation",
     description:
       "Bring one state-heavy workload, one baseline, and one painful constraint.",
-    images: ["https://atomik.tech/09-current-live-atomik-desk-v039k.png"],
+    images: ["https://atomik.tech/10-current-live-atomik-desk-v040a.png"],
   },
 };
 

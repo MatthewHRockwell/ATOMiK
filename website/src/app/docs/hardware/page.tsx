@@ -10,7 +10,7 @@ export const metadata: Metadata = {
     description:
       "Live prototype, hardware validation, board-run measurements, synthesis output, and current standalone boot build artifacts.",
     url: "https://atomik.tech/docs/hardware",
-    images: [{ url: "https://atomik.tech/09-current-live-atomik-desk-v039k.png", width: 1920, height: 1080 }],
+    images: [{ url: "https://atomik.tech/10-current-live-atomik-desk-v040a.png", width: 1920, height: 1080 }],
     type: "website",
   },
   twitter: {
@@ -18,16 +18,16 @@ export const metadata: Metadata = {
     title: "ATOMiK Hardware Proof Map",
     description:
       "Hardware validation and synthesis artifacts kept separate from roadmap claims.",
-    images: ["https://atomik.tech/09-current-live-atomik-desk-v039k.png"],
+    images: ["https://atomik.tech/10-current-live-atomik-desk-v040a.png"],
   },
 };
 
 const artifacts = [
   {
     label: "HARDWARE_VALIDATED",
-    title: "Current v0.39-K live prototype screenshot",
-    href: "/09-current-live-atomik-desk-v039k.png",
-    body: "ATOMiK Desk v0.39-K prototype UI running on live Zynq hardware. UI claims are limited to what the screenshot shows.",
+    title: "Current v0.40-A live prototype screenshot",
+    href: "/10-current-live-atomik-desk-v040a.png",
+    body: "ATOMiK Desk v0.40-A UI captured live from /dev/fb0 on Zynq hardware, with on-screen metrics driven by real measured on-board data. HARDWARE_VALIDATED UI ARTIFACT - NOT A CUSTOMER WORKLOAD BENCHMARK.",
   },
   {
     label: "BUILD_ARTIFACT",
@@ -63,7 +63,7 @@ export default function HardwarePage() {
       </p>
       <h1 className="mt-4 text-4xl font-bold">Hardware validation map</h1>
       <p className="mt-4 max-w-3xl text-lg leading-8" style={{ color: "#8888a0" }}>
-        This page separates hardware validation, build artifacts, synthesis output, and roadmap language. Use exact performance numbers only when the linked artifact supports them.
+        This page separates hardware validation, build artifacts, synthesis output, UI artifacts, and roadmap language. Use exact performance numbers only when the linked artifact supports them.
       </p>
 
       <div className="mt-8 grid gap-4 md:grid-cols-2">

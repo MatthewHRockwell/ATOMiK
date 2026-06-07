@@ -3,10 +3,10 @@ import Link from "next/link";
 import Nav from "@/components/Nav";
 
 export const metadata = pageMetadata({
-  title: 'ASIC Roadmap | ATOMiK',
-  description: "ATOMiK's evidence-labeled path from FPGA validation toward silicon IP feasibility and future Resource Fabric hardware.",
+  title: 'Validation Roadmap | ATOMiK',
+  description: "ATOMiK's evidence-labeled path from proof artifacts toward customer workload validation, IP diligence, and silicon feasibility review.",
   path: '/about/roadmap',
-  openGraphTitle: 'ATOMiK ASIC Roadmap',
+  openGraphTitle: 'ATOMiK Validation Roadmap',
 });
 
 /* ------------------------------------------------------------------ */
@@ -84,12 +84,12 @@ const milestones: Milestone[] = [
     title: "Mathematical Foundation",
     status: "completed",
     bullets: [
-      "Formal proof work covering delta-state algebra properties; public counts require current proof-packet audit",
+      "Formal proof work covering delta-state algebra properties; public counts are not quoted unless audited across repo, site, and deck",
       "Abelian group: commutative, associative, self-inverse, identity",
-      "Reduced cache/speculation exposure is a design target to validate",
+      "Security-sensitive implications remain scoped review targets, not public security claims",
     ],
     highlight: "Proof-labeled algebra foundation",
-    proofLinks: [{ label: "SOFTWARE_VALIDATED proof map", href: evidenceLinks.technicalProof }],
+    proofLinks: [{ label: "FORMAL_PROOF / SOFTWARE_VALIDATED proof map", href: evidenceLinks.technicalProof }],
   },
   {
     phase: "Phase 1",
@@ -101,7 +101,7 @@ const milestones: Milestone[] = [
       "Multi-node delta streaming: dual-SoC convergence demonstrated in historical hardware artifacts",
       "Historical validation matrix: 53/54 compliance, 9/9 ATOMiK, 10/10 integration, 6/6 display tests",
     ],
-    highlight: "Prototype firmware running today",
+    highlight: "Historical hardware artifact",
     proofLinks: [{ label: "HARDWARE_VALIDATED proof boundary", href: evidenceLinks.hardwareValidation }],
   },
   {
@@ -109,20 +109,22 @@ const milestones: Milestone[] = [
     title: "Xilinx Zynq XC7Z020 \u2014 Parallel Scaling + Linux",
     status: "completed",
     bullets: [
+      "LIVE_MEASURED parallel-bank throughput on AX7020: 8-bank XOR accumulator scales 1/2/4/8x on an on-chip cycle counter (about 100-800 Mdeltas/s at 100 MHz), byte-identical result across all bank counts",
       "SYNTHESIS_VALIDATED N=512 config: 23,542 LUT at 136 MHz",
       "SYNTHESIS_VALIDATED scaling: 3.7x LUT growth for 16x throughput",
       "Linux 6.9 userspace validation: 16/16 PASS via /dev/mem mmap (S-mode, MMU)",
       "HARDWARE_VALIDATED Linux userspace path: user process -> kernel -> Wishbone CSR -> ATOMiK core",
     ],
-    highlight: "Synthesis scaling + Linux userspace validated",
+    highlight: "Parallel-bank throughput measured + synthesis scaling + Linux userspace validated",
     proofLinks: [
+      { label: "LIVE_MEASURED parallel-bank proof", href: "https://github.com/MatthewHRockwell/ATOMiK/blob/main/hardware/zynq/results/PARALLEL_BANKS_HARDWARE_VALIDATED.md" },
       { label: "SYNTHESIS_VALIDATED artifact", href: evidenceLinks.hardwareSynthesis },
       { label: "HARDWARE_VALIDATED Linux proof", href: evidenceLinks.linuxUserspace },
     ],
   },
   {
     phase: "Phase 3",
-    title: "ASIC Feasibility Review",
+    title: "ASIC/IP Feasibility Review",
     status: "in-progress",
     bullets: [
       "Open-source PDK review path before any tape-out commitment",
@@ -130,7 +132,7 @@ const milestones: Milestone[] = [
       "Review whether delta-state algebra maps cleanly into silicon IP",
       "Toolchain plan: OpenLane 2, Magic, KLayout, and mentor review",
     ],
-    highlight: "First silicon target",
+    highlight: "Feasibility review target",
   },
   {
     phase: "Phase 4",
@@ -148,9 +150,9 @@ const milestones: Milestone[] = [
     title: "Volume ASIC \u2014 Edge + Data-Center SKUs",
     status: "future",
     bullets: [
-      "Edge SKU: ultra-low-power, sub-1 mm\u00b2 die for IoT / embedded",
-      "Data-center SKU: thousands of parallel banks, PCIe / CXL attach",
-      "Hardware root-of-trust direction with reduced data-dependent timing surfaces",
+      "Edge SKU direction: power- and area-conscious silicon IP, not a measured silicon claim",
+      "Infrastructure SKU direction: high parallelism and attach options remain roadmap until measured",
+      "Security-sensitive hardware directions require separate review before public claims",
       "Power and throughput targets require post-review projections and measured silicon before public quoting",
     ],
   },
@@ -344,10 +346,10 @@ function ScalingChart() {
 /* ------------------------------------------------------------------ */
 /*  Page                                                               */
 /* ------------------------------------------------------------------ */
-export default function ASICRoadmapPage() {
+export default function ValidationRoadmapPage() {
   return (
     <div className="min-h-screen" style={{ background: bg, color: "#e4e4eb" }}>
-      <Nav active="ASIC Roadmap" />
+      <Nav active="Validation Roadmap" />
       {/* ---- Hero ---- */}
       <section className="relative overflow-hidden px-6 pb-16 pt-24 text-center">
         {/* Gradient glow */}
@@ -362,10 +364,10 @@ export default function ASICRoadmapPage() {
           className="relative mb-3 text-sm font-semibold uppercase tracking-widest"
           style={{ color: accent }}
         >
-          ASIC Roadmap
+          Validation Roadmap
         </p>
         <h1 className="relative mx-auto mb-4 max-w-3xl text-4xl font-extrabold leading-tight text-white sm:text-5xl">
-          From FPGA to{" "}
+          From proof artifacts to{" "}
           <span
             style={{
               background: `linear-gradient(90deg, ${accent}, ${accent2})`,
@@ -373,22 +375,21 @@ export default function ASICRoadmapPage() {
               WebkitTextFillColor: "transparent",
             }}
           >
-            Silicon IP
+            customer workload evidence
           </span>
         </h1>
         <p className="relative mx-auto max-w-2xl text-lg text-gray-400">
-          ATOMiK&apos;s delta-state algebra is formally verified, FPGA-backed, and
-          mapped to a synthesis-characterized path toward silicon IP evaluation.
+          ATOMiK&apos;s proof stack is evidence-labeled: formal proof work, live hardware UI evidence, Linux userspace-to-FPGA validation, AX7020 workload measurements, and a roadmap toward customer-representative validation.
         </p>
       </section>
 
       {/* ---- Key metrics ---- */}
       <section className="mx-auto max-w-5xl px-6 pb-20">
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-          <MetricCard label="Lean 4 Proofs" value="108" sub="Theorems verified" color={green} />
-          <MetricCard label="Peak FPGA" value="Synthesis" sub="Zynq XC7Z020, N=512" color={accent} />
-          <MetricCard label="Single Core" value="Synthesis" sub="See evidence labels" color={accent2} />
-          <MetricCard label="ASIC Path" value="Feasibility" sub="Roadmap, not measured" color={gold} />
+          <MetricCard label="Formal Work" value="Labeled" sub="Direct statements only" color={green} />
+          <MetricCard label="Zynq UI" value="v0.40-A" sub="Hardware-validated UI artifact" color={accent} />
+          <MetricCard label="Linux Path" value="16/16" sub="Algebraic checks passing" color={accent2} />
+          <MetricCard label="ASIC/IP Path" value="Feasibility" sub="Roadmap, not measured" color={gold} />
         </div>
       </section>
 
@@ -436,7 +437,7 @@ export default function ASICRoadmapPage() {
           </h2>
           <p className="mb-6 text-gray-400">
             ATOMiK is preparing investor, chip-partner, and design-partner diligence around state-aware compute. Get in
-            touch to discuss proof review, licensing, or integration.
+            touch to discuss proof review, workload evaluation, licensing, or integration.
           </p>
           <a
             href="/contact?intent=licensing"

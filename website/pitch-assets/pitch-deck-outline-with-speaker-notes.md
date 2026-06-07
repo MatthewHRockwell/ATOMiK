@@ -1,198 +1,57 @@
+Generated source copy. Do not edit as sole authority; use `../SOURCE_OF_TRUTH.md`, `../PITCH_DECK_FRIDAY.md`, and internal presenter docs for current routing.
+
 # ATOMiK Friday Pitch Deck Source
 
-Core message: ATOMiK makes change the unit of compute.
-
-Positioning: ATOMiK is a state-aware compute architecture that helps edge and embedded teams reduce wasted state movement by tracking meaningful change instead of repeatedly moving, scanning, syncing, or rebuilding full state.
-
-Claim rule: every performance or maturity claim needs an evidence label, artifact, context, and caveat. Do not claim universal speedups, guaranteed battery gains, guaranteed heat reduction, guaranteed water savings, production ASIC readiness, or replacement of CPUs, GPUs, accelerators, compression, caching, or sync protocols.
-
-## Main Deck
-
-### 1. Cover
-
-Title: ATOMiK
-
-Headline: Make change the unit of compute.
-
-Body: State-aware compute evaluation for edge and embedded teams constrained by battery, heat, bandwidth, latency, reliability, or hardware footprint.
-
-Visual direction: Dark technical background. Use the Atom AI assistant concept visual large on the right with subtle cyan, violet, and amber state traces. Label assistant use as conceptual if shown outside brand context.
-
-Speaker notes: Modern systems waste resources moving state they already know. ATOMiK evaluates whether tracking meaningful change can remove that waste in one real workload.
-
-Evidence/caveat notes: Concept visual only. Do not imply Atom AI is a commercial product.
-
-### 2. The Hidden Tax Is State Movement
-
-Headline: The hidden tax in constrained compute is state movement.
-
-Body: Battery drain, bandwidth pressure, heat, and latency often come from repeatedly scanning, syncing, replaying, or rebuilding state.
-
-Visual direction: Thick orange full-state paths collapsing into a thinner cyan delta path.
-
-Speaker notes: The pain is not abstract. The buyer already pays for it through bigger batteries, more cooling, more bandwidth, overbuilt hardware, or engineering time.
-
-Evidence/caveat notes: Frame as customer pain and evaluation target, not measured universal ATOMiK savings.
-
-### 3. First Wedge
-
-Headline: The first customer has one workload, one baseline, and one constraint.
-
-Body: Edge and embedded teams with a state-heavy path constrained by battery, heat, bandwidth, latency, footprint, weight, reliability, cost, or compute density.
-
-Visual direction: Target diagram with center ring: one workload / one baseline / one constraint.
-
-Speaker notes: ATOMiK is not for everyone first. It is for teams that can bring one painful constrained state path.
-
-Evidence/caveat notes: This is ICP definition, not traction proof.
-
-### 4. The Insight
-
-Headline: State does not need to move as if everything changed.
-
-Body: Traditional path: scan, move, replay, reconstruct, repeat. ATOMiK path: reference state, meaningful deltas, coalesced changes, reconstruct when needed.
-
-Visual direction: Large state block breaking into changed regions.
-
-Speaker notes: ATOMiK does not try to move everything faster. It asks what actually changed.
-
-Evidence/caveat notes: Use as architecture explanation.
-
-### 5. What ATOMiK Is
-
-Headline: ATOMiK is a state-aware compute architecture.
-
-Body: ATOMiK helps edge and embedded teams reduce wasted state movement by tracking meaningful change instead of repeatedly moving, scanning, syncing, or rebuilding full state.
-
-Visual direction: Three cards: track meaningful change, coalesce repeated work, preserve correctness.
-
-Speaker notes: The architecture is about changing the unit of work from full state to meaningful change.
-
-Evidence/caveat notes: Avoid saying this improves every workload.
-
-### 6. The Evaluation Offer
-
-Headline: Give us one workload. We will tell you if ATOMiK fits.
-
-Body: Give us one state-heavy workload, your current baseline, and the constraint that already hurts. We evaluate where state movement creates waste and whether ATOMiK can improve the path. You receive a workload map, baseline comparison, evidence map, fit/no-fit recommendation, and next-step plan. Success looks like measured improvement against one agreed metric while preserving correctness.
-
-Visual direction: Four horizontal cards: Give / Evaluate / Receive / Success.
-
-Speaker notes: We are not asking prospects to believe a broad compute claim. We are asking them to measure one real path.
-
-Evidence/caveat notes: Evaluation-first commercial motion.
-
-### 7. What We Measure
-
-Headline: Every evaluation starts with a metric, baseline, and decision threshold.
-
-Body: Bytes moved, full-state transfers avoided, operations coalesced, cycles per update, update latency, memory/state footprint, power or thermal proxy, and correctness preservation.
-
-Visual direction: Metric cards with proof labels: homepage-safe, proof-page-safe, diligence-only.
-
-Speaker notes: The metric is chosen before any benchmark or prototype claim.
-
-Evidence/caveat notes: Power and thermal remain proxy or diligence-only unless artifact-backed.
-
-### 8. Proof Today
-
-Headline: The proof is real, specific, and evidence-labeled.
-
-Body: Public proof packet, evidence labels, claims registry, Linux userspace-to-FPGA validation, AX7020 board-run workload matrix, synthesis artifacts, and formal proof work.
-
-Visual direction: Proof cards stamped HARDWARE_VALIDATED, LIVE_MEASURED, SOFTWARE_VALIDATED, SYNTHESIS_VALIDATED.
-
-Speaker notes: We separate what is measured, hardware-validated, software-validated, synthesis-validated, projected, conceptual, and roadmap.
-
-Evidence/caveat notes: Avoid unaudited formal proof counts unless reconciled across repo, site, and deck.
-
-### 9. Honest Benchmark Story
-
-Headline: ATOMiK wins when the workload lets architecture compound.
-
-Body: The AX7020 interpretation shows that naive hardware access can lose, batching can help, and coalescing/personality rules can drive major wins when the workload fits.
-
-Visual direction: Waterfall: Software baseline -> direct hardware -> batched -> profiled/coalesced.
-
-Speaker notes: The credible story is workload-specific. The architecture is strongest where redundant state movement dominates the cost.
-
-Evidence/caveat notes: The small STATE path showed 1.37x vs software and 19.1x profiled/coalesced vs batched ATOMiK in that context. The same artifact also shows software winning on larger uniform STATE rows. Quote only with artifact and caveat.
-
-### 10. Why Now
-
-Headline: AI and edge compute are making state movement expensive.
-
-Body: More systems are expected to do useful work locally. Context-heavy workloads increase state pressure. Energy, bandwidth, thermal, and hardware limits are becoming buying constraints.
-
-Visual direction: Split between cloud/data-center pressure and constrained local devices.
-
-Speaker notes: The market is moving toward local intelligence and constrained execution. ATOMiK gives teams a way to evaluate whether state movement is the hidden limiter.
-
-Evidence/caveat notes: Add source-backed market citations before publishing TAM or energy numbers.
-
-### 11. Competition and Status Quo
-
-Headline: The status quo buys margin instead of removing waste.
-
-Body: More compute, bigger batteries, more cooling, more bandwidth, compression, caching, deduplication, sync protocols, accelerators, cloud offload, overbuilt hardware, manual optimization, or feature cuts.
-
-Visual direction: Two-column table: status quo / what it does not solve.
-
-Speaker notes: ATOMiK does not merely move more state faster. It evaluates whether less state needs to move.
-
-Evidence/caveat notes: Do not claim ATOMiK replaces these tools. It may work beside them.
-
-### 12. Business Model
-
-Headline: Start with evaluations. Expand to design partnerships and licensing.
-
-Body: Proof review reservations, technical evaluation reservations, scoped design-partner evaluations, licensing/IP diligence, and commercial licensing or embedded IP paths.
-
-Visual direction: Revenue path from proof review to IP/licensing.
-
-Speaker notes: The commercial path matches the claim discipline: start measured, expand where the workload proves value.
-
-Evidence/caveat notes: Public reservation prices qualify interest and do not represent the full commercial model.
-
-### 13. Roadmap and Milestones
-
-Headline: The next milestone is evaluated customer proof.
-
-Body: Lock 2-3 design-partner evaluations, publish one sanitized workload evaluation, harden the proof packet, complete external ASIC/IP feasibility review, define licensing architecture, and build repeatable evaluation tooling.
-
-Visual direction: Evidence-gated roadmap: Proof -> Evaluation -> Design Partner -> IP Review -> Licensing.
-
-Speaker notes: The milestone is not more theory. It is converting proof into customer-specific evidence.
-
-Evidence/caveat notes: Roadmap items must be labeled as planned work.
-
-### 14. Ask
-
-Headline: We are raising to turn proof into evaluated commercial opportunity.
-
-Body: Raise: $2.0M target pre-seed; $1.25M minimum viable close; $2.75M stretch plan. Planned runway: about 18 months. Use of funds: design-partner evaluations, technical validation, ASIC/IP diligence, engineering support, GTM/customer development, and IP/legal. Milestones: 2-3 design-partner evaluations, one sanitized measured workload artifact, external ASIC/IP feasibility review, and a licensing-ready package.
-
-Visual direction: Four use-of-funds blocks tied to measurable milestones.
-
-Speaker notes: ATOMiK is not asking the market to accept a broad compute claim. We are asking the right customers to bring one constrained state path, measure the waste, and decide with evidence.
-
-Evidence/caveat notes: Final SAFE terms, valuation cap, discount, and close mechanics require CFO/counsel approval.
-
-## Appendix Slides
-
-1. Full X/Y/Z/A evaluation process.
-2. Full metrics matrix.
-3. Evidence labels and claim rules.
-4. Linux userspace-to-FPGA proof card.
-5. AX7020 matrix details and where it loses.
-6. Hardware synthesis details.
-7. Formal proof work overview without unaudited counts.
-8. Design partner evaluation template.
-9. Risk register.
-10. Financial model assumptions.
-11. Market sizing assumptions and sources to add.
-12. Competitive/status quo landscape.
-13. Data room index.
+## Friday 10-Minute Operating Deck
+
+Use this as the controlling Friday pacing guide when time is constrained. The generated full investor deck currently has 16 slides; the live talk should still fit the 10-minute agenda by speaking to headlines, not every bullet.
+
+| Slide | Time | Title | Headline | Main point | Evidence/caveat note |
+|---:|---:|---|---|---|---|
+| 1 | 0:00-0:30 | Cover | Make change the unit of compute. | Name ATOMiK, category, and `$5M` proof-round posture. | Planned SAFE; final terms CFO/counsel pending. |
+| 2 | 0:30-1:05 | Problem | The hidden tax is repeated state work. | Buyers feel this as battery, heat, bandwidth, latency, reliability, size, weight, footprint, and hardware limits. | Pain categories are not all proven ATOMiK outcomes. |
+| 3 | 1:05-1:35 | End-Game Value | Customers do not buy delta-state algebra. | They buy bytes avoided, update latency, operations coalesced, correctness, and measured impact. | Downstream ROI requires workload-specific measurement. |
+| 4 | 1:35-2:10 | Market Opportunity | The wedge is narrow; the pressure is large. | `$1T+` TAM context, `$112B-$169B` SAM context, `$10M-$40M` SOM planning target. | TAM/SAM are adjacent spend pools; SOM is founder-prepared target, not forecast. |
+| 5 | 2:10-2:45 | Focus Markets | Where growth pressure meets constrained state work. | Edge AI, robotics/industrial, drones/remote autonomy, and smallsat/remote sensing growth trajectories plus target-account examples. | Target examples are hypotheses only; no relationship implied. |
+| 6 | 2:45-3:15 | Competitive Landscape | Buyers compare ATOMiK against named incumbents and status quo. | More silicon, processor/IP incumbents, and software/status quo alternatives. | Names are alternatives, not partnership or displacement claims. |
+| 7 | 3:15-3:45 | Primitive | Make change the unit of compute. | Reference state plus accumulated change: LOAD, ACCUM, READ, SWAP. | Keep CEO-safe; do not over-teach algebra. |
+| 8 | 3:45-4:15 | Fit | ATOMiK has a wedge, not a universal claim. | Strongest where state movement, sync, replay, sparse updates, or context movement dominate. | Not a CPU/GPU/NPU replacement. |
+| 9 | 4:15-4:40 | Use Cases | Different industries feel the same waste in different budgets. | Robotics, edge AI, industrial, remote, and defense-adjacent buyers. | ICP is constraint-led, not industry-label-led. |
+| 10 | 4:40-5:10 | Live Proof | Current demo surface running on Zynq hardware. | Show current Zynq UI artifact (v0.40-A, captured from `/dev/fb0`, driven by real measured on-board data). | Screenshot is not customer workload proof; it is not an interactive demo. |
+| 11 | 5:10-5:55 | Proof Stack | Real, specific, evidence-bounded. | Zynq UI v0.40-A, parallel-bank throughput measured on AX7020 (1/2/4/8x, byte-identical to software), Linux-to-FPGA, AX7020 matrix, 1080p30 display, formal/synthesis context. | No universal speedup or downstream outcome claim; 1080p30 only (1080p60 impossible on this board). |
+| 12 | 5:55-6:35 | Commercial Path | Start with paid evaluation, then earn strategic options. | Proof review, technical evaluation, design partner, licensing/IP diligence. | No promised acquisition or return multiple. |
+| 13 | 6:35-7:25 | Financial Model | `$5M` funds proof, partner readiness, and licensing diligence. | Founder-prepared planning ranges plus use of funds. | Not a forecast, booked revenue, or committed pipeline. |
+| 14 | 7:25-8:00 | Risks and Gates | Trust comes from saying what is unproven. | Customer validation, ASIC economics, downstream outcome measurement, incumbents. | Risks are why the round exists. |
+| 15 | 8:00-8:30 | Team | Founder-led proof with commercial translation. | Matt owns deck/proof/ask; Allison owns buyer/commercial translation and feedback capture. | Allison is not expected to present the technical deck. |
+| 16 | 8:30-9:35 | Ask | `$5M` target to reach measured workload proof. | Capital, qualified workloads, design-partner introductions, diligence help. | Final SAFE mechanics CFO/counsel pending. |
+| Close | 9:35-10:00 | Close | Bring one constrained state path. | Measure the waste and decide with evidence. | Transition cleanly to Q&A and AAN feedback. |
+
+## Source Notes For Market And Competition Slides
+
+- TAM context: semiconductor industry context only, not all addressable ATOMiK revenue.
+- SAM context: embedded systems and edge AI are adjacent spend pools where power, latency, and hardware limits matter.
+- SOM target: founder-prepared 3-5 year annual revenue planning target if proof converts through paid evaluations, design partners, and licensing. It is not a forecast.
+- Focus-market growth sources: Grand View Research edge AI, smart robots, commercial drone, and nanosatellite/microsatellite market reports.
+- Target-account examples: design-partner/account hypotheses only. No customer relationship, traction, endorsement, pipeline, or revenue is implied.
+- Competitor/status-quo examples: buyer alternatives and incumbents, not partnership or displacement claims.
+
+## Core Positioning
+
+ATOMiK helps constrained edge and embedded teams do less unnecessary state work by tracking meaningful changes instead of repeatedly moving, scanning, syncing, replaying, or rebuilding full state.
+
+The strongest buyer story is not "new computing architecture" first. It is: before customers spend more on batteries, cooling, bigger hardware, more bandwidth, or redesign, ATOMiK tests whether the expensive state path can do less work.
+
+## Claim Rule
+
+Every performance or maturity claim needs an evidence label, artifact, context, and caveat. Do not claim universal speedups, guaranteed battery gains, guaranteed heat reduction, guaranteed water savings, production ASIC readiness, or replacement of CPUs, GPUs, accelerators, compression, caching, or sync protocols.
+
+## Current Deck Controls
+
+- PPTX source of truth: `business/pitch_deck/generate_deck.py`.
+- Current full investor deck: 16 slides.
+- Current rushed-room deck: 6 slides.
+- Live delivery source: `06_internal_presenter/ATOMiK_Friday_Talking_Points.md` plus `ROOM_CHECKLIST.md`.
+- Proof details source: `05_proof_artifacts/README.md`, `PROOF_CARDS.md`, `VERSION_MAP.md`, `claims_registry_snapshot.yaml`, and `README_EXTERNAL_REFERENCES.md`.
 
 ## Closing Line
 

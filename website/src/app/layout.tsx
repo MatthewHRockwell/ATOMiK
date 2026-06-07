@@ -32,7 +32,7 @@ export const metadata: Metadata = {
       "Bring one state-heavy workload, one current baseline, and one painful constraint.",
     url: "https://atomik.tech",
     siteName: "ATOMiK",
-    images: [{ url: "https://atomik.tech/09-current-live-atomik-desk-v039k.png", width: 1920, height: 1080 }],
+    images: [{ url: "https://atomik.tech/10-current-live-atomik-desk-v040a.png", width: 1920, height: 1080 }],
     type: "website",
   },
   twitter: {
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
     title: "ATOMiK - State-Aware Compute Evaluation",
     description:
       "Proof-bound evaluation for edge and embedded teams constrained by state movement.",
-    images: ["https://atomik.tech/09-current-live-atomik-desk-v039k.png"],
+    images: ["https://atomik.tech/10-current-live-atomik-desk-v040a.png"],
   },
 };
 

@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     description:
       "Use-case pages centered on what the customer brings, what ATOMiK evaluates, metrics, fit signals, no-fit signals, and proof needed.",
     url: "https://atomik.tech/solutions",
-    images: [{ url: "https://atomik.tech/09-current-live-atomik-desk-v039k.png", width: 1920, height: 1080 }],
+    images: [{ url: "https://atomik.tech/10-current-live-atomik-desk-v040a.png", width: 1920, height: 1080 }],
     type: "website",
   },
   twitter: {
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     title: "ATOMiK Use Cases - Edge and Embedded State Movement",
     description:
       "Start with one state-heavy workload, one baseline, and one painful constraint.",
-    images: ["https://atomik.tech/09-current-live-atomik-desk-v039k.png"],
+    images: ["https://atomik.tech/10-current-live-atomik-desk-v040a.png"],
   },
 };
 

@@ -1,5 +1,5 @@
 export const positioningStatement =
-  "ATOMiK is a state-aware compute architecture that helps edge and embedded teams reduce wasted state movement by tracking meaningful change instead of repeatedly moving or rebuilding full state.";
+  "ATOMiK is a state-aware compute architecture that helps edge and embedded teams reduce wasted state movement by tracking meaningful change instead of repeatedly moving, scanning, syncing, replaying, or rebuilding full state.";
 
 export const offerFormula = {
   give:
@@ -237,7 +237,7 @@ export const proofToday = [
     title: "Evidence-labeling framework",
     label: "Evidence labels",
     body:
-      "Claims are separated as live measured, hardware validated, software validated, synthesis validated, build artifact, projected, conceptual, or roadmap.",
+      "Claims are separated as live measured, hardware validated, software validated, formal proof, synthesis validated, build artifact, projected, conceptual, or roadmap.",
     href: "https://github.com/MatthewHRockwell/ATOMiK/blob/main/docs/evidence-labels.md",
   },
   {
@@ -251,8 +251,15 @@ export const proofToday = [
     title: "Live Zynq prototype evidence",
     label: "Hardware validated",
     body:
-      "ATOMiK Desk v0.39-K is a current prototype UI screenshot running on live Zynq hardware. It is not proof of power, thermal, uptime, or production maturity.",
-    href: "/09-current-live-atomik-desk-v039k.png",
+      "ATOMiK Desk v0.40-A is the current UI captured live from /dev/fb0 on Zynq hardware, with on-screen metrics driven by real measured on-board data. It is not proof of power, thermal, uptime, or production maturity.",
+    href: "/10-current-live-atomik-desk-v040a.png",
+  },
+  {
+    title: "Parallel-bank throughput on AX7020",
+    label: "Live measured",
+    body:
+      "An 8-bank XOR accumulator on the AX7020 scaled linearly with allocated banks (1/2/4/8x fewer cycles, about 100-800 Mdeltas/s at 100 MHz), measured with an on-chip cycle counter. The result was byte-identical across every bank count and matched a software recompute - order-independent and lock-free by construction. It is the throughput substrate, not a customer-workload speedup or power claim.",
+    href: "https://github.com/MatthewHRockwell/ATOMiK/blob/main/hardware/zynq/results/PARALLEL_BANKS_HARDWARE_VALIDATED.md",
   },
   {
     title: "Linux userspace to FPGA validation",
@@ -270,7 +277,7 @@ export const proofToday = [
   },
   {
     title: "Formal proof work",
-    label: "Software validated",
+    label: "Formal proof",
     body:
       "Formal proof work is present in the repository. Public pages should avoid unaudited proof counts unless the count is verified across repo, site, and deck.",
     href: "https://github.com/MatthewHRockwell/ATOMiK/tree/main/math/proofs",
@@ -303,9 +310,9 @@ export const successExamples = [
 export const notSuccessClaims = [
   "Universal speedup",
   "Guaranteed battery extension",
-  "Guaranteed heat reduction",
-  "Guaranteed water savings",
-  "Guaranteed smaller hardware",
+  "Guaranteed heat or cooling reduction",
+  "Guaranteed water or power-bill savings",
+  "Guaranteed smaller hardware or footprint",
   "Generic better compute",
   "Proof from unrelated workloads",
 ];
