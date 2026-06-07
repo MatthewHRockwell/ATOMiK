@@ -72,7 +72,7 @@ static const struct {
      * ACT_NONE (no-op until built); DASHBOARD is the home/idle active state. */
     { "DASHBOARD", "ATOMiK Desk",     ATOMIK_ACCENT, ACT_NONE          },
     { "AGENTS",    "Atom",            ATOMIK_ACCENT, ACT_OPEN_ASSISTANT },
-    { "WORKFLOWS", "Workflows",       ATOMIK_ACCENT, ACT_NONE          },
+    { "WORKLOADS", "Workloads",       ATOMIK_ACCENT, ACT_OPEN_WORKLOAD },
     { "KNOWLEDGE", "Knowledge",       ATOMIK_ACCENT, ACT_NONE          },
     { "STUDIO",    "Studio",          ATOMIK_ACCENT, ACT_NONE          },
     { "TERMINAL",  "Terminal",        ATOMIK_ACCENT, ACT_OPEN_TERMINAL },

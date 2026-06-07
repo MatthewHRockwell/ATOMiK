@@ -426,6 +426,8 @@ int main(int argc, char **argv) {
     if (getenv("ATOMIK_PREVIEW")) {
         seed_demo_usage();   /* representative usage so PREDICTIVE INSIGHTS populates */
         fabric_seed_waveforms();   /* lively Resource Fabric waves for the capture */
+        /* v0.41: open a named surface for the host shot (layout verify only). */
+        if (getenv("ATOMIK_PREVIEW_WORKLOAD")) workloads_surface_open();
         /* Optional warm-up: run N frames (ticking fabric/status each) before
          * the final dump so time-evolving surfaces — the self-driving demo
          * workload, building waveforms — are visible in the capture.  Default
@@ -545,6 +547,11 @@ int main(int argc, char **argv) {
              * apps because they ARE chrome. */
             else if (ev.key == 'r' || ev.key == 'R') {
                 fabric_open();
+                dirty = 1;
+            }
+            else if (ev.key == 'w' || ev.key == 'W') {
+                workloads_surface_open();   /* v0.41: telemetry-aggregation demo */
+                agent_log(ACT_OPEN_WORKLOAD);
                 dirty = 1;
             }
             else if (ev.key == 'p' || ev.key == 'P') {
@@ -742,6 +749,7 @@ int main(int argc, char **argv) {
                 else if (a == ACT_OPEN_FILES)     open_files();
                 else if (a == ACT_OPEN_NOTES)     open_notes();
                 else if (a == ACT_OPEN_ASSISTANT) assistant_summon();
+                else if (a == ACT_OPEN_WORKLOAD)  workloads_surface_open();
                 if (a != ACT_NONE) agent_log(a); else agent_log(ACT_DOCK_HOVER);
             } else {
                 s_dock_hover = slot;   /* hover highlight follows the cursor */

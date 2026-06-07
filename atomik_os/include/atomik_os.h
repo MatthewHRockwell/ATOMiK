@@ -215,6 +215,7 @@ typedef enum {
     ACT_CLOSE_WINDOW,
     ACT_CYCLE_FOCUS,
     ACT_DOCK_HOVER,
+    ACT_OPEN_WORKLOAD,    /* v0.41: Workloads surface (telemetry aggregation demo) */
     ACT_QUIT,
     ACT_MAX,
 } action_t;
@@ -660,6 +661,8 @@ void          state_watch_draw(window_t *w, int x, int y, int wd, int ht);
  * centerpiece (moved out of the Resource Fabric). */
 void          system_surface_open(void);
 void          system_surface_draw(window_t *w, int x, int y, int wd, int ht);
+void          workloads_surface_open(void);
+void          workloads_surface_draw(window_t *w, int x, int y, int wd, int ht);
 void          state_watch_tick(void);
 
 /* atomik_asset.c — board-side asset loader, v0.36 (Class B foundation).
