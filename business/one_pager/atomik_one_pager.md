@@ -55,6 +55,7 @@ maturity, performance, power, thermal, battery, water, or footprint outcomes.
 | Proof | Label | Status |
 |---|---|---|
 | Zynq Desk v0.40-A | `HARDWARE_VALIDATED` | current public proof image, captured from /dev/fb0 |
+| Live Workloads demo on AX7020 | `LIVE_MEASURED` | first customer-facing workload demo on hardware: 800 Mevents/s @ 8 banks, byte-identical |
 | Parallel-bank throughput on AX7020 | `LIVE_MEASURED` | 8-bank accumulator scales 1/2/4/8x, byte-identical to software |
 | Linux userspace to FPGA path | `HARDWARE_VALIDATED` | documented OS-to-bus validation path |
 | AX7020 board run matrix | `LIVE_MEASURED` | raw artifact with interpretation caveats and workload-specific wins/losses |

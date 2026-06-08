@@ -122,6 +122,7 @@ This screenshot is not customer workload proof, production-readiness proof, batt
 | Proof | Label | Status |
 |---|---|---|
 | Zynq Desk v0.40-A | `HARDWARE_VALIDATED` | current UI proof image, captured from `/dev/fb0` |
+| Live Workloads demo on AX7020 | `LIVE_MEASURED` | first customer-facing workload demo on hardware: 800 Mevents/s @ 8 banks, byte-identical |
 | Parallel-bank throughput on AX7020 | `LIVE_MEASURED` | 8-bank accumulator scales 1/2/4/8x, byte-identical to software |
 | Linux userspace to FPGA path | `HARDWARE_VALIDATED` | documented OS-to-bus validation path |
 | AX7020 board matrix | `LIVE_MEASURED` | raw artifact with wins and losses |
@@ -138,7 +139,9 @@ Every proof claim requires artifact, context, and caveat.
 
 **Measured throughput substrate (`LIVE_MEASURED`):** an 8-bank ATOMiK XOR accumulator scales linearly with allocated banks on the AX7020 — 1/2/4/8 banks complete the same work in 1/2/4/8x fewer cycles (about 100 to 800 Mdeltas/s at the 100 MHz sys clock) — with a byte-identical result across every bank count that matches a software recompute. This is the throughput substrate, not a customer-workload speedup.
 
-**Active bring-up, not yet validated:** standalone SD boot is `BUILD_ARTIFACT` only. The interactive Workloads demo and USB keyboard/mouse input are software-complete and host-verified but not board-confirmed (unified bitstream building; USB input gated on a VBUS/power path). The currently validated path is JTAG-assisted; public power-on boot artifact remains gated.
+**First customer-facing workload demo, proven on hardware (`LIVE_MEASURED`):** the Workloads surface (real-time telemetry aggregation) runs on the AX7020 over HDMI showing live measured throughput from the parallel-bank engine — 800 Mevents/s at 8 banks, byte-identical across configs. Only the throughput figures are measured; the surface's other on-screen values are derived/scenario, and this is a static capture, not an interactive session.
+
+**Active bring-up, not yet validated:** standalone SD boot is `BUILD_ARTIFACT` only. The Workloads surface with live data is now board-proven (above), but its **interactivity and USB keyboard/mouse input** remain software-complete and host-verified only, not board-confirmed (USB input gated on a VBUS/power path). The currently validated boot path is JTAG-assisted; public power-on boot artifact remains gated.
 
 **v0.40 funds the move from proof artifacts to repeatable demo and productization:**
 

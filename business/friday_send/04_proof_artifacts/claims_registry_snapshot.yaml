@@ -1,5 +1,5 @@
 schema_version: 1
-last_updated: "2026-06-07"
+last_updated: "2026-06-08"
 disclaimer: "Live screenshots show current prototypes. Concept visuals show product direction and are not represented as current commercial functionality. Performance claims are only stated when backed by measured artifacts."
 
 evidence_labels:
@@ -119,13 +119,23 @@ claims:
     public_safe: true
     notes: "Software-harness measurements, NOT hardware. Ratios are workload-dependent and vary widely across the suite and across analysis runs. Do NOT publish a single headline multiplier, and do NOT revive the older 7,670x-916,000x range as a universal or hardware result (it is not reproduced by a current artifact). The board-measured grounding for redundant-work reduction is the AX7020 coalescing path (16x operation reduction, 64 ops to 4)."
 
+  - id: live-workloads-surface-ax7020-2026-06-08
+    label: LIVE_MEASURED
+    claim: "ATOMiK's Workloads surface (real-time telemetry aggregation) runs on the AX7020 over HDMI showing live measured parallel-bank throughput: 800 Mevents/s at 8 banks, 1/2/4/8 throughput scaling, byte-identical across all bank configurations."
+    artifact: "website/public/12-workloads-live-ax7020.png"
+    source_artifact: "atomik_os/docs/screenshots/workloads_LIVE_20260607.png"
+    related_artifact: "hardware/zynq/results/PARALLEL_BANKS_HARDWARE_VALIDATED.md"
+    date: "2026-06-08"
+    public_safe: true
+    notes: "First customer-facing workload demo proven end-to-end on hardware (parallel-bank engine 0xF0021000, board-side daemon -> /tmp/atomik_bench_live.txt -> surface). SCOPE TIGHTLY: only the throughput figures (800 Mevents/s, 1/2/4/8x, byte-identical) are LIVE_MEASURED. Resource Fabric STATE/SYNC/AGENT/EVENT/VISUAL and top-bar temp/efficiency/predictive values are DERIVED/SCENARIO, not measured customer/power/thermal proof. STATIC capture, not an interactive session; does NOT prove USB input or interactivity (still in-flight). Never say 'live interactive demo' or 'plug in a keyboard'."
+
   - id: interactive-workloads-input-in-flight-2026-06-06
     label: ROADMAP
-    claim: "An interactive Workloads demo with live on-screen numbers and USB keyboard/mouse input is software-complete and host-verified."
+    claim: "INTERACTIVITY and USB keyboard/mouse HID input for the Workloads demo are software-complete and host-verified, but not yet board-confirmed."
     artifact: "atomik_os/src/workloads_surface.c"
     date: "2026-06-06"
     public_safe: false
-    notes: "IN FLIGHT, not board-verified. Unified bitstream building; USB input blocked on a VBUS/power path. DO NOT publish 'live interactive demo' or 'plug in a keyboard and use it' until board-confirmed. Public copy may only say the OS renders and is driven by real measured data."
+    notes: "PARTIALLY ADVANCED 2026-06-08: the Workloads surface rendering with live measured throughput IS now board-verified (see live-workloads-surface-ax7020-2026-06-08). What remains IN FLIGHT is interactivity + USB HID input (USB blocked on a VBUS/power path). DO NOT publish 'live interactive demo' or 'plug in a keyboard and use it' until USB HID is board-confirmed. The surface-with-live-data claim is now publishable; keep it separate from the interactive/input claim."
 
   - id: xc7z020-synthesis-ceiling
     label: SYNTHESIS_VALIDATED

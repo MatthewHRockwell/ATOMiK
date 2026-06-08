@@ -54,6 +54,32 @@ Caveat:
 
 This is the measurement bench engine (0xF0021000), not the production application adapter. Quote throughput figures at the 100 MHz sys clock.
 
+## Proof Card: Live Workloads Surface on AX7020
+
+Evidence label: LIVE_MEASURED
+
+Artifact: `12-workloads-live-ax7020.png` (pairs with `PARALLEL_BANKS_HARDWARE_VALIDATED.md`)
+
+What it proves:
+
+- The Workloads surface (real-time telemetry aggregation) runs on the AX7020 over HDMI, captured live from `/dev/fb0`.
+- The on-screen throughput is live measured from the parallel-bank engine: 800 Mevents/s at 8 banks, 1/2/4/8 throughput scaling, byte-identical result across all bank configurations.
+- The first customer-facing workload demo proven end-to-end on hardware.
+
+What it does not prove:
+
+- Customer workload performance, production maturity, or downstream power/thermal outcomes.
+- An interactive session or USB keyboard/mouse input (both still in flight; this is a static capture).
+- That any on-screen value other than the throughput figures is measured (Resource Fabric lane values and top-bar temp/efficiency/predictive readouts are derived or scenario data).
+
+Safe claim:
+
+ATOMiK's Workloads surface runs on the AX7020 over HDMI showing live measured parallel-bank throughput (800 Mevents/s at 8 banks, byte-identical across configs).
+
+Caveat:
+
+Use with `12-workloads-live-ax7020.caption.md`. Scope the numbers to throughput only. Never present as an interactive demo or imply USB input.
+
 ## Proof Card: Zynq HDMI Display (1080p30)
 
 Evidence label: HARDWARE_VALIDATED

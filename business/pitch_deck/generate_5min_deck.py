@@ -55,6 +55,7 @@ def main():
     add_title(s, 4, "Proof today", "Real, specific, evidence-labeled")
     proofs=[
         ("Zynq UI v0.40-A", "HARDWARE_VALIDATED", g.GREEN),
+        ("Live Workloads demo", "LIVE_MEASURED 800 Mevents/s on AX7020", g.BLUE),
         ("Parallel banks", "LIVE_MEASURED 1/2/4/8x on AX7020", g.BLUE),
         ("Linux-to-FPGA", "HARDWARE_VALIDATED", g.CYAN),
         ("AX7020 matrix", "LIVE_MEASURED with caveats", g.BLUE),

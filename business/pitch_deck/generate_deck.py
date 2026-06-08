@@ -311,13 +311,14 @@ def build():
     s = add_slide(prs, 11, "Proof stack", "Real, specific, evidence-bounded")
     for i,(a,b,c,d) in enumerate([
         ("Zynq Desk v0.40-A", "HARDWARE_VALIDATED", "current UI proof image, captured from /dev/fb0", GREEN),
+        ("Live Workloads demo", "LIVE_MEASURED", "first customer-facing workload on AX7020: 800 Mevents/s @ 8 banks, byte-identical", BLUE),
         ("Parallel-bank throughput", "LIVE_MEASURED", "AX7020 8-bank accumulator scales 1/2/4/8x, byte-identical to software", BLUE),
         ("Linux userspace to FPGA", "HARDWARE_VALIDATED", "documented OS-to-bus path", CYAN),
         ("AX7020 board matrix", "LIVE_MEASURED", "wins and losses with caveats", BLUE),
         ("Formal algebra", "FORMAL_PROOF*", "Lean4-checked algebra; exact audited properties only", VIOLET),
         ("Standalone boot", "BUILD_ARTIFACT", "not promoted until run proof", AMBER),
     ]):
-        y = Inches(1.92 + i*0.64)
+        y = Inches(1.85 + i*0.58)
         rect(s, Inches(0.9), y, Inches(11.55), Inches(0.5), PANEL)
         text_box(s, Inches(1.12), y+Inches(0.12), Inches(3.0), Inches(0.16), a, 10.2, TEXT, True)
         text_box(s, Inches(4.3), y+Inches(0.12), Inches(2.4), Inches(0.16), b, 9.2, d, True)
