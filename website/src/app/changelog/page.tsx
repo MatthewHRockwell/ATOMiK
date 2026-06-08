@@ -1,5 +1,3 @@
-"use client";
-
 import Link from "next/link";
 import Nav from "@/components/Nav";
 
@@ -71,7 +69,7 @@ const releases: Release[] = [
     date: "2026-04-28",
     category: "hardware",
     items: [
-      "Internal interactive demo screens for explaining state waste, delta accumulation, and hardware proof boundaries",
+      "Internal scripted demo screens for explaining state waste, delta accumulation, and hardware proof boundaries",
       "Scripted operator demo flow with proof cards for hardware validation, formal verification, and benchmark review",
       "State Storm visualization: software scans are contrasted with delta-state accumulation as a narrative model",
       "Cost and race visualizations are treated as demo surfaces unless linked to measured artifacts",
@@ -221,6 +219,7 @@ const releases: Release[] = [
       "Custom RV64I CPU with native ATOMiK ISA extensions",
       "Delta-driven display pipeline",
       "6,287 LUT (73%), zero TNS",
+      "Archived Tang Nano prototype path; figures are historical hardware artifacts, not current Zynq proof. Use the hardware proof map for public claims.",
     ],
   },
   {
@@ -232,6 +231,7 @@ const releases: Release[] = [
       "Single-bank ATOMiK timing and throughput documented in historical hardware artifacts",
       "PicoRV32 integration, SPI XIP boot",
       "11/11 hardware tests, +23% Fmax margin",
+      "Archived prototype; quote LUT, Fmax, and test figures only from the linked historical hardware artifacts, not as current claims.",
     ],
   },
 ];

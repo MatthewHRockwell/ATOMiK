@@ -51,7 +51,7 @@ const jsonLd = {
       "@type": "Organization",
       name: "ATOMiK",
       url: "https://atomik.tech",
-      logo: "https://atomik.tech/logo.png",
+      logo: "https://atomik.tech/SiteLogo.png",
       sameAs: ["https://github.com/MatthewHRockwell/ATOMiK"],
       description:
         "State-aware compute architecture for teams evaluating constrained state-heavy workloads.",

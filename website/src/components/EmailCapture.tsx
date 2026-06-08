@@ -124,6 +124,7 @@ export default function EmailCapture({ variant = "default" }: EmailCaptureProps)
       >
         <input
           type="email"
+          aria-label="Email address"
           placeholder="you@example.com"
           value={email}
           onChange={(e) => {
@@ -141,7 +142,7 @@ export default function EmailCapture({ variant = "default" }: EmailCaptureProps)
           type="submit"
           disabled={status === "loading"}
           className="px-5 py-2 rounded-md text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50 whitespace-nowrap"
-          style={{ background: "#4f8fff" }}
+          style={{ background: "#2563eb" }}
         >
           {status === "loading"
             ? isBlog ? "Registering..." : "Subscribing..."
