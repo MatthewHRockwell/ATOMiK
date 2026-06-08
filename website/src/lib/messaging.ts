@@ -262,6 +262,13 @@ export const proofToday = [
     href: "https://github.com/MatthewHRockwell/ATOMiK/blob/main/hardware/zynq/results/PARALLEL_BANKS_HARDWARE_VALIDATED.md",
   },
   {
+    title: "Live Workloads demo on hardware",
+    label: "Live measured",
+    body:
+      "The Workloads surface (real-time telemetry aggregation) runs on the AX7020 over HDMI driven by live measured throughput from the parallel-bank engine: 800 Mevents/s at 8 banks, with byte-identical results across configs. The first customer-facing workload demo proven end-to-end on hardware. Throughput is measured; it is a static capture, not an interactive session.",
+    href: "/12-workloads-live-ax7020.png",
+  },
+  {
     title: "Linux userspace to FPGA validation",
     label: "Hardware validated",
     body:

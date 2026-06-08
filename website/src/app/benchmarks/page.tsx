@@ -83,6 +83,15 @@ const artifactInterpretations = [
       "It is a static capture, not an interactive session: it does not prove the in-flight interactive Workloads demo or USB keyboard/mouse input, and it is not a customer workload, power, thermal, or production-maturity claim.",
   },
   {
+    title: "Live Workloads surface on AX7020",
+    href: "/12-workloads-live-ax7020.png",
+    label: "LIVE_MEASURED",
+    proves:
+      "The Workloads surface (real-time telemetry aggregation) runs on the AX7020 over HDMI showing live measured parallel-bank throughput: 800 Mevents/s at 8 banks, 1/2/4/8x throughput scaling, and a byte-identical result across all bank configurations. The first customer-facing workload demo proven end-to-end on hardware.",
+    doesNotProve:
+      "Only the throughput figures are measured; the Resource Fabric lane values and top-bar temperature/efficiency readouts are derived or scenario data, not measured proof. It is a static capture, not an interactive session, and does not prove the in-flight USB keyboard/mouse input.",
+  },
+  {
     title: "Parallel-bank throughput on AX7020",
     href: "https://github.com/MatthewHRockwell/ATOMiK/blob/main/hardware/zynq/results/PARALLEL_BANKS_HARDWARE_VALIDATED.md",
     label: "LIVE_MEASURED",

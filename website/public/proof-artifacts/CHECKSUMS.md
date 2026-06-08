@@ -5,6 +5,7 @@ SHA-256 checksums for the proof digest files downloadable from atomik.tech.
 f181ae1c637f4abfe1722fef0d0b64218051d67b1eb3247e289d7019e6491474  09-current-live-atomik-desk-v039k.caption.md
 27fed0956d176987498af91c4fb5acd4cbde001718b0141fcddaebe2fb9c2289  10-current-live-atomik-desk-v040a.caption.md
 7d80144948ef3c34bea5f7e98f9804bc2908ff9ddaf21e29b03842c115417d92  11-current-live-atomik-desk-v040a-workload.caption.md
+0a2cce600827826c3f69bc05faf6127f557067f045a197c005e3b809f472a60e  12-workloads-live-ax7020.caption.md
 03932f4619648add562b8f7fa19628766b7237e9e073ae3b2a145a0d7df2821e  AX7020_SUMMARY.md
 72d6ee5c7764d89e9f5a1c5019d78d0ffacab7bbb4b3fa725cbb9558f87382ff  LINUX_USERSPACE_PROOF_SUMMARY.md
 4b51b09aec2e427b89ad27f70087cbaf66f9fa0a6799dd5fc73e975ea08b5354  PROOF_CARDS.md
