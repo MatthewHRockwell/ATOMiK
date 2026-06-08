@@ -2,16 +2,16 @@
 
 This digest is for controlled proof review. It summarizes what each artifact proves, what it does not prove, and what language is safe to use.
 
-## Proof Card: ATOMiK Desk v0.39-K UI Artifact
+## Proof Card: ATOMiK Desk v0.40-A UI Artifact
 
 Evidence label: HARDWARE_VALIDATED
 
-Artifact: `09-current-live-atomik-desk-v039k.png`
+Artifact: `10-current-live-atomik-desk-v040a.png` (supersedes v0.39-K)
 
 What it proves:
 
-- A current ATOMiK Desk prototype/demo surface exists as a Zynq hardware UI artifact.
-- The UI direction is visually inspectable.
+- The current ATOMiK Desk prototype/demo surface was captured live from `/dev/fb0` (fb2png) on the booted AX7020.
+- The UI direction is visually inspectable, and on-screen metrics are driven by real measured on-board data.
 
 What it does not prove:
 
@@ -22,11 +22,60 @@ What it does not prove:
 
 Safe claim:
 
-ATOMiK Desk v0.39-K is a current Zynq hardware UI artifact.
+ATOMiK Desk v0.40-A is the current Zynq hardware UI artifact, captured live from the framebuffer.
 
 Caveat:
 
-Use with `09-current-live-atomik-desk-v039k.caption.md` and the label `HARDWARE_VALIDATED UI ARTIFACT - NOT A CUSTOMER WORKLOAD BENCHMARK`.
+Use with `10-current-live-atomik-desk-v040a.caption.md` and the label `HARDWARE_VALIDATED UI ARTIFACT - NOT A CUSTOMER WORKLOAD BENCHMARK`.
+
+## Proof Card: Parallel-Bank Throughput on AX7020
+
+Evidence label: LIVE_MEASURED
+
+Artifact: `PARALLEL_BANKS_HARDWARE_VALIDATED.md` (repo: `hardware/zynq/results/`)
+
+What it proves:
+
+- An 8-bank ATOMiK XOR accumulator scaled linearly with allocated banks on the AX7020, measured with an on-chip cycle counter.
+- 1/2/4/8 banks complete the same accumulation in 1/2/4/8x fewer cycles (about 100 to 800 Mdeltas/s at the 100 MHz sys clock).
+- The result was byte-identical across every bank count and matched a software recompute: the order-independent, lock-free shared accumulator, on silicon.
+
+What it does not prove:
+
+- A customer-workload speedup.
+- Battery, heat, cooling, water, power-bill, or footprint outcomes.
+- Production readiness.
+
+Safe claim:
+
+On the AX7020, an 8-bank ATOMiK accumulator scaled 1/2/4/8x with allocated banks, with a byte-identical result that matched software.
+
+Caveat:
+
+This is the measurement bench engine (0xF0021000), not the production application adapter. Quote throughput figures at the 100 MHz sys clock.
+
+## Proof Card: Zynq HDMI Display (1080p30)
+
+Evidence label: HARDWARE_VALIDATED
+
+Artifact: `HDMI_1080P60_IMPOSSIBLE.md` (repo: `hardware/zynq/results/`)
+
+What it proves:
+
+- The ATOMiK Desk UI renders at 1080p30 over HDMI on the AX7020.
+- A fresh place-and-route shows 1080p60 fails minimum-pulse-width on the 737.5 MHz serializer.
+
+What it does not prove:
+
+- 1080p60 on this board (it is physically impossible on the soldered -2 part).
+
+Safe claim:
+
+ATOMiK renders at 1080p30 over HDMI on the AX7020.
+
+Caveat:
+
+Claim 1080p30 only. Never claim 1080p60. 720p60 is the achievable true-60Hz path.
 
 ## Proof Card: Linux Userspace-to-FPGA Validation
 

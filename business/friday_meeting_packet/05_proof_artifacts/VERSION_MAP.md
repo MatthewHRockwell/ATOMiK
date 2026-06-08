@@ -2,9 +2,19 @@
 
 This map prevents proof artifacts from being blended across versions. Each version proves a different thing.
 
+## v0.40-A
+
+Current Zynq UI capture artifact (supersedes v0.39-K as the current-live image).
+
+- Packaged artifact: `10-current-live-atomik-desk-v040a.png`
+- Evidence label: HARDWARE_VALIDATED
+- Capture method: live `fb2png` of `/dev/fb0` on the booted AX7020 (RV64 NaxRiscv, simplefb 1920x1080), 2026-05-29. Not a recomposited/edited mockup.
+- What it supports: current live concept-aligned UI (ATOMiK Desk) running on Zynq hardware, with on-screen metrics from real on-board perf-bench.
+- What it does not support: customer workload performance, production maturity, uptime, battery, heat, cooling, water, power, or footprint outcomes.
+
 ## v0.39-K
 
-Current Zynq UI screenshot artifact.
+Prior Zynq UI screenshot artifact (archived; superseded by v0.40-A above).
 
 - Packaged artifact: `09-current-live-atomik-desk-v039k.png`
 - Evidence label: HARDWARE_VALIDATED

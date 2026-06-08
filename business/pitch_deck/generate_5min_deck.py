@@ -54,7 +54,8 @@ def main():
     s = prs.slides.add_slide(prs.slide_layouts[6]); g.set_bg(s)
     add_title(s, 4, "Proof today", "Real, specific, evidence-labeled")
     proofs=[
-        ("Zynq UI", "HARDWARE_VALIDATED", g.GREEN),
+        ("Zynq UI v0.40-A", "HARDWARE_VALIDATED", g.GREEN),
+        ("Parallel banks", "LIVE_MEASURED 1/2/4/8x on AX7020", g.BLUE),
         ("Linux-to-FPGA", "HARDWARE_VALIDATED", g.CYAN),
         ("AX7020 matrix", "LIVE_MEASURED with caveats", g.BLUE),
         ("Lean4 algebra", "FORMAL_PROOF where audited", g.VIOLET),

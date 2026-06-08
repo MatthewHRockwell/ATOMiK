@@ -1,20 +1,20 @@
 # ATOMiK Friday Meeting Packet Checksum Manifest
 
-Generated: 2026-05-28
+Generated: 2026-06-07
 
 This file covers the broader internal Friday meeting packet and excludes itself. For the clean external send package, use `FRIDAY_SEND_CHECKSUMS.md`.
 
 | SHA-256 | File |
 |---|---|
 | `93cda29db6a7a9fbe1f21b6746713f5b3c3a85fcf5e59cfb08636f9168d40e6c` | `00_READ_ME_FIRST.md` |
-| `848974f14bea78e33a76c2522f061c951b29a499e43380bf1e41170b52ee40ee` | `01_front_of_room/ATOMiK_5_Minute_Deck.pdf` |
-| `9bd2391a4f6e2b69d02395c9eae05e9980dd4255556321a57fd45720d196f5eb` | `01_front_of_room/ATOMiK_5_Minute_Deck.pptx` |
-| `8e985ac3bc32eb052ea9fad18e28c09bcc7047f700ae7d26225110f808911d21` | `01_front_of_room/ATOMiK_Executive_Summary.docx` |
-| `9c3bd10384938d160e358f3ad1a7f81b63a835262f535c53ac6b92bddc5bb8b3` | `01_front_of_room/ATOMiK_Executive_Summary.pdf` |
-| `1e0d427f36b692690a4f7763ec520397ae2b6ecebb8b54017c08523bcf0766a8` | `01_front_of_room/ATOMiK_Investor_Deck.pdf` |
-| `5ad1b0ef0ca5970b36dab8f71dd686084026618f985afc5e65f07ff9fa6434a2` | `01_front_of_room/ATOMiK_Investor_Deck.pptx` |
-| `af4c506120dc40442b8889ae3a5a3d73ce445917466e673a0909b36f049d2ef4` | `01_front_of_room/ATOMiK_One_Pager.docx` |
-| `51271d47be10ea4773691ea7a93cd41b08617c2ff556f6dc10e05dbd35f78203` | `01_front_of_room/ATOMiK_One_Pager.pdf` |
+| `a33589126ba4165e070b01db6b4c8808f3805ac1a05c9122bd56d30b29dbb0d8` | `01_front_of_room/ATOMiK_5_Minute_Deck.pdf` |
+| `cac8b30fc1ff8cd0fcc70518531848ac37fc6b593ad9453aa57f0e56fbf124e8` | `01_front_of_room/ATOMiK_5_Minute_Deck.pptx` |
+| `d11921bfeebd49d8867a5ce5c49973ac652e240c8342a52cb2393a400f4e770b` | `01_front_of_room/ATOMiK_Executive_Summary.docx` |
+| `0f21c0e3695809d923b5daabc64df8e2aeadd006e70c0f8fa982fb543255f8e2` | `01_front_of_room/ATOMiK_Executive_Summary.pdf` |
+| `f27388364baef3eb1dcf9c05a24a7a1d20d4c2d135aa739627917d638d6816eb` | `01_front_of_room/ATOMiK_Investor_Deck.pdf` |
+| `6bc72f909a0e6b29993caf8e0cea862aa8ee7a0d930918bfc5f328d762b56869` | `01_front_of_room/ATOMiK_Investor_Deck.pptx` |
+| `639ace3471a19dcb288ce56fd61a4e22fec1af4ce524edd2fe177ee8670575ff` | `01_front_of_room/ATOMiK_One_Pager.docx` |
+| `a55c083add51712c5eca0df1be9b3024122944af351a07ba24c2443fb26ccd1e` | `01_front_of_room/ATOMiK_One_Pager.pdf` |
 | `ddb0b200858783d7190c13ef1f3cd2adb486038f3fc37de7afa2cc449882bee3` | `02_business_docs/AAN_BACKGROUND_AND_FEEDBACK.md` |
 | `9987ef55951f0214e841da17dfe39b63c8f359d9023359f1d13e36158c725567` | `02_business_docs/CLAIMS_EVIDENCE_MATRIX.md` |
 | `1e2764a84473e3b8d2515c391e2f3614b73095c0ad0eee9abd7b80dfa1de12b5` | `02_business_docs/COMPETITIVE_STATUS_QUO.md` |
@@ -50,8 +50,8 @@ This file covers the broader internal Friday meeting packet and excludes itself.
 | `29691939d888166a77d1d7356e10b98ba4a7a395f67946ccbfe90da52dda99e0` | `03_financial/static_exports/runway.csv` |
 | `45b5f38c12f5d01ca3b0228055f1443ac1233232a36c9eb31440487ff0ce79fc` | `03_financial/static_exports/use_of_funds.csv` |
 | `0c34ab4caa2402e613e30600543efecac1db86f122292085f388d84a225ba6cf` | `04_data_room/README_DATA_ROOM.md` |
-| `239fabacb8d95516431a5507ef2d75257b8b447387bda50e406b0adc4d85b42d` | `04_data_room/business/ATOMiK_Business_Plan.docx` |
-| `ae568c709026d707339771882e7fae9b344d6ebbb3266259bfe9b3ba23602635` | `04_data_room/business/ATOMiK_Business_Plan.pdf` |
+| `8e6dc26fc4f4ea2fde79133ba31c902df5e4738fafde377c6b2ce2e3ba72b513` | `04_data_room/business/ATOMiK_Business_Plan.docx` |
+| `d6d52aa43bdc699c1778409a2e3e4ac4f32819875cacb99ca5a9cfddb4836534` | `04_data_room/business/ATOMiK_Business_Plan.pdf` |
 | `804dfd614f404cf8fdf11d053c6f858c9e5e57ca890972350209bfbed293a99e` | `04_data_room/customers/ATOMiK_Customer_Pipeline.docx` |
 | `68cbf85f3cc2d698eff6e1542a38af47360ee629519f561e8df5410ab5adbdbe` | `04_data_room/customers/ATOMiK_Customer_Pipeline.pdf` |
 | `3cc1c2598e5d75c93cffe23f021b5771460002a95cf10c45b2ae76f64b786b7e` | `04_data_room/customers/design_partner_templates/README.md` |
@@ -67,23 +67,30 @@ This file covers the broader internal Friday meeting packet and excludes itself.
 | `093a2fa5ae627fd14bed7611f082739f5fdcfe6a326ae07e4bb75a06a8c0897d` | `04_data_room/legal/legal_status_current.md` |
 | `3fd8c73742985f0d5f7ddfe459693d159b9a40751f14052ae5598f3494731b24` | `04_data_room/product_tech/ATOMiK_Patent_Summary_for_Investors.docx` |
 | `9d9d586a968f44538242e038e31be8b3e5bb9226d192abcf04e631179c7a4e17` | `04_data_room/product_tech/ATOMiK_Patent_Summary_for_Investors.md` |
-| `f5629fbc867837ebebbe8db77d0d424964bac2f81e7784084a8a284f32f787d5` | `04_data_room/product_tech/ATOMiK_Patent_Summary_for_Investors.pdf` |
-| `a5797b36614bc2b3e5c9765a35064ce99038d561dbbcd58419cf50cecfddd7bb` | `04_data_room/product_tech/ATOMiK_Product_Technical_Overview.docx` |
-| `ee6d5207368e8f60edc0fed529ba88cfeb5a45ae5696ba22a755c9cc61d0e659` | `04_data_room/product_tech/ATOMiK_Product_Technical_Overview.pdf` |
+| `8a72ee60d33d0b1a24fc6d798bb5050c09625125498ff462753d5e9a6601a172` | `04_data_room/product_tech/ATOMiK_Patent_Summary_for_Investors.pdf` |
+| `ebf4752876672756803836fb9624279fa01a30b1c6f81feba162ba2bd12311e6` | `04_data_room/product_tech/ATOMiK_Product_Technical_Overview.docx` |
+| `4e7ce11f327a3082313204a285561c9688a5fcc9dba476371e737b8e6eddbe0a` | `04_data_room/product_tech/ATOMiK_Product_Technical_Overview.pdf` |
 | `6c4c90f9a6c7a5b7794f143145f98d98d8ab9a0e21e9d088c17078189facdcc5` | `04_data_room/team/ATOMiK_Team_Overview.docx` |
 | `b1ad414869b7c74dd31302b786fd816f2aeeffa255d36eede2a2a5924942005e` | `04_data_room/team/ATOMiK_Team_Overview.pdf` |
 | `f181ae1c637f4abfe1722fef0d0b64218051d67b1eb3247e289d7019e6491474` | `05_proof_artifacts/09-current-live-atomik-desk-v039k.caption.md` |
 | `8e78ef3375d9876347c747a218778cd633d3c62618fcb16acb5f5b0d986aef92` | `05_proof_artifacts/09-current-live-atomik-desk-v039k.png` |
+| `27fed0956d176987498af91c4fb5acd4cbde001718b0141fcddaebe2fb9c2289` | `05_proof_artifacts/10-current-live-atomik-desk-v040a.caption.md` |
+| `c7350a5cb2b670376eb79cd469df8c9d2b1907068a9ca54387e42cf62af2ff05` | `05_proof_artifacts/10-current-live-atomik-desk-v040a.png` |
+| `7d80144948ef3c34bea5f7e98f9804bc2908ff9ddaf21e29b03842c115417d92` | `05_proof_artifacts/11-current-live-atomik-desk-v040a-workload.caption.md` |
+| `19676a6fc52af0bba817320e763631094d8c52cd3e4651da23b4016dee24cb09` | `05_proof_artifacts/11-current-live-atomik-desk-v040a-workload.png` |
 | `8be21902b35f9b80d741667b2044f1ab876caf4512a1fbe15a0431e6f53d0abc` | `05_proof_artifacts/20260509_matrix_interpretation.md` |
 | `03932f4619648add562b8f7fa19628766b7237e9e073ae3b2a145a0d7df2821e` | `05_proof_artifacts/AX7020_SUMMARY.md` |
+| `85b8b91751c1fc7283dc5773274ceab8005f7fd36437ebafe1581bcd20c9a209` | `05_proof_artifacts/CHECKSUMS.md` |
+| `7f640e68c561b06752cfc294004858340f6f4038e3aff51116fea82f7deb1ff7` | `05_proof_artifacts/HDMI_1080P60_IMPOSSIBLE.md` |
 | `582c3dbf02aa6e55f5814969ca2e3d9d36b398a81a5289038d431cfd6146ca21` | `05_proof_artifacts/LINUX_USERSPACE_PROOF.md` |
 | `72d6ee5c7764d89e9f5a1c5019d78d0ffacab7bbb4b3fa725cbb9558f87382ff` | `05_proof_artifacts/LINUX_USERSPACE_PROOF_SUMMARY.md` |
-| `dead11cdc9f56092a32c292f1ab3bf3c638c2b786feedd5b84b7c76f8e5d5e26` | `05_proof_artifacts/PROOF_CARDS.md` |
-| `3b046582687042c9ce2c436a51666bf838de794ac61433b63379e859ef724ec3` | `05_proof_artifacts/README.md` |
+| `3c5504e5bb21572408f7a615975e40ed5d017ce0d09a5c6e1e8f949db082c71d` | `05_proof_artifacts/PARALLEL_BANKS_HARDWARE_VALIDATED.md` |
+| `4b51b09aec2e427b89ad27f70087cbaf66f9fa0a6799dd5fc73e975ea08b5354` | `05_proof_artifacts/PROOF_CARDS.md` |
+| `afbb849b57099a8d917190cda744456c310db2c22cb1a97df807502cb048c6ab` | `05_proof_artifacts/README.md` |
 | `a7a7a018805ab25139a103470c628ab0d4ac64cbb61455ed2212578ce74ce670` | `05_proof_artifacts/README_EXTERNAL_REFERENCES.md` |
-| `9d3a02211c5a53ef8697d598d74072860031660711e18316f256b6d772da8460` | `05_proof_artifacts/VERSION_MAP.md` |
+| `56293b594a64c55873c585cab96cbf5bbbcc0df5be986afdef26e11485a5a9ae` | `05_proof_artifacts/VERSION_MAP.md` |
 | `2bca268c45c77f1a04a4d41844fb53f9324fb9fc9d0bda6ddc211bffbf26dd6f` | `05_proof_artifacts/ZYNQ_BASELINE.md` |
-| `1681f37d1a170d1f904984f1657f62a23c6b11c6ff81f61b27f6da16d7b0b752` | `05_proof_artifacts/claims_registry_snapshot.yaml` |
+| `b6a49b29539e28a39fae0ae2e410f46c9a45c507ed9c71dc7479d011f8b5d3b2` | `05_proof_artifacts/claims_registry_snapshot.yaml` |
 | `aaa567f4f3627547eb48b9cabdf231cd4864adec051d6179d77a9087aea6a355` | `05_proof_artifacts/evidence-labels.md` |
 | `65a92b735ad040978a75bd108f2d50732391f4b6aceab1d311bf3a9986e92233` | `05_proof_artifacts/perf_matrix_ax7020_20260509.csv` |
 | `b2c9a642fc95880d08fab65a97c6324774623e0f7cd915634e5f4c79e1c7e016` | `05_proof_artifacts/perf_matrix_ax7020_20260509.summary.json` |
@@ -117,6 +124,6 @@ This file covers the broader internal Friday meeting packet and excludes itself.
 | `daddc7eec96ba27f60b96b074a78eba02597edd840736e059b39377da836d52c` | `07_website_sources/pitch-assets/objection-handling-faq.md` |
 | `e788ea4918843b9274b05b640d1e8899c70b53021d23bac97e89d7f614b96915` | `07_website_sources/pitch-assets/pitch-deck-outline-with-speaker-notes.md` |
 | `ba67f259a2bcf276dc35f1a431a3005168fdc63e5a3e77c0d92f55900ae70264` | `07_website_sources/pitch-assets/proof-packet-source.md` |
-| `563c7863389edbaaf8388984f2640fa398bff43a387a65ea8789a2a80d6e5d4b` | `FRIDAY_SEND_CHECKSUMS.md` |
+| `caf065455246381989f41b743dad6adec05f0d8086ef1b183e559952e899d842` | `FRIDAY_SEND_CHECKSUMS.md` |
 | `263349ec23e09592b43799eb16e318ad724efe57ff4ab1ae475c98743102ef0e` | `FRIDAY_SEND_README.md` |
 | `b5888349c3ed98b387678e15e0639fee32164854f376e5739d75407ad2e1bb74` | `MANIFEST.md` |
