@@ -550,7 +550,11 @@ int main(int argc, char **argv) {
                 dirty = 1;
             }
             else if (ev.key == 'w' || ev.key == 'W') {
-                workloads_surface_open();   /* v0.41: telemetry-aggregation demo */
+                /* v0.41: open the Workloads surface; re-pressing W while it's
+                 * already up cycles through the scenarios (Telemetry Sync ->
+                 * Control Coalescing -> Parallel Aggregate). */
+                if (workloads_surface_is_open()) workloads_cycle_scenario();
+                workloads_surface_open();
                 agent_log(ACT_OPEN_WORKLOAD);
                 dirty = 1;
             }

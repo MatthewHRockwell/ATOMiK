@@ -663,6 +663,9 @@ void          system_surface_open(void);
 void          system_surface_draw(window_t *w, int x, int y, int wd, int ht);
 void          workloads_surface_open(void);
 void          workloads_surface_draw(window_t *w, int x, int y, int wd, int ht);
+int           workloads_surface_is_open(void);
+void          workloads_cycle_scenario(void);
+void          workloads_set_scenario(int n);
 void          state_watch_tick(void);
 
 /* atomik_asset.c — board-side asset loader, v0.36 (Class B foundation).
