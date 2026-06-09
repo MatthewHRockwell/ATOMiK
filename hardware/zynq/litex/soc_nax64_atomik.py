@@ -21,6 +21,7 @@ from litex.soc.integration.builder import *
 from litex.soc.integration.soc import SoCRegion
 from litex.soc.cores.cpu import zynq7000
 from litex.soc.interconnect import wishbone
+from litex.soc.interconnect.axi import connect_axi
 from litex.soc.cores.cpu.naxriscv.core import NaxRiscv
 from litex.soc.cores.video import VideoS7HDMIPHY, VideoTimingGenerator
 from litex.soc.cores.clock import S7MMCM
@@ -52,7 +53,7 @@ NaxRiscv.with_rvc             = True
 # NaxSoc.scala: `def withL2 = l2Bytes > 0` — 0 disables L2 entirely.
 # Forces NaxRiscv to issue single-word accesses instead of 64-byte burst refills;
 # if memtest errors disappear the burst path through 32-bit GP0 is the cause.
-NaxRiscv.l2_bytes             = 0          # L2 disabled
+NaxRiscv.l2_bytes             = 32 * 1024  # DIAGNOSTIC: L2 on, main_ram still GP0
 NaxRiscv.l2_ways              = 4          # ignored when l2_bytes==0
 
 # CRG ------------------------------------------------------------------------------------
@@ -129,23 +130,41 @@ class BaseSoC(SoCCore):
             '] [get_ips Zynq]'
         )
 
+        # ---- main_ram on a NATIVE 64-bit burst AXI path (the real fix, 2026-06-08) ----
+        # Earlier dead ends: the 32-bit LiteX wishbone (whether routed to GP0 or
+        # bridged onto S_AXI_HP) tore NaxRiscv 64-byte cacheline bursts and corrupted
+        # DDR (GP0 16/524288, HP-32bit 50%, HP-64bit hung on a width converter). The
+        # real fix is NaxRiscv's native wide memory egress: add_memory_buses() exposes
+        # mBus, a 64-bit burst-capable AXI4 master; do_finalize() then routes main_ram
+        # to that 'm' bus while peripherals stay on the 32-bit pBus. We bridge mBus
+        # straight to a 64-bit S_AXI_HP so the burst stays wide end-to-end.
+        self.cpu.add_memory_buses(address_width=32, data_width=64)
+        main_ram_region = SoCRegion(
+            origin=self.cpu.mem_map["main_ram"], size=0x2000_0000, mode="rwx", cached=True)
+        self.bus.add_region("main_ram", main_ram_region)
+
+        # Reserve GP0 first so the add_axi_gp_slave() order keeps IOP on GP1 (the
+        # PSUart0Bridge console routes through the ps_iop remapper on GP1).
         axi_gp0 = ps.add_axi_gp_slave(clock_domain="sys")
 
-        # DDR region: NaxRiscv 0x40000000 → PS DDR 0x00100000
-        axi_gp0_ddr_dst = SoCRegion(origin=0x100000, size=0x2000_0000)
-        main_ram_region = SoCRegion(
-            origin=self.cpu.mem_map["main_ram"],
-            size=axi_gp0_ddr_dst.size,
-            mode="rwx",
-        )
-
-        wb = self.bus.add_adapter("axi_gp0", axi_gp0, direction="s2m")
-        remap_module = wishbone.Interface(data_width=32, address_width=32)
-        self.submodules += wishbone.Remapper(
-            master=remap_module, slave=wb,
-            src_regions=[main_ram_region], dst_regions=[axi_gp0_ddr_dst],
-        )
-        self.bus.add_slave("main_ram", remap_module, main_ram_region)
+        # Bridge NaxRiscv mBus (AXI4, id_width 8) -> S_AXI_HP (AXI3, id_width 6, 64-bit).
+        # connect_axi name-matches the channels; we hand-drive: addr (CPU 0x40000000 ->
+        # PS DDR 0x00100000 offset), the truncated/zero-extended IDs, and the AXI3 WID
+        # (AXI4 has no WID; NaxRiscv mBus is in-order single-outstanding so WID = AWID).
+        # axi_full=True keeps wlast/rlast connected.
+        axi_hp_mem = ps.add_axi_hp_slave(clock_domain="sys", data_width=64)
+        mbus    = self.cpu.memory_buses[0]
+        DDR_OFF = 0x4000_0000 - 0x0010_0000  # 0x3FF00000
+        self.comb += connect_axi(mbus, axi_hp_mem, omit={"addr", "id"}, axi_full=True)
+        self.comb += [
+            axi_hp_mem.aw.addr.eq(mbus.aw.addr - DDR_OFF),
+            axi_hp_mem.ar.addr.eq(mbus.ar.addr - DDR_OFF),
+            axi_hp_mem.aw.id.eq(mbus.aw.id),   # 8 -> 6 (truncate)
+            axi_hp_mem.ar.id.eq(mbus.ar.id),
+            axi_hp_mem.w.id.eq(mbus.aw.id),    # AXI3 WID = AWID (in-order)
+            mbus.b.id.eq(axi_hp_mem.b.id),     # 6 -> 8 (zero-extend)
+            mbus.r.id.eq(axi_hp_mem.r.id),
+        ]
 
         # PS I/O Peripherals via GP1: NaxRiscv 0x80000000 → PS IOP 0xE0000000
         # Exposes PS USB0, GEM0, SDIO, GPIO to NaxRiscv Linux
@@ -524,7 +543,7 @@ def main():
     NaxRiscv.jtag_tap             = False
     NaxRiscv.jtag_instruction     = False
     NaxRiscv.with_dma             = False
-    NaxRiscv.l2_bytes             = 0           # L2 disabled (DDR diagnostic)
+    NaxRiscv.l2_bytes             = 32 * 1024   # DIAGNOSTIC: L2 on, main_ram still GP0
     NaxRiscv.l2_ways              = 4           # ignored when l2_bytes==0
 
     soc = BaseSoC(
