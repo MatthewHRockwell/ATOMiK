@@ -666,6 +666,19 @@ void          workloads_surface_draw(window_t *w, int x, int y, int wd, int ht);
 int           workloads_surface_is_open(void);
 void          workloads_cycle_scenario(void);
 void          workloads_set_scenario(int n);
+
+/* Board-measured memory-workload results (wlmeasure.c, fed by aworkload). */
+typedef struct {
+    int  valid;        /* parsed a complete block                       */
+    long conv;         /* conventional cost (bytes or writes)           */
+    long atomik;       /* ATOMiK cost (bytes or writes)                 */
+    int  saved_pct;    /* percent saved                                 */
+    int  verified;     /* 1 = delta math verified on the adapter HW     */
+    int  is_bytes;     /* 1 = bytes, 0 = writes (unit)                  */
+    int  extra;        /* changed regions / unique writes               */
+} wl_measure_t;
+int  wlmeasure_get(int which, wl_measure_t *out);  /* 0=telemetry 1=coalescing */
+void wlmeasure_tick(void);
 void          state_watch_tick(void);
 
 /* atomik_asset.c — board-side asset loader, v0.36 (Class B foundation).

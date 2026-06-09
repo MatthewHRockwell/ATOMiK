@@ -439,6 +439,7 @@ int main(int argc, char **argv) {
             status_tick();
             fabric_tick();
             bench_tick();                   /* parse the live sweep file too   */
+            wlmeasure_tick();               /* + memory-workload measurements  */
             redraw_frame();                 /* host fb_present() dumps the PNG */
             if (i + 1 < frames) usleep(120000);  /* real-time advance for timers */
         }
@@ -487,6 +488,7 @@ int main(int argc, char **argv) {
          * calling it every frame is fine; advances the demo's bank
          * allocation cursor so the Fabric surface visibly reallocates. */
         bench_tick();
+        wlmeasure_tick();
         /* v0.35: tick the State Watch sampler.  Self-rate-limits to
          * 200 ms per sample, so calling it every frame is fine.
          * Passive observer — reads existing producers + maintains

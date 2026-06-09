@@ -181,6 +181,32 @@ void workloads_surface_draw(window_t *w, int x, int y, int wd, int ht) {
         s_wl[2].conv_bar = (double)base; s_wl[2].atomik_bar = (double)fast;
         s_wl[2].savings = sav_str;
     }
+    s_wl[2].live = bench_live;
+
+    /* live memory-workload data (aworkload) overwrites scenarios 0 + 1 with
+     * real, hardware-VERIFIED numbers; flips them LIVE when present. */
+    static char m_conv[2][16], m_atk[2][16], m_sav[2][28];
+    for (int wi = 0; wi < 2; wi++) {
+        wl_measure_t m;
+        if (wlmeasure_get(wi, &m) && m.valid && m.verified && m.conv > 0) {
+            if (m.is_bytes) {
+                if (m.conv >= 1024) snprintf(m_conv[wi], sizeof m_conv[wi], "%.1f", m.conv / 1024.0);
+                else                snprintf(m_conv[wi], sizeof m_conv[wi], "%ld", m.conv);
+                snprintf(m_atk[wi], sizeof m_atk[wi], "%ld", m.atomik);
+                snprintf(m_sav[wi], sizeof m_sav[wi], "%d%% LESS DATA MOVED", m.saved_pct);
+            } else {
+                snprintf(m_conv[wi], sizeof m_conv[wi], "%ld", m.conv);
+                snprintf(m_atk[wi],  sizeof m_atk[wi],  "%ld", m.atomik);
+                snprintf(m_sav[wi], sizeof m_sav[wi], "%d%% FEWER WRITES", m.saved_pct);
+            }
+            s_wl[wi].conv_big = m_conv[wi]; s_wl[wi].atomik_big = m_atk[wi];
+            s_wl[wi].conv_bar = (double)m.conv; s_wl[wi].atomik_bar = (double)m.atomik;
+            s_wl[wi].savings = m_sav[wi];
+            s_wl[wi].live = 1;
+        } else {
+            s_wl[wi].live = 0;
+        }
+    }
 
     wl_scenario_t *sc = &s_wl[s_scenario];
 
@@ -190,7 +216,7 @@ void workloads_surface_draw(window_t *w, int x, int y, int wd, int ht) {
     }
     /* source chip top-right */
     {
-        int live = sc->live && bench_live;
+        int live = sc->live;
         const char *chip = live ? "LIVE / MEASURED" : "SCENARIO";
         pixel_t cc = live ? ATOMIK_SEM_SAVINGS : ATOMIK_SEM_WASTE;
         if (lab) {
