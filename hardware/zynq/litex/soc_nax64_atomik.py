@@ -195,12 +195,32 @@ class BaseSoC(SoCCore):
         # cached PS-side status.
         self.irq.add("uart", use_loc_if_exists=True)
 
-        # USB0 interrupt from PS to NaxRiscv PLIC
-        # PS7 IRQ_P2F_USB0 output mirrors the USB0 interrupt to PL fabric.
-        # Wire it to PLIC input 3 (input 1 = liteuart).
+        # USB0 interrupt from PS to NaxRiscv PLIC, via a LEVEL->EDGE converter.
+        # PS7 IRQ_P2F_USB0 is LEVEL-triggered (active high, stays asserted while
+        # the chipidea controller has unserviced events).  The LiteX/NaxRiscv
+        # PLIC input is EDGE-triggered, so when several USB completion events
+        # stack up the line stays high, the PLIC latches only the first rising
+        # edge, and every subsequent completion IRQ is dropped — the kernel's
+        # URB never completes and control transfers time out -110 (the residual
+        # marginality after the mBus DMA fix; see project_usb_irq_root_cause).
+        #
+        # Fix: while usb0_irq is high, re-pulse the PLIC input for 1 cycle every
+        # 2^PERIOD_BITS sys cycles.  Each pulse is a fresh edge, so the PLIC
+        # keeps re-latching the pending bit for every still-unserviced USB
+        # event until the kernel ACKs them all and the line finally drops.
+        # 256 cycles @100 MHz = 2.56 us re-fire period — far below the USB
+        # control-transfer timeout, and pulses arriving while one is already
+        # pending are harmlessly absorbed by the PLIC's single pending bit.
         usb0_irq = ps.get_irq_p2f_usb0()
         self.irq.add("usb0", use_loc_if_exists=True)
-        self.comb += self.cpu.interrupt[3].eq(usb0_irq)
+        USB_IRQ_PERIOD_BITS = 8
+        usb_irq_ctr = Signal(USB_IRQ_PERIOD_BITS)
+        self.sync += If(usb0_irq,
+                        usb_irq_ctr.eq(usb_irq_ctr + 1),
+                     ).Else(
+                        usb_irq_ctr.eq(0),
+                     )
+        self.comb += self.cpu.interrupt[3].eq(usb0_irq & (usb_irq_ctr == 0))
 
         # LCD ST7789V 320x172 — GPIO bitbang SPI
         # Pins confirmed from RK-ZYNQ7020-F Schematics.pdf page 5, Bank 33.
