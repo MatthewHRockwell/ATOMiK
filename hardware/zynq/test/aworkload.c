@@ -9,7 +9,7 @@
  * /tmp/atomik_workloads_live.txt; atomik_os parses it (wlmeasure.c).
  *
  * Adapter register map (atomik_cfu_wishbone.v, word-addressed):
- *   0x00 CMD={funct3<<29}  0x04 RS1  0x08 RS2  0x0C RD  0x10 STATUS
+ *   0x00 CMD (funct3 in dat_w[2:0])  0x04 RS1  0x08 RS2  0x0C RD  0x10 STATUS
  *   funct3: LOAD=0 ACCUM=1 READ=2 LOAD_HI=4 ACCUM_HI=5 READ_HI=6
  *
  *   riscv64-linux-gnu-gcc -O2 -static aworkload.c -o aworkload
@@ -26,7 +26,7 @@
 #define A_RS2  2
 #define A_RD   3
 #define A_STATUS 4
-#define FN(f) ((uint32_t)(f) << 29)
+#define FN(f) ((uint32_t)(f))   /* funct3 in dat_w[2:0] — proven by CMD readback */
 
 static volatile uint32_t *g_adp = 0;
 
@@ -62,7 +62,16 @@ static uint64_t adp_read(void) {
     return ((uint64_t)hi << 32) | lo;
 }
 
-static uint64_t mix(uint64_t x) { x ^= x << 13; x ^= x >> 7; x ^= x << 17; return x; }
+/* splitmix64 — NONLINEAR mixer.  The previous xorshift mix() was linear over
+ * GF(2); with sequential u over 256 updates into 32 regs the deltas formed
+ * exact cosets and XOR-cancelled to ZERO in every register, making the old
+ * "verification" vacuously pass against all-zero hardware reads. */
+static uint64_t mix(uint64_t x) {
+    x += 0x9E3779B97F4A7C15ULL;
+    x = (x ^ (x >> 30)) * 0xBF58476D1CE4E5B9ULL;
+    x = (x ^ (x >> 27)) * 0x94D049BB133111EBULL;
+    return x ^ (x >> 31);
+}
 
 #define N_REGIONS 256
 
@@ -71,19 +80,17 @@ static uint64_t mix(uint64_t x) { x ^= x << 13; x ^= x >> 7; x ^= x << 17; retur
  * workloads use it identically so their results can't diverge by code path. */
 static int verify_deltas(const int *touched, const uint64_t *vals, int n) {
     if (!g_adp) return 0;
-    /* The first ACCUM after a preceding READ sequence is dropped by the
-     * adapter's pipeline; absorb it with a throwaway cycle so the real loop's
-     * accumulates all land. */
-    adp_load(0, 0); adp_accum(0x1ULL); (void)adp_read();
-    int any = 0;
+    int nonzero = 0;
     for (int i = 0; i < n; i++) {
         if (!touched[i]) continue;
-        any = 1;
         adp_load((uint32_t)i, 0);
         adp_accum(vals[i]);
         if (adp_read() != vals[i]) return 0;
+        if (vals[i] != 0) nonzero++;
     }
-    return any;
+    /* HONESTY GUARD: a verification that only ever checked zero values proves
+     * nothing (an all-zero readback would "pass" it) — require nonzero work. */
+    return nonzero > 0;
 }
 
 /* Telemetry sync: 256 sensor regions, a sparse fraction change each tick.
@@ -101,11 +108,6 @@ static int telemetry_sync(FILE *f, uint64_t seed, int density_pct) {
     long conv_bytes   = (long)N_REGIONS * 8;          /* full state, every tick */
     long atomik_bytes = (long)n_changed * 8;          /* only the changed values */
 
-    /* VERIFY on hardware: accumulate all the changed deltas (from 0) and check
-     * the combined result equals the software XOR — i.e. the sparse deltas
-     * compose into the correct net change, order-independently.  (Uses the
-     * proven LOAD-0 + ACCUM path; LOAD with a nonzero high word is unreliable
-     * on this adapter build.) */
     /* VERIFY on hardware via the shared per-slot path (identical to the
      * coalescing check) — each changed delta applies correctly. */
     int touched_t[N_REGIONS];
