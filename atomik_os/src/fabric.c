@@ -1204,7 +1204,7 @@ void fabric_draw(window_t *w, int x, int y, int wd, int ht) {
 
         /* Big metric (real telemetry) — concept-01 layout: top-RIGHT, right-
          * aligned in lane color, with the dim unit below it. */
-        char big[16], unit[24];
+        char big[16], unit[32];
         lane_big_metric(lane, big, sizeof big, unit, sizeof unit);
         int disp  = font_aa_loaded(FONT_AA_DISPLAY);
         int big_h = disp ? text_height_aa(FONT_AA_DISPLAY) : text_height(3);

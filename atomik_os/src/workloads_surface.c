@@ -299,6 +299,18 @@ void workloads_surface_draw(window_t *w, int x, int y, int wd, int ht) {
         }
         ty += bh + ATOMIK_GRID_M;
     }
+
+    /* ── provenance footer — where these numbers come from ───────────── */
+    if (lab) {
+        const char *prov;
+        if (sc->live)
+            prov = (s_scenario == 2)
+                 ? "Measured on XC7Z020 silicon - parallel-bank engine @0xF0021000"
+                 : "Verified on XC7Z020 silicon - ATOMiK delta-state adapter @0xF0020000";
+        else
+            prov = "Illustrative scenario - board verification pending";
+        draw_text_aa(FONT_AA_LABEL, ix, ty, prov, rgb(0x5E, 0x6A, 0x80));
+    }
 }
 
 void workloads_surface_open(void) {
