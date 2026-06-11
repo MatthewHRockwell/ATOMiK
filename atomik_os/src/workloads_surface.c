@@ -310,6 +310,38 @@ void workloads_surface_draw(window_t *w, int x, int y, int wd, int ht) {
         else
             prov = "Illustrative scenario - board verification pending";
         draw_text_aa(FONT_AA_LABEL, ix, ty, prov, rgb(0x5E, 0x6A, 0x80));
+        ty += lh + ATOMIK_GRID_M;
+    }
+
+    /* ── bottom rail: scenario position dots (left) + key hint (right) ── */
+    {
+        int by = y + ht - lh - ATOMIK_GRID_M;
+        int dot_y = by + lh / 2;
+        int dx = ix + 4;
+        for (int i = 0; i < N_WL; i++) {
+            int active = (i == s_scenario);
+            int r = active ? 4 : 3;
+            pixel_t c = active ? ATOMIK_ACCENT : rgb(0x3A, 0x46, 0x60);
+            for (int yy = -r; yy <= r; yy++)
+                for (int xx = -r; xx <= r; xx++)
+                    if (xx*xx + yy*yy <= r*r)
+                        draw_blend_pixel(dx + xx, dot_y + yy, c, active ? 255 : 200);
+            if (active)            /* soft halo on the active dot */
+                for (int g = r+1; g <= r+3; g++) {
+                    uint8_t a = (uint8_t)(50 - (g-r-1)*15);
+                    for (int yy = -g; yy <= g; yy++)
+                        for (int xx = -g; xx <= g; xx++) {
+                            int d2 = xx*xx + yy*yy;
+                            if (d2 > r*r && d2 <= g*g) draw_blend_pixel(dx+xx, dot_y+yy, c, a);
+                        }
+                }
+            dx += 18;
+        }
+        if (lab) {
+            const char *hint = "Press W for the next workload";
+            int hw = text_width_aa(FONT_AA_LABEL, hint);
+            draw_text_aa(FONT_AA_LABEL, ix + iw - hw, by, hint, rgb(0x5E, 0x6A, 0x80));
+        }
     }
 }
 
@@ -318,7 +350,7 @@ void workloads_surface_open(void) {
     const char *e = getenv("ATOMIK_PREVIEW_WL_SCENARIO");
     if (e && *e) workloads_set_scenario(atoi(e));
     if (s_window_id >= 0) { wm_focus(s_window_id); return; }
-    int ww = 780, wh = 600;
+    int ww = 780, wh = 560;
     int wx = (FB_W - ww) / 2, wy = (FB_H - wh) / 2 - 20;
     window_t *win = wm_open("WORKLOADS", wx, wy, ww, wh, workloads_surface_draw, NULL);
     if (win) s_window_id = win->id;
