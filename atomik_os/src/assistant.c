@@ -94,6 +94,18 @@ void assistant_summon_capture_success(void) {
     s_shown_ms = anim_now_ms();
 }
 
+/* v0.42: report "animating" while the character overlay is up so the main
+ * loop keeps repainting (float bob + breathing aura).  Rate-limited to ~6 fps
+ * — smooth enough to read as alive, light enough for the soft CPU. */
+static unsigned long s_last_anim_ms = 0;
+int assistant_animating(void) {
+    if (!s_visible || !s_avatar_loaded) return 0;
+    unsigned long now = anim_now_ms();
+    if (now - s_last_anim_ms < 160) return 0;
+    s_last_anim_ms = now;
+    return 1;
+}
+
 void assistant_dismiss(void) {
     if (!s_visible) return;
     s_visible = 0;
@@ -324,6 +336,21 @@ void assistant_draw(void) {
     int av_x = x + ATOMIK_GRID_L + 4;
     int av_y = y + (h - ASSIST_AVATAR_PX) / 2;
 
+    /* v0.42 Atom float: a gentle vertical bob (+/-4 px, 2.4 s period) synced
+     * to the aura's breathing phase so the character "hovers" alive on the
+     * card.  Driven by anim_now_ms; the main loop repaints while the overlay
+     * is visible (assistant_animating).  Taylor sine — no math.h here. */
+    double assist_sn;
+    {
+        unsigned long now0 = anim_now_ms();
+        double ph = (double)(now0 % 2400) / 2400.0 * 6.2831853;
+        while (ph > 3.14159265) ph -= 6.2831853;
+        while (ph < -3.14159265) ph += 6.2831853;
+        double p3 = ph*ph*ph, p5 = p3*ph*ph;
+        assist_sn = ph - p3/6.0 + p5/120.0;
+    }
+    av_y += (int)(4.0 * assist_sn);
+
     /* v0.39-E aura palette.
      * Cyan is the brand identity for Atom; SUCCESS keeps cyan for
      * the INNER two rings and paints the OUTER ring emerald so the
@@ -361,14 +388,7 @@ void assistant_draw(void) {
      * For SUCCESS the outer ring is emerald, identity stays cyan.
      * Pulse amplitude driven by anim_now_ms so Atom breathes. */
     {
-        unsigned long now = anim_now_ms();
-        double phase = (double)(now % 2400) / 2400.0 * 6.2831853;
-        double s = phase;
-        while (s > 3.14159265) s -= 6.2831853;
-        while (s < -3.14159265) s += 6.2831853;
-        double s3 = s*s*s, s5 = s3*s*s;
-        double sn = s - s3/6.0 + s5/120.0;
-        double pulse = 0.7 + 0.3 * sn;
+        double pulse = 0.7 + 0.3 * assist_sn;   /* synced with the float bob */
         int cx = av_x + ASSIST_AVATAR_PX / 2;
         int cy = av_y + ASSIST_AVATAR_PX / 2;
         for (int layer = 0; layer < 3; layer++) {

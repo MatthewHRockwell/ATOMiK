@@ -773,6 +773,7 @@ int main(int argc, char **argv) {
             }
             if (!need_frame && stocks_changed && s_stocks_id) need_frame = 1;
             if (!need_frame && wl_changed) need_frame = 1;
+            if (!need_frame && assistant_animating()) need_frame = 1;
             if (need_frame) redraw_frame();
         }
     }

@@ -779,7 +779,8 @@ void assistant_summon_mode(assistant_mode_t m);  /* manual with mode pick  */
  * for a real first-LIVE event to fire.  Not user-exposed in the UI
  * vocabulary; the 'G' hotkey is hidden documentation only. */
 void assistant_summon_capture_success(void);
-void assistant_dismiss(void);                    /* hide overlay           */
+void assistant_dismiss(void);
+int  assistant_animating(void);  /* v0.42: overlay alive -> keep repainting */                    /* hide overlay           */
 int  assistant_visible(void);
 void assistant_draw(void);                       /* paint overlay if visible */
 void assistant_tick(void);                       /* per-frame: auto-dismiss */
