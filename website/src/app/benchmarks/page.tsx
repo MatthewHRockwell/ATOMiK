@@ -92,6 +92,15 @@ const artifactInterpretations = [
       "Only the throughput figures are measured; the Resource Fabric lane values and top-bar temperature/efficiency readouts are derived or scenario data, not measured proof. It is a static capture, not an interactive session, and does not prove the in-flight USB keyboard/mouse input.",
   },
   {
+    title: "Verified workload savings on AX7020",
+    href: "/13-workloads-telemetry-verified-ax7020.png",
+    label: "LIVE_MEASURED",
+    proves:
+      "The redesigned conventional-vs-ATOMiK Workloads surface on AX7020 HDMI: an edge-telemetry sync tick moves 2,048 B vs 160 B (92% less data moved) and control coalescing reduces 256 updates to 32 net writes (87% fewer), each verified on the ATOMiK adapter with exact 64-bit LOAD/ACCUM/READ round-trips and a falsification-tested harness. A paired capture mid auto-cycle (14-workloads-coalescing-selfdriving-ax7020.png) shows the untethered board advancing scenarios by itself.",
+    doesNotProve:
+      "Ratios are for deterministic test patterns (92% at 5% change density; 87% at this update locality) - not universal multipliers, power, thermal, or customer outcomes. Self-driving means auto-cycling, not interactive input; USB keyboard/mouse remain in flight. Fabric lane and top-bar values are derived/scenario.",
+  },
+  {
     title: "Parallel-bank throughput on AX7020",
     href: "https://github.com/MatthewHRockwell/ATOMiK/blob/main/hardware/zynq/results/PARALLEL_BANKS_HARDWARE_VALIDATED.md",
     label: "LIVE_MEASURED",

@@ -2,6 +2,16 @@
 
 This map prevents proof artifacts from being blended across versions. Each version proves a different thing.
 
+## Verified Workloads surface + self-driving demo (2026-06-12)
+
+Supersedes the 2026-06-08 Workloads capture as the strongest workload proof: savings comparisons are now adapter-verified and the demo self-drives.
+
+- Packaged artifacts: `13-workloads-telemetry-verified-ax7020.png`, `14-workloads-coalescing-selfdriving-ax7020.png`
+- Evidence label: LIVE_MEASURED (adapter-verified)
+- Capture method: live `fb2png` of `/dev/fb0` on the AX7020 unified bitstream, 2026-06-11/12. The memory scenarios read `/tmp/atomik_workloads_live.txt` written by the on-board `aworkload` tool, which verifies every delta on the ATOMiK adapter (0xF0020000) with a falsification-tested harness; the parallel scenario reads the bench-engine daemon feed.
+- What it supports: conventional-vs-ATOMiK savings measured AND hardware-verified (92% less data on the telemetry tick, 87% fewer writes on coalescing); the untethered board auto-cycles all three scenarios (two captures show different scenarios).
+- What it does NOT support: universal multipliers (pattern-dependent ratios), an interactive session or USB input (in flight), customer/power/thermal/production outcomes; Fabric lane and top-bar values remain derived/scenario.
+
 ## Live Workloads surface (2026-06-08)
 
 First customer-facing workload demo proven end-to-end on hardware.

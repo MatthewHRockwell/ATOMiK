@@ -269,6 +269,13 @@ export const proofToday = [
     href: "/12-workloads-live-ax7020.png",
   },
   {
+    title: "Verified savings on hardware: 92% less data, 87% fewer writes",
+    label: "Live measured",
+    body:
+      "The redesigned Workloads surface shows conventional-vs-ATOMiK side by side on the AX7020: an edge-telemetry sync tick moves 2,048 bytes conventionally vs 160 bytes as deltas (92% less data moved), and 256 control updates coalesce into 32 net writes (87% fewer). Every delta was verified on the ATOMiK adapter with exact 64-bit round-trips using a falsification-tested harness, and the demo self-drives through all three scenarios untethered. Figures are for deterministic test patterns (ratios scale with change density and locality); static captures, not an interactive session.",
+    href: "/13-workloads-telemetry-verified-ax7020.png",
+  },
+  {
     title: "Linux userspace to FPGA validation",
     label: "Hardware validated",
     body:

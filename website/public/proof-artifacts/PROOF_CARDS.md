@@ -80,6 +80,25 @@ Caveat:
 
 Use with `12-workloads-live-ax7020.caption.md`. Scope the numbers to throughput only. Never present as an interactive demo or imply USB input.
 
+## Proof Card: Verified Workload Savings + Self-Driving Demo (AX7020)
+
+Artifact: `13-workloads-telemetry-verified-ax7020.png` + `14-workloads-coalescing-selfdriving-ax7020.png` (captions alongside)
+
+What it proves:
+
+- The redesigned conventional-vs-ATOMiK Workloads surface runs on the AX7020 over HDMI, captured live from `/dev/fb0`.
+- Edge telemetry sync: 2,048 B conventional vs 160 B as deltas per tick — 92% less data moved — adapter-verified (exact 64-bit LOAD/ACCUM/READ round-trips at 0xF0020000, falsification-tested harness).
+- Control coalescing: 256 updates coalesce to 32 net writes — 87% fewer — adapter-verified, final state identical.
+- The demo SELF-DRIVES: the untethered board auto-cycles all three scenarios (two captures ~15s apart show different scenarios).
+
+What it does NOT prove:
+
+- Universal multipliers (92% is at 5% change density; 87% at this update locality — ratios scale with the pattern). Never blend with the retired 7,670x–916,000x range.
+- An interactive session or USB keyboard/mouse input (both still in flight). Self-driving = auto-cycling, not input.
+- Power, thermal, customer-outcome, or production-maturity claims. Fabric/top-bar values remain derived/scenario.
+
+Use with `13-...caption.md` / `14-...caption.md`. Scope every number to its pattern.
+
 ## Proof Card: Zynq HDMI Display (1080p30)
 
 Evidence label: HARDWARE_VALIDATED
