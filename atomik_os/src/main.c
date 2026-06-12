@@ -479,6 +479,7 @@ int main(int argc, char **argv) {
          * returns 1 when it actually changed something so we can
          * force a repaint. */
         int stocks_changed = stocks_tick();
+        int wl_changed = workloads_tick();   /* v0.41 demo auto-cycle */
         /* v0.30: tick the Resource Fabric once per frame so its
          * personality auto-detection re-classifies based on recent
          * LLM/state activity.  Cheap (no I/O, no allocation). */
@@ -771,6 +772,7 @@ int main(int argc, char **argv) {
                 if (top && top->id == s_terminal_id) need_frame = 1;
             }
             if (!need_frame && stocks_changed && s_stocks_id) need_frame = 1;
+            if (!need_frame && wl_changed) need_frame = 1;
             if (need_frame) redraw_frame();
         }
     }

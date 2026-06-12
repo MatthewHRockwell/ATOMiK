@@ -100,7 +100,27 @@ void workloads_set_scenario(int n) {
 }
 
 int  workloads_surface_is_open(void) { return s_window_id >= 0; }
-void workloads_cycle_scenario(void)  { s_scenario = (s_scenario + 1) % N_WL; }
+
+static unsigned long s_last_cycle_ms = 0;
+void workloads_cycle_scenario(void) {
+    s_scenario = (s_scenario + 1) % N_WL;
+    s_last_cycle_ms = anim_now_ms();      /* manual press resets the auto timer */
+}
+
+/* v0.41 standalone demo: when demo mode is on (/tmp/atomik_demo or 'L') and
+ * the surface is open, advance to the next scenario every ~12s so the demo
+ * tells the whole three-workload story with no input attached.  Returns 1
+ * when it cycled (caller repaints). */
+#define WL_DEMO_CYCLE_MS 12000UL
+int workloads_tick(void) {
+    if (s_window_id < 0 || !fabric_demo_enabled()) return 0;
+    unsigned long now = anim_now_ms();
+    if (s_last_cycle_ms == 0) { s_last_cycle_ms = now; return 0; }
+    if (now - s_last_cycle_ms < WL_DEMO_CYCLE_MS) return 0;
+    s_last_cycle_ms = now;
+    s_scenario = (s_scenario + 1) % N_WL;
+    return 1;
+}
 
 /* horizontal comparison bar: a label, a rounded bar of width ∝ value, value
  * text at the end.  Conventional = amber (waste), ATOMiK = green (savings). */
@@ -336,6 +356,9 @@ void workloads_surface_draw(window_t *w, int x, int y, int wd, int ht) {
                         }
                 }
             dx += 18;
+        }
+        if (lab && fabric_demo_enabled()) {
+            draw_text_aa(FONT_AA_LABEL, dx + 4, by, "AUTO", ATOMIK_ACCENT_DIM);
         }
         if (lab) {
             const char *hint = "Press W for the next workload";
