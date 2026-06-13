@@ -336,20 +336,28 @@ void assistant_draw(void) {
     int av_x = x + ATOMIK_GRID_L + 4;
     int av_y = y + (h - ASSIST_AVATAR_PX) / 2;
 
-    /* v0.42 Atom float: a gentle vertical bob (+/-4 px, 2.4 s period) synced
-     * to the aura's breathing phase so the character "hovers" alive on the
-     * card.  Driven by anim_now_ms; the main loop repaints while the overlay
-     * is visible (assistant_animating).  Taylor sine — no math.h here. */
-    double assist_sn;
+    /* v0.42 Atom float: a visible hover — vertical bob (+/-9 px, 2.4 s) plus a
+     * gentle horizontal sway (+/-3 px) a quarter-period out of phase, so the
+     * character traces a slow lazy figure and reads as a living, floating
+     * assistant (not a static sticker).  Synced to the aura's breathing phase.
+     * Driven by anim_now_ms; the main loop repaints while the overlay is
+     * visible (assistant_animating).  Taylor sine — no math.h here. */
+    double assist_sn, assist_cs;
     {
         unsigned long now0 = anim_now_ms();
         double ph = (double)(now0 % 2400) / 2400.0 * 6.2831853;
+        double q  = ph + 1.5707963;   /* +90deg -> cosine for the sway */
         while (ph > 3.14159265) ph -= 6.2831853;
         while (ph < -3.14159265) ph += 6.2831853;
+        while (q  > 3.14159265) q  -= 6.2831853;
+        while (q  < -3.14159265) q  += 6.2831853;
         double p3 = ph*ph*ph, p5 = p3*ph*ph;
         assist_sn = ph - p3/6.0 + p5/120.0;
+        double q3 = q*q*q, q5 = q3*q*q;
+        assist_cs = q - q3/6.0 + q5/120.0;
     }
-    av_y += (int)(4.0 * assist_sn);
+    av_y += (int)(9.0 * assist_sn);
+    av_x += (int)(3.0 * assist_cs);
 
     /* v0.39-E aura palette.
      * Cyan is the brand identity for Atom; SUCCESS keeps cyan for
