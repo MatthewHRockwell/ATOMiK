@@ -38,8 +38,34 @@
 #define ASSIST_AVATAR_PX          160
 #define ASSIST_MARGIN             ATOMIK_GRID_L
 
-static atomik_asset_t   s_avatar;
-static int              s_avatar_loaded = 0;
+/* ── Pose-frame set ───────────────────────────────────────────────────────
+ * Atom is no longer a single static sticker: he has a set of pose assets,
+ * selected by mood + a summon-entrance gesture + a blink overlay.  Only IDLE
+ * is required; every other pose is optional and falls back to IDLE when its
+ * art isn't present, so new hand-authored poses (wave, point, …) light up the
+ * moment their .atomik_asset is dropped in /tmp/atomik_assets/ — no code
+ * change.  Generate poses with tools/prep_assistant_poses.py. */
+typedef enum {
+    POSE_IDLE = 0,   /* calm float — the default, required                  */
+    POSE_BLINK,      /* eyes shut — swapped in during the blink window      */
+    POSE_HAPPY,      /* SUCCESS mood                                        */
+    POSE_ALERT,      /* WARNING mood                                        */
+    POSE_THINK,      /* THINKING mood                                       */
+    POSE_WAVE,       /* greeting gesture played briefly on summon           */
+    POSE_COUNT
+} atom_pose_t;
+static const char *const POSE_FILE[POSE_COUNT] = {
+    "/tmp/atomik_assets/assistant_idle_160.atomik_asset",
+    "/tmp/atomik_assets/assistant_blink_160.atomik_asset",
+    "/tmp/atomik_assets/assistant_happy_160.atomik_asset",
+    "/tmp/atomik_assets/assistant_alert_160.atomik_asset",
+    "/tmp/atomik_assets/assistant_think_160.atomik_asset",
+    "/tmp/atomik_assets/assistant_wave_160.atomik_asset",
+};
+static atomik_asset_t   s_pose[POSE_COUNT];
+static int              s_pose_ok[POSE_COUNT];
+#define s_avatar        s_pose[POSE_IDLE]        /* back-compat alias */
+#define s_avatar_loaded s_pose_ok[POSE_IDLE]
 static int              s_visible       = 0;
 static unsigned long    s_shown_ms      = 0;
 static assistant_mode_t   s_mode          = ASSIST_EXPLAIN;
@@ -52,16 +78,34 @@ static unsigned long    s_last_dismiss_ms  = 0;
 static int s_last_x, s_last_y, s_last_w, s_last_h;
 
 int assistant_init(void) {
-    if (s_avatar_loaded) return 1;
-    int rc = atomik_asset_load(
-        "/tmp/atomik_assets/assistant_idle_160.atomik_asset",
-        &s_avatar);
-    if (rc != 0) {
-        memset(&s_avatar, 0, sizeof s_avatar);
-        return 0;
+    if (s_pose_ok[POSE_IDLE]) return 1;
+    /* Load every pose that exists; only IDLE is mandatory. */
+    int any_optional = 0;
+    for (int p = 0; p < POSE_COUNT; p++) {
+        if (s_pose_ok[p]) continue;
+        if (atomik_asset_load(POSE_FILE[p], &s_pose[p]) == 0) {
+            s_pose_ok[p] = 1;
+            if (p != POSE_IDLE) any_optional++;
+        } else {
+            memset(&s_pose[p], 0, sizeof s_pose[p]);
+        }
     }
-    s_avatar_loaded = 1;
+    (void)any_optional;
+    if (!s_pose_ok[POSE_IDLE]) return 0;   /* no idle art → fall back to text box */
     return 1;
+}
+
+/* Which pose to draw this frame: a brief greeting wave on summon, then the
+ * mood pose (falling back to IDLE if that mood's art is absent). */
+static atom_pose_t active_pose(unsigned long now) {
+    if (s_pose_ok[POSE_WAVE] && (now - s_shown_ms) < 900) return POSE_WAVE;
+    switch (s_mode) {
+    case ASSIST_SUCCESS:  if (s_pose_ok[POSE_HAPPY]) return POSE_HAPPY; break;
+    case ASSIST_WARNING:  if (s_pose_ok[POSE_ALERT]) return POSE_ALERT; break;
+    case ASSIST_THINKING: if (s_pose_ok[POSE_THINK]) return POSE_THINK; break;
+    default: break;
+    }
+    return POSE_IDLE;
 }
 
 void assistant_summon(void) {
@@ -443,22 +487,25 @@ void assistant_draw(void) {
         }
     }
 
-    if (s_avatar_loaded) {
-        atomik_asset_blit(&s_avatar, av_x, av_y);
-        /* Periodic blink — briefly paint the dark face color over Atom's eye
-         * band so he reads as sentient, not a frozen sticker.  Eyes sit on the
-         * near-black face screen at ~0.32-0.46 H, ~0.35-0.69 W of the 156x160
-         * asset; the lid rect stays well inside that screen so it never spills
-         * onto the silver shell.  ~150 ms blink every ~3.6 s, anim-clock driven
-         * (the float already keeps the frame repainting).  SUCCESS blinks a
-         * touch quicker — an excited Atom. */
+    if (s_pose_ok[POSE_IDLE]) {
+        unsigned long now = anim_now_ms();
+        atom_pose_t pose = active_pose(now);
+        /* blink window: ~150 ms every ~3.6 s (2.6 s when excited). */
         unsigned blink_period = (s_mode == ASSIST_SUCCESS) ? 2600 : 3600;
-        if ((anim_now_ms() % blink_period) < 150) {
+        int blinking = ((now % blink_period) < 150);
+        /* Prefer a real eyes-shut frame; only on the calm IDLE pose (mood
+         * poses carry their own expression). */
+        if (blinking && pose == POSE_IDLE && s_pose_ok[POSE_BLINK]) pose = POSE_BLINK;
+        atomik_asset_blit(&s_pose[pose], av_x, av_y);
+        /* Procedural blink fallback when no baked POSE_BLINK art: paint the
+         * measured face-screen black over Atom's eye band (well inside the dark
+         * screen, never onto the silver shell). */
+        if (blinking && pose == POSE_IDLE && !s_pose_ok[POSE_BLINK]) {
             int ex0 = av_x + (int)(ASSIST_AVATAR_PX * 0.35);
             int ex1 = av_x + (int)(ASSIST_AVATAR_PX * 0.69);
             int ey0 = av_y + (int)(ASSIST_AVATAR_PX * 0.30);
-            int ey1 = av_y + (int)(ASSIST_AVATAR_PX * 0.49);  /* full eye, above the smile */
-            pixel_t lid = rgb(0x20, 0x16, 0x1A);   /* measured face-screen black */
+            int ey1 = av_y + (int)(ASSIST_AVATAR_PX * 0.49);
+            pixel_t lid = rgb(0x20, 0x16, 0x1A);
             for (int yy = ey0; yy < ey1; yy++)
                 for (int xx = ex0; xx < ex1; xx++)
                     draw_pixel(xx, yy, lid);
