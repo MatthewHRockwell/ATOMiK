@@ -428,6 +428,18 @@ int main(int argc, char **argv) {
         fabric_seed_waveforms();   /* lively Resource Fabric waves for the capture */
         /* v0.41: open a named surface for the host shot (layout verify only). */
         if (getenv("ATOMIK_PREVIEW_WORKLOAD")) workloads_surface_open();
+        /* v0.42: summon Atom in a chosen mood for animation host-shots:
+         * ATOMIK_PREVIEW_ASSIST=success|thinking|warning|explain */
+        {
+            const char *am = getenv("ATOMIK_PREVIEW_ASSIST");
+            if (am) {
+                assistant_mode_t m = ASSIST_EXPLAIN;
+                if      (!strcmp(am, "success"))  m = ASSIST_SUCCESS;
+                else if (!strcmp(am, "thinking")) m = ASSIST_THINKING;
+                else if (!strcmp(am, "warning"))  m = ASSIST_WARNING;
+                assistant_summon_mode(m);
+            }
+        }
         /* Optional warm-up: run N frames (ticking fabric/status each) before
          * the final dump so time-evolving surfaces — the self-driving demo
          * workload, building waveforms — are visible in the capture.  Default

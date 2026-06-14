@@ -336,16 +336,29 @@ void assistant_draw(void) {
     int av_x = x + ATOMIK_GRID_L + 4;
     int av_y = y + (h - ASSIST_AVATAR_PX) / 2;
 
-    /* v0.42 Atom float: a visible hover — vertical bob (+/-9 px, 2.4 s) plus a
-     * gentle horizontal sway (+/-3 px) a quarter-period out of phase, so the
-     * character traces a slow lazy figure and reads as a living, floating
-     * assistant (not a static sticker).  Synced to the aura's breathing phase.
+    /* v0.42 Atom float: a visible hover that takes on the MOOD of why Atom
+     * appeared.  A vertical bob + a quarter-phase horizontal sway, but the
+     * period (tempo), vertical amplitude, and lateral amplitude all shift by
+     * mode so the motion reinforces the aura's color cue:
+     *   SUCCESS  — fast, tall, springy bounce (excited)
+     *   THINKING — quick, shallow pulse with more sway (busy processing)
+     *   WARNING  — slow, low, wide wary drift
+     *   EXPLAIN/IDLE — the calm lazy float (default)
      * Driven by anim_now_ms; the main loop repaints while the overlay is
      * visible (assistant_animating).  Taylor sine — no math.h here. */
+    unsigned period_ms; double amp_y, amp_x;
+    switch (s_mode) {
+    case ASSIST_SUCCESS:  period_ms = 1500; amp_y = 12.0; amp_x = 2.0; break;
+    case ASSIST_THINKING: period_ms = 1100; amp_y = 5.0;  amp_x = 5.0; break;
+    case ASSIST_WARNING:  period_ms = 3200; amp_y = 6.0;  amp_x = 5.0; break;
+    case ASSIST_EXPLAIN:
+    case ASSIST_IDLE:
+    default:              period_ms = 2400; amp_y = 9.0;  amp_x = 3.0; break;
+    }
     double assist_sn, assist_cs;
     {
         unsigned long now0 = anim_now_ms();
-        double ph = (double)(now0 % 2400) / 2400.0 * 6.2831853;
+        double ph = (double)(now0 % period_ms) / (double)period_ms * 6.2831853;
         double q  = ph + 1.5707963;   /* +90deg -> cosine for the sway */
         while (ph > 3.14159265) ph -= 6.2831853;
         while (ph < -3.14159265) ph += 6.2831853;
@@ -356,8 +369,8 @@ void assistant_draw(void) {
         double q3 = q*q*q, q5 = q3*q*q;
         assist_cs = q - q3/6.0 + q5/120.0;
     }
-    av_y += (int)(9.0 * assist_sn);
-    av_x += (int)(3.0 * assist_cs);
+    av_y += (int)(amp_y * assist_sn);
+    av_x += (int)(amp_x * assist_cs);
 
     /* v0.39-E aura palette.
      * Cyan is the brand identity for Atom; SUCCESS keeps cyan for
