@@ -95,6 +95,24 @@ int assistant_init(void) {
     return 1;
 }
 
+/* Demo/capture override: if /tmp/atomik_assist_force holds a mood word, every
+ * summon is pinned to it so a specific pose/mood can be photographed
+ * deterministically (the demo otherwise picks the mood from events).  Returns
+ * the forced mode, or the passed-in default when the file is absent/empty. */
+static assistant_mode_t forced_mode(assistant_mode_t deflt) {
+    FILE *f = fopen("/tmp/atomik_assist_force", "r");
+    if (!f) return deflt;
+    char b[16] = {0};
+    char *got = fgets(b, sizeof b, f);
+    fclose(f);
+    if (!got) return deflt;
+    if (!strncmp(b, "success", 7))  return ASSIST_SUCCESS;
+    if (!strncmp(b, "thinking", 8)) return ASSIST_THINKING;
+    if (!strncmp(b, "warning", 7))  return ASSIST_WARNING;
+    if (!strncmp(b, "explain", 7))  return ASSIST_EXPLAIN;
+    return deflt;
+}
+
 /* Which pose to draw this frame: a brief greeting wave on summon, then the
  * mood pose (falling back to IDLE if that mood's art is absent). */
 static atom_pose_t active_pose(unsigned long now) {
@@ -119,7 +137,7 @@ void assistant_summon_mode(assistant_mode_t m) {
         return;
     }
     if (!s_avatar_loaded) assistant_init();
-    s_mode     = m;
+    s_mode     = forced_mode(m);          /* demo/capture mood pin */
     s_src      = ASSIST_SRC_MANUAL;       /* v0.39-D — manual entry */
     s_visible  = 1;
     s_shown_ms = anim_now_ms();
@@ -132,7 +150,7 @@ void assistant_summon_capture_success(void) {
      * cleanly (else two halos can overlap during animation). */
     if (s_visible) { assistant_dismiss(); }
     if (!s_avatar_loaded) assistant_init();
-    s_mode     = ASSIST_SUCCESS;
+    s_mode     = forced_mode(ASSIST_SUCCESS);
     s_src      = ASSIST_SRC_FIRST_LIVE;
     s_visible  = 1;
     s_shown_ms = anim_now_ms();
@@ -214,7 +232,7 @@ void assistant_on_personality_change(personality_t old_p,
     if (!s_avatar_loaded) assistant_init();
     /* v0.39-C: personality switch is an explanation moment.
      * v0.39-D: title becomes "<P> workload detected". */
-    s_mode     = ASSIST_EXPLAIN;
+    s_mode     = forced_mode(ASSIST_EXPLAIN);
     s_src      = ASSIST_SRC_SWITCH;
     s_visible  = 1;
     s_shown_ms = now;
@@ -228,7 +246,7 @@ void assistant_on_first_live(personality_t p) {
     if (!s_avatar_loaded) assistant_init();
     /* v0.39-C: data started flowing — good news, success halo.
      * v0.39-D: title becomes "<P> data live". */
-    s_mode     = ASSIST_SUCCESS;
+    s_mode     = forced_mode(ASSIST_SUCCESS);
     s_src      = ASSIST_SRC_FIRST_LIVE;
     s_visible  = 1;
     s_shown_ms = now;
