@@ -445,6 +445,24 @@ void assistant_draw(void) {
 
     if (s_avatar_loaded) {
         atomik_asset_blit(&s_avatar, av_x, av_y);
+        /* Periodic blink — briefly paint the dark face color over Atom's eye
+         * band so he reads as sentient, not a frozen sticker.  Eyes sit on the
+         * near-black face screen at ~0.32-0.46 H, ~0.35-0.69 W of the 156x160
+         * asset; the lid rect stays well inside that screen so it never spills
+         * onto the silver shell.  ~150 ms blink every ~3.6 s, anim-clock driven
+         * (the float already keeps the frame repainting).  SUCCESS blinks a
+         * touch quicker — an excited Atom. */
+        unsigned blink_period = (s_mode == ASSIST_SUCCESS) ? 2600 : 3600;
+        if ((anim_now_ms() % blink_period) < 150) {
+            int ex0 = av_x + (int)(ASSIST_AVATAR_PX * 0.35);
+            int ex1 = av_x + (int)(ASSIST_AVATAR_PX * 0.69);
+            int ey0 = av_y + (int)(ASSIST_AVATAR_PX * 0.30);
+            int ey1 = av_y + (int)(ASSIST_AVATAR_PX * 0.49);  /* full eye, above the smile */
+            pixel_t lid = rgb(0x20, 0x16, 0x1A);   /* measured face-screen black */
+            for (int yy = ey0; yy < ey1; yy++)
+                for (int xx = ex0; xx < ex1; xx++)
+                    draw_pixel(xx, yy, lid);
+        }
     } else {
         /* Fallback — violet placeholder rectangle with "Atom" text. */
         int aw = ASSIST_AVATAR_PX;
