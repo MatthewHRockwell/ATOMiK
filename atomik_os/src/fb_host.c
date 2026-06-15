@@ -41,6 +41,10 @@ void fb_enable_scanout(int enable) { (void)enable; }   /* no MMIO on host */
 
 /* PNG writing is shared with the board backend via png_write.c. */
 void fb_present(void) {
+    /* The live-loop repro harness calls redraw_frame() thousands of times to
+     * exercise the draw paths for leak/crash detection; skip the per-frame PNG
+     * encode (the bottleneck) when ATOMIK_NO_PRESENT is set. */
+    if (getenv("ATOMIK_NO_PRESENT")) return;
     const char *path = getenv("ATOMIK_SHOT");
     if (!path) path = "/tmp/atomik_host_shot.png";
     png_write_xrgb(path, (const uint32_t *)s_back, FB_W, FB_H);

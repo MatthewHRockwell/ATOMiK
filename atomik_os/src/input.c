@@ -154,11 +154,18 @@ void input_close(void) {
     s_n_mouse = 0;
 }
 
+/* Once stdin hits EOF (it was a regular file like the launcher's keystroke
+ * file, or /dev/null), a closed/EOF fd polls as PERMANENTLY readable — so
+ * leaving it in the poll set makes input_poll return instantly every call and
+ * the whole compositor busy-spins at 100% CPU.  Drop stdin from the poll set
+ * after EOF so the loop idles on timeout_ms again. */
+static int s_stdin_eof = 0;
+
 event_t input_poll(int timeout_ms) {
     event_t ev = { EV_NONE, 0, 0, 0 };
     struct pollfd pfd[1 + MAX_KBDS + MAX_MICE];
     int nfd = 0;
-    pfd[nfd].fd = 0; pfd[nfd].events = POLLIN; nfd++;
+    pfd[nfd].fd = s_stdin_eof ? -1 : 0; pfd[nfd].events = POLLIN; nfd++;  /* -1 = ignored by poll */
     for (int i = 0; i < s_n_kbd; i++) {
         pfd[nfd].fd = s_kbd_fd[i]; pfd[nfd].events = POLLIN; nfd++;
     }
@@ -172,10 +179,13 @@ event_t input_poll(int timeout_ms) {
     /* stdin first — preserves UART-relay semantics. */
     if (pfd[0].revents & POLLIN) {
         char c = 0;
-        if (read(0, &c, 1) == 1) {
+        ssize_t r = read(0, &c, 1);
+        if (r == 1) {
             if (c == 'q' || c == 'Q' || c == 0x03) ev.kind = EV_QUIT;
             else { ev.kind = EV_KEY; ev.key = (int)(unsigned char)c; }
             return ev;
+        } else if (r == 0) {
+            s_stdin_eof = 1;   /* EOF — stop polling stdin to avoid a busy-spin */
         }
     }
 

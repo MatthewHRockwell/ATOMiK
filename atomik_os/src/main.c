@@ -419,6 +419,60 @@ int main(int argc, char **argv) {
     fabric_open();
     redraw_frame();    /* second paint so Fabric is visible immediately */
 
+    /* ── Host live-loop repro harness (ATOMIK_PREVIEW_LIVELOOP) ───────────────
+     * Runs the REAL per-frame tick + redraw cycle over a fast-forwarded sim
+     * clock, with Atom summoned, so time-triggered runtime crashes (e.g. the
+     * ~12 s Atom auto-dismiss segfault) reproduce on the host under a
+     * sanitizer — something the single-shot preview can't do because it never
+     * runs the live event loop.  Build with -fsanitize=address for a trace.
+     *   ATOMIK_LIVELOOP_MS=N    total sim ms (default 16000, past the 12 s dismiss)
+     *   ATOMIK_LIVELOOP_SUMMON=N  ms at which Atom is summoned (default 2000) */
+    if (getenv("ATOMIK_PREVIEW_LIVELOOP")) {
+        seed_demo_usage();
+        fabric_seed_waveforms();
+        fabric_demo_enable(1);          /* match the board's self-driving demo  */
+        workloads_surface_open();       /* Workloads open, as on the board      */
+        const char *fm = getenv("ATOMIK_LIVELOOP_MODE");
+        assistant_mode_t lm = ASSIST_EXPLAIN;
+        if (fm) {
+            if      (!strcmp(fm, "thinking")) lm = ASSIST_THINKING;
+            else if (!strcmp(fm, "success"))  lm = ASSIST_SUCCESS;
+            else if (!strcmp(fm, "warning"))  lm = ASSIST_WARNING;
+        }
+        long total  = getenv("ATOMIK_LIVELOOP_MS") ? atol(getenv("ATOMIK_LIVELOOP_MS")) : 40000;
+        long summon = getenv("ATOMIK_LIVELOOP_SUMMON") ? atol(getenv("ATOMIK_LIVELOOP_SUMMON")) : 2000;
+        long next_summon = summon;
+        for (long t = 0; t <= total; t += 16) {
+            anim_set_sim_time((unsigned long)t);
+            /* re-summon after each auto-dismiss so multiple summon/dismiss
+             * cycles run (the board's demo re-summons on each event). */
+            if (t >= next_summon && !assistant_visible()) {
+                assistant_summon_mode(lm);
+                next_summon = t + 13000;   /* dismiss is at +12s; re-arm after */
+            }
+            stocks_tick();
+            workloads_tick();
+            fabric_tick();
+            bench_tick();
+            wlmeasure_tick();
+            state_watch_tick();
+            replica_flow_tick();
+            status_tick();
+            redraw_frame();   /* drives assistant_tick (auto-dismiss) + draw */
+            if ((t % 1000) == 0) {
+                long rss_kb = 0;
+                FILE *sf = fopen("/proc/self/statm", "r");
+                if (sf) { long pages = 0, res = 0;
+                    if (fscanf(sf, "%ld %ld", &pages, &res) == 2) rss_kb = res * (sysconf(_SC_PAGESIZE) / 1024);
+                    fclose(sf); }
+                fprintf(stderr, "[liveloop] sim t=%ldms  RSS=%ldKB\n", t, rss_kb);
+            }
+        }
+        fprintf(stderr, "[liveloop] survived %ldms — no crash\n", total);
+        fb_close();
+        return 0;
+    }
+
     /* Host preview build: redraw_frame() above already wrote the PNG via the
      * host fb backend.  Exit instead of entering the interactive input loop
      * so `make host-shot` dumps a faithful frame of the REAL renderer in

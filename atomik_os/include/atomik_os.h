@@ -1193,6 +1193,7 @@ void         document_draw(window_t *w, int x, int y, int wd, int ht);
  * common easing curves. The compositor checks anim_dirty() each frame to
  * decide whether to schedule another redraw. */
 unsigned long anim_now_ms(void);
+void          anim_set_sim_time(unsigned long ms);  /* host repro harness: inject clock */
 double        anim_ease_out(double t);  /* t in [0,1] */
 double        anim_lerp(double a, double b, double t);
 /* Drive open-window age tracking. Returns 0..1 for the fade-in tween. */
