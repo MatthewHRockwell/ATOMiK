@@ -515,6 +515,14 @@ int main(int argc, char **argv) {
         return 0;
     }
 
+    /* Demo/capture startup hook: open the Workloads surface on launch if the
+     * flag file exists — robust where the stdin 'w' keystroke is timing-flaky
+     * (the launcher just `touch`es it). */
+    if (access("/tmp/atomik_open_workloads", F_OK) == 0) {
+        workloads_surface_open();
+        redraw_frame();
+    }
+
     unsigned long autoshot_start = anim_now_ms();
     while (s_running) {
         /* v0.40 in-OS auto-capture: once the demo workload has had time to
