@@ -122,6 +122,28 @@ def transfer(s, local_path, remote_path, label):
     cmd(s, f"gunzip -c /tmp/{label}.gz > {remote_path} && chmod +x {remote_path}")
     cmd(s, f"stat -c%s {remote_path}")
 
+
+def transfer_verified(s, local_path, remote_path, label, tries=5):
+    """transfer() + confirm the on-board file is the exact expected size, with
+    retries.  The ttyUSB byte-doubling can silently corrupt a transfer (the
+    gunzip fails or the file lands wrong) yet deploy used to march on — that is
+    how the AA fonts went missing while deploy still reported VERSION OK."""
+    want = os.path.getsize(local_path)
+    for k in range(tries):
+        transfer(s, local_path, remote_path, label)
+        got = cmd_capture(s, f"stat -c%s {remote_path} 2>&1", t=8) or ""
+        if str(want) in got:
+            if k:
+                print(f"[deploy]  {label}: verified {want}B (try {k+1})", flush=True)
+            return True
+        print(f"[deploy]  {label}: SIZE MISMATCH (got {got.strip()[-16:]!r}, "
+              f"want {want}) — re-shipping (try {k+1}/{tries})", flush=True)
+        time.sleep(1)
+    print(f"[deploy]  {label}: FAILED to land after {tries} tries — UI/fonts "
+          f"may be wrong on board!", flush=True)
+    return False
+
+
 def expected_version():
     """Read AOS_VERSION from atomik_os.h so we know what string the new
     binary should self-stamp."""
@@ -307,9 +329,9 @@ def main():
         # original transfer (e.g. /tmp/atomiik_os) and left it non-executable.
         cmd(s, f"chmod +x {REMOTE}; ls -la {REMOTE} | head -1")
     else:
-        transfer(s, LOCAL, REMOTE, "aos")
+        transfer_verified(s, LOCAL, REMOTE, "aos")
     if (not args.no_binary) and (not args.no_fb2png) and os.path.exists(FB2PNG_LOCAL):
-        transfer(s, FB2PNG_LOCAL, FB2PNG_REMOTE, "fb2png")
+        transfer_verified(s, FB2PNG_LOCAL, FB2PNG_REMOTE, "fb2png")
 
     # v0.36: ship .atomik_asset files so the board can blit pre-rendered
     # backgrounds (Class B per ChatGPT 2026-05-09).  Each asset goes to
@@ -328,12 +350,17 @@ def main():
             asset_files.sort()
             if asset_files:
                 cmd(s, "mkdir -p /tmp/atomik_assets", log=False)
+                missing_assets = []
                 for local in asset_files:
                     name = os.path.basename(local)
                     remote = f"/tmp/atomik_assets/{name}"
                     label = f"asset_{name.split('.')[0]}"
                     print(f"[deploy] shipping asset: {name}", flush=True)
-                    transfer(s, local, remote, label)
+                    if not transfer_verified(s, local, remote, label):
+                        missing_assets.append(name)
+                if missing_assets:
+                    print(f"[deploy]  WARNING: assets did NOT land: {missing_assets}",
+                          flush=True)
 
     # v0.38-K: ship .atomik_font atlases to /tmp/atomik_fonts/ — DECOUPLED
     # from --no-assets (v0.40): fonts are the premium-typography essential,
@@ -346,12 +373,25 @@ def main():
                                  if f.endswith(".atomik_font")])
             if font_files:
                 cmd(s, "mkdir -p /tmp/atomik_fonts", log=False)
+                missing_fonts = []
                 for name in font_files:
                     local = os.path.join(fonts_dir, name)
                     remote = f"/tmp/atomik_fonts/{name}"
                     label = f"font_{name.split('.')[0]}"
                     print(f"[deploy] shipping font: {name}", flush=True)
-                    transfer(s, local, remote, label)
+                    if not transfer_verified(s, local, remote, label):
+                        missing_fonts.append(name)
+                # Fonts are the premium-typography essential: a missing atlas
+                # means the whole UI falls back to the blocky pixel font.  Make
+                # this LOUD instead of a silent "VERSION OK".
+                if missing_fonts:
+                    print(f"[deploy]  *** FONTS DID NOT LAND: {missing_fonts} — "
+                          f"the board UI will render in the pixel-font fallback. "
+                          f"Re-run the deploy or ship fonts manually. ***",
+                          flush=True)
+                else:
+                    print(f"[deploy]  all {len(font_files)} AA fonts verified on board",
+                          flush=True)
 
     if args.no_launch:
         print("[deploy] --no-launch set; not starting.")
