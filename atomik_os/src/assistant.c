@@ -434,6 +434,20 @@ void assistant_draw(void) {
     av_y += (int)(amp_y * assist_sn);
     av_x += (int)(amp_x * assist_cs);
 
+    /* v0.42 entrance: for the first ~320 ms after summon, Atom slides up into
+     * place (eased) so he "arrives" rather than popping in — a small touch that
+     * reads as a living assistant.  Uses the sim/real anim clock. */
+    {
+        unsigned long age = anim_now_ms() - s_shown_ms;
+        if (age < 320) {
+            double t = (double)age / 320.0;          /* 0..1 */
+            double slide = (1.0 - anim_ease_out(t));  /* 1..0 */
+            av_y += (int)(14.0 * slide);              /* start 14 px low (within the
+                                                       * card margin — no poke-out),
+                                                       * ease up to settle */
+        }
+    }
+
     /* v0.39-E aura palette.
      * Cyan is the brand identity for Atom; SUCCESS keeps cyan for
      * the INNER two rings and paints the OUTER ring emerald so the
