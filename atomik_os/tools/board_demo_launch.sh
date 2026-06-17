@@ -12,6 +12,13 @@
 # via the /tmp/atomik_open_workloads startup hook (robust; not the flaky 'w' key).
 [ -e /dev/mem ] || mknod /dev/mem c 1 1
 [ -e /dev/fb0 ] || mknod /dev/fb0 c 29 0
+# USB HID input nodes (minimal initramfs has a static /dev; the input
+# layer registers the device but no node is auto-created). Needs the
+# kernel booted with 'irqpoll' so the USB controller IRQ is serviced
+# (the chipidea IRQ isn't delivered via PS IRQ_P2F -> see DEMO.md).
+mkdir -p /dev/input
+[ -e /dev/input/event0 ] || mknod /dev/input/event0 c 13 64
+[ -e /dev/input/event1 ] || mknod /dev/input/event1 c 13 65
 echo 0 > /sys/class/vtconsole/vtcon1/bind 2>/dev/null
 pkill -9 atomik_os 2>/dev/null
 sleep 1

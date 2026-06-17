@@ -16,7 +16,7 @@ source /opt/Xilinx/2025.2/Vivado/settings64.sh
 ATOMIK_BITSTREAM=hardware/zynq/litex-build-nax64-mbus-irq/gateware/hamgeek_rk7020f.bit \
   python3 hardware/zynq/fsbl_build/jtag_load_all_then_boot.py
 ```
-~96s to load + `Liftoff`. The NaxRiscv Linux console is on **/dev/ttyUSB2**
+~96s to load + `Liftoff`. **The DTB must carry `irqpoll` in bootargs** (hardware/zynq/litex-build/linux_nax64.dtb) — without it the USB controller's IRQ is never delivered to the CPU (PS IRQ_P2F doesn't propagate the chipidea level IRQ) and USB HID never enumerates (-110). The NaxRiscv Linux console is on **/dev/ttyUSB2**
 (probe for the `root@atomik-rv64` shell; the port varies per enumeration).
 
 ## 2. Deploy (verified — fonts/assets/binary are size-checked + retried)
