@@ -276,6 +276,13 @@ export const proofToday = [
     href: "/13-workloads-telemetry-verified-ax7020.png",
   },
   {
+    title: "All three workloads on hardware",
+    label: "Live measured",
+    body:
+      "All three customer Workloads scenarios on the AX7020 with the production typography: telemetry sync (92% less data), control coalescing (87% fewer writes), and parallel aggregate (8x faster). The two memory scenarios are adapter-verified with exact 64-bit round-trips; parallel is measured on the bench engine. Ratios are pattern-dependent, not universal multipliers; static captures, not interactive.",
+    href: "/15-workloads-all3-board-ax7020.png",
+  },
+  {
     title: "Linux userspace to FPGA validation",
     label: "Hardware validated",
     body:
