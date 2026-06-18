@@ -298,6 +298,9 @@ void bench_tick(void);                  /* refresh cached sweep (~2s) + alloc */
 const bench_point_t *bench_sweep_points(int *n); /* cached 1/2/4/8 sweep      */
 int  bench_active_banks(void);          /* current (demo-cycled) allocation   */
 int  bench_source(void);                /* metric_source_t: METRIC_LIVE/WAITING */
+const char *bench_result_hex(void);     /* merged accumulator, identical at every bank count ("" if unknown) */
+int  bench_result_identical(void);      /* 1 = every bank count produced the SAME result (order-independence) */
+int  bench_take_dirty(void);            /* one-shot: sweep data/source changed since last call */
 void bench_register_metrics(void);      /* register bench.* LIVE metrics      */
 
 /* perf_counter.c declarations live below the personality_t enum.

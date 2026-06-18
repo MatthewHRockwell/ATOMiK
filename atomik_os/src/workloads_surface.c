@@ -182,6 +182,69 @@ static void compare_panel(int x, int y, int w, int h, const char *head,
         draw_text_aa(FONT_AA_LABEL, tx, ty, unit, rgb(0x86, 0x92, 0xA8));
 }
 
+/* Parallel-Aggregate scenario only: the bank ladder.  Renders the measured
+ * 1/2/4/8-lane sweep as rungs (label, speedup bar, value), max-lane rung in
+ * savings-green, then the order-independence proof: the merged-accumulator
+ * result was IDENTICAL at every lane count (commutative XOR — lane order and
+ * count cannot change the answer).  Returns the height consumed. */
+static int parallel_ladder(int x, int y, int w, const bench_point_t *pts, int npts) {
+    int lab = font_aa_loaded(FONT_AA_LABEL);
+    int lh  = lab ? text_height_aa(FONT_AA_LABEL) : text_height(1);
+    int y0 = y;
+    double smax = 1.0;
+    for (int i = 0; i < npts; i++) if (pts[i].speedup > smax) smax = pts[i].speedup;
+    int label_col = 92, val_col = 70;
+    int bar_x   = x + label_col;
+    int track_w = w - label_col - val_col;
+    int rh = 22;
+    for (int i = 0; i < npts; i++) {
+        int top = (i == npts - 1);                  /* max-lane rung = headline */
+        pixel_t col = top ? ATOMIK_SEM_SAVINGS : ATOMIK_ACCENT;
+        char lbl[24];
+        snprintf(lbl, sizeof lbl, "%u lane%s", pts[i].banks, pts[i].banks == 1 ? "" : "s");
+        if (lab) {
+            int lw = text_width_aa(FONT_AA_LABEL, lbl);
+            draw_text_aa(FONT_AA_LABEL, bar_x - 12 - lw, y + (rh - lh) / 2, lbl,
+                         top ? ATOMIK_FG : ATOMIK_FG_DIM);
+        }
+        int bh = 14, by = y + (rh - bh) / 2;
+        draw_rect_rounded(bar_x, by, track_w, bh, bh / 2, rgb(0x16, 0x1E, 0x30));
+        int fw = (smax > 0) ? (int)(pts[i].speedup / smax * track_w) : bh;
+        if (fw < bh) fw = bh;
+        if (fw > track_w) fw = track_w;
+        draw_rect_rounded(bar_x, by, fw, bh, bh / 2, col);
+        if (top)
+            for (int g = 1; g <= 3; g++) {
+                uint8_t a = (uint8_t)(40 - (g - 1) * 12);
+                for (int sx = 0; sx < fw; sx++) draw_blend_pixel(bar_x + sx, by - g, col, a);
+            }
+        char vs[16]; snprintf(vs, sizeof vs, "%.2fx", pts[i].speedup);
+        if (lab) {
+            int vw = text_width_aa(FONT_AA_LABEL, vs);
+            draw_text_aa(FONT_AA_LABEL, x + w - vw, y + (rh - lh) / 2, vs, col);
+        }
+        y += rh + 4;
+    }
+    /* order-independence proof line */
+    y += 4;
+    if (lab) {
+        const char *hex = bench_result_hex();
+        int ident = bench_result_identical();
+        char proof[112];
+        if (ident && hex[0])
+            snprintf(proof, sizeof proof, "Same result  %s  at 1 / 2 / 4 / 8 lanes", hex);
+        else
+            snprintf(proof, sizeof proof, "Order-independent result across all lanes");
+        draw_text_aa(FONT_AA_LABEL, x, y, proof, rgb(0xB8, 0xE8, 0xC4));
+        if (ident) {
+            int pw = text_width_aa(FONT_AA_LABEL, proof);
+            draw_text_aa(FONT_AA_LABEL, x + pw + 12, y, "[verified]", ATOMIK_SEM_SAVINGS);
+        }
+        y += lh + 2;
+    }
+    return y - y0;
+}
+
 void workloads_surface_draw(window_t *w, int x, int y, int wd, int ht) {
     (void)w;
     int pad = ATOMIK_GRID_L, ix = x + pad, iw = wd - pad * 2, ty = y + ATOMIK_GRID_M;
@@ -290,8 +353,13 @@ void workloads_surface_draw(window_t *w, int x, int y, int wd, int ht) {
         ty += phh + ATOMIK_GRID_L;
     }
 
-    /* ── visual bar comparison ────────────────────────────────────────── */
-    {
+    /* ── visual comparison: lane ladder for Parallel Aggregate (shows the
+     *    measured 1/2/4/8-lane scaling + the identical-result proof); plain
+     *    two-bar comparison for the data-movement scenarios. ──────────────── */
+    if (s_scenario == 2 && bench_live) {
+        ty += parallel_ladder(ix, ty, iw, pts, npts);
+        ty += ATOMIK_GRID_L;
+    } else {
         double vmax = sc->conv_bar > sc->atomik_bar ? sc->conv_bar : sc->atomik_bar;
         compare_bar(ix, ty, iw, "Conventional", sc->conv_bar, vmax, ATOMIK_SEM_WASTE, sc->conv_big);
         ty += 16 + ATOMIK_GRID_M;

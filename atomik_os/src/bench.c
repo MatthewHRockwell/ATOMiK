@@ -29,8 +29,20 @@ static int            s_nbanks = 8;
 static int            s_source = METRIC_WAITING;
 static unsigned long  s_last_ms = 0;
 static int            s_active_idx = 0;
+static char           s_result_hex[24] = "";   /* merged accumulator (identical across banks) */
+static int            s_identical = 0;          /* every parsed data row had the same result   */
+static int            s_dirty = 0;              /* parsed data changed since last consumed      */
+static int            s_prev_source = -1;
+static uint32_t       s_prev_cyc0 = 0;
 
 static const uint32_t k_banks[BENCH_N_POINTS] = {1, 2, 4, 8};
+
+const char *bench_result_hex(void)   { return s_result_hex; }
+int  bench_result_identical(void)    { return s_identical; }
+/* one-shot: 1 if the sweep data/source changed since the last call.  The
+ * main loop uses this to force a repaint when live numbers first arrive or
+ * refresh (the surface launches with no input, so nothing else would). */
+int  bench_take_dirty(void)          { int d = s_dirty; s_dirty = 0; return d; }
 
 static int is_known_bank(uint32_t b) {
     return b == 1 || b == 2 || b == 4 || b == 8;
@@ -61,6 +73,7 @@ static int parse_file(int *all_match) {
     uint32_t base_cyc = 0;
     char line[256];
     int nbanks = s_nbanks;
+    char first_hex[24] = ""; int hex_seen = 0, hex_ident = 1;
 
     while (fgets(line, sizeof line, f)) {
         if (strstr(line, "ALL MATCH")) *all_match = 1;
@@ -78,9 +91,29 @@ static int parse_file(int *all_match) {
             if (banks == 1) base_cyc = cycles;
             p->speedup  = 0.0;     /* filled below once base_cyc known */
             p->verified = 0;       /* set from all_match below */
+
+            /* capture the per-row merged-accumulator result and confirm every
+             * bank count produced the SAME value — that identity IS the
+             * order-independence proof (commutative XOR; lane order/count
+             * cannot change the answer). */
+            const char *hx = strstr(line, "0x");
+            if (hx) {
+                char tok[24]; int j = 0;
+                while (j < 23 && ((hx[j] == 'x' || hx[j] == 'X') ||
+                                  (hx[j] >= '0' && hx[j] <= '9') ||
+                                  (hx[j] >= 'a' && hx[j] <= 'f') ||
+                                  (hx[j] >= 'A' && hx[j] <= 'F')))
+                    { tok[j] = hx[j]; j++; }
+                tok[j] = '\0';
+                if (!hex_seen) { strncpy(first_hex, tok, sizeof first_hex - 1); hex_seen = 1; }
+                else if (strcmp(tok, first_hex) != 0) hex_ident = 0;
+            }
         }
     }
     fclose(f);
+
+    s_identical = (npts > 0 && hex_seen && hex_ident && *all_match) ? 1 : 0;
+    if (s_identical) strncpy(s_result_hex, first_hex, sizeof s_result_hex - 1);
 
     if (npts == 0) return 0;
     if (base_cyc == 0) base_cyc = pts[0].cycles;   /* fallback if no 1-bank row */
@@ -111,6 +144,13 @@ void bench_tick(void) {
         s_source = METRIC_WAITING;
         if (npts == 0) s_npts = 0;
     }
+
+    /* flag a repaint if the source flipped (e.g. WAITING->LIVE when the first
+     * sweep lands) or the measured cycles changed. */
+    uint32_t cyc0 = (s_npts > 0) ? s_pts[0].cycles : 0;
+    if (s_source != s_prev_source || cyc0 != s_prev_cyc0) s_dirty = 1;
+    s_prev_source = s_source;
+    s_prev_cyc0   = cyc0;
 
     /* tiny debug breadcrumb (few hundred bytes) for off-board confirmation */
     FILE *d = fopen("/tmp/atomik_bench_dbg.txt", "w");

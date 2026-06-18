@@ -847,6 +847,10 @@ int main(int argc, char **argv) {
             }
             if (!need_frame && stocks_changed && s_stocks_id) need_frame = 1;
             if (!need_frame && wl_changed) need_frame = 1;
+            /* live parallel-bank sweep refreshed -> repaint the open Workloads
+             * surface (it launches with no input; nothing else would). */
+            { int bd = bench_take_dirty();
+              if (!need_frame && bd && workloads_surface_is_open()) need_frame = 1; }
             if (!need_frame && assistant_animating()) need_frame = 1;
             if (need_frame) redraw_frame();
         }
