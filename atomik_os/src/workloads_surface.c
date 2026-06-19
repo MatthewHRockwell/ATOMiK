@@ -20,6 +20,13 @@
 static int s_window_id = -1;
 static int s_scenario  = 0;          /* active scenario tab (0..N_WL-1) */
 
+/* v0.42 interactive: cursor-selected lane rung on the Parallel Aggregate card.
+ * -1 = default (max lanes).  The ladder records each rung's on-screen rect at
+ * draw time so a click can hit-test it. */
+static int s_sel_idx = -1;
+static int s_rung_x = 0, s_rung_w = 0, s_rung_h = 0, s_rung_n = 0;
+static int s_rung_y[BENCH_N_POINTS];
+
 /* set the active scenario (board: 'W' re-press cycles; preview: env). */
 void workloads_set_scenario(int n);  /* fwd (declared in header below if needed) */
 
@@ -100,6 +107,21 @@ void workloads_set_scenario(int n) {
 }
 
 int  workloads_surface_is_open(void) { return s_window_id >= 0; }
+
+/* v0.42 interactive: hit-test a screen-space click against the lane ladder.
+ * Returns 1 if it selected a rung (caller repaints).  The ladder records its
+ * rung rects at draw time. */
+int workloads_surface_handle_click(int mx, int my) {
+    if (s_window_id < 0 || s_scenario != 2 || s_rung_n <= 0) return 0;
+    if (mx < s_rung_x || mx > s_rung_x + s_rung_w) return 0;
+    for (int i = 0; i < s_rung_n; i++) {
+        if (my >= s_rung_y[i] && my < s_rung_y[i] + s_rung_h) {
+            s_sel_idx = i;
+            return 1;
+        }
+    }
+    return 0;
+}
 
 static unsigned long s_last_cycle_ms = 0;
 void workloads_cycle_scenario(void) {
@@ -197,15 +219,27 @@ static int parallel_ladder(int x, int y, int w, const bench_point_t *pts, int np
     int bar_x   = x + label_col;
     int track_w = w - label_col - val_col;
     int rh = 22;
+    /* the cursor-selected rung (default = max lanes); record geometry so a
+     * click can hit-test the rows. */
+    int sel = (s_sel_idx >= 0 && s_sel_idx < npts) ? s_sel_idx : npts - 1;
+    s_rung_x = x; s_rung_w = w; s_rung_h = rh; s_rung_n = npts;
     for (int i = 0; i < npts; i++) {
-        int top = (i == npts - 1);                  /* max-lane rung = headline */
-        pixel_t col = top ? ATOMIK_SEM_SAVINGS : ATOMIK_ACCENT;
+        s_rung_y[i] = y;
+        int chosen = (i == sel);                    /* the featured config */
+        pixel_t col = chosen ? ATOMIK_SEM_SAVINGS : ATOMIK_ACCENT;
         char lbl[24];
         snprintf(lbl, sizeof lbl, "%u lane%s", pts[i].banks, pts[i].banks == 1 ? "" : "s");
+        /* selection chevron on the chosen rung */
+        if (chosen) {
+            for (int t = 0; t < 5; t++) {
+                draw_rect(x, y + (rh - 9) / 2 + t,     5 - t, 1, ATOMIK_SEM_SAVINGS);
+                draw_rect(x, y + (rh - 9) / 2 + 8 - t, 5 - t, 1, ATOMIK_SEM_SAVINGS);
+            }
+        }
         if (lab) {
             int lw = text_width_aa(FONT_AA_LABEL, lbl);
             draw_text_aa(FONT_AA_LABEL, bar_x - 12 - lw, y + (rh - lh) / 2, lbl,
-                         top ? ATOMIK_FG : ATOMIK_FG_DIM);
+                         chosen ? ATOMIK_FG : ATOMIK_FG_DIM);
         }
         int bh = 14, by = y + (rh - bh) / 2;
         draw_rect_rounded(bar_x, by, track_w, bh, bh / 2, rgb(0x16, 0x1E, 0x30));
@@ -213,7 +247,7 @@ static int parallel_ladder(int x, int y, int w, const bench_point_t *pts, int np
         if (fw < bh) fw = bh;
         if (fw > track_w) fw = track_w;
         draw_rect_rounded(bar_x, by, fw, bh, bh / 2, col);
-        if (top)
+        if (chosen)
             for (int g = 1; g <= 3; g++) {
                 uint8_t a = (uint8_t)(40 - (g - 1) * 12);
                 for (int sx = 0; sx < fw; sx++) draw_blend_pixel(bar_x + sx, by - g, col, a);
@@ -254,15 +288,22 @@ void workloads_surface_draw(window_t *w, int x, int y, int wd, int ht) {
     /* live bench data overwrites the parallel-aggregate scenario numbers. */
     int npts = 0; const bench_point_t *pts = bench_sweep_points(&npts);
     int bench_live = (bench_source() == METRIC_LIVE) && npts >= 2;
-    static char conv_cyc[16], atk_cyc[16], sav_str[24];
+    /* the cursor-selected lane config (default = max lanes) drives the
+     * featured ATOMiK side; the conventional side stays the 1-lane baseline. */
+    int sel = (s_sel_idx >= 0 && s_sel_idx < npts) ? s_sel_idx : (npts > 0 ? npts - 1 : 0);
+    static char conv_cyc[16], atk_cyc[16], sav_str[24], atk_how[44];
     if (bench_live) {
-        long base = (long)pts[0].cycles, fast = (long)pts[npts-1].cycles;
+        long base = (long)pts[0].cycles, fast = (long)pts[sel].cycles;
         snprintf(conv_cyc, sizeof conv_cyc, "%ld", base);
         snprintf(atk_cyc,  sizeof atk_cyc,  "%ld", fast);
-        snprintf(sav_str, sizeof sav_str, "%.0fx FASTER", pts[npts-1].speedup);
+        if (sel == 0) snprintf(sav_str, sizeof sav_str, "BASELINE (1 lane)");
+        else          snprintf(sav_str, sizeof sav_str, "%.0fx FASTER", pts[sel].speedup);
+        snprintf(atk_how, sizeof atk_how, "%u lane%s, lock-free, all at once",
+                 pts[sel].banks, pts[sel].banks == 1 ? "" : "s");
         s_wl[2].conv_big = conv_cyc; s_wl[2].atomik_big = atk_cyc;
         s_wl[2].conv_bar = (double)base; s_wl[2].atomik_bar = (double)fast;
         s_wl[2].savings = sav_str;
+        s_wl[2].atomik_how = atk_how;
     }
     s_wl[2].live = bench_live;
 
@@ -429,7 +470,9 @@ void workloads_surface_draw(window_t *w, int x, int y, int wd, int ht) {
             draw_text_aa(FONT_AA_LABEL, dx + 4, by, "AUTO", ATOMIK_ACCENT_DIM);
         }
         if (lab) {
-            const char *hint = "Press W for the next workload";
+            const char *hint = (s_scenario == 2)
+                ? "Click a lane to select  /  W for next workload"
+                : "Press W for the next workload";
             int hw = text_width_aa(FONT_AA_LABEL, hint);
             draw_text_aa(FONT_AA_LABEL, ix + iw - hw, by, hint, rgb(0x5E, 0x6A, 0x80));
         }
@@ -440,6 +483,9 @@ void workloads_surface_open(void) {
     /* preview: pick scenario via env so each can be screenshotted. */
     const char *e = getenv("ATOMIK_PREVIEW_WL_SCENARIO");
     if (e && *e) workloads_set_scenario(atoi(e));
+    /* preview: pre-select a lane rung for host shots of the interactive state. */
+    const char *es = getenv("ATOMIK_PREVIEW_WL_SEL");
+    if (es && *es) s_sel_idx = atoi(es);
     if (s_window_id >= 0) { wm_focus(s_window_id); return; }
     int ww = 780, wh = 560;
     int wx = (FB_W - ww) / 2, wy = (FB_H - wh) / 2 - 20;

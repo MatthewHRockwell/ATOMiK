@@ -832,6 +832,10 @@ int main(int argc, char **argv) {
                 else if (a == ACT_OPEN_ASSISTANT) assistant_summon();
                 else if (a == ACT_OPEN_WORKLOAD)  workloads_surface_open();
                 if (a != ACT_NONE) agent_log(a); else agent_log(ACT_DOCK_HOVER);
+            } else if (ev.kind == EV_MOUSE_DOWN &&
+                       workloads_surface_handle_click(ev.mx, ev.my)) {
+                /* v0.42: clicked a lane rung on the Parallel Aggregate card —
+                 * select that bank config; the repaint below features it. */
             } else {
                 s_dock_hover = slot;   /* hover highlight follows the cursor */
             }
