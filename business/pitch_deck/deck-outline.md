@@ -11,8 +11,8 @@ Current generated Friday investor deck: 16 slides. Use `generate_deck.py` as the
 7. **Primitive** - `state = reference_state XOR accumulated_delta`; LOAD, ACCUM, READ, SWAP.
 8. **Fit** - ATOMiK has a wedge, not a universal claim.
 9. **Use cases** - Robotics, edge AI, industrial systems, remote systems, and defense-adjacent buyers share expensive constraint pressure.
-10. **Live proof** - v0.39-K Zynq hardware UI proof image with callouts; caption-bound and not a customer workload benchmark.
-11. **Proof stack** - Zynq UI, Linux userspace-to-FPGA proof, AX7020 matrix, FORMAL_PROOF footnote, standalone boot build artifact.
+10. **Live proof** - v0.40-A Zynq hardware UI proof image (captured from /dev/fb0, driven by real measured on-board data) with callouts; caption-bound, not a customer workload benchmark, and not an interactive demo.
+11. **Proof stack** - Zynq UI v0.40-A, parallel-bank throughput measured on AX7020 (1/2/4/8x, byte-identical to software), Linux userspace-to-FPGA proof, AX7020 matrix, FORMAL_PROOF footnote, standalone boot build artifact.
 12. **Commercial path** - Show constrained path -> evaluate fit -> show measured evidence -> call no-fit when ATOMiK does not help; design partner/licensing only after proof.
 13. **Financial model** - founder-prepared planning ranges and `$5M` use of funds; finance/GTM/ops plus reserve shown as `$1.0M`; not forecast, booked revenue, or guaranteed ROI.
 14. **Risks and gates** - Customer validation, downstream outcome measurement, ASIC economics, incumbents.

@@ -13,6 +13,15 @@ function clip(value: unknown, max = 450) {
 function buildMetadata(body: Record<string, unknown>): LeadMetadata {
   return {
     source: clip(body.source) || 'newsletter',
+    cta: clip(body.cta),
+    intent: clip(body.intent),
+    landing_path: clip(body.landing_path),
+    referrer: clip(body.referrer),
+    utm_source: clip(body.utm_source),
+    utm_medium: clip(body.utm_medium),
+    utm_campaign: clip(body.utm_campaign),
+    utm_content: clip(body.utm_content),
+    utm_term: clip(body.utm_term),
     name: clip(body.name),
     role: clip(body.role),
     company: clip(body.company),
@@ -55,6 +64,12 @@ async function persistToStripe(email: string, metadata: LeadMetadata) {
       ...metadata,
       lead_submissions: String(Number.isFinite(priorCount) ? priorCount + 1 : 1),
       latest_source: metadata.source,
+      latest_cta: metadata.cta,
+      latest_intent: metadata.intent,
+      latest_landing_path: metadata.landing_path,
+      latest_utm_source: metadata.utm_source,
+      latest_utm_medium: metadata.utm_medium,
+      latest_utm_campaign: metadata.utm_campaign,
       latest_requested_path: metadata.requested_path,
       latest_pain_category: metadata.pain_category,
       latest_timeline: metadata.timeline,
@@ -86,6 +101,13 @@ function compactLead(email: string, metadata: LeadMetadata) {
   return {
     email,
     source: metadata.source,
+    cta: metadata.cta,
+    intent: metadata.intent,
+    landing_path: metadata.landing_path,
+    referrer: metadata.referrer,
+    utm_source: metadata.utm_source,
+    utm_medium: metadata.utm_medium,
+    utm_campaign: metadata.utm_campaign,
     name: metadata.name,
     company: metadata.company,
     role: metadata.role,
@@ -108,6 +130,10 @@ function leadText(email: string, metadata: LeadMetadata) {
     metadata.company ? `Company: ${metadata.company}` : '',
     metadata.role ? `Role: ${metadata.role}` : '',
     metadata.source ? `Source: ${metadata.source}` : '',
+    metadata.cta ? `CTA: ${metadata.cta}` : '',
+    metadata.intent ? `Intent slug: ${metadata.intent}` : '',
+    metadata.landing_path ? `Landing path: ${metadata.landing_path}` : '',
+    metadata.utm_campaign ? `UTM campaign: ${metadata.utm_campaign}` : '',
     metadata.requested_path ? `Intent: ${metadata.requested_path}` : '',
     metadata.pain_category ? `Pain: ${metadata.pain_category}` : '',
     metadata.timeline ? `Timeline: ${metadata.timeline}` : '',
@@ -127,9 +153,15 @@ function slackPayload(email: string, metadata: LeadMetadata) {
     ['Company', metadata.company],
     ['Role', metadata.role],
     ['Source', metadata.source],
+    ['CTA', metadata.cta],
+    ['Intent slug', metadata.intent],
     ['Intent', metadata.requested_path],
+    ['Landing', metadata.landing_path],
+    ['UTM campaign', metadata.utm_campaign],
     ['Pain', metadata.pain_category],
     ['Timeline', metadata.timeline],
+    ['Use case', metadata.use_case],
+    ['Stack', metadata.current_stack],
   ]
     .filter(([, value]) => value)
     .map(([label, value]) => ({ type: 'mrkdwn', text: `*${label}:*\n${value}` }));
@@ -156,17 +188,23 @@ function discordPayload(email: string, metadata: LeadMetadata) {
     ['Company', metadata.company],
     ['Role', metadata.role],
     ['Source', metadata.source],
+    ['CTA', metadata.cta],
+    ['Intent slug', metadata.intent],
     ['Intent', metadata.requested_path],
+    ['Landing', metadata.landing_path],
+    ['UTM campaign', metadata.utm_campaign],
     ['Pain', metadata.pain_category],
     ['Timeline', metadata.timeline],
     ['Use case', metadata.use_case],
+    ['Stack', metadata.current_stack],
     ['Message', metadata.message],
   ]
     .filter(([, value]) => value)
-    .map(([name, value]) => ({ name, value: String(value).slice(0, 1024), inline: name !== 'Message' && name !== 'Use case' }));
+    .map(([name, value]) => ({ name, value: String(value).slice(0, 1024), inline: name !== 'Message' && name !== 'Use case' && name !== 'Stack' }));
 
   return {
     content: `New ATOMiK lead: ${metadata.company || metadata.name || email}`,
+    allowed_mentions: { parse: [] },
     embeds: [
       {
         title: 'New ATOMiK lead',
@@ -190,7 +228,12 @@ function buildWebhookPayload(email: string, metadata: LeadMetadata, format: Lead
 
 function logLeadAlert(email: string, metadata: LeadMetadata, deliveryPaths: string[]) {
   console.warn('[LEAD_ALERT] ' + JSON.stringify({
-    ...compactLead(email, metadata),
+    email_domain: email.split('@')[1] || 'unknown',
+    source: metadata.source,
+    intent: metadata.intent,
+    requested_path: metadata.requested_path,
+    pain_category: metadata.pain_category,
+    timeline: metadata.timeline,
     delivery_paths: deliveryPaths,
     stripe_customer_record: deliveryPaths.includes('stripe'),
     webhook_delivered: deliveryPaths.includes('webhook'),
@@ -273,12 +316,12 @@ export async function POST(req: NextRequest) {
     if (!stored) {
       console.error('[SUBSCRIBE] Lead not captured: ' + normalized, { source: metadata.source, path: metadata.requested_path, errors });
       return NextResponse.json(
-        { error: 'Lead capture is temporarily unavailable. Please email mrockwell@atomik.tech directly.' },
+        { error: 'Lead capture is temporarily unavailable. Please email matthew.h.rockwell@gmail.com directly.' },
         { status: 503 }
       );
     }
 
-    console.log('[SUBSCRIBE] captured ' + normalized + ' (source: ' + metadata.source + '; path: ' + (metadata.requested_path || 'n/a') + '; delivery: ' + deliveryPaths.join(',') + ')');
+    console.log('[SUBSCRIBE] captured lead (domain: ' + (normalized.split('@')[1] || 'unknown') + '; source: ' + metadata.source + '; path: ' + (metadata.requested_path || 'n/a') + '; delivery: ' + deliveryPaths.join(',') + ')');
 
     return NextResponse.json({ success: true });
   } catch (error) {

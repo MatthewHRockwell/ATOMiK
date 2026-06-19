@@ -21,8 +21,7 @@ import re
 import signal
 import sys
 import threading
-import time
-from http.server import HTTPServer, BaseHTTPRequestHandler
+from http.server import BaseHTTPRequestHandler, HTTPServer
 
 PROC_ATOMIK = "/proc/atomik"
 PROC_ATOMIK_COW = "/proc/atomik/cow"
@@ -52,9 +51,9 @@ def check_health():
 def read_file(path):
     """Read entire file contents, return None on failure."""
     try:
-        with open(path, "r") as f:
+        with open(path) as f:
             return f.read()
-    except (OSError, IOError):
+    except OSError:
         return None
 
 
@@ -120,9 +119,7 @@ def collect_metrics():
     lines.append("# HELP atomik_info ATOMiK module information.")
     lines.append("# TYPE atomik_info gauge")
     lines.append(
-        'atomik_info{{version="{v}",backend="{b}",license="{l}"}} 1'.format(
-            v=version, b=backend, l=license_val
-        )
+        f'atomik_info{{version="{version}",backend="{backend}",license="{license_val}"}} 1'
     )
 
     # -- Core operations (counters) --
@@ -130,36 +127,34 @@ def collect_metrics():
     ops_accum = kv_u64(proc_all, "ops_accum")
     ops_read = kv_u64(proc_all, "ops_read")
     ops_swap = kv_u64(proc_all, "ops_swap")
-    ops_total = kv_u64(proc_all, "ops_total",
-                       ops_load + ops_accum + ops_read + ops_swap)
 
     lines.append("")
     lines.append("# HELP atomik_ops_total Total ATOMiK operations by type.")
     lines.append("# TYPE atomik_ops_total counter")
-    lines.append('atomik_ops_total{{op="load"}} {}'.format(ops_load))
-    lines.append('atomik_ops_total{{op="accum"}} {}'.format(ops_accum))
-    lines.append('atomik_ops_total{{op="read"}} {}'.format(ops_read))
-    lines.append('atomik_ops_total{{op="swap"}} {}'.format(ops_swap))
+    lines.append(f'atomik_ops_total{{op="load"}} {ops_load}')
+    lines.append(f'atomik_ops_total{{op="accum"}} {ops_accum}')
+    lines.append(f'atomik_ops_total{{op="read"}} {ops_read}')
+    lines.append(f'atomik_ops_total{{op="swap"}} {ops_swap}')
 
     lines.append("")
     lines.append("# HELP atomik_ops_load_total Total LOAD operations.")
     lines.append("# TYPE atomik_ops_load_total counter")
-    lines.append("atomik_ops_load_total {}".format(ops_load))
+    lines.append(f"atomik_ops_load_total {ops_load}")
 
     lines.append("")
     lines.append("# HELP atomik_ops_accum_total Total ACCUM operations.")
     lines.append("# TYPE atomik_ops_accum_total counter")
-    lines.append("atomik_ops_accum_total {}".format(ops_accum))
+    lines.append(f"atomik_ops_accum_total {ops_accum}")
 
     lines.append("")
     lines.append("# HELP atomik_ops_read_total Total READ operations.")
     lines.append("# TYPE atomik_ops_read_total counter")
-    lines.append("atomik_ops_read_total {}".format(ops_read))
+    lines.append(f"atomik_ops_read_total {ops_read}")
 
     lines.append("")
     lines.append("# HELP atomik_ops_swap_total Total SWAP operations.")
     lines.append("# TYPE atomik_ops_swap_total counter")
-    lines.append("atomik_ops_swap_total {}".format(ops_swap))
+    lines.append(f"atomik_ops_swap_total {ops_swap}")
 
     # -- Fingerprinting --
     fp_checks = kv_u64(proc_all, "fp_checks")
@@ -171,7 +166,7 @@ def collect_metrics():
         "Total fingerprint checks performed."
     )
     lines.append("# TYPE atomik_fp_checks_total counter")
-    lines.append("atomik_fp_checks_total {}".format(fp_checks))
+    lines.append(f"atomik_fp_checks_total {fp_checks}")
 
     lines.append("")
     lines.append(
@@ -179,7 +174,7 @@ def collect_metrics():
         "Fingerprint checks that found no change."
     )
     lines.append("# TYPE atomik_fp_unchanged_total counter")
-    lines.append("atomik_fp_unchanged_total {}".format(fp_unchanged))
+    lines.append(f"atomik_fp_unchanged_total {fp_unchanged}")
 
     # -- COW metrics --
     cow_faults = kv_u64(proc_all, "cow_faults")
@@ -191,7 +186,7 @@ def collect_metrics():
     lines.append("")
     lines.append("# HELP atomik_cow_faults_total Total COW faults observed.")
     lines.append("# TYPE atomik_cow_faults_total counter")
-    lines.append("atomik_cow_faults_total {}".format(cow_faults))
+    lines.append(f"atomik_cow_faults_total {cow_faults}")
 
     lines.append("")
     lines.append(
@@ -199,7 +194,7 @@ def collect_metrics():
         "COW copies that were redundant (no actual change)."
     )
     lines.append("# TYPE atomik_cow_redundant_total counter")
-    lines.append("atomik_cow_redundant_total {}".format(cow_redundant))
+    lines.append(f"atomik_cow_redundant_total {cow_redundant}")
 
     lines.append("")
     lines.append(
@@ -207,7 +202,7 @@ def collect_metrics():
         "Total bytes copied during COW faults."
     )
     lines.append("# TYPE atomik_cow_bytes_copied_total counter")
-    lines.append("atomik_cow_bytes_copied_total {}".format(cow_bytes_copied))
+    lines.append(f"atomik_cow_bytes_copied_total {cow_bytes_copied}")
 
     lines.append("")
     lines.append(
@@ -215,7 +210,7 @@ def collect_metrics():
         "Bytes saved by eliminating redundant COW copies."
     )
     lines.append("# TYPE atomik_cow_bytes_saved_total counter")
-    lines.append("atomik_cow_bytes_saved_total {}".format(cow_bytes_saved))
+    lines.append(f"atomik_cow_bytes_saved_total {cow_bytes_saved}")
 
     lines.append("")
     lines.append(
@@ -223,7 +218,7 @@ def collect_metrics():
         "Percentage of COW copies that were redundant (0-100)."
     )
     lines.append("# TYPE atomik_cow_redundancy_rate gauge")
-    lines.append("atomik_cow_redundancy_rate {}".format(cow_rate))
+    lines.append(f"atomik_cow_redundancy_rate {cow_rate}")
 
     # -- Network metrics --
     net_sends = kv_u64(proc_all, "net_sends")
@@ -237,7 +232,7 @@ def collect_metrics():
         "# HELP atomik_net_sends_total Total network sends tracked."
     )
     lines.append("# TYPE atomik_net_sends_total counter")
-    lines.append("atomik_net_sends_total {}".format(net_sends))
+    lines.append(f"atomik_net_sends_total {net_sends}")
 
     lines.append("")
     lines.append(
@@ -245,14 +240,14 @@ def collect_metrics():
         "Network sends that were redundant."
     )
     lines.append("# TYPE atomik_net_redundant_total counter")
-    lines.append("atomik_net_redundant_total {}".format(net_redundant))
+    lines.append(f"atomik_net_redundant_total {net_redundant}")
 
     lines.append("")
     lines.append(
         "# HELP atomik_net_bytes_total Total network bytes tracked."
     )
     lines.append("# TYPE atomik_net_bytes_total counter")
-    lines.append("atomik_net_bytes_total {}".format(net_bytes))
+    lines.append(f"atomik_net_bytes_total {net_bytes}")
 
     lines.append("")
     lines.append(
@@ -261,7 +256,7 @@ def collect_metrics():
     )
     lines.append("# TYPE atomik_net_bytes_redundant_total counter")
     lines.append(
-        "atomik_net_bytes_redundant_total {}".format(net_bytes_redundant)
+        f"atomik_net_bytes_redundant_total {net_bytes_redundant}"
     )
 
     lines.append("")
@@ -270,7 +265,7 @@ def collect_metrics():
         "Percentage of network sends that were redundant (0-100)."
     )
     lines.append("# TYPE atomik_net_redundancy_rate gauge")
-    lines.append("atomik_net_redundancy_rate {}".format(net_rate))
+    lines.append(f"atomik_net_redundancy_rate {net_rate}")
 
     lines.append("")
     return "\n".join(lines) + "\n"
@@ -311,7 +306,7 @@ class MetricsHandler(BaseHTTPRequestHandler):
                 self.wfile.write(body.encode("utf-8"))
             except Exception as e:
                 log.error("error collecting metrics: %s", e)
-                msg = "Error collecting metrics: {}\n".format(e)
+                msg = f"Error collecting metrics: {e}\n"
                 self.send_response(500)
                 self.send_header("Content-Type", "text/plain")
                 self.send_header("Content-Length", str(len(msg)))
@@ -350,7 +345,7 @@ def main():
         "--port",
         type=int,
         default=DEFAULT_PORT,
-        help="HTTP port to listen on (default: {})".format(DEFAULT_PORT),
+        help=f"HTTP port to listen on (default: {DEFAULT_PORT})",
     )
     parser.add_argument(
         "--log-level",

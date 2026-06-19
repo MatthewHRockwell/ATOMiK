@@ -18,6 +18,62 @@ void about_draw(window_t *w, int x, int y, int wd, int ht);    /* about.c */
 void monitor_draw(window_t *w, int x, int y, int wd, int ht);  /* monitor.c */
 /* terminal_draw, terminal_send_key, terminal_start declared in atomik_os.h */
 
+/* Representative recent-usage history so PREDICTIVE INSIGHTS shows real,
+ * differentiated predictions.  The predictor is real (agent_score); this is a
+ * demo warm-start, analogous to the Fabric's perf-sample seed. */
+static void seed_demo_usage(void) {
+    static const action_t seq[] = {
+        ACT_OPEN_CHAT, ACT_OPEN_CODE, ACT_OPEN_TERMINAL, ACT_OPEN_DOCUMENT,
+        ACT_OPEN_DOCUMENT, ACT_OPEN_CODE, ACT_OPEN_DOCUMENT, ACT_OPEN_DOCUMENT,
+        ACT_OPEN_CODE, ACT_OPEN_DOCUMENT, ACT_OPEN_DOCUMENT, ACT_OPEN_DOCUMENT,
+    };
+    for (unsigned i = 0; i < sizeof(seq) / sizeof(seq[0]); i++) agent_log(seq[i]);
+}
+
+/* v0.41 pointer cursor — classic tilted arrow, white fill + dark edge so it
+ * reads on any background.  Hotspot at the top-left tip (mx,my).  Drawn LAST
+ * each frame (above all chrome).  No-op until a mouse device is present. */
+static void cursor_draw(void) {
+    int cx_ovr = -1, cy_ovr = -1;
+    const char *pc = getenv("ATOMIK_PREVIEW_CURSOR");  /* "x,y" for host shots */
+    if (pc && *pc) { int a = -1, b = -1; if (sscanf(pc, "%d,%d", &a, &b) == 2) { cx_ovr = a; cy_ovr = b; } }
+    if (!input_mouse_present() && cx_ovr < 0) return;
+    static const char *CUR[18] = {
+        "E         ",
+        "EE        ",
+        "EFE       ",
+        "EFFE      ",
+        "EFFFE     ",
+        "EFFFFE    ",
+        "EFFFFFE   ",
+        "EFFFFFFE  ",
+        "EFFFFFFFE ",
+        "EFFFFFFFFE",
+        "EFFFFEEEEE",
+        "EFFEFFE   ",
+        "EFE EFFE  ",
+        "EE  EFFE  ",
+        "E    EFFE ",
+        "     EFFE ",
+        "      EFFE",
+        "      EEEE",
+    };
+    int x0 = cx_ovr >= 0 ? cx_ovr : input_mouse_x();
+    int y0 = cy_ovr >= 0 ? cy_ovr : input_mouse_y();
+    pixel_t fillc = rgb(0xF0, 0xF6, 0xFF);
+    pixel_t edge  = rgb(0x06, 0x0A, 0x14);
+    for (int r = 0; r < 18; r++) {
+        for (int c = 0; c < 10; c++) {
+            char ch = CUR[r][c];
+            if (ch == ' ') continue;
+            int px = x0 + c, py = y0 + r;
+            if (px < 0 || px >= FB_W || py < 0 || py >= FB_H) continue;
+            draw_pixel(px, py, ch == 'F' ? fillc : edge);
+        }
+    }
+    dirty_rect(x0, y0, 10, 18);
+}
+
 static void redraw_frame(void) {
     /* v0.38-A: tile-based dirty tracking.  Each visible surface
      * declares the rect it touches via dirty_rect() during its draw
@@ -41,6 +97,7 @@ static void redraw_frame(void) {
     assistant_tick();   /* v0.39-A: auto-dismiss timeout check */
     assistant_draw();   /* v0.39-A: summoned Atom overlay on top of chrome */
     notify_draw();
+    cursor_draw();      /* v0.41: pointer cursor — topmost layer */
     fb_present();
     dirty_finalize_frame();
 }
@@ -298,6 +355,26 @@ int main(int argc, char **argv) {
         }
     }
 
+    /* v0.40: /tmp/atomik_demo present => start the self-driving demo workload
+     * so a deploy capture shows live Fabric activity (lanes cycling ACTIVE with
+     * real on-board perf-bench data) without fragile UART keystroke injection.
+     * 'L' toggles it at runtime. */
+    {
+        FILE *df = fopen("/tmp/atomik_demo", "r");
+        if (df) { fabric_demo_enable(1); seed_demo_usage(); fabric_seed_waveforms(); fclose(df); }
+    }
+
+    /* v0.40 in-OS AUTO-CAPTURE: /tmp/atomik_autoshot => after AUTOSHOT_MS of
+     * runtime, atomik_os snapshots its OWN screen to /tmp/atomik_autoshot.png
+     * and writes /tmp/atomik_autoshot.done — no host/UART command touches the
+     * OS during render, so the capture is clean (no console-input bleed, no
+     * window clutter). The deploy host just waits silently then pulls the PNG. */
+    int autoshot = 0, autoshot_done = 0;
+    {
+        FILE *as = fopen("/tmp/atomik_autoshot", "r");
+        if (as) { autoshot = 1; fclose(as); }
+    }
+
     if (fb_open() < 0) { fprintf(stderr, "fb_open failed\n"); return 1; }
     fb_clear(0);
     fb_present();
@@ -321,6 +398,11 @@ int main(int argc, char **argv) {
      * provider.  Surfaces can now consume by ID through metric_get(),
      * and the Pulse Bar's "DATA:" badge reads metric_worst_source(). */
     metric_init();
+    /* v0.40: live parallel-bank throughput producer.  Maps the bench engine
+     * @0xF0021000 (O_RDWR) and registers bench.* LIVE metrics.  Non-fatal:
+     * if the engine/mem is absent it stays WAITING and the surface dims. */
+    bench_open();
+    bench_register_metrics();
     /* v0.38-A: tile-based dirty-region tracker.  Components declare
      * their dirty rects each frame; redraw_frame() finalizes per-
      * frame stats so the VISUAL Resource Fabric lane reflects real
@@ -337,7 +419,125 @@ int main(int argc, char **argv) {
     fabric_open();
     redraw_frame();    /* second paint so Fabric is visible immediately */
 
+    /* ── Host live-loop repro harness (ATOMIK_PREVIEW_LIVELOOP) ───────────────
+     * Runs the REAL per-frame tick + redraw cycle over a fast-forwarded sim
+     * clock, with Atom summoned, so time-triggered runtime crashes (e.g. the
+     * ~12 s Atom auto-dismiss segfault) reproduce on the host under a
+     * sanitizer — something the single-shot preview can't do because it never
+     * runs the live event loop.  Build with -fsanitize=address for a trace.
+     *   ATOMIK_LIVELOOP_MS=N    total sim ms (default 16000, past the 12 s dismiss)
+     *   ATOMIK_LIVELOOP_SUMMON=N  ms at which Atom is summoned (default 2000) */
+    if (getenv("ATOMIK_PREVIEW_LIVELOOP")) {
+        seed_demo_usage();
+        fabric_seed_waveforms();
+        fabric_demo_enable(1);          /* match the board's self-driving demo  */
+        workloads_surface_open();       /* Workloads open, as on the board      */
+        const char *fm = getenv("ATOMIK_LIVELOOP_MODE");
+        assistant_mode_t lm = ASSIST_EXPLAIN;
+        if (fm) {
+            if      (!strcmp(fm, "thinking")) lm = ASSIST_THINKING;
+            else if (!strcmp(fm, "success"))  lm = ASSIST_SUCCESS;
+            else if (!strcmp(fm, "warning"))  lm = ASSIST_WARNING;
+        }
+        long total  = getenv("ATOMIK_LIVELOOP_MS") ? atol(getenv("ATOMIK_LIVELOOP_MS")) : 40000;
+        long summon = getenv("ATOMIK_LIVELOOP_SUMMON") ? atol(getenv("ATOMIK_LIVELOOP_SUMMON")) : 2000;
+        long next_summon = summon;
+        for (long t = 0; t <= total; t += 16) {
+            anim_set_sim_time((unsigned long)t);
+            /* re-summon after each auto-dismiss so multiple summon/dismiss
+             * cycles run (the board's demo re-summons on each event). */
+            if (t >= next_summon && !assistant_visible()) {
+                assistant_summon_mode(lm);
+                next_summon = t + 13000;   /* dismiss is at +12s; re-arm after */
+            }
+            stocks_tick();
+            workloads_tick();
+            fabric_tick();
+            bench_tick();
+            wlmeasure_tick();
+            state_watch_tick();
+            replica_flow_tick();
+            status_tick();
+            redraw_frame();   /* drives assistant_tick (auto-dismiss) + draw */
+            if ((t % 1000) == 0) {
+                long rss_kb = 0;
+                FILE *sf = fopen("/proc/self/statm", "r");
+                if (sf) { long pages = 0, res = 0;
+                    if (fscanf(sf, "%ld %ld", &pages, &res) == 2) rss_kb = res * (sysconf(_SC_PAGESIZE) / 1024);
+                    fclose(sf); }
+                fprintf(stderr, "[liveloop] sim t=%ldms  RSS=%ldKB\n", t, rss_kb);
+            }
+        }
+        fprintf(stderr, "[liveloop] survived %ldms — no crash\n", total);
+        fb_close();
+        return 0;
+    }
+
+    /* Host preview build: redraw_frame() above already wrote the PNG via the
+     * host fb backend.  Exit instead of entering the interactive input loop
+     * so `make host-shot` dumps a faithful frame of the REAL renderer in
+     * seconds.  Gated on ATOMIK_PREVIEW so the binary could still loop. */
+    if (getenv("ATOMIK_PREVIEW")) {
+        seed_demo_usage();   /* representative usage so PREDICTIVE INSIGHTS populates */
+        fabric_seed_waveforms();   /* lively Resource Fabric waves for the capture */
+        /* v0.41: open a named surface for the host shot (layout verify only). */
+        if (getenv("ATOMIK_PREVIEW_WORKLOAD")) workloads_surface_open();
+        /* v0.42: summon Atom in a chosen mood for animation host-shots:
+         * ATOMIK_PREVIEW_ASSIST=success|thinking|warning|explain */
+        {
+            const char *am = getenv("ATOMIK_PREVIEW_ASSIST");
+            if (am) {
+                assistant_mode_t m = ASSIST_EXPLAIN;
+                if      (!strcmp(am, "success"))  m = ASSIST_SUCCESS;
+                else if (!strcmp(am, "thinking")) m = ASSIST_THINKING;
+                else if (!strcmp(am, "warning"))  m = ASSIST_WARNING;
+                assistant_summon_mode(m);
+            }
+        }
+        /* Optional warm-up: run N frames (ticking fabric/status each) before
+         * the final dump so time-evolving surfaces — the self-driving demo
+         * workload, building waveforms — are visible in the capture.  Default
+         * 1 keeps the plain preview unchanged. */
+        const char *nf = getenv("ATOMIK_PREVIEW_FRAMES");
+        int frames = nf ? atoi(nf) : 1;
+        if (frames < 1) frames = 1;
+        for (int i = 0; i < frames; i++) {
+            status_tick();
+            fabric_tick();
+            bench_tick();                   /* parse the live sweep file too   */
+            wlmeasure_tick();               /* + memory-workload measurements  */
+            redraw_frame();                 /* host fb_present() dumps the PNG */
+            if (i + 1 < frames) usleep(120000);  /* real-time advance for timers */
+        }
+        /* clean idle home for concept comparison — no transient assistant */
+        if (getenv("ATOMIK_PREVIEW_CLEAN")) { assistant_dismiss(); redraw_frame(); }
+        fb_close();
+        return 0;
+    }
+
+    /* Demo/capture startup hook: open the Workloads surface on launch if the
+     * flag file exists — robust where the stdin 'w' keystroke is timing-flaky
+     * (the launcher just `touch`es it). */
+    if (access("/tmp/atomik_open_workloads", F_OK) == 0) {
+        workloads_surface_open();
+        redraw_frame();
+    }
+
+    unsigned long autoshot_start = anim_now_ms();
     while (s_running) {
+        /* v0.40 in-OS auto-capture: once the demo workload has had time to
+         * cycle the lanes + build waveforms, snapshot our own screen.  Force a
+         * fresh frame so the back buffer is current, write the PNG + done flag,
+         * and only do it once. */
+        if (autoshot && !autoshot_done &&
+            anim_now_ms() - autoshot_start > 18000UL) {
+            redraw_frame();
+            fb_write_png("/tmp/atomik_autoshot.png");
+            FILE *adf = fopen("/tmp/atomik_autoshot.done", "w");
+            if (adf) { fputs("ok\n", adf); fclose(adf); }
+            autoshot_done = 1;
+        }
+
         /* Frame-loop: when an animation is active or the terminal is
          * focused (async pty output), poll fast (16ms = ~60Hz). Otherwise
          * idle at 100ms to save CPU. */
@@ -353,10 +553,17 @@ int main(int argc, char **argv) {
          * returns 1 when it actually changed something so we can
          * force a repaint. */
         int stocks_changed = stocks_tick();
+        int wl_changed = workloads_tick();   /* v0.41 demo auto-cycle */
         /* v0.30: tick the Resource Fabric once per frame so its
          * personality auto-detection re-classifies based on recent
          * LLM/state activity.  Cheap (no I/O, no allocation). */
         fabric_tick();
+        /* v0.40: re-measure the parallel-bank sweep on the engine.
+         * Self-rate-limits to BENCH_REFRESH_MS (4 sub-ms HW runs), so
+         * calling it every frame is fine; advances the demo's bank
+         * allocation cursor so the Fabric surface visibly reallocates. */
+        bench_tick();
+        wlmeasure_tick();
         /* v0.35: tick the State Watch sampler.  Self-rate-limits to
          * 200 ms per sample, so calling it every frame is fine.
          * Passive observer — reads existing producers + maintains
@@ -419,6 +626,15 @@ int main(int argc, char **argv) {
                 fabric_open();
                 dirty = 1;
             }
+            else if (ev.key == 'w' || ev.key == 'W') {
+                /* v0.41: open the Workloads surface; re-pressing W while it's
+                 * already up cycles through the scenarios (Telemetry Sync ->
+                 * Control Coalescing -> Parallel Aggregate). */
+                if (workloads_surface_is_open()) workloads_cycle_scenario();
+                workloads_surface_open();
+                agent_log(ACT_OPEN_WORKLOAD);
+                dirty = 1;
+            }
             else if (ev.key == 'p' || ev.key == 'P') {
                 fabric_cycle_override();
                 fabric_open();        /* surface the panel so the change is visible */
@@ -431,6 +647,12 @@ int main(int argc, char **argv) {
              * letter shortcut. */
             else if (ev.key == '!') {
                 perf_bench_matrix();
+                dirty = 1;
+            }
+            /* v0.40: 'L' toggles the self-driving demo workload (lanes cycle
+             * ACTIVE with real perf-bench data + building waveforms). */
+            else if (ev.key == 'l' || ev.key == 'L') {
+                fabric_demo_enable(!fabric_demo_enabled());
                 dirty = 1;
             }
             /* v0.35: 'V' opens the State Watch surface — the time-
@@ -569,7 +791,7 @@ int main(int argc, char **argv) {
                 s_dock_hover = slot;
                 action_t a = dock_action_for_slot(slot);
                 if      (a == ACT_OPEN_ABOUT)     open_about();
-                else if (a == ACT_OPEN_MONITOR)   open_monitor();
+                else if (a == ACT_OPEN_MONITOR)   system_surface_open();  /* SYSTEM rail */
                 else if (a == ACT_OPEN_TERMINAL)  open_terminal();
                 else if (a == ACT_OPEN_FILES)     open_files();
                 else if (a == ACT_OPEN_NOTES)     open_notes();
@@ -593,6 +815,27 @@ int main(int argc, char **argv) {
             }
 
             if (dirty) redraw_frame();
+        } else if (ev.kind == EV_MOUSE_MOVE || ev.kind == EV_MOUSE_DOWN ||
+                   ev.kind == EV_MOUSE_UP) {
+            /* v0.41 pointer: motion moves the cursor + updates rail hover;
+             * a left-click on a rail cell activates that capability (same
+             * dispatch as the number-key launcher). */
+            int slot = dock_hit_test(ev.mx, ev.my);
+            if (ev.kind == EV_MOUSE_DOWN && slot >= 0) {
+                s_dock_hover = slot;
+                action_t a = dock_action_for_slot(slot);
+                if      (a == ACT_OPEN_ABOUT)     open_about();
+                else if (a == ACT_OPEN_MONITOR)   system_surface_open();
+                else if (a == ACT_OPEN_TERMINAL)  open_terminal();
+                else if (a == ACT_OPEN_FILES)     open_files();
+                else if (a == ACT_OPEN_NOTES)     open_notes();
+                else if (a == ACT_OPEN_ASSISTANT) assistant_summon();
+                else if (a == ACT_OPEN_WORKLOAD)  workloads_surface_open();
+                if (a != ACT_NONE) agent_log(a); else agent_log(ACT_DOCK_HOVER);
+            } else {
+                s_dock_hover = slot;   /* hover highlight follows the cursor */
+            }
+            redraw_frame();            /* reflect the new cursor / hover */
         } else {
             /* No event arrived. Redraw a frame if an animation is in
              * progress (window fade-in, predicted-icon pulse, etc.) OR if
@@ -603,6 +846,12 @@ int main(int argc, char **argv) {
                 if (top && top->id == s_terminal_id) need_frame = 1;
             }
             if (!need_frame && stocks_changed && s_stocks_id) need_frame = 1;
+            if (!need_frame && wl_changed) need_frame = 1;
+            /* live parallel-bank sweep refreshed -> repaint the open Workloads
+             * surface (it launches with no input; nothing else would). */
+            { int bd = bench_take_dirty();
+              if (!need_frame && bd && workloads_surface_is_open()) need_frame = 1; }
+            if (!need_frame && assistant_animating()) need_frame = 1;
             if (need_frame) redraw_frame();
         }
     }

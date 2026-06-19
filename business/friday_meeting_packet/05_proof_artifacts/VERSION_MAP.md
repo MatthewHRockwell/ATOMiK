@@ -2,9 +2,29 @@
 
 This map prevents proof artifacts from being blended across versions. Each version proves a different thing.
 
+## Live Workloads surface (2026-06-08)
+
+First customer-facing workload demo proven end-to-end on hardware.
+
+- Packaged artifact: `12-workloads-live-ax7020.png`
+- Evidence label: LIVE_MEASURED
+- Capture method: live `fb2png` of `/dev/fb0` on the AX7020 unified bitstream (HDMI + bench engine), 2026-06-07. The Workloads surface reads live throughput from the parallel-bank engine (0xF0021000) via a board-side daemon writing `/tmp/atomik_bench_live.txt`.
+- What it supports: the Workloads / telemetry-aggregation surface runs on hardware showing live measured parallel-bank throughput — 800 Mevents/s at 8 banks, 1/2/4/8 scaling, byte-identical across configs. Pairs with `PARALLEL_BANKS_HARDWARE_VALIDATED.md`.
+- What it does NOT support: an interactive session or USB keyboard/mouse input (both still in flight); any on-screen value other than the throughput figures (Fabric lane values and top-bar temp/efficiency/predictive are derived/scenario); customer workload, power, thermal, or production outcomes.
+
+## v0.40-A
+
+Current Zynq UI capture artifact (supersedes v0.39-K as the current-live image).
+
+- Packaged artifact: `10-current-live-atomik-desk-v040a.png`
+- Evidence label: HARDWARE_VALIDATED
+- Capture method: live `fb2png` of `/dev/fb0` on the booted AX7020 (RV64 NaxRiscv, simplefb 1920x1080), 2026-05-29. Not a recomposited/edited mockup.
+- What it supports: current live concept-aligned UI (ATOMiK Desk) running on Zynq hardware, with on-screen metrics from real on-board perf-bench.
+- What it does not support: customer workload performance, production maturity, uptime, battery, heat, cooling, water, power, or footprint outcomes.
+
 ## v0.39-K
 
-Current Zynq UI screenshot artifact.
+Prior Zynq UI screenshot artifact (archived; superseded by v0.40-A above).
 
 - Packaged artifact: `09-current-live-atomik-desk-v039k.png`
 - Evidence label: HARDWARE_VALIDATED

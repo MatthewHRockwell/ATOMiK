@@ -70,7 +70,11 @@ static void sw_baseline_run(int regions, int ops, perf_sample_t *out) {
         uint32_t cur = s_sw_state[r];
         cur ^= d;
         s_sw_state[r] = cur;
+#if defined(__riscv)
         __asm__ volatile("fence" ::: "memory");   /* per-op fence */
+#else
+        __asm__ volatile("" ::: "memory");        /* host preview: compiler barrier */
+#endif
         perf_op(out, sizeof(uint32_t), sizeof(uint32_t), r);
         perf_hw_op(out);
     }

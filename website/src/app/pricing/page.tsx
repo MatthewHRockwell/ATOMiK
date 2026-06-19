@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     description:
       "Operational evaluation process, intake package, metrics matrix, fit criteria, and proof boundaries.",
     url: "https://atomik.tech/pricing",
-    images: [{ url: "https://atomik.tech/09-current-live-atomik-desk-v039k.png", width: 1920, height: 1080 }],
+    images: [{ url: "https://atomik.tech/10-current-live-atomik-desk-v040a.png", width: 1920, height: 1080 }],
     type: "website",
   },
   twitter: {
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
     title: "ATOMiK Evaluation Access",
     description:
       "Bring one workload, one baseline, and one constraint that already hurts.",
-    images: ["https://atomik.tech/09-current-live-atomik-desk-v039k.png"],
+    images: ["https://atomik.tech/10-current-live-atomik-desk-v040a.png"],
   },
 };
 
@@ -99,7 +99,7 @@ const faqs = [
   {
     q: "What does not happen yet?",
     a:
-      "This is not generic self-serve product access, a guaranteed production integration, or a promise of universal speedup, battery extension, heat reduction, water savings, or smaller hardware.",
+      "This is not generic self-serve product access, a guaranteed production integration, or a promise of universal speedup, battery extension, heat/cooling reduction, water or power-bill savings, footprint reduction, or smaller hardware.",
   },
   {
     q: "How are claims handled?",
@@ -297,6 +297,9 @@ export default function PricingPage() {
       <section className="mx-auto max-w-6xl px-6 py-12" style={{ borderTop: `1px solid ${colors.border}` }}>
         <p className="text-sm font-semibold uppercase" style={{ color: colors.cyan }}>Reserve or request</p>
         <h2 className="mt-3 max-w-3xl text-3xl font-bold md:text-4xl">Pick the next serious step.</h2>
+        <div className="mt-5 rounded p-5 text-sm leading-6" style={{ background: colors.panel2, border: `1px solid ${colors.border}`, color: colors.muted }}>
+          Reservations hold proof-review or scoping time. They do not create a commercial license, production integration, or guaranteed outcome. Final scope, deliverables, credit treatment, refund handling, and terms are confirmed in writing before larger work begins. Use <strong style={{ color: colors.text }}>Ask first</strong> if you want to align on scope before paying.
+        </div>
         <div className="mt-8 grid gap-5 md:grid-cols-2">
           {paidOffers.map((offer) => (
             <article key={offer.id} className="rounded p-6" style={{ background: colors.panel, border: `1px solid ${colors.border}` }}>

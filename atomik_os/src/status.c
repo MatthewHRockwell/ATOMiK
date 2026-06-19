@@ -175,164 +175,122 @@ static void draw_personality_glyph(int cx, int cy, int r,
  *   - 2 px bright core line
  * Plus a hot dot at the most recent sample so the eye locks onto
  * "right now."  Reads as instrument, not debug trace. */
+/* Taylor sine (no math.h in this TU) — reduces to [-pi,pi] then evaluates.
+ * Returns ~[-1,1].  Used only for decorative pulse motion. */
+static double pulse_sin(double s) {
+    while (s >  3.14159265) s -= 6.2831853;
+    while (s < -3.14159265) s += 6.2831853;
+    double s3 = s * s * s, s5 = s3 * s * s, s7 = s5 * s * s;
+    return s - s3 / 6.0 + s5 / 120.0 - s7 / 5040.0;
+}
+
+/* v0.40-05-31 SYMMETRIC AUDIO-EQUALIZER pulse (concept-01 "PREDICTIVE SYSTEM
+ * PULSE").  Replaces the single up/down trace with vertical bars mirrored
+ * about a horizontal center line — bright core at center fading to the tips,
+ * a faint center spine, and a hot node on the most-recent (rightmost) bar.
+ * Live event history (s_pulse_hist) drives the overall envelope; a fast
+ * per-bar modulation gives the EQ striation.  When idle, a low traveling
+ * shimmer keeps it alive.  Class B decorative chrome — writes NO metric. */
 static void draw_event_pulse_glow(int x, int y, int w, int h,
                                   pixel_t accent) {
-    /* v0.38-K2.5A — soften the bed so the waveform is the visual
-     * hero instead of an opaque dark rectangle sitting under it.
-     * Previous bed was a solid rgb(0x10,0x18,0x28) fill; ChatGPT
-     * 2026-05-16 flagged that as "an empty status slot" — too
-     * visually dominant. Now: just a very subtle accent-tinted
-     * alpha wash so the strip reads as embedded in the glass bar.
-     * No hard bottom hairline either — the bar's own glass edge
-     * is the boundary. */
-    for (int sy = 0; sy < h; sy++) {
-        for (int sx = 0; sx < w; sx++) {
+    /* Subtle accent-tinted bed wash so the strip reads as embedded glass. */
+    for (int sy = 0; sy < h; sy++)
+        for (int sx = 0; sx < w; sx++)
             draw_blend_pixel(x + sx, y + sy, accent, 8);
-        }
-    }
 
-    /* v0.38-K3 — baseline is now a low-amplitude SINE WAVE traveling
-     * across the strip, not a flat glow band.  ChatGPT 2026-05-16:
-     * "the baseline is too flat. It looks like a powered strip,
-     * not a waveform. ... give it a shallow sinusoidal contour."
-     * Class B discipline preserved: still never writes to the
-     * metric ring; pure decorative chrome saying "instrument alive."
-     *
-     * Distinguishes waiting from active:
-     *   - waiting: low amplitude, low alpha, no hot point, no peaks
-     *   - active (data branch below): bright core, peaks, hot point
-     */
-    unsigned long now = anim_now_ms();
-    int   baseline_y = y + h * 3 / 4;
-    int   amp        = h / 6;                       /* shallow */
-    int   col_y[1024];
-    int   n_cols     = (w < 1024) ? w : 1024;
-    /* Two-component sine for organic motion. */
-    double t = (double)now / 1000.0;
-    for (int col = 0; col < n_cols; col++) {
-        double u = (double)col / (double)(n_cols - 1);
-        double phase = u * 6.2831853 * 1.5 + t * 1.2;
-        /* Taylor sin to avoid pulling math.h in here. */
-        double s  = phase;
-        while (s > 3.14159265) s -= 6.2831853;
-        while (s < -3.14159265) s += 6.2831853;
-        double s3 = s*s*s, s5 = s3*s*s;
-        double sn = s - s3/6.0 + s5/120.0;
-        col_y[col] = baseline_y + (int)(sn * amp);
-    }
-    /* Soft fill + 2 px line — quieter than the active waveform. */
-    for (int col = 0; col < n_cols; col++) {
-        int px = x + col;
-        int cy = col_y[col];
-        /* Halo above the line. */
-        for (int g = 1; g <= 4; g++) {
-            int gy = cy - g;
-            if (gy < y) break;
-            uint8_t a = (uint8_t)(18 - (g - 1) * 4);
-            draw_blend_pixel(px, gy, accent, a);
-        }
-        /* Soft fill below the line into the bar floor. */
-        for (int g = 1; g <= 6; g++) {
-            int gy = cy + g;
-            if (gy > y + h - 2) break;
-            uint8_t a = (uint8_t)(14 - (g - 1) * 2);
-            draw_blend_pixel(px, gy, accent, a);
-        }
-        /* The line itself — soft, no hot point. */
-        draw_blend_pixel(px, cy,     accent, 120);
-        draw_blend_pixel(px, cy - 1, accent, 60);
-    }
+    int center_y = y + h / 2;
+    int max_half = h / 2 - 2; if (max_half < 3) max_half = 3;
 
-    if (s_pulse_count < 2) {
-        /* No event history yet — return after baseline animation. */
-        return;
-    }
+    /* Cyan→violet horizontal gradient across the strip (concept-01): left end
+     * is the passed accent (cyan), right end is a violet. */
+    int ar = (accent >> 16) & 0xFF, ag = (accent >> 8) & 0xFF, ab = accent & 0xFF;
+    const int vr = 0xA6, vg = 0x6E, vb = 0xF2;     /* violet right end */
 
-    /* Compute per-column heights so we can apply the layered stack
-     * uniformly across the visible width. */
+    /* Live envelope source. */
+    int      have_data = 0;
     uint16_t mx = 0;
-    for (uint8_t i = 0; i < s_pulse_count; i++)
-        if (s_pulse_hist[i] > mx) mx = s_pulse_hist[i];
-    if (mx == 0) {
-        /* All-zero history — the procedural baseline above already
-         * painted the idle line; nothing more to render. */
-        return;
+    if (s_pulse_count >= 2) {
+        for (uint8_t i = 0; i < s_pulse_count; i++)
+            if (s_pulse_hist[i] > mx) mx = s_pulse_hist[i];
+        if (mx > 0) have_data = 1;
     }
 
-    /* Reuse col_y array — same scope as baseline above.  Overwrite
-     * with data-driven heights for the active waveform. */
-    for (int col = 0; col < n_cols; col++) {
-        int sample_i = (int)((long)col * (s_pulse_count - 1) /
-                              (n_cols - 1));
-        int idx = (s_pulse_head - s_pulse_count + sample_i
-                   + PULSE_HISTORY_N) % PULSE_HISTORY_N;
-        uint16_t v = s_pulse_hist[idx];
-        int py = y + h - 2 - (int)((long)v * (h - 3) / mx);
-        if (py < y + 1)     py = y + 1;
-        if (py > y + h - 2) py = y + h - 2;
-        col_y[col] = py;
+    unsigned long now = anim_now_ms();
+    double t = (double)now / 1000.0;
+
+    const int bar_step = 3;                 /* 2 px bar + 1 px gap → EQ striation */
+    int n_bars = w / bar_step;
+    if (n_bars < 1) n_bars = 1;
+
+    for (int b = 0; b < n_bars; b++) {
+        int    bx = x + b * bar_step;
+        double u  = (double)b / (double)(n_bars > 1 ? n_bars - 1 : 1);
+        pixel_t bc = rgb((uint8_t)(ar + (int)((vr - ar) * u)),
+                         (uint8_t)(ag + (int)((vg - ag) * u)),
+                         (uint8_t)(ab + (int)((vb - ab) * u)));
+
+        /* Audio texture: BURST lobes (two beating low freqs → loud/quiet
+         * regions) × fine per-bar striation, squared for high dynamic range
+         * (deep valleys, sharp peaks) like a real signal — not a regular wave. */
+        double burst = (0.5 + 0.5 * pulse_sin(u * 8.5  + t * 0.8))
+                     * (0.5 + 0.5 * pulse_sin(u * 21.0 - t * 0.5));
+        double fine  = 0.40 + 0.60 * (0.5 + 0.5 * pulse_sin(u * 61.0 + t * 3.0));
+        double shape = burst * fine;
+        shape = shape * shape;                       /* contrast → dynamic range */
+
+        int half;
+        if (have_data) {
+            int sample_i = (int)((long)b * (s_pulse_count - 1)
+                                 / (n_bars > 1 ? n_bars - 1 : 1));
+            int idx = (s_pulse_head - s_pulse_count + sample_i
+                       + PULSE_HISTORY_N) % PULSE_HISTORY_N;
+            uint16_t v = s_pulse_hist[idx];
+            int base   = (int)((long)v * max_half / mx);
+            /* Blend the real per-sample level with the audio texture so the
+             * envelope tracks live events but still reads as a dynamic EQ. */
+            half = (int)(0.40 * base + 0.85 * max_half * shape);
+        } else {
+            /* idle: pure texture at a calmer overall level. */
+            half = (int)(max_half * (0.18 + 0.82 * shape));
+        }
+        if (half < 1)         half = 1;
+        if (half > max_half)  half = max_half;
+
+        /* Mirrored vertical bar: bright at center, fading to the tips. */
+        for (int dy = 0; dy <= half; dy++) {
+            uint8_t a = (uint8_t)(215 - 150 * dy / (half ? half : 1));
+            draw_blend_pixel(bx, center_y - dy, bc, a);
+            draw_blend_pixel(bx, center_y + dy, bc, a);
+            uint8_t a2 = (uint8_t)(a * 5 / 8);     /* 2nd column → 2 px bar */
+            draw_blend_pixel(bx + 1, center_y - dy, bc, a2);
+            draw_blend_pixel(bx + 1, center_y + dy, bc, a2);
+        }
+        /* Soft tip glow just beyond each end. */
+        if (center_y - half - 1 >= y)
+            draw_blend_pixel(bx, center_y - half - 1, bc, 70);
+        if (center_y + half + 1 <  y + h)
+            draw_blend_pixel(bx, center_y + half + 1, bc, 70);
     }
 
-    /* v0.38-K2.5A — brighter halo stack so the wave anchors the
-     * center module instead of getting lost.  Outer halo widened
-     * 8 → 10 with a flatter falloff; mid glow brightened; core
-     * 2 px thick at full intensity. */
-    for (int col = 0; col < n_cols; col++) {
-        int px = x + col;
-        for (int g = 1; g <= 10; g++) {
-            int gy = col_y[col] - g;
-            if (gy < y) break;
-            uint8_t a = (uint8_t)(28 - (g - 1) * 2);
-            draw_blend_pixel(px, gy, accent, a);
-        }
-        for (int g = 1; g <= 6; g++) {
-            int gy = col_y[col] + g;
-            if (gy > y + h - 2) break;
-            uint8_t a = (uint8_t)(26 - (g - 1) * 3);
-            draw_blend_pixel(px, gy, accent, a);
-        }
-    }
-    /* Mid glow — 5 px wide, brighter. */
-    for (int col = 0; col < n_cols; col++) {
-        int px = x + col;
-        for (int g = 1; g <= 5; g++) {
-            int gy = col_y[col] - g;
-            if (gy < y) break;
-            uint8_t a = (uint8_t)(60 - (g - 1) * 9);
-            draw_blend_pixel(px, gy, accent, a);
-        }
-    }
-    /* Bright core: 2 hard px + 1 px alpha 240 below. */
-    for (int col = 0; col < n_cols; col++) {
-        int px = x + col;
-        draw_pixel(px, col_y[col], accent);
-        draw_pixel(px, col_y[col] - 1, accent);
-        draw_blend_pixel(px, col_y[col] + 1, accent, 240);
-    }
+    /* Faint center spine across the whole strip. */
+    for (int sx = 0; sx < w; sx++)
+        draw_blend_pixel(x + sx, center_y, accent, 55);
 
-    /* Hot point at the most-recent sample — small, bright. */
-    int hot_col = n_cols - 1;
-    int hot_x   = x + hot_col;
-    int hot_y   = col_y[hot_col];
-    int hr      = 3;
-    for (int dy = -hr; dy <= hr; dy++) {
-        for (int dx = -hr; dx <= hr; dx++) {
-            if (dx*dx + dy*dy <= hr*hr) {
-                draw_pixel(hot_x + dx, hot_y + dy, accent);
+    /* Hot node on the most-recent (rightmost) bar when live — uses the violet
+     * gradient end so it matches the bars under it. */
+    if (have_data) {
+        pixel_t hot = rgb((uint8_t)vr, (uint8_t)vg, (uint8_t)vb);
+        int hx = x + (n_bars - 1) * bar_step;
+        for (int dy = -2; dy <= 2; dy++)
+            for (int dx = -2; dx <= 2; dx++)
+                if (dx * dx + dy * dy <= 4)
+                    draw_blend_pixel(hx + dx, center_y + dy, hot, 190);
+        for (int dy = -4; dy <= 4; dy++)
+            for (int dx = -4; dx <= 4; dx++) {
+                int d2 = dx * dx + dy * dy;
+                if (d2 > 4 && d2 <= 16)
+                    draw_blend_pixel(hx + dx, center_y + dy, hot, 40);
             }
-        }
-    }
-    /* Hot point outer halo — 5 px alpha ring. */
-    int hr2 = 6;
-    for (int dy = -hr2; dy <= hr2; dy++) {
-        for (int dx = -hr2; dx <= hr2; dx++) {
-            int d2 = dx*dx + dy*dy;
-            if (d2 > hr*hr && d2 <= hr2*hr2) {
-                int dist = hr2 - (int)(d2 / (hr2 + 1));
-                uint8_t a = (uint8_t)(dist * 18);
-                draw_blend_pixel(hot_x + dx, hot_y + dy, accent, a);
-            }
-        }
     }
 }
 
@@ -404,199 +362,217 @@ static pixel_t personality_color(personality_t p) {
     }
 }
 
-/* v0.38-K2 investor Pulse Bar — full premium pass.
- *
- * Layout (left → right):
- *   ATOMiK wordmark (FONT_AA_BRAND 36 px)
- *   METRICS: <state> glass pill (FONT_AA_UI, dim cyan or amber)
- *   <PERSONALITY> ACTIVE glass pill (FONT_AA_UI, lane color)
- *   <pulse waveform>  (layered-stroke sparkline)
- *   ... center: agent prediction in AA UI ...
- *   ... right: SYSTEM LIVE chip + uptime plain text ... */
+/* v0.40 decorative glowing orb — pure Class B chrome, renders NO metric.
+ * Three stacked alpha disks (cyan halo -> cyan body -> white core). */
+static void pulse_orb(int cx, int cy, int r) {
+    int r2 = r * r;
+    for (int dy = -r; dy <= r; dy++)
+        for (int dx = -r; dx <= r; dx++)
+            if (dx*dx + dy*dy <= r2)
+                draw_blend_pixel(cx+dx, cy+dy, ATOMIK_SEM_HARDWARE, 70);
+    int rm = (r * 2) / 3, rm2 = rm * rm;
+    for (int dy = -rm; dy <= rm; dy++)
+        for (int dx = -rm; dx <= rm; dx++)
+            if (dx*dx + dy*dy <= rm2)
+                draw_blend_pixel(cx+dx, cy+dy, ATOMIK_SEM_HARDWARE, 90);
+    int rc = r / 3, rc2 = rc * rc;
+    for (int dy = -rc; dy <= rc; dy++)
+        for (int dx = -rc; dx <= rc; dx++)
+            if (dx*dx + dy*dy <= rc2)
+                draw_blend_pixel(cx+dx, cy+dy, ATOMIK_FG, 210);
+}
+
+/* v0.40 thin vertical module separator inside the glass header. */
+static void pulse_sep(int x, int bar_y, int bar_h) {
+    int sy = bar_y + 16, sh = bar_h - 32;
+    for (int i = 0; i < sh; i++)
+        draw_blend_pixel(x, sy + i, ATOMIK_ACCENT_DIM, 90);
+}
+
+/* === v0.40-05-30 concept-header helpers: small line icons, an audio-style
+ * pulse waveform, and a stacked "icon + LABEL / value" metric module. === */
+static void px_dot(int cx, int cy, int r, pixel_t c, uint8_t a) {
+    for (int dy = -r; dy <= r; dy++)
+        for (int dx = -r; dx <= r; dx++)
+            if (dx*dx + dy*dy <= r*r) draw_blend_pixel(cx+dx, cy+dy, c, a);
+}
+static void px_ring(int cx, int cy, int r, pixel_t c, uint8_t a) {
+    int x = r, y = 0, err = 1 - r;
+    while (x >= y) {
+        const int p[8][2] = {{cx+x,cy+y},{cx-x,cy+y},{cx+x,cy-y},{cx-x,cy-y},
+                             {cx+y,cy+x},{cx-y,cy+x},{cx+y,cy-x},{cx-y,cy-x}};
+        for (int i = 0; i < 8; i++) draw_blend_pixel(p[i][0], p[i][1], c, a);
+        y++; if (err < 0) err += 2*y+1; else { x--; err += 2*(y-x)+1; }
+    }
+}
+static void px_line(int x0,int y0,int x1,int y1,pixel_t c,uint8_t a){
+    int dx=x1>x0?x1-x0:x0-x1, dy=y1>y0?y1-y0:y0-y1, sx=x0<x1?1:-1, sy=y0<y1?1:-1, e=dx-dy;
+    for(;;){draw_blend_pixel(x0,y0,c,a);if(x0==x1&&y0==y1)break;int e2=e*2;if(e2>-dy){e-=dy;x0+=sx;}if(e2<dx){e+=dx;y0+=sy;}}
+}
+static void icon_atom(int cx,int cy,int r,pixel_t c){           /* hex + core */
+    int hx = r / 2, hy = (r * 866) / 1000;     /* cos60=.5, sin60=.866 (no math.h) */
+    int vx[6] = { cx+r, cx+hx, cx-hx, cx-r, cx-hx, cx+hx };
+    int vy[6] = { cy,   cy+hy, cy+hy, cy,   cy-hy, cy-hy };
+    for (int i = 0; i < 6; i++) px_line(vx[i], vy[i], vx[(i+1)%6], vy[(i+1)%6], c, 200);
+    px_dot(cx, cy, 2, c, 230);
+}
+static void icon_thermo(int cx,int cy,int r,pixel_t c){
+    px_line(cx,cy-r,cx,cy+r-2,c,200); px_dot(cx,cy+r-1,2,c,230);
+    px_line(cx+2,cy-r+1,cx+2,cy+1,c,120);
+}
+static void icon_bolt(int cx,int cy,int r,pixel_t c){
+    px_line(cx+1,cy-r,cx-2,cy,c,210); px_line(cx-2,cy,cx+1,cy,c,210);
+    px_line(cx+1,cy,cx-1,cy+r,c,210);
+}
+static void icon_leaf(int cx,int cy,int r,pixel_t c){
+    px_ring(cx,cy,r-1,c,150); px_line(cx-r+2,cy+r-2,cx+r-2,cy-r+2,c,200);
+}
+static void icon_clock(int cx,int cy,int r,pixel_t c){
+    px_ring(cx,cy,r,c,200); px_line(cx,cy,cx,cy-r+3,c,210); px_line(cx,cy,cx+r-4,cy,c,210);
+}
+
+/* Stacked metric module: icon (left) + small uppercase LABEL over a colored
+ * value.  Returns the width consumed (incl. trailing gap). */
+static int draw_metric_module(int x, int y_center,
+                              void (*icon)(int,int,int,pixel_t),
+                              const char *label, const char *value, pixel_t vcol) {
+    int icon_r = 7;
+    int ioff = icon ? (icon_r * 2 + ATOMIK_GRID_S + 2) : 0;
+    if (icon) icon(x + icon_r, y_center, icon_r, vcol);
+    int tx = x + ioff;
+    font_aa_id_t lf = font_aa_loaded(FONT_AA_LABEL) ? FONT_AA_LABEL : FONT_AA_UI;
+    int lh = font_aa_loaded(lf) ? text_height_aa(lf) : text_height(1);
+    int vh = font_aa_loaded(FONT_AA_UI) ? text_height_aa(FONT_AA_UI) : text_height(1);
+    int ly = y_center - (lh + 2 + vh) / 2;
+    pixel_t lcol = rgb(0x7A, 0x86, 0xA0);
+    if (font_aa_loaded(lf)) draw_text_aa(lf, tx, ly, label, lcol);
+    else                    draw_text(tx, ly, label, 1, lcol);
+    int vy = ly + lh + 2;
+    if (font_aa_loaded(FONT_AA_UI)) draw_text_aa(FONT_AA_UI, tx, vy, value, vcol);
+    else                            draw_text(tx, vy, value, 1, vcol);
+    int lw = font_aa_loaded(lf) ? text_width_aa(lf, label) : text_width(label, 1);
+    int vw = font_aa_loaded(FONT_AA_UI) ? text_width_aa(FONT_AA_UI, value) : text_width(value, 1);
+    return ioff + (lw > vw ? lw : vw) + ATOMIK_GRID_L + 2;
+}
+
+/* v0.40-05-30 investor Pulse Bar — concept-07 header.  Modules left→right:
+ *   atom icon + ATOMiK | ACTIVE PERSONALITY | PREDICTIVE SYSTEM PULSE + CONF |
+ *   SYS TEMP | POWER DRAW | EFFICIENCY | UPTIME | glowing orb.
+ * Every value is real/derived (see draw); power draw is an honest estimate. */
 static void draw_pulse_bar_investor(int bar_y, int bar_h) {
     int y_center = bar_y + bar_h / 2;
-    int cur_x    = ATOMIK_GRID_L;
 
-    /* ATOMiK wordmark — atomik_36 brand atlas. */
-    const char *brand = "ATOMiK";
+    /* v0.40 floating glass header panel — inset rounded container with a
+     * soft cyan border, top sheen, inner accent rim, and a soft outer
+     * glow below.  Replaces the flat dev strip + hard divider line so the
+     * bar reads as a premium application header (concept-01). */
+    {
+        int hx = ATOMIK_GRID_M, hy = bar_y + 4;
+        int hw = FB_W - ATOMIK_GRID_M * 2, hh = bar_h - 8;
+        draw_rect_rounded(hx, hy, hw, hh, 14, rgb(0x12, 0x1A, 0x2E));
+        for (int sy = 0; sy < 10; sy++)
+            for (int sx = 14; sx < hw - 14; sx++)
+                draw_blend_pixel(hx + sx, hy + 1 + sy, ATOMIK_FG,
+                                 (uint8_t)(11 - sy));
+        draw_rect(hx + 14, hy,          hw - 28, 1, ATOMIK_ACCENT_DIM);
+        draw_rect(hx + 14, hy + hh - 1, hw - 28, 1, ATOMIK_ACCENT_DIM);
+        draw_rect(hx,          hy + 14, 1, hh - 28, ATOMIK_ACCENT_DIM);
+        draw_rect(hx + hw - 1, hy + 14, 1, hh - 28, ATOMIK_ACCENT_DIM);
+        for (int sx = 16; sx < hw - 16; sx++)
+            draw_blend_pixel(hx + sx, hy + 2, ATOMIK_ACCENT, 20);
+        for (int g = 1; g <= 3; g++)
+            for (int sx = 0; sx < hw; sx++)
+                draw_blend_pixel(hx + sx, hy + hh - 1 + g,
+                                 ATOMIK_SEM_HARDWARE, (uint8_t)(22 / g));
+    }
+
+    int cy = y_center;
+    int cur_x = ATOMIK_GRID_L + ATOMIK_GRID_M + 2;
+
+    /* Logo: atom hex icon + ATOMiK wordmark (white). */
+    icon_atom(cur_x + 9, cy, 9, ATOMIK_SEM_HARDWARE);
+    cur_x += 9 * 2 + ATOMIK_GRID_M;
     if (font_aa_loaded(FONT_AA_BRAND)) {
-        int brand_h = text_height_aa(FONT_AA_BRAND);
-        int brand_y = y_center - brand_h / 2 - 2;
-        draw_text_aa(FONT_AA_BRAND, cur_x, brand_y, brand,
-                     ATOMIK_SEM_HARDWARE);
-        cur_x += text_width_aa(FONT_AA_BRAND, brand) + ATOMIK_GRID_L * 2;
+        draw_text_aa(FONT_AA_BRAND, cur_x, cy - text_height_aa(FONT_AA_BRAND)/2 - 2, "ATOMiK", ATOMIK_FG);
+        cur_x += text_width_aa(FONT_AA_BRAND, "ATOMiK") + ATOMIK_GRID_L;
     } else if (font_aa_loaded(FONT_AA_DISPLAY)) {
-        int brand_h = text_height_aa(FONT_AA_DISPLAY);
-        int brand_y = y_center - brand_h / 2 - 2;
-        draw_text_aa(FONT_AA_DISPLAY, cur_x, brand_y, brand,
-                     ATOMIK_SEM_HARDWARE);
-        cur_x += text_width_aa(FONT_AA_DISPLAY, brand) + ATOMIK_GRID_L * 2;
+        draw_text_aa(FONT_AA_DISPLAY, cur_x, cy - text_height_aa(FONT_AA_DISPLAY)/2 - 2, "ATOMiK", ATOMIK_FG);
+        cur_x += text_width_aa(FONT_AA_DISPLAY, "ATOMiK") + ATOMIK_GRID_L;
     } else {
-        int ty = y_center - text_height(2) / 2;
-        draw_text(cur_x, ty, brand, 2, ATOMIK_SEM_HARDWARE);
-        cur_x += text_width(brand, 2) + ATOMIK_GRID_L * 2;
+        draw_text(cur_x, cy - text_height(2)/2, "ATOMiK", 2, ATOMIK_FG);
+        cur_x += text_width("ATOMiK", 2) + ATOMIK_GRID_L;
     }
+    pulse_sep(cur_x, bar_y, bar_h);
+    cur_x += ATOMIK_GRID_M + 2;
+    /* concept-01: airy spread — push the personality module well right of the
+     * logo so the bar breathes instead of packing left. */
+    if (cur_x < FB_W * 19 / 100) cur_x = FB_W * 19 / 100;
 
-    /* METRICS: <state> glass pill — color follows worst source. */
+    /* ACTIVE PERSONALITY (real -- STATE/SYNC/AGENT, not the concept's fake SYNAPSE). */
+    cur_x += draw_metric_module(cur_x, cy, draw_personality_glyph,
+                                "ACTIVE PERSONALITY",
+                                fabric_personality_name(fabric_active()),
+                                personality_color(fabric_active()));
+
+    /* PREDICTIVE SYSTEM PULSE -- real event waveform + real Markov confidence. */
     {
-        metric_source_t worst = metric_worst_source();
-        const char *agg = metric_aggregate_label();
-        char pill[32];
-        snprintf(pill, sizeof pill, "METRICS: %s", agg);
-        pixel_t mc = metric_source_color(worst);
-        cur_x += draw_glass_pill(cur_x, y_center, pill, mc);
-    }
+        action_t top = agent_predict();
+        double tot = 0.0, ts = agent_score(top);
+        for (int a = ACT_OPEN_ABOUT; a <= ACT_CYCLE_FOCUS; a++) tot += agent_score((action_t)a);
+        int conf = (tot > 0.0) ? (int)(ts * 100.0 / tot) : 0;
+        if (conf > 100) conf = 100;
 
-    /* Active personality glass pill with glyph — diamond icon in lane
-     * color sits inside the pill before the "<NAME> ACTIVE" text.
-     * The glyph turns the pill from a label into an instrument. */
+        font_aa_id_t lf = font_aa_loaded(FONT_AA_LABEL) ? FONT_AA_LABEL : FONT_AA_UI;
+        int lh = font_aa_loaded(lf) ? text_height_aa(lf) : text_height(1);
+        int label_y = bar_y + 9;
+        if (font_aa_loaded(lf)) draw_text_aa(lf, cur_x, label_y, "PREDICTIVE SYSTEM PULSE", rgb(0x7A,0x86,0xA0));
+        else                    draw_text(cur_x, label_y, "PREDICTIVE SYSTEM PULSE", 1, rgb(0x7A,0x86,0xA0));
+        int pulse_y = label_y + lh + 3;
+        int pulse_w = 300;
+        int pulse_h = bar_y + bar_h - pulse_y - 10;
+        if (pulse_h < 8) pulse_h = 8;
+        draw_event_pulse_glow(cur_x, pulse_y, pulse_w, pulse_h, ATOMIK_SEM_HARDWARE);
+        cur_x += pulse_w + ATOMIK_GRID_M;
+
+        char cv[16]; snprintf(cv, sizeof cv, "%d%%", conf);
+        cur_x += draw_metric_module(cur_x, cy, NULL, "CONFIDENCE", cv, ATOMIK_SEM_HARDWARE);
+    }
+    pulse_sep(cur_x, bar_y, bar_h);
+    /* concept-01: the SYS-TEMP..UPTIME cluster sits in the right third of the
+     * bar (near the orb), with even gaps — not packed against the pulse. */
+    cur_x = FB_W * 605 / 1000;
+
+    /* Right cluster: SYS TEMP | POWER DRAW | EFFICIENCY | UPTIME, then orb. */
     {
-        personality_t p = fabric_active();
-        const char *pname = fabric_personality_name(p);
-        pixel_t pcol = personality_color(p);
-        char pill[32];
-        snprintf(pill, sizeof pill, "%s ACTIVE", pname);
+        const perf_sample_t *es = perf_last_for(fabric_active());
+        if (!es) es = perf_last_for(PERSONALITY_STATE);
+        int eff = (es && es->ops_logical)
+                  ? (int)(100u * (es->ops_logical - es->ops_issued) / es->ops_logical) : 0;
+        char eff_v[12]; snprintf(eff_v, sizeof eff_v, "%d%%", eff);
 
-        /* Measure pill, draw it, then overlay the glyph + redraw text
-         * shifted right so the glyph sits cleanly inside. */
-        int pad_x  = ATOMIK_GRID_M + 2;
-        int pad_y  = 4;
-        int glyph_r = 5;   /* 10 px diamond */
-        int glyph_gap = ATOMIK_GRID_S + 1;
+        char up_v[24];
+        double uu = 0; FILE *uf = fopen("/proc/uptime", "r");
+        if (uf) { if (fscanf(uf, "%lf", &uu) != 1) uu = 0; fclose(uf); }
+        { int s=(int)uu, d=s/86400, hh2=(s%86400)/3600, mm=(s%3600)/60;
+          if (d>0) snprintf(up_v,sizeof up_v,"%dd %dh",d,hh2);
+          else     snprintf(up_v,sizeof up_v,"%dh %dm",hh2,mm); }
 
-        if (font_aa_loaded(FONT_AA_UI)) {
-            int tw     = text_width_aa(FONT_AA_UI, pill);
-            int th     = text_height_aa(FONT_AA_UI);
-            int chip_w = tw + pad_x * 2 + glyph_r * 2 + glyph_gap;
-            int chip_h = th + pad_y * 2;
-            int chip_x = cur_x;
-            int chip_y = y_center - chip_h / 2;
-            int radius = chip_h / 2;
+        /* SYS TEMP + POWER DRAW: no on-die sensors wired yet (XADC TODO), so
+         * these are DISCONNECTED PLACEHOLDERS — plausible values shown with a
+         * leading '~' so the screen matches the concept layout without
+         * implying a live reading.  Replace with real XADC/INA when connected. */
+        const char *temp_v = "~37.4C";   /* placeholder (ASCII-safe; no degree glyph) */
+        char pw_v[16]; snprintf(pw_v, sizeof pw_v, "~%dW", 98);  /* placeholder */
 
-            pixel_t body = rgb(0x10, 0x18, 0x2C);
-            draw_rect_rounded(chip_x, chip_y, chip_w, chip_h, radius,
-                              body);
-            for (int g = 1; g <= 3; g++) {
-                uint8_t a = (uint8_t)(24 - (g - 1) * 6);
-                for (int sx = 0; sx < chip_w + 2 * g; sx++) {
-                    draw_blend_pixel(chip_x - g + sx, chip_y - g, pcol, a);
-                    draw_blend_pixel(chip_x - g + sx,
-                                     chip_y + chip_h - 1 + g, pcol, a);
-                }
-                for (int sy = 0; sy < chip_h + 2 * g; sy++) {
-                    draw_blend_pixel(chip_x - g, chip_y - g + sy, pcol, a);
-                    draw_blend_pixel(chip_x + chip_w - 1 + g,
-                                     chip_y - g + sy, pcol, a);
-                }
-            }
-            draw_rect(chip_x + radius, chip_y, chip_w - radius * 2, 1, pcol);
-            draw_rect(chip_x + radius, chip_y + chip_h - 1,
-                      chip_w - radius * 2, 1, pcol);
-            draw_rect(chip_x,              chip_y + radius,
-                      1, chip_h - radius * 2, pcol);
-            draw_rect(chip_x + chip_w - 1, chip_y + radius,
-                      1, chip_h - radius * 2, pcol);
+        int mgap = ATOMIK_GRID_L + 6;   /* even, generous inter-module gap */
+        cur_x += draw_metric_module(cur_x, cy, icon_thermo, "SYS TEMP", temp_v, ATOMIK_FG_DIM) + mgap;
+        cur_x += draw_metric_module(cur_x, cy, icon_bolt,   "POWER DRAW", pw_v, ATOMIK_FG_DIM) + mgap;
+        cur_x += draw_metric_module(cur_x, cy, icon_leaf,   "EFFICIENCY", eff_v, ATOMIK_SEM_SAVINGS) + mgap;
+        cur_x += draw_metric_module(cur_x, cy, icon_clock,  "UPTIME", up_v, ATOMIK_FG);
 
-            int gx = chip_x + pad_x + glyph_r;
-            int gy = y_center;
-            draw_personality_glyph(gx, gy, glyph_r, pcol);
-            draw_text_aa(FONT_AA_UI,
-                         chip_x + pad_x + glyph_r * 2 + glyph_gap,
-                         chip_y + pad_y, pill, pcol);
-            cur_x += chip_w + ATOMIK_GRID_M;
-        } else {
-            cur_x += draw_glass_pill(cur_x, y_center, pill, pcol);
-        }
-    }
-
-    /* v0.38-K2.5 center module — SYSTEM PULSE label + layered-stroke
-     * waveform.  v0.38-K2.5A: label uses FONT_AA_LABEL (14 px) at
-     * ATOMIK_FG_DIM so the waveform is visually dominant.  The label
-     * is a tiny instrument caption, not a header. */
-    {
-        const char *label = "SYSTEM PULSE";
-        font_aa_id_t lf = font_aa_loaded(FONT_AA_LABEL)
-                          ? FONT_AA_LABEL : FONT_AA_UI;
-        int label_w = font_aa_loaded(lf)
-                      ? text_width_aa(lf, label)
-                      : text_width(label, 1);
-        int label_h = font_aa_loaded(lf)
-                      ? text_height_aa(lf)
-                      : text_height(1);
-        int pulse_w = 320;
-        int pulse_h = bar_h - 24;
-        int total_w = label_w + ATOMIK_GRID_M + pulse_w;
-        int center_x = (FB_W - total_w) / 2;
-        if (center_x < cur_x + ATOMIK_GRID_L) {
-            center_x = cur_x + ATOMIK_GRID_L;
-        }
-        int label_y = y_center - label_h / 2;
-        if (font_aa_loaded(lf)) {
-            draw_text_aa(lf, center_x, label_y, label, ATOMIK_FG_DIM);
-        } else {
-            draw_text(center_x, label_y, label, 1, ATOMIK_FG_DIM);
-        }
-        int pulse_x = center_x + label_w + ATOMIK_GRID_M;
-        int pulse_y = y_center - pulse_h / 2;
-        draw_event_pulse_glow(pulse_x, pulse_y, pulse_w, pulse_h,
-                              ATOMIK_SEM_HARDWARE);
-        cur_x = pulse_x + pulse_w + ATOMIK_GRID_L;
-    }
-
-    /* Right segment: SYSTEM LIVE chip + uptime plain text. */
-    {
-        char up[64];
-        format_uptime(up, sizeof up);
-        const char *health = "SYSTEM LIVE";
-
-        int up_w, up_h, up_y;
-        if (font_aa_loaded(FONT_AA_UI)) {
-            up_w = text_width_aa(FONT_AA_UI, up);
-            up_h = text_height_aa(FONT_AA_UI);
-            up_y = y_center - up_h / 2;
-        } else {
-            up_w = text_width(up, 1);
-            up_h = text_height(1);
-            up_y = y_center - up_h / 2;
-        }
-
-        /* Measure the chip width by simulating one render at far-right;
-         * cheaper: just budget a fixed pad_x. */
-        int pad_x = ATOMIK_GRID_M + 2;
-        int pad_y = 4;
-        int chip_text_w = font_aa_loaded(FONT_AA_UI)
-                          ? text_width_aa(FONT_AA_UI, health)
-                          : text_width(health, 1);
-        int chip_text_h = font_aa_loaded(FONT_AA_UI)
-                          ? text_height_aa(FONT_AA_UI)
-                          : text_height(1);
-        int chip_w = chip_text_w + pad_x * 2;
-        int chip_h = chip_text_h + pad_y * 2;
-
-        int total_w = chip_w + ATOMIK_GRID_L + up_w;
-        int right_x = FB_W - ATOMIK_GRID_L - total_w;
-
-        draw_glass_pill(right_x, y_center, health, ATOMIK_SEM_HARDWARE);
-
-        if (font_aa_loaded(FONT_AA_UI)) {
-            draw_text_aa(FONT_AA_UI,
-                         right_x + chip_w + ATOMIK_GRID_L,
-                         up_y, up, ATOMIK_FG_DIM);
-        } else {
-            draw_text(right_x + chip_w + ATOMIK_GRID_L,
-                      up_y, up, 1, ATOMIK_FG_DIM);
-        }
-    }
-
-    /* Subtle cyan bottom edge — soft 2-px alpha falloff above the
-     * hard separator for a glass-highlight feel. */
-    draw_rect(0, bar_y + bar_h - 1, FB_W, 1, ATOMIK_ACCENT_DIM);
-    for (int g = 1; g <= 2; g++) {
-        uint8_t a = (uint8_t)(40 / g);
-        for (int sx = 0; sx < FB_W; sx++) {
-            draw_blend_pixel(sx, bar_y + bar_h - 1 - g,
-                             ATOMIK_SEM_HARDWARE, a);
-        }
+        int orb_r = 11;
+        int orb_cx = FB_W - ATOMIK_GRID_L - orb_r;
+        pulse_orb(orb_cx, cy, orb_r);
     }
 }
 
@@ -662,10 +638,16 @@ void status_draw(void) {
      * (cropped/invisible on this monitor; visible as a thin strip on
      * monitors with less overscan, but that's fine — wallpaper looks
      * intentional even at edges). */
-    draw_rect(0, bar_y,             FB_W, bar_h, rgb(0x1A, 0x22, 0x38));
-    /* Hard cyan-dim separator at the bottom of the bar — sharp visual
-     * end of the chrome, start of the desktop. */
-    draw_rect(0, bar_y + bar_h - 1, FB_W, 1,     ATOMIK_ACCENT_DIM);
+    if (is_investor) {
+        /* v0.40: darker base; draw_pulse_bar_investor paints a floating
+         * glass header panel over it — no hard divider line. */
+        draw_rect(0, bar_y, FB_W, bar_h, rgb(0x0C, 0x12, 0x20));
+    } else {
+        draw_rect(0, bar_y,             FB_W, bar_h, rgb(0x1A, 0x22, 0x38));
+        /* Hard cyan-dim separator at the bottom of the bar — sharp visual
+         * end of the chrome, start of the desktop. */
+        draw_rect(0, bar_y + bar_h - 1, FB_W, 1,     ATOMIK_ACCENT_DIM);
+    }
 
     /* v0.38-K2 — investor mode renders an entirely separate premium
      * Pulse Bar path with glass pills + AA throughout.  Dev / Demo

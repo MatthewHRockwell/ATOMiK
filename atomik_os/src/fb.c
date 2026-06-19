@@ -63,6 +63,13 @@ void fb_clear(pixel_t color) {
     for (size_t i = 0; i < (size_t)FB_W * FB_H; i++) p[i] = color;
 }
 
+/* v0.40 in-OS auto-capture: write the current back buffer to a PNG.  Lets
+ * atomik_os snapshot its own screen WITHOUT any host/UART command (no console
+ * input bleed, no shell during render). */
+void fb_write_png(const char *path) {
+    if (s_back) png_write_xrgb(path, (const uint32_t *)s_back, FB_W, FB_H);
+}
+
 void fb_enable_scanout(int enable) {
     /* DMA must be enabled BEFORE VTG, disabled AFTER VTG, to avoid showing
      * a torn first frame. */

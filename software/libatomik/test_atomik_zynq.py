@@ -11,14 +11,13 @@ ATOMiK Project — March 2026
 SPDX-License-Identifier: MIT
 """
 
-import sys
 import os
+import sys
 
 # Add parent directory so atomik_zynq can be imported
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from atomik_zynq import ATOMiK
-
 
 pass_count = 0
 fail_count = 0
@@ -332,9 +331,9 @@ def main():
     test_burst_accum()
     test_associativity()
 
-    print(f"\n============================================")
+    print("\n============================================")
     print(f"Test Summary: {pass_count}/{pass_count + fail_count} passed")
-    print(f"============================================")
+    print("============================================")
 
     if fail_count > 0:
         print(f"*** {fail_count} TESTS FAILED ***")

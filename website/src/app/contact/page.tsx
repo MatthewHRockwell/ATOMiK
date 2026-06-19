@@ -220,6 +220,9 @@ export default function ContactPage() {
         <p className="mt-4 text-base leading-7" style={{ color: "#9fb1c7" }}>
           Use this form for technical evaluation, proof review, licensing, investor diligence, and design-partner conversations. The strongest request names one workload, one current baseline, one painful constraint, and the decision the evidence needs to support.
         </p>
+        <div className="mt-5 rounded-lg p-4 text-sm leading-6" style={{ background: "#101927", border: "1px solid #1d324a", color: "#9fb1c7" }}>
+          Share only sanitized or high-level workload context here. Do not submit proprietary traces, source code, customer data, export-controlled material, or confidential implementation details until an NDA and evaluation scope are in place.
+        </div>
         {status === "sent" ? (
           <div
             className="mt-10 rounded-lg border p-8"
@@ -234,10 +237,6 @@ export default function ContactPage() {
               <Link href="/pricing" style={{ color: "#22d3ee" }}>
                 evaluation page
               </Link>
-              . You can also reach ATOMiK at{" "}
-              <a href="mailto:matthew.h.rockwell@gmail.com" style={{ color: "#22d3ee" }}>
-                matthew.h.rockwell@gmail.com
-              </a>
               .
             </p>
           </div>
@@ -249,8 +248,9 @@ export default function ContactPage() {
           >
             <div className="grid gap-5 md:grid-cols-2">
               <div>
-                <label className="mb-1.5 block text-sm font-medium">Name</label>
+                <label htmlFor="contact-name" className="mb-1.5 block text-sm font-medium">Name</label>
                 <input
+                  id="contact-name"
                   type="text"
                   autoComplete="name"
                   required
@@ -261,8 +261,9 @@ export default function ContactPage() {
                 />
               </div>
               <div>
-                <label className="mb-1.5 block text-sm font-medium">Work email</label>
+                <label htmlFor="contact-email" className="mb-1.5 block text-sm font-medium">Work email</label>
                 <input
+                  id="contact-email"
                   type="email"
                   autoComplete="email"
                   inputMode="email"
@@ -277,8 +278,9 @@ export default function ContactPage() {
 
             <div className="grid gap-5 md:grid-cols-2">
               <div>
-                <label className="mb-1.5 block text-sm font-medium">Company</label>
+                <label htmlFor="contact-company" className="mb-1.5 block text-sm font-medium">Company</label>
                 <input
+                  id="contact-company"
                   type="text"
                   autoComplete="organization"
                   value={form.company}
@@ -288,8 +290,9 @@ export default function ContactPage() {
                 />
               </div>
               <div>
-                <label className="mb-1.5 block text-sm font-medium">Role</label>
+                <label htmlFor="contact-role" className="mb-1.5 block text-sm font-medium">Role</label>
                 <select
+                  id="contact-role"
                   value={form.role}
                   onChange={(e) => update("role", e.target.value)}
                   className={fieldClass}
@@ -304,8 +307,9 @@ export default function ContactPage() {
 
             <div className="grid gap-5 md:grid-cols-3">
               <div>
-                <label className="mb-1.5 block text-sm font-medium">Request</label>
+                <label htmlFor="contact-request" className="mb-1.5 block text-sm font-medium">Request</label>
                 <select
+                  id="contact-request"
                   value={form.requestType}
                   onChange={(e) => updateRequestType(e.target.value)}
                   className={fieldClass}
@@ -317,8 +321,9 @@ export default function ContactPage() {
                 </select>
               </div>
               <div>
-                <label className="mb-1.5 block text-sm font-medium">Pain category</label>
+                <label htmlFor="contact-pain" className="mb-1.5 block text-sm font-medium">Pain category</label>
                 <select
+                  id="contact-pain"
                   value={form.painCategory}
                   onChange={(e) => update("painCategory", e.target.value)}
                   className={fieldClass}
@@ -330,8 +335,9 @@ export default function ContactPage() {
                 </select>
               </div>
               <div>
-                <label className="mb-1.5 block text-sm font-medium">Timeline</label>
+                <label htmlFor="contact-timeline" className="mb-1.5 block text-sm font-medium">Timeline</label>
                 <select
+                  id="contact-timeline"
                   value={form.timeline}
                   onChange={(e) => update("timeline", e.target.value)}
                   className={fieldClass}
@@ -345,33 +351,36 @@ export default function ContactPage() {
             </div>
 
             <div>
-              <label className="mb-1.5 block text-sm font-medium">Use case or workload</label>
+              <label htmlFor="contact-usecase" className="mb-1.5 block text-sm font-medium">Use case or workload</label>
               <textarea
+                id="contact-usecase"
                 required
                 rows={4}
                 value={form.useCase}
                 onChange={(e) => update("useCase", e.target.value)}
-                placeholder="Example: battery-limited edge telemetry, AI-at-the-edge context movement, embedded state tracking, robotics or industrial control, remote reliability, or data-center state movement..."
+                placeholder="Example: sanitized battery-limited edge telemetry, AI-at-the-edge context movement, embedded state tracking, robotics or industrial control, remote reliability, or data-center state movement..."
                 className={textareaClass}
                 style={inputStyle}
               />
             </div>
 
             <div>
-              <label className="mb-1.5 block text-sm font-medium">Current stack or constraints</label>
+              <label htmlFor="contact-stack" className="mb-1.5 block text-sm font-medium">Current stack or constraints</label>
               <textarea
+                id="contact-stack"
                 rows={3}
                 value={form.currentStack}
                 onChange={(e) => update("currentStack", e.target.value)}
-                placeholder="Runtime, target hardware, state size, update cadence, current baseline, battery, heat, bandwidth, latency, footprint, reliability, cost, or decision threshold..."
+                placeholder="Sanitized runtime, target hardware class, approximate state size, update cadence, current baseline, battery, heat, bandwidth, latency, footprint, reliability, cost, or decision threshold..."
                 className={textareaClass}
                 style={inputStyle}
               />
             </div>
 
             <div>
-              <label className="mb-1.5 block text-sm font-medium">Anything else</label>
+              <label htmlFor="contact-message" className="mb-1.5 block text-sm font-medium">Anything else</label>
               <textarea
+                id="contact-message"
                 rows={3}
                 value={form.message}
                 onChange={(e) => update("message", e.target.value)}

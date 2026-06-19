@@ -38,8 +38,34 @@
 #define ASSIST_AVATAR_PX          160
 #define ASSIST_MARGIN             ATOMIK_GRID_L
 
-static atomik_asset_t   s_avatar;
-static int              s_avatar_loaded = 0;
+/* ── Pose-frame set ───────────────────────────────────────────────────────
+ * Atom is no longer a single static sticker: he has a set of pose assets,
+ * selected by mood + a summon-entrance gesture + a blink overlay.  Only IDLE
+ * is required; every other pose is optional and falls back to IDLE when its
+ * art isn't present, so new hand-authored poses (wave, point, …) light up the
+ * moment their .atomik_asset is dropped in /tmp/atomik_assets/ — no code
+ * change.  Generate poses with tools/prep_assistant_poses.py. */
+typedef enum {
+    POSE_IDLE = 0,   /* calm float — the default, required                  */
+    POSE_BLINK,      /* eyes shut — swapped in during the blink window      */
+    POSE_HAPPY,      /* SUCCESS mood                                        */
+    POSE_ALERT,      /* WARNING mood                                        */
+    POSE_THINK,      /* THINKING mood                                       */
+    POSE_WAVE,       /* greeting gesture played briefly on summon           */
+    POSE_COUNT
+} atom_pose_t;
+static const char *const POSE_FILE[POSE_COUNT] = {
+    "/tmp/atomik_assets/assistant_idle_160.atomik_asset",
+    "/tmp/atomik_assets/assistant_blink_160.atomik_asset",
+    "/tmp/atomik_assets/assistant_happy_160.atomik_asset",
+    "/tmp/atomik_assets/assistant_alert_160.atomik_asset",
+    "/tmp/atomik_assets/assistant_think_160.atomik_asset",
+    "/tmp/atomik_assets/assistant_wave_160.atomik_asset",
+};
+static atomik_asset_t   s_pose[POSE_COUNT];
+static int              s_pose_ok[POSE_COUNT];
+#define s_avatar        s_pose[POSE_IDLE]        /* back-compat alias */
+#define s_avatar_loaded s_pose_ok[POSE_IDLE]
 static int              s_visible       = 0;
 static unsigned long    s_shown_ms      = 0;
 static assistant_mode_t   s_mode          = ASSIST_EXPLAIN;
@@ -52,16 +78,52 @@ static unsigned long    s_last_dismiss_ms  = 0;
 static int s_last_x, s_last_y, s_last_w, s_last_h;
 
 int assistant_init(void) {
-    if (s_avatar_loaded) return 1;
-    int rc = atomik_asset_load(
-        "/tmp/atomik_assets/assistant_idle_160.atomik_asset",
-        &s_avatar);
-    if (rc != 0) {
-        memset(&s_avatar, 0, sizeof s_avatar);
-        return 0;
+    if (s_pose_ok[POSE_IDLE]) return 1;
+    /* Load every pose that exists; only IDLE is mandatory. */
+    int any_optional = 0;
+    for (int p = 0; p < POSE_COUNT; p++) {
+        if (s_pose_ok[p]) continue;
+        if (atomik_asset_load(POSE_FILE[p], &s_pose[p]) == 0) {
+            s_pose_ok[p] = 1;
+            if (p != POSE_IDLE) any_optional++;
+        } else {
+            memset(&s_pose[p], 0, sizeof s_pose[p]);
+        }
     }
-    s_avatar_loaded = 1;
+    (void)any_optional;
+    if (!s_pose_ok[POSE_IDLE]) return 0;   /* no idle art → fall back to text box */
     return 1;
+}
+
+/* Demo/capture override: if /tmp/atomik_assist_force holds a mood word, every
+ * summon is pinned to it so a specific pose/mood can be photographed
+ * deterministically (the demo otherwise picks the mood from events).  Returns
+ * the forced mode, or the passed-in default when the file is absent/empty. */
+static assistant_mode_t forced_mode(assistant_mode_t deflt) {
+    FILE *f = fopen("/tmp/atomik_assist_force", "r");
+    if (!f) return deflt;
+    char b[16] = {0};
+    char *got = fgets(b, sizeof b, f);
+    fclose(f);
+    if (!got) return deflt;
+    if (!strncmp(b, "success", 7))  return ASSIST_SUCCESS;
+    if (!strncmp(b, "thinking", 8)) return ASSIST_THINKING;
+    if (!strncmp(b, "warning", 7))  return ASSIST_WARNING;
+    if (!strncmp(b, "explain", 7))  return ASSIST_EXPLAIN;
+    return deflt;
+}
+
+/* Which pose to draw this frame: a brief greeting wave on summon, then the
+ * mood pose (falling back to IDLE if that mood's art is absent). */
+static atom_pose_t active_pose(unsigned long now) {
+    if (s_pose_ok[POSE_WAVE] && (now - s_shown_ms) < 900) return POSE_WAVE;
+    switch (s_mode) {
+    case ASSIST_SUCCESS:  if (s_pose_ok[POSE_HAPPY]) return POSE_HAPPY; break;
+    case ASSIST_WARNING:  if (s_pose_ok[POSE_ALERT]) return POSE_ALERT; break;
+    case ASSIST_THINKING: if (s_pose_ok[POSE_THINK]) return POSE_THINK; break;
+    default: break;
+    }
+    return POSE_IDLE;
 }
 
 void assistant_summon(void) {
@@ -75,7 +137,7 @@ void assistant_summon_mode(assistant_mode_t m) {
         return;
     }
     if (!s_avatar_loaded) assistant_init();
-    s_mode     = m;
+    s_mode     = forced_mode(m);          /* demo/capture mood pin */
     s_src      = ASSIST_SRC_MANUAL;       /* v0.39-D — manual entry */
     s_visible  = 1;
     s_shown_ms = anim_now_ms();
@@ -88,10 +150,22 @@ void assistant_summon_capture_success(void) {
      * cleanly (else two halos can overlap during animation). */
     if (s_visible) { assistant_dismiss(); }
     if (!s_avatar_loaded) assistant_init();
-    s_mode     = ASSIST_SUCCESS;
+    s_mode     = forced_mode(ASSIST_SUCCESS);
     s_src      = ASSIST_SRC_FIRST_LIVE;
     s_visible  = 1;
     s_shown_ms = anim_now_ms();
+}
+
+/* v0.42: report "animating" while the character overlay is up so the main
+ * loop keeps repainting (float bob + breathing aura).  Rate-limited to ~6 fps
+ * — smooth enough to read as alive, light enough for the soft CPU. */
+static unsigned long s_last_anim_ms = 0;
+int assistant_animating(void) {
+    if (!s_visible || !s_avatar_loaded) return 0;
+    unsigned long now = anim_now_ms();
+    if (now - s_last_anim_ms < 160) return 0;
+    s_last_anim_ms = now;
+    return 1;
 }
 
 void assistant_dismiss(void) {
@@ -158,7 +232,7 @@ void assistant_on_personality_change(personality_t old_p,
     if (!s_avatar_loaded) assistant_init();
     /* v0.39-C: personality switch is an explanation moment.
      * v0.39-D: title becomes "<P> workload detected". */
-    s_mode     = ASSIST_EXPLAIN;
+    s_mode     = forced_mode(ASSIST_EXPLAIN);
     s_src      = ASSIST_SRC_SWITCH;
     s_visible  = 1;
     s_shown_ms = now;
@@ -172,7 +246,7 @@ void assistant_on_first_live(personality_t p) {
     if (!s_avatar_loaded) assistant_init();
     /* v0.39-C: data started flowing — good news, success halo.
      * v0.39-D: title becomes "<P> data live". */
-    s_mode     = ASSIST_SUCCESS;
+    s_mode     = forced_mode(ASSIST_SUCCESS);
     s_src      = ASSIST_SRC_FIRST_LIVE;
     s_visible  = 1;
     s_shown_ms = now;
@@ -324,6 +398,56 @@ void assistant_draw(void) {
     int av_x = x + ATOMIK_GRID_L + 4;
     int av_y = y + (h - ASSIST_AVATAR_PX) / 2;
 
+    /* v0.42 Atom float: a visible hover that takes on the MOOD of why Atom
+     * appeared.  A vertical bob + a quarter-phase horizontal sway, but the
+     * period (tempo), vertical amplitude, and lateral amplitude all shift by
+     * mode so the motion reinforces the aura's color cue:
+     *   SUCCESS  — fast, tall, springy bounce (excited)
+     *   THINKING — quick, shallow pulse with more sway (busy processing)
+     *   WARNING  — slow, low, wide wary drift
+     *   EXPLAIN/IDLE — the calm lazy float (default)
+     * Driven by anim_now_ms; the main loop repaints while the overlay is
+     * visible (assistant_animating).  Taylor sine — no math.h here. */
+    unsigned period_ms; double amp_y, amp_x;
+    switch (s_mode) {
+    case ASSIST_SUCCESS:  period_ms = 1500; amp_y = 12.0; amp_x = 2.0; break;
+    case ASSIST_THINKING: period_ms = 1100; amp_y = 5.0;  amp_x = 5.0; break;
+    case ASSIST_WARNING:  period_ms = 3200; amp_y = 6.0;  amp_x = 5.0; break;
+    case ASSIST_EXPLAIN:
+    case ASSIST_IDLE:
+    default:              period_ms = 2400; amp_y = 9.0;  amp_x = 3.0; break;
+    }
+    double assist_sn, assist_cs;
+    {
+        unsigned long now0 = anim_now_ms();
+        double ph = (double)(now0 % period_ms) / (double)period_ms * 6.2831853;
+        double q  = ph + 1.5707963;   /* +90deg -> cosine for the sway */
+        while (ph > 3.14159265) ph -= 6.2831853;
+        while (ph < -3.14159265) ph += 6.2831853;
+        while (q  > 3.14159265) q  -= 6.2831853;
+        while (q  < -3.14159265) q  += 6.2831853;
+        double p3 = ph*ph*ph, p5 = p3*ph*ph;
+        assist_sn = ph - p3/6.0 + p5/120.0;
+        double q3 = q*q*q, q5 = q3*q*q;
+        assist_cs = q - q3/6.0 + q5/120.0;
+    }
+    av_y += (int)(amp_y * assist_sn);
+    av_x += (int)(amp_x * assist_cs);
+
+    /* v0.42 entrance: for the first ~320 ms after summon, Atom slides up into
+     * place (eased) so he "arrives" rather than popping in — a small touch that
+     * reads as a living assistant.  Uses the sim/real anim clock. */
+    {
+        unsigned long age = anim_now_ms() - s_shown_ms;
+        if (age < 320) {
+            double t = (double)age / 320.0;          /* 0..1 */
+            double slide = (1.0 - anim_ease_out(t));  /* 1..0 */
+            av_y += (int)(14.0 * slide);              /* start 14 px low (within the
+                                                       * card margin — no poke-out),
+                                                       * ease up to settle */
+        }
+    }
+
     /* v0.39-E aura palette.
      * Cyan is the brand identity for Atom; SUCCESS keeps cyan for
      * the INNER two rings and paints the OUTER ring emerald so the
@@ -361,14 +485,7 @@ void assistant_draw(void) {
      * For SUCCESS the outer ring is emerald, identity stays cyan.
      * Pulse amplitude driven by anim_now_ms so Atom breathes. */
     {
-        unsigned long now = anim_now_ms();
-        double phase = (double)(now % 2400) / 2400.0 * 6.2831853;
-        double s = phase;
-        while (s > 3.14159265) s -= 6.2831853;
-        while (s < -3.14159265) s += 6.2831853;
-        double s3 = s*s*s, s5 = s3*s*s;
-        double sn = s - s3/6.0 + s5/120.0;
-        double pulse = 0.7 + 0.3 * sn;
+        double pulse = 0.7 + 0.3 * assist_sn;   /* synced with the float bob */
         int cx = av_x + ASSIST_AVATAR_PX / 2;
         int cy = av_y + ASSIST_AVATAR_PX / 2;
         for (int layer = 0; layer < 3; layer++) {
@@ -402,8 +519,29 @@ void assistant_draw(void) {
         }
     }
 
-    if (s_avatar_loaded) {
-        atomik_asset_blit(&s_avatar, av_x, av_y);
+    if (s_pose_ok[POSE_IDLE]) {
+        unsigned long now = anim_now_ms();
+        atom_pose_t pose = active_pose(now);
+        /* blink window: ~150 ms every ~3.6 s (2.6 s when excited). */
+        unsigned blink_period = (s_mode == ASSIST_SUCCESS) ? 2600 : 3600;
+        int blinking = ((now % blink_period) < 150);
+        /* Prefer a real eyes-shut frame; only on the calm IDLE pose (mood
+         * poses carry their own expression). */
+        if (blinking && pose == POSE_IDLE && s_pose_ok[POSE_BLINK]) pose = POSE_BLINK;
+        atomik_asset_blit(&s_pose[pose], av_x, av_y);
+        /* Procedural blink fallback when no baked POSE_BLINK art: paint the
+         * measured face-screen black over Atom's eye band (well inside the dark
+         * screen, never onto the silver shell). */
+        if (blinking && pose == POSE_IDLE && !s_pose_ok[POSE_BLINK]) {
+            int ex0 = av_x + (int)(ASSIST_AVATAR_PX * 0.35);
+            int ex1 = av_x + (int)(ASSIST_AVATAR_PX * 0.69);
+            int ey0 = av_y + (int)(ASSIST_AVATAR_PX * 0.30);
+            int ey1 = av_y + (int)(ASSIST_AVATAR_PX * 0.49);
+            pixel_t lid = rgb(0x20, 0x16, 0x1A);
+            for (int yy = ey0; yy < ey1; yy++)
+                for (int xx = ex0; xx < ex1; xx++)
+                    draw_pixel(xx, yy, lid);
+        }
     } else {
         /* Fallback — violet placeholder rectangle with "Atom" text. */
         int aw = ASSIST_AVATAR_PX;

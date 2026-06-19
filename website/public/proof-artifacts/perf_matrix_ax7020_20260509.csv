@@ -1,0 +1,10 @@
+regs,ops,profile,software_cycles,software_hw_ops,software_bytes_avoided,atomik_direct_cycles,atomik_direct_hw_ops,atomik_direct_bytes_avoided,atomik_batched_cycles,atomik_batched_hw_ops,atomik_batched_bytes_avoided,atomik_profile_cycles,atomik_profile_hw_ops,atomik_profile_bytes_avoided,speedup_profile_vs_software,speedup_batched_vs_direct,speedup_profile_vs_batched
+8,64,STATE,8800,64,0,422908,64,0,122203,64,0,6406,4,0,1.3737,3.4607,19.0763
+8,64,SYNC,8145,64,0,14325,64,0,17248,64,0,14912,4,0,0.5462,0.8305,1.1567
+8,64,AGENT,8144,64,0,15294,64,0,17783,64,0,21847,3,4,0.3728,0.86,0.814
+32,256,STATE,25361,256,0,49338,256,0,47551,256,0,38465,16,0,0.6593,1.0376,1.2362
+32,256,SYNC,25339,256,0,48576,256,0,43868,256,0,39387,16,0,0.6433,1.1073,1.1138
+32,256,AGENT,24942,256,0,48885,256,0,48270,256,0,54904,10,24,0.4543,1.0127,0.8792
+64,1024,STATE,74600,1024,0,184889,1024,0,173010,1024,0,145766,32,0,0.5118,1.0687,1.1869
+64,1024,SYNC,74513,1024,0,185267,1024,0,171939,1024,0,151742,32,0,0.4911,1.0775,1.1331
+64,1024,AGENT,74534,1024,0,185406,1024,0,172261,1024,0,165209,20,48,0.4511,1.0763,1.0427

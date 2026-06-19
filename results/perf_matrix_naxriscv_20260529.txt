@@ -1,0 +1,33 @@
+ATOMiK perf-bench (v0.33-D) — four-way comparison matrix
+Captured 2026-05-29 on the AX7020 board, RV64 NaxRiscv soft-CPU (LiteX, ~100 MHz),
+ATOMiK adapter @ /dev/mem 0xF0020000. Real cycle counts (rdcycle). atomik_os SIGSTOP'd
+during the run for a clean measurement.
+
+software / atomik_direct / atomik_batched / atomik_profile
+
+regs  ops  prof  | software cyc  | atomik direct  | atomik batched | atomik profile
+                  | (hw ops/byts) | (hw ops/byts)  | (hw ops/byts)  | (hw ops/byts av)
+----  ---  ----- | ------------  | -------------  | -------------  | ----------------
+   8   64  STATE |      9170 (64/   0) |    571143 (64/   0) |    132092 (64/   0) |      7221 ( 4/   0)
+   8   64  SYNC  |      7547 (64/   0) |     14560 (64/   0) |     10293 (64/   0) |      9850 ( 4/   0)
+   8   64  AGENT |      7683 (64/   0) |     13563 (64/   0) |     15343 (64/   0) |  24368441 ( 3/   4)
+  32  256  STATE |     24655 (256/   0) |     47547 (256/   0) |     45827 (256/   0) |     33834 (16/   0)
+  32  256  SYNC  |     25382 (256/   0) |     48633 (256/   0) |     45625 (256/   0) |     38888 (16/   0)
+  32  256  AGENT |     25319 (256/   0) |     46528 (256/   0) |     46508 (256/   0) |     57068 (10/  24)
+  64  1024  STATE |     74298 (1024/   0) |    186226 (1024/   0) |    169955 (1024/   0) |    144591 (32/   0)
+  64  1024  SYNC  |     74241 (1024/   0) |    306208 (1024/   0) |    170460 (1024/   0) |  24310269 (32/   0)
+  64  1024  AGENT |     74922 (1024/   0) |  16440897 (1024/   0) |    169362 (1024/   0) |  24387738 (20/  48)
+
+legend: cycles_total (hw_ops_emitted / bytes_avoided)
+speedup = software_cycles / atomik_cycles (use perf_speedup)
+
+NOTES (honest framing — see feedback_perf_matrix_framing):
+- The architectural result is OPS REDUCTION in the profile path: hw ops drop 64->4, 256->16,
+  1024->32 (≈16x at the 8-reg/64-op case). Fewer hardware ops = less memory traffic, the
+  real benefit on bandwidth-constrained systems.
+- STATE 8/64 profile is ALSO faster in raw cycles here: 7221 vs 9170 software (~1.27x).
+- The direct/batched columns show cycle OVERHEAD vs software on this soft-CPU — adapter MMIO
+  is expensive at ~100 MHz. Do NOT frame the matrix as cycle "wins/losses"; the win is the
+  ops/traffic reduction, which compounds on real bandwidth-bound workloads.
+- AGENT-profile cells with ~24M cycles are timing outliers from the relevance-recency
+  (anim_now_ms) path, not representative — treat as anomalous.

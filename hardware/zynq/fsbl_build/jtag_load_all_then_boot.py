@@ -24,7 +24,13 @@ import os, subprocess, sys, time, serial
 ZYNQ_DIR  = "/home/mattrock/Projects/ATOMiK/hardware/zynq"
 XSDB      = "/opt/Xilinx/2025.2/Vivado/bin/xsdb"
 PS7_INIT  = f"{ZYNQ_DIR}/scripts/ps7_init_rk7020f.tcl"
-BITSTREAM = f"{ZYNQ_DIR}/litex/build/hamgeek_rk7020f/gateware/hamgeek_rk7020f.bit"
+# v0.40: HDMI demo boot uses the L2-off + video-framebuffer build (ATOMiK CSR
+# @0xF0020000 + simple-framebuffer for /dev/fb0).  The old litex/build bitstream
+# has no HDMI framebuffer, so atomik_os would have nothing to scan out.
+# Override with ATOMIK_BITSTREAM env to boot a different build (e.g. the
+# parallel-bank bench build) without editing this proven script.
+BITSTREAM = os.environ.get("ATOMIK_BITSTREAM",
+    f"{ZYNQ_DIR}/litex-build-nax64-l2off-fb/gateware/hamgeek_rk7020f.bit")
 PSLD      = f"{ZYNQ_DIR}/ps_loader"
 BIOS_PORT = "/dev/ttyUSB2"  # LiteX BIOS UART — varies; probe all ports if this fails
 
@@ -46,12 +52,12 @@ BOOT_FILES = [
 #   NaxRiscv 0x56000000 == PS 0x16100000  (sd_rw,        ~580KB)
 #   NaxRiscv 0x58000000 == PS 0x18100000  (BOOT.bin,     ~3.9MB)
 #   NaxRiscv 0x5C000000 == PS 0x1C100000  (nax64.bit.bin,~3.9MB)
-SD_FILES = [
-    ("/tmp/sd_rw",                                                   0x1610_0000),
-    (f"{ZYNQ_DIR}/fsbl_build/BOOT.bin",                              0x1810_0000),
-    (f"{ZYNQ_DIR}/litex-build-nax64-sdboot/gateware/hamgeek_rk7020f.bit.bin",
-                                                                     0x1C10_0000),
-]
+# v0.40: SD-write side-quest files (sd_rw, BOOT.bin, sdboot bitstream) are NOT
+# needed to boot Linux for the HDMI demo — they only matter for the separate
+# SD-population workflow.  Skipping them removes the /tmp/sd_rw dependency and
+# ~8 MB of JTAG transfer, so the demo boot is faster.  Restore from git history
+# if you need the SD-write path again.
+SD_FILES = []
 
 BOOT_TARGET = 0x40A0_0000   # trampoline address
 
@@ -121,14 +127,15 @@ def main():
             print("  Liftoff confirmed!")
         print(f"  Response: {d2[:80]!r}")
 
-    # NaxRiscv addresses for /dev/mem dd (PS - 0x3FF00000 = NaxRiscv).
-    NAX_SD_RW   = 0x5600_0000
-    NAX_BOOT    = 0x5800_0000
-    NAX_BITSTR  = 0x5C00_0000
-    sz_sd_rw    = os.path.getsize(SD_FILES[0][0])
-    sz_boot     = os.path.getsize(SD_FILES[1][0])
-    sz_bitstr   = os.path.getsize(SD_FILES[2][0])
-    print(f"""
+    if SD_FILES:
+        # NaxRiscv addresses for /dev/mem dd (PS - 0x3FF00000 = NaxRiscv).
+        NAX_SD_RW  = 0x5600_0000
+        NAX_BOOT   = 0x5800_0000
+        NAX_BITSTR = 0x5C00_0000
+        sz_sd_rw   = os.path.getsize(SD_FILES[0][0])
+        sz_boot    = os.path.getsize(SD_FILES[1][0])
+        sz_bitstr  = os.path.getsize(SD_FILES[2][0])
+        print(f"""
 === Wait ~100s for Linux to boot, then on the BOARD (NaxRiscv addresses): ===
 
 mknod /dev/mem c 1 1 2>/dev/null
@@ -137,7 +144,18 @@ dd if=/dev/mem bs=512 skip={NAX_BOOT//512}   count={sz_boot//512+1}   2>/dev/nul
 dd if=/dev/mem bs=512 skip={NAX_BITSTR//512} count={sz_bitstr//512+1} 2>/dev/null | head -c {sz_bitstr} > /tmp/nax64.bit.bin
 
 ls -lh /tmp/sd_rw /tmp/BOOT.bin /tmp/nax64.bit.bin
-/tmp/sd_rw detect    # <-- expect dump_sdhc lines and either "Card OK" or specific failure point
+/tmp/sd_rw detect
+""")
+    else:
+        print("""
+=== HDMI demo boot: wait ~2-4 min for systemd, then deploy atomik_os ===
+
+  cd atomik_os && python3 deploy.py --mode INVESTOR
+
+deploy.py base64-ships build/atomik_os + fb2png to /tmp over ttyUSB2, launches
+it on /dev/fb0 (investor mode), and pulls back a real fb2png screenshot.
+For premium AA fonts, ship the .atomik_font set to /tmp/atomik_fonts first
+(see ship_fonts step in the session notes).
 """)
 
 if __name__ == "__main__":

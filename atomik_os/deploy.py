@@ -15,7 +15,8 @@ Usage:
 import argparse, base64, gzip, os, re, sys, time
 import serial
 
-PORT, BAUD = "/dev/ttyUSB2", 115200
+PORT = os.environ.get("ATOMIK_PORT", "/dev/ttyUSB2")  # BIOS/console port varies per session
+BAUD = 115200
 HERE   = os.path.dirname(os.path.abspath(__file__))
 LOCAL  = os.path.join(HERE, "build", "atomik_os")
 REMOTE = "/tmp/atomik_os"
@@ -121,6 +122,28 @@ def transfer(s, local_path, remote_path, label):
     cmd(s, f"gunzip -c /tmp/{label}.gz > {remote_path} && chmod +x {remote_path}")
     cmd(s, f"stat -c%s {remote_path}")
 
+
+def transfer_verified(s, local_path, remote_path, label, tries=5):
+    """transfer() + confirm the on-board file is the exact expected size, with
+    retries.  The ttyUSB byte-doubling can silently corrupt a transfer (the
+    gunzip fails or the file lands wrong) yet deploy used to march on — that is
+    how the AA fonts went missing while deploy still reported VERSION OK."""
+    want = os.path.getsize(local_path)
+    for k in range(tries):
+        transfer(s, local_path, remote_path, label)
+        got = cmd_capture(s, f"stat -c%s {remote_path} 2>&1", t=8) or ""
+        if str(want) in got:
+            if k:
+                print(f"[deploy]  {label}: verified {want}B (try {k+1})", flush=True)
+            return True
+        print(f"[deploy]  {label}: SIZE MISMATCH (got {got.strip()[-16:]!r}, "
+              f"want {want}) — re-shipping (try {k+1}/{tries})", flush=True)
+        time.sleep(1)
+    print(f"[deploy]  {label}: FAILED to land after {tries} tries — UI/fonts "
+          f"may be wrong on board!", flush=True)
+    return False
+
+
 def expected_version():
     """Read AOS_VERSION from atomik_os.h so we know what string the new
     binary should self-stamp."""
@@ -206,6 +229,43 @@ def capture_and_save(s, expected_ver):
     print(f"[deploy]  screenshot saved: {path}", flush=True)
     return path
 
+def autoshot_capture_and_save(s, ver):
+    """Pull the in-OS auto-captured PNG.  atomik_os writes
+    /tmp/atomik_autoshot.png + .done ~18s after launch, entirely on its own —
+    so we send NOTHING for ~24s (any keystroke bleeds into the OS via the
+    shared console and clutters the frame), then pull the already-captured PNG."""
+    os.makedirs(SHOTS_DIR, exist_ok=True)
+    print("[deploy] AUTOSHOT: silent wait ~24s for the in-OS capture "
+          "(no commands => clean frame) …", flush=True)
+    time.sleep(24)   # boot (~5s) + demo cycles + capture fires at 18s
+    done = ""
+    for _ in range(8):
+        done = (cmd_capture(s, "cat /tmp/atomik_autoshot.done 2>/dev/null", t=8) or "").strip()
+        if "ok" in done:
+            break
+        time.sleep(3)
+    if "ok" not in done:
+        print("[deploy]  AUTOSHOT: no /tmp/atomik_autoshot.done — atomik_os "
+              "didn't reach the capture (chmod/launch failure?). Re-run with "
+              "--no-binary --autoshot to chmod-fix the on-board binary.",
+              flush=True)
+        return None
+    sz = (cmd_capture(s, "stat -c%s /tmp/atomik_autoshot.png 2>/dev/null", t=8) or "").strip()
+    print(f"[deploy]  AUTOSHOT captured ({sz} bytes) — pulling", flush=True)
+    cmd(s, "pkill -STOP atomik_os && echo P || echo N", t=8, log=False)
+    raw = pull_file(s, "/tmp/atomik_autoshot.png", "autoshot")
+    cmd(s, "pkill -CONT atomik_os && echo R || echo N", t=8, log=False)
+    if not raw:
+        print("[deploy]  AUTOSHOT pull FAILED", flush=True)
+        return None
+    ts = time.strftime("%Y%m%d_%H%M%S")
+    path = os.path.join(SHOTS_DIR, f"autoshot_{ts}_{ver}.png")
+    with open(path, "wb") as f:
+        f.write(raw)
+    print(f"[deploy]  AUTOSHOT saved: {path}", flush=True)
+    return path
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--no-launch", action="store_true")
@@ -213,6 +273,23 @@ def main():
                     help="Skip transferring the fb2png screenshot tool")
     ap.add_argument("--no-assets", action="store_true",
                     help="Skip shipping atomik_os/assets/*.atomik_asset")
+    ap.add_argument("--no-fonts", action="store_true",
+                    help="Skip shipping the .atomik_font atlases (decoupled "
+                         "from --no-assets; fonts are the premium-typography "
+                         "essential)")
+    ap.add_argument("--no-binary", action="store_true",
+                    help="Don't re-transfer the binary; just chmod +x the one "
+                         "already on the board (use after a partial deploy or "
+                         "a UART-corrupted chmod)")
+    ap.add_argument("--demo", action="store_true",
+                    help="Start the self-driving demo workload (touch "
+                         "/tmp/atomik_demo) so the captured frame shows live "
+                         "Fabric activity with real perf-bench data")
+    ap.add_argument("--autoshot", action="store_true",
+                    help="In-OS auto-capture: atomik_os snapshots its own "
+                         "screen ~18s in (no shell/UART during render => a "
+                         "clean frame, no console-input bleed). Host waits "
+                         "silently then pulls the self-captured PNG.")
     ap.add_argument("--no-shot", action="store_true",
                     help="Skip post-launch screenshot verification")
     ap.add_argument("--mode", choices=["DEV", "DEMO", "INVESTOR"],
@@ -246,9 +323,15 @@ def main():
     print(f"[deploy] upload @ {FAST_RATE_S*1000:.1f} ms/char "
           f"(atomik_os killed; safe to push fast)", flush=True)
 
-    transfer(s, LOCAL, REMOTE, "aos")
-    if (not args.no_fb2png) and os.path.exists(FB2PNG_LOCAL):
-        transfer(s, FB2PNG_LOCAL, FB2PNG_REMOTE, "fb2png")
+    if args.no_binary:
+        # Binary already on the board — just (re)assert +x.  Fixes the case
+        # where a UART byte-doubling corrupted the chmod target during the
+        # original transfer (e.g. /tmp/atomiik_os) and left it non-executable.
+        cmd(s, f"chmod +x {REMOTE}; ls -la {REMOTE} | head -1")
+    else:
+        transfer_verified(s, LOCAL, REMOTE, "aos")
+    if (not args.no_binary) and (not args.no_fb2png) and os.path.exists(FB2PNG_LOCAL):
+        transfer_verified(s, FB2PNG_LOCAL, FB2PNG_REMOTE, "fb2png")
 
     # v0.36: ship .atomik_asset files so the board can blit pre-rendered
     # backgrounds (Class B per ChatGPT 2026-05-09).  Each asset goes to
@@ -267,29 +350,48 @@ def main():
             asset_files.sort()
             if asset_files:
                 cmd(s, "mkdir -p /tmp/atomik_assets", log=False)
+                missing_assets = []
                 for local in asset_files:
                     name = os.path.basename(local)
                     remote = f"/tmp/atomik_assets/{name}"
                     label = f"asset_{name.split('.')[0]}"
                     print(f"[deploy] shipping asset: {name}", flush=True)
-                    transfer(s, local, remote, label)
+                    if not transfer_verified(s, local, remote, label):
+                        missing_assets.append(name)
+                if missing_assets:
+                    print(f"[deploy]  WARNING: assets did NOT land: {missing_assets}",
+                          flush=True)
 
-        # v0.38-K: ship .atomik_font atlases to /tmp/atomik_fonts/.
-        # font_aa.c probes that directory at startup; missing fonts
-        # fall back to the pixel font.  Ship-once cost — atlases don't
-        # change between deploys unless tools/font_pack.py output does.
+    # v0.38-K: ship .atomik_font atlases to /tmp/atomik_fonts/ — DECOUPLED
+    # from --no-assets (v0.40): fonts are the premium-typography essential,
+    # assets are optional Class B art.  font_aa.c probes that dir; missing
+    # fonts fall back to the pixel font.
+    if not args.no_fonts:
         fonts_dir = os.path.join(HERE, "assets", "fonts")
         if os.path.isdir(fonts_dir):
             font_files = sorted([f for f in os.listdir(fonts_dir)
                                  if f.endswith(".atomik_font")])
             if font_files:
                 cmd(s, "mkdir -p /tmp/atomik_fonts", log=False)
+                missing_fonts = []
                 for name in font_files:
                     local = os.path.join(fonts_dir, name)
                     remote = f"/tmp/atomik_fonts/{name}"
                     label = f"font_{name.split('.')[0]}"
                     print(f"[deploy] shipping font: {name}", flush=True)
-                    transfer(s, local, remote, label)
+                    if not transfer_verified(s, local, remote, label):
+                        missing_fonts.append(name)
+                # Fonts are the premium-typography essential: a missing atlas
+                # means the whole UI falls back to the blocky pixel font.  Make
+                # this LOUD instead of a silent "VERSION OK".
+                if missing_fonts:
+                    print(f"[deploy]  *** FONTS DID NOT LAND: {missing_fonts} — "
+                          f"the board UI will render in the pixel-font fallback. "
+                          f"Re-run the deploy or ship fonts manually. ***",
+                          flush=True)
+                else:
+                    print(f"[deploy]  all {len(font_files)} AA fonts verified on board",
+                          flush=True)
 
     if args.no_launch:
         print("[deploy] --no-launch set; not starting.")
@@ -304,6 +406,19 @@ def main():
           "rm -f /tmp/aos_fifo_writer.pid /tmp/aos_keys", log=False)
     # Wipe stale version stamp so we KNOW the next read is from the new run.
     cmd(s, "rm -f /tmp/atomik_os_version /tmp/aos.err /tmp/aos.out", log=False)
+    # v0.40: --demo writes /tmp/atomik_demo so atomik_os starts the self-driving
+    # demo workload (lanes cycle ACTIVE with real perf-bench data) — for a live
+    # capture without UART keystroke injection.  Otherwise clear any stale flag.
+    if getattr(args, "demo", False):
+        cmd(s, "touch /tmp/atomik_demo", log=False)
+        print("[deploy] demo workload ENABLED (/tmp/atomik_demo)", flush=True)
+    else:
+        cmd(s, "rm -f /tmp/atomik_demo", log=False)
+    if getattr(args, "autoshot", False):
+        cmd(s, "rm -f /tmp/atomik_autoshot.done; touch /tmp/atomik_autoshot", log=False)
+        print("[deploy] in-OS auto-capture ENABLED (/tmp/atomik_autoshot)", flush=True)
+    else:
+        cmd(s, "rm -f /tmp/atomik_autoshot /tmp/atomik_autoshot.done", log=False)
     # v0.38-J++ mode hint: write /tmp/atomik_mode so atomik_os reads it
     # at startup and skips the DEV default.
     print(f"[deploy] initial mode = {args.mode}", flush=True)
@@ -336,9 +451,19 @@ def main():
     cmd(s, "echo $! > /tmp/aos_fifo_writer.pid", log=False)
     # Bash rejects `cmd &; echo marker`, so launch on its own line.
     slow(s, f"nohup {REMOTE} > /tmp/aos.out 2> /tmp/aos.err "
-            f"< /tmp/aos_keys &\n")
+            f"< /dev/null &\n")
     time.sleep(0.6)
     s.read(8192)
+
+    # v0.40 AUTOSHOT: atomik_os snapshots its OWN screen ~18s in.  To keep that
+    # frame CLEAN we must send NO commands during render (any keystroke bleeds
+    # into atomik_os via the shared console).  So skip the version/health probes
+    # entirely, wait silently, then pull the self-captured PNG.
+    if getattr(args, "autoshot", False):
+        autoshot_capture_and_save(s, expected or "unknown")
+        print("[deploy] done — autoshot pulled (or reported failure above).")
+        return
+
     cmd(s, "sleep 2; pgrep atomik_os && echo OS_RUNNING || echo OS_NOT_RUNNING")
     cmd(s, "cat /tmp/aos.err 2>/dev/null | head -20")
     cmd(s, "cat /tmp/aos.out 2>/dev/null | head -20")

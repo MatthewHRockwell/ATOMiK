@@ -6,7 +6,8 @@
 // logic on the proven SMP SoC without requiring CfuPlugin integration.
 //
 // Register map (32-bit word-addressed from base):
-//   0x00  CMD       — Write: {funct3[2:0], 29'b0} triggers command
+//   0x00  CMD       — Write: funct3 in dat_w[2:0] triggers command
+//                     (NOT the top bits — a stale comment here cost a day)
 //   0x04  RS1       — Write: rs1 (input 0)
 //   0x08  RS2       — Write: rs2 (input 1)
 //   0x0C  RD        — Read: rd (output from last command)

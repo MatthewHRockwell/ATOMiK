@@ -21,6 +21,7 @@ from litex.soc.integration.builder import *
 from litex.soc.integration.soc import SoCRegion
 from litex.soc.cores.cpu import zynq7000
 from litex.soc.interconnect import wishbone
+from litex.soc.interconnect.axi import connect_axi
 from litex.soc.cores.cpu.naxriscv.core import NaxRiscv
 from litex.soc.cores.video import VideoS7HDMIPHY, VideoTimingGenerator
 from litex.soc.cores.clock import S7MMCM
@@ -52,7 +53,7 @@ NaxRiscv.with_rvc             = True
 # NaxSoc.scala: `def withL2 = l2Bytes > 0` — 0 disables L2 entirely.
 # Forces NaxRiscv to issue single-word accesses instead of 64-byte burst refills;
 # if memtest errors disappear the burst path through 32-bit GP0 is the cause.
-NaxRiscv.l2_bytes             = 0          # L2 disabled
+NaxRiscv.l2_bytes             = 32 * 1024  # DIAGNOSTIC: L2 on, main_ram still GP0
 NaxRiscv.l2_ways              = 4          # ignored when l2_bytes==0
 
 # CRG ------------------------------------------------------------------------------------
@@ -71,6 +72,7 @@ class BaseSoC(SoCCore):
                  with_video_framebuffer=False,
                  with_video_phy_only=False,
                  with_video_framebuffer_hp=False,
+                 video_1080p60=False,
                  **kwargs):
         platform = hamgeek_rk7020f.Platform()
         self.crg = _CRG(platform, sys_clk_freq)
@@ -128,23 +130,41 @@ class BaseSoC(SoCCore):
             '] [get_ips Zynq]'
         )
 
+        # ---- main_ram on a NATIVE 64-bit burst AXI path (the real fix, 2026-06-08) ----
+        # Earlier dead ends: the 32-bit LiteX wishbone (whether routed to GP0 or
+        # bridged onto S_AXI_HP) tore NaxRiscv 64-byte cacheline bursts and corrupted
+        # DDR (GP0 16/524288, HP-32bit 50%, HP-64bit hung on a width converter). The
+        # real fix is NaxRiscv's native wide memory egress: add_memory_buses() exposes
+        # mBus, a 64-bit burst-capable AXI4 master; do_finalize() then routes main_ram
+        # to that 'm' bus while peripherals stay on the 32-bit pBus. We bridge mBus
+        # straight to a 64-bit S_AXI_HP so the burst stays wide end-to-end.
+        self.cpu.add_memory_buses(address_width=32, data_width=64)
+        main_ram_region = SoCRegion(
+            origin=self.cpu.mem_map["main_ram"], size=0x2000_0000, mode="rwx", cached=True)
+        self.bus.add_region("main_ram", main_ram_region)
+
+        # Reserve GP0 first so the add_axi_gp_slave() order keeps IOP on GP1 (the
+        # PSUart0Bridge console routes through the ps_iop remapper on GP1).
         axi_gp0 = ps.add_axi_gp_slave(clock_domain="sys")
 
-        # DDR region: NaxRiscv 0x40000000 → PS DDR 0x00100000
-        axi_gp0_ddr_dst = SoCRegion(origin=0x100000, size=0x2000_0000)
-        main_ram_region = SoCRegion(
-            origin=self.cpu.mem_map["main_ram"],
-            size=axi_gp0_ddr_dst.size,
-            mode="rwx",
-        )
-
-        wb = self.bus.add_adapter("axi_gp0", axi_gp0, direction="s2m")
-        remap_module = wishbone.Interface(data_width=32, address_width=32)
-        self.submodules += wishbone.Remapper(
-            master=remap_module, slave=wb,
-            src_regions=[main_ram_region], dst_regions=[axi_gp0_ddr_dst],
-        )
-        self.bus.add_slave("main_ram", remap_module, main_ram_region)
+        # Bridge NaxRiscv mBus (AXI4, id_width 8) -> S_AXI_HP (AXI3, id_width 6, 64-bit).
+        # connect_axi name-matches the channels; we hand-drive: addr (CPU 0x40000000 ->
+        # PS DDR 0x00100000 offset), the truncated/zero-extended IDs, and the AXI3 WID
+        # (AXI4 has no WID; NaxRiscv mBus is in-order single-outstanding so WID = AWID).
+        # axi_full=True keeps wlast/rlast connected.
+        axi_hp_mem = ps.add_axi_hp_slave(clock_domain="sys", data_width=64)
+        mbus    = self.cpu.memory_buses[0]
+        DDR_OFF = 0x4000_0000 - 0x0010_0000  # 0x3FF00000
+        self.comb += connect_axi(mbus, axi_hp_mem, omit={"addr", "id"}, axi_full=True)
+        self.comb += [
+            axi_hp_mem.aw.addr.eq(mbus.aw.addr - DDR_OFF),
+            axi_hp_mem.ar.addr.eq(mbus.ar.addr - DDR_OFF),
+            axi_hp_mem.aw.id.eq(mbus.aw.id),   # 8 -> 6 (truncate)
+            axi_hp_mem.ar.id.eq(mbus.ar.id),
+            axi_hp_mem.w.id.eq(mbus.aw.id),    # AXI3 WID = AWID (in-order)
+            mbus.b.id.eq(axi_hp_mem.b.id),     # 6 -> 8 (zero-extend)
+            mbus.r.id.eq(axi_hp_mem.r.id),
+        ]
 
         # PS I/O Peripherals via GP1: NaxRiscv 0x80000000 → PS IOP 0xE0000000
         # Exposes PS USB0, GEM0, SDIO, GPIO to NaxRiscv Linux
@@ -175,12 +195,32 @@ class BaseSoC(SoCCore):
         # cached PS-side status.
         self.irq.add("uart", use_loc_if_exists=True)
 
-        # USB0 interrupt from PS to NaxRiscv PLIC
-        # PS7 IRQ_P2F_USB0 output mirrors the USB0 interrupt to PL fabric.
-        # Wire it to PLIC input 3 (input 1 = liteuart).
+        # USB0 interrupt from PS to NaxRiscv PLIC, via a LEVEL->EDGE converter.
+        # PS7 IRQ_P2F_USB0 is LEVEL-triggered (active high, stays asserted while
+        # the chipidea controller has unserviced events).  The LiteX/NaxRiscv
+        # PLIC input is EDGE-triggered, so when several USB completion events
+        # stack up the line stays high, the PLIC latches only the first rising
+        # edge, and every subsequent completion IRQ is dropped — the kernel's
+        # URB never completes and control transfers time out -110 (the residual
+        # marginality after the mBus DMA fix; see project_usb_irq_root_cause).
+        #
+        # Fix: while usb0_irq is high, re-pulse the PLIC input for 1 cycle every
+        # 2^PERIOD_BITS sys cycles.  Each pulse is a fresh edge, so the PLIC
+        # keeps re-latching the pending bit for every still-unserviced USB
+        # event until the kernel ACKs them all and the line finally drops.
+        # 256 cycles @100 MHz = 2.56 us re-fire period — far below the USB
+        # control-transfer timeout, and pulses arriving while one is already
+        # pending are harmlessly absorbed by the PLIC's single pending bit.
         usb0_irq = ps.get_irq_p2f_usb0()
         self.irq.add("usb0", use_loc_if_exists=True)
-        self.comb += self.cpu.interrupt[3].eq(usb0_irq)
+        USB_IRQ_PERIOD_BITS = 8
+        usb_irq_ctr = Signal(USB_IRQ_PERIOD_BITS)
+        self.sync += If(usb0_irq,
+                        usb_irq_ctr.eq(usb_irq_ctr + 1),
+                     ).Else(
+                        usb_irq_ctr.eq(0),
+                     )
+        self.comb += self.cpu.interrupt[3].eq(usb0_irq & (usb_irq_ctr == 0))
 
         # LCD ST7789V 320x172 — GPIO bitbang SPI
         # Pins confirmed from RK-ZYNQ7020-F Schematics.pdf page 5, Bank 33.
@@ -225,6 +265,34 @@ class BaseSoC(SoCCore):
             self.bus.add_slave("atomik_adapter", adapter_bus,
                 region=SoCRegion(origin=0xf0020000, size=0x20, cached=False))
 
+            # ── ATOMiK parallel-bank throughput bench (separate region) ──
+            # Makes the N-bank parallel XOR accumulator REAL on hardware:
+            # accumulates `count` deterministic deltas across `active_banks`
+            # banks and reports the exact HW cycles taken, so a 1->8 bank
+            # sweep yields a measured throughput curve. Does NOT touch the
+            # validated single-bank adapter above.
+            rtl_dir   = os.path.join(os.path.dirname(zynq_dir), "rtl")
+            bench_v   = os.path.join(zynq_dir, "rtl", "atomik_parallel_bench.v")
+            platform.add_source(bench_v)
+            platform.add_source(os.path.join(rtl_dir, "atomik_parallel_acc.v"))
+            platform.add_source(os.path.join(rtl_dir, "atomik_delta_acc.v"))
+
+            bench_bus = wishbone.Interface(data_width=32, address_width=32, addressing="word")
+            self.specials += Instance("atomik_parallel_bench",
+                p_N_BANKS = 8,
+                i_clk     = ClockSignal("sys"),
+                i_rst     = ResetSignal("sys"),
+                i_adr     = bench_bus.adr[:5],
+                i_dat_w   = bench_bus.dat_w,
+                o_dat_r   = bench_bus.dat_r,
+                i_we      = bench_bus.we,
+                i_cyc     = bench_bus.cyc,
+                i_stb     = bench_bus.stb,
+                o_ack     = bench_bus.ack,
+            )
+            self.bus.add_slave("atomik_bench", bench_bus,
+                region=SoCRegion(origin=0xf0021000, size=0x80, cached=False))
+
         # ------------------------------------------------------------------
         # Phase 9.2 "cheap confirmation" variant: --with-video-phy-only
         #
@@ -241,13 +309,23 @@ class BaseSoC(SoCCore):
             self.video_pll = video_pll = S7MMCM(speedgrade=-2)
             self.comb += video_pll.reset.eq(ResetSignal("sys"))
             video_pll.register_clkin(ClockSignal("sys"), sys_clk_freq)
-            video_pll.create_clkout(self.cd_hdmi,   25.175e6)
-            video_pll.create_clkout(self.cd_hdmi5x, 5*25.175e6)
+            # --video-1080p60 TEST PATH: drive the OSERDES at the full
+            # 1080p60 rate (148.5 MHz pixel → 742.5 MHz serializer) to get a
+            # first-party timing verdict on whether OSERDES2 -2 can close it.
+            # Default phy-only stays at the proven 640x480.
+            if video_1080p60:
+                _phy_pix_clk = 148.5e6
+                _phy_timings = "1920x1080@60Hz"
+            else:
+                _phy_pix_clk = 25.175e6
+                _phy_timings = "640x480@60Hz"
+            video_pll.create_clkout(self.cd_hdmi,   _phy_pix_clk)
+            video_pll.create_clkout(self.cd_hdmi5x, 5*_phy_pix_clk)
 
             self.videophy = VideoS7HDMIPHY(platform.request("hdmi_out"),
                                            clock_domain="hdmi")
 
-            video_vtg = VideoTimingGenerator(default_video_timings="640x480@60Hz")
+            video_vtg = VideoTimingGenerator(default_video_timings=_phy_timings)
             video_vtg = ClockDomainsRenamer("hdmi")(video_vtg)
             self.add_module(name="video_vtg", module=video_vtg)
 
@@ -257,11 +335,14 @@ class BaseSoC(SoCCore):
             self.comb += video_vtg.source.connect(self.videophy.sink,
                 keep={"valid", "ready", "last", "de", "hsync", "vsync"})
 
-            # Same XDC pre-placement false-path fix as the FB variant.
+            # Use the SAME proven false-path form as the HP framebuffer build
+            # (the MMCME2-pin-filter form in the old phy-only diagnostic was
+            # never exercised through P&R and errors out with "only one
+            # non-empty group remains"). clkout0=hdmi, clkout1=hdmi5x.
             platform.toolchain.pre_placement_commands.add(
                 "set_clock_groups -asynchronous "
                 "-group [get_clocks clk_fpga_0] "
-                "-group [get_clocks -include_generated_clocks -of_objects [get_pins -hierarchical -filter {{NAME =~ */MMCME2_ADV/CLKOUT*}}]]"
+                "-group [get_clocks {{{{clkout0 clkout1}}}}]"
             )
             # Intentionally no bus.add_master call. No wishbone arbiter.
 
@@ -464,6 +545,9 @@ def main():
     parser.add_target_argument("--with-video-framebuffer-hp", action="store_true",
                                help="Enable HDMI framebuffer via AXI HP0 (Path B — "
                                     "dedicated DMA master, no SoC bus arbiter)")
+    parser.add_target_argument("--video-1080p60", action="store_true",
+                               help="TEST ONLY: drive PHY at 1080p60 (742.5 MHz serializer) "
+                                    "to empirically check the OSERDES2 -2 timing ceiling")
     args = parser.parse_args()
 
     # Force NaxRiscv config AFTER parse_args (which resets class attrs).
@@ -479,7 +563,7 @@ def main():
     NaxRiscv.jtag_tap             = False
     NaxRiscv.jtag_instruction     = False
     NaxRiscv.with_dma             = False
-    NaxRiscv.l2_bytes             = 0           # L2 disabled (DDR diagnostic)
+    NaxRiscv.l2_bytes             = 32 * 1024   # DIAGNOSTIC: L2 on, main_ram still GP0
     NaxRiscv.l2_ways              = 4           # ignored when l2_bytes==0
 
     soc = BaseSoC(
@@ -487,6 +571,7 @@ def main():
         with_video_framebuffer=args.with_video_framebuffer,
         with_video_phy_only=args.with_video_phy_only,
         with_video_framebuffer_hp=args.with_video_framebuffer_hp,
+        video_1080p60=args.video_1080p60,
         **parser.soc_argdict,
     )
     builder = Builder(soc, **parser.builder_argdict)

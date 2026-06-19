@@ -358,7 +358,11 @@ int atomik_batch_commit(void) {
 
     /* One fence per batch — the architectural win.  asm volatile so
      * the compiler doesn't reorder MMIO across this barrier. */
+#if defined(__riscv)
     __asm__ volatile("fence" ::: "memory");
+#else
+    __asm__ volatile("" ::: "memory");        /* host preview: compiler barrier */
+#endif
 
     perf_batch_summary(&s_sample, s_n_logical_ops, s_n_slots_used);
     s_sample.regions_touched = s_n_logical_ops;
@@ -388,7 +392,11 @@ int atomik_batch_commit_baseline(void) {
         if (!s_slots[i].in_use) continue;
         for (uint32_t k = 0; k < s_slots[i].logical_hits; k++) {
             issue_hw_op(s_slots[i].region_id, s_slots[i].accum);
+#if defined(__riscv)
             __asm__ volatile("fence" ::: "memory");   /* per-op fence */
+#else
+            __asm__ volatile("" ::: "memory");        /* host preview */
+#endif
             perf_hw_op(&s_sample);
             hw_ops++;
         }

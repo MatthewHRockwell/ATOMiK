@@ -1,5 +1,5 @@
 export const positioningStatement =
-  "ATOMiK is a state-aware compute architecture that helps edge and embedded teams reduce wasted state movement by tracking meaningful change instead of repeatedly moving or rebuilding full state.";
+  "ATOMiK is a state-aware compute architecture that helps edge and embedded teams reduce wasted state movement by tracking meaningful change instead of repeatedly moving, scanning, syncing, replaying, or rebuilding full state.";
 
 export const offerFormula = {
   give:
@@ -237,7 +237,7 @@ export const proofToday = [
     title: "Evidence-labeling framework",
     label: "Evidence labels",
     body:
-      "Claims are separated as live measured, hardware validated, software validated, synthesis validated, build artifact, projected, conceptual, or roadmap.",
+      "Claims are separated as live measured, hardware validated, software validated, formal proof, synthesis validated, build artifact, projected, conceptual, or roadmap.",
     href: "https://github.com/MatthewHRockwell/ATOMiK/blob/main/docs/evidence-labels.md",
   },
   {
@@ -251,8 +251,36 @@ export const proofToday = [
     title: "Live Zynq prototype evidence",
     label: "Hardware validated",
     body:
-      "ATOMiK Desk v0.39-K is a current prototype UI screenshot running on live Zynq hardware. It is not proof of power, thermal, uptime, or production maturity.",
-    href: "/09-current-live-atomik-desk-v039k.png",
+      "ATOMiK Desk v0.40-A is the current UI captured live from /dev/fb0 on Zynq hardware, with on-screen metrics driven by real measured on-board data. It is not proof of power, thermal, uptime, or production maturity.",
+    href: "/10-current-live-atomik-desk-v040a.png",
+  },
+  {
+    title: "Parallel-bank throughput on AX7020",
+    label: "Live measured",
+    body:
+      "An 8-bank XOR accumulator on the AX7020 scaled linearly with allocated banks (1/2/4/8x fewer cycles, about 100-800 Mdeltas/s at 100 MHz), measured with an on-chip cycle counter. The result was byte-identical across every bank count and matched a software recompute - order-independent and lock-free by construction. It is the throughput substrate, not a customer-workload speedup or power claim.",
+    href: "https://github.com/MatthewHRockwell/ATOMiK/blob/main/hardware/zynq/results/PARALLEL_BANKS_HARDWARE_VALIDATED.md",
+  },
+  {
+    title: "Live Workloads demo on hardware",
+    label: "Live measured",
+    body:
+      "The Workloads surface (real-time telemetry aggregation) runs on the AX7020 over HDMI driven by live measured throughput from the parallel-bank engine: 800 Mevents/s at 8 banks, with byte-identical results across configs. The first customer-facing workload demo proven end-to-end on hardware. Throughput is measured; it is a static capture, not an interactive session.",
+    href: "/12-workloads-live-ax7020.png",
+  },
+  {
+    title: "Verified savings on hardware: 92% less data, 87% fewer writes",
+    label: "Live measured",
+    body:
+      "The redesigned Workloads surface shows conventional-vs-ATOMiK side by side on the AX7020: an edge-telemetry sync tick moves 2,048 bytes conventionally vs 160 bytes as deltas (92% less data moved), and 256 control updates coalesce into 32 net writes (87% fewer). Every delta was verified on the ATOMiK adapter with exact 64-bit round-trips using a falsification-tested harness, and the demo self-drives through all three scenarios untethered. Figures are for deterministic test patterns (ratios scale with change density and locality); static captures, not an interactive session.",
+    href: "/13-workloads-telemetry-verified-ax7020.png",
+  },
+  {
+    title: "All three workloads on hardware",
+    label: "Live measured",
+    body:
+      "All three customer Workloads scenarios on the AX7020 with the production typography: telemetry sync (92% less data), control coalescing (87% fewer writes), and parallel aggregate (8x faster). The two memory scenarios are adapter-verified with exact 64-bit round-trips; parallel is measured on the bench engine. Ratios are pattern-dependent, not universal multipliers; static captures, not interactive.",
+    href: "/15-workloads-all3-board-ax7020.png",
   },
   {
     title: "Linux userspace to FPGA validation",
@@ -270,7 +298,7 @@ export const proofToday = [
   },
   {
     title: "Formal proof work",
-    label: "Software validated",
+    label: "Formal proof",
     body:
       "Formal proof work is present in the repository. Public pages should avoid unaudited proof counts unless the count is verified across repo, site, and deck.",
     href: "https://github.com/MatthewHRockwell/ATOMiK/tree/main/math/proofs",
@@ -303,9 +331,9 @@ export const successExamples = [
 export const notSuccessClaims = [
   "Universal speedup",
   "Guaranteed battery extension",
-  "Guaranteed heat reduction",
-  "Guaranteed water savings",
-  "Guaranteed smaller hardware",
+  "Guaranteed heat or cooling reduction",
+  "Guaranteed water or power-bill savings",
+  "Guaranteed smaller hardware or footprint",
   "Generic better compute",
   "Proof from unrelated workloads",
 ];

@@ -25,7 +25,7 @@ REPO = ROOT.parents[1]
 SOURCE = ROOT / "slides.md"
 OUT_MAIN = ROOT / "ATOMiK_Investor_Deck.pptx"
 OUT_AGGIE = ROOT / "ATOMiK_Aggie_Angel_Deck.pptx"
-LIVE_SCREENSHOT = REPO / "website/public/09-current-live-atomik-desk-v039k.png"
+LIVE_SCREENSHOT = REPO / "website/public/10-current-live-atomik-desk-v040a.png"
 MATT_HEADSHOT = Path("/home/mattrock/Projects/matthew-rockwell-portfolio/assets/matthew-rockwell-headshot.jpg")
 ALLISON_HEADSHOT = ROOT / "assets/allison_rossi_headshot.jpg"
 
@@ -301,22 +301,24 @@ def build():
     rect(s, Inches(0.75), Inches(2.28), Inches(7.65), Inches(3.7), PANEL2)
     image_fit(s, LIVE_SCREENSHOT, Inches(0.95), Inches(2.5), Inches(7.25), Inches(3.25))
     for i,(h,b,c) in enumerate([
-        ("What it shows", "current Zynq hardware UI/demo surface", GREEN),
+        ("What it shows", "current Zynq UI captured from /dev/fb0, driven by real measured on-board data", GREEN),
         ("What to quote", "caption-bound hardware-validated UI artifact", CYAN),
-        ("What not to quote", "on-screen telemetry as customer benchmark", AMBER),
+        ("What not to quote", "on-screen telemetry as customer benchmark; not an interactive demo", AMBER),
     ]):
         card(s, Inches(8.65), Inches(2.35+i*1.14), Inches(3.65), Inches(0.92), h, b, c, 10.2, 8.0)
     source_note(s, "HARDWARE_VALIDATED UI ARTIFACT - not a customer workload benchmark or production-readiness claim.")
 
     s = add_slide(prs, 11, "Proof stack", "Real, specific, evidence-bounded")
     for i,(a,b,c,d) in enumerate([
-        ("Zynq Desk v0.39-K", "HARDWARE_VALIDATED", "current UI proof image", GREEN),
+        ("Zynq Desk v0.40-A", "HARDWARE_VALIDATED", "current UI proof image, captured from /dev/fb0", GREEN),
+        ("Live Workloads demo", "LIVE_MEASURED", "first customer-facing workload on AX7020: 800 Mevents/s @ 8 banks, byte-identical", BLUE),
+        ("Parallel-bank throughput", "LIVE_MEASURED", "AX7020 8-bank accumulator scales 1/2/4/8x, byte-identical to software", BLUE),
         ("Linux userspace to FPGA", "HARDWARE_VALIDATED", "documented OS-to-bus path", CYAN),
         ("AX7020 board matrix", "LIVE_MEASURED", "wins and losses with caveats", BLUE),
         ("Formal algebra", "FORMAL_PROOF*", "Lean4-checked algebra; exact audited properties only", VIOLET),
         ("Standalone boot", "BUILD_ARTIFACT", "not promoted until run proof", AMBER),
     ]):
-        y = Inches(2.02 + i*0.72)
+        y = Inches(1.85 + i*0.58)
         rect(s, Inches(0.9), y, Inches(11.55), Inches(0.5), PANEL)
         text_box(s, Inches(1.12), y+Inches(0.12), Inches(3.0), Inches(0.16), a, 10.2, TEXT, True)
         text_box(s, Inches(4.3), y+Inches(0.12), Inches(2.4), Inches(0.16), b, 9.2, d, True)

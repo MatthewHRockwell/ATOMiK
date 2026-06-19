@@ -9,7 +9,7 @@
  * carries a user-visible change. About window, status bar, and the
  * /tmp/atomik_os_version stamp all read from here so the screen output
  * NEVER lies about which build is running. */
-#define AOS_VERSION "v0.39-K"
+#define AOS_VERSION "v0.40-A"
 
 /* Display geometry — locked to 1920x1080 XRGB8888 since simplefb is fixed. */
 #define FB_W       1920
@@ -130,6 +130,9 @@ pixel_t *fb_back(void);   /* writeable back buffer (FB_W*FB_H pixels) */
 void fb_present(void);    /* memcpy back buffer to /dev/fb0 mmap */
 void fb_clear(pixel_t color);
 void fb_enable_scanout(int enable);  /* drives the LiteX VTG/DMA CSRs */
+void fb_write_png(const char *path); /* v0.40 in-OS auto-capture: back buffer -> PNG */
+/* png_write.c — dependency-free XRGB8888 -> PNG (shared by fb/fb_host/main). */
+int  png_write_xrgb(const char *path, const uint32_t *px, int w, int h);
 
 /* draw.c — primitives. All operate on the back buffer. */
 void draw_rect(int x, int y, int w, int h, pixel_t color);
@@ -182,7 +185,8 @@ void wallpaper_draw(void);
  * workspace center.  Draws AFTER wallpaper, BEFORE windows.  Acts
  * as the OS's identity statement, not as a window.  About moves
  * to A-key only. */
-void hero_draw(void);
+void hero_draw(void);            /* v0.40 home surface: title + twin glass panels */
+void hero_draw_adaptive(void);   /* 3-orb energy scene — Adaptive Mode (concept-06) */
 
 /* agent.c — agentic usage logger + adaptive surfacing.
  *
@@ -211,6 +215,7 @@ typedef enum {
     ACT_CLOSE_WINDOW,
     ACT_CYCLE_FOCUS,
     ACT_DOCK_HOVER,
+    ACT_OPEN_WORKLOAD,    /* v0.41: Workloads surface (telemetry aggregation demo) */
     ACT_QUIT,
     ACT_MAX,
 } action_t;
@@ -267,6 +272,36 @@ int  atomik_open(void);
 void atomik_close(void);
 /* Read each slot's accumulator. Fills `out[ATOMIK_N_SLOTS]`. */
 int  atomik_read_slots(uint32_t *out);
+
+/* bench.c — LIVE parallel-bank throughput, measured on the parallel-bank
+ * bench engine @0xF0021000 (separate region from the single-bank adapter).
+ * Drives the engine over /dev/mem (O_RDWR), measures hardware cycles for a
+ * fixed-count accumulation at 1/2/4/8 active banks, and verifies the HW XOR
+ * result against an independent software recompute.  Every number here is
+ * METRIC_LIVE — it came from the silicon's own cycle counter this session. */
+#define BENCH_BASE_PS   0xF0021000UL
+#define BENCH_SYS_HZ    100000000.0     /* sys_clk_freq the engine runs at   */
+#define BENCH_N_POINTS  4               /* the 1/2/4/8-bank sweep            */
+typedef struct {
+    uint32_t banks;        /* active bank count for this point   */
+    uint32_t cycles;       /* HW cycles measured                 */
+    double   mdeltas_s;    /* throughput at BENCH_SYS_HZ          */
+    double   speedup;      /* vs the 1-bank point                */
+    int      verified;     /* HW result == SW reference          */
+} bench_point_t;
+
+int  bench_open(void);                  /* map engine; 0 ok, -1 unavailable  */
+void bench_close(void);
+int  bench_available(void);             /* 1 if engine mapped + responding   */
+int  bench_nbanks(void);               /* N_BANKS reported by STATUS         */
+void bench_tick(void);                  /* refresh cached sweep (~2s) + alloc */
+const bench_point_t *bench_sweep_points(int *n); /* cached 1/2/4/8 sweep      */
+int  bench_active_banks(void);          /* current (demo-cycled) allocation   */
+int  bench_source(void);                /* metric_source_t: METRIC_LIVE/WAITING */
+const char *bench_result_hex(void);     /* merged accumulator, identical at every bank count ("" if unknown) */
+int  bench_result_identical(void);      /* 1 = every bank count produced the SAME result (order-independence) */
+int  bench_take_dirty(void);            /* one-shot: sweep data/source changed since last call */
+void bench_register_metrics(void);      /* register bench.* LIVE metrics      */
 
 /* perf_counter.c declarations live below the personality_t enum.
  * (See the fabric.c declaration block further down.) */
@@ -526,6 +561,9 @@ void          fabric_open(void);    /* opens / focuses the Resource Fabric windo
 void          fabric_draw(window_t *w, int x, int y, int wd, int ht);
 personality_t fabric_active(void);  /* current detected personality */
 const char   *fabric_personality_name(personality_t p);
+void          fabric_demo_enable(int on);  /* v0.40 self-driving demo workload */
+int           fabric_demo_enabled(void);
+void          fabric_seed_waveforms(void); /* lively decorative lane history    */
 /* Tick the fabric on every frame so detection state has a chance to
  * reclassify based on recent activity. */
 void          fabric_tick(void);
@@ -620,6 +658,30 @@ const char                  *fabric_lane_name(fabric_lane_t lane);
 
 void          state_watch_open(void);
 void          state_watch_draw(window_t *w, int x, int y, int wd, int ht);
+
+/* system_surface.c — the SYSTEM capability surface (2026 task-manager):
+ * compute & resource allocation, with the real PARALLEL BANKS bench as its
+ * centerpiece (moved out of the Resource Fabric). */
+void          system_surface_open(void);
+void          system_surface_draw(window_t *w, int x, int y, int wd, int ht);
+void          workloads_surface_open(void);
+void          workloads_surface_draw(window_t *w, int x, int y, int wd, int ht);
+int           workloads_surface_is_open(void);
+void          workloads_cycle_scenario(void);
+void          workloads_set_scenario(int n);
+
+/* Board-measured memory-workload results (wlmeasure.c, fed by aworkload). */
+typedef struct {
+    int  valid;        /* parsed a complete block                       */
+    long conv;         /* conventional cost (bytes or writes)           */
+    long atomik;       /* ATOMiK cost (bytes or writes)                 */
+    int  saved_pct;    /* percent saved                                 */
+    int  verified;     /* 1 = delta math verified on the adapter HW     */
+    int  is_bytes;     /* 1 = bytes, 0 = writes (unit)                  */
+    int  extra;        /* changed regions / unique writes               */
+} wl_measure_t;
+int  wlmeasure_get(int which, wl_measure_t *out);  /* 0=telemetry 1=coalescing */
+void wlmeasure_tick(void);
 void          state_watch_tick(void);
 
 /* atomik_asset.c — board-side asset loader, v0.36 (Class B foundation).
@@ -720,7 +782,8 @@ void assistant_summon_mode(assistant_mode_t m);  /* manual with mode pick  */
  * for a real first-LIVE event to fire.  Not user-exposed in the UI
  * vocabulary; the 'G' hotkey is hidden documentation only. */
 void assistant_summon_capture_success(void);
-void assistant_dismiss(void);                    /* hide overlay           */
+void assistant_dismiss(void);
+int  assistant_animating(void);  /* v0.42: overlay alive -> keep repainting */                    /* hide overlay           */
 int  assistant_visible(void);
 void assistant_draw(void);                       /* paint overlay if visible */
 void assistant_tick(void);                       /* per-frame: auto-dismiss */
@@ -1133,6 +1196,7 @@ void         document_draw(window_t *w, int x, int y, int wd, int ht);
  * common easing curves. The compositor checks anim_dirty() each frame to
  * decide whether to schedule another redraw. */
 unsigned long anim_now_ms(void);
+void          anim_set_sim_time(unsigned long ms);  /* host repro harness: inject clock */
 double        anim_ease_out(double t);  /* t in [0,1] */
 double        anim_lerp(double a, double b, double t);
 /* Drive open-window age tracking. Returns 0..1 for the fade-in tween. */
@@ -1147,13 +1211,22 @@ typedef enum {
     EV_NONE = 0,
     EV_KEY,
     EV_QUIT,
+    EV_MOUSE_MOVE,    /* cursor moved; mx,my hold the new absolute position   */
+    EV_MOUSE_DOWN,    /* left button pressed at mx,my                          */
+    EV_MOUSE_UP,      /* left button released at mx,my                         */
 } event_kind_t;
 typedef struct {
     event_kind_t kind;
-    int key;          /* ASCII for now */
+    int key;          /* ASCII for now                          */
+    int mx, my;       /* absolute cursor position (mouse events) */
 } event_t;
 int  input_open(void);
 void input_close(void);
 event_t input_poll(int timeout_ms);
+/* Current absolute cursor position (clamped to the framebuffer). Valid once a
+ * mouse device has been seen; defaults to screen center. */
+int  input_mouse_x(void);
+int  input_mouse_y(void);
+int  input_mouse_present(void);   /* 1 if at least one mouse device is open */
 
 #endif /* ATOMIK_OS_H */

@@ -14,6 +14,7 @@
 #include "atomik_os.h"
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 extern pixel_t *fb_back(void);
 
@@ -22,68 +23,181 @@ static int      s_cached = 0;
 
 void wallpaper_invalidate(void) { s_cached = 0; }
 
-/* v0.36-A: tile a SMALL (480×270) asset across the full framebuffer,
- * then let the procedural overlay handle vignette/glow/wordmark.
- * Smaller asset → ~9 MB heap peak instead of the ~17 MB that hung
- * v0.36 #1 on AX7020.  Tile dimensions (480×270) divide 1920×1080
- * evenly (4×4) so there are no partial-tile edges. */
-static int try_tile_asset(void) {
-    const char *paths[] = {
-        "/tmp/atomik_assets/topology_tile.atomik_asset",
-        "/root/atomik_assets/topology_tile.atomik_asset",
-        "/usr/share/atomik_os/topology_tile.atomik_asset",
-        NULL
-    };
-    atomik_asset_t a;
-    for (int i = 0; paths[i]; i++) {
-        if (atomik_asset_load(paths[i], &a) == 0) {
-            atomik_asset_blit_tiled(&a, 0, 0, FB_W, FB_H);
-            atomik_asset_free(&a);
-            return 1;
-        }
+/* --- v0.40 layered procedural background helpers (concept-01 depth) --- */
+static void bg_line(int x0, int y0, int x1, int y1, pixel_t c, uint8_t a) {
+    int dx = x1 > x0 ? x1 - x0 : x0 - x1;
+    int dy = y1 > y0 ? y1 - y0 : y0 - y1;
+    int sx = x0 < x1 ? 1 : -1, sy = y0 < y1 ? 1 : -1, err = dx - dy;
+    for (;;) {
+        draw_blend_pixel(x0, y0, c, a);
+        if (x0 == x1 && y0 == y1) break;
+        int e2 = err * 2;
+        if (e2 > -dy) { err -= dy; x0 += sx; }
+        if (e2 <  dx) { err += dx; y0 += sy; }
     }
-    return 0;
+}
+static void bg_circle(int cx, int cy, int r, pixel_t c, uint8_t a) {
+    int x = r, y = 0, err = 1 - r;
+    while (x >= y) {
+        draw_blend_pixel(cx+x, cy+y, c, a); draw_blend_pixel(cx-x, cy+y, c, a);
+        draw_blend_pixel(cx+x, cy-y, c, a); draw_blend_pixel(cx-x, cy-y, c, a);
+        draw_blend_pixel(cx+y, cy+x, c, a); draw_blend_pixel(cx-y, cy+x, c, a);
+        draw_blend_pixel(cx+y, cy-x, c, a); draw_blend_pixel(cx-y, cy-x, c, a);
+        y++;
+        if (err < 0) err += 2*y + 1; else { x--; err += 2*(y - x) + 1; }
+    }
 }
 
-static void wallpaper_full_render(void) {
-    /* v0.36-A: tile the small (480×270) topology asset across the full
-     * screen.  If the asset isn't present, draw the procedural gradient
-     * as a fallback.  Either way, the vignette, accent glow, and
-     * wordmark are layered on top procedurally — they're cheap and
-     * keep the wordmark sharp regardless of asset presence. */
-    if (!try_tile_asset()) {
-        draw_gradient_v(0, 0, FB_W, FB_H, ATOMIK_BG_TOP, ATOMIK_BG_BOT);
+/* Soft additive radial glow with quadratic falloff (a = peak*(1 - d^2/R^2)).
+ * Bounded box; only blends inside the disc.  The workhorse for the nebula. */
+static void soft_glow(int cx, int cy, int R, pixel_t c, uint8_t peak) {
+    if (R <= 0) return;
+    long R2 = (long)R * R;
+    for (int dy = -R; dy <= R; dy++) {
+        int y = cy + dy; if (y < 0 || y >= FB_H) continue;
+        for (int dx = -R; dx <= R; dx++) {
+            int x = cx + dx; if (x < 0 || x >= FB_W) continue;
+            long d2 = (long)dx * dx + (long)dy * dy;
+            if (d2 >= R2) continue;
+            uint8_t a = (uint8_t)((long)peak * (R2 - d2) / R2);
+            if (a) draw_blend_pixel(x, y, c, a);
+        }
     }
+}
 
-    /* Soft accent vignette in the center: a few translucent ellipses. */
-    int cx = FB_W / 2;
-    int cy = FB_H / 2 - 60;
-    for (int r = 600; r >= 200; r -= 50) {
-        /* Cheap circle fill with low alpha. We sample sparsely on big radii
-         * for speed — full fill at small radii, scanline-skipping at large. */
-        int step = r > 400 ? 4 : (r > 300 ? 2 : 1);
-        int alpha = 8 + (600 - r) / 12;
-        if (alpha > 60) alpha = 60;
-        for (int dy = -r; dy <= r; dy += step) {
-            int span = (int)((r * r - dy * dy) > 0 ? r * r - dy * dy : 0);
-            int xspan = 0;
-            while (xspan * xspan < span) xspan++;
-            for (int dx = -xspan; dx <= xspan; dx += step) {
-                draw_blend_pixel(cx + dx, cy + dy, ATOMIK_ACCENT, (uint8_t)alpha);
+/* Atmospheric "deep space / nebula" background (concept-01): smooth dark navy
+ * with a soft blue central glow behind the hero, off-center nebula clouds for
+ * asymmetric depth, faint rings, and a sparse star field — NO perspective
+ * grid.  Rendered ONCE into the wallpaper cache (no per-frame cost) with a
+ * FIXED seed so it is screenshot-stable.  Pure decorative Class B chrome. */
+static void wallpaper_full_render(void) {
+    uint32_t seed = 0xA70A1CBAu;
+#define BG_RND (seed ^= seed << 13, seed ^= seed >> 17, seed ^= seed << 5, seed)
+
+    /* Hero center: workspace midpoint (rail .. Fabric) so the glow sits behind
+     * the hero, not the screen center. */
+    int rr = dock_right_edge(), fs = fabric_shelf_x();
+    int cx = (rr > 0 && fs > rr) ? (rr + fs) / 2 : FB_W / 2;
+    int cy = (FB_H * 38) / 100;
+    pixel_t cyan = ATOMIK_ACCENT;
+
+    /* 1. base gradient — deep navy, very slightly lifted up top (where the
+     * nebula core sits), deepening toward the bottom. */
+    draw_gradient_v(0, 0, FB_W, FB_H, rgb(0x07, 0x0C, 0x18), rgb(0x04, 0x07, 0x10));
+
+    /* 2. off-center nebula clouds — large, very soft, low alpha, for an
+     * asymmetric "asteroid field / deep space" depth (blue + a hint of
+     * violet).  Drawn before the core so the core reads brightest. */
+    soft_glow((FB_W * 22) / 100, (FB_H * 72) / 100, 520, rgb(0x10, 0x22, 0x4C), 20);
+    soft_glow((FB_W * 82) / 100, (FB_H * 22) / 100, 460, rgb(0x22, 0x1A, 0x44), 16);
+    soft_glow((FB_W * 70) / 100, (FB_H * 80) / 100, 420, rgb(0x0E, 0x26, 0x46), 14);
+
+    /* 3. nebula core behind the hero — a wide blue halo + a tighter cyan core,
+     * additive, smooth quadratic falloff.  This is the concept's central glow. */
+    soft_glow(cx, cy, 600, rgb(0x14, 0x34, 0x60), 30);
+    soft_glow(cx, cy, 340, rgb(0x2A, 0x6A, 0xA8), 30);
+    soft_glow(cx, cy, 180, cyan, 22);
+
+    /* 4. faint concentric rings behind the hero (the concept's subtle halo). */
+    bg_circle(cx, cy, 232, cyan, 12);
+    bg_circle(cx, cy, 318, cyan, 8);
+    bg_circle(cx, cy, 404, cyan, 5);
+
+    /* 4.5 AURORA particle-flow field (concept-01): fine cyan dots strung
+     * along gently-curving streamlines that sweep across the field — denser
+     * and brighter near the hero core, dimmer toward the edges.  This is the
+     * concept's signature "flowing dot stream" texture.  Rendered ONCE into
+     * the cache (no per-frame cost) so we can afford the per-dot work; pure
+     * decorative Class B chrome (writes no number, never read as telemetry).
+     * Core-weighted alpha via the same quadratic falloff as soft_glow, so no
+     * sqrt is needed per dot. */
+    {
+        const long R  = 940;
+        const long R2 = R * R;
+        const int  sp = 9;                 /* dot-matrix spacing */
+        for (int gy = 0; gy < FB_H; gy += sp) {
+            for (int gx = 0; gx < FB_W; gx += sp) {
+                /* Flow displacement — warp the regular lattice along a smooth
+                 * vector field so the dots read as a flowing current, not a
+                 * static grid. */
+                double fx = (double)gx, fy = (double)gy;
+                int dx = (int)(7.0 * sin(fy * 0.020 + fx * 0.0045));
+                int dy = (int)(6.0 * cos(fx * 0.015 + fy * 0.010));
+                int x  = gx + dx, y = gy + dy;
+                if (x < 0 || x >= FB_W || y < 0 || y >= FB_H) continue;
+
+                /* Core-weighted base brightness (quadratic falloff).
+                 * v0.40-06: boosted for real HDMI — the AX7020 panel's gamma
+                 * crushes low alpha, so the dim mid-field dots vanished on
+                 * hardware (board capture 2026-06-05).  Raise the core weight
+                 * and the per-dot floor so the whole flow survives the panel
+                 * while the crests stay capped (no blow-out). */
+                long ddx = x - cx, ddy = y - cy;
+                long d2  = ddx * ddx + ddy * ddy;
+                int  core = (d2 < R2) ? (int)((long)95 * (R2 - d2) / R2) : 0;
+
+                /* Diagonal flowing bands: brightness crests sweep up-right so
+                 * the field has visible aurora ribbons, like the concept.  The
+                 * band floor (0.62) is lifted so off-crest dots don't fall
+                 * below the HDMI visibility threshold. */
+                double band = 0.5 + 0.5 * sin(fx * 0.0052 - fy * 0.0090);
+                int a = (int)((22 + core) * (0.62 + 0.38 * band));
+
+                /* A touch of per-dot variance so the lattice isn't sterile. */
+                a += (int)(BG_RND % 7u) - 3;
+                if (a <= 3) continue;
+                if (a > 200) a = 200;
+
+                pixel_t c = (BG_RND % 7u == 0) ? rgb(0xDC, 0xF2, 0xFF) : cyan;
+                draw_blend_pixel(x, y, c, (uint8_t)a);
+
+                /* Sparse bright nodes with a tiny cross glow on the crests. */
+                if (band > 0.92 && core > 30 && (BG_RND % 5u == 0)) {
+                    draw_blend_pixel(x, y, rgb(0xE0, 0xF6, 0xFF), 200);
+                    draw_blend_pixel(x + 1, y, cyan, 70);
+                    draw_blend_pixel(x, y + 1, cyan, 70);
+                }
             }
         }
     }
 
-    /* v0.38-F: wallpaper wordmark + tagline removed.
-     *
-     * The big "ATOMiK / Delta-State Desktop" text used to print at
-     * screen center, but it overlapped with src/hero.c's procedural
-     * centerpiece and competed with the Class B iridescent background
-     * for visual attention.  Per the v0.38 concept-fidelity audit
-     * (memory project_v038_concept_fidelity_audit.md), the hero
-     * owns the center now; ATOMiK identity lives in the Pulse Bar's
-     * scale-2 wordmark only.  Cleaner composition, closer to the
-     * concept-image macro hierarchy. */
+    /* 5. star field — sparse points across the WHOLE field, varied brightness,
+     * mostly cool white with occasional cyan/violet.  A handful of brighter
+     * "hero" stars get a 1px cross bloom. */
+    for (int p = 0; p < 280; p++) {
+        int x = (int)(BG_RND % (uint32_t)FB_W);
+        int y = (int)(BG_RND % (uint32_t)FB_H);
+        uint8_t a = (uint8_t)(10 + (BG_RND % 46u));
+        uint32_t pick = BG_RND % 10u;
+        pixel_t c = pick < 7u ? rgb(0xC8, 0xD6, 0xF0)
+                  : pick < 9u ? cyan : rgb(0x9A, 0x86, 0xFF);
+        draw_blend_pixel(x, y, c, a);
+    }
+    for (int p = 0; p < 26; p++) {
+        int x = (int)(BG_RND % (uint32_t)FB_W);
+        int y = (int)(BG_RND % (uint32_t)FB_H);
+        draw_blend_pixel(x, y, rgb(0xE6, 0xEE, 0xFF), 200);
+        draw_blend_pixel(x - 1, y, cyan, 60); draw_blend_pixel(x + 1, y, cyan, 60);
+        draw_blend_pixel(x, y - 1, cyan, 60); draw_blend_pixel(x, y + 1, cyan, 60);
+    }
+
+    /* 6. soft edge vignette — darken toward all four edges, gentle. */
+    int vb = 260;
+    for (int b = 0; b < vb; b++) {
+        uint8_t a = (uint8_t)(60 * (vb - b) / vb);
+        for (int x = 0; x < FB_W; x++) {
+            draw_blend_pixel(x, b, 0, a);
+            draw_blend_pixel(x, FB_H - 1 - b, 0, a);
+        }
+    }
+    for (int b = 0; b < vb; b++) {
+        uint8_t a = (uint8_t)(60 * (vb - b) / vb);
+        for (int y = 0; y < FB_H; y++) {
+            draw_blend_pixel(b, y, 0, a);
+            draw_blend_pixel(FB_W - 1 - b, y, 0, a);
+        }
+    }
+#undef BG_RND
 }
 
 void wallpaper_draw(void) {
