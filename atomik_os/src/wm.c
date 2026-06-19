@@ -214,6 +214,35 @@ void wm_draw_all(void) {
     }
 }
 
+/* v0.42 delta render: recomposite ONLY window `id` (plus any visible window
+ * stacked above it that overlaps its rect, so z-order stays correct) into the
+ * back buffer.  Does NOT touch the wallpaper, hero, dock, status bar, or other
+ * windows — they didn't change, so a click that only mutates one window's
+ * content costs that window's pixels, not the whole 1080p desktop.  The caller
+ * presents the returned rect.  Sets *rw=0 if the window isn't found/visible. */
+void wm_redraw_window(int id, int *rx, int *ry, int *rw, int *rh) {
+    window_t *win = find_by_id(id);
+    if (!win || !win->visible) { if (rw) *rw = 0; if (rh) *rh = 0; return; }
+    if (rx) *rx = win->x; if (ry) *ry = win->y;
+    if (rw) *rw = win->w; if (rh) *rh = win->h;
+
+    int order[WM_MAX_WINDOWS];
+    for (int i = 0; i < s_count; i++) order[i] = i;
+    for (int i = 0; i < s_count - 1; i++)
+        for (int j = i + 1; j < s_count; j++)
+            if (s_windows[order[i]].z > s_windows[order[j]].z) {
+                int t = order[i]; order[i] = order[j]; order[j] = t;
+            }
+    window_t *top = wm_topmost();
+    for (int i = 0; i < s_count; i++) {
+        window_t *w = &s_windows[order[i]];
+        if (!w->visible || w->z < win->z) continue;        /* target + above only */
+        if (w->x < win->x + win->w && w->x + w->w > win->x &&  /* overlaps target  */
+            w->y < win->y + win->h && w->y + w->h > win->y)
+            draw_one(w, w == top);
+    }
+}
+
 /* v0.31: enumeration getters for the status-bar window-strip. */
 int wm_count(void) { return s_count; }
 const window_t *wm_get(int idx) {

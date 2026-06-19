@@ -521,6 +521,7 @@ void      wm_close(int id);
 window_t *wm_focus(int id);
 window_t *wm_topmost(void);
 void      wm_draw_all(void);
+void      wm_redraw_window(int id, int *rx, int *ry, int *rw, int *rh); /* delta: one window */
 int       wm_handle_key(int key);   /* returns 1 if key was consumed */
 
 /* v0.31: enumeration so the status bar can render a per-window dot
@@ -668,6 +669,7 @@ void          system_surface_draw(window_t *w, int x, int y, int wd, int ht);
 void          workloads_surface_open(void);
 void          workloads_surface_draw(window_t *w, int x, int y, int wd, int ht);
 int           workloads_surface_is_open(void);
+int           workloads_surface_window_id(void);              /* wm window id, -1 if closed */
 int           workloads_surface_handle_click(int mx, int my); /* select a lane rung; 1 if handled */
 void          workloads_cycle_scenario(void);
 void          workloads_set_scenario(int n);

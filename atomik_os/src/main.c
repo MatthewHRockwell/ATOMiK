@@ -143,6 +143,29 @@ static void redraw_frame(void) {
     dirty_finalize_frame();
 }
 
+/* v0.42 delta render for clicks: when a click mutates ONE window's content (e.g.
+ * selecting a lane on the Parallel Aggregate card), recomposite only that window
+ * + the cursor and present only those rects — instead of a full-desktop
+ * redraw_frame() that brute-forces 2,073,600 pixels and freezes the cursor for a
+ * frame.  This is the cursor's save-under generalized to the window manager. */
+static void redraw_window_delta(int id) {
+    int rx, ry, rw, rh;
+    int had_cursor = (s_cur_sx >= 0 && s_cur_has_save);
+    int ocx = s_cur_sx, ocy = s_cur_sy;
+    /* lift the cursor off the back buffer so the window recomposite + cursor
+     * repaint start from a clean background. */
+    if (had_cursor) cursor_restore_under(s_cur_sx, s_cur_sy);
+    s_cur_has_save = 0; s_cur_sx = s_cur_sy = -1;
+
+    wm_redraw_window(id, &rx, &ry, &rw, &rh);
+    if (rw == 0) { redraw_frame(); return; }   /* window vanished -> full redraw */
+
+    cursor_draw();                             /* save-under + paint at cursor pos */
+    fb_present_rect(rx, ry, rw, rh);           /* the changed window */
+    if (had_cursor) fb_present_rect(ocx, ocy, CUR_W, CUR_H);      /* clear old cursor */
+    if (s_cur_sx >= 0) fb_present_rect(s_cur_sx, s_cur_sy, CUR_W, CUR_H); /* new cursor */
+}
+
 /* v0.31: workspace_w returns the width of the central column where
  * normal app windows live.  Resource Fabric occupies the right shelf
  * (pinned system panel); the Capability Rail (v0.34) occupies the
@@ -877,8 +900,9 @@ int main(int argc, char **argv) {
             } else if (ev.kind == EV_MOUSE_DOWN &&
                        workloads_surface_handle_click(ev.mx, ev.my)) {
                 /* v0.42: clicked a lane rung on the Parallel Aggregate card —
-                 * select that bank config; full repaint features it. */
-                redraw_frame();
+                 * only the Workloads window changed, so recomposite JUST that
+                 * window (+ cursor), not the whole desktop. */
+                redraw_window_delta(workloads_surface_window_id());
             } else if (ev.kind == EV_MOUSE_MOVE && slot == s_dock_hover) {
                 /* Pure cursor motion, no rail-hover change: a DELTA update only
                  * — restore-under + paint + present two ~10x18 rects.  No full

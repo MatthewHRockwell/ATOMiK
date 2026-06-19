@@ -107,6 +107,7 @@ void workloads_set_scenario(int n) {
 }
 
 int  workloads_surface_is_open(void) { return s_window_id >= 0; }
+int  workloads_surface_window_id(void) { return s_window_id; }
 
 /* v0.42 interactive: hit-test a screen-space click against the lane ladder.
  * Returns 1 if it selected a rung (caller repaints).  The ladder records its
