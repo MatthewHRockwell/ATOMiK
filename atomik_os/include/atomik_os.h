@@ -128,6 +128,7 @@ int  fb_open(void);
 void fb_close(void);
 pixel_t *fb_back(void);   /* writeable back buffer (FB_W*FB_H pixels) */
 void fb_present(void);    /* memcpy back buffer to /dev/fb0 mmap */
+void fb_present_rect(int x, int y, int w, int h); /* present only a delta rect */
 void fb_clear(pixel_t color);
 void fb_enable_scanout(int enable);  /* drives the LiteX VTG/DMA CSRs */
 void fb_write_png(const char *path); /* v0.40 in-OS auto-capture: back buffer -> PNG */

@@ -30,48 +30,89 @@ static void seed_demo_usage(void) {
     for (unsigned i = 0; i < sizeof(seq) / sizeof(seq[0]); i++) agent_log(seq[i]);
 }
 
-/* v0.41 pointer cursor — classic tilted arrow, white fill + dark edge so it
- * reads on any background.  Hotspot at the top-left tip (mx,my).  Drawn LAST
- * each frame (above all chrome).  No-op until a mouse device is present. */
-static void cursor_draw(void) {
-    int cx_ovr = -1, cy_ovr = -1;
-    const char *pc = getenv("ATOMIK_PREVIEW_CURSOR");  /* "x,y" for host shots */
-    if (pc && *pc) { int a = -1, b = -1; if (sscanf(pc, "%d,%d", &a, &b) == 2) { cx_ovr = a; cy_ovr = b; } }
-    if (!input_mouse_present() && cx_ovr < 0) return;
-    static const char *CUR[18] = {
-        "E         ",
-        "EE        ",
-        "EFE       ",
-        "EFFE      ",
-        "EFFFE     ",
-        "EFFFFE    ",
-        "EFFFFFE   ",
-        "EFFFFFFE  ",
-        "EFFFFFFFE ",
-        "EFFFFFFFFE",
-        "EFFFFEEEEE",
-        "EFFEFFE   ",
-        "EFE EFFE  ",
-        "EE  EFFE  ",
-        "E    EFFE ",
-        "     EFFE ",
-        "      EFFE",
-        "      EEEE",
-    };
-    int x0 = cx_ovr >= 0 ? cx_ovr : input_mouse_x();
-    int y0 = cy_ovr >= 0 ? cy_ovr : input_mouse_y();
+/* v0.42 pointer cursor — drawn via SAVE-UNDER so a mouse move is a true DELTA,
+ * not a full-frame recomposite (the whole ATOMiK point: push what changed).
+ * The background under the cursor is saved before the arrow is painted; moving
+ * the cursor restores the old region and paints the new one, presenting only
+ * those two ~10x18 rects.  Classic tilted arrow, white fill + dark edge.
+ * Hotspot at the top-left tip.  No-op until a mouse device is present. */
+#define CUR_W 10
+#define CUR_H 18
+static const char *CUR[CUR_H] = {
+    "E         ", "EE        ", "EFE       ", "EFFE      ", "EFFFE     ",
+    "EFFFFE    ", "EFFFFFE   ", "EFFFFFFE  ", "EFFFFFFFE ", "EFFFFFFFFE",
+    "EFFFFEEEEE", "EFFEFFE   ", "EFE EFFE  ", "EE  EFFE  ", "E    EFFE ",
+    "     EFFE ", "      EFFE", "      EEEE",
+};
+static pixel_t s_cur_save[CUR_W * CUR_H]; /* background under the composited cursor */
+static int s_cur_sx = -1, s_cur_sy = -1;  /* where the cursor is currently composited */
+static int s_cur_has_save = 0;
+
+static void cursor_paint(int x0, int y0) {
     pixel_t fillc = rgb(0xF0, 0xF6, 0xFF);
     pixel_t edge  = rgb(0x06, 0x0A, 0x14);
-    for (int r = 0; r < 18; r++) {
-        for (int c = 0; c < 10; c++) {
+    for (int r = 0; r < CUR_H; r++)
+        for (int c = 0; c < CUR_W; c++) {
             char ch = CUR[r][c];
             if (ch == ' ') continue;
             int px = x0 + c, py = y0 + r;
             if (px < 0 || px >= FB_W || py < 0 || py >= FB_H) continue;
             draw_pixel(px, py, ch == 'F' ? fillc : edge);
         }
+}
+static void cursor_save_under(int x0, int y0) {
+    pixel_t *bb = fb_back();
+    for (int r = 0; r < CUR_H; r++)
+        for (int c = 0; c < CUR_W; c++) {
+            int px = x0 + c, py = y0 + r;
+            s_cur_save[r * CUR_W + c] =
+                (px >= 0 && px < FB_W && py >= 0 && py < FB_H) ? bb[py * FB_W + px] : 0;
+        }
+    s_cur_has_save = 1;
+}
+static void cursor_restore_under(int x0, int y0) {
+    if (!s_cur_has_save) return;
+    pixel_t *bb = fb_back();
+    for (int r = 0; r < CUR_H; r++)
+        for (int c = 0; c < CUR_W; c++) {
+            int px = x0 + c, py = y0 + r;
+            if (px >= 0 && px < FB_W && py >= 0 && py < FB_H)
+                bb[py * FB_W + px] = s_cur_save[r * CUR_W + c];
+        }
+}
+
+/* Called at the end of a FULL redraw_frame: the back buffer is freshly
+ * composited (no cursor), so save the background under the cursor and paint it
+ * on top.  Records position so a later delta move knows what to restore. */
+static void cursor_draw(void) {
+    int cx_ovr = -1, cy_ovr = -1;
+    const char *pc = getenv("ATOMIK_PREVIEW_CURSOR");  /* "x,y" for host shots */
+    if (pc && *pc) { int a = -1, b = -1; if (sscanf(pc, "%d,%d", &a, &b) == 2) { cx_ovr = a; cy_ovr = b; } }
+    if (!input_mouse_present() && cx_ovr < 0) { s_cur_sx = s_cur_sy = -1; s_cur_has_save = 0; return; }
+    int x0 = cx_ovr >= 0 ? cx_ovr : input_mouse_x();
+    int y0 = cy_ovr >= 0 ? cy_ovr : input_mouse_y();
+    cursor_save_under(x0, y0);
+    cursor_paint(x0, y0);
+    s_cur_sx = x0; s_cur_sy = y0;
+    dirty_rect(x0, y0, CUR_W, CUR_H);
+}
+
+/* Cursor-only motion: a pure delta.  Restore the old region from save-under,
+ * paint the cursor at the new spot, and present ONLY those two rects — no
+ * surface recomposite, no full present.  This is the desktop running ATOMiK on
+ * itself: a cursor move touches ~360 pixels, not 2,073,600. */
+static void cursor_move_delta(void) {
+    if (!input_mouse_present()) return;
+    int nx = input_mouse_x(), ny = input_mouse_y();
+    if (nx == s_cur_sx && ny == s_cur_sy) return;
+    if (s_cur_sx >= 0 && s_cur_has_save) {        /* erase old cursor */
+        cursor_restore_under(s_cur_sx, s_cur_sy);
+        fb_present_rect(s_cur_sx, s_cur_sy, CUR_W, CUR_H);
     }
-    dirty_rect(x0, y0, 10, 18);
+    cursor_save_under(nx, ny);                     /* paint new cursor */
+    cursor_paint(nx, ny);
+    fb_present_rect(nx, ny, CUR_W, CUR_H);
+    s_cur_sx = nx; s_cur_sy = ny;
 }
 
 static void redraw_frame(void) {
@@ -832,14 +873,22 @@ int main(int argc, char **argv) {
                 else if (a == ACT_OPEN_ASSISTANT) assistant_summon();
                 else if (a == ACT_OPEN_WORKLOAD)  workloads_surface_open();
                 if (a != ACT_NONE) agent_log(a); else agent_log(ACT_DOCK_HOVER);
+                redraw_frame();
             } else if (ev.kind == EV_MOUSE_DOWN &&
                        workloads_surface_handle_click(ev.mx, ev.my)) {
                 /* v0.42: clicked a lane rung on the Parallel Aggregate card —
-                 * select that bank config; the repaint below features it. */
+                 * select that bank config; full repaint features it. */
+                redraw_frame();
+            } else if (ev.kind == EV_MOUSE_MOVE && slot == s_dock_hover) {
+                /* Pure cursor motion, no rail-hover change: a DELTA update only
+                 * — restore-under + paint + present two ~10x18 rects.  No full
+                 * recomposite/present, so the cursor tracks at the mouse's full
+                 * report rate.  THIS is ATOMiK on its own desktop. */
+                cursor_move_delta();
             } else {
-                s_dock_hover = slot;   /* hover highlight follows the cursor */
+                s_dock_hover = slot;   /* hover changed, or button up: full redraw */
+                redraw_frame();
             }
-            redraw_frame();            /* reflect the new cursor / hover */
         } else {
             /* No event arrived. Redraw a frame if an animation is in
              * progress (window fade-in, predicted-icon pulse, etc.) OR if

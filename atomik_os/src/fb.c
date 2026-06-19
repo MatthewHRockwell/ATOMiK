@@ -58,6 +58,22 @@ void fb_present(void) {
     memcpy(s_fb_map, s_back, FB_BYTES);
 }
 
+/* Present ONLY a rectangular delta to the scanout surface — the ATOMiK way:
+ * push the pixels that changed, not the 2 megapixels that didn't.  Used for
+ * cursor moves (two ~10x18 rects) so the cursor tracks at the mouse's full
+ * report rate instead of being gated by a full-frame recomposite+copy. */
+void fb_present_rect(int x, int y, int w, int h) {
+    if (x < 0) { w += x; x = 0; }
+    if (y < 0) { h += y; y = 0; }
+    if (x + w > FB_W) w = FB_W - x;
+    if (y + h > FB_H) h = FB_H - y;
+    if (w <= 0 || h <= 0) return;
+    for (int r = 0; r < h; r++) {
+        size_t off = (size_t)(y + r) * FB_W + x;
+        memcpy(s_fb_map + off, s_back + off, (size_t)w * sizeof(pixel_t));
+    }
+}
+
 void fb_clear(pixel_t color) {
     pixel_t *p = s_back;
     for (size_t i = 0; i < (size_t)FB_W * FB_H; i++) p[i] = color;

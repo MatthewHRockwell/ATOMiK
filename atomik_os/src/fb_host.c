@@ -51,6 +51,10 @@ void fb_present(void) {
     fprintf(stderr, "[host] wrote %s (%dx%d)\n", path, FB_W, FB_H);
 }
 
+/* Host has no live scanout — cursor deltas are visible only in the final PNG,
+ * which fb_present() writes from the full back buffer.  No-op here. */
+void fb_present_rect(int x, int y, int w, int h) { (void)x; (void)y; (void)w; (void)h; }
+
 /* In-OS auto-capture parity on host (writes wherever requested). */
 void fb_write_png(const char *path) {
     if (s_back) png_write_xrgb(path, (const uint32_t *)s_back, FB_W, FB_H);
