@@ -27,6 +27,18 @@ static int s_sel_idx = -1;
 static int s_rung_x = 0, s_rung_w = 0, s_rung_h = 0, s_rung_n = 0;
 static int s_rung_y[BENCH_N_POINTS];
 
+/* v0.42 sub-element delta: the only elements that change on a lane select are
+ * the ATOMiK comparison panel, the lane ladder, and the savings banner.  Their
+ * on-screen rects are recorded during the full draw so a select can redraw ONLY
+ * these — skipping the unchanged header/tabs/title/desc/CONVENTIONAL-panel/
+ * provenance AA text, which is what made the click pause on the slow core. */
+static int s_atk_rect[4]     = {0, 0, 0, 0};  /* x,y,w,h — ATOMiK panel  */
+static int s_ladder_rect[4]  = {0, 0, 0, 0};  /* x,y,w,h — lane ladder   */
+static int s_savings_rect[4] = {0, 0, 0, 0};  /* x,y,w,h — savings banner */
+/* parallel-scenario featured-number buffers (module scope so the sub-element
+ * redraw can recompute them, not just the full draw). */
+static char s_pconv[16], s_patk[16], s_psav[24], s_phow[44];
+
 /* set the active scenario (board: 'W' re-press cycles; preview: env). */
 void workloads_set_scenario(int n);  /* fwd (declared in header below if needed) */
 
@@ -280,33 +292,62 @@ static int parallel_ladder(int x, int y, int w, const bench_point_t *pts, int np
     return y - y0;
 }
 
+/* Recompute the Parallel Aggregate scenario's featured numbers from the live
+ * bench sweep + the cursor-selected lane (s_sel_idx); updates s_wl[2] in place.
+ * Returns bench_live.  Shared by the full draw and the sub-element redraw. */
+static int parallel_recompute(void) {
+    int npts = 0; const bench_point_t *pts = bench_sweep_points(&npts);
+    int bench_live = (bench_source() == METRIC_LIVE) && npts >= 2;
+    int sel = (s_sel_idx >= 0 && s_sel_idx < npts) ? s_sel_idx : (npts > 0 ? npts - 1 : 0);
+    if (bench_live) {
+        long base = (long)pts[0].cycles, fast = (long)pts[sel].cycles;
+        snprintf(s_pconv, sizeof s_pconv, "%ld", base);
+        snprintf(s_patk,  sizeof s_patk,  "%ld", fast);
+        if (sel == 0) snprintf(s_psav, sizeof s_psav, "BASELINE (1 lane)");
+        else          snprintf(s_psav, sizeof s_psav, "%.0fx FASTER", pts[sel].speedup);
+        snprintf(s_phow, sizeof s_phow, "%u lane%s, lock-free, all at once",
+                 pts[sel].banks, pts[sel].banks == 1 ? "" : "s");
+        s_wl[2].conv_big = s_pconv; s_wl[2].atomik_big = s_patk;
+        s_wl[2].conv_bar = (double)base; s_wl[2].atomik_bar = (double)fast;
+        s_wl[2].savings = s_psav;  s_wl[2].atomik_how = s_phow;
+    }
+    s_wl[2].live = bench_live;
+    return bench_live;
+}
+
+/* Savings banner (green pill with the Nx-FASTER headline + guarantee line).
+ * Returns its height.  Factored out so the sub-element redraw can repaint it. */
+static int draw_savings_banner(int x, int y, int w, const char *savings,
+                               const char *guarantee) {
+    int lab = font_aa_loaded(FONT_AA_LABEL);
+    int lh  = lab ? text_height_aa(FONT_AA_LABEL) : text_height(1);
+    int bh  = (font_aa_loaded(FONT_AA_DISPLAY) ? text_height_aa(FONT_AA_DISPLAY) : 28)
+              + ATOMIK_GRID_M * 2;
+    draw_rect_rounded(x, y, w, bh, 12, rgb(0x0E, 0x22, 0x16));
+    draw_rect(x, y, w, 1, ATOMIK_SEM_SAVINGS);
+    draw_rect(x, y + bh - 1, w, 1, ATOMIK_SEM_SAVINGS);
+    draw_rect(x, y, 1, bh, ATOMIK_SEM_SAVINGS);
+    draw_rect(x + w - 1, y, 1, bh, ATOMIK_SEM_SAVINGS);
+    if (font_aa_loaded(FONT_AA_DISPLAY))
+        draw_text_aa(FONT_AA_DISPLAY, x + ATOMIK_GRID_L, y + ATOMIK_GRID_M, savings, ATOMIK_SEM_SAVINGS);
+    if (lab) {
+        int gw = text_width_aa(FONT_AA_LABEL, guarantee);
+        draw_text_aa(FONT_AA_LABEL, x + w - gw - ATOMIK_GRID_L, y + bh/2 - lh/2,
+                     guarantee, rgb(0xB8, 0xE8, 0xC4));
+    }
+    return bh;
+}
+
 void workloads_surface_draw(window_t *w, int x, int y, int wd, int ht) {
     (void)w;
     int pad = ATOMIK_GRID_L, ix = x + pad, iw = wd - pad * 2, ty = y + ATOMIK_GRID_M;
     int lab = font_aa_loaded(FONT_AA_LABEL);
     int lh  = lab ? text_height_aa(FONT_AA_LABEL) : text_height(1);
 
-    /* live bench data overwrites the parallel-aggregate scenario numbers. */
+    /* live bench data drives the parallel-aggregate scenario (via the cursor-
+     * selected lane, s_sel_idx); pts/npts reused for the ladder draw below. */
     int npts = 0; const bench_point_t *pts = bench_sweep_points(&npts);
-    int bench_live = (bench_source() == METRIC_LIVE) && npts >= 2;
-    /* the cursor-selected lane config (default = max lanes) drives the
-     * featured ATOMiK side; the conventional side stays the 1-lane baseline. */
-    int sel = (s_sel_idx >= 0 && s_sel_idx < npts) ? s_sel_idx : (npts > 0 ? npts - 1 : 0);
-    static char conv_cyc[16], atk_cyc[16], sav_str[24], atk_how[44];
-    if (bench_live) {
-        long base = (long)pts[0].cycles, fast = (long)pts[sel].cycles;
-        snprintf(conv_cyc, sizeof conv_cyc, "%ld", base);
-        snprintf(atk_cyc,  sizeof atk_cyc,  "%ld", fast);
-        if (sel == 0) snprintf(sav_str, sizeof sav_str, "BASELINE (1 lane)");
-        else          snprintf(sav_str, sizeof sav_str, "%.0fx FASTER", pts[sel].speedup);
-        snprintf(atk_how, sizeof atk_how, "%u lane%s, lock-free, all at once",
-                 pts[sel].banks, pts[sel].banks == 1 ? "" : "s");
-        s_wl[2].conv_big = conv_cyc; s_wl[2].atomik_big = atk_cyc;
-        s_wl[2].conv_bar = (double)base; s_wl[2].atomik_bar = (double)fast;
-        s_wl[2].savings = sav_str;
-        s_wl[2].atomik_how = atk_how;
-    }
-    s_wl[2].live = bench_live;
+    int bench_live = parallel_recompute();
 
     /* live memory-workload data (aworkload) overwrites scenarios 0 + 1 with
      * real, hardware-VERIFIED numbers; flips them LIVE when present. */
@@ -392,6 +433,8 @@ void workloads_surface_draw(window_t *w, int x, int y, int wd, int ht) {
                       sc->conv_big, sc->conv_unit, ATOMIK_SEM_WASTE, 0);
         compare_panel(ix + pw + gap, ty, pw, phh, "ATOMiK", sc->atomik_how,
                       sc->atomik_big, sc->atomik_unit, ATOMIK_SEM_SAVINGS, 1);
+        s_atk_rect[0] = ix + pw + gap; s_atk_rect[1] = ty;
+        s_atk_rect[2] = pw;            s_atk_rect[3] = phh;
         ty += phh + ATOMIK_GRID_L;
     }
 
@@ -399,8 +442,10 @@ void workloads_surface_draw(window_t *w, int x, int y, int wd, int ht) {
      *    measured 1/2/4/8-lane scaling + the identical-result proof); plain
      *    two-bar comparison for the data-movement scenarios. ──────────────── */
     if (s_scenario == 2 && bench_live) {
-        ty += parallel_ladder(ix, ty, iw, pts, npts);
-        ty += ATOMIK_GRID_L;
+        int lad_h = parallel_ladder(ix, ty, iw, pts, npts);
+        s_ladder_rect[0] = ix; s_ladder_rect[1] = ty;
+        s_ladder_rect[2] = iw; s_ladder_rect[3] = lad_h;
+        ty += lad_h + ATOMIK_GRID_L;
     } else {
         double vmax = sc->conv_bar > sc->atomik_bar ? sc->conv_bar : sc->atomik_bar;
         compare_bar(ix, ty, iw, "Conventional", sc->conv_bar, vmax, ATOMIK_SEM_WASTE, sc->conv_big);
@@ -411,22 +456,9 @@ void workloads_surface_draw(window_t *w, int x, int y, int wd, int ht) {
 
     /* ── savings banner ───────────────────────────────────────────────── */
     {
-        int bh = (font_aa_loaded(FONT_AA_DISPLAY) ? text_height_aa(FONT_AA_DISPLAY) : 28) + ATOMIK_GRID_M * 2;
-        draw_rect_rounded(ix, ty, iw, bh, 12, rgb(0x0E, 0x22, 0x16));
-        draw_rect(ix, ty, iw, 1, ATOMIK_SEM_SAVINGS);
-        draw_rect(ix, ty + bh - 1, iw, 1, ATOMIK_SEM_SAVINGS);
-        draw_rect(ix, ty, 1, bh, ATOMIK_SEM_SAVINGS);
-        draw_rect(ix + iw - 1, ty, 1, bh, ATOMIK_SEM_SAVINGS);
-        int px = ix + ATOMIK_GRID_L, py = ty + ATOMIK_GRID_M;
-        if (font_aa_loaded(FONT_AA_DISPLAY)) {
-            draw_text_aa(FONT_AA_DISPLAY, px, py, sc->savings, ATOMIK_SEM_SAVINGS);
-        }
-        /* guarantee line, right-aligned */
-        if (lab) {
-            int gw = text_width_aa(FONT_AA_LABEL, sc->guarantee);
-            int gy = ty + bh/2 - lh/2;
-            draw_text_aa(FONT_AA_LABEL, ix + iw - gw - ATOMIK_GRID_L, gy, sc->guarantee, rgb(0xB8,0xE8,0xC4));
-        }
+        s_savings_rect[0] = ix; s_savings_rect[1] = ty; s_savings_rect[2] = iw;
+        int bh = draw_savings_banner(ix, ty, iw, sc->savings, sc->guarantee);
+        s_savings_rect[3] = bh;
         ty += bh + ATOMIK_GRID_M;
     }
 
@@ -478,6 +510,47 @@ void workloads_surface_draw(window_t *w, int x, int y, int wd, int ht) {
             draw_text_aa(FONT_AA_LABEL, ix + iw - hw, by, hint, rgb(0x5E, 0x6A, 0x80));
         }
     }
+}
+
+/* v0.42 sub-element delta: after a lane select changed s_sel_idx, redraw ONLY
+ * the three selection-dependent elements (ATOMiK panel, ladder, savings banner)
+ * over the existing back buffer — skipping the unchanged header/tabs/title/
+ * CONVENTIONAL panel/provenance AA text that made a full window recomposite
+ * pause on this core.  Returns 1 + the bounding rect (caller presents it + the
+ * cursor); 0 to fall back to a full redraw. */
+int workloads_surface_redraw_selection(int *rx, int *ry, int *rw, int *rh) {
+    if (s_window_id < 0 || s_scenario != 2 ||
+        s_atk_rect[2] == 0 || s_ladder_rect[2] == 0 || s_savings_rect[2] == 0)
+        return 0;
+    if (!parallel_recompute()) return 0;          /* bench data gone -> full */
+
+    wl_scenario_t *sc = &s_wl[2];
+    /* ATOMiK panel + savings banner draw their own backgrounds, so they fully
+     * self-erase.  The ladder's labels/chevron sit on the bare window body, so
+     * clear that rect to the card tone first (else the OLD selection chevron
+     * ghosts on the previously-selected rung). */
+    compare_panel(s_atk_rect[0], s_atk_rect[1], s_atk_rect[2], s_atk_rect[3],
+                  "ATOMiK", sc->atomik_how, sc->atomik_big, sc->atomik_unit,
+                  ATOMIK_SEM_SAVINGS, 1);
+    draw_rect(s_ladder_rect[0], s_ladder_rect[1], s_ladder_rect[2], s_ladder_rect[3], wm_card_bg());
+    int npts = 0; const bench_point_t *pts = bench_sweep_points(&npts);
+    parallel_ladder(s_ladder_rect[0], s_ladder_rect[1], s_ladder_rect[2], pts, npts);
+    draw_savings_banner(s_savings_rect[0], s_savings_rect[1], s_savings_rect[2],
+                        sc->savings, sc->guarantee);
+
+    /* bounding box of the three redrawn rects */
+    int x0 = s_atk_rect[0], y0 = s_atk_rect[1];
+    int x1 = s_atk_rect[0] + s_atk_rect[2], y1 = s_atk_rect[1] + s_atk_rect[3];
+    const int *rs[3] = { s_atk_rect, s_ladder_rect, s_savings_rect };
+    for (int i = 0; i < 3; i++) {
+        if (rs[i][0] < x0) x0 = rs[i][0];
+        if (rs[i][1] < y0) y0 = rs[i][1];
+        if (rs[i][0] + rs[i][2] > x1) x1 = rs[i][0] + rs[i][2];
+        if (rs[i][1] + rs[i][3] > y1) y1 = rs[i][1] + rs[i][3];
+    }
+    if (rx) *rx = x0; if (ry) *ry = y0;
+    if (rw) *rw = x1 - x0; if (rh) *rh = y1 - y0;
+    return 1;
 }
 
 void workloads_surface_open(void) {

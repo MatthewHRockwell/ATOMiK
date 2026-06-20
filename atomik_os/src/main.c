@@ -166,6 +166,30 @@ static void redraw_window_delta(int id) {
     if (s_cur_sx >= 0) fb_present_rect(s_cur_sx, s_cur_sy, CUR_W, CUR_H); /* new cursor */
 }
 
+/* v0.42 finest delta: a workloads lane-select changes only three elements
+ * (ATOMiK panel, ladder, savings banner).  Redraw JUST those + the cursor and
+ * present only their rects — skipping the window's unchanged header/tabs/title/
+ * CONVENTIONAL-panel/provenance AA text.  A lane select touches a few thousand
+ * pixels, not the window, not the desktop.  Falls back to a full redraw if the
+ * surface can't do the sub-element path. */
+static void redraw_selection_delta(void) {
+    int rx, ry, rw, rh;
+    int had_cursor = (s_cur_sx >= 0 && s_cur_has_save);
+    int ocx = s_cur_sx, ocy = s_cur_sy;
+    if (had_cursor) cursor_restore_under(s_cur_sx, s_cur_sy);
+    s_cur_has_save = 0; s_cur_sx = s_cur_sy = -1;
+
+    if (!workloads_surface_redraw_selection(&rx, &ry, &rw, &rh)) {
+        redraw_window_delta(workloads_surface_window_id());  /* -> full if no window */
+        return;
+    }
+
+    cursor_draw();
+    fb_present_rect(rx, ry, rw, rh);
+    if (had_cursor) fb_present_rect(ocx, ocy, CUR_W, CUR_H);
+    if (s_cur_sx >= 0) fb_present_rect(s_cur_sx, s_cur_sy, CUR_W, CUR_H);
+}
+
 /* v0.31: workspace_w returns the width of the central column where
  * normal app windows live.  Resource Fabric occupies the right shelf
  * (pinned system panel); the Capability Rail (v0.34) occupies the
@@ -899,19 +923,23 @@ int main(int argc, char **argv) {
                 redraw_frame();
             } else if (ev.kind == EV_MOUSE_DOWN &&
                        workloads_surface_handle_click(ev.mx, ev.my)) {
-                /* v0.42: clicked a lane rung on the Parallel Aggregate card —
-                 * only the Workloads window changed, so recomposite JUST that
-                 * window (+ cursor), not the whole desktop. */
-                redraw_window_delta(workloads_surface_window_id());
-            } else if (ev.kind == EV_MOUSE_MOVE && slot == s_dock_hover) {
-                /* Pure cursor motion, no rail-hover change: a DELTA update only
-                 * — restore-under + paint + present two ~10x18 rects.  No full
-                 * recomposite/present, so the cursor tracks at the mouse's full
-                 * report rate.  THIS is ATOMiK on its own desktop. */
-                cursor_move_delta();
-            } else {
-                s_dock_hover = slot;   /* hover changed, or button up: full redraw */
+                /* v0.42: clicked a lane rung — only the ATOMiK panel, ladder,
+                 * and savings banner change, so redraw JUST those three (+ the
+                 * cursor), not the window, not the desktop. */
+                redraw_selection_delta();
+            } else if (ev.kind == EV_MOUSE_MOVE && slot != s_dock_hover) {
+                /* moved across a rail-slot boundary: the hover highlight changed,
+                 * so repaint (full — the dock spans the rail). */
+                s_dock_hover = slot;
                 redraw_frame();
+            } else {
+                /* pure cursor motion (same hover), button RELEASE, or a press on
+                 * dead space — nothing composited changes, so a DELTA cursor
+                 * update only.  No full recomposite.  (A mouse-up landing here
+                 * used to trigger redraw_frame() — that was the ~1s post-click
+                 * freeze.)  This is ATOMiK on its own desktop. */
+                s_dock_hover = slot;
+                cursor_move_delta();
             }
         } else {
             /* No event arrived. Redraw a frame if an animation is in
