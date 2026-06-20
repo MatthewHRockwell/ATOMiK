@@ -909,6 +909,7 @@ int main(int argc, char **argv) {
              * a left-click on a rail cell activates that capability (same
              * dispatch as the number-key launcher). */
             int slot = dock_hit_test(ev.mx, ev.my);
+            int s_wl_click = 0;
             if (ev.kind == EV_MOUSE_DOWN && slot >= 0) {
                 s_dock_hover = slot;
                 action_t a = dock_action_for_slot(slot);
@@ -922,11 +923,18 @@ int main(int argc, char **argv) {
                 if (a != ACT_NONE) agent_log(a); else agent_log(ACT_DOCK_HOVER);
                 redraw_frame();
             } else if (ev.kind == EV_MOUSE_DOWN &&
-                       workloads_surface_handle_click(ev.mx, ev.my)) {
-                /* v0.42: clicked a lane rung — only the ATOMiK panel, ladder,
-                 * and savings banner change, so redraw JUST those three (+ the
-                 * cursor), not the window, not the desktop. */
-                redraw_selection_delta();
+                       (s_wl_click = workloads_surface_handle_click(ev.mx, ev.my))) {
+                if (s_wl_click == 2) {
+                    /* v0.42: switched scenario tab — the whole card body changes,
+                     * but the wallpaper/hero/dock/status don't, so redraw JUST the
+                     * workloads window (+ cursor), not the 1080p desktop. */
+                    redraw_window_delta(workloads_surface_window_id());
+                } else {
+                    /* clicked a lane rung — only the ATOMiK panel, ladder, and
+                     * savings banner change, so redraw JUST those three (+ the
+                     * cursor), not the window, not the desktop. */
+                    redraw_selection_delta();
+                }
             } else if (ev.kind == EV_MOUSE_MOVE && slot != s_dock_hover) {
                 /* moved across a rail-slot boundary: the hover highlight changed,
                  * so repaint (full — the dock spans the rail). */

@@ -65,6 +65,9 @@ typedef struct {
 
 #define N_WL 3
 
+static int s_tab_rect[N_WL][4];               /* x,y,w,h — scenario tabs (clickable) */
+static unsigned long s_last_cycle_ms = 0;     /* auto-cycle timer / manual reset */
+
 /* Static scenario copy.  The parallel-aggregate big numbers are overwritten
  * at draw time from the live bench sweep when available. */
 static wl_scenario_t s_wl[N_WL] = {
@@ -121,11 +124,31 @@ void workloads_set_scenario(int n) {
 int  workloads_surface_is_open(void) { return s_window_id >= 0; }
 int  workloads_surface_window_id(void) { return s_window_id; }
 
-/* v0.42 interactive: hit-test a screen-space click against the lane ladder.
- * Returns 1 if it selected a rung (caller repaints).  The ladder records its
- * rung rects at draw time. */
+/* v0.42 interactive: hit-test a screen-space click against the surface.
+ * Returns:
+ *   2 — switched to a DIFFERENT scenario tab (caller does a window-delta redraw,
+ *       since the whole card body changes).
+ *   1 — selected a lane rung within the parallel scenario (caller does the
+ *       cheaper sub-element redraw).
+ *   0 — click landed on nothing actionable.
+ * Both the tabs and the ladder rungs record their rects at draw time. */
 int workloads_surface_handle_click(int mx, int my) {
-    if (s_window_id < 0 || s_scenario != 2 || s_rung_n <= 0) return 0;
+    if (s_window_id < 0) return 0;
+
+    /* Tabs first — present in every scenario, along the top of the card. */
+    for (int i = 0; i < N_WL; i++) {
+        int *r = s_tab_rect[i];
+        if (r[2] <= 0) continue;
+        if (mx >= r[0] && mx < r[0] + r[2] && my >= r[1] && my < r[1] + r[3]) {
+            if (i == s_scenario) return 0;   /* already on it — no change */
+            s_scenario = i;
+            s_last_cycle_ms = anim_now_ms(); /* a manual switch resets auto-cycle */
+            return 2;
+        }
+    }
+
+    /* Lane ladder — only the parallel-aggregate scenario has selectable rungs. */
+    if (s_scenario != 2 || s_rung_n <= 0) return 0;
     if (mx < s_rung_x || mx > s_rung_x + s_rung_w) return 0;
     for (int i = 0; i < s_rung_n; i++) {
         if (my >= s_rung_y[i] && my < s_rung_y[i] + s_rung_h) {
@@ -136,7 +159,6 @@ int workloads_surface_handle_click(int mx, int my) {
     return 0;
 }
 
-static unsigned long s_last_cycle_ms = 0;
 void workloads_cycle_scenario(void) {
     s_scenario = (s_scenario + 1) % N_WL;
     s_last_cycle_ms = anim_now_ms();      /* manual press resets the auto timer */
@@ -265,6 +287,15 @@ static int parallel_ladder(int x, int y, int w, const bench_point_t *pts, int np
                 uint8_t a = (uint8_t)(40 - (g - 1) * 12);
                 for (int sx = 0; sx < fw; sx++) draw_blend_pixel(bar_x + sx, by - g, col, a);
             }
+        /* The 1-lane rung IS the conventional sequential path: one accumulator,
+         * one delta per cycle, no parallelism to exploit.  Its bar is only ~1/N
+         * of the track, so annotate the empty space to its right — the
+         * equivalence then reads as the deliberate fair-fight baseline (same
+         * work, same cycles) rather than ATOMiK failing to win.  The scaling
+         * lives in the rungs below it. */
+        if (pts[i].banks == 1 && lab)
+            draw_text_aa(FONT_AA_LABEL, bar_x + fw + 12, y + (rh - lh) / 2,
+                         "= conventional baseline", rgb(0x6E, 0x7A, 0x90));
         char vs[16]; snprintf(vs, sizeof vs, "%.2fx", pts[i].speedup);
         if (lab) {
             int vw = text_width_aa(FONT_AA_LABEL, vs);
@@ -408,6 +439,8 @@ void workloads_surface_draw(window_t *w, int x, int y, int wd, int ht) {
             if (active) { draw_rect(tabx, ty + th - 2, tw, 2, ATOMIK_ACCENT); }
             if (lab) draw_text_aa(FONT_AA_LABEL, tabx + ATOMIK_GRID_S, ty + 3, t,
                                   active ? ATOMIK_FG : ATOMIK_FG_DIM);
+            s_tab_rect[i][0] = tabx; s_tab_rect[i][1] = ty;
+            s_tab_rect[i][2] = tw;   s_tab_rect[i][3] = th;   /* clickable */
             tabx += tw + ATOMIK_GRID_S;
         }
         ty += lh + 8 + ATOMIK_GRID_L;
