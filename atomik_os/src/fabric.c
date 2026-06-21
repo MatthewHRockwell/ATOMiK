@@ -129,6 +129,7 @@ static personality_t detect(unsigned long now) {
 }
 
 void fabric_cycle_override(void) {
+    personality_t prev = s_active;        /* current effective personality */
     switch (s_override_p) {
     case PERSONALITY_NONE:  s_override_p = PERSONALITY_STATE; break;
     case PERSONALITY_STATE: s_override_p = PERSONALITY_SYNC;  break;
@@ -137,6 +138,15 @@ void fabric_cycle_override(void) {
     }
     s_override_set_ms = anim_now_ms();
     atomik_event_emit(EVT_OVERRIDE, (int)s_override_p);
+    /* v0.42: a MANUAL personality switch is the clearest "explain this state"
+     * moment — summon Atom for it too.  The fabric_tick() auto-summon is gated
+     * on !fabric_override_active(), so without this an override switch (the P
+     * key, the user-facing control) would never summon.  Reflect s_active now so
+     * Atom's title names the new personality before the next tick. */
+    if (s_override_p != PERSONALITY_NONE && s_override_p != prev) {
+        s_active = s_override_p;
+        assistant_on_personality_change(prev, s_override_p);
+    }
 }
 
 int fabric_override_active(void) {
