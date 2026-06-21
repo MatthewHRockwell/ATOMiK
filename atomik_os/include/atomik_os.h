@@ -790,6 +790,8 @@ void assistant_summon_capture_success(void);
 void assistant_dismiss(void);
 int  assistant_animating(void);  /* v0.42: overlay alive -> keep repainting */                    /* hide overlay           */
 int  assistant_visible(void);
+int  assistant_bounds(int *x, int *y, int *w, int *h); /* v0.42: aura footprint for delta repaint */
+int  assistant_footprint(int *x, int *y, int *w, int *h); /* v0.42: draw-free footprint for save-under */
 void assistant_draw(void);                       /* paint overlay if visible */
 void assistant_tick(void);                       /* per-frame: auto-dismiss */
 

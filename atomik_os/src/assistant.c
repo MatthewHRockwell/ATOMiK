@@ -254,6 +254,37 @@ void assistant_on_first_live(personality_t p) {
 
 int assistant_visible(void) { return s_visible; }
 
+/* v0.42: expose Atom's last-painted footprint (the expanded aura rect) so the
+ * delta-render paths can repaint + present it when a window recomposite under
+ * it would otherwise wipe the overlapping pixels.  Returns 0 if not visible or
+ * not yet drawn this run. */
+int assistant_bounds(int *x, int *y, int *w, int *h) {
+    if (!s_visible || s_last_w <= 0 || s_last_h <= 0) return 0;
+    if (x) *x = s_last_x; if (y) *y = s_last_y;
+    if (w) *w = s_last_w; if (h) *h = s_last_h;
+    return 1;
+}
+
+/* v0.42: the assistant's footprint computed WITHOUT drawing — same expanded
+ * aura rect assistant_draw() stores in s_last_*.  The bubble is stationary
+ * while visible (only the avatar bobs INSIDE it), so this rect is stable and
+ * can be used as a fixed save-under region for delta-animating Atom.  Returns
+ * 0 if not visible. */
+int assistant_footprint(int *x, int *y, int *w, int *h) {
+    if (!s_visible) return 0;
+    int bx = dock_right_edge() + ATOMIK_GRID_L * 2;
+    int by = FB_H - ASSIST_BUBBLE_H - ATOMIK_GRID_L * 2;
+    int bw = ASSIST_BUBBLE_W;
+    int bh = ASSIST_BUBBLE_H;
+    if (bx + bw > fabric_shelf_x() - ATOMIK_GRID_L) {
+        bw = fabric_shelf_x() - ATOMIK_GRID_L - bx;
+        if (bw < 320) bw = 320;
+    }
+    if (x) *x = bx - 56; if (y) *y = by - 28;
+    if (w) *w = bw + 56 + 12; if (h) *h = bh + 56;
+    return 1;
+}
+
 void assistant_tick(void) {
     if (!s_visible) return;
     unsigned long now = anim_now_ms();

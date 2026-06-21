@@ -47,6 +47,7 @@ static const char *CUR[CUR_H] = {
 static pixel_t s_cur_save[CUR_W * CUR_H]; /* background under the composited cursor */
 static int s_cur_sx = -1, s_cur_sy = -1;  /* where the cursor is currently composited */
 static int s_cur_has_save = 0;
+static unsigned long s_last_mouse_ms = 0; /* last pointer event — gates Atom's float */
 
 static void cursor_paint(int x0, int y0) {
     pixel_t fillc = rgb(0xF0, 0xF6, 0xFF);
@@ -115,6 +116,43 @@ static void cursor_move_delta(void) {
     s_cur_sx = nx; s_cur_sy = ny;
 }
 
+/* v0.42 Atom save-under.  The assistant bubble's footprint is stationary while
+ * visible (only the avatar bobs INSIDE it), so we delta-animate Atom exactly
+ * like the cursor: save the clean background under the footprint during a full
+ * frame, then on each float frame restore it, repaint Atom, and present just
+ * that rect.  Without this, Atom's 160 ms float forced a full redraw_frame()
+ * that starved the input loop and made the cursor stutter whenever Atom was up. */
+static pixel_t *s_atom_save     = NULL;
+static int      s_atom_cap      = 0;      /* allocated pixel capacity        */
+static int      s_atom_fx, s_atom_fy, s_atom_fw, s_atom_fh;  /* saved rect     */
+static int      s_atom_has_save = 0;
+
+static void atom_capture_under(int x, int y, int w, int h) {
+    if (x < 0) { w += x; x = 0; }
+    if (y < 0) { h += y; y = 0; }
+    if (x + w > FB_W) w = FB_W - x;
+    if (y + h > FB_H) h = FB_H - y;
+    if (w <= 0 || h <= 0) { s_atom_has_save = 0; return; }
+    if (w * h > s_atom_cap) {
+        pixel_t *n = realloc(s_atom_save, (size_t)w * h * sizeof(pixel_t));
+        if (!n) { s_atom_has_save = 0; return; }
+        s_atom_save = n; s_atom_cap = w * h;
+    }
+    pixel_t *bb = fb_back();
+    for (int r = 0; r < h; r++)
+        memcpy(&s_atom_save[r * w], &bb[(y + r) * FB_W + x], (size_t)w * sizeof(pixel_t));
+    s_atom_fx = x; s_atom_fy = y; s_atom_fw = w; s_atom_fh = h;
+    s_atom_has_save = 1;
+}
+
+static void atom_restore_under(void) {
+    if (!s_atom_has_save) return;
+    pixel_t *bb = fb_back();
+    for (int r = 0; r < s_atom_fh; r++)
+        memcpy(&bb[(s_atom_fy + r) * FB_W + s_atom_fx], &s_atom_save[r * s_atom_fw],
+               (size_t)s_atom_fw * sizeof(pixel_t));
+}
+
 static void redraw_frame(void) {
     /* v0.38-A: tile-based dirty tracking.  Each visible surface
      * declares the rect it touches via dirty_rect() during its draw
@@ -136,11 +174,42 @@ static void redraw_frame(void) {
     wm_draw_all();
     status_draw();      /* global chrome — drawn after windows */
     assistant_tick();   /* v0.39-A: auto-dismiss timeout check */
+    /* v0.42: snapshot the clean background under Atom's footprint BEFORE drawing
+     * it, so later float frames can restore + repaint Atom as a regional delta
+     * instead of forcing another full recomposite. */
+    { int fx, fy, fw, fh;
+      if (assistant_footprint(&fx, &fy, &fw, &fh)) atom_capture_under(fx, fy, fw, fh); }
     assistant_draw();   /* v0.39-A: summoned Atom overlay on top of chrome */
     notify_draw();
     cursor_draw();      /* v0.41: pointer cursor — topmost layer */
     fb_present();
     dirty_finalize_frame();
+}
+
+/* v0.42: Atom float animation as a regional delta.  Restore the clean bg under
+ * the (stationary) bubble footprint, repaint Atom at its new float offset, and
+ * present only that rect + the cursor — no full recomposite, so the cursor
+ * stays smooth the whole time Atom is on screen.  Falls back to a full frame if
+ * no clean save-under has been captured yet. */
+static void redraw_assistant_delta(void) {
+    int fx, fy, fw, fh;
+    if (!assistant_footprint(&fx, &fy, &fw, &fh) || !s_atom_has_save) {
+        redraw_frame();
+        return;
+    }
+    int had_cursor = (s_cur_sx >= 0 && s_cur_has_save);
+    int ocx = s_cur_sx, ocy = s_cur_sy;
+    if (had_cursor) cursor_restore_under(s_cur_sx, s_cur_sy);
+    s_cur_has_save = 0; s_cur_sx = s_cur_sy = -1;
+
+    atom_restore_under();   /* clean bg back under the bubble */
+    assistant_tick();       /* may auto-dismiss — then draw no-ops, leaving the
+                             * restored clean bg, which erases Atom cleanly. */
+    assistant_draw();       /* Atom at its new float position */
+    cursor_draw();
+    fb_present_rect(s_atom_fx, s_atom_fy, s_atom_fw, s_atom_fh);
+    if (had_cursor)    fb_present_rect(ocx, ocy, CUR_W, CUR_H);
+    if (s_cur_sx >= 0) fb_present_rect(s_cur_sx, s_cur_sy, CUR_W, CUR_H);
 }
 
 /* v0.42 delta render for clicks: when a click mutates ONE window's content (e.g.
@@ -160,8 +229,20 @@ static void redraw_window_delta(int id) {
     wm_redraw_window(id, &rx, &ry, &rw, &rh);
     if (rw == 0) { redraw_frame(); return; }   /* window vanished -> full redraw */
 
+    /* If Atom is up and overlaps the recomposited window, the window draw just
+     * wiped the overlapping aura pixels — recapture the (now-fresh) bg under the
+     * footprint so the float save-under stays current, then repaint Atom on top
+     * and present its footprint so it doesn't flicker out on a click. */
+    int ax, ay, aw, ah, have_atom = 0;
+    if (assistant_visible()) {
+        if (assistant_footprint(&ax, &ay, &aw, &ah)) atom_capture_under(ax, ay, aw, ah);
+        assistant_draw();
+        have_atom = assistant_bounds(&ax, &ay, &aw, &ah);
+    }
+
     cursor_draw();                             /* save-under + paint at cursor pos */
     fb_present_rect(rx, ry, rw, rh);           /* the changed window */
+    if (have_atom) fb_present_rect(ax, ay, aw, ah);              /* Atom on top */
     if (had_cursor) fb_present_rect(ocx, ocy, CUR_W, CUR_H);      /* clear old cursor */
     if (s_cur_sx >= 0) fb_present_rect(s_cur_sx, s_cur_sy, CUR_W, CUR_H); /* new cursor */
 }
@@ -184,8 +265,17 @@ static void redraw_selection_delta(void) {
         return;
     }
 
+    /* keep Atom on top if it overlaps the repainted sub-elements (see above). */
+    int ax, ay, aw, ah, have_atom = 0;
+    if (assistant_visible()) {
+        if (assistant_footprint(&ax, &ay, &aw, &ah)) atom_capture_under(ax, ay, aw, ah);
+        assistant_draw();
+        have_atom = assistant_bounds(&ax, &ay, &aw, &ah);
+    }
+
     cursor_draw();
     fb_present_rect(rx, ry, rw, rh);
+    if (have_atom) fb_present_rect(ax, ay, aw, ah);
     if (had_cursor) fb_present_rect(ocx, ocy, CUR_W, CUR_H);
     if (s_cur_sx >= 0) fb_present_rect(s_cur_sx, s_cur_sy, CUR_W, CUR_H);
 }
@@ -908,6 +998,7 @@ int main(int argc, char **argv) {
             /* v0.41 pointer: motion moves the cursor + updates rail hover;
              * a left-click on a rail cell activates that capability (same
              * dispatch as the number-key launcher). */
+            s_last_mouse_ms = anim_now_ms();   /* freezes Atom's float while moving */
             int slot = dock_hit_test(ev.mx, ev.my);
             int s_wl_click = 0;
             if (ev.kind == EV_MOUSE_DOWN && slot >= 0) {
@@ -964,8 +1055,19 @@ int main(int argc, char **argv) {
              * surface (it launches with no input; nothing else would). */
             { int bd = bench_take_dirty();
               if (!need_frame && bd && workloads_surface_is_open()) need_frame = 1; }
-            if (!need_frame && assistant_animating()) need_frame = 1;
-            if (need_frame) redraw_frame();
+            if (need_frame) {
+                redraw_frame();
+            } else if (assistant_animating() &&
+                       anim_now_ms() - s_last_mouse_ms > 220) {
+                /* nothing else changed — Atom's float is the only thing moving.
+                 * Animate it as a regional delta so the cursor stays smooth
+                 * instead of a full recomposite every 160 ms.  AND only when the
+                 * cursor has been idle >220 ms: a float frame costs ~10-25 ms, so
+                 * letting it fire mid-motion makes the cursor hitch + jump to
+                 * catch up.  Atom bobs when you're not moving; freezes when you
+                 * are.  Cursor smoothness wins. */
+                redraw_assistant_delta();
+            }
         }
     }
 
