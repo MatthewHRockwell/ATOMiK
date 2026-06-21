@@ -142,8 +142,13 @@ void fabric_cycle_override(void) {
      * moment — summon Atom for it too.  The fabric_tick() auto-summon is gated
      * on !fabric_override_active(), so without this an override switch (the P
      * key, the user-facing control) would never summon.  Reflect s_active now so
-     * Atom's title names the new personality before the next tick. */
-    if (s_override_p != PERSONALITY_NONE && s_override_p != prev) {
+     * Atom's title names the new personality before the next tick.  Cycling back
+     * to NONE releases the override (the explain moment is over) — dismiss Atom
+     * rather than leaving it to time out, so the switch/release lifecycle is
+     * symmetric. */
+    if (s_override_p == PERSONALITY_NONE) {
+        assistant_dismiss();
+    } else if (s_override_p != prev) {
         s_active = s_override_p;
         assistant_on_personality_change(prev, s_override_p);
     }
