@@ -28,11 +28,14 @@ echo "USB:" $(grep -c Logitech /proc/bus/input/devices 2>/dev/null)
 # LIVE parallel-bank sweep producer (real measured order-independence + scaling).
 # v0.43 interactive: read the seed from /tmp/atomik_bench_ctl (written by the
 # "Shuffle deltas" button) so the audience drives the workload; default until
-# the first shuffle.  In-place write (one daemon per boot); parse_file tolerates
-# a transient partial read (honest WAITING) and the next loop fixes it.
+# the first shuffle.  ATOMIC write: abench takes ~150ms to produce the table, so
+# write to a UNIQUE temp (mktemp -> race-safe even if two daemons ever run) then
+# rename into place — a reader (atomik_os or a probe) always sees a COMPLETE
+# file, never a mid-write truncation (which would flicker the card to WAITING).
 ( while true; do
     S=$(cat /tmp/atomik_bench_ctl 2>/dev/null); [ -n "$S" ] || S=0xDEADBEEF0BADF00D
-    /abench 65537 "$S" > /tmp/atomik_bench_live.txt 2>/dev/null
+    T=$(mktemp /tmp/.bench.XXXXXX 2>/dev/null) || T=/tmp/.bench.tmp
+    if /abench 65537 "$S" > "$T" 2>/dev/null; then mv -f "$T" /tmp/atomik_bench_live.txt; else rm -f "$T"; fi
     sleep 0.3
   done ) &
 echo "BENCH_DAEMON=$!"
