@@ -25,8 +25,16 @@ mkdir -p /tmp/atomik_assets
 cp /atomik_assets/*.atomik_asset /tmp/atomik_assets/ 2>/dev/null
 echo "ASSETS:" $(ls /tmp/atomik_assets/*.atomik_asset 2>/dev/null | wc -l)
 echo "USB:" $(grep -c Logitech /proc/bus/input/devices 2>/dev/null)
-# LIVE parallel-bank sweep producer (real measured order-independence + scaling)
-( while true; do /abench 65537 0xDEADBEEF0BADF00D > /tmp/atomik_bench_live.txt 2>&1; sleep 2; done ) &
+# LIVE parallel-bank sweep producer (real measured order-independence + scaling).
+# v0.43 interactive: read the seed from /tmp/atomik_bench_ctl (written by the
+# "Shuffle deltas" button) so the audience drives the workload; default until
+# the first shuffle.  In-place write (one daemon per boot); parse_file tolerates
+# a transient partial read (honest WAITING) and the next loop fixes it.
+( while true; do
+    S=$(cat /tmp/atomik_bench_ctl 2>/dev/null); [ -n "$S" ] || S=0xDEADBEEF0BADF00D
+    /abench 65537 "$S" > /tmp/atomik_bench_live.txt 2>/dev/null
+    sleep 0.3
+  done ) &
 echo "BENCH_DAEMON=$!"
 # open the Workloads surface pinned to the Parallel Aggregate scenario
 touch /tmp/atomik_open_workloads

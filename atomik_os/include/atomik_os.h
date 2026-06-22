@@ -263,6 +263,10 @@ void wallet_set_daily_cap(int uusd);
 /* atomik.c — ATOMiK delta-state adapter access via /dev/mem */
 #define ATOMIK_BASE_PS  0xF0020000UL    /* base via PS GP1 → PL */
 #define ATOMIK_N_SLOTS  8
+/* Bytes the adapter actually DECODES (csr.csv: atomik_adapter region size).
+ * mmap maps a full page but reads past this window hit undecoded MMIO and
+ * fault — so slot reads MUST be clamped to it.  See atomik_read_slots(). */
+#define ATOMIK_ADAPTER_WINDOW  0x20UL
 typedef struct {
     uint32_t cmd;
     uint32_t rs1;
@@ -302,6 +306,8 @@ int  bench_source(void);                /* metric_source_t: METRIC_LIVE/WAITING 
 const char *bench_result_hex(void);     /* merged accumulator, identical at every bank count ("" if unknown) */
 int  bench_result_identical(void);      /* 1 = every bank count produced the SAME result (order-independence) */
 int  bench_take_dirty(void);            /* one-shot: sweep data/source changed since last call */
+const char *bench_seed_hex(void);       /* v0.43: active workload seed (for the live display) */
+void bench_shuffle(void);               /* v0.43: pick a new seed -> daemon re-runs the sweep */
 void bench_register_metrics(void);      /* register bench.* LIVE metrics      */
 
 /* perf_counter.c declarations live below the personality_t enum.

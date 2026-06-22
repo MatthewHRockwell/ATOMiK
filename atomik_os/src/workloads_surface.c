@@ -66,6 +66,7 @@ typedef struct {
 #define N_WL 3
 
 static int s_tab_rect[N_WL][4];               /* x,y,w,h — scenario tabs (clickable) */
+static int s_shuffle_rect[4] = {0,0,0,0};     /* x,y,w,h — "Shuffle deltas" pill */
 static unsigned long s_last_cycle_ms = 0;     /* auto-cycle timer / manual reset */
 
 /* Static scenario copy.  The parallel-aggregate big numbers are overwritten
@@ -144,6 +145,17 @@ int workloads_surface_handle_click(int mx, int my) {
             s_scenario = i;
             s_last_cycle_ms = anim_now_ms(); /* a manual switch resets auto-cycle */
             return 2;
+        }
+    }
+
+    /* Shuffle pill — only on the parallel-aggregate card.  Returns 3: a new
+     * workload seed (the result hash changes, then re-verifies identical). */
+    if (s_scenario == 2) {
+        int *s = s_shuffle_rect;
+        if (s[2] > 0 && mx >= s[0] && mx < s[0] + s[2] &&
+            my >= s[1] && my < s[1] + s[3]) {
+            bench_shuffle();
+            return 3;
         }
     }
 
@@ -318,7 +330,28 @@ static int parallel_ladder(int x, int y, int w, const bench_point_t *pts, int np
             int pw = text_width_aa(FONT_AA_LABEL, proof);
             draw_text_aa(FONT_AA_LABEL, x + pw + 12, y, "[verified]", ATOMIK_SEM_SAVINGS);
         }
-        y += lh + 2;
+        y += lh + 6;
+    }
+
+    /* ── interactive: change the workload, watch the invariant hold ──────────
+     * "Shuffle deltas" writes a new seed to the engine daemon; the proof line
+     * above then flips to a NEW hash that is STILL byte-identical across 1/2/4/8
+     * lanes.  The live seed makes the input visible so the audience sees they
+     * changed it — proof you DID, not proof you're shown. */
+    if (lab) {
+        char sline[48];
+        snprintf(sline, sizeof sline, "live deltas - seed %s", bench_seed_hex());
+        const char *blab = "Shuffle deltas";
+        int bw = text_width_aa(FONT_AA_LABEL, blab) + ATOMIK_GRID_L;
+        int bh = lh + 10;
+        int bx = x + w - bw;
+        draw_text_aa(FONT_AA_LABEL, x, y + (bh - lh) / 2, sline, rgb(0x6E, 0x7A, 0x90));
+        draw_rect_rounded(bx, y, bw, bh, 6, rgb(0x13, 0x2A, 0x36));
+        draw_rect(bx + 6, y, bw - 12, 1, ATOMIK_ACCENT);   /* top accent edge */
+        draw_text_aa(FONT_AA_LABEL, bx + ATOMIK_GRID_S, y + (bh - lh) / 2, blab, ATOMIK_ACCENT);
+        s_shuffle_rect[0] = bx; s_shuffle_rect[1] = y;
+        s_shuffle_rect[2] = bw; s_shuffle_rect[3] = bh;
+        y += bh + 2;
     }
     return y - y0;
 }

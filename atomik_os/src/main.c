@@ -1021,9 +1021,11 @@ int main(int argc, char **argv) {
                      * workloads window (+ cursor), not the 1080p desktop. */
                     redraw_window_delta(workloads_surface_window_id());
                 } else {
-                    /* clicked a lane rung — only the ATOMiK panel, ladder, and
-                     * savings banner change, so redraw JUST those three (+ the
-                     * cursor), not the window, not the desktop. */
+                    /* lane rung (1) or Shuffle pill (3) — only the ATOMiK panel,
+                     * ladder, and savings banner change, so redraw JUST those
+                     * three (+ the cursor).  Shuffle's new seed shows instantly;
+                     * the new result hash lands a beat later when the daemon
+                     * re-runs (bench_take_dirty -> repaint). */
                     redraw_selection_delta();
                 }
             } else if (ev.kind == EV_MOUSE_MOVE && slot != s_dock_hover) {

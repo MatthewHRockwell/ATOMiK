@@ -20,8 +20,9 @@
 #include <string.h>
 
 #define BENCH_FILE       "/tmp/atomik_bench_live.txt"
+#define BENCH_CTL        "/tmp/atomik_bench_ctl"  /* atomik_os -> daemon: seed  */
 #define BENCH_COUNT      65537u            /* must match the daemon's count   */
-#define BENCH_REFRESH_MS 2000
+#define BENCH_REFRESH_MS 300               /* snappy enough to feel a Shuffle */
 
 static bench_point_t  s_pts[BENCH_N_POINTS];
 static int            s_npts = 0;
@@ -34,11 +35,34 @@ static int            s_identical = 0;          /* every parsed data row had the
 static int            s_dirty = 0;              /* parsed data changed since last consumed      */
 static int            s_prev_source = -1;
 static uint32_t       s_prev_cyc0 = 0;
+static char           s_prev_hex[24] = "";      /* detect a result-hash change (Shuffle)        */
+
+/* v0.43 interactive: the active workload seed.  The audience presses "Shuffle
+ * deltas" -> a new seed is written to BENCH_CTL -> the standalone engine daemon
+ * re-runs the 1/2/4/8 sweep with it -> the proof line flips to a NEW result
+ * hash that is STILL byte-identical across every lane count.  Order-/parallel-
+ * independence proven LIVE on a workload the audience chose. */
+static uint64_t       s_seed = 0xDEADBEEF0BADF00DULL;
+static char           s_seed_hex[20] = "0xDEADBEEF0BADF00D";
 
 static const uint32_t k_banks[BENCH_N_POINTS] = {1, 2, 4, 8};
 
 const char *bench_result_hex(void)   { return s_result_hex; }
 int  bench_result_identical(void)    { return s_identical; }
+const char *bench_seed_hex(void)     { return s_seed_hex; }
+
+static uint64_t mix64(uint64_t x) { x ^= x << 13; x ^= x >> 7; x ^= x << 17; return x; }
+
+/* Pick a fresh seed, publish it to the daemon, and force a prompt re-parse. */
+void bench_shuffle(void) {
+    static uint64_t ctr = 0x9E3779B97F4A7C15ULL;
+    ctr  += 0x9E3779B97F4A7C15ULL;
+    s_seed = mix64(s_seed ^ ctr ^ ((uint64_t)anim_now_ms() * 0x100000001B3ULL));
+    snprintf(s_seed_hex, sizeof s_seed_hex, "0x%016llX", (unsigned long long)s_seed);
+    FILE *f = fopen(BENCH_CTL, "w");
+    if (f) { fprintf(f, "0x%016llX\n", (unsigned long long)s_seed); fclose(f); }
+    s_dirty = 1;            /* immediate repaint shows the new seed              */
+}
 /* one-shot: 1 if the sweep data/source changed since the last call.  The
  * main loop uses this to force a repaint when live numbers first arrive or
  * refresh (the surface launches with no input, so nothing else would). */
@@ -148,9 +172,14 @@ void bench_tick(void) {
     /* flag a repaint if the source flipped (e.g. WAITING->LIVE when the first
      * sweep lands) or the measured cycles changed. */
     uint32_t cyc0 = (s_npts > 0) ? s_pts[0].cycles : 0;
-    if (s_source != s_prev_source || cyc0 != s_prev_cyc0) s_dirty = 1;
+    /* A Shuffle changes the result hash but NOT the cycle counts (same count,
+     * same bank split) — so the hash must be part of the dirty test or the new
+     * workload's result would never repaint. */
+    if (s_source != s_prev_source || cyc0 != s_prev_cyc0 ||
+        strcmp(s_result_hex, s_prev_hex) != 0) s_dirty = 1;
     s_prev_source = s_source;
     s_prev_cyc0   = cyc0;
+    strncpy(s_prev_hex, s_result_hex, sizeof s_prev_hex - 1);
 
     /* tiny debug breadcrumb (few hundred bytes) for off-board confirmation */
     FILE *d = fopen("/tmp/atomik_bench_dbg.txt", "w");
