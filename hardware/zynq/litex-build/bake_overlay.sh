@@ -42,6 +42,7 @@ cp "$REPO/atomik_os/build/atomik_os"  "$STAGE/atomik_os"
 cp "$REPO/atomik_os/build/fb2png"     "$STAGE/fb2png"
 cp "$REPO/atomik_os/tools/fbcrop"     "$STAGE/fbcrop"
 cp "$OVL/abench"                      "$STAGE/abench"
+cp "$OVL/fbbench"                     "$STAGE/fbbench" 2>/dev/null || true
 cp "$OVL/aos_launch.sh"               "$STAGE/aos_launch.sh"
 chmod 755 "$STAGE"/atomik_os "$STAGE"/fb2png "$STAGE"/fbcrop "$STAGE"/abench "$STAGE"/aos_launch.sh
 

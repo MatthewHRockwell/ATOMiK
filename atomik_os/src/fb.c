@@ -74,6 +74,22 @@ void fb_present_rect(int x, int y, int w, int h) {
     }
 }
 
+/* v0.43 drag: blit a standalone w*h buffer (its own stride) STRAIGHT to the
+ * scanout surface at (dx,dy), clipped.  One framebuffer write, no s_back
+ * round-trip — measured ~23ms for a 780x560 window (vs ~86ms for the
+ * compose-into-back-then-present path).  Used by window drag. */
+void fb_blit_to_screen(const pixel_t *src, int sw, int sh, int dx, int dy) {
+    for (int r = 0; r < sh; r++) {
+        int py = dy + r; if (py < 0 || py >= FB_H) continue;
+        int x0 = dx < 0 ? 0 : dx;
+        int x1 = dx + sw > FB_W ? FB_W : dx + sw;
+        if (x1 <= x0) continue;
+        memcpy(s_fb_map + (size_t)py * FB_W + x0,
+               src + (size_t)r * sw + (x0 - dx),
+               (size_t)(x1 - x0) * sizeof(pixel_t));
+    }
+}
+
 void fb_clear(pixel_t color) {
     pixel_t *p = s_back;
     for (size_t i = 0; i < (size_t)FB_W * FB_H; i++) p[i] = color;

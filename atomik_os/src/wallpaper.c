@@ -226,3 +226,21 @@ void wallpaper_draw(void) {
     }
     memcpy(bb, s_cache, FB_BYTES);
 }
+
+/* v0.43: stamp just a rectangle of the cached wallpaper into the back buffer —
+ * used by window drag to cheaply put background where a window was, without a
+ * full recomposite.  (Hero/other layers above the wallpaper aren't included; the
+ * release recomposite restores them.)  No-op until the cache exists. */
+void wallpaper_blit_rect(int x, int y, int w, int h) {
+    if (!s_cache) return;
+    if (x < 0) { w += x; x = 0; }
+    if (y < 0) { h += y; y = 0; }
+    if (x + w > FB_W) w = FB_W - x;
+    if (y + h > FB_H) h = FB_H - y;
+    if (w <= 0 || h <= 0) return;
+    pixel_t *bb = fb_back();
+    for (int r = 0; r < h; r++) {
+        size_t off = (size_t)(y + r) * FB_W + x;
+        memcpy(bb + off, s_cache + off, (size_t)w * sizeof(pixel_t));
+    }
+}

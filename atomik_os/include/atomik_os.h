@@ -129,6 +129,7 @@ void fb_close(void);
 pixel_t *fb_back(void);   /* writeable back buffer (FB_W*FB_H pixels) */
 void fb_present(void);    /* memcpy back buffer to /dev/fb0 mmap */
 void fb_present_rect(int x, int y, int w, int h); /* present only a delta rect */
+void fb_blit_to_screen(const pixel_t *src, int sw, int sh, int dx, int dy); /* buffer -> scanout */
 void fb_clear(pixel_t color);
 void fb_enable_scanout(int enable);  /* drives the LiteX VTG/DMA CSRs */
 void fb_write_png(const char *path); /* v0.40 in-OS auto-capture: back buffer -> PNG */
@@ -176,6 +177,7 @@ void draw_text_aa(font_aa_id_t id, int x, int y, const char *s, pixel_t color);
 
 /* wallpaper.c */
 void wallpaper_draw(void);
+void wallpaper_blit_rect(int x, int y, int w, int h); /* stamp cached wallpaper rect into back buffer */
 
 /* hero.c — v0.38-E procedural centerpiece visualization.
  *
@@ -529,6 +531,21 @@ window_t *wm_topmost(void);
 void      wm_draw_all(void);
 void      wm_redraw_window(int id, int *rx, int *ry, int *rw, int *rh); /* delta: one window */
 int       wm_handle_key(int key);   /* returns 1 if key was consumed */
+
+/* v0.43 mouse: window pick + title-bar drag. */
+#define WM_HIT_NONE   0
+#define WM_HIT_BODY   1
+#define WM_HIT_TITLE  2
+#define WM_HIT_CLOSE  3
+int       wm_pick(int x, int y, int *region);  /* topmost window id @ (x,y), 0=desktop */
+int       wm_exists(int id);                    /* 1 if a window with this id is open   */
+int       wm_window_rect(int id, int *x, int *y, int *w, int *h); /* current geometry    */
+void      wm_set_visible(int id, int vis);      /* hide/show (for save-under drag)      */
+void      wm_move_to(int id, int x, int y);     /* set position (clamped on-screen)     */
+void      wm_drag_begin(int id, int px, int py);
+int       wm_dragging(void);                    /* window id being dragged, 0 = none    */
+void      wm_drag_to(int px, int py);
+void      wm_drag_end(void);
 
 /* v0.31: enumeration so the status bar can render a per-window dot
  * strip showing every open window (focused = bright cyan, buried =

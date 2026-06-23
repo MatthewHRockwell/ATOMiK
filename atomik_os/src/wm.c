@@ -250,6 +250,84 @@ const window_t *wm_get(int idx) {
     return &s_windows[idx];
 }
 
+/* ── v0.43 mouse: window pick + title-bar drag ──────────────────────────── */
+static int s_drag_id = 0;          /* window being dragged (0 = none)        */
+static int s_drag_dx, s_drag_dy;   /* grab offset within the window          */
+
+/* Topmost visible window at (x,y); *region = WM_HIT_CLOSE/TITLE/BODY, or
+ * WM_HIT_NONE with return 0 if the point is over bare desktop. */
+int wm_pick(int x, int y, int *region) {
+    if (region) *region = WM_HIT_NONE;
+    window_t *best = NULL;
+    for (int i = 0; i < s_count; i++) {
+        window_t *w = &s_windows[i];
+        if (!w->visible) continue;
+        if (x >= w->x && x < w->x + w->w && y >= w->y && y < w->y + w->h)
+            if (!best || w->z > best->z) best = w;
+    }
+    if (!best) return 0;
+    if (region) {
+        if (best->title[0] && y < best->y + WM_TITLE_H) {
+            int cb = 10;
+            int cbx = best->x + best->w - cb - 14;
+            int cby = best->y + (WM_TITLE_H - cb) / 2;
+            if (x >= cbx - 5 && x <= cbx + cb + 5 && y >= cby - 5 && y <= cby + cb + 5)
+                *region = WM_HIT_CLOSE;
+            else
+                *region = WM_HIT_TITLE;
+        } else {
+            *region = WM_HIT_BODY;
+        }
+    }
+    return best->id;
+}
+
+int wm_exists(int id) { return find_by_id(id) != NULL; }
+
+int wm_window_rect(int id, int *x, int *y, int *w, int *h) {
+    window_t *win = find_by_id(id);
+    if (!win) return 0;
+    if (x) *x = win->x; if (y) *y = win->y;
+    if (w) *w = win->w; if (h) *h = win->h;
+    return 1;
+}
+
+void wm_set_visible(int id, int vis) {
+    window_t *win = find_by_id(id);
+    if (win) win->visible = vis ? 1 : 0;
+}
+
+void wm_move_to(int id, int x, int y) {
+    window_t *win = find_by_id(id);
+    if (!win) return;
+    if (y < 0) y = 0;
+    if (y > FB_H - WM_TITLE_H) y = FB_H - WM_TITLE_H;
+    if (x < 80 - win->w) x = 80 - win->w;
+    if (x > FB_W - 80)    x = FB_W - 80;
+    win->x = x; win->y = y;
+}
+
+void wm_drag_begin(int id, int px, int py) {
+    window_t *w = find_by_id(id);
+    if (!w) { s_drag_id = 0; return; }
+    s_drag_id = id; s_drag_dx = px - w->x; s_drag_dy = py - w->y;
+}
+int  wm_dragging(void) { return s_drag_id; }
+void wm_drag_end(void) { s_drag_id = 0; }
+
+void wm_drag_to(int px, int py) {
+    if (!s_drag_id) return;
+    window_t *w = find_by_id(s_drag_id);
+    if (!w) { s_drag_id = 0; return; }
+    int x = px - s_drag_dx, y = py - s_drag_dy;
+    /* keep the title bar on-screen and grabbable. */
+    if (y < 0) y = 0;
+    if (y > FB_H - WM_TITLE_H) y = FB_H - WM_TITLE_H;
+    if (x < 80 - w->w) x = 80 - w->w;
+    if (x > FB_W - 80)  x = FB_W - 80;
+    w->x = x; w->y = y;
+}
+
 int wm_handle_key(int key) {
     if (s_count == 0) return 0;
     /* Esc OR Ctrl-W (= 0x17) — close the focused window.  Ctrl-W is

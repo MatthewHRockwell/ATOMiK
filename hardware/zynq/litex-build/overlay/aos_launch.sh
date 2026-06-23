@@ -28,15 +28,20 @@ echo "USB:" $(grep -c Logitech /proc/bus/input/devices 2>/dev/null)
 # LIVE parallel-bank sweep producer (real measured order-independence + scaling).
 # v0.43 interactive: read the seed from /tmp/atomik_bench_ctl (written by the
 # "Shuffle deltas" button) so the audience drives the workload; default until
-# the first shuffle.  ATOMIC write: abench takes ~150ms to produce the table, so
-# write to a UNIQUE temp (mktemp -> race-safe even if two daemons ever run) then
-# rename into place — a reader (atomik_os or a probe) always sees a COMPLETE
-# file, never a mid-write truncation (which would flicker the card to WAITING).
-( while true; do
+# the first shuffle.  RUN-ON-CHANGE: abench busy-polls the engine ~150ms per
+# sweep; re-running every 0.3s burned ~50% of the single CPU and starved the
+# compositor (mouse lag) for ZERO benefit — the result is identical until the
+# seed changes.  So only re-run when the seed actually changes (a Shuffle); idle
+# is a cheap cat+compare+sleep.  ATOMIC write (mktemp+rename) so a reader never
+# catches a mid-write truncation.  Instant Shuffle response, no idle CPU drain.
+( LAST=""
+  while true; do
     S=$(cat /tmp/atomik_bench_ctl 2>/dev/null); [ -n "$S" ] || S=0xDEADBEEF0BADF00D
-    T=$(mktemp /tmp/.bench.XXXXXX 2>/dev/null) || T=/tmp/.bench.tmp
-    if /abench 65537 "$S" > "$T" 2>/dev/null; then mv -f "$T" /tmp/atomik_bench_live.txt; else rm -f "$T"; fi
-    sleep 0.3
+    if [ "$S" != "$LAST" ]; then
+      T=$(mktemp /tmp/.bench.XXXXXX 2>/dev/null) || T=/tmp/.bench.tmp
+      if /abench 65537 "$S" > "$T" 2>/dev/null; then mv -f "$T" /tmp/atomik_bench_live.txt; LAST="$S"; else rm -f "$T"; fi
+    fi
+    sleep 0.2
   done ) &
 echo "BENCH_DAEMON=$!"
 # open the Workloads surface pinned to the Parallel Aggregate scenario

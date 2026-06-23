@@ -41,8 +41,13 @@ void monitor_draw(window_t *w, int x, int y, int wd, int ht) {
     int row_y     = y + 96;
     int label_x   = x + 24;
     int bar_x     = x + 120;
-    int bar_w     = wd - 220;
-    int hex_x     = x + wd - 96 - 8;
+    /* Reserve a right column for the hex value (size-1) + the change dot so the
+     * row never overflows the window edge.  (v0.2 used a size-2 hex in a 96px
+     * gap, which spilled off the window — and off-screen when the window sat
+     * near the edge.) */
+    int hex_col_w = 130;
+    int bar_w     = wd - 120 - hex_col_w - 24;
+    if (bar_w < 80) bar_w = 80;
 
     for (int i = 0; i < ATOMIK_N_SLOTS; i++) {
         int yy = row_y + i * row_h;
@@ -68,15 +73,17 @@ void monitor_draw(window_t *w, int x, int y, int wd, int ht) {
             for (int dy = -3; dy <= 3; dy++)
                 for (int dx = -3; dx <= 3; dx++)
                     if (dx*dx + dy*dy <= 9)
-                        draw_pixel(bar_x + bar_w + 18 + dx, yy + 24 + dy,
+                        draw_pixel(bar_x + bar_w + 16 + dx, yy + 24 + dy,
                                    ATOMIK_ACCENT);
         }
         s_last[i] = v[i];
 
-        /* Hex value text */
+        /* Hex value — size 1, right-aligned inside the reserved column so it
+         * never runs past the window edge. */
         char hex[16];
         snprintf(hex, sizeof hex, "0x%08x", v[i]);
-        draw_text(hex_x, yy + 16, hex, 2, ATOMIK_FG);
+        int hw = text_width(hex, 1);
+        draw_text(x + wd - 24 - hw, yy + 18, hex, 1, ATOMIK_FG);
     }
 
     /* Footer */
