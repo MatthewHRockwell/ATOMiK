@@ -834,6 +834,9 @@ int main(int argc, char **argv) {
         if (ev.kind == EV_QUIT) { s_running = 0; break; }
         if (ev.kind == EV_KEY) {
             int dirty = 0;
+            /* any key also releases a (possibly stuck) window drag, then the key
+             * is handled normally — never leave a drag frozen. */
+            if (wm_dragging()) { wm_drag_end(); wdrag_end(); }
 
             /* v0.31 patch 8 — Global Input Router.  Order matters and
              * is now explicit (per ChatGPT review 2026-05-06):
@@ -1080,9 +1083,16 @@ int main(int argc, char **argv) {
             int s_wl_click = 0;
             if (wm_dragging()) {
                 /* a title-bar drag owns all motion until the button releases.
-                 * Move = save-under memcpy (smooth); release = one recomposite. */
-                if (ev.kind == EV_MOUSE_UP) { wm_drag_end(); wdrag_end(); }
-                else { wdrag_move(ev.mx, ev.my); }
+                 * Move = save-under memcpy (smooth); release = one recomposite.
+                 * End on EITHER up OR a fresh down — if a button-up is ever
+                 * dropped (USB input is flaky on this board) a new click must
+                 * still release the drag, never leave it stuck (a stuck drag
+                 * suppresses redraws and freezes the screen). */
+                if (ev.kind == EV_MOUSE_UP || ev.kind == EV_MOUSE_DOWN) {
+                    wm_drag_end(); wdrag_end();
+                } else {
+                    wdrag_move(ev.mx, ev.my);
+                }
             } else if (ev.kind == EV_MOUSE_DOWN && slot >= 0) {
                 s_dock_hover = slot;
                 action_t a = dock_action_for_slot(slot);
@@ -1132,9 +1142,11 @@ int main(int argc, char **argv) {
             }
         } else if (wm_dragging()) {
             /* A drag is in progress (button held, cursor momentarily still).
-             * The dragged window is HIDDEN for the save-under, so a stray
-             * redraw_frame() here would erase it mid-drag — skip all idle
-             * redraws until the button releases. */
+             * Skip idle redraws so the dragged window isn't erased.  BUT if no
+             * pointer event has arrived for 2.5 s the button-up was almost
+             * certainly dropped and the drag is stuck (which freezes the whole
+             * screen) — force-end it so the desktop recovers on its own. */
+            if (anim_now_ms() - s_last_mouse_ms > 2500) { wm_drag_end(); wdrag_end(); }
         } else {
             /* No event arrived. Redraw a frame if an animation is in
              * progress (window fade-in, predicted-icon pulse, etc.) OR if
