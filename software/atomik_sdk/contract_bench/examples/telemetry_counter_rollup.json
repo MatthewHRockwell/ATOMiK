@@ -1,0 +1,12 @@
+{
+  "name": "Fleet telemetry counter rollup",
+  "customer": "Example Telemetry Co.",
+  "aggregation": "sum",
+  "required_throughput": 50000000,
+  "requires_reorder_stability": true,
+  "events_per_window": 50000000,
+  "producers": 2048,
+  "out_of_order": true,
+  "unit": "events/s",
+  "notes": "2048 edge devices emit per-metric counter deltas over lossy UDP. Deltas arrive out of order and from all producers concurrently; the per-metric rollup must be exactly correct. Today this is serialized behind a lock to guarantee correctness, which caps throughput."
+}
