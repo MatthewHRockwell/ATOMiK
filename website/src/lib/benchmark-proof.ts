@@ -114,6 +114,61 @@ export function evaluate(
   };
 }
 
+// The downloadable proof report — the leave-behind that travels to the buyer's
+// decision-maker.  Mirrors report.to_markdown() in the Python harness.
+export function renderReportMarkdown(opts: {
+  workload: string;
+  customer?: string;
+  aggregation: string;
+  requiredThroughput: number;
+  requiresReorder: boolean;
+  result: ProofResult;
+}): string {
+  const r = opts.result;
+  const who = opts.customer ? `${opts.customer} / ${opts.workload}` : opts.workload;
+  const scale = Object.entries(SILICON.scaling)
+    .map(([b, s]) => `${b}->${s.toFixed(2)}x`)
+    .join("  ");
+  const ok = (b: boolean) => (b ? "PASS" : "FAIL");
+  const aggDesc = ABELIAN[opts.aggregation.toLowerCase()] ?? "order-dependent operator";
+  const tput = r.throughputPass
+    ? `${r.margin.toFixed(1)}x headroom — needs ${r.minBanks} of ${r.banksAvailable} banks`
+    : `short by ${(1 / r.margin).toFixed(1)}x at ${r.banksAvailable} banks`;
+  const corr = r.correctnessPass
+    ? r.abelian
+      ? `'${opts.aggregation}' (${aggDesc}) is abelian -> provably order-independent, lock-free`
+      : "delivered even though not required"
+    : `'${opts.aggregation}' is order-dependent — ATOMiK won't claim reorder-stable correctness here`;
+  return [
+    `# ATOMiK Benchmark Proof — ${who}`,
+    ``,
+    `**VERDICT: ${r.verdict}** — ${r.headline}`,
+    ``,
+    `## Throughput gate`,
+    `- Required: **${eng(opts.requiredThroughput)}**`,
+    `- ATOMiK (measured on silicon): **${eng(r.peakThroughput)} at ${r.banksAvailable} banks ` +
+      `(${eng(r.perBankThroughput)} per bank)**`,
+    `- ${ok(r.throughputPass)} — ${tput}`,
+    ``,
+    `## Correctness gate (the part a lock would cost you)`,
+    `- Required: ${opts.requiresReorder ? "byte-identical regardless of arrival order / parallelism" : "exact result"}`,
+    `- ATOMiK: ${r.correctnessPass ? `byte-identical across 1/2/4/8 banks (${SILICON.resultHex})` : "not order-independent for this operator"}`,
+    `- ${ok(r.correctnessPass)} — ${corr}`,
+    ``,
+    `## Measured linear scaling (silicon)`,
+    `- Speedup vs 1 bank: ${scale}`,
+    ``,
+    `## Provenance`,
+    `- Measured ${SILICON.measuredOn} on ${SILICON.board}`,
+    `- Engine: ${SILICON.engine}, ${(SILICON.clockHz / 1e6).toFixed(0)} MHz`,
+    `- Reproduce: ${SILICON.reproduce}`,
+    ``,
+    `> Scope: throughput is the engine's measured accumulation rate (the aggregation step).`,
+    `> End-to-end depends on the ingest path; ATOMiK's order-independence removes the global`,
+    `> ordering/locks that cap a conventional aggregator.`,
+  ].join("\n");
+}
+
 // Human throughput, e.g. 800_000_000 -> "800 M/s".
 export function eng(n: number): string {
   if (!isFinite(n)) return "—";

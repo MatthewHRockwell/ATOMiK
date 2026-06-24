@@ -30,7 +30,7 @@ const c = {
 export default function BenchmarkProofPage() {
   return (
     <main style={{ background: c.bg, color: c.text, minHeight: "100vh" }}>
-      <Nav active="Benchmark" />
+      <Nav active="Workloads" />
       <section style={{ maxWidth: 960, margin: "0 auto", padding: "56px 22px 80px" }}>
         <div
           style={{
@@ -86,11 +86,15 @@ export default function BenchmarkProofPage() {
             anything else this page returns an honest no.
           </p>
           <p style={{ marginTop: 12 }}>
-            See the{" "}
+            Browse{" "}
+            <Link href="/workloads" style={{ color: c.cyan }}>
+              worked workload scenarios
+            </Link>{" "}
+            to find yours, see the{" "}
             <Link href="/benchmarks" style={{ color: c.cyan }}>
               proof &amp; benchmarks
             </Link>{" "}
-            packet for the evidence labels and artifacts, or{" "}
+            packet, or{" "}
             <Link href="/contact?topic=live-benchmark" style={{ color: c.cyan }}>
               ask us to run your workload live on the board
             </Link>

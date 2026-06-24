@@ -1,0 +1,11 @@
+{
+  "name": "High-cardinality metric rollup",
+  "customer": "Observability (archetype)",
+  "aggregation": "sum",
+  "required_throughput": 25000000,
+  "requires_reorder_stability": true,
+  "producers": 5000,
+  "out_of_order": true,
+  "unit": "events/s",
+  "notes": "Thousands of agents emit per-series counter/gauge deltas + histogram-bucket increments, out of order over lossy transport. Each series must roll up exactly per flush window. Today serialized per series to stay exact -> lock caps throughput, hot series contend."
+}
