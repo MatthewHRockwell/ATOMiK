@@ -169,6 +169,46 @@ export function renderReportMarkdown(opts: {
   ].join("\n");
 }
 
+// The downloadable SYNC proof — for the replica-convergence archetype class.
+// Two gates: convergence (the byte-identical order-independence, silicon-proven)
+// and data-moved (a MEASURED ratio, caveated as change-density-dependent).
+export function renderSyncReportMarkdown(opts: {
+  workload: string;
+  vertical: string;
+  fullStateBytes: number;
+  deltaBytes: number;
+  changeDensity: string;
+  measuredNote: string;
+}): string {
+  const pct = Math.round((1 - opts.deltaBytes / opts.fullStateBytes) * 100);
+  return [
+    `# ATOMiK Sync Proof — ${opts.vertical} / ${opts.workload}`,
+    ``,
+    `**VERDICT: CONVERGES** — coordination-free convergence + ~${pct}% less data moved`,
+    ``,
+    `## Convergence gate (correctness)`,
+    `- Required: replicas reach identical state with no coordinator / consensus`,
+    `- ATOMiK: order-, partition-, and merge-independent — byte-identical result across`,
+    `  1/2/4/8 banks (${SILICON.resultHex})`,
+    `- PASS — the same property that makes parallel banks byte-identical makes replicas`,
+    `  converge: any order or partition of deltas merges to identical state, no coordination`,
+    ``,
+    `## Data-moved gate (bandwidth)`,
+    `- Conventional full-state sync: ${opts.fullStateBytes} B/tick`,
+    `- ATOMiK delta sync: ${opts.deltaBytes} B/tick (measured)`,
+    `- ~${pct}% less data moved at ${opts.changeDensity}`,
+    `- ${opts.measuredNote}`,
+    ``,
+    `## Provenance`,
+    `- Convergence proof measured ${SILICON.measuredOn} on ${SILICON.board}`,
+    `- Reproduce the order-independence: ${SILICON.reproduce}`,
+    ``,
+    `> Scope: the data-moved ratio is for the measured change density (${opts.changeDensity}).`,
+    `> It scales with how much of the state changes per tick — lower change density means a`,
+    `> larger reduction, higher means smaller. It is not a universal multiplier.`,
+  ].join("\n");
+}
+
 // Human throughput, e.g. 800_000_000 -> "800 M/s".
 export function eng(n: number): string {
   if (!isFinite(n)) return "—";

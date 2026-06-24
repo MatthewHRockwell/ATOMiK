@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
-import { SCENARIOS } from "@/lib/workload-scenarios";
+import { SCENARIOS, syncReductionPct } from "@/lib/workload-scenarios";
 import { evaluate, eng } from "@/lib/benchmark-proof";
 
 export const metadata: Metadata = {
@@ -55,8 +55,17 @@ export default function WorkloadsPage() {
 
       <section style={{ maxWidth: 1040, margin: "0 auto", padding: "0 22px 64px", display: "grid", gap: 18 }}>
         {SCENARIOS.map((s) => {
-          const r = evaluate(s.aggregation, s.requiredThroughput, s.requiresReorderStability);
-          const vc = r.verdict === "SURPASS" ? c.green : r.verdict === "PASS" ? c.cyan : "#fb7185";
+          const isSync = (s.kind ?? "aggregation") === "sync";
+          const r = isSync
+            ? null
+            : evaluate(s.aggregation!, s.requiredThroughput!, s.requiresReorderStability ?? true);
+          const badge = isSync
+            ? `CONVERGES · ${syncReductionPct(s.sync!)}% less data`
+            : `${r!.verdict} · ${r!.margin.toFixed(0)}× headroom`;
+          const subline = isSync
+            ? `${s.sync!.deltaBytes} B vs ${s.sync!.fullStateBytes} B/tick · converges with no coordinator`
+            : `${eng(s.requiredThroughput!)} required → ${eng(r!.peakThroughput)} measured, byte-identical`;
+          const vc = isSync || r!.verdict === "SURPASS" ? c.green : r!.verdict === "PASS" ? c.cyan : "#fb7185";
           return (
             <Link
               key={s.slug}
@@ -77,15 +86,14 @@ export default function WorkloadsPage() {
                     padding: "4px 12px", borderRadius: 8, whiteSpace: "nowrap",
                   }}
                 >
-                  {r.verdict} · {r.margin.toFixed(0)}× headroom
+                  {badge}
                 </span>
               </div>
               <p style={{ color: c.muted, fontSize: 14.5, lineHeight: 1.5, margin: "10px 0 0", maxWidth: 720 }}>
                 {s.tagline}
               </p>
               <p style={{ color: c.faint, fontSize: 13, margin: "10px 0 0" }}>
-                {eng(s.requiredThroughput)} required → {eng(r.peakThroughput)} measured, byte-identical
-                · <span style={{ color: c.cyan }}>see the proof →</span>
+                {subline} · <span style={{ color: c.cyan }}>see the proof →</span>
               </p>
             </Link>
           );

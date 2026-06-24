@@ -103,13 +103,17 @@ export default async function ScenarioPage({ params }: { params: Promise<{ slug:
           >
             <div>
               <p style={{ color: c.amber, fontSize: 12, fontWeight: 600, textTransform: "uppercase", letterSpacing: 0.5, margin: "0 0 8px" }}>
-                Today — serialized behind a lock
+                {(s.kind ?? "aggregation") === "sync"
+                  ? "Today — coordinated / full-state sync"
+                  : "Today — serialized behind a lock"}
               </p>
               <p style={{ color: c.muted, fontSize: 14.5, lineHeight: 1.6, margin: 0 }}>{s.todayPain}</p>
             </div>
             <div style={{ borderTop: `1px solid ${c.border}`, paddingTop: 18 }}>
               <p style={{ color: c.green, fontSize: 12, fontWeight: 600, textTransform: "uppercase", letterSpacing: 0.5, margin: "0 0 8px" }}>
-                With ATOMiK — order-independent, lock-free
+                {(s.kind ?? "aggregation") === "sync"
+                  ? "With ATOMiK — order-independent, coordination-free"
+                  : "With ATOMiK — order-independent, lock-free"}
               </p>
               <p style={{ color: c.text, fontSize: 14.5, lineHeight: 1.6, margin: "0 0 12px" }}>{s.withAtomik}</p>
               <Bullets items={s.valuePoints} />

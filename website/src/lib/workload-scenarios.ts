@@ -6,21 +6,40 @@
 // lock-elimination + the byte-identical guarantee — real architectural facts,
 // no invented multipliers, nothing from the unsupported traffic-reduction range.
 
+// Two archetype CLASSES. "aggregation" gates on throughput-at-correctness (the
+// parallel-bank engine). "sync" gates on convergence + data-moved (the
+// delta-state replication property).
+export type ScenarioKind = "aggregation" | "sync";
+
+export interface SyncFacts {
+  fullStateBytes: number; // bytes a conventional full-state sync ships per tick
+  deltaBytes: number; // bytes ATOMiK's delta ships — MEASURED on the AX7020 adapter
+  changeDensity: string; // human: the change density the measurement was taken at
+  measuredNote: string; // provenance of the data-moved measurement
+}
+
 export interface Scenario {
   slug: string;
   vertical: string;
   name: string;
   tagline: string;
-  // workload spec — drives the silicon-backed verdict (evaluate())
-  aggregation: string; // must be abelian for the correctness gate to pass
-  requiredThroughput: number; // events/s the archetype gates on
-  requiresReorderStability: boolean;
-  // narrative — the LOI argument
+  kind?: ScenarioKind; // default "aggregation"
+  // aggregation-kind: drives the throughput-at-correctness verdict (evaluate())
+  aggregation?: string; // must be abelian for the correctness gate to pass
+  requiredThroughput?: number; // events/s the archetype gates on
+  requiresReorderStability?: boolean;
+  // sync-kind: drives the convergence + data-moved verdict
+  sync?: SyncFacts;
+  // narrative — the LOI argument (shared by both classes)
   whoThisIs: string[]; // self-identification ("this is us if...")
   pattern: string[]; // what the workload is
-  todayPain: string; // the lock/serialization story
+  todayPain: string; // the lock / coordination / serialization story
   withAtomik: string; // what ATOMiK changes
-  valuePoints: string[]; // the value, honestly (lock elimination)
+  valuePoints: string[]; // the value, honestly
+}
+
+export function syncReductionPct(s: SyncFacts): number {
+  return Math.round((1 - s.deltaBytes / s.fullStateBytes) * 100);
 }
 
 export const SCENARIOS: Scenario[] = [
@@ -146,6 +165,42 @@ export const SCENARIOS: Scenario[] = [
       "No per-device sequencing / windowing lock on the commit path.",
       "Exact, byte-identical rollups for billing and SLA.",
       "Linear scaling across the fleet; devices never coordinate.",
+    ],
+  },
+  {
+    slug: "replica-state-convergence",
+    vertical: "Distributed State",
+    name: "Replica state convergence",
+    tagline:
+      "Replicas converge to identical state by exchanging deltas — no coordinator, no consensus, a fraction of the bandwidth.",
+    kind: "sync",
+    sync: {
+      fullStateBytes: 2048,
+      deltaBytes: 160,
+      changeDensity: "~5% of state changed per tick",
+      measuredNote:
+        "Measured on the AX7020 ATOMiK adapter: an edge-telemetry sync tick moved 160 B vs 2,048 B of full state, with exact 64-bit LOAD/ACCUM/READ round-trips on a falsification-tested harness.",
+    },
+    whoThisIs: [
+      "You replicate state across edge / multi-region nodes or to client caches.",
+      "You use (or are weighing) CRDTs or consensus to keep replicas consistent.",
+      "Sync bandwidth and coordination latency are real costs for you.",
+    ],
+    pattern: [
+      "State is replicated across N nodes (edge, multi-region, or client-side).",
+      "Nodes update concurrently and must converge to the same state.",
+      "Updates and reconciliations cross the network — bandwidth and latency matter.",
+      "No node is authoritative; there is no global order.",
+    ],
+    todayPain:
+      "Keeping replicas consistent means a coordinator / consensus (Raft / Paxos: latency, a leader bottleneck) or CRDTs (metadata overhead, and you still ship state or fat op-logs). And each sync tends to ship full state or a growing op-log, not just what changed.",
+    withAtomik:
+      "Replicas exchange delta-state. Because the merge is order-independent and self-consistent — byte-identical no matter which deltas arrive in which order at which node — replicas converge with NO coordinator and NO consensus, and each tick ships only the delta, not the full state.",
+    valuePoints: [
+      "Coordination-free convergence — no leader, no consensus round-trip.",
+      "Any node, any order, after any partition → identical state (the same byte-identical property proven on silicon).",
+      "Ships the delta, not full state — measured 160 B vs 2,048 B (~92% less) at ~5% change density.",
+      "Reconnect after a partition = replay deltas in any order and converge — no reconciliation protocol.",
     ],
   },
 ];
