@@ -1,0 +1,11 @@
+{
+  "name": "Impression & click aggregation",
+  "customer": "Ad-Tech (archetype)",
+  "aggregation": "sum",
+  "required_throughput": 200000000,
+  "requires_reorder_stability": true,
+  "producers": 4096,
+  "out_of_order": true,
+  "unit": "events/s",
+  "notes": "Per-campaign/creative impression/click/spend counters across many bid+serve nodes; budget pacing + frequency capping read the counts so they must be exact. Today per-campaign lock/CAS or stale approximate counts (overspend); hot campaigns contend, lock caps serve throughput at peak."
+}

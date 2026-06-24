@@ -1,0 +1,11 @@
+{
+  "name": "Fleet telemetry rollup",
+  "customer": "IoT / Edge (archetype)",
+  "aggregation": "sum",
+  "required_throughput": 40000000,
+  "requires_reorder_stability": true,
+  "producers": 1000000,
+  "out_of_order": true,
+  "unit": "events/s",
+  "notes": "Millions of devices emit per-metric deltas over lossy high-latency transport; arrive late + wildly out of order. Rollups must be exact per device/metric (billing/SLA). Today per-device windowing + watermarks + serialized commit -> latency, memory, reprocessing on late data."
+}

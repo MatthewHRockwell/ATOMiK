@@ -86,6 +86,68 @@ export const SCENARIOS: Scenario[] = [
       "Edges never coordinate or sequence — order is irrelevant.",
     ],
   },
+  {
+    slug: "adtech-impression-aggregation",
+    vertical: "Ad-Tech",
+    name: "Impression & click aggregation",
+    tagline:
+      "Per-campaign impression, click and spend counters aggregated across bid/serve nodes in real time, exact for pacing and capping.",
+    aggregation: "sum",
+    requiredThroughput: 200_000_000,
+    requiresReorderStability: true,
+    whoThisIs: [
+      "You run a programmatic exchange, DSP, or SSP.",
+      "You keep per-campaign / per-creative budget, pacing, and frequency counters.",
+      "Hot campaigns contend, and stale counts mean overspend or over-serving.",
+    ],
+    pattern: [
+      "Per-campaign / creative / placement counters: impressions, clicks, conversions, spend.",
+      "Updated concurrently across many bid and serve nodes.",
+      "Budget pacing and frequency capping read the counts, so they must be exact.",
+      "Events arrive out of order across the serving fleet.",
+    ],
+    todayPain:
+      "Exact per-campaign counts under concurrent serving means a per-campaign lock / CAS — or accepting stale, approximate counts and eating the overspend / over-serve. Hot campaigns contend; the lock caps serve throughput at exactly peak traffic.",
+    withAtomik:
+      "Serve nodes feed count deltas into a shared accumulator with no per-campaign lock. The count is order-independent and byte-identical, so pacing and capping decisions use an exact count regardless of which node served first.",
+    valuePoints: [
+      "No per-campaign lock contention — hot campaigns don't serialize the serve path.",
+      "Exact counts for budget pacing & frequency capping — no overspend from stale reads.",
+      "Linear scaling with banks; serve throughput holds under traffic spikes.",
+      "Serve nodes never coordinate — order of impressions is irrelevant.",
+    ],
+  },
+  {
+    slug: "iot-fleet-telemetry-rollup",
+    vertical: "IoT / Edge",
+    name: "Fleet telemetry rollup",
+    tagline:
+      "Per-device telemetry deltas from a large fleet, rolled up exactly despite late, out-of-order delivery — no windowing, no watermarks.",
+    aggregation: "sum",
+    requiredThroughput: 40_000_000,
+    requiresReorderStability: true,
+    whoThisIs: [
+      "You run a large connected-device fleet (cellular / LoRa / NB-IoT).",
+      "You roll up per-device / per-metric usage counters for billing, SLA, or alerting.",
+      "Late and out-of-order arrivals force buffering, watermarks, or reprocessing.",
+    ],
+    pattern: [
+      "Millions of devices emit per-metric deltas: usage counters, event tallies, totals.",
+      "Transport is lossy and high-latency; deltas arrive wildly out of order and delayed.",
+      "Rollups must be exact per device / metric per window — billing and SLA depend on it.",
+      "Devices are concurrent and uncoordinated.",
+    ],
+    todayPain:
+      "Exact rollups under late, out-of-order arrival usually means per-device windowing with watermarks plus a serialized commit path — adding latency, memory, and reprocessing whenever late data shows up after the window closed.",
+    withAtomik:
+      "Devices feed deltas into a shared accumulator in any order, at any time. The rollup is order-independent and byte-identical, so a delta that arrives an hour late simply accumulates into the exact result — no sequencing, no watermark stalls, no reprocessing.",
+    valuePoints: [
+      "Late and out-of-order data accumulates correctly — no watermarks, no reprocessing.",
+      "No per-device sequencing / windowing lock on the commit path.",
+      "Exact, byte-identical rollups for billing and SLA.",
+      "Linear scaling across the fleet; devices never coordinate.",
+    ],
+  },
 ];
 
 export function getScenario(slug: string): Scenario | undefined {
