@@ -12,7 +12,15 @@ from pathlib import Path
 
 import pytest
 
-from atomik_sdk.contract_bench import ENGINE, WorkloadSpec, evaluate, is_abelian
+from atomik_sdk.contract_bench import (
+    ENGINE,
+    REFERENCE_SYNC,
+    SyncSpec,
+    WorkloadSpec,
+    evaluate,
+    evaluate_sync,
+    is_abelian,
+)
 
 
 class TestSilicon:
@@ -145,3 +153,58 @@ class TestRendering:
               / "atomik_sdk/contract_bench/examples/telemetry_counter_rollup.json")
         r = evaluate(WorkloadSpec.from_json(ex))
         assert r.verdict == "SURPASS"
+
+
+class TestSync:
+    """The sync / replica-convergence archetype — second harness class."""
+
+    def test_reference_converges(self):
+        r = evaluate_sync(REFERENCE_SYNC)
+        assert r.verdict == "CONVERGES"
+        assert r.convergence_gate.passed
+        assert r.data_moved_gate.passed
+
+    def test_reduction_is_measured_ratio(self):
+        # 160 / 2048 -> ~92% less data moved
+        r = evaluate_sync(REFERENCE_SYNC)
+        assert r.reduction_pct == 92
+        assert "92" in r.headline
+
+    def test_convergence_grounded_in_silicon(self):
+        # the convergence claim is NOT new — it's the byte-identical engine result
+        r = evaluate_sync(REFERENCE_SYNC)
+        assert ENGINE.result_hex in r.convergence_gate.measured
+        assert r.convergence_gate.passed == ENGINE.identical_across_banks
+
+    def test_delta_larger_than_full_state_fails(self):
+        # honesty: if the "delta" isn't smaller, it does NOT pass the bandwidth gate
+        bad = SyncSpec(name="degenerate", full_state_bytes=100, delta_bytes=200)
+        r = evaluate_sync(bad)
+        assert r.verdict == "FAIL"
+        assert not r.data_moved_gate.passed
+        assert r.convergence_gate.passed  # convergence still holds on silicon
+
+    def test_scope_note_caveats_change_density(self):
+        r = evaluate_sync(REFERENCE_SYNC)
+        assert "not a universal multiplier" in r.scope_note
+        assert "5%" in r.scope_note
+
+    def test_markdown_has_both_gates_and_verdict(self):
+        md = evaluate_sync(REFERENCE_SYNC).to_markdown()
+        assert "VERDICT: CONVERGES" in md
+        assert "Convergence gate" in md
+        assert "Data-moved gate" in md
+        assert "0x17e9fe29b5dc0aad" in md
+
+    def test_json_roundtrips(self):
+        import json
+        d = json.loads(evaluate_sync(REFERENCE_SYNC).to_json())
+        assert d["verdict"] == "CONVERGES"
+        assert d["fields"]["reduction_pct"] == 92
+
+    def test_example_spec_loads_and_converges(self):
+        ex = (Path(__file__).resolve().parents[1]
+              / "atomik_sdk/contract_bench/examples/replica_state_convergence.json")
+        r = evaluate_sync(SyncSpec.from_json(ex))
+        assert r.verdict == "CONVERGES"
+        assert r.reduction_pct == 92

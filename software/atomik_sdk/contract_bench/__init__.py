@@ -19,6 +19,7 @@ from .harness import evaluate
 from .report import BenchmarkReport, Gate
 from .silicon import ABELIAN_AGGREGATIONS, ENGINE, SiliconMeasurement, is_abelian
 from .spec import WorkloadSpec
+from .sync import REFERENCE_SYNC, SyncReport, SyncSpec, evaluate_sync
 
 __all__ = [
     "WorkloadSpec",
@@ -29,4 +30,9 @@ __all__ = [
     "SiliconMeasurement",
     "is_abelian",
     "ABELIAN_AGGREGATIONS",
+    # sync / replica-convergence archetype class
+    "SyncSpec",
+    "SyncReport",
+    "evaluate_sync",
+    "REFERENCE_SYNC",
 ]

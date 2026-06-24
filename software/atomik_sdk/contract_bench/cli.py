@@ -9,11 +9,21 @@ CLI: turn a customer workload spec into a PASS/SURPASS benchmark proof.
 from __future__ import annotations
 
 import argparse
+import json
 import sys
 
 from . import silicon as si
 from .harness import evaluate
 from .spec import WorkloadSpec
+from .sync import SyncSpec, evaluate_sync
+
+
+def _is_sync_spec(path: str) -> bool:
+    try:
+        data = json.loads(open(path).read())
+    except Exception:
+        return False
+    return data.get("kind") == "sync" or "delta_bytes" in data
 
 
 def _build_spec(args: argparse.Namespace) -> WorkloadSpec:
@@ -43,6 +53,13 @@ def main(argv: list[str] | None = None) -> int:
                    help="delta count for the live run (default: events_per_window or 65537)")
     p.add_argument("--port", default="/dev/ttyUSB2", help="board serial port")
     args = p.parse_args(argv)
+
+    # sync / replica-convergence specs (kind:"sync" or carrying delta_bytes) route
+    # to the sync evaluator — a different archetype class, different gates.
+    if args.spec and _is_sync_spec(args.spec):
+        report = evaluate_sync(SyncSpec.from_json(args.spec))
+        print(report.to_json() if args.json else report.to_markdown())
+        return 0 if report.verdict == "CONVERGES" else 2
 
     spec = _build_spec(args)
     engine = si.ENGINE
