@@ -75,6 +75,53 @@ class TestVerdict:
         assert r.correctness_gate.passed
 
 
+class TestBoardParse:
+    SAMPLE = """ATOMiK parallel-bench  v2  N_BANKS=8
+count=50000000  seed=0xdeadbeef0badf00d
+
+banks  hw_cycles   speedup  result              ok
+1      50000001    1.00    0x0badf00ddeadbeef  OK
+2      25000001    1.99    0x0badf00ddeadbeef  OK
+4      12500001    3.99    0x0badf00ddeadbeef  OK
+8      6250001     7.99    0x0badf00ddeadbeef  OK
+
+software reference = 0x0badf00ddeadbeef
+VERIFY: ALL MATCH
+"""
+
+    def test_parse_live_output(self):
+        from atomik_sdk.contract_bench.board import parse_abench
+        m = parse_abench(self.SAMPLE, count=50_000_000)
+        assert m.cycles == {1: 50000001, 2: 25000001, 4: 12500001, 8: 6250001}
+        assert m.identical_across_banks
+        assert m.result_hex == "0x0badf00ddeadbeef"
+        # ~8 deltas/cycle at 8 banks -> ~800 M/s, count-independent
+        assert m.peak_throughput() == pytest.approx(800e6, rel=0.01)
+
+    def test_parse_evaluates_to_surpass(self):
+        from atomik_sdk.contract_bench.board import parse_abench
+        m = parse_abench(self.SAMPLE, count=50_000_000)
+        spec = WorkloadSpec("live rollup", aggregation="sum", required_throughput=50e6)
+        r = evaluate(spec, m)
+        assert r.verdict == "SURPASS"
+        assert "live" in r.provenance["measured_on"]
+
+    def test_parse_raises_on_empty(self):
+        from atomik_sdk.contract_bench.board import parse_abench
+        with pytest.raises(RuntimeError):
+            parse_abench("no data here", count=1)
+
+    def test_parse_survives_one_uart_mangled_hash(self):
+        # row for 1 bank lost its hex over the UART (-> 0x0000000000000000);
+        # the other 3 agree, so the report must use the real value.
+        from atomik_sdk.contract_bench.board import parse_abench
+        mangled = self.SAMPLE.replace("1      50000001    1.00    0x0badf00ddeadbeef",
+                                      "1      50000001    1.00    0x0000000000000000")
+        m = parse_abench(mangled, count=50_000_000)
+        assert m.result_hex == "0x0badf00ddeadbeef"
+        assert m.cycles[1] == 50000001
+
+
 class TestRendering:
     def test_markdown_has_both_gates_and_verdict(self):
         r = evaluate(WorkloadSpec("rollup", aggregation="sum",
