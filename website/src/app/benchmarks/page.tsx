@@ -215,6 +215,9 @@ export default function BenchmarksPage() {
           ATOMiK proof is organized by evidence tier. Performance claims must be quoted only with their artifact, workload context, and caveat. Do not isolate the biggest number without the interpretation.
         </p>
         <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+          <Link href="/benchmark-proof" className="rounded px-5 py-3 text-center text-sm font-semibold no-underline" style={{ background: colors.green, color: colors.bg }}>
+            Test ATOMiK against your numbers →
+          </Link>
           <Link href="/contact?intent=proof&source=proof-hero&cta=request-proof-review" className="rounded px-5 py-3 text-center text-sm font-semibold text-white no-underline" style={{ background: colors.blue }}>
             Request Proof Review
           </Link>
@@ -222,6 +225,20 @@ export default function BenchmarksPage() {
             Request Evaluation
           </Link>
         </div>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-6 py-10" style={{ borderTop: `1px solid ${colors.border}` }}>
+        <Link href="/benchmark-proof" className="block rounded-xl p-6 no-underline transition-colors hover:border-cyan-400" style={{ border: `1px solid ${colors.border}`, background: colors.panel }}>
+          <p className="text-sm font-semibold uppercase" style={{ color: colors.green }}>
+            Interactive · HARDWARE_VALIDATED
+          </p>
+          <h2 className="mt-2 text-2xl font-bold md:text-3xl" style={{ color: colors.text }}>
+            Prove it against your aggregation benchmark.
+          </h2>
+          <p className="mt-3 max-w-3xl text-sm leading-6" style={{ color: colors.muted }}>
+            Pick your aggregation and the throughput-at-correctness bar you gate commitment on, and see the silicon-measured verdict live — 800&nbsp;Mevents/s at 8 banks, byte-identical across 1/2/4/8 banks on the AX7020. We&apos;ll run your workload live on the board on request. <span style={{ color: colors.cyan }}>Open the benchmark tool →</span>
+          </p>
+        </Link>
       </section>
 
       <section className="mx-auto max-w-6xl px-6 py-12" style={{ borderTop: `1px solid ${colors.border}` }}>

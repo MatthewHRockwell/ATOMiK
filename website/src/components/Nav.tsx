@@ -12,6 +12,7 @@ export default function Nav({ active }: { active?: string }) {
     { href: "/", label: "Product" },
     { href: "/pricing", label: "Evaluation" },
     { href: "/benchmarks", label: "Proof" },
+    { href: "/benchmark-proof", label: "Benchmark" },
     { href: "/solutions", label: "Use Cases" },
     { href: contactHref("licensing", "nav", "discuss-licensing"), label: "Licensing" },
     { href: "/investor-brief", label: "Investors" },

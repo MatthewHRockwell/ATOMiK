@@ -30,7 +30,7 @@ const c = {
 export default function BenchmarkProofPage() {
   return (
     <main style={{ background: c.bg, color: c.text, minHeight: "100vh" }}>
-      <Nav />
+      <Nav active="Benchmark" />
       <section style={{ maxWidth: 960, margin: "0 auto", padding: "56px 22px 80px" }}>
         <div
           style={{
