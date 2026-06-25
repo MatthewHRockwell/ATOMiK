@@ -1,0 +1,9 @@
+{
+  "kind": "sync",
+  "name": "Offline-first client sync",
+  "customer": "Local-First / Mobile (archetype)",
+  "full_state_bytes": 2048,
+  "delta_bytes": 160,
+  "change_density": "~5% of state changed per sync",
+  "measured_note": "Bandwidth is the representative delta tick measured on the AX7020 ATOMiK adapter: 160 B moved vs 2,048 B of full state, with exact 64-bit LOAD/ACCUM/READ round-trips on a falsification-tested harness. The convergence guarantee is the same byte-identical, order-independent merge."
+}

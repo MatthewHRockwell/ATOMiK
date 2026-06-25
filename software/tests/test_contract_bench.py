@@ -202,9 +202,9 @@ class TestSync:
         assert d["verdict"] == "CONVERGES"
         assert d["fields"]["reduction_pct"] == 92
 
-    def test_example_spec_loads_and_converges(self):
-        ex = (Path(__file__).resolve().parents[1]
-              / "atomik_sdk/contract_bench/examples/replica_state_convergence.json")
-        r = evaluate_sync(SyncSpec.from_json(ex))
-        assert r.verdict == "CONVERGES"
-        assert r.reduction_pct == 92
+    def test_example_specs_load_and_converge(self):
+        exdir = Path(__file__).resolve().parents[1] / "atomik_sdk/contract_bench/examples"
+        for name in ("replica_state_convergence.json", "offline_first_client_sync.json"):
+            r = evaluate_sync(SyncSpec.from_json(exdir / name))
+            assert r.verdict == "CONVERGES", name
+            assert r.reduction_pct == 92, name

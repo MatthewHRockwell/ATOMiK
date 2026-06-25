@@ -203,6 +203,42 @@ export const SCENARIOS: Scenario[] = [
       "Reconnect after a partition = replay deltas in any order and converge — no reconciliation protocol.",
     ],
   },
+  {
+    slug: "offline-first-client-sync",
+    vertical: "Local-First / Mobile",
+    name: "Offline-first client sync",
+    tagline:
+      "Field / mobile clients work offline, then converge on reconnect by exchanging deltas — no server merge pass, no last-writer-wins data loss, a fraction of the bandwidth.",
+    kind: "sync",
+    sync: {
+      fullStateBytes: 2048,
+      deltaBytes: 160,
+      changeDensity: "~5% of state changed per sync",
+      measuredNote:
+        "Bandwidth is the representative delta tick measured on the AX7020 ATOMiK adapter: 160 B moved vs 2,048 B of full state, with exact 64-bit LOAD/ACCUM/READ round-trips on a falsification-tested harness. The convergence guarantee is the same byte-identical, order-independent merge.",
+    },
+    whoThisIs: [
+      "You build local-first / offline-capable apps (mobile, field service, retail) where clients work disconnected.",
+      "Clients accumulate counters, tallies, and inventory deltas offline and must converge on reconnect.",
+      "You use (or are weighing) a CRDT library or a server reconciliation pass, and you pay for it in bandwidth and merge complexity.",
+    ],
+    pattern: [
+      "Each client holds a replica of shared state: counters, tallies, and signed inventory / usage deltas.",
+      "Clients mutate state offline for minutes to hours, then reconnect over a metered or flaky link.",
+      "On reconnect, replicas must converge to identical state regardless of which client synced first.",
+      "No client is authoritative; reconnection order is arbitrary.",
+    ],
+    todayPain:
+      "Converging offline clients means a CRDT library (per-field metadata that grows, and you still ship state or a fat op-log) or a server-side reconciliation / last-writer-wins pass that silently drops concurrent edits. And each sync tends to ship the full record set or a growing op-log, not just what changed — expensive on metered, intermittent mobile links.",
+    withAtomik:
+      "Clients exchange delta-state. Because the merge is order-independent and self-consistent — byte-identical no matter which client's deltas arrive in which order — replicas converge with NO server reconciliation and NO per-field CRDT metadata, and each sync ships only the delta, not the full record set.",
+    valuePoints: [
+      "Coordination-free convergence on reconnect — no server merge pass, no last-writer-wins loss of concurrent edits.",
+      "Any client, any reconnection order, after any offline gap → identical state (the same byte-identical property proven on silicon).",
+      "Ships the delta, not the full record set — measured 160 B vs 2,048 B (~92% less) at ~5% change density.",
+      "No growing per-field CRDT metadata on the wire — the delta IS the merge.",
+    ],
+  },
 ];
 
 export function getScenario(slug: string): Scenario | undefined {

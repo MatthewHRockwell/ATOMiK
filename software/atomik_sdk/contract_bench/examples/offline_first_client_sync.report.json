@@ -1,0 +1,34 @@
+{
+  "workload": "Offline-first client sync",
+  "customer": "Local-First / Mobile (archetype)",
+  "verdict": "CONVERGES",
+  "headline": "coordination-free convergence + ~92% less data moved",
+  "convergence_gate": {
+    "name": "convergence",
+    "required": "replicas reach identical state with no coordinator / consensus",
+    "measured": "byte-identical across 1/2/4/8 banks (0x17e9fe29b5dc0aad)",
+    "passed": true,
+    "detail": "any node, any order, after any partition -> identical merged state (the same byte-identical property proven on silicon)"
+  },
+  "data_moved_gate": {
+    "name": "data_moved",
+    "required": "2048 B/tick full-state sync",
+    "measured": "160 B/tick delta (measured)",
+    "passed": true,
+    "detail": "~92% less at ~5% of state changed per sync \u2014 scales with change density, not a universal multiplier"
+  },
+  "reduction_pct": 92,
+  "provenance": {
+    "convergence_measured_on": "2026-06-21",
+    "board": "ALINX/HamGeek AX7020 (XC7Z020-2CLG484)",
+    "reproduce_order_independence": "abench 65537 0xDEADBEEF0BADF00D",
+    "data_moved_note": "Bandwidth is the representative delta tick measured on the AX7020 ATOMiK adapter: 160 B moved vs 2,048 B of full state, with exact 64-bit LOAD/ACCUM/READ round-trips on a falsification-tested harness. The convergence guarantee is the same byte-identical, order-independent merge."
+  },
+  "scope_note": "The data-moved ratio is for ~5% of state changed per sync; it scales with how much of the state changes per tick \u2014 lower change density means a larger reduction, higher means smaller. It is not a universal multiplier.",
+  "fields": {
+    "full_state_bytes": 2048,
+    "delta_bytes": 160,
+    "reduction_pct": 92,
+    "result_hex": "0x17e9fe29b5dc0aad"
+  }
+}
