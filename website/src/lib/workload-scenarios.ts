@@ -168,6 +168,37 @@ export const SCENARIOS: Scenario[] = [
     ],
   },
   {
+    slug: "analytics-distinct-counts",
+    vertical: "Product Analytics",
+    name: "Distinct-count cardinality rollup",
+    tagline:
+      "Unique users / devices / sessions estimated with sketches and merged across shards and windows — byte-identical regardless of merge order, no serialized reducer.",
+    aggregation: "hll_merge",
+    requiredThroughput: 20_000_000,
+    requiresReorderStability: true,
+    whoThisIs: [
+      "You report unique users / devices / sessions at scale (growth, billing, dashboards).",
+      "You merge HyperLogLog / sketches across shards and time windows (Redis PFCOUNT, ClickHouse uniq, Druid, APPROX_COUNT_DISTINCT).",
+      "You funnel the merge through a serialized reducer to keep the estimate stable under concurrency.",
+    ],
+    pattern: [
+      "Many shards maintain sketch registers over a high-cardinality keyspace.",
+      "Sketches are merged across shards and rolling windows into one cardinality estimate.",
+      "Merges happen concurrently and out of order as shards report in.",
+      "The merged estimate must be identical regardless of which sketch merged first.",
+    ],
+    todayPain:
+      "Sketch merge is register-wise — mathematically order-independent — yet production pipelines still funnel it through a serialized reducer or a locked accumulator to avoid lost updates and keep the final estimate stable. The reducer caps merge throughput and adds dashboard latency exactly when traffic and cardinality spike.",
+    withAtomik:
+      "Shards feed sketch-register deltas into a shared accumulator with no reducer lock. The register merge is order-independent and byte-identical, so the cardinality estimate is the same no matter which shard's sketch landed first or how many banks merged it.",
+    valuePoints: [
+      "No serialized reducer / merge lock — shards never coordinate.",
+      "Register merge is order-independent and byte-identical (the same property proven on silicon).",
+      "Linear scaling with banks for the merge step (1 / 2 / 4 / 8×).",
+      "Late / out-of-order shard reports fold into the exact same estimate — no re-reduce.",
+    ],
+  },
+  {
     slug: "replica-state-convergence",
     vertical: "Distributed State",
     name: "Replica state convergence",

@@ -154,6 +154,17 @@ class TestRendering:
         r = evaluate(WorkloadSpec.from_json(ex))
         assert r.verdict == "SURPASS"
 
+    def test_non_sum_abelian_example_surpasses(self):
+        # hll_merge is abelian (register-wise) -> correctness gate must pass too
+        ex = (Path(__file__).resolve().parents[1]
+              / "atomik_sdk/contract_bench/examples/analytics_distinct_counts.json")
+        spec = WorkloadSpec.from_json(ex)
+        assert spec.aggregation == "hll_merge"
+        assert is_abelian(spec.aggregation)
+        r = evaluate(spec)
+        assert r.verdict == "SURPASS"
+        assert r.correctness_gate.passed
+
 
 class TestSync:
     """The sync / replica-convergence archetype — second harness class."""
