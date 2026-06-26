@@ -18,6 +18,7 @@ from .live_run import reference_live_run, run_live
 from .loi import render_conditional_loi
 from .spec import WorkloadSpec
 from .sync import SyncSpec, evaluate_sync
+from .value import ValueInputs, compute_value, render_value_memo
 
 
 def _is_sync_spec(path: str) -> bool:
@@ -64,7 +65,37 @@ def main(argv: list[str] | None = None) -> int:
                    help="emit a witnessed record from the RECORDED reference measurement")
     p.add_argument("--seed", default="0xDEADBEEF0BADF00D", help="abench seed for the live run")
     p.add_argument("--out", help="write the artifact to this path instead of stdout")
+    # cost-of-lock value memo (all baseline inputs are BUYER-STATED)
+    p.add_argument("--value", action="store_true", help="emit a Cost-of-Lock value memo")
+    p.add_argument("--approach", default="lock", choices=["lock", "shard", "crdt", "consensus"],
+                   help="how correctness is kept today")
+    p.add_argument("--instances", type=int, help="instances/replicas/shards provisioned today")
+    p.add_argument("--instance-monthly", type=float, help="$/instance/month")
+    p.add_argument("--coordination-overhead", type=float,
+                   help="%% of capacity/cost attributed to coordination")
+    p.add_argument("--p99-ms", type=float, help="current p99 latency (ms)")
+    p.add_argument("--p99-lock-induced", action="store_true",
+                   help="the p99 tail is coordination-induced")
     args = p.parse_args(argv)
+
+    if args.value:
+        spec = _build_spec(args)
+        inp = ValueInputs(
+            aggregation=spec.aggregation,
+            required_throughput=spec.required_throughput,
+            approach=args.approach,
+            reorder=spec.requires_reorder_stability,
+            instances=args.instances,
+            instance_monthly=args.instance_monthly,
+            coordination_overhead_pct=args.coordination_overhead,
+            p99_ms=args.p99_ms,
+            p99_lock_induced=args.p99_lock_induced,
+        )
+        memo = compute_value(inp)
+        text = (memo.to_json() if args.json
+                else render_value_memo(inp, memo, company=args.company, workload=spec.name))
+        _emit(args, text)
+        return 0 if memo.applicable else 2
 
     # sync / replica-convergence specs (kind:"sync" or carrying delta_bytes) route
     # to the sync evaluator — a different archetype class, different gates.

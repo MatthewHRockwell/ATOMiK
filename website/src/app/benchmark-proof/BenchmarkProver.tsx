@@ -240,6 +240,16 @@ export default function BenchmarkProver() {
           {reorder ? ", reorder-stable" : ""} — into the request, with the verdict
           re-computed from the measured engine on the next page.
         </p>
+        {r.verdict !== "FAIL" && (
+          <p style={{ marginTop: 10, fontSize: 13.5 }}>
+            <a
+              href={`/cost-of-lock?agg=${encodeURIComponent(agg)}&rate=${Math.round(required)}&reorder=${reorder ? 1 : 0}`}
+              style={{ color: c.cyan, textDecoration: "none" }}
+            >
+              What is hitting this bar worth? → quantify the coordination tax it removes
+            </a>
+          </p>
+        )}
       </div>
     </div>
   );

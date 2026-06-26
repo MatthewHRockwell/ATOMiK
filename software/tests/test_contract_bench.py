@@ -23,6 +23,11 @@ from atomik_sdk.contract_bench import (
     reference_live_run,
     render_conditional_loi,
 )
+from atomik_sdk.contract_bench import (
+    ValueInputs,
+    compute_value,
+    render_value_memo,
+)
 from atomik_sdk.contract_bench.board import parse_abench
 from atomik_sdk.contract_bench.live_run import LiveRunRecord, _record
 
@@ -333,3 +338,57 @@ class TestLiveRun:
     def test_record_dataclass_shape(self):
         rec = reference_live_run("X")
         assert isinstance(rec, LiveRunRecord)
+
+
+class TestValue:
+    """Cost-of-Lock value translator — honest economic legibility."""
+
+    def test_dollar_tax_is_arithmetic_on_buyer_baseline(self):
+        # 12 x $900 = $10,800/mo baseline; 35% attributed to coordination -> $3,780
+        inp = ValueInputs(aggregation="sum", required_throughput=100e6, approach="shard",
+                          instances=12, instance_monthly=900, coordination_overhead_pct=35)
+        m = compute_value(inp)
+        assert m.applicable
+        assert m.monthly_baseline == 10_800
+        assert m.coordination_tax_monthly == pytest.approx(3_780)
+        assert "$3,780" in m.headline
+
+    def test_atomik_line_is_measured_only(self):
+        m = compute_value(ValueInputs(aggregation="sum", required_throughput=100e6))
+        measured = [ln for ln in m.lines if ln["source"] == "MEASURED"]
+        assert measured and "byte-identical" in measured[0]["value"]
+        # no fabricated speedup multiplier — only the measured ceiling / headroom
+        assert "8.0x headroom" in measured[0]["value"]
+
+    def test_non_abelian_makes_no_value_claim(self):
+        m = compute_value(ValueInputs(aggregation="median", required_throughput=1e6))
+        assert not m.applicable
+        assert "order-dependent" in m.reason
+        assert m.coordination_tax_monthly is None
+
+    def test_rate_over_ceiling_makes_no_claim(self):
+        m = compute_value(ValueInputs(aggregation="sum", required_throughput=2e9))
+        assert not m.applicable
+        assert "ceiling" in m.reason
+
+    def test_overhead_without_cost_reports_percent(self):
+        m = compute_value(ValueInputs(aggregation="sum", required_throughput=50e6,
+                                      approach="lock", coordination_overhead_pct=40))
+        assert m.reclaimed_pct == 40
+        assert m.coordination_tax_monthly is None
+        assert "40% of capacity" in m.headline
+
+    def test_memo_tags_every_line_and_keeps_caveats(self):
+        inp = ValueInputs(aggregation="sum", required_throughput=100e6, approach="lock",
+                          instances=4, instance_monthly=500, coordination_overhead_pct=30)
+        md = render_value_memo(inp, compute_value(inp), company="Acme")
+        assert "[MEASURED]" in md and "[YOUR BASELINE]" in md
+        assert "Acme" in md
+        assert "not a throughput multiplier" in md
+        assert "Cost-of-Lock Value Memo" in md
+
+    def test_memo_for_non_abelian_states_no_claim(self):
+        inp = ValueInputs(aggregation="median", required_throughput=1e6)
+        md = render_value_memo(inp, compute_value(inp))
+        assert "NO CLAIM" in md
+        assert "What the numbers say" not in md

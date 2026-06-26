@@ -22,6 +22,7 @@ from .report import BenchmarkReport, Gate
 from .silicon import ABELIAN_AGGREGATIONS, ENGINE, SiliconMeasurement, is_abelian
 from .spec import WorkloadSpec
 from .sync import REFERENCE_SYNC, SyncReport, SyncSpec, evaluate_sync
+from .value import ValueInputs, ValueMemo, compute_value, render_value_memo
 
 __all__ = [
     "WorkloadSpec",
@@ -43,4 +44,9 @@ __all__ = [
     "LiveRunRecord",
     "reference_live_run",
     "run_live",
+    # cost-of-lock value translator
+    "ValueInputs",
+    "ValueMemo",
+    "compute_value",
+    "render_value_memo",
 ]
