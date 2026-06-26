@@ -89,6 +89,14 @@ export default function BenchmarkProofPage() {
             anything else this page returns an honest no.
           </p>
           <p style={{ marginTop: 12 }}>
+            <strong style={{ color: c.muted }}>And it&apos;s not only measured — it&apos;s proven.</strong>{" "}
+            The abelian-group property this verdict depends on is{" "}
+            <Link href="/formal-verification" style={{ color: c.cyan }}>
+              formally verified in Lean 4
+            </Link>{" "}
+            (108 theorems, zero <code>sorry</code>, depending only on Lean&apos;s standard axioms).
+          </p>
+          <p style={{ marginTop: 12 }}>
             Browse{" "}
             <Link href="/workloads" style={{ color: c.cyan }}>
               worked workload scenarios

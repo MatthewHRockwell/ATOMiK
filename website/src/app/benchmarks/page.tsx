@@ -218,6 +218,9 @@ export default function BenchmarksPage() {
           <Link href="/benchmark-proof" className="rounded px-5 py-3 text-center text-sm font-semibold no-underline" style={{ background: colors.green, color: colors.bg }}>
             Test ATOMiK against your numbers →
           </Link>
+          <Link href="/formal-verification" className="rounded px-5 py-3 text-center text-sm font-semibold no-underline" style={{ color: colors.text, border: `1px solid ${colors.cyan}` }}>
+            Formal verification (Lean 4) →
+          </Link>
           <Link href="/contact?intent=proof&source=proof-hero&cta=request-proof-review" className="rounded px-5 py-3 text-center text-sm font-semibold text-white no-underline" style={{ background: colors.blue }}>
             Request Proof Review
           </Link>
