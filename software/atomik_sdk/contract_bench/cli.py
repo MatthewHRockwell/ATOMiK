@@ -14,6 +14,7 @@ import sys
 
 from . import silicon as si
 from .harness import evaluate
+from .live_run import reference_live_run, run_live
 from .loi import render_conditional_loi
 from .spec import WorkloadSpec
 from .sync import SyncSpec, evaluate_sync
@@ -57,6 +58,12 @@ def main(argv: list[str] | None = None) -> int:
                    help="emit a Conditional LOI (draft) instead of the proof report")
     p.add_argument("--company", default="", help="counterparty name for the LOI")
     p.add_argument("--drafted-on", default="____-__-__", help="LOI draft date (YYYY-MM-DD)")
+    p.add_argument("--live-run", action="store_true",
+                   help="drive abench on a connected AX7020 and emit a witnessed live-run record")
+    p.add_argument("--reference-run", action="store_true",
+                   help="emit a witnessed record from the RECORDED reference measurement")
+    p.add_argument("--seed", default="0xDEADBEEF0BADF00D", help="abench seed for the live run")
+    p.add_argument("--out", help="write the artifact to this path instead of stdout")
     args = p.parse_args(argv)
 
     # sync / replica-convergence specs (kind:"sync" or carrying delta_bytes) route
@@ -64,11 +71,8 @@ def main(argv: list[str] | None = None) -> int:
     if args.spec and _is_sync_spec(args.spec):
         sync_spec = SyncSpec.from_json(args.spec)
         sync_report = evaluate_sync(sync_spec)
-        if args.loi:
-            print(render_conditional_loi(sync_spec, sync_report,
-                                         company=args.company, drafted_on=args.drafted_on))
-        else:
-            print(sync_report.to_json() if args.json else sync_report.to_markdown())
+        record = _live_record(args, sync_spec.name)
+        _emit(args, _render(args, sync_spec, sync_report, record))
         return 0 if sync_report.verdict == "CONVERGES" else 2
 
     spec = _build_spec(args)
@@ -79,13 +83,37 @@ def main(argv: list[str] | None = None) -> int:
         engine = measure_on_board(count, port=args.port)
 
     report = evaluate(spec, engine)
-    if args.loi:
-        print(render_conditional_loi(spec, report, company=args.company,
-                                     drafted_on=args.drafted_on, engine=engine))
-    else:
-        print(report.to_json() if args.json else report.to_markdown())
+    record = _live_record(args, spec.name)
+    _emit(args, _render(args, spec, report, record, engine=engine))
     # exit code: 0 = PASS/SURPASS, 2 = FAIL (so it's usable in CI / scripts)
     return 0 if report.verdict in ("PASS", "SURPASS") else 2
+
+
+def _live_record(args: argparse.Namespace, workload: str):
+    """A witnessed run record if requested (live board or recorded reference)."""
+    if args.live_run:
+        count = args.count or 65537
+        return run_live(workload, count, seed=args.seed, port=args.port)
+    if args.reference_run:
+        return reference_live_run(workload, seed=args.seed)
+    return None
+
+
+def _render(args, spec, report, record, *, engine=si.ENGINE) -> str:
+    if args.loi:
+        return render_conditional_loi(spec, report, company=args.company,
+                                      drafted_on=args.drafted_on, live_run=record, engine=engine)
+    if record is not None:
+        return record.to_json() if args.json else record.to_markdown()
+    return report.to_json() if args.json else report.to_markdown()
+
+
+def _emit(args: argparse.Namespace, text: str) -> None:
+    if args.out:
+        with open(args.out, "w") as fh:
+            fh.write(text + "\n")
+    else:
+        print(text)
 
 
 if __name__ == "__main__":

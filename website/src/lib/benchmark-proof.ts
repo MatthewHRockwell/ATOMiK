@@ -26,6 +26,73 @@ export const SILICON = {
   reproduce: "abench 65537 0xDEADBEEF0BADF00D",
 } as const;
 
+// The RECORDED reference run — the silicon-measured ladder behind every verdict.
+// Not a fresh run; the recorded 2026-06-21 measurement (mirrors silicon.py /
+// live_run.reference_live_run).  Used to make "800 M/s measured" concrete and
+// to back the LOI with witnessed evidence.
+export const REFERENCE_RUN = {
+  source: "recorded reference",
+  runOn: SILICON.measuredOn,
+  board: SILICON.board,
+  count: 65537,
+  seed: "0xDEADBEEF0BADF00D",
+  cycles: { 1: 65537, 2: 32769, 4: 16385, 8: 8193 } as Record<number, number>,
+  resultHex: SILICON.resultHex,
+  identical: SILICON.identicalAcrossBanks,
+  reproduce: SILICON.reproduce,
+} as const;
+
+export interface LadderRow {
+  banks: number;
+  cycles: number;
+  speedup: number; // truncated (1.99/3.99/7.99), honest about per-run overhead
+  throughput: number;
+}
+
+export function referenceLadder(): LadderRow[] {
+  const base = REFERENCE_RUN.cycles[1];
+  return Object.keys(REFERENCE_RUN.cycles)
+    .map(Number)
+    .sort((a, b) => a - b)
+    .map((banks) => {
+      const cycles = REFERENCE_RUN.cycles[banks];
+      return {
+        banks,
+        cycles,
+        speedup: Math.floor((base / cycles) * 100) / 100,
+        throughput: (REFERENCE_RUN.count * SILICON.clockHz) / cycles,
+      };
+    });
+}
+
+export interface LiveRunEvidence {
+  source: string;
+  runOn: string;
+  board: string;
+  peak: number;
+  perBank: number;
+  banks: number;
+  resultHex: string;
+  identical: boolean;
+  reproduce: string;
+}
+
+// The recorded reference, as LOI acceptance evidence.
+export function referenceRunEvidence(): LiveRunEvidence {
+  const base = REFERENCE_RUN.cycles[1];
+  return {
+    source: REFERENCE_RUN.source,
+    runOn: REFERENCE_RUN.runOn,
+    board: REFERENCE_RUN.board,
+    peak: (REFERENCE_RUN.count * SILICON.clockHz) / REFERENCE_RUN.cycles[8],
+    perBank: (REFERENCE_RUN.count * SILICON.clockHz) / base,
+    banks: 8,
+    resultHex: REFERENCE_RUN.resultHex,
+    identical: REFERENCE_RUN.identical,
+    reproduce: REFERENCE_RUN.reproduce,
+  };
+}
+
 // ATOMiK's engine accelerates exactly the aggregations that form an abelian
 // group — only then is the merged result provably order-independent.  The page
 // will NOT claim reorder-stable correctness for anything outside this set.
@@ -229,6 +296,7 @@ export function renderConditionalLOI(opts: {
   workload: string;
   company?: string;
   draftedOn?: string; // ISO date (browser-supplied); blank placeholder otherwise
+  liveRun?: LiveRunEvidence; // witnessed silicon backing (recorded reference or live)
   // aggregation
   aggregation?: string;
   requiredThroughput?: number;
@@ -306,7 +374,22 @@ export function renderConditionalLOI(opts: {
     ];
   }
 
+  const lr = opts.liveRun;
+  const witnessed = lr
+    ? [
+        "## 4a. Silicon backing — witnessed run",
+        `- Source: **${lr.source}** (${lr.runOn}) on ${lr.board}`,
+        `- Engine sustained **${eng(lr.peak)}** (${eng(lr.perBank)} per bank) at ${lr.banks} banks.`,
+        `- Merged result **${lr.resultHex}**, ${lr.identical ? "byte-identical" : "NOT identical"} across 1 / 2 / 4 / 8 banks — the order-independence proof.`,
+        `- Reproduce: \`${lr.reproduce}\``,
+        "",
+        "This run witnesses the engine ceiling and order-independence that back the bar. The acceptance test in Section 4 re-runs at the Counterparty's operator and scale.",
+        "",
+      ]
+    : [];
+
   const tail = [
+    ...witnessed,
     "## 5. Counterparty's conditional commitment",
     "Upon a PASS, the Counterparty intends in good faith to proceed to (select one):",
     "- [ ] Paid pilot / evaluation",

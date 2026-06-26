@@ -7,6 +7,7 @@ import {
   eng,
   evaluate,
   parseCarriedSpec,
+  referenceRunEvidence,
   renderConditionalLOI,
   type CarriedSpec,
 } from "@/lib/benchmark-proof";
@@ -229,6 +230,7 @@ export default function ContactPage() {
       workload: carried.workload || (carried.kind === "sync" ? "Replica-sync workload" : "Aggregation workload"),
       company: form.company,
       draftedOn: new Date().toISOString().slice(0, 10),
+      liveRun: referenceRunEvidence(),
       aggregation: carried.agg,
       requiredThroughput: carried.rate,
       requiresReorder: carried.reorder,

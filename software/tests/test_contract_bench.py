@@ -20,8 +20,11 @@ from atomik_sdk.contract_bench import (
     evaluate,
     evaluate_sync,
     is_abelian,
+    reference_live_run,
     render_conditional_loi,
 )
+from atomik_sdk.contract_bench.board import parse_abench
+from atomik_sdk.contract_bench.live_run import LiveRunRecord, _record
 
 
 class TestSilicon:
@@ -274,3 +277,59 @@ class TestConditionalLOI:
         spec, report = self._agg()
         with pytest.raises(TypeError):
             render_conditional_loi(REFERENCE_SYNC, report)
+
+
+class TestLiveRun:
+    """The witnessed live-run record — dated proof that backs the LOI."""
+
+    def test_reference_record_carries_the_recorded_measurement(self):
+        rec = reference_live_run("Distinct-count rollup")
+        assert rec.source == "recorded reference"
+        assert rec.run_on == ENGINE.measured_on  # 2026-06-21, not fabricated
+        assert rec.result_hex == "0x17e9fe29b5dc0aad"
+        assert rec.identical_across_banks
+        assert rec.peak_throughput == pytest.approx(800e6, rel=0.01)
+        assert rec.cycles == ENGINE.cycles
+
+    def test_record_renders_ladder_transcript_and_proof(self):
+        rec = reference_live_run("X")
+        md = rec.to_markdown()
+        assert "## Measured ladder" in md
+        assert "7.99x" in md            # honest per-run overhead, not 8.00
+        assert "ALL MATCH" in md
+        assert "0x17e9fe29b5dc0aad" in md
+        assert "Raw transcript" in md
+        assert "abench 65537" in md
+
+    def test_record_from_live_transcript_parses_to_record(self):
+        # a record built from an actual abench transcript (parser fixture)
+        m = parse_abench(TestBoardParse.SAMPLE, count=50_000_000)
+        rec = _record("Live workload", m, source="live (on-call)",
+                      run_on="live", seed="0xdeadbeef0badf00d", transcript=TestBoardParse.SAMPLE)
+        assert rec.source == "live (on-call)"
+        assert rec.result_hex == "0x0badf00ddeadbeef"
+        assert rec.transcript == TestBoardParse.SAMPLE
+        assert "VERIFY: ALL MATCH" in rec.to_markdown()
+
+    def test_record_json_roundtrips(self):
+        import json
+        d = json.loads(reference_live_run("X").to_json())
+        assert d["identical_across_banks"] is True
+        assert d["cycles"]["8"] == 8193
+
+    def test_loi_embeds_witnessed_run(self):
+        spec = WorkloadSpec(name="Rollup", aggregation="sum", required_throughput=50e6)
+        rec = reference_live_run(spec.name)
+        loi = render_conditional_loi(spec, evaluate(spec), live_run=rec)
+        assert "Silicon backing — witnessed run" in loi
+        assert "recorded reference" in loi
+        assert "0x17e9fe29b5dc0aad" in loi
+        assert "re-runs at the Counterparty's operator and scale" in loi
+
+    def test_loi_without_run_has_no_witnessed_section(self):
+        spec, report = TestConditionalLOI()._agg()
+        assert "Silicon backing — witnessed run" not in render_conditional_loi(spec, report)
+
+    def test_record_dataclass_shape(self):
+        rec = reference_live_run("X")
+        assert isinstance(rec, LiveRunRecord)

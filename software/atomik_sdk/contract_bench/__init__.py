@@ -16,6 +16,7 @@ atomik.tech).
 from __future__ import annotations
 
 from .harness import evaluate
+from .live_run import LiveRunRecord, reference_live_run, run_live
 from .loi import render_conditional_loi
 from .report import BenchmarkReport, Gate
 from .silicon import ABELIAN_AGGREGATIONS, ENGINE, SiliconMeasurement, is_abelian
@@ -38,4 +39,8 @@ __all__ = [
     "REFERENCE_SYNC",
     # conditional LOI instrument
     "render_conditional_loi",
+    # witnessed live-run record
+    "LiveRunRecord",
+    "reference_live_run",
+    "run_live",
 ]

@@ -17,6 +17,7 @@ commit (no LOI is manufactured for a workload that doesn't pass).
 from __future__ import annotations
 
 from . import silicon as si
+from .live_run import LiveRunRecord
 from .report import BenchmarkReport, _eng
 from .spec import WorkloadSpec
 from .sync import SyncReport, SyncSpec
@@ -30,6 +31,7 @@ def render_conditional_loi(
     *,
     company: str = "",
     drafted_on: str = "____-__-__",
+    live_run: LiveRunRecord | None = None,
     engine: si.SiliconMeasurement = si.ENGINE,
 ) -> str:
     counterparty = company.strip() if company.strip() else _BLANK
@@ -60,7 +62,25 @@ def render_conditional_loi(
     else:
         raise TypeError("spec and report must both be aggregation or both sync")
 
+    witnessed: list[str] = []
+    if live_run is not None:
+        witnessed = [
+            "## 4a. Silicon backing — witnessed run",
+            f"- Source: **{live_run.source}** ({live_run.run_on}) on {live_run.board}",
+            f"- Engine sustained **{_eng(live_run.peak_throughput)}** "
+            f"({_eng(live_run.per_bank_throughput)} per bank) at {live_run.n_banks} banks.",
+            f"- Merged result **{live_run.result_hex}**, "
+            f"{'byte-identical' if live_run.identical_across_banks else 'NOT identical'} "
+            "across 1 / 2 / 4 / 8 banks — the order-independence proof.",
+            f"- Reproduce: `{live_run.reproduce}`",
+            "",
+            "This run witnesses the engine ceiling and order-independence that back the bar. "
+            "The acceptance test in Section 4 re-runs at the Counterparty's operator and scale.",
+            "",
+        ]
+
     tail = [
+        *witnessed,
         "## 5. Counterparty's conditional commitment",
         "Upon a PASS, the Counterparty intends in good faith to proceed to (select one):",
         "- [ ] Paid pilot / evaluation",

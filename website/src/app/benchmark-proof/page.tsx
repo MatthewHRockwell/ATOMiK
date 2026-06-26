@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
+import { REFERENCE_RUN, eng, referenceLadder } from "@/lib/benchmark-proof";
 import BenchmarkProver from "./BenchmarkProver";
 
 export const metadata: Metadata = {
@@ -64,6 +65,8 @@ export default function BenchmarkProofPage() {
           <BenchmarkProver />
         </div>
 
+        <ReferenceRunPanel />
+
         <div
           style={{
             marginTop: 36,
@@ -95,7 +98,7 @@ export default function BenchmarkProofPage() {
               proof &amp; benchmarks
             </Link>{" "}
             packet, or{" "}
-            <Link href="/contact?topic=live-benchmark" style={{ color: c.cyan }}>
+            <Link href="/contact?intent=live-benchmark" style={{ color: c.cyan }}>
               ask us to run your workload live on the board
             </Link>
             .
@@ -104,5 +107,54 @@ export default function BenchmarkProofPage() {
       </section>
       <Footer />
     </main>
+  );
+}
+
+function ReferenceRunPanel() {
+  const rows = referenceLadder();
+  const th = { textAlign: "right" as const, padding: "6px 10px", color: c.faint, fontWeight: 600, fontSize: 12, textTransform: "uppercase" as const, letterSpacing: 0.4 };
+  const td = { textAlign: "right" as const, padding: "7px 10px", color: c.text, fontSize: 14, fontVariantNumeric: "tabular-nums" as const };
+  return (
+    <div style={{ marginTop: 28, border: `1px solid ${c.border}`, borderRadius: 14, padding: 22, background: "#0c0f0c" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", flexWrap: "wrap", gap: 10 }}>
+        <h2 style={{ fontSize: 18, fontWeight: 700, margin: 0 }}>Recorded reference run</h2>
+        <span style={{ color: c.green, fontSize: 12, letterSpacing: 0.4 }}>
+          {REFERENCE_RUN.source} · {REFERENCE_RUN.runOn}
+        </span>
+      </div>
+      <p style={{ color: c.muted, fontSize: 14, lineHeight: 1.55, margin: "8px 0 14px", maxWidth: 720 }}>
+        The verdict above isn&apos;t a projection — it&apos;s read off this measured ladder.{" "}
+        <code style={{ color: c.cyan }}>{REFERENCE_RUN.reproduce}</code> on the {REFERENCE_RUN.board}.
+        Your workload gets its own dated run on request.
+      </p>
+      <div style={{ overflowX: "auto" }}>
+        <table style={{ borderCollapse: "collapse", width: "100%", maxWidth: 560 }}>
+          <thead>
+            <tr style={{ borderBottom: `1px solid ${c.border}` }}>
+              <th style={{ ...th, textAlign: "left" }}>banks</th>
+              <th style={th}>hw cycles</th>
+              <th style={th}>speedup</th>
+              <th style={th}>throughput</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((r) => (
+              <tr key={r.banks} style={{ borderBottom: `1px solid #1a201a` }}>
+                <td style={{ ...td, textAlign: "left", color: c.muted }}>{r.banks}</td>
+                <td style={td}>{r.cycles.toLocaleString()}</td>
+                <td style={td}>{r.speedup.toFixed(2)}×</td>
+                <td style={{ ...td, color: c.green }}>{eng(r.throughput)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p style={{ color: c.faint, fontSize: 12.5, marginTop: 12, lineHeight: 1.5 }}>
+        Merged result <code style={{ color: c.muted }}>{REFERENCE_RUN.resultHex}</code> —{" "}
+        {REFERENCE_RUN.identical ? "byte-identical" : "NOT identical"} across 1 / 2 / 4 / 8 banks. That
+        invariance under re-partition is the order-independence proof; the speedups truncate
+        (1.99/3.99/7.99) to show real per-run overhead.
+      </p>
+    </div>
   );
 }

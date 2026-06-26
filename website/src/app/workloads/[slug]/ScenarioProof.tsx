@@ -5,6 +5,7 @@ import {
   eng,
   evaluate,
   loiHref,
+  referenceRunEvidence,
   renderConditionalLOI,
   renderReportMarkdown,
   renderSyncReportMarkdown,
@@ -137,6 +138,7 @@ function AggregationProof({ scenario }: { scenario: Scenario }) {
               aggregation: scenario.aggregation!,
               requiredThroughput: scenario.requiredThroughput!,
               requiresReorder: scenario.requiresReorderStability ?? true,
+              liveRun: referenceRunEvidence(),
             }),
             `atomik-conditional-loi-${scenario.slug}.md`,
           )
@@ -200,6 +202,7 @@ function SyncProof({ scenario }: { scenario: Scenario }) {
               fullStateBytes: s.fullStateBytes,
               deltaBytes: s.deltaBytes,
               changeDensity: s.changeDensity,
+              liveRun: referenceRunEvidence(),
             }),
             `atomik-conditional-loi-${scenario.slug}.md`,
           )

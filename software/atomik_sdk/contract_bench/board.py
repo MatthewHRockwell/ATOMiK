@@ -61,7 +61,7 @@ def parse_abench(out: str, count: int, clock_hz: int = 100_000_000) -> SiliconMe
     )
 
 
-def measure_on_board(
+def measure_on_board_raw(
     count: int,
     *,
     seed: str = DEFAULT_SEED,
@@ -69,8 +69,13 @@ def measure_on_board(
     clock_hz: int = 100_000_000,
     pause_aos: bool = True,
     timeout: float = 45.0,
-) -> SiliconMeasurement:
-    """Run `abench <count> <seed>` on the connected board and return its measurement."""
+) -> tuple[SiliconMeasurement, str]:
+    """Run abench on the board; return (measurement, raw console transcript).
+
+    The transcript is what makes a live run *witnessable* — it goes verbatim into
+    the LiveRunRecord so a prospect sees the actual abench output, not just a
+    parsed number.
+    """
     import serial  # optional: only needed for live runs
 
     s = serial.Serial(port, 115200, timeout=2)
@@ -101,4 +106,20 @@ def measure_on_board(
             except Exception:
                 pass
         s.close()
-    return parse_abench(buf, count, clock_hz)
+    return parse_abench(buf, count, clock_hz), buf
+
+
+def measure_on_board(
+    count: int,
+    *,
+    seed: str = DEFAULT_SEED,
+    port: str = "/dev/ttyUSB2",
+    clock_hz: int = 100_000_000,
+    pause_aos: bool = True,
+    timeout: float = 45.0,
+) -> SiliconMeasurement:
+    """Run `abench <count> <seed>` on the connected board and return its measurement."""
+    measurement, _ = measure_on_board_raw(
+        count, seed=seed, port=port, clock_hz=clock_hz, pause_aos=pause_aos, timeout=timeout
+    )
+    return measurement

@@ -9,6 +9,7 @@ import {
   eng,
   evaluate,
   loiHref,
+  referenceRunEvidence,
   renderConditionalLOI,
 } from "@/lib/benchmark-proof";
 
@@ -214,6 +215,7 @@ export default function BenchmarkProver() {
                     aggregation: agg,
                     requiredThroughput: required,
                     requiresReorder: reorder,
+                    liveRun: referenceRunEvidence(),
                   }),
                   "atomik-conditional-loi-draft.md",
                 )
