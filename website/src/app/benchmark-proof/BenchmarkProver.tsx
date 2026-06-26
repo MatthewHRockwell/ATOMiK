@@ -9,7 +9,18 @@ import {
   eng,
   evaluate,
   loiHref,
+  renderConditionalLOI,
 } from "@/lib/benchmark-proof";
+
+function downloadMarkdown(md: string, name: string) {
+  const blob = new Blob([md], { type: "text/markdown" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = name;
+  a.click();
+  URL.revokeObjectURL(url);
+}
 
 const c = {
   bg: "#070807",
@@ -177,22 +188,51 @@ export default function BenchmarkProver() {
           <code style={{ color: c.muted }}>{SILICON.reproduce}</code>.
         </p>
 
-        <a
-          href={loiHref({ kind: "aggregation", agg, rate: required, reorder })}
-          style={{
-            display: "inline-block",
-            marginTop: 16,
-            background: verdictColor,
-            color: c.bg,
-            fontWeight: 700,
-            fontSize: 14,
-            padding: "10px 18px",
-            borderRadius: 8,
-            textDecoration: "none",
-          }}
-        >
-          Request a live on-silicon run + conditional LOI on this bar →
-        </a>
+        <div style={{ display: "flex", gap: 12, marginTop: 16, flexWrap: "wrap" }}>
+          <a
+            href={loiHref({ kind: "aggregation", agg, rate: required, reorder })}
+            style={{
+              display: "inline-block",
+              background: verdictColor,
+              color: c.bg,
+              fontWeight: 700,
+              fontSize: 14,
+              padding: "10px 18px",
+              borderRadius: 8,
+              textDecoration: "none",
+            }}
+          >
+            Request a live on-silicon run + conditional LOI on this bar →
+          </a>
+          {r.verdict !== "FAIL" && (
+            <button
+              onClick={() =>
+                downloadMarkdown(
+                  renderConditionalLOI({
+                    kind: "aggregation",
+                    workload: "My aggregation workload",
+                    aggregation: agg,
+                    requiredThroughput: required,
+                    requiresReorder: reorder,
+                  }),
+                  "atomik-conditional-loi-draft.md",
+                )
+              }
+              style={{
+                background: "transparent",
+                color: c.text,
+                fontWeight: 600,
+                fontSize: 14,
+                padding: "10px 18px",
+                borderRadius: 8,
+                border: `1px solid ${c.border}`,
+                cursor: "pointer",
+              }}
+            >
+              Download conditional LOI (draft)
+            </button>
+          )}
+        </div>
         <p style={{ color: c.faint, fontSize: 12, marginTop: 8, lineHeight: 1.5 }}>
           Carries this exact spec — {agg} at {eng(required)}
           {reorder ? ", reorder-stable" : ""} — into the request, with the verdict

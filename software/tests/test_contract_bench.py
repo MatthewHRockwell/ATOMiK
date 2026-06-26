@@ -20,6 +20,7 @@ from atomik_sdk.contract_bench import (
     evaluate,
     evaluate_sync,
     is_abelian,
+    render_conditional_loi,
 )
 
 
@@ -219,3 +220,57 @@ class TestSync:
             r = evaluate_sync(SyncSpec.from_json(exdir / name))
             assert r.verdict == "CONVERGES", name
             assert r.reduction_pct == 92, name
+
+
+class TestConditionalLOI:
+    """The Conditional LOI instrument — the part a prospect counter-signs."""
+
+    def _agg(self, agg="sum", rate=50e6):
+        spec = WorkloadSpec(name="Rollup", aggregation=agg, required_throughput=rate,
+                            customer="Acme")
+        return spec, evaluate(spec)
+
+    def test_passing_aggregation_states_a_commitment(self):
+        spec, report = self._agg()
+        loi = render_conditional_loi(spec, report, company="Acme Corp", drafted_on="2026-06-25")
+        assert "Conditional Letter of Intent (DRAFT)" in loi
+        assert "ATOMiK commits that the parallel-bank" in loi
+        assert ">= 50 M/s" in loi
+        assert "Acme Corp" in loi          # counterparty named
+        assert "2026-06-25" in loi
+        assert "## 8. Signatures" in loi
+        assert "Acceptance test" in loi
+
+    def test_failing_aggregation_refuses_to_commit(self):
+        # non-abelian operator -> the bar section must say ATOMiK does NOT commit
+        spec, report = self._agg(agg="median")
+        assert report.verdict == "FAIL"
+        loi = render_conditional_loi(spec, report)
+        assert "does **NOT** commit" in loi
+        assert "ATOMiK commits that the parallel-bank" not in loi
+
+    def test_blank_company_leaves_a_signature_blank(self):
+        spec, report = self._agg()
+        loi = render_conditional_loi(spec, report)
+        assert "________________________" in loi  # unnamed counterparty placeholder
+
+    def test_scope_limitations_are_present(self):
+        # the honesty guardrails must travel with the instrument
+        spec, report = self._agg()
+        loi = render_conditional_loi(spec, report)
+        assert "only to abelian operators" in loi
+        assert "not end-to-end system throughput" in loi
+        assert "non-binding" in loi
+
+    def test_sync_loi_commits_to_convergence_and_bandwidth(self):
+        report = evaluate_sync(REFERENCE_SYNC)
+        loi = render_conditional_loi(REFERENCE_SYNC, report, company="Edge Co")
+        assert "converge to byte-identical state with no coordinator" in loi
+        assert "160 B vs 2048 B" in loi
+        assert "~92% less" in loi
+        assert "Edge Co" in loi
+
+    def test_mismatched_spec_and_report_raise(self):
+        spec, report = self._agg()
+        with pytest.raises(TypeError):
+            render_conditional_loi(REFERENCE_SYNC, report)

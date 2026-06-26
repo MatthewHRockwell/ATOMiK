@@ -7,6 +7,7 @@ import {
   eng,
   evaluate,
   parseCarriedSpec,
+  renderConditionalLOI,
   type CarriedSpec,
 } from "@/lib/benchmark-proof";
 
@@ -117,6 +118,7 @@ interface ProofView {
   verdict: string;
   color: keyof typeof VERDICT_COLOR;
   workload: string;
+  passing: boolean; // gates whether a conditional LOI is offered
   lines: { label: string; value: string }[];
   summary: string; // multi-line, prefills the "Use case or workload" field
   interests: string[];
@@ -159,6 +161,7 @@ function buildProofView(spec: CarriedSpec): ProofView {
       verdict: r.verdict,
       color,
       workload,
+      passing: r.verdict !== "FAIL",
       lines,
       summary,
       interests: [`verdict:${r.verdict}`, `op:${spec.agg}`, `rate:${eng(spec.rate ?? 0)}`],
@@ -194,6 +197,7 @@ function buildProofView(spec: CarriedSpec): ProofView {
     verdict,
     color: converges ? "green" : "amber",
     workload,
+    passing: converges,
     lines,
     summary,
     interests: [`verdict:${verdict}`, `reduction:${pct}%`],
@@ -216,6 +220,29 @@ export default function ContactPage() {
   });
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [proof, setProof] = useState<ProofView | null>(null);
+  const [carried, setCarried] = useState<CarriedSpec | null>(null);
+
+  function downloadLOI() {
+    if (!carried) return;
+    const md = renderConditionalLOI({
+      kind: carried.kind,
+      workload: carried.workload || (carried.kind === "sync" ? "Replica-sync workload" : "Aggregation workload"),
+      company: form.company,
+      draftedOn: new Date().toISOString().slice(0, 10),
+      aggregation: carried.agg,
+      requiredThroughput: carried.rate,
+      requiresReorder: carried.reorder,
+      fullStateBytes: carried.fullStateBytes,
+      deltaBytes: carried.deltaBytes,
+    });
+    const blob = new Blob([md], { type: "text/markdown" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "atomik-conditional-loi-draft.md";
+    a.click();
+    URL.revokeObjectURL(url);
+  }
 
   // Pick up a spec carried from the benchmark tool / workload catalog: recompute
   // the verdict, show it, and prefill the workload field so the lead arrives
@@ -226,6 +253,7 @@ export default function ContactPage() {
     const view = buildProofView(spec);
     const timeout = window.setTimeout(() => {
       setProof(view);
+      setCarried(spec);
       setForm((current) => ({
         ...current,
         requestType: "Request Live Benchmark (conditional LOI)",
@@ -379,6 +407,26 @@ export default function ContactPage() {
               on-silicon run; you commit to the next step if it holds. The spec is prefilled below —
               edit anything before sending.
             </p>
+            {proof.passing ? (
+              <div className="mt-4 flex flex-wrap items-center gap-3">
+                <button
+                  type="button"
+                  onClick={downloadLOI}
+                  className="min-h-11 rounded-lg px-4 py-2.5 text-sm font-semibold"
+                  style={{ background: VERDICT_COLOR[proof.color], color: "#070b12" }}
+                >
+                  Download conditional LOI (draft)
+                </button>
+                <span className="text-xs" style={{ color: "#7f8b81" }}>
+                  A counter-signable draft built from this spec — fill Company above to name it.
+                </span>
+              </div>
+            ) : (
+              <p className="mt-4 text-xs leading-5" style={{ color: VERDICT_COLOR.amber }}>
+                This spec doesn&apos;t meet the bar, so no LOI is offered — submit it and we&apos;ll
+                discuss an honest re-scope.
+              </p>
+            )}
           </div>
         )}
         {status === "sent" ? (

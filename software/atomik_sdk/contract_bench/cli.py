@@ -14,6 +14,7 @@ import sys
 
 from . import silicon as si
 from .harness import evaluate
+from .loi import render_conditional_loi
 from .spec import WorkloadSpec
 from .sync import SyncSpec, evaluate_sync
 
@@ -52,14 +53,23 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--count", type=int,
                    help="delta count for the live run (default: events_per_window or 65537)")
     p.add_argument("--port", default="/dev/ttyUSB2", help="board serial port")
+    p.add_argument("--loi", action="store_true",
+                   help="emit a Conditional LOI (draft) instead of the proof report")
+    p.add_argument("--company", default="", help="counterparty name for the LOI")
+    p.add_argument("--drafted-on", default="____-__-__", help="LOI draft date (YYYY-MM-DD)")
     args = p.parse_args(argv)
 
     # sync / replica-convergence specs (kind:"sync" or carrying delta_bytes) route
     # to the sync evaluator — a different archetype class, different gates.
     if args.spec and _is_sync_spec(args.spec):
-        report = evaluate_sync(SyncSpec.from_json(args.spec))
-        print(report.to_json() if args.json else report.to_markdown())
-        return 0 if report.verdict == "CONVERGES" else 2
+        sync_spec = SyncSpec.from_json(args.spec)
+        sync_report = evaluate_sync(sync_spec)
+        if args.loi:
+            print(render_conditional_loi(sync_spec, sync_report,
+                                         company=args.company, drafted_on=args.drafted_on))
+        else:
+            print(sync_report.to_json() if args.json else sync_report.to_markdown())
+        return 0 if sync_report.verdict == "CONVERGES" else 2
 
     spec = _build_spec(args)
     engine = si.ENGINE
@@ -69,7 +79,11 @@ def main(argv: list[str] | None = None) -> int:
         engine = measure_on_board(count, port=args.port)
 
     report = evaluate(spec, engine)
-    print(report.to_json() if args.json else report.to_markdown())
+    if args.loi:
+        print(render_conditional_loi(spec, report, company=args.company,
+                                     drafted_on=args.drafted_on, engine=engine))
+    else:
+        print(report.to_json() if args.json else report.to_markdown())
     # exit code: 0 = PASS/SURPASS, 2 = FAIL (so it's usable in CI / scripts)
     return 0 if report.verdict in ("PASS", "SURPASS") else 2
 

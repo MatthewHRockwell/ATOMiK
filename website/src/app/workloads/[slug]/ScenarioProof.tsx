@@ -5,6 +5,7 @@ import {
   eng,
   evaluate,
   loiHref,
+  renderConditionalLOI,
   renderReportMarkdown,
   renderSyncReportMarkdown,
   SILICON,
@@ -45,7 +46,17 @@ function shell(vc: string): CSSProperties {
   return { background: c.panel, border: `1px solid ${vc}`, borderRadius: 14, padding: 22 };
 }
 
-function CTA({ href, vc, onDownload }: { href: string; vc: string; onDownload: () => void }) {
+function CTA({
+  href,
+  vc,
+  onDownload,
+  onDownloadLOI,
+}: {
+  href: string;
+  vc: string;
+  onDownload: () => void;
+  onDownloadLOI: () => void;
+}) {
   return (
     <div style={{ display: "flex", gap: 12, marginTop: 18, flexWrap: "wrap" }}>
       <a
@@ -55,8 +66,14 @@ function CTA({ href, vc, onDownload }: { href: string; vc: string; onDownload: (
         Run this on our silicon → sign conditional on your bar
       </a>
       <button
+        onClick={onDownloadLOI}
+        style={{ background: "transparent", color: c.text, fontWeight: 600, fontSize: 14, padding: "11px 18px", borderRadius: 8, border: `1px solid ${vc}`, cursor: "pointer" }}
+      >
+        Download conditional LOI (draft)
+      </button>
+      <button
         onClick={onDownload}
-        style={{ background: "transparent", color: c.text, fontWeight: 600, fontSize: 14, padding: "11px 18px", borderRadius: 8, border: `1px solid ${c.border}`, cursor: "pointer" }}
+        style={{ background: "transparent", color: c.muted, fontWeight: 600, fontSize: 14, padding: "11px 18px", borderRadius: 8, border: `1px solid ${c.border}`, cursor: "pointer" }}
       >
         Download the proof report
       </button>
@@ -112,6 +129,18 @@ function AggregationProof({ scenario }: { scenario: Scenario }) {
         })}
         vc={vc}
         onDownload={onDownload}
+        onDownloadLOI={() =>
+          download(
+            renderConditionalLOI({
+              kind: "aggregation",
+              workload: scenario.name,
+              aggregation: scenario.aggregation!,
+              requiredThroughput: scenario.requiredThroughput!,
+              requiresReorder: scenario.requiresReorderStability ?? true,
+            }),
+            `atomik-conditional-loi-${scenario.slug}.md`,
+          )
+        }
       />
     </div>
   );
@@ -163,6 +192,18 @@ function SyncProof({ scenario }: { scenario: Scenario }) {
         })}
         vc={vc}
         onDownload={onDownload}
+        onDownloadLOI={() =>
+          download(
+            renderConditionalLOI({
+              kind: "sync",
+              workload: scenario.name,
+              fullStateBytes: s.fullStateBytes,
+              deltaBytes: s.deltaBytes,
+              changeDensity: s.changeDensity,
+            }),
+            `atomik-conditional-loi-${scenario.slug}.md`,
+          )
+        }
       />
     </div>
   );

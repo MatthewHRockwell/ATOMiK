@@ -16,6 +16,7 @@ atomik.tech).
 from __future__ import annotations
 
 from .harness import evaluate
+from .loi import render_conditional_loi
 from .report import BenchmarkReport, Gate
 from .silicon import ABELIAN_AGGREGATIONS, ENGINE, SiliconMeasurement, is_abelian
 from .spec import WorkloadSpec
@@ -35,4 +36,6 @@ __all__ = [
     "SyncReport",
     "evaluate_sync",
     "REFERENCE_SYNC",
+    # conditional LOI instrument
+    "render_conditional_loi",
 ]

@@ -210,6 +210,134 @@ export function renderSyncReportMarkdown(opts: {
 }
 
 // ---------------------------------------------------------------------------
+// The Conditional LOI — the instrument the buyer counter-signs.  It embeds the
+// proof and the bar, states the acceptance test, and leaves blanks for the
+// legal specifics.  It is offered ONLY for a passing verdict; on a FAIL the bar
+// section states honestly that ATOMiK does not commit.
+// ---------------------------------------------------------------------------
+export function loiPasses(spec: CarriedSpec): boolean {
+  if (spec.kind === "aggregation") {
+    return evaluate(spec.agg ?? "", spec.rate ?? 0, spec.reorder ?? true).verdict !== "FAIL";
+  }
+  const full = spec.fullStateBytes ?? 0;
+  const delta = spec.deltaBytes ?? 0;
+  return delta > 0 && delta < full;
+}
+
+export function renderConditionalLOI(opts: {
+  kind: "aggregation" | "sync";
+  workload: string;
+  company?: string;
+  draftedOn?: string; // ISO date (browser-supplied); blank placeholder otherwise
+  // aggregation
+  aggregation?: string;
+  requiredThroughput?: number;
+  requiresReorder?: boolean;
+  // sync
+  fullStateBytes?: number;
+  deltaBytes?: number;
+  changeDensity?: string;
+}): string {
+  const drafted = opts.draftedOn || "____-__-__";
+  const counterparty = opts.company?.trim() || "________________________";
+  const head = [
+    "# ATOMiK — Conditional Letter of Intent (DRAFT)",
+    "",
+    "**This is a non-binding draft for discussion.** Binding terms require a mutually executed agreement, and any proprietary workload data requires an NDA and an agreed evaluation scope.",
+    "",
+    `- **Drafted:** ${drafted}`,
+    `- **Between:** Rockwell Intelligence (\"ATOMiK\") and **${counterparty}** (\"Counterparty\")`,
+    `- **Workload:** ${opts.workload}`,
+    "",
+    "## 1. Purpose",
+    "This letter records a conditional commitment: if ATOMiK demonstrates the bar in Section 3 on a live run of the Counterparty's workload on ATOMiK silicon (Section 4), the Counterparty intends to proceed to the next step in Section 5.",
+    "",
+  ];
+
+  let body: string[];
+  if (opts.kind === "aggregation") {
+    const r = evaluate(opts.aggregation ?? "sum", opts.requiredThroughput ?? 0, opts.requiresReorder ?? true);
+    const commits = r.verdict !== "FAIL";
+    body = [
+      "## 2. The workload",
+      `- Aggregation operator: **${opts.aggregation}**${r.abelian ? " (abelian — order-independent)" : " (order-dependent)"}`,
+      `- Required throughput to commit: **${eng(opts.requiredThroughput ?? 0)}**`,
+      `- Correctness requirement: **${opts.requiresReorder ? "byte-identical regardless of arrival order / parallelism" : "exact result"}**`,
+      "",
+      "## 3. ATOMiK's commitment (the bar)",
+      commits
+        ? `ATOMiK commits that the parallel-bank delta-state accumulator will sustain **>= ${eng(opts.requiredThroughput ?? 0)}** at **byte-identical correctness across 1 / 2 / 4 / 8 banks** for the **${opts.aggregation}** aggregation, on the ${SILICON.board} at ${(SILICON.clockHz / 1e6).toFixed(0)} MHz.`
+        : `On the current spec ATOMiK does **NOT** commit: '${opts.aggregation}' is outside the order-independent (abelian) class, so ATOMiK will not claim reorder-stable correctness for it. Re-scope the operator or drop the reorder requirement to proceed.`,
+      "",
+      `- Site-computed verdict vs the measured engine: **${r.verdict}**${r.throughputPass ? ` — ${r.margin.toFixed(1)}x headroom (${r.minBanks} of ${r.banksAvailable} banks).` : "."}`,
+      `- Measured engine ceiling: **${eng(r.peakThroughput)}** across ${r.banksAvailable} banks (${eng(r.perBankThroughput)} per bank).`,
+      "",
+      "## 4. Acceptance test",
+      "A PASS is a live on-silicon run at the Counterparty's scale where BOTH hold:",
+      "1. **Throughput:** sustained accumulation rate >= the required throughput in Section 3.",
+      "2. **Correctness:** the merged result is byte-identical across 1 / 2 / 4 / 8 banks (the order-independence proof).",
+      "",
+      `Witness / reproduce the reference run: \`${SILICON.reproduce}\`. The Counterparty's run uses their operator and scale.`,
+      "",
+    ];
+  } else {
+    const full = opts.fullStateBytes ?? 0;
+    const delta = opts.deltaBytes ?? 0;
+    const pct = full > 0 ? Math.round((1 - delta / full) * 100) : 0;
+    const commits = delta > 0 && delta < full;
+    body = [
+      "## 2. The workload",
+      "- Pattern: replica / state convergence by delta exchange",
+      `- Conventional full-state sync: **${full} B/tick**`,
+      `- ATOMiK delta sync: **${delta} B/tick**${opts.changeDensity ? ` at ${opts.changeDensity}` : ""}`,
+      "",
+      "## 3. ATOMiK's commitment (the bar)",
+      commits
+        ? `ATOMiK commits that replicas exchanging delta-state **converge to byte-identical state with no coordinator or consensus** — any node, any order, after any partition (the same order-independence proven on silicon) — and that a sync tick moves **${delta} B vs ${full} B** of full state (**~${pct}% less**)${opts.changeDensity ? ` at ${opts.changeDensity}` : ""}.`
+        : `On the current spec ATOMiK does **NOT** commit a bandwidth reduction: the stated delta (${delta} B) is not smaller than full state (${full} B). Re-scope the change density to proceed.`,
+      "",
+      "## 4. Acceptance test",
+      "A PASS is a live on-silicon run where BOTH hold:",
+      "1. **Convergence:** replicas merge to a byte-identical result regardless of delta order / partition.",
+      "2. **Data moved:** the delta tick is materially smaller than full-state sync at the Counterparty's change density.",
+      "",
+      `Witness / reproduce the order-independence: \`${SILICON.reproduce}\`.`,
+      "",
+    ];
+  }
+
+  const tail = [
+    "## 5. Counterparty's conditional commitment",
+    "Upon a PASS, the Counterparty intends in good faith to proceed to (select one):",
+    "- [ ] Paid pilot / evaluation",
+    "- [ ] Design-partner LOI",
+    "- [ ] Purchase order / commercial terms",
+    "",
+    "within **____ days** of the acceptance test.",
+    "",
+    "## 6. Scope & limitations (read before signing)",
+    "- The throughput commitment covers the **engine's accumulation / merge step measured on silicon**, not end-to-end system throughput, which depends on the Counterparty's ingest path.",
+    "- The correctness / order-independence guarantee applies **only to abelian operators**. For order-dependent operators ATOMiK makes no reorder-stable claim.",
+    "- Any sync bandwidth figure **scales with change density** and is not a universal multiplier.",
+    "- This draft is **non-binding**; binding terms require a mutually executed agreement.",
+    "",
+    "## 7. Provenance",
+    `- Engine: ${SILICON.engine}`,
+    `- Measured: ${SILICON.measuredOn} on ${SILICON.board}`,
+    `- Byte-identical result hash across banks: ${SILICON.resultHex}`,
+    `- Reproduce: ${SILICON.reproduce}`,
+    "",
+    "## 8. Signatures",
+    "",
+    "ATOMiK / Rockwell Intelligence — Matthew Rockwell   ____________________   Date ________",
+    "",
+    `${counterparty} — ____________________   Date ________`,
+  ];
+
+  return [...head, ...body, ...tail].join("\n");
+}
+
+// ---------------------------------------------------------------------------
 // Carry layer — moves a computed proof from the benchmark tool / catalog into
 // the contact intake so the lead arrives spec'd, not as free-text prose.  The
 // contact page RE-COMPUTES the verdict from these facts (it never trusts a
