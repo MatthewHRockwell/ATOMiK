@@ -4,6 +4,7 @@ import type { CSSProperties } from "react";
 import {
   eng,
   evaluate,
+  loiHref,
   renderReportMarkdown,
   renderSyncReportMarkdown,
   SILICON,
@@ -44,11 +45,11 @@ function shell(vc: string): CSSProperties {
   return { background: c.panel, border: `1px solid ${vc}`, borderRadius: 14, padding: 22 };
 }
 
-function CTA({ slug, vc, onDownload }: { slug: string; vc: string; onDownload: () => void }) {
+function CTA({ href, vc, onDownload }: { href: string; vc: string; onDownload: () => void }) {
   return (
     <div style={{ display: "flex", gap: 12, marginTop: 18, flexWrap: "wrap" }}>
       <a
-        href={`/contact?topic=live-benchmark&workload=${slug}`}
+        href={href}
         style={{ background: vc, color: c.bg, fontWeight: 700, fontSize: 14, padding: "11px 18px", borderRadius: 8, textDecoration: "none" }}
       >
         Run this on our silicon → sign conditional on your bar
@@ -101,7 +102,17 @@ function AggregationProof({ scenario }: { scenario: Scenario }) {
         accumulation rate (the aggregation step); end-to-end depends on your ingest path, which
         ATOMiK&apos;s order-independence frees from global ordering / locks.
       </Provenance>
-      <CTA slug={scenario.slug} vc={vc} onDownload={onDownload} />
+      <CTA
+        href={loiHref({
+          kind: "aggregation",
+          workload: scenario.name,
+          agg: scenario.aggregation!,
+          rate: scenario.requiredThroughput!,
+          reorder: scenario.requiresReorderStability ?? true,
+        })}
+        vc={vc}
+        onDownload={onDownload}
+      />
     </div>
   );
 }
@@ -143,7 +154,16 @@ function SyncProof({ scenario }: { scenario: Scenario }) {
         {s.measuredNote} Convergence is the same order-independence proven on the AX7020
         ({SILICON.measuredOn}); reproduce with <code style={{ color: c.muted }}>{SILICON.reproduce}</code>.
       </Provenance>
-      <CTA slug={scenario.slug} vc={vc} onDownload={onDownload} />
+      <CTA
+        href={loiHref({
+          kind: "sync",
+          workload: scenario.name,
+          fullStateBytes: s.fullStateBytes,
+          deltaBytes: s.deltaBytes,
+        })}
+        vc={vc}
+        onDownload={onDownload}
+      />
     </div>
   );
 }

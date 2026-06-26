@@ -8,6 +8,7 @@ import {
   SILICON,
   eng,
   evaluate,
+  loiHref,
 } from "@/lib/benchmark-proof";
 
 const c = {
@@ -177,7 +178,7 @@ export default function BenchmarkProver() {
         </p>
 
         <a
-          href="/contact?topic=live-benchmark"
+          href={loiHref({ kind: "aggregation", agg, rate: required, reorder })}
           style={{
             display: "inline-block",
             marginTop: 16,
@@ -190,8 +191,13 @@ export default function BenchmarkProver() {
             textDecoration: "none",
           }}
         >
-          Request a live on-silicon run of your workload →
+          Request a live on-silicon run + conditional LOI on this bar →
         </a>
+        <p style={{ color: c.faint, fontSize: 12, marginTop: 8, lineHeight: 1.5 }}>
+          Carries this exact spec — {agg} at {eng(required)}
+          {reorder ? ", reorder-stable" : ""} — into the request, with the verdict
+          re-computed from the measured engine on the next page.
+        </p>
       </div>
     </div>
   );

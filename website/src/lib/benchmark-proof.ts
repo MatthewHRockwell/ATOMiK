@@ -209,6 +209,61 @@ export function renderSyncReportMarkdown(opts: {
   ].join("\n");
 }
 
+// ---------------------------------------------------------------------------
+// Carry layer — moves a computed proof from the benchmark tool / catalog into
+// the contact intake so the lead arrives spec'd, not as free-text prose.  The
+// contact page RE-COMPUTES the verdict from these facts (it never trusts a
+// verdict string from the URL), so the carried link is tamper-evident.
+// ---------------------------------------------------------------------------
+export interface CarriedSpec {
+  kind: "aggregation" | "sync";
+  workload?: string; // human label for the workload, for context
+  // aggregation
+  agg?: string;
+  rate?: number; // required throughput, events/s
+  reorder?: boolean;
+  // sync
+  fullStateBytes?: number;
+  deltaBytes?: number;
+}
+
+// Build the /contact link that carries a spec into the conditional-LOI intake.
+export function loiHref(spec: CarriedSpec): string {
+  const p = new URLSearchParams();
+  p.set("intent", "live-benchmark");
+  p.set("bm_kind", spec.kind);
+  if (spec.workload) p.set("bm_workload", spec.workload);
+  if (spec.kind === "aggregation") {
+    if (spec.agg) p.set("bm_agg", spec.agg);
+    if (spec.rate != null && isFinite(spec.rate)) p.set("bm_rate", String(Math.round(spec.rate)));
+    p.set("bm_reorder", spec.reorder === false ? "0" : "1");
+  } else {
+    if (spec.fullStateBytes != null) p.set("bm_full", String(spec.fullStateBytes));
+    if (spec.deltaBytes != null) p.set("bm_delta", String(spec.deltaBytes));
+  }
+  return `/contact?${p.toString()}`;
+}
+
+// Read a carried spec back out of the contact URL.  Returns null if absent or
+// malformed (the contact page then just renders the normal form).
+export function parseCarriedSpec(params: URLSearchParams): CarriedSpec | null {
+  const kind = params.get("bm_kind");
+  const workload = params.get("bm_workload") || undefined;
+  if (kind === "aggregation") {
+    const agg = params.get("bm_agg") || undefined;
+    const rate = params.get("bm_rate");
+    if (!agg || rate == null || !isFinite(Number(rate))) return null;
+    return { kind, workload, agg, rate: Number(rate), reorder: params.get("bm_reorder") !== "0" };
+  }
+  if (kind === "sync") {
+    const full = params.get("bm_full");
+    const delta = params.get("bm_delta");
+    if (full == null || delta == null) return null;
+    return { kind, workload, fullStateBytes: Number(full), deltaBytes: Number(delta) };
+  }
+  return null;
+}
+
 // Human throughput, e.g. 800_000_000 -> "800 M/s".
 export function eng(n: number): string {
   if (!isFinite(n)) return "—";

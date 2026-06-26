@@ -3,8 +3,15 @@
 import Link from "next/link";
 import Nav from "@/components/Nav";
 import { useEffect, useState, FormEvent } from "react";
+import {
+  eng,
+  evaluate,
+  parseCarriedSpec,
+  type CarriedSpec,
+} from "@/lib/benchmark-proof";
 
 const requestTypes = [
+  "Request Live Benchmark (conditional LOI)",
   "Request Evaluation",
   "Request Investor Diligence",
   "Request Proof Review",
@@ -42,6 +49,7 @@ const timelines = [
 ];
 
 const requestTypeByIntent: Record<string, string> = {
+  "live-benchmark": "Request Live Benchmark (conditional LOI)",
   evaluation: "Request Evaluation",
   demo: "Request Proof Review",
   "technical-demo": "Request Proof Review",
@@ -56,6 +64,7 @@ const requestTypeByIntent: Record<string, string> = {
 };
 
 const intentByRequestType: Record<string, string> = {
+  "Request Live Benchmark (conditional LOI)": "live-benchmark",
   "Request Evaluation": "evaluation",
   "Request Investor Diligence": "investor",
   "Request Proof Review": "proof",
@@ -74,6 +83,7 @@ const roleByIntent: Record<string, string> = {
 };
 
 const painCategoryByIntent: Record<string, string> = {
+  "live-benchmark": "Technical diligence",
   investor: "Technical diligence",
   diligence: "Technical diligence",
   "investor-diligence": "Technical diligence",
@@ -96,6 +106,100 @@ function readAttribution() {
   };
 }
 
+const VERDICT_COLOR: Record<string, string> = {
+  green: "#2dd36f",
+  cyan: "#22d3ee",
+  rose: "#fb7185",
+  amber: "#f5a524",
+};
+
+interface ProofView {
+  verdict: string;
+  color: keyof typeof VERDICT_COLOR;
+  workload: string;
+  lines: { label: string; value: string }[];
+  summary: string; // multi-line, prefills the "Use case or workload" field
+  interests: string[];
+}
+
+// Recompute the verdict from the carried facts — we never trust a verdict
+// string from the URL, only the spec (operator/rate, or full/delta bytes).
+function buildProofView(spec: CarriedSpec): ProofView {
+  if (spec.kind === "aggregation") {
+    const r = evaluate(spec.agg ?? "sum", spec.rate ?? 0, spec.reorder ?? true);
+    const color = r.verdict === "SURPASS" ? "green" : r.verdict === "PASS" ? "cyan" : "rose";
+    const workload = spec.workload || "My aggregation workload";
+    const lines = [
+      { label: "Operator", value: `${spec.agg}${r.abelian ? " (order-independent)" : " (order-dependent)"}` },
+      { label: "Required throughput", value: eng(spec.rate ?? 0) },
+      { label: "Reorder-stable", value: spec.reorder ? "required" : "not required" },
+      { label: "Measured engine", value: `${eng(r.peakThroughput)} across ${r.banksAvailable} banks` },
+      {
+        label: "Throughput gate",
+        value: r.throughputPass
+          ? `PASS — ${r.margin.toFixed(1)}× headroom (${r.minBanks} of ${r.banksAvailable} banks)`
+          : `FAIL — short by ${(1 / r.margin).toFixed(1)}×`,
+      },
+      {
+        label: "Correctness gate",
+        value: r.correctnessPass
+          ? "PASS — byte-identical across 1/2/4/8 banks"
+          : "FAIL — operator not order-independent",
+      },
+    ];
+    const summary = [
+      "Live benchmark + conditional-LOI request.",
+      `Workload: ${workload}`,
+      `Operator: ${spec.agg} · Required: ${eng(spec.rate ?? 0)} · Reorder-stable: ${spec.reorder ? "required" : "not required"}`,
+      `Site-computed verdict vs the measured ${eng(r.peakThroughput)} engine: ${r.verdict}` +
+        (r.throughputPass ? ` (${r.margin.toFixed(1)}× headroom, ${r.minBanks} of ${r.banksAvailable} banks).` : "."),
+      "Requesting: a live on-silicon run of this spec on the AX7020 and a conditional LOI committing to this bar.",
+    ].join("\n");
+    return {
+      verdict: r.verdict,
+      color,
+      workload,
+      lines,
+      summary,
+      interests: [`verdict:${r.verdict}`, `op:${spec.agg}`, `rate:${eng(spec.rate ?? 0)}`],
+    };
+  }
+
+  // sync / replica-convergence
+  const full = spec.fullStateBytes ?? 0;
+  const delta = spec.deltaBytes ?? 0;
+  const pct = full > 0 ? Math.round((1 - delta / full) * 100) : 0;
+  const converges = delta > 0 && delta < full;
+  const verdict = converges ? "CONVERGES" : "REVIEW";
+  const workload = spec.workload || "My replica-sync workload";
+  const lines = [
+    { label: "Full-state sync", value: `${full} B/tick` },
+    { label: "ATOMiK delta sync", value: `${delta} B/tick` },
+    { label: "Data moved", value: `~${pct}% less` },
+    {
+      label: "Convergence gate",
+      value: converges
+        ? "PASS — byte-identical, coordination-free merge"
+        : "REVIEW — delta is not smaller than full state",
+    },
+  ];
+  const summary = [
+    "Live convergence + conditional-LOI request.",
+    `Workload: ${workload}`,
+    `Full-state ${full} B/tick vs delta ${delta} B/tick = ~${pct}% less data moved.`,
+    `Site verdict: ${verdict} (coordination-free, byte-identical merge).`,
+    "Requesting: a live on-silicon run and a conditional LOI.",
+  ].join("\n");
+  return {
+    verdict,
+    color: converges ? "green" : "amber",
+    workload,
+    lines,
+    summary,
+    interests: [`verdict:${verdict}`, `reduction:${pct}%`],
+  };
+}
+
 export default function ContactPage() {
   const [form, setForm] = useState({
     name: "",
@@ -111,6 +215,27 @@ export default function ContactPage() {
     message: "",
   });
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
+  const [proof, setProof] = useState<ProofView | null>(null);
+
+  // Pick up a spec carried from the benchmark tool / workload catalog: recompute
+  // the verdict, show it, and prefill the workload field so the lead arrives
+  // spec'd rather than as free-text.
+  useEffect(() => {
+    const spec = parseCarriedSpec(new URLSearchParams(window.location.search));
+    if (!spec) return;
+    const view = buildProofView(spec);
+    const timeout = window.setTimeout(() => {
+      setProof(view);
+      setForm((current) => ({
+        ...current,
+        requestType: "Request Live Benchmark (conditional LOI)",
+        intent: "live-benchmark",
+        painCategory: "Technical diligence",
+        useCase: current.useCase ? current.useCase : view.summary,
+      }));
+    }, 0);
+    return () => window.clearTimeout(timeout);
+  }, []);
 
   useEffect(() => {
     const intent = new URLSearchParams(window.location.search).get("intent");
@@ -185,7 +310,7 @@ export default function ContactPage() {
           use_case: form.useCase,
           current_stack: form.currentStack,
           message: form.message,
-          interests: [form.requestType, form.painCategory, form.timeline],
+          interests: [form.requestType, form.painCategory, form.timeline, ...(proof ? proof.interests : [])],
         }),
       });
 
@@ -223,6 +348,39 @@ export default function ContactPage() {
         <div className="mt-5 rounded-lg p-4 text-sm leading-6" style={{ background: "#101927", border: "1px solid #1d324a", color: "#9fb1c7" }}>
           Share only sanitized or high-level workload context here. Do not submit proprietary traces, source code, customer data, export-controlled material, or confidential implementation details until an NDA and evaluation scope are in place.
         </div>
+        {proof && status !== "sent" && (
+          <div
+            className="mt-6 rounded-lg p-5"
+            style={{ background: "#0d1420", border: `1px solid ${VERDICT_COLOR[proof.color]}` }}
+          >
+            <div className="flex flex-wrap items-baseline gap-3">
+              <span
+                className="rounded-md px-3 py-1 text-sm font-extrabold tracking-wide"
+                style={{ background: VERDICT_COLOR[proof.color], color: "#070b12" }}
+              >
+                {proof.verdict}
+              </span>
+              <span className="text-sm font-semibold">Workload proof attached</span>
+              <span className="text-sm" style={{ color: "#9fb1c7" }}>
+                {proof.workload}
+              </span>
+            </div>
+            <dl className="mt-4 grid gap-x-6 gap-y-2 sm:grid-cols-2">
+              {proof.lines.map((l) => (
+                <div key={l.label} className="flex justify-between gap-3 text-sm">
+                  <dt style={{ color: "#7f8b81" }}>{l.label}</dt>
+                  <dd className="text-right font-medium">{l.value}</dd>
+                </div>
+              ))}
+            </dl>
+            <p className="mt-4 text-xs leading-5" style={{ color: "#7f8b81" }}>
+              Verdict re-computed on this page from the measured AX7020 engine (not carried as a
+              claim from the link). It scopes a conditional LOI: ATOMiK commits to this bar on a live
+              on-silicon run; you commit to the next step if it holds. The spec is prefilled below —
+              edit anything before sending.
+            </p>
+          </div>
+        )}
         {status === "sent" ? (
           <div
             className="mt-10 rounded-lg border p-8"
