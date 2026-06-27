@@ -109,7 +109,11 @@ export default function BenchmarkProofPage() {
             <Link href="/contact?intent=live-benchmark" style={{ color: c.cyan }}>
               ask us to run your workload live on the board
             </Link>
-            .
+            . If this is your workload, the{" "}
+            <Link href="/design-partners" style={{ color: c.cyan }}>
+              design partner program
+            </Link>{" "}
+            runs it live behind a conditional LOI.
           </p>
         </div>
       </section>

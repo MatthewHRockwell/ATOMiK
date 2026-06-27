@@ -51,6 +51,13 @@ export default function WorkloadsPage() {
           Representative archetypes — not named customers. Verdicts use measured engine facts (AX7020,
           100 MHz, byte-identical across 1/2/4/8 banks).
         </p>
+        <p style={{ color: c.muted, fontSize: 14, marginTop: 14 }}>
+          Recognize yours?{" "}
+          <Link href="/design-partners" style={{ color: c.cyan }}>
+            Become a founding design partner →
+          </Link>{" "}
+          — we run it live on silicon behind a conditional LOI you only honor if we hit your bar.
+        </p>
       </section>
 
       <section style={{ maxWidth: 1040, margin: "0 auto", padding: "0 22px 64px", display: "grid", gap: 18 }}>
