@@ -61,13 +61,20 @@ the ask to almost zero, which is the whole point for a first LOI.
    `/benchmark-proof` with their numbers → `/formal-verification` if they push on
    correctness → `/cost-of-lock` for the value → the conditional LOI.
 
-## ⚠️ One thing to fix before you promise live runs
+## ✅ Live-run path is hardware-validated (2026-06-28)
 
-`run_live()` (the harness that produces a witnessed AX7020 record) is built but
-has **never been fired on hardware**. Before you tell a prospect "I'll run it
-live," do it once end-to-end and bank a real witnessed record. If you promise a
-live run and can't deliver on the call, the pitch's credibility is gone. This
-needs a board session — it is the highest-priority task gating this whole motion.
+`run_live()` was fired end-to-end on the AX7020 on 2026-06-28: the harness drove
+`abench` over the board console and produced a witnessed record with the verbatim
+transcript — `0x17e9fe29b5dc0aad` byte-identical across 1/2/4/8 banks, 800 M/s at
+8 banks, reproducing the recorded reference exactly. Sample artifact (record +
+LOI with the live run embedded) in `witnessed_run_2026-06-28/`.
+
+So the offer is real and deliverable. Two operational notes for prospect runs:
+- Console port is **/dev/ttyUSB1** in the current setup (the harness default is
+  `/dev/ttyUSB2`; pass `--port /dev/ttyUSB1`).
+- The board does not auto-boot Linux from cold; if it's powered down you need a
+  boot session before a call. Keep it warm before a scheduled live run, or
+  generate the record ahead of time and hand it over.
 
 ## Claim guardrails (hard rules — every word in this pack obeys them)
 
