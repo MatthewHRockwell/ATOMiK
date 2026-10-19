@@ -84,6 +84,7 @@ int font_init(void) {
 int text_height(int scale) { return 16 * scale; }
 
 int text_width(const char *s, int scale) {
+    if (!s) return 0;
     int w = 0;
     while (*s++) w += 8 * scale;
     return w;
@@ -163,6 +164,7 @@ static void draw_glyph(int x, int y, unsigned char c, int scale,
 }
 
 void draw_text(int x, int y, const char *s, int scale, pixel_t color) {
+    if (!s) return;
     int cx = x;
     while (*s) {
         draw_glyph(cx, y, (unsigned char)*s, scale, color);

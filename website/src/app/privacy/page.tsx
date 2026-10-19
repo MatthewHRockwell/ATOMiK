@@ -1,10 +1,12 @@
-import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/siteMetadata";
 import Link from "next/link";
 
-export const metadata: Metadata = {
-  title: "Privacy Policy - ATOMiK",
-  description: "ATOMiK privacy policy. How we collect, use, and protect your data.",
-};
+export const metadata = pageMetadata({
+  title: 'Privacy Policy - ATOMiK',
+  description: 'ATOMiK privacy policy. How we collect, use, and protect your data.',
+  path: '/privacy',
+  openGraphTitle: 'ATOMiK Privacy Policy',
+});
 
 export default function PrivacyPage() {
   return (
@@ -18,23 +20,25 @@ export default function PrivacyPage() {
         </Link>
 
         <h1 className="text-4xl font-bold tracking-tight mb-2">Privacy Policy</h1>
-        <p className="text-[#8888a0] text-sm mb-12">Effective March 1, 2026</p>
+        <p className="text-[#8888a0] text-sm mb-12">Last updated May 28, 2026</p>
 
         <div className="space-y-10">
           <Section title="1. Introduction">
             <p>
               ATOMiK (&ldquo;we,&rdquo; &ldquo;us,&rdquo; or &ldquo;our&rdquo;) operates the
-              atomik.tech website and provides delta-state computing software, including Python
-              and C libraries and hardware IP cores. This policy describes what data we collect,
-              how we use it, and your rights regarding that data.
+              atomik.tech website, publishes ATOMiK software and proof materials, and handles
+              request-based evaluation, licensing, and diligence inquiries. This policy describes
+              what data we collect, how we use it, and your rights regarding that data.
             </p>
           </Section>
 
           <Section title="2. Information We Collect">
             <ul className="list-disc list-inside space-y-2 text-[#8888a0]">
               <li>
-                <span className="text-[#e0e0e8]">Contact information</span> &mdash; name, email address, company, and workload details
-                provided through contact, evaluation, or investor-diligence forms.
+                <span className="text-[#e0e0e8]">Contact information</span> &mdash; name, email address, company, and sanitized workload details
+                provided through contact, evaluation, or investor-diligence forms. Do not submit
+                proprietary traces, source code, customer data, export-controlled material, or confidential
+                implementation details until an NDA and evaluation scope are in place.
               </li>
               <li>
                 <span className="text-[#e0e0e8]">Payment information</span> &mdash; processed
@@ -42,9 +46,8 @@ export default function PrivacyPage() {
                 not store credit card numbers or bank details on our servers.
               </li>
               <li>
-                <span className="text-[#e0e0e8]">Usage analytics</span> &mdash; anonymized
-                telemetry such as page views, feature usage frequency, and error reports to improve
-                the product.
+                <span className="text-[#e0e0e8]">Usage analytics</span> &mdash; limited site logs, page activity, and error
+                reports where configured to improve the website and evaluation workflow.
               </li>
               <li>
                 <span className="text-[#e0e0e8]">Communications</span> &mdash; emails, diligence requests,
@@ -67,7 +70,7 @@ export default function PrivacyPage() {
             <p>We use the following third-party services that may process your data:</p>
             <ul className="list-disc list-inside space-y-2 text-[#8888a0] mt-3">
               <li>
-                <span className="text-[#e0e0e8]">Stripe</span> &mdash; payment processing and optional lead/customer records.
+                <span className="text-[#e0e0e8]">Stripe</span> &mdash; payment processing and optional lead/customer records for evaluation or reservation workflows.
                 See{" "}
                 <a
                   href="https://stripe.com/privacy"
@@ -98,8 +101,8 @@ export default function PrivacyPage() {
           <Section title="5. Data Sharing">
             <p>
               We do not sell, rent, or trade your personal information to third parties. We share
-              data only with the service providers listed above, solely for the purposes described
-              in this policy.
+              data only with the service providers listed above and configured lead-notification tools,
+              solely for the purposes described in this policy.
             </p>
           </Section>
 
@@ -122,10 +125,10 @@ export default function PrivacyPage() {
             <p className="mt-3">
               To exercise any of these rights, contact us at{" "}
               <a
-                href="mailto:mrockwell@atomik.tech"
+                href="mailto:matthew.h.rockwell@gmail.com"
                 className="text-[#8b5cf6] hover:underline"
               >
-                mrockwell@atomik.tech
+                matthew.h.rockwell@gmail.com
               </a>
               .
             </p>
@@ -151,10 +154,10 @@ export default function PrivacyPage() {
             <p>
               For questions about this privacy policy or your data, contact us at{" "}
               <a
-                href="mailto:mrockwell@atomik.tech"
+                href="mailto:matthew.h.rockwell@gmail.com"
                 className="text-[#8b5cf6] hover:underline"
               >
-                mrockwell@atomik.tech
+                matthew.h.rockwell@gmail.com
               </a>
               .
             </p>

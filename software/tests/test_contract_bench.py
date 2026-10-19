@@ -1,0 +1,394 @@
+"""
+Tests for atomik_sdk.contract_bench — the aggregation benchmark-proof harness.
+
+These pin the honesty rules: throughput comes from the silicon-measured engine,
+order-independence is only claimed for abelian aggregations, and the verdict
+reflects BOTH gates.
+"""
+
+from __future__ import annotations
+
+from pathlib import Path
+
+import pytest
+
+from atomik_sdk.contract_bench import (
+    ENGINE,
+    REFERENCE_SYNC,
+    SyncSpec,
+    WorkloadSpec,
+    evaluate,
+    evaluate_sync,
+    is_abelian,
+    reference_live_run,
+    render_conditional_loi,
+)
+from atomik_sdk.contract_bench import (
+    ValueInputs,
+    compute_value,
+    render_value_memo,
+)
+from atomik_sdk.contract_bench.board import parse_abench
+from atomik_sdk.contract_bench.live_run import LiveRunRecord, _record
+
+
+class TestSilicon:
+    def test_peak_is_eight_banks_at_clock(self):
+        # 65537 deltas / 8193 cycles * 100MHz ~= 800 M/s
+        assert ENGINE.peak_throughput() == pytest.approx(800e6, rel=0.01)
+
+    def test_per_bank_is_clock(self):
+        # 1 accumulation / bank / cycle at 100 MHz
+        assert ENGINE.per_bank_throughput() == pytest.approx(100e6, rel=0.01)
+
+    def test_scaling_is_linear_and_measured(self):
+        s = ENGINE.scaling()
+        assert s[1] == pytest.approx(1.0, abs=0.01)
+        assert s[8] == pytest.approx(7.99, abs=0.05)
+
+    def test_byte_identical_recorded(self):
+        assert ENGINE.identical_across_banks
+        assert ENGINE.result_hex == "0x17e9fe29b5dc0aad"
+
+
+class TestVerdict:
+    def test_surpass_when_well_under_peak_and_abelian(self):
+        spec = WorkloadSpec("rollup", aggregation="sum", required_throughput=50e6)
+        r = evaluate(spec)
+        assert r.verdict == "SURPASS"
+        assert r.throughput_gate.passed and r.correctness_gate.passed
+        assert r.margin == pytest.approx(16.0, rel=0.05)
+
+    def test_pass_when_just_under_peak(self):
+        spec = WorkloadSpec("tight", aggregation="xor", required_throughput=600e6)
+        r = evaluate(spec)
+        assert r.verdict == "PASS"  # passes but <2x headroom
+
+    def test_fail_when_over_peak(self):
+        spec = WorkloadSpec("toobig", aggregation="sum", required_throughput=2e9)
+        r = evaluate(spec)
+        assert r.verdict == "FAIL"
+        assert not r.throughput_gate.passed
+        assert r.correctness_gate.passed  # correctness still holds
+
+    def test_fail_correctness_for_non_abelian(self):
+        # a non-order-independent op: we must NOT claim reorder-stability
+        spec = WorkloadSpec("avg", aggregation="median", required_throughput=1e6)
+        r = evaluate(spec)
+        assert r.verdict == "FAIL"
+        assert not r.correctness_gate.passed
+        assert not is_abelian("median")
+
+    def test_min_banks_required_scales_with_bar(self):
+        # 250 M/s needs ceil(250/100) = 3 banks
+        r = evaluate(WorkloadSpec("x", aggregation="sum", required_throughput=250e6))
+        assert r.min_banks_required == 3
+        assert r.banks_available == 8
+
+    def test_no_reorder_requirement_still_passes(self):
+        spec = WorkloadSpec("simple", aggregation="sum", required_throughput=10e6,
+                            requires_reorder_stability=False)
+        r = evaluate(spec)
+        assert r.correctness_gate.passed
+
+
+class TestBoardParse:
+    SAMPLE = """ATOMiK parallel-bench  v2  N_BANKS=8
+count=50000000  seed=0xdeadbeef0badf00d
+
+banks  hw_cycles   speedup  result              ok
+1      50000001    1.00    0x0badf00ddeadbeef  OK
+2      25000001    1.99    0x0badf00ddeadbeef  OK
+4      12500001    3.99    0x0badf00ddeadbeef  OK
+8      6250001     7.99    0x0badf00ddeadbeef  OK
+
+software reference = 0x0badf00ddeadbeef
+VERIFY: ALL MATCH
+"""
+
+    def test_parse_live_output(self):
+        from atomik_sdk.contract_bench.board import parse_abench
+        m = parse_abench(self.SAMPLE, count=50_000_000)
+        assert m.cycles == {1: 50000001, 2: 25000001, 4: 12500001, 8: 6250001}
+        assert m.identical_across_banks
+        assert m.result_hex == "0x0badf00ddeadbeef"
+        # ~8 deltas/cycle at 8 banks -> ~800 M/s, count-independent
+        assert m.peak_throughput() == pytest.approx(800e6, rel=0.01)
+
+    def test_parse_evaluates_to_surpass(self):
+        from atomik_sdk.contract_bench.board import parse_abench
+        m = parse_abench(self.SAMPLE, count=50_000_000)
+        spec = WorkloadSpec("live rollup", aggregation="sum", required_throughput=50e6)
+        r = evaluate(spec, m)
+        assert r.verdict == "SURPASS"
+        assert "live" in r.provenance["measured_on"]
+
+    def test_parse_raises_on_empty(self):
+        from atomik_sdk.contract_bench.board import parse_abench
+        with pytest.raises(RuntimeError):
+            parse_abench("no data here", count=1)
+
+    def test_parse_survives_one_uart_mangled_hash(self):
+        # row for 1 bank lost its hex over the UART (-> 0x0000000000000000);
+        # the other 3 agree, so the report must use the real value.
+        from atomik_sdk.contract_bench.board import parse_abench
+        mangled = self.SAMPLE.replace("1      50000001    1.00    0x0badf00ddeadbeef",
+                                      "1      50000001    1.00    0x0000000000000000")
+        m = parse_abench(mangled, count=50_000_000)
+        assert m.result_hex == "0x0badf00ddeadbeef"
+        assert m.cycles[1] == 50000001
+
+
+class TestRendering:
+    def test_markdown_has_both_gates_and_verdict(self):
+        r = evaluate(WorkloadSpec("rollup", aggregation="sum",
+                                  required_throughput=50e6, customer="Acme"))
+        md = r.to_markdown()
+        assert "VERDICT: SURPASS" in md
+        assert "Throughput gate" in md
+        assert "Correctness gate" in md
+        assert "Acme" in md
+        assert "0x17e9fe29b5dc0aad" in md
+
+    def test_json_roundtrips(self):
+        import json
+        r = evaluate(WorkloadSpec("rollup", aggregation="sum", required_throughput=50e6))
+        d = json.loads(r.to_json())
+        assert d["verdict"] == "SURPASS"
+        assert d["fields"]["measured_peak_throughput"] == pytest.approx(800e6, rel=0.01)
+
+    def test_example_spec_loads_and_surpasses(self):
+        ex = (Path(__file__).resolve().parents[1]
+              / "atomik_sdk/contract_bench/examples/telemetry_counter_rollup.json")
+        r = evaluate(WorkloadSpec.from_json(ex))
+        assert r.verdict == "SURPASS"
+
+    def test_non_sum_abelian_example_surpasses(self):
+        # hll_merge is abelian (register-wise) -> correctness gate must pass too
+        ex = (Path(__file__).resolve().parents[1]
+              / "atomik_sdk/contract_bench/examples/analytics_distinct_counts.json")
+        spec = WorkloadSpec.from_json(ex)
+        assert spec.aggregation == "hll_merge"
+        assert is_abelian(spec.aggregation)
+        r = evaluate(spec)
+        assert r.verdict == "SURPASS"
+        assert r.correctness_gate.passed
+
+
+class TestSync:
+    """The sync / replica-convergence archetype — second harness class."""
+
+    def test_reference_converges(self):
+        r = evaluate_sync(REFERENCE_SYNC)
+        assert r.verdict == "CONVERGES"
+        assert r.convergence_gate.passed
+        assert r.data_moved_gate.passed
+
+    def test_reduction_is_measured_ratio(self):
+        # 160 / 2048 -> ~92% less data moved
+        r = evaluate_sync(REFERENCE_SYNC)
+        assert r.reduction_pct == 92
+        assert "92" in r.headline
+
+    def test_convergence_grounded_in_silicon(self):
+        # the convergence claim is NOT new — it's the byte-identical engine result
+        r = evaluate_sync(REFERENCE_SYNC)
+        assert ENGINE.result_hex in r.convergence_gate.measured
+        assert r.convergence_gate.passed == ENGINE.identical_across_banks
+
+    def test_delta_larger_than_full_state_fails(self):
+        # honesty: if the "delta" isn't smaller, it does NOT pass the bandwidth gate
+        bad = SyncSpec(name="degenerate", full_state_bytes=100, delta_bytes=200)
+        r = evaluate_sync(bad)
+        assert r.verdict == "FAIL"
+        assert not r.data_moved_gate.passed
+        assert r.convergence_gate.passed  # convergence still holds on silicon
+
+    def test_scope_note_caveats_change_density(self):
+        r = evaluate_sync(REFERENCE_SYNC)
+        assert "not a universal multiplier" in r.scope_note
+        assert "5%" in r.scope_note
+
+    def test_markdown_has_both_gates_and_verdict(self):
+        md = evaluate_sync(REFERENCE_SYNC).to_markdown()
+        assert "VERDICT: CONVERGES" in md
+        assert "Convergence gate" in md
+        assert "Data-moved gate" in md
+        assert "0x17e9fe29b5dc0aad" in md
+
+    def test_json_roundtrips(self):
+        import json
+        d = json.loads(evaluate_sync(REFERENCE_SYNC).to_json())
+        assert d["verdict"] == "CONVERGES"
+        assert d["fields"]["reduction_pct"] == 92
+
+    def test_example_specs_load_and_converge(self):
+        exdir = Path(__file__).resolve().parents[1] / "atomik_sdk/contract_bench/examples"
+        for name in ("replica_state_convergence.json", "offline_first_client_sync.json"):
+            r = evaluate_sync(SyncSpec.from_json(exdir / name))
+            assert r.verdict == "CONVERGES", name
+            assert r.reduction_pct == 92, name
+
+
+class TestConditionalLOI:
+    """The Conditional LOI instrument — the part a prospect counter-signs."""
+
+    def _agg(self, agg="sum", rate=50e6):
+        spec = WorkloadSpec(name="Rollup", aggregation=agg, required_throughput=rate,
+                            customer="Acme")
+        return spec, evaluate(spec)
+
+    def test_passing_aggregation_states_a_commitment(self):
+        spec, report = self._agg()
+        loi = render_conditional_loi(spec, report, company="Acme Corp", drafted_on="2026-06-25")
+        assert "Conditional Letter of Intent (DRAFT)" in loi
+        assert "ATOMiK commits that the parallel-bank" in loi
+        assert ">= 50 M/s" in loi
+        assert "Acme Corp" in loi          # counterparty named
+        assert "2026-06-25" in loi
+        assert "## 8. Signatures" in loi
+        assert "Acceptance test" in loi
+
+    def test_failing_aggregation_refuses_to_commit(self):
+        # non-abelian operator -> the bar section must say ATOMiK does NOT commit
+        spec, report = self._agg(agg="median")
+        assert report.verdict == "FAIL"
+        loi = render_conditional_loi(spec, report)
+        assert "does **NOT** commit" in loi
+        assert "ATOMiK commits that the parallel-bank" not in loi
+
+    def test_blank_company_leaves_a_signature_blank(self):
+        spec, report = self._agg()
+        loi = render_conditional_loi(spec, report)
+        assert "________________________" in loi  # unnamed counterparty placeholder
+
+    def test_scope_limitations_are_present(self):
+        # the honesty guardrails must travel with the instrument
+        spec, report = self._agg()
+        loi = render_conditional_loi(spec, report)
+        assert "only to abelian operators" in loi
+        assert "not end-to-end system throughput" in loi
+        assert "non-binding" in loi
+
+    def test_sync_loi_commits_to_convergence_and_bandwidth(self):
+        report = evaluate_sync(REFERENCE_SYNC)
+        loi = render_conditional_loi(REFERENCE_SYNC, report, company="Edge Co")
+        assert "converge to byte-identical state with no coordinator" in loi
+        assert "160 B vs 2048 B" in loi
+        assert "~92% less" in loi
+        assert "Edge Co" in loi
+
+    def test_mismatched_spec_and_report_raise(self):
+        spec, report = self._agg()
+        with pytest.raises(TypeError):
+            render_conditional_loi(REFERENCE_SYNC, report)
+
+
+class TestLiveRun:
+    """The witnessed live-run record — dated proof that backs the LOI."""
+
+    def test_reference_record_carries_the_recorded_measurement(self):
+        rec = reference_live_run("Distinct-count rollup")
+        assert rec.source == "recorded reference"
+        assert rec.run_on == ENGINE.measured_on  # 2026-06-21, not fabricated
+        assert rec.result_hex == "0x17e9fe29b5dc0aad"
+        assert rec.identical_across_banks
+        assert rec.peak_throughput == pytest.approx(800e6, rel=0.01)
+        assert rec.cycles == ENGINE.cycles
+
+    def test_record_renders_ladder_transcript_and_proof(self):
+        rec = reference_live_run("X")
+        md = rec.to_markdown()
+        assert "## Measured ladder" in md
+        assert "7.99x" in md            # honest per-run overhead, not 8.00
+        assert "ALL MATCH" in md
+        assert "0x17e9fe29b5dc0aad" in md
+        assert "Raw transcript" in md
+        assert "abench 65537" in md
+
+    def test_record_from_live_transcript_parses_to_record(self):
+        # a record built from an actual abench transcript (parser fixture)
+        m = parse_abench(TestBoardParse.SAMPLE, count=50_000_000)
+        rec = _record("Live workload", m, source="live (on-call)",
+                      run_on="live", seed="0xdeadbeef0badf00d", transcript=TestBoardParse.SAMPLE)
+        assert rec.source == "live (on-call)"
+        assert rec.result_hex == "0x0badf00ddeadbeef"
+        assert rec.transcript == TestBoardParse.SAMPLE
+        assert "VERIFY: ALL MATCH" in rec.to_markdown()
+
+    def test_record_json_roundtrips(self):
+        import json
+        d = json.loads(reference_live_run("X").to_json())
+        assert d["identical_across_banks"] is True
+        assert d["cycles"]["8"] == 8193
+
+    def test_loi_embeds_witnessed_run(self):
+        spec = WorkloadSpec(name="Rollup", aggregation="sum", required_throughput=50e6)
+        rec = reference_live_run(spec.name)
+        loi = render_conditional_loi(spec, evaluate(spec), live_run=rec)
+        assert "Silicon backing — witnessed run" in loi
+        assert "recorded reference" in loi
+        assert "0x17e9fe29b5dc0aad" in loi
+        assert "re-runs at the Counterparty's operator and scale" in loi
+
+    def test_loi_without_run_has_no_witnessed_section(self):
+        spec, report = TestConditionalLOI()._agg()
+        assert "Silicon backing — witnessed run" not in render_conditional_loi(spec, report)
+
+    def test_record_dataclass_shape(self):
+        rec = reference_live_run("X")
+        assert isinstance(rec, LiveRunRecord)
+
+
+class TestValue:
+    """Cost-of-Lock value translator — honest economic legibility."""
+
+    def test_dollar_tax_is_arithmetic_on_buyer_baseline(self):
+        # 12 x $900 = $10,800/mo baseline; 35% attributed to coordination -> $3,780
+        inp = ValueInputs(aggregation="sum", required_throughput=100e6, approach="shard",
+                          instances=12, instance_monthly=900, coordination_overhead_pct=35)
+        m = compute_value(inp)
+        assert m.applicable
+        assert m.monthly_baseline == 10_800
+        assert m.coordination_tax_monthly == pytest.approx(3_780)
+        assert "$3,780" in m.headline
+
+    def test_atomik_line_is_measured_only(self):
+        m = compute_value(ValueInputs(aggregation="sum", required_throughput=100e6))
+        measured = [ln for ln in m.lines if ln["source"] == "MEASURED"]
+        assert measured and "byte-identical" in measured[0]["value"]
+        # no fabricated speedup multiplier — only the measured ceiling / headroom
+        assert "8.0x headroom" in measured[0]["value"]
+
+    def test_non_abelian_makes_no_value_claim(self):
+        m = compute_value(ValueInputs(aggregation="median", required_throughput=1e6))
+        assert not m.applicable
+        assert "order-dependent" in m.reason
+        assert m.coordination_tax_monthly is None
+
+    def test_rate_over_ceiling_makes_no_claim(self):
+        m = compute_value(ValueInputs(aggregation="sum", required_throughput=2e9))
+        assert not m.applicable
+        assert "ceiling" in m.reason
+
+    def test_overhead_without_cost_reports_percent(self):
+        m = compute_value(ValueInputs(aggregation="sum", required_throughput=50e6,
+                                      approach="lock", coordination_overhead_pct=40))
+        assert m.reclaimed_pct == 40
+        assert m.coordination_tax_monthly is None
+        assert "40% of capacity" in m.headline
+
+    def test_memo_tags_every_line_and_keeps_caveats(self):
+        inp = ValueInputs(aggregation="sum", required_throughput=100e6, approach="lock",
+                          instances=4, instance_monthly=500, coordination_overhead_pct=30)
+        md = render_value_memo(inp, compute_value(inp), company="Acme")
+        assert "[MEASURED]" in md and "[YOUR BASELINE]" in md
+        assert "Acme" in md
+        assert "not a throughput multiplier" in md
+        assert "Cost-of-Lock Value Memo" in md
+
+    def test_memo_for_non_abelian_states_no_claim(self):
+        inp = ValueInputs(aggregation="median", required_throughput=1e6)
+        md = render_value_memo(inp, compute_value(inp))
+        assert "NO CLAIM" in md
+        assert "What the numbers say" not in md

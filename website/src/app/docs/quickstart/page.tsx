@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/siteMetadata";
 import {
   codeBlockStyle,
   kwColor,
@@ -9,11 +9,12 @@ import {
   varColor,
 } from "../shared";
 
-export const metadata: Metadata = {
-  title: "Quick Start — ATOMiK Docs",
-  description:
-    "Install the ATOMiK Python SDK and run your first delta-state operation in under a minute.",
-};
+export const metadata = pageMetadata({
+  title: 'Quick Start — ATOMiK Docs',
+  description: 'Review the ATOMiK Python SDK shape and first delta-state operation with evidence-scoped caveats.',
+  path: '/docs/quickstart',
+  openGraphTitle: 'ATOMiK Quick Start Docs',
+});
 
 export default function QuickStartPage() {
   return (
@@ -26,7 +27,9 @@ export default function QuickStartPage() {
       </p>
       <h1 className="text-4xl font-bold tracking-tight mb-4">Quick Start</h1>
       <p className="text-lg mb-10" style={{ color: "#8888a0" }}>
-        Install the Python SDK and run your first delta-state operation in under a minute.
+        Review the Python SDK shape and run a first delta-state operation. Treat
+        workload performance, deployment support, and protocol behavior as separate
+        evaluation questions.
       </p>
 
       {/* Install */}
@@ -134,15 +137,17 @@ export default function QuickStartPage() {
           Key insight
         </p>
         <p style={{ color: "#b0b0c0" }}>
-          State is never stored — it is reconstructed:{" "}
+          In the accumulator model, current state is reconstructed from a reference
+          and accumulated delta:{" "}
           <code
             className="text-sm font-mono px-2 py-0.5 rounded"
             style={{ background: "#1e1e2e", color: "#22c55e" }}
           >
             current_state = initial_state &oplus; accumulator
           </code>
-          . Deltas are commutative, associative, and self-inverse (XOR Abelian group).
-          Order does not matter. Duplicate deltas cancel. Zero dependencies, Python 3.9+.
+          . XOR deltas are commutative, associative, and self-inverse in the algebraic
+          model. Production ordering, replay, duplicate handling, and packaging claims
+          still require workload-specific validation.
         </p>
       </div>
 

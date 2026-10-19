@@ -1,0 +1,7 @@
+set_property PACKAGE_PIN AB1 [get_ports uart_tx]
+set_property IOSTANDARD LVCMOS33 [get_ports uart_tx]
+set_property PACKAGE_PIN AB2 [get_ports {leds[0]}]
+set_property PACKAGE_PIN Y4  [get_ports {leds[1]}]
+set_property PACKAGE_PIN Y6  [get_ports {leds[2]}]
+set_property PACKAGE_PIN AA7 [get_ports {leds[3]}]
+set_property IOSTANDARD LVCMOS33 [get_ports {leds[*]}]

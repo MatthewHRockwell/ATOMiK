@@ -1,5 +1,3 @@
-"use client";
-
 import Link from "next/link";
 import Nav from "@/components/Nav";
 
@@ -15,7 +13,7 @@ type Release = {
 };
 
 const evidenceLinks = {
-  deskProof: "/09-current-live-atomik-desk-v039k.png",
+  deskProof: "/10-current-live-atomik-desk-v040a.png",
   perfMatrix: "https://github.com/MatthewHRockwell/ATOMiK/blob/main/results/perf_matrix_ax7020_20260509.txt",
   perfInterpretation: "https://github.com/MatthewHRockwell/ATOMiK/blob/main/docs/perf/20260509_matrix_interpretation.md",
   linuxUserspace: "https://github.com/MatthewHRockwell/ATOMiK/blob/main/docs/LINUX_USERSPACE_PROOF.md",
@@ -39,15 +37,29 @@ const releases: Release[] = [
     links: [{ label: "Open hardware proof map", href: evidenceLinks.hardwareProof }],
   },
   {
-    version: "v0.39-K",
-    title: "ATOMiK Desk Current Live Prototype UI Proof",
-    date: "2026-05-21",
+    version: "parallel-banks",
+    title: "Parallel-Bank Throughput Measured on AX7020",
+    date: "2026-05-30",
     category: "hardware",
     items: [
-      "Current live-hardware screenshot promoted as the public ATOMiK Desk proof artifact",
-      "Top rail de-noise, v0.39-K visual hierarchy, Pulse Bar, Cap Rail, Hero, and Fabric surfaces visible in the captured prototype UI",
+      "An 8-bank ATOMiK XOR accumulator scaled linearly with allocated banks on the AX7020, measured with an on-chip cycle counter",
+      "1/2/4/8 banks complete the same accumulation in 1/2/4/8x fewer cycles (about 100 to 800 Mdeltas/s at the 100 MHz sys clock)",
+      "The result was byte-identical across every bank count and matched a software recompute: order-independent and lock-free by construction",
+      "Classified as LIVE_MEASURED for the throughput substrate (bench engine), not a customer-workload speedup, power, or thermal claim",
+      "Same effort confirmed 1080p60 is physically impossible on this board (OSERDES2 pulse-width limit); the UI renders at 1080p30",
+    ],
+    links: [{ label: "Open parallel-bank proof", href: "https://github.com/MatthewHRockwell/ATOMiK/blob/main/hardware/zynq/results/PARALLEL_BANKS_HARDWARE_VALIDATED.md" }],
+  },
+  {
+    version: "v0.40-A",
+    title: "ATOMiK Desk Current Live Prototype UI Proof",
+    date: "2026-05-29",
+    category: "hardware",
+    items: [
+      "Current live-hardware framebuffer capture (fb2png of /dev/fb0) promoted as the public ATOMiK Desk proof artifact, superseding v0.39-K",
+      "Concept-aligned hero, Pulse Bar, Cap Rail, and Resource Fabric surfaces visible in the captured prototype UI, with on-screen metrics driven by real measured on-board data",
       "Classified as HARDWARE_VALIDATED for the UI surface, not as a commercial desktop product or performance benchmark",
-      "Public proof asset: 09-current-live-atomik-desk-v039k.png",
+      "Public proof asset: 10-current-live-atomik-desk-v040a.png",
     ],
     links: [{ label: "Open proof image", href: evidenceLinks.deskProof }],
   },
@@ -57,7 +69,7 @@ const releases: Release[] = [
     date: "2026-04-28",
     category: "hardware",
     items: [
-      "Internal interactive demo screens for explaining state waste, delta accumulation, and hardware proof boundaries",
+      "Internal scripted demo screens for explaining state waste, delta accumulation, and hardware proof boundaries",
       "Scripted operator demo flow with proof cards for hardware validation, formal verification, and benchmark review",
       "State Storm visualization: software scans are contrasted with delta-state accumulation as a narrative model",
       "Cost and race visualizations are treated as demo surfaces unless linked to measured artifacts",
@@ -207,6 +219,7 @@ const releases: Release[] = [
       "Custom RV64I CPU with native ATOMiK ISA extensions",
       "Delta-driven display pipeline",
       "6,287 LUT (73%), zero TNS",
+      "Archived Tang Nano prototype path; figures are historical hardware artifacts, not current Zynq proof. Use the hardware proof map for public claims.",
     ],
   },
   {
@@ -218,6 +231,7 @@ const releases: Release[] = [
       "Single-bank ATOMiK timing and throughput documented in historical hardware artifacts",
       "PicoRV32 integration, SPI XIP boot",
       "11/11 hardware tests, +23% Fmax margin",
+      "Archived prototype; quote LUT, Fmax, and test figures only from the linked historical hardware artifacts, not as current claims.",
     ],
   },
 ];

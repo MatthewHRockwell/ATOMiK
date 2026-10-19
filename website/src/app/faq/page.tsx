@@ -11,11 +11,11 @@ const faqCategories = [
     items: [
       {
         q: "What is ATOMiK?",
-        a: "ATOMiK is a state-aware compute architecture for systems that spend too much work rediscovering what changed. The public materials cover the live hardware prototype direction, proof artifacts, developer adoption path, and roadmap toward ATOMiK Desk and Resource Fabric.",
+        a: "ATOMiK is a state-aware compute architecture for systems that spend too much work rediscovering what changed. The public materials are organized around evaluation: one workload, one baseline, one painful constraint, and proof artifacts that show what is validated today.",
       },
       {
         q: "What problem does ATOMiK solve?",
-        a: "State-heavy systems repeatedly move, replay, rescan, or reconstruct state even when only a small part changed. ATOMiK makes state change, delta application, and adaptive execution first-class primitives so a workload can be evaluated around the work that actually changed.",
+        a: "State-heavy systems repeatedly move, replay, rescan, or reconstruct state even when only a small part changed. ATOMiK evaluates whether meaningful-change tracking, coalescing, and state-aware boundaries can reduce that wasted work while preserving correctness.",
       },
       {
         q: "What is public today?",
@@ -34,12 +34,12 @@ const faqCategories = [
     items: [
       {
         q: "Is there a public free tier?",
-        a: "No conventional public free tier is listed. ATOMiK is currently request-based so evaluation time is focused on real workloads, evidence review, and technical fit.",
+        a: "No. ATOMiK is request-based right now so evaluation time is focused on real workloads, evidence review, and technical fit.",
         link: { href: "/pricing", label: "View evaluation options" },
       },
       {
         q: "What are the public evaluation paths?",
-        a: "There are two public paths: Evaluation Access for technical review and early demo availability, and Design Partner / Paid Technical Evaluation for teams with a real state-heavy workload and defined success criteria.",
+        a: "There are three public paths: proof-review reservation, technical-evaluation reservation, and request-based investor, licensing, or design-partner diligence for teams with a real state-heavy workload and defined success criteria.",
         link: { href: "/contact?intent=evaluation", label: "Request evaluation access" },
       },
       {
@@ -62,7 +62,7 @@ const faqCategories = [
       },
       {
         q: "How does ATOMiK compare to CRDTs?",
-        a: "Both address state synchronization problems, but ATOMiK frames state change and delta application as compute primitives. Public comparisons should be read with the evidence labels and artifact links attached to any performance claim.",
+        a: "Both address state synchronization problems, but ATOMiK frames state change and delta application as compute primitives. Public comparisons are best read with the evidence labels and artifact links attached to any performance claim.",
         link: { href: "/whitepaper", label: "View technical brief" },
       },
       {
@@ -96,7 +96,7 @@ const faqCategories = [
       },
       {
         q: "How do I request a feature?",
-        a: "Feature requests should be tied to a concrete state-heavy workload or evaluation goal. Design partner conversations are the best path when the request affects roadmap, prototype mapping, or evaluation deliverables.",
+        a: "Feature requests work best when tied to a concrete state-heavy workload or evaluation goal. Design partner conversations are the best path when the request affects roadmap, prototype mapping, or evaluation deliverables.",
         link: { href: "/contact?intent=design-partner", label: "Discuss design partnership" },
       },
     ],
@@ -294,7 +294,7 @@ export default function FAQPage() {
                 href="/contact?intent=evaluation"
                 className="px-5 py-2 rounded-full text-sm font-semibold text-white no-underline transition-opacity hover:opacity-85"
                 style={{
-                  background: "#4f8fff",
+                  background: "#2563eb",
                   boxShadow: "0 2px 12px rgba(79,143,255,0.3)",
                 }}
               >

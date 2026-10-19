@@ -37,10 +37,10 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
         <div className="max-w-5xl mx-auto px-6 pt-8">
           <DocsBreadcrumb />
         </div>
-        <div className="pb-6">
+        {children}
+        <div className="pb-8">
           <EvidenceBanner surface="docs" />
         </div>
-        {children}
         <div className="max-w-5xl mx-auto px-6 pb-16">
           <DocsPrevNext />
         </div>

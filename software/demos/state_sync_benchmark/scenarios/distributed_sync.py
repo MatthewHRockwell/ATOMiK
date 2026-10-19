@@ -97,7 +97,7 @@ class DistributedSyncScenario:
         t0 = time.perf_counter()
         total_messages = 0
         for s, val in shuffled:
-            processed = sync.apply_ordered(s, val)
+            sync.apply_ordered(s, val)   # side-effect: updates sync.pending
             total_messages += 1
         conventional_time = time.perf_counter() - t0
 

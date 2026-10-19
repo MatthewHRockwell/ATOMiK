@@ -3,8 +3,8 @@ import Link from "next/link";
 import Nav from "@/components/Nav";
 
 export const metadata = pageMetadata({
-  title: 'About ATOMiK — Delta-State Computing',
-  description: 'ATOMiK is building the next computing primitive: state-aware compute for systems constrained by heat, power, bandwidth, latency, and hardware footprint.',
+  title: 'About ATOMiK - State-Aware Compute Evaluation',
+  description: 'ATOMiK helps edge and embedded teams evaluate whether state-aware execution can reduce wasted state movement in constrained workloads.',
   path: '/about',
   openGraphTitle: 'About ATOMiK',
 });
@@ -50,7 +50,7 @@ const timelineItems = [
     year: "2025",
     title: "FPGA v3 -- HD Video + Multi-Node",
     description:
-      "1280x720@60Hz HDMI output on a $13.50 FPGA. Delta-driven display pipeline. Multi-node convergence demonstrated in historical hardware artifacts.",
+      "1280x720@60Hz HDMI output on a $13.50 FPGA. Delta-driven display pipeline. Multi-node convergence remains a historical hardware artifact, not a current customer proof claim.",
     color: "text-green-400",
     border: "border-green-500/40",
     bg: "bg-green-500/5",
@@ -88,25 +88,25 @@ const proofPoints = [
   {
     value: "Lean4",
     label: "Proof Work",
-    sublabel: "Software validated",
+    sublabel: "Formal proof, audited statements only",
     gradient: "from-purple-400 to-purple-600",
   },
   {
-    value: "Public",
-    label: "Test Artifacts",
-    sublabel: "Software + hardware",
+    value: "v0.40-A",
+    label: "Zynq UI Proof",
+    sublabel: "Hardware-validated UI artifact",
     gradient: "from-green-400 to-green-600",
   },
   {
-    value: "3",
-    label: "FPGA Platforms",
-    sublabel: "Tang Nano, Zynq, Custom",
+    value: "AX7020",
+    label: "Workload Matrix",
+    sublabel: "Wins, losses, caveats",
     gradient: "from-blue-400 to-blue-600",
   },
   {
-    value: "SYNTH",
-    label: "Scaling Path",
-    sublabel: "Zynq evidence-labeled",
+    value: "16/16",
+    label: "Linux Path",
+    sublabel: "Algebraic checks passing",
     gradient: "from-yellow-400 to-yellow-600",
   },
 ];
@@ -144,7 +144,7 @@ export default function AboutPage() {
             </span>
           </h1>
           <p className="text-xl leading-relaxed max-w-3xl" style={{ color: "#8888a0" }}>
-            Building state-aware compute from formal proof to FPGA-backed evaluation.
+            Building state-aware compute from proof artifacts to customer-representative workload evaluation.
           </p>
         </div>
       </section>
@@ -163,28 +163,13 @@ export default function AboutPage() {
           </h2>
           <div className="space-y-4 text-lg leading-relaxed" style={{ color: "#b0b0c0" }}>
             <p>
-              Modern systems spend enormous energy moving, scanning, and reconstructing state. ATOMiK
-              targets that waste directly.{" "}
-              <span className="font-semibold text-white">
-                Delta-state algebra reconstructs state from a reference plus deltas
-              </span>
-              : compact operations that compose cleanly and can be evaluated across software and hardware paths.
+              ATOMiK starts from a practical buyer problem: constrained systems often spend too much work moving, scanning, syncing, replaying, or rebuilding state. The useful question is whether one real workload has enough wasted state movement to justify evaluation.
             </p>
             <p>
-              The algebra has Lean4 formal proof work. The hardware path is
-              prototype-validated across FPGA work and clearly separated from synthesis-only or roadmap claims. The software packages are available (
-              <code
-                className="text-sm font-mono px-2 py-0.5 rounded"
-                style={{ background: "#1e1e2e", color: "#22c55e" }}
-              >
-                pip install atomik-core
-              </code>
-              ).
+              The current proof stack is artifact-bound: formal proof work for audited algebraic statements, a current Zynq UI proof image, Linux userspace-to-FPGA validation, and an AX7020 workload matrix with wins, losses, and caveats.
             </p>
             <p>
-              The goal is to make state-aware execution available at{" "}
-              <span className="font-semibold text-white">the layers where it creates measurable value</span> —
-              from software evaluation to embeddable hardware IP when the evidence justifies it.
+              The goal is to evaluate state-aware execution where it can create measurable value: one workload, one baseline, one painful constraint, and a clear fit/no-fit decision.
             </p>
           </div>
         </div>
@@ -194,7 +179,7 @@ export default function AboutPage() {
       <section className="max-w-5xl mx-auto px-6 pb-20">
         <h2 className="text-3xl font-bold mb-4">The Invention</h2>
         <p className="mb-10 text-lg" style={{ color: "#8888a0" }}>
-          From a mathematical insight to software, formal proof, and FPGA-backed prototypes.
+          From mathematical insight to software, formal proof work, and evidence-labeled hardware artifacts.
         </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -220,7 +205,7 @@ export default function AboutPage() {
             {
               step: "04",
               title: "The Hardware Path",
-              desc: "FPGA prototype paths and synthesis-characterized scaling are documented. ASIC evaluation is roadmap work.",
+              desc: "FPGA prototype paths, a current Zynq UI proof image, Linux userspace validation, and synthesis-characterized scaling are documented with claim boundaries.",
               color: "#d4a843",
             },
           ].map((item) => (
@@ -297,7 +282,7 @@ export default function AboutPage() {
 
       {/* Key Proof Points */}
       <section className="max-w-5xl mx-auto px-6 pb-20">
-        <h2 className="text-3xl font-bold mb-10 text-center">By the Numbers</h2>
+        <h2 className="text-3xl font-bold mb-10 text-center">Evidence Stack</h2>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
           {proofPoints.map((point) => (
             <div
@@ -331,14 +316,13 @@ export default function AboutPage() {
         >
           <h2 className="text-2xl font-bold mb-6">Founder</h2>
           <div className="flex flex-col sm:flex-row gap-8 items-start">
-            {/* Avatar placeholder */}
             <div
               className="w-24 h-24 rounded-full flex items-center justify-center text-3xl font-bold shrink-0"
               style={{
                 background: "linear-gradient(135deg, #8b5cf6, #4f8fff)",
               }}
             >
-              MR
+              MHR
             </div>
             <div>
               <h3 className="text-xl font-bold text-white mb-1">Matt Rockwell</h3>
@@ -346,27 +330,25 @@ export default function AboutPage() {
                 Inventor &amp; Founder
               </p>
               <p className="leading-relaxed mb-4" style={{ color: "#b0b0c0" }}>
-                Matt Rockwell is a systems engineer and founder of ATOMiK, with deep expertise
+                Matt Rockwell is a systems engineer and founder of ATOMiK, with deep experience
                 in embedded systems, FPGA development, and formal verification. He created the
-                delta-state algebra as a rethinking of how computers handle state
-                - formalizing the core algebra in Lean4 before writing the first line of
-                prototype code. ATOMiK grew from a mathematical insight into a
-                hardware-validated computing architecture running on FPGA-backed hardware prototypes.
+                delta-state algebra and built the software, proof, and hardware artifacts that now
+                support ATOMiK&apos;s state-aware evaluation path.
               </p>
               <p className="leading-relaxed mb-6" style={{ color: "#b0b0c0" }}>
-                Designed the delta-state algebra, wrote the formal proofs, built the hardware,
-                and published the software tooling. ATOMiK is currently founder-led, with the next
-                diligence phase expanding around finance, ASIC review, customer evaluation, and
-                partner validation.
+                Designed the delta-state algebra, built formal proof work, developed hardware prototypes,
+                and published software tooling. ATOMiK is currently founder-led, with the next
+                diligence phase focused on customer-representative workload proof, ASIC/IP review,
+                financial diligence, and partner validation.
               </p>
               <div className="flex flex-wrap items-center gap-3">
-                <a
-                  href="mailto:matthew.h.rockwell@gmail.com"
+                <Link
+                  href="/contact?intent=investor-diligence&source=about-founder&cta=contact-founder"
                   className="inline-flex items-center gap-2 text-sm font-mono px-4 py-2 rounded-lg border transition-colors hover:bg-white/5"
                   style={{ borderColor: "#1e1e2e", color: "#4f8fff" }}
                 >
-                  matthew.h.rockwell@gmail.com
-                </a>
+                  Contact ATOMiK
+                </Link>
                 <a
                   href="https://www.linkedin.com/in/matthewhrockwell/"
                   target="_blank"
@@ -422,7 +404,7 @@ export default function AboutPage() {
               changes, with formal proof work around the core algebra.
             </p>
             <p>
-              From formal proof work to FPGA prototype paths and a live Zynq Desk demo, ATOMiK
+              From formal proof work to FPGA prototype paths and a live Zynq Desk proof image, ATOMiK
               is the result of building from first principles while labeling each proof boundary.
             </p>
           </div>
@@ -440,7 +422,7 @@ export default function AboutPage() {
         >
           <h2 className="text-2xl font-bold mb-3">What Comes Next</h2>
           <p className="mb-6" style={{ color: "#8888a0" }}>
-            From FPGA validation to ASIC feasibility review. See the evidence-gated path toward silicon IP.
+            From artifact-bound proof to customer-representative workload validation and ASIC/IP feasibility review.
           </p>
           <Link
             href="/about/roadmap"

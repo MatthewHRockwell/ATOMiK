@@ -1,5 +1,5 @@
 schema_version: 1
-last_updated: "2026-05-28"
+last_updated: "2026-06-08"
 disclaimer: "Live screenshots show current prototypes. Concept visuals show product direction and are not represented as current commercial functionality. Performance claims are only stated when backed by measured artifacts."
 
 evidence_labels:
@@ -43,29 +43,38 @@ claims:
     notes: "Historical UI proof image. Do not represent as current proof image. Do not infer benchmark, uptime, allocation, maturity, performance, power, thermal, water, battery, or footprint claims from the screenshot."
 
 
+  - id: live-desk-ui-v040a-2026-05-29
+    label: HARDWARE_VALIDATED
+    claim: "ATOMiK Desk v0.40-A prototype UI is the current live UI captured from /dev/fb0 on Zynq hardware; the OS renders and is driven by real measured on-board data."
+    artifact: "website/public/10-current-live-atomik-desk-v040a.png"
+    source_artifact: "atomik_os/docs/screenshots/v0.40-A_HARDWARE.png"
+    date: "2026-05-29"
+    public_safe: true
+    notes: "Current UI proof image (supersedes v0.39-K). Live fb2png, not a recomposited mockup. Do not represent as commercial product. Do not infer benchmark, uptime, allocation, maturity, performance, power, thermal, water, battery, or footprint claims from the screenshot."
+
+  - id: live-desk-workload-surface-v040a-2026-05-29
+    label: HARDWARE_VALIDATED
+    claim: "ATOMiK Desk v0.40-A workload surface on Zynq hardware shows apps open and the Resource Fabric driven by real measured on-board data, captured live from /dev/fb0."
+    artifact: "website/public/11-current-live-atomik-desk-v040a-workload.png"
+    source_artifact: "atomik_os/docs/screenshots/v0.40-A_demo_workload_HARDWARE.png"
+    date: "2026-05-29"
+    public_safe: true
+    notes: "Static framebuffer capture, NOT an interactive session. Do not present as a live interactive demo or imply keyboard/mouse input (both in-flight, not board-confirmed). On-screen lane values are real on-board metric-provider output, not customer/production/power/thermal/footprint proof."
+
   - id: live-desk-ui-v039k-2026-05-21
     label: HARDWARE_VALIDATED
-    claim: "ATOMiK Desk v0.39-K prototype UI screenshot shows the current live UI/UX direction running on Zynq hardware."
+    claim: "ATOMiK Desk v0.39-K prototype UI screenshot is a prior (superseded) live UI artifact running on Zynq hardware."
     artifact: "website/public/09-current-live-atomik-desk-v039k.png"
-    packaged_artifact: "09-current-live-atomik-desk-v039k.png"
-    friday_send_artifact: "business/friday_send/04_proof_artifacts/09-current-live-atomik-desk-v039k.png"
-    meeting_packet_artifact: "business/friday_meeting_packet/05_proof_artifacts/09-current-live-atomik-desk-v039k.png"
-    caption_artifact: "09-current-live-atomik-desk-v039k.caption.md"
     source_artifact: "atomik_os/docs/screenshots/deploy_v0.39-K_rail.png"
     date: "2026-05-21"
     public_safe: true
-    notes: "Current UI proof image for v0.39-K. Do not represent as commercial product. Do not infer benchmark, uptime, allocation, maturity, performance, power, thermal, water, battery, or footprint claims from the screenshot."
+    notes: "Superseded by v0.40-A. Do not represent as the current proof image or as commercial product. Do not infer benchmark, uptime, allocation, maturity, performance, power, thermal, water, battery, or footprint claims from the screenshot."
 
   - id: ax7020-perf-matrix-2026-05-09
     label: LIVE_MEASURED
     claim: "AX7020 board run produced a four-way software / direct / batched / profiled performance matrix."
     artifact: "results/perf_matrix_ax7020_20260509.txt"
-    packaged_artifact: "perf_matrix_ax7020_20260509.txt"
-    packaged_csv: "perf_matrix_ax7020_20260509.csv"
-    packaged_summary_json: "perf_matrix_ax7020_20260509.summary.json"
     interpretation: "docs/perf/20260509_matrix_interpretation.md"
-    packaged_interpretation: "20260509_matrix_interpretation.md"
-    packaged_summary: "AX7020_SUMMARY.md"
     date: "2026-05-09"
     public_safe: true
     notes: "Publish with interpretation caveats: naive hardware access can lose; batching/coalescing is workload-dependent; SYNC row has known measurement limitation."
@@ -74,9 +83,6 @@ claims:
     label: HARDWARE_VALIDATED
     claim: "ATOMiK algebraic property checks passed through a Linux userspace to FPGA accelerator path."
     artifact: "docs/LINUX_USERSPACE_PROOF.md"
-    packaged_artifact: "LINUX_USERSPACE_PROOF.md"
-    packaged_summary: "LINUX_USERSPACE_PROOF_SUMMARY.md"
-    packaged_baseline: "ZYNQ_BASELINE.md"
     date: "2026-04-06"
     public_safe: true
     notes: "The source document records 16 algebraic checks and environment details."
@@ -85,18 +91,56 @@ claims:
     label: HARDWARE_VALIDATED
     claim: "Parallel accumulator bank configurations were programmed to Tang Nano 9K hardware and tested."
     artifact: "docs/HARDWARE_SYNTHESIS.md"
-    external_repo_artifact: "docs/HARDWARE_SYNTHESIS.md"
-    packaged_status: "Referenced external repo artifact; not included in this proof folder. See README_EXTERNAL_REFERENCES.md."
     date: "2026-01-27"
     public_safe: true
     notes: "Use exact counts only when quoting directly from the source artifact."
+
+  - id: parallel-bank-throughput-ax7020-2026-05-30
+    label: LIVE_MEASURED
+    claim: "An 8-bank ATOMiK XOR accumulator scaled linearly with allocated banks on the AX7020, measured with an on-chip cycle counter, with a byte-identical result across all bank counts that matched a software recompute."
+    artifact: "hardware/zynq/results/PARALLEL_BANKS_HARDWARE_VALIDATED.md"
+    date: "2026-05-30"
+    public_safe: true
+    notes: "1/2/4/8 banks complete the same accumulation in 1/2/4/8x fewer cycles (about 100 to 800 Mdeltas/s at the 100 MHz sys clock). This is the measurement bench engine (0xF0021000), not the production application adapter. Proves the throughput substrate and the order-independent / lock-free / deterministic-latency property; NOT a customer-workload speedup, power, or thermal outcome. Quote figures at 100 MHz."
+
+  - id: zynq-hdmi-1080p30-2026-05-30
+    label: HARDWARE_VALIDATED
+    claim: "The ATOMiK Desk UI renders at 1080p30 over HDMI on the AX7020."
+    artifact: "hardware/zynq/results/HDMI_1080P60_IMPOSSIBLE.md"
+    date: "2026-05-30"
+    public_safe: true
+    notes: "Claim 1080p30 ONLY. 1080p60 is physically impossible on this board (OSERDES2 minimum-pulse-width limit on the 737.5 MHz serializer). Never claim 1080p60. 720p60 is the achievable true-60Hz path. Earlier 1280x720@60Hz figures refer to the Tang Nano, not the AX7020."
+
+  - id: memory-traffic-reduction-software-suite
+    label: SOFTWARE_VALIDATED
+    claim: "Delta-state execution reduced memory-traffic bytes by orders of magnitude on state-redundant workloads in the software benchmark suite while preserving the final result."
+    artifact: "hardware/experiments/analysis/statistics.md"
+    date: "2026-01-24"
+    public_safe: true
+    notes: "Software-harness measurements, NOT hardware. Ratios are workload-dependent and vary widely across the suite and across analysis runs. Do NOT publish a single headline multiplier, and do NOT revive the older 7,670x-916,000x range as a universal or hardware result (it is not reproduced by a current artifact). The board-measured grounding for redundant-work reduction is the AX7020 coalescing path (16x operation reduction, 64 ops to 4)."
+
+  - id: live-workloads-surface-ax7020-2026-06-08
+    label: LIVE_MEASURED
+    claim: "ATOMiK's Workloads surface (real-time telemetry aggregation) runs on the AX7020 over HDMI showing live measured parallel-bank throughput: 800 Mevents/s at 8 banks, 1/2/4/8 throughput scaling, byte-identical across all bank configurations."
+    artifact: "website/public/12-workloads-live-ax7020.png"
+    source_artifact: "atomik_os/docs/screenshots/workloads_LIVE_20260607.png"
+    related_artifact: "hardware/zynq/results/PARALLEL_BANKS_HARDWARE_VALIDATED.md"
+    date: "2026-06-08"
+    public_safe: true
+    notes: "First customer-facing workload demo proven end-to-end on hardware (parallel-bank engine 0xF0021000, board-side daemon -> /tmp/atomik_bench_live.txt -> surface). SCOPE TIGHTLY: only the throughput figures (800 Mevents/s, 1/2/4/8x, byte-identical) are LIVE_MEASURED. Resource Fabric STATE/SYNC/AGENT/EVENT/VISUAL and top-bar temp/efficiency/predictive values are DERIVED/SCENARIO, not measured customer/power/thermal proof. STATIC capture, not an interactive session; does NOT prove USB input or interactivity (still in-flight). Never say 'live interactive demo' or 'plug in a keyboard'."
+
+  - id: interactive-workloads-input-in-flight-2026-06-06
+    label: ROADMAP
+    claim: "INTERACTIVITY and USB keyboard/mouse HID input for the Workloads demo are software-complete and host-verified, but not yet board-confirmed."
+    artifact: "atomik_os/src/workloads_surface.c"
+    date: "2026-06-06"
+    public_safe: false
+    notes: "PARTIALLY ADVANCED 2026-06-08: the Workloads surface rendering with live measured throughput IS now board-verified (see live-workloads-surface-ax7020-2026-06-08). What remains IN FLIGHT is interactivity + USB HID input (USB blocked on a VBUS/power path). DO NOT publish 'live interactive demo' or 'plug in a keyboard and use it' until USB HID is board-confirmed. The surface-with-live-data claim is now publishable; keep it separate from the interactive/input claim."
 
   - id: xc7z020-synthesis-ceiling
     label: SYNTHESIS_VALIDATED
     claim: "XC7Z020 high-bank throughput ceilings are synthesis-derived, not live-board measurements."
     artifact: "docs/HARDWARE_SYNTHESIS.md"
-    external_repo_artifact: "docs/HARDWARE_SYNTHESIS.md"
-    packaged_status: "Referenced external repo artifact; not included in this proof folder. See README_EXTERNAL_REFERENCES.md."
     date: "2026-01-27"
     public_safe: true
     notes: "Must be labeled as synthesis-validated wherever used."
@@ -106,8 +150,6 @@ claims:
     label: BUILD_ARTIFACT
     claim: "The Zynq standalone SD boot path has local build artifacts, including BOOT.bin and the SD-boot bitstream."
     artifact: "hardware/zynq/fsbl_build/BOOT.bin"
-    external_repo_artifact: "hardware/zynq/fsbl_build/BOOT.bin"
-    packaged_status: "Referenced external local build artifact; not included in this proof folder. See README_EXTERNAL_REFERENCES.md."
     related_artifact: "hardware/zynq/litex-build-nax64-sdboot/gateware/"
     date: "2026-05-23"
     public_safe: true
@@ -117,8 +159,6 @@ claims:
     label: SOFTWARE_VALIDATED
     claim: "Formal proof work is present in the public repository."
     artifact: "math/proofs/"
-    external_repo_artifact: "math/proofs/"
-    packaged_status: "Referenced external repo path; not included in this proof folder. See README_EXTERNAL_REFERENCES.md."
     date: null
     public_safe: true
     notes: "Avoid public proof counts until the count is audited across website, README, and deck."

@@ -1,0 +1,9 @@
+{
+  "kind": "sync",
+  "name": "Replica state convergence",
+  "customer": "Distributed State (archetype)",
+  "full_state_bytes": 2048,
+  "delta_bytes": 160,
+  "change_density": "~5% of state changed per tick",
+  "measured_note": "Measured on the AX7020 ATOMiK adapter: an edge-telemetry sync tick moved 160 B vs 2,048 B of full state, with exact 64-bit LOAD/ACCUM/READ round-trips on a falsification-tested harness."
+}

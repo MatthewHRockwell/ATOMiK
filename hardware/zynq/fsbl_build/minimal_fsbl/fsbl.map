@@ -1,0 +1,321 @@
+Archive member included to satisfy reference by file (symbol)
+
+/usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7-a/nofp/libgcc.a(_udivsi3.o)
+                              minimal_fsbl/sdhc.o (__aeabi_uidiv)
+/usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7-a/nofp/libgcc.a(_divsi3.o)
+                              minimal_fsbl/sdhc.o (__aeabi_idiv)
+/usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7-a/nofp/libgcc.a(_dvmd_tls.o)
+                              /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7-a/nofp/libgcc.a(_udivsi3.o) (__aeabi_idiv0)
+
+There are no discarded input sections
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+OCM              0x00000000         0x00040000         xrw
+*default*        0x00000000         0xffffffff
+
+Linker script and memory map
+
+                0x00008000                        _stack_size = 0x8000
+                0x00000000                        . = ORIGIN (OCM)
+
+.vectors        0x00000000       0x20
+ *(.vectors)
+ .vectors       0x00000000       0x20 minimal_fsbl/startup.o
+                0x00000000                _start
+
+.text           0x00000020     0x1f2c
+ *(.text.reset)
+ .text.reset    0x00000020       0x48 minimal_fsbl/startup.o
+                0x00000020                reset_handler
+ *(.text .text.*)
+ .text          0x00000068        0x0 minimal_fsbl/startup.o
+ .text          0x00000068       0x28 minimal_fsbl/fsbl_main.o
+ .text.startup  0x00000090      0x338 minimal_fsbl/fsbl_main.o
+                0x00000090                main
+ .text          0x000003c8      0x368 minimal_fsbl/ps7_init.o
+                0x000003c8                getPS7MessageInfo
+                0x000003e4                ps7GetSiliconVersion
+                0x000003f8                mask_write
+                0x00000410                mask_poll
+                0x0000043c                mask_read
+                0x00000448                perf_start_clock
+                0x0000045c                perf_reset_clock
+                0x00000478                get_number_of_cycles_for_delay
+                0x00000498                perf_disable_clock
+                0x000004ac                perf_reset_and_start_timer
+                0x000004c8                ps7_config
+                0x000005e4                ps7_post_config
+                0x00000618                ps7_debug
+                0x0000064c                ps7_init
+ .text          0x00000730      0x720 minimal_fsbl/sdhc.o
+                0x00000938                sdhc_controller_init
+                0x00000a10                sdhc_card_init
+                0x00000c50                sdhc_read_block
+                0x00000d50                sdhc_write_block
+ .text          0x00000e50      0x7cc minimal_fsbl/fat32.o
+                0x00001190                fat32_mount
+                0x00001430                fat32_read_file
+ .text          0x0000161c      0x22c minimal_fsbl/pcap_prog.o
+                0x0000161c                pcap_program
+ .text          0x00001848      0x278 /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7-a/nofp/libgcc.a(_udivsi3.o)
+                0x00001848                __udivsi3
+                0x00001848                __aeabi_uidiv
+                0x00001aa4                __aeabi_uidivmod
+ .text          0x00001ac0      0x2b0 /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7-a/nofp/libgcc.a(_divsi3.o)
+                0x00001ac0                __aeabi_idiv
+                0x00001ac0                __divsi3
+                0x00001d54                __aeabi_idivmod
+ .text          0x00001d70        0x4 /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7-a/nofp/libgcc.a(_dvmd_tls.o)
+                0x00001d70                __aeabi_ldiv0
+                0x00001d70                __aeabi_idiv0
+ *(.rodata .rodata.*)
+ .rodata.str1.1
+                0x00001d74      0x13d minimal_fsbl/fsbl_main.o
+                                 0x77 (size before relaxing)
+ *fill*         0x00001eb1        0x3 
+ .rodata        0x00001eb4       0x30 minimal_fsbl/fsbl_main.o
+ .rodata.str1.1
+                0x00001ee4       0xc6 minimal_fsbl/ps7_init.o
+ .rodata        0x00001ee4       0x18 minimal_fsbl/ps7_init.o
+ .rodata        0x00001efc       0x50 minimal_fsbl/fat32.o
+                0x00001fac                        . = ALIGN (0x4)
+
+.glue_7         0x00001f4c        0x0
+ .glue_7        0x00001f4c        0x0 linker stubs
+
+.glue_7t        0x00001f4c        0x0
+ .glue_7t       0x00001f4c        0x0 linker stubs
+
+.vfp11_veneer   0x00001f4c        0x0
+ .vfp11_veneer  0x00001f4c        0x0 linker stubs
+
+.v4_bx          0x00001f4c        0x0
+ .v4_bx         0x00001f4c        0x0 linker stubs
+
+.iplt           0x00001f4c        0x0
+ .iplt          0x00001f4c        0x0 minimal_fsbl/startup.o
+
+.rel.dyn        0x00001f4c        0x0
+ .rel.iplt      0x00001f4c        0x0 minimal_fsbl/startup.o
+
+.data           0x00001f50     0x1e80
+                0x00001f50                        _data_start = .
+ *(.data .data.*)
+ .data          0x00001f50        0x0 minimal_fsbl/startup.o
+ .data          0x00001f50        0x0 minimal_fsbl/fsbl_main.o
+ .data          0x00001f50     0x1e80 minimal_fsbl/ps7_init.o
+                0x00001f50                ps7_post_config_1_0
+                0x00001f8c                ps7_post_config_2_0
+                0x00001fc8                ps7_post_config_3_0
+                0x00002004                ps7_debug_1_0
+                0x0000202c                ps7_debug_2_0
+                0x00002054                ps7_debug_3_0
+                0x0000207c                ps7_mio_init_data_1_0
+                0x00002268                ps7_pll_init_data_1_0
+                0x000023e8                ps7_clock_init_data_1_0
+                0x00002464                ps7_ddr_init_data_1_0
+                0x00002970                ps7_peripherals_init_data_1_0
+                0x00002a2c                ps7_mio_init_data_2_0
+                0x00002c18                ps7_pll_init_data_2_0
+                0x00002d98                ps7_clock_init_data_2_0
+                0x00002e14                ps7_ddr_init_data_2_0
+                0x00003340                ps7_peripherals_init_data_2_0
+                0x000033fc                ps7_mio_init_data_3_0
+                0x000035e8                ps7_pll_init_data_3_0
+                0x00003768                ps7_clock_init_data_3_0
+                0x000037e4                ps7_ddr_init_data_3_0
+                0x00003d00                ps7_peripherals_init_data_3_0
+                0x00003dbc                ps7_mio_init_data
+                0x00003dc0                ps7_pll_init_data
+                0x00003dc4                ps7_clock_init_data
+                0x00003dc8                ps7_ddr_init_data
+                0x00003dcc                ps7_peripherals_init_data
+ .data          0x00003dd0        0x0 minimal_fsbl/sdhc.o
+ .data          0x00003dd0        0x0 minimal_fsbl/fat32.o
+ .data          0x00003dd0        0x0 minimal_fsbl/pcap_prog.o
+ .data          0x00003dd0        0x0 /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7-a/nofp/libgcc.a(_udivsi3.o)
+ .data          0x00003dd0        0x0 /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7-a/nofp/libgcc.a(_divsi3.o)
+ .data          0x00003dd0        0x0 /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7-a/nofp/libgcc.a(_dvmd_tls.o)
+                0x00003dd0                        . = ALIGN (0x8)
+                0x00003dd0                        _data_end = .
+
+.igot.plt       0x00003dd0        0x0
+ .igot.plt      0x00003dd0        0x0 minimal_fsbl/startup.o
+
+.bss            0x00003dd0      0x808
+                0x00003dd0                        _bss_start = .
+ *(.bss .bss.*)
+ .bss           0x00003dd0        0x0 minimal_fsbl/startup.o
+ .bss           0x00003dd0        0x0 minimal_fsbl/fsbl_main.o
+ .bss           0x00003dd0        0x0 minimal_fsbl/ps7_init.o
+ .bss           0x00003dd0        0x4 minimal_fsbl/sdhc.o
+ .bss           0x00003dd4      0x800 minimal_fsbl/fat32.o
+ .bss           0x000045d4        0x0 minimal_fsbl/pcap_prog.o
+ .bss           0x000045d4        0x0 /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7-a/nofp/libgcc.a(_udivsi3.o)
+ .bss           0x000045d4        0x0 /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7-a/nofp/libgcc.a(_divsi3.o)
+ .bss           0x000045d4        0x0 /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7-a/nofp/libgcc.a(_dvmd_tls.o)
+ *(COMMON)
+                0x000045d8                        . = ALIGN (0x8)
+ *fill*         0x000045d4        0x4 
+                0x000045d8                        _bss_end = .
+
+.stack          0x000045e0     0x8000
+                0x000045e0                        _stack_bottom = .
+                0x0000c5e0                        . = (. + _stack_size)
+ *fill*         0x000045e0     0x8000 
+                0x0000c5e0                        _stack_top = .
+                0x0000c5e0                        _end = .
+LOAD minimal_fsbl/startup.o
+LOAD minimal_fsbl/fsbl_main.o
+LOAD minimal_fsbl/ps7_init.o
+LOAD minimal_fsbl/sdhc.o
+LOAD minimal_fsbl/fat32.o
+LOAD minimal_fsbl/pcap_prog.o
+LOAD /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7-a/nofp/libgcc.a
+OUTPUT(minimal_fsbl/fsbl.elf elf32-littlearm)
+LOAD linker stubs
+
+.ARM.attributes
+                0x00000000       0x2f
+ .ARM.attributes
+                0x00000000       0x21 minimal_fsbl/startup.o
+ .ARM.attributes
+                0x00000021       0x33 minimal_fsbl/fsbl_main.o
+ .ARM.attributes
+                0x00000054       0x33 minimal_fsbl/ps7_init.o
+ .ARM.attributes
+                0x00000087       0x33 minimal_fsbl/sdhc.o
+ .ARM.attributes
+                0x000000ba       0x33 minimal_fsbl/fat32.o
+ .ARM.attributes
+                0x000000ed       0x33 minimal_fsbl/pcap_prog.o
+ .ARM.attributes
+                0x00000120       0x1f /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7-a/nofp/libgcc.a(_udivsi3.o)
+ .ARM.attributes
+                0x0000013f       0x1f /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7-a/nofp/libgcc.a(_divsi3.o)
+ .ARM.attributes
+                0x0000015e       0x1f /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7-a/nofp/libgcc.a(_dvmd_tls.o)
+
+.comment        0x00000000       0x26
+ .comment       0x00000000       0x26 minimal_fsbl/fsbl_main.o
+                                 0x27 (size before relaxing)
+ .comment       0x00000026       0x27 minimal_fsbl/ps7_init.o
+ .comment       0x00000026       0x27 minimal_fsbl/sdhc.o
+ .comment       0x00000026       0x27 minimal_fsbl/fat32.o
+ .comment       0x00000026       0x27 minimal_fsbl/pcap_prog.o
+
+.debug_line     0x00000000     0x2a14
+ .debug_line    0x00000000       0x74 minimal_fsbl/startup.o
+ .debug_line    0x00000074      0x97d minimal_fsbl/fsbl_main.o
+ .debug_line    0x000009f1      0x39c minimal_fsbl/ps7_init.o
+ .debug_line    0x00000d8d      0xceb minimal_fsbl/sdhc.o
+ .debug_line    0x00001a78      0xaa0 minimal_fsbl/fat32.o
+ .debug_line    0x00002518      0x3cf minimal_fsbl/pcap_prog.o
+ .debug_line    0x000028e7       0x69 /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7-a/nofp/libgcc.a(_udivsi3.o)
+ .debug_line    0x00002950       0x7a /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7-a/nofp/libgcc.a(_divsi3.o)
+ .debug_line    0x000029ca       0x4a /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7-a/nofp/libgcc.a(_dvmd_tls.o)
+
+.debug_line_str
+                0x00000000       0xe6
+ .debug_line_str
+                0x00000000       0xe6 minimal_fsbl/startup.o
+                                 0x4f (size before relaxing)
+ .debug_line_str
+                0x000000e6       0x97 /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7-a/nofp/libgcc.a(_udivsi3.o)
+ .debug_line_str
+                0x000000e6       0x97 /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7-a/nofp/libgcc.a(_divsi3.o)
+ .debug_line_str
+                0x000000e6       0x97 /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7-a/nofp/libgcc.a(_dvmd_tls.o)
+
+.debug_info     0x00000000     0x47bd
+ .debug_info    0x00000000       0x23 minimal_fsbl/startup.o
+ .debug_info    0x00000023     0x11dc minimal_fsbl/fsbl_main.o
+ .debug_info    0x000011ff      0x8a4 minimal_fsbl/ps7_init.o
+ .debug_info    0x00001aa3     0x1574 minimal_fsbl/sdhc.o
+ .debug_info    0x00003017     0x1145 minimal_fsbl/fat32.o
+ .debug_info    0x0000415c      0x5a9 minimal_fsbl/pcap_prog.o
+ .debug_info    0x00004705       0x3e /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7-a/nofp/libgcc.a(_udivsi3.o)
+ .debug_info    0x00004743       0x3e /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7-a/nofp/libgcc.a(_divsi3.o)
+ .debug_info    0x00004781       0x3c /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7-a/nofp/libgcc.a(_dvmd_tls.o)
+
+.debug_abbrev   0x00000000     0x1103
+ .debug_abbrev  0x00000000       0x12 minimal_fsbl/startup.o
+ .debug_abbrev  0x00000012      0x35b minimal_fsbl/fsbl_main.o
+ .debug_abbrev  0x0000036d      0x2db minimal_fsbl/ps7_init.o
+ .debug_abbrev  0x00000648      0x44d minimal_fsbl/sdhc.o
+ .debug_abbrev  0x00000a95      0x486 minimal_fsbl/fat32.o
+ .debug_abbrev  0x00000f1b      0x172 minimal_fsbl/pcap_prog.o
+ .debug_abbrev  0x0000108d       0x28 /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7-a/nofp/libgcc.a(_udivsi3.o)
+ .debug_abbrev  0x000010b5       0x28 /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7-a/nofp/libgcc.a(_divsi3.o)
+ .debug_abbrev  0x000010dd       0x26 /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7-a/nofp/libgcc.a(_dvmd_tls.o)
+
+.debug_aranges  0x00000000      0x130
+ .debug_aranges
+                0x00000000       0x28 minimal_fsbl/startup.o
+ .debug_aranges
+                0x00000028       0x28 minimal_fsbl/fsbl_main.o
+ .debug_aranges
+                0x00000050       0x20 minimal_fsbl/ps7_init.o
+ .debug_aranges
+                0x00000070       0x20 minimal_fsbl/sdhc.o
+ .debug_aranges
+                0x00000090       0x20 minimal_fsbl/fat32.o
+ .debug_aranges
+                0x000000b0       0x20 minimal_fsbl/pcap_prog.o
+ .debug_aranges
+                0x000000d0       0x20 /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7-a/nofp/libgcc.a(_udivsi3.o)
+ .debug_aranges
+                0x000000f0       0x20 /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7-a/nofp/libgcc.a(_divsi3.o)
+ .debug_aranges
+                0x00000110       0x20 /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7-a/nofp/libgcc.a(_dvmd_tls.o)
+
+.debug_str      0x00000000      0xa56
+ .debug_str     0x00000000      0xa56 minimal_fsbl/startup.o
+                                 0x5b (size before relaxing)
+ .debug_str     0x00000a56      0x3dc minimal_fsbl/fsbl_main.o
+ .debug_str     0x00000a56      0x4ba minimal_fsbl/ps7_init.o
+ .debug_str     0x00000a56      0x302 minimal_fsbl/sdhc.o
+ .debug_str     0x00000a56      0x423 minimal_fsbl/fat32.o
+ .debug_str     0x00000a56      0x184 minimal_fsbl/pcap_prog.o
+ .debug_str     0x00000a56       0xbe /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7-a/nofp/libgcc.a(_udivsi3.o)
+ .debug_str     0x00000a56       0xbc /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7-a/nofp/libgcc.a(_divsi3.o)
+ .debug_str     0x00000a56       0xbf /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7-a/nofp/libgcc.a(_dvmd_tls.o)
+
+.debug_rnglists
+                0x00000000      0x50c
+ .debug_rnglists
+                0x00000000       0x19 minimal_fsbl/startup.o
+ .debug_rnglists
+                0x00000019      0x210 minimal_fsbl/fsbl_main.o
+ .debug_rnglists
+                0x00000229       0x22 minimal_fsbl/ps7_init.o
+ .debug_rnglists
+                0x0000024b      0x103 minimal_fsbl/sdhc.o
+ .debug_rnglists
+                0x0000034e      0x15f minimal_fsbl/fat32.o
+ .debug_rnglists
+                0x000004ad       0x5f minimal_fsbl/pcap_prog.o
+
+.debug_loclists
+                0x00000000     0x242e
+ .debug_loclists
+                0x00000000      0x7a4 minimal_fsbl/fsbl_main.o
+ .debug_loclists
+                0x000007a4      0x4a8 minimal_fsbl/ps7_init.o
+ .debug_loclists
+                0x00000c4c      0xb4a minimal_fsbl/sdhc.o
+ .debug_loclists
+                0x00001796      0x9dd minimal_fsbl/fat32.o
+ .debug_loclists
+                0x00002173      0x2bb minimal_fsbl/pcap_prog.o
+
+.debug_frame    0x00000000      0x3b8
+ .debug_frame   0x00000000       0x44 minimal_fsbl/fsbl_main.o
+ .debug_frame   0x00000044      0x128 minimal_fsbl/ps7_init.o
+ .debug_frame   0x0000016c       0xfc minimal_fsbl/sdhc.o
+ .debug_frame   0x00000268       0xe4 minimal_fsbl/fat32.o
+ .debug_frame   0x0000034c       0x2c minimal_fsbl/pcap_prog.o
+ .debug_frame   0x00000378       0x20 /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7-a/nofp/libgcc.a(_udivsi3.o)
+ .debug_frame   0x00000398       0x20 /usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7-a/nofp/libgcc.a(_divsi3.o)

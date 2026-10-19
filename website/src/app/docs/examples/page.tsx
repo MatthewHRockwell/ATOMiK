@@ -1,9 +1,10 @@
-import type { Metadata } from "next";
-export const metadata: Metadata = {
-  title: "Examples — ATOMiK Docs",
-  description:
-    "Evaluation-oriented examples showing delta-state algebra patterns: distributed cache models, IoT sensor fusion sketches, and real-time analytics examples.",
-};
+import { pageMetadata } from "@/lib/siteMetadata";
+export const metadata = pageMetadata({
+  title: 'Examples — ATOMiK Docs',
+  description: 'Evaluation-oriented examples showing delta-state algebra patterns: distributed cache models, IoT sensor fusion sketches, and real-time analytics examples.',
+  path: '/docs/examples',
+  openGraphTitle: 'ATOMiK Evaluation Examples',
+});
 
 const examples = [
   {
@@ -90,7 +91,8 @@ export default function ExamplesPage() {
       >
         <h2 className="text-2xl font-bold mb-3">Ready to Build?</h2>
         <p className="mb-6" style={{ color: "#8888a0" }}>
-          Start with the Python SDK. Scale to kernel-level. Deploy on FPGA.
+          Start with the public examples. Promote a path to kernel or FPGA only after
+          the workload, evidence tier, and success criteria are scoped.
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <a

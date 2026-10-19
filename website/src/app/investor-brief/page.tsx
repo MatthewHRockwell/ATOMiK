@@ -17,7 +17,7 @@ export const metadata: Metadata = {
     description:
       "ATOMiK is moving from proof to evaluated customer and IP opportunities, with public claims bounded by evidence tier.",
     url: "https://atomik.tech/investor-brief",
-    images: [{ url: "https://atomik.tech/09-current-live-atomik-desk-v039k.png", width: 1920, height: 1080 }],
+    images: [{ url: "https://atomik.tech/10-current-live-atomik-desk-v040a.png", width: 1920, height: 1080 }],
     type: "website",
   },
   twitter: {
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     title: "ATOMiK Investor Diligence",
     description:
       "Proof-bound diligence for customer evaluations, IP protection, and ASIC feasibility.",
-    images: ["https://atomik.tech/09-current-live-atomik-desk-v039k.png"],
+    images: ["https://atomik.tech/10-current-live-atomik-desk-v040a.png"],
   },
 };
 

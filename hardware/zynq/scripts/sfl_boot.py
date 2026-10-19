@@ -84,7 +84,7 @@ def sfl_frame(cmd, payload):
     return bytes([len(payload)]) + crc.to_bytes(2, "big") + cmd + payload
 
 
-def sfl_handshake(ser, timeout=10):
+def sfl_handshake(ser, timeout=120):
     """Trigger serialboot and complete the SFL magic handshake."""
     ser.reset_input_buffer()
     ser.write(b"serialboot\r\n")
@@ -130,8 +130,13 @@ def sfl_upload(ser, name, addr, data):
                 print(f"\n  ERROR: too many CRC retries ({retries})")
                 return False
         else:
-            print(f"\n  ERROR at offset 0x{offset:x}: ack={ack!r}")
-            return False
+            # Unexpected byte (could be BIOS noise). Retry up to 10x.
+            retries += 1
+            if retries > 300:
+                print(f"\n  ERROR at offset 0x{offset:x}: ack={ack!r}")
+                return False
+            # Drain any junk, then retry this chunk
+            ser.read(256)
 
     print(f"\r  [{name}] {total // 1024}KB/{total // 1024}KB "
           f"(100%) [{retries} retries]")

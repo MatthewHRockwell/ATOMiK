@@ -1,12 +1,13 @@
-import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/siteMetadata";
 import Link from "next/link";
 import Nav from "@/components/Nav";
 
-export const metadata: Metadata = {
-  title: "Workload Briefs - ATOMiK",
-  description:
-    "Public ATOMiK workload briefs and design-partner targets. No public customer case studies are claimed without approval and artifacts.",
-};
+export const metadata = pageMetadata({
+  title: 'Workload Briefs - ATOMiK',
+  description: 'ATOMiK workload briefs for design-partner discovery across edge, sync, rollback, and state-heavy evaluation paths.',
+  path: '/case-studies',
+  openGraphTitle: 'ATOMiK Workload Briefs',
+});
 
 const colors = {
   bg: "#070b12",
@@ -15,22 +16,22 @@ const colors = {
   text: "#f4f8ff",
   muted: "#9fb1c7",
   cyan: "#22d3ee",
-  blue: "#4f8fff",
+  blue: "#2563eb",
 };
 
 const workloads = [
   {
-    label: "WORKLOAD HYPOTHESIS",
+    label: "EVALUATION BRIEF",
     title: "Edge / embedded telemetry",
     body: "Constrained systems where full payloads, repeated scans, and limited backhaul make state movement expensive.",
   },
   {
-    label: "WORKLOAD HYPOTHESIS",
+    label: "EVALUATION BRIEF",
     title: "Distributed sync / replication",
     body: "Systems that repeatedly ask what changed across nodes, logs, or replicas before applying useful work.",
   },
   {
-    label: "WORKLOAD HYPOTHESIS",
+    label: "EVALUATION BRIEF",
     title: "Rollback-sensitive execution",
     body: "Runtime paths where undo, replay, checkpoints, or recovery logic add operational and latency overhead.",
   },
@@ -46,10 +47,10 @@ export default function CaseStudiesPage() {
           Workload briefs
         </p>
         <h1 className="mt-4 max-w-3xl text-4xl font-bold md:text-5xl">
-          Public customer case studies are not claimed yet.
+          Where ATOMiK should be evaluated first.
         </h1>
         <p className="mt-5 max-w-3xl text-lg leading-8" style={{ color: colors.muted }}>
-          This page now tracks target workload briefs for discovery and evaluation. Public customer results, production claims, logos, savings, or named references should only appear here when backed by referenceable artifacts and approval.
+          These workload briefs show where wasted state movement can become visible customer cost: backhaul, latency, rollback overhead, battery, or compute density. Customer names, savings, production claims, and logos appear only when backed by approved referenceable artifacts.
         </p>
       </section>
 

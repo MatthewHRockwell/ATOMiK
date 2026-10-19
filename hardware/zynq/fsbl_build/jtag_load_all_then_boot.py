@@ -27,7 +27,10 @@ PS7_INIT  = f"{ZYNQ_DIR}/scripts/ps7_init_rk7020f.tcl"
 # v0.40: HDMI demo boot uses the L2-off + video-framebuffer build (ATOMiK CSR
 # @0xF0020000 + simple-framebuffer for /dev/fb0).  The old litex/build bitstream
 # has no HDMI framebuffer, so atomik_os would have nothing to scan out.
-BITSTREAM = f"{ZYNQ_DIR}/litex-build-nax64-l2off-fb/gateware/hamgeek_rk7020f.bit"
+# Override with ATOMIK_BITSTREAM env to boot a different build (e.g. the
+# parallel-bank bench build) without editing this proven script.
+BITSTREAM = os.environ.get("ATOMIK_BITSTREAM",
+    f"{ZYNQ_DIR}/litex-build-nax64-l2off-fb/gateware/hamgeek_rk7020f.bit")
 PSLD      = f"{ZYNQ_DIR}/ps_loader"
 BIOS_PORT = "/dev/ttyUSB2"  # LiteX BIOS UART — varies; probe all ports if this fails
 

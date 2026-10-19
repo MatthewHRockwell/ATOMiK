@@ -18,7 +18,147 @@ void about_draw(window_t *w, int x, int y, int wd, int ht);    /* about.c */
 void monitor_draw(window_t *w, int x, int y, int wd, int ht);  /* monitor.c */
 /* terminal_draw, terminal_send_key, terminal_start declared in atomik_os.h */
 
-static void redraw_frame(void) {
+/* Representative recent-usage history so PREDICTIVE INSIGHTS shows real,
+ * differentiated predictions.  The predictor is real (agent_score); this is a
+ * demo warm-start, analogous to the Fabric's perf-sample seed. */
+static void seed_demo_usage(void) {
+    static const action_t seq[] = {
+        ACT_OPEN_CHAT, ACT_OPEN_CODE, ACT_OPEN_TERMINAL, ACT_OPEN_DOCUMENT,
+        ACT_OPEN_DOCUMENT, ACT_OPEN_CODE, ACT_OPEN_DOCUMENT, ACT_OPEN_DOCUMENT,
+        ACT_OPEN_CODE, ACT_OPEN_DOCUMENT, ACT_OPEN_DOCUMENT, ACT_OPEN_DOCUMENT,
+    };
+    for (unsigned i = 0; i < sizeof(seq) / sizeof(seq[0]); i++) agent_log(seq[i]);
+}
+
+/* v0.42 pointer cursor — drawn via SAVE-UNDER so a mouse move is a true DELTA,
+ * not a full-frame recomposite (the whole ATOMiK point: push what changed).
+ * The background under the cursor is saved before the arrow is painted; moving
+ * the cursor restores the old region and paints the new one, presenting only
+ * those two ~10x18 rects.  Classic tilted arrow, white fill + dark edge.
+ * Hotspot at the top-left tip.  No-op until a mouse device is present. */
+#define CUR_W 10
+#define CUR_H 18
+static const char *CUR[CUR_H] = {
+    "E         ", "EE        ", "EFE       ", "EFFE      ", "EFFFE     ",
+    "EFFFFE    ", "EFFFFFE   ", "EFFFFFFE  ", "EFFFFFFFE ", "EFFFFFFFFE",
+    "EFFFFEEEEE", "EFFEFFE   ", "EFE EFFE  ", "EE  EFFE  ", "E    EFFE ",
+    "     EFFE ", "      EFFE", "      EEEE",
+};
+static pixel_t s_cur_save[CUR_W * CUR_H]; /* background under the composited cursor */
+static int s_cur_sx = -1, s_cur_sy = -1;  /* where the cursor is currently composited */
+static int s_cur_has_save = 0;
+static unsigned long s_last_mouse_ms = 0; /* last pointer event — gates Atom's float */
+
+static void cursor_paint(int x0, int y0) {
+    pixel_t fillc = rgb(0xF0, 0xF6, 0xFF);
+    pixel_t edge  = rgb(0x06, 0x0A, 0x14);
+    for (int r = 0; r < CUR_H; r++)
+        for (int c = 0; c < CUR_W; c++) {
+            char ch = CUR[r][c];
+            if (ch == ' ') continue;
+            int px = x0 + c, py = y0 + r;
+            if (px < 0 || px >= FB_W || py < 0 || py >= FB_H) continue;
+            draw_pixel(px, py, ch == 'F' ? fillc : edge);
+        }
+}
+static void cursor_save_under(int x0, int y0) {
+    pixel_t *bb = fb_back();
+    for (int r = 0; r < CUR_H; r++)
+        for (int c = 0; c < CUR_W; c++) {
+            int px = x0 + c, py = y0 + r;
+            s_cur_save[r * CUR_W + c] =
+                (px >= 0 && px < FB_W && py >= 0 && py < FB_H) ? bb[py * FB_W + px] : 0;
+        }
+    s_cur_has_save = 1;
+}
+static void cursor_restore_under(int x0, int y0) {
+    if (!s_cur_has_save) return;
+    pixel_t *bb = fb_back();
+    for (int r = 0; r < CUR_H; r++)
+        for (int c = 0; c < CUR_W; c++) {
+            int px = x0 + c, py = y0 + r;
+            if (px >= 0 && px < FB_W && py >= 0 && py < FB_H)
+                bb[py * FB_W + px] = s_cur_save[r * CUR_W + c];
+        }
+}
+
+/* Called at the end of a FULL redraw_frame: the back buffer is freshly
+ * composited (no cursor), so save the background under the cursor and paint it
+ * on top.  Records position so a later delta move knows what to restore. */
+static void cursor_draw(void) {
+    int cx_ovr = -1, cy_ovr = -1;
+    const char *pc = getenv("ATOMIK_PREVIEW_CURSOR");  /* "x,y" for host shots */
+    if (pc && *pc) { int a = -1, b = -1; if (sscanf(pc, "%d,%d", &a, &b) == 2) { cx_ovr = a; cy_ovr = b; } }
+    if (!input_mouse_present() && cx_ovr < 0) { s_cur_sx = s_cur_sy = -1; s_cur_has_save = 0; return; }
+    int x0 = cx_ovr >= 0 ? cx_ovr : input_mouse_x();
+    int y0 = cy_ovr >= 0 ? cy_ovr : input_mouse_y();
+    cursor_save_under(x0, y0);
+    cursor_paint(x0, y0);
+    s_cur_sx = x0; s_cur_sy = y0;
+    dirty_rect(x0, y0, CUR_W, CUR_H);
+}
+
+/* Cursor-only motion: a pure delta.  Restore the old region from save-under,
+ * paint the cursor at the new spot, and present ONLY those two rects — no
+ * surface recomposite, no full present.  This is the desktop running ATOMiK on
+ * itself: a cursor move touches ~360 pixels, not 2,073,600. */
+static void cursor_move_delta(void) {
+    if (!input_mouse_present()) return;
+    int nx = input_mouse_x(), ny = input_mouse_y();
+    if (nx == s_cur_sx && ny == s_cur_sy) return;
+    if (s_cur_sx >= 0 && s_cur_has_save) {        /* erase old cursor */
+        cursor_restore_under(s_cur_sx, s_cur_sy);
+        fb_present_rect(s_cur_sx, s_cur_sy, CUR_W, CUR_H);
+    }
+    cursor_save_under(nx, ny);                     /* paint new cursor */
+    cursor_paint(nx, ny);
+    fb_present_rect(nx, ny, CUR_W, CUR_H);
+    s_cur_sx = nx; s_cur_sy = ny;
+}
+
+/* v0.42 Atom save-under.  The assistant bubble's footprint is stationary while
+ * visible (only the avatar bobs INSIDE it), so we delta-animate Atom exactly
+ * like the cursor: save the clean background under the footprint during a full
+ * frame, then on each float frame restore it, repaint Atom, and present just
+ * that rect.  Without this, Atom's 160 ms float forced a full redraw_frame()
+ * that starved the input loop and made the cursor stutter whenever Atom was up. */
+static pixel_t *s_atom_save     = NULL;
+static int      s_atom_cap      = 0;      /* allocated pixel capacity        */
+static int      s_atom_fx, s_atom_fy, s_atom_fw, s_atom_fh;  /* saved rect     */
+static int      s_atom_has_save = 0;
+
+static void atom_capture_under(int x, int y, int w, int h) {
+    if (x < 0) { w += x; x = 0; }
+    if (y < 0) { h += y; y = 0; }
+    if (x + w > FB_W) w = FB_W - x;
+    if (y + h > FB_H) h = FB_H - y;
+    if (w <= 0 || h <= 0) { s_atom_has_save = 0; return; }
+    if (w * h > s_atom_cap) {
+        pixel_t *n = realloc(s_atom_save, (size_t)w * h * sizeof(pixel_t));
+        if (!n) { s_atom_has_save = 0; return; }
+        s_atom_save = n; s_atom_cap = w * h;
+    }
+    pixel_t *bb = fb_back();
+    for (int r = 0; r < h; r++)
+        memcpy(&s_atom_save[r * w], &bb[(y + r) * FB_W + x], (size_t)w * sizeof(pixel_t));
+    s_atom_fx = x; s_atom_fy = y; s_atom_fw = w; s_atom_fh = h;
+    s_atom_has_save = 1;
+}
+
+static void atom_restore_under(void) {
+    if (!s_atom_has_save) return;
+    pixel_t *bb = fb_back();
+    for (int r = 0; r < s_atom_fh; r++)
+        memcpy(&bb[(s_atom_fy + r) * FB_W + s_atom_fx], &s_atom_save[r * s_atom_fw],
+               (size_t)s_atom_fw * sizeof(pixel_t));
+}
+
+/* redraw_frame_ex(present): compose the whole desktop into the back buffer.
+ * When present==0 we skip the cursor paint AND the fb_present() — used by the
+ * drag grab to recover the clean background into s_back WITHOUT touching the
+ * screen (most of redraw_frame's cost is the 2M-px present, and the screen
+ * shouldn't change at grab time, so that present is pure latency). */
+static void redraw_frame_ex(int present) {
     /* v0.38-A: tile-based dirty tracking.  Each visible surface
      * declares the rect it touches via dirty_rect() during its draw
      * call.  At frame end, dirty_finalize_frame() snapshots the per-
@@ -39,10 +179,193 @@ static void redraw_frame(void) {
     wm_draw_all();
     status_draw();      /* global chrome — drawn after windows */
     assistant_tick();   /* v0.39-A: auto-dismiss timeout check */
+    /* v0.42: snapshot the clean background under Atom's footprint BEFORE drawing
+     * it, so later float frames can restore + repaint Atom as a regional delta
+     * instead of forcing another full recomposite. */
+    { int fx, fy, fw, fh;
+      if (assistant_footprint(&fx, &fy, &fw, &fh)) atom_capture_under(fx, fy, fw, fh); }
     assistant_draw();   /* v0.39-A: summoned Atom overlay on top of chrome */
     notify_draw();
-    fb_present();
+    if (present) {
+        cursor_draw();  /* v0.41: pointer cursor — topmost layer */
+        fb_present();
+    }
     dirty_finalize_frame();
+}
+static void redraw_frame(void) { redraw_frame_ex(1); }
+
+/* v0.42: Atom float animation as a regional delta.  Restore the clean bg under
+ * the (stationary) bubble footprint, repaint Atom at its new float offset, and
+ * present only that rect + the cursor — no full recomposite, so the cursor
+ * stays smooth the whole time Atom is on screen.  Falls back to a full frame if
+ * no clean save-under has been captured yet. */
+static void redraw_assistant_delta(void) {
+    int fx, fy, fw, fh;
+    if (!assistant_footprint(&fx, &fy, &fw, &fh) || !s_atom_has_save) {
+        redraw_frame();
+        return;
+    }
+    int had_cursor = (s_cur_sx >= 0 && s_cur_has_save);
+    int ocx = s_cur_sx, ocy = s_cur_sy;
+    if (had_cursor) cursor_restore_under(s_cur_sx, s_cur_sy);
+    s_cur_has_save = 0; s_cur_sx = s_cur_sy = -1;
+
+    atom_restore_under();   /* clean bg back under the bubble */
+    assistant_tick();       /* may auto-dismiss — then draw no-ops, leaving the
+                             * restored clean bg, which erases Atom cleanly. */
+    assistant_draw();       /* Atom at its new float position */
+    cursor_draw();
+    fb_present_rect(s_atom_fx, s_atom_fy, s_atom_fw, s_atom_fh);
+    if (had_cursor)    fb_present_rect(ocx, ocy, CUR_W, CUR_H);
+    if (s_cur_sx >= 0) fb_present_rect(s_cur_sx, s_cur_sy, CUR_W, CUR_H);
+}
+
+/* v0.42 delta render for clicks: when a click mutates ONE window's content (e.g.
+ * selecting a lane on the Parallel Aggregate card), recomposite only that window
+ * + the cursor and present only those rects — instead of a full-desktop
+ * redraw_frame() that brute-forces 2,073,600 pixels and freezes the cursor for a
+ * frame.  This is the cursor's save-under generalized to the window manager. */
+static void redraw_window_delta(int id) {
+    int rx, ry, rw, rh;
+    int had_cursor = (s_cur_sx >= 0 && s_cur_has_save);
+    int ocx = s_cur_sx, ocy = s_cur_sy;
+    /* lift the cursor off the back buffer so the window recomposite + cursor
+     * repaint start from a clean background. */
+    if (had_cursor) cursor_restore_under(s_cur_sx, s_cur_sy);
+    s_cur_has_save = 0; s_cur_sx = s_cur_sy = -1;
+
+    wm_redraw_window(id, &rx, &ry, &rw, &rh);
+    if (rw == 0) { redraw_frame(); return; }   /* window vanished -> full redraw */
+
+    /* If Atom is up and overlaps the recomposited window, the window draw just
+     * wiped the overlapping aura pixels — recapture the (now-fresh) bg under the
+     * footprint so the float save-under stays current, then repaint Atom on top
+     * and present its footprint so it doesn't flicker out on a click. */
+    int ax, ay, aw, ah, have_atom = 0;
+    if (assistant_visible()) {
+        if (assistant_footprint(&ax, &ay, &aw, &ah)) atom_capture_under(ax, ay, aw, ah);
+        assistant_draw();
+        have_atom = assistant_bounds(&ax, &ay, &aw, &ah);
+    }
+
+    cursor_draw();                             /* save-under + paint at cursor pos */
+    fb_present_rect(rx, ry, rw, rh);           /* the changed window */
+    if (have_atom) fb_present_rect(ax, ay, aw, ah);              /* Atom on top */
+    if (had_cursor) fb_present_rect(ocx, ocy, CUR_W, CUR_H);      /* clear old cursor */
+    if (s_cur_sx >= 0) fb_present_rect(s_cur_sx, s_cur_sy, CUR_W, CUR_H); /* new cursor */
+}
+
+/* v0.42 finest delta: a workloads lane-select changes only three elements
+ * (ATOMiK panel, ladder, savings banner).  Redraw JUST those + the cursor and
+ * present only their rects — skipping the window's unchanged header/tabs/title/
+ * CONVENTIONAL-panel/provenance AA text.  A lane select touches a few thousand
+ * pixels, not the window, not the desktop.  Falls back to a full redraw if the
+ * surface can't do the sub-element path. */
+static void redraw_selection_delta(void) {
+    int rx, ry, rw, rh;
+    int had_cursor = (s_cur_sx >= 0 && s_cur_has_save);
+    int ocx = s_cur_sx, ocy = s_cur_sy;
+    if (had_cursor) cursor_restore_under(s_cur_sx, s_cur_sy);
+    s_cur_has_save = 0; s_cur_sx = s_cur_sy = -1;
+
+    if (!workloads_surface_redraw_selection(&rx, &ry, &rw, &rh)) {
+        redraw_window_delta(workloads_surface_window_id());  /* -> full if no window */
+        return;
+    }
+
+    /* keep Atom on top if it overlaps the repainted sub-elements (see above). */
+    int ax, ay, aw, ah, have_atom = 0;
+    if (assistant_visible()) {
+        if (assistant_footprint(&ax, &ay, &aw, &ah)) atom_capture_under(ax, ay, aw, ah);
+        assistant_draw();
+        have_atom = assistant_bounds(&ax, &ay, &aw, &ah);
+    }
+
+    cursor_draw();
+    fb_present_rect(rx, ry, rw, rh);
+    if (have_atom) fb_present_rect(ax, ay, aw, ah);
+    if (had_cursor) fb_present_rect(ocx, ocy, CUR_W, CUR_H);
+    if (s_cur_sx >= 0) fb_present_rect(s_cur_sx, s_cur_sy, CUR_W, CUR_H);
+}
+
+/* v0.43 window DRAG — bandwidth-optimal (measured: a single window write to the
+ * fb is ~23ms/43fps; the old path did ~4 full-window memory ops/move ~86ms/10fps
+ * by round-tripping through s_back + double-presenting).  Here each move is ONE
+ * window write straight to the scanout (fb_blit_to_screen) + the thin uncovered
+ * trailing edge restored from s_back — no recompose, no s_back round-trip.  The
+ * cursor is BAKED into the window copy at the grab offset (it stays at a fixed
+ * spot on the window while dragging), so it moves for free.  The original stays
+ * in place; the window snaps to the drop point on release. */
+static pixel_t *s_wdrag_content = NULL;   /* window pixels + baked cursor       */
+static int s_wdrag_id = 0, s_wdrag_w = 0, s_wdrag_h = 0, s_wdrag_dx = 0, s_wdrag_dy = 0;
+static int s_wdrag_x = 0, s_wdrag_y = 0;
+
+static void wdrag_begin(int id, int mx, int my) {
+    int wx, wy, ww, wh;
+    if (!wm_window_rect(id, &wx, &wy, &ww, &wh)) return;
+    s_wdrag_content = realloc(s_wdrag_content, (size_t)ww*wh*sizeof(pixel_t));
+    if (!s_wdrag_content) { s_wdrag_id = 0; return; }
+    s_wdrag_id = id; s_wdrag_w = ww; s_wdrag_h = wh;
+    s_wdrag_dx = mx - wx; s_wdrag_dy = my - wy;
+    /* lift the cursor off s_back first, so neither the captured copy nor a later
+     * trailing-restore carries a stale cursor. */
+    if (s_cur_has_save) cursor_restore_under(s_cur_sx, s_cur_sy);
+    s_cur_has_save = 0; s_cur_sx = s_cur_sy = -1;
+    pixel_t *bb = fb_back();
+    for (int r = 0; r < wh; r++) for (int c = 0; c < ww; c++) {
+        int px = wx + c, py = wy + r;
+        s_wdrag_content[r*ww+c] = (px>=0&&px<FB_W&&py>=0&&py<FB_H) ? bb[py*FB_W+px] : 0;
+    }
+    /* bake the cursor into the copy at the grab offset (fixed spot while dragging) */
+    pixel_t fillc = rgb(0xF0,0xF6,0xFF), edge = rgb(0x06,0x0A,0x14);
+    for (int r = 0; r < CUR_H; r++) for (int c = 0; c < CUR_W; c++) {
+        char ch = CUR[r][c]; if (ch == ' ') continue;
+        int px = s_wdrag_dx + c, py = s_wdrag_dy + r;
+        if (px>=0 && px<ww && py>=0 && py<wh)
+            s_wdrag_content[py*ww+px] = (ch=='F') ? fillc : edge;
+    }
+    /* REPLACE the original in s_back with cached wallpaper, so trailing-restores
+     * show background (a real move), not the old window (a leftover copy).  Cheap
+     * (~5ms rect blit, no recompose, no present).  The first move repaints the
+     * origin area on screen; the hero behind the card is briefly absent there and
+     * restored by the release recomposite. */
+    wallpaper_blit_rect(wx, wy, ww, wh);
+    s_wdrag_x = wx; s_wdrag_y = wy;   /* copy starts exactly over the original */
+}
+
+/* Restore just the uncovered (trailing) part of the old rect — vertical band of
+ * the columns the new rect doesn't cover (clamped to old width) + horizontal
+ * band over the x-overlap.  All from s_back (the static desktop bg). */
+static void wdrag_restore_trailing(int ox, int oy, int nx, int ny) {
+    int w = s_wdrag_w, h = s_wdrag_h, dx = nx - ox, dy = ny - oy;
+    if (dx > 0)       fb_present_rect(ox, oy, dx < w ? dx : w, h);
+    else if (dx < 0)  { if (-dx >= w) fb_present_rect(ox, oy, w, h);
+                        else          fb_present_rect(nx + w, oy, -dx, h); }
+    int oxw = w - (dx > 0 ? dx : -dx);
+    if (oxw > 0) {
+        int oxs = dx > 0 ? ox + dx : ox;
+        if (dy > 0)      fb_present_rect(oxs, oy, oxw, dy < h ? dy : h);
+        else if (dy < 0){ if (-dy >= h) fb_present_rect(oxs, oy, oxw, h);
+                          else          fb_present_rect(oxs, ny + h, oxw, -dy); }
+    }
+}
+
+static void wdrag_move(int mx, int my) {
+    if (!s_wdrag_id) return;
+    int nx = mx - s_wdrag_dx, ny = my - s_wdrag_dy, w = s_wdrag_w, h = s_wdrag_h;
+    if (ny < 0) ny = 0; if (ny > FB_H - WM_TITLE_H) ny = FB_H - WM_TITLE_H;
+    if (nx < 80 - w) nx = 80 - w; if (nx > FB_W - 80) nx = FB_W - 80;
+    if (nx == s_wdrag_x && ny == s_wdrag_y) return;
+    wdrag_restore_trailing(s_wdrag_x, s_wdrag_y, nx, ny);  /* uncover old edge */
+    fb_blit_to_screen(s_wdrag_content, w, h, nx, ny);      /* window straight to fb */
+    s_wdrag_x = nx; s_wdrag_y = ny;
+}
+
+static void wdrag_end(void) {
+    if (!s_wdrag_id) return;
+    wm_move_to(s_wdrag_id, s_wdrag_x, s_wdrag_y);
+    s_wdrag_id = 0;
+    redraw_frame();                          /* finalize (z + position)           */
 }
 
 /* v0.31: workspace_w returns the width of the central column where
@@ -75,10 +398,13 @@ static void open_about(void) {
 
 static int s_monitor_id = 0;
 static void open_monitor(void) {
-    if (s_monitor_id) { wm_focus(s_monitor_id); return; }
-    int ww = 980, wh = 660;            /* restored: fits in 1424-px workspace */
-    int wx = workspace_cx(ww) + 40;    /* offset so it doesn't fully cover About */
-    int wy = (FB_H - wh) / 2 - 40;
+    if (s_monitor_id) {
+        if (wm_exists(s_monitor_id)) { wm_focus(s_monitor_id); return; }
+        s_monitor_id = 0;   /* was closed via the title-bar X — reopen */
+    }
+    int ww = 900, wh = 600;
+    int wx = (FB_W - ww) / 2;          /* centered — never off the right edge   */
+    int wy = (FB_H - wh) / 2;
     window_t *w = wm_open("ATOMiK Monitor", wx, wy, ww, wh, monitor_draw, NULL);
     if (w) s_monitor_id = w->id;
 }
@@ -304,7 +630,7 @@ int main(int argc, char **argv) {
      * 'L' toggles it at runtime. */
     {
         FILE *df = fopen("/tmp/atomik_demo", "r");
-        if (df) { fabric_demo_enable(1); fclose(df); }
+        if (df) { fabric_demo_enable(1); seed_demo_usage(); fabric_seed_waveforms(); fclose(df); }
     }
 
     /* v0.40 in-OS AUTO-CAPTURE: /tmp/atomik_autoshot => after AUTOSHOT_MS of
@@ -341,6 +667,11 @@ int main(int argc, char **argv) {
      * provider.  Surfaces can now consume by ID through metric_get(),
      * and the Pulse Bar's "DATA:" badge reads metric_worst_source(). */
     metric_init();
+    /* v0.40: live parallel-bank throughput producer.  Maps the bench engine
+     * @0xF0021000 (O_RDWR) and registers bench.* LIVE metrics.  Non-fatal:
+     * if the engine/mem is absent it stays WAITING and the surface dims. */
+    bench_open();
+    bench_register_metrics();
     /* v0.38-A: tile-based dirty-region tracker.  Components declare
      * their dirty rects each frame; redraw_frame() finalizes per-
      * frame stats so the VISUAL Resource Fabric lane reflects real
@@ -357,11 +688,81 @@ int main(int argc, char **argv) {
     fabric_open();
     redraw_frame();    /* second paint so Fabric is visible immediately */
 
+    /* ── Host live-loop repro harness (ATOMIK_PREVIEW_LIVELOOP) ───────────────
+     * Runs the REAL per-frame tick + redraw cycle over a fast-forwarded sim
+     * clock, with Atom summoned, so time-triggered runtime crashes (e.g. the
+     * ~12 s Atom auto-dismiss segfault) reproduce on the host under a
+     * sanitizer — something the single-shot preview can't do because it never
+     * runs the live event loop.  Build with -fsanitize=address for a trace.
+     *   ATOMIK_LIVELOOP_MS=N    total sim ms (default 16000, past the 12 s dismiss)
+     *   ATOMIK_LIVELOOP_SUMMON=N  ms at which Atom is summoned (default 2000) */
+    if (getenv("ATOMIK_PREVIEW_LIVELOOP")) {
+        seed_demo_usage();
+        fabric_seed_waveforms();
+        fabric_demo_enable(1);          /* match the board's self-driving demo  */
+        workloads_surface_open();       /* Workloads open, as on the board      */
+        const char *fm = getenv("ATOMIK_LIVELOOP_MODE");
+        assistant_mode_t lm = ASSIST_EXPLAIN;
+        if (fm) {
+            if      (!strcmp(fm, "thinking")) lm = ASSIST_THINKING;
+            else if (!strcmp(fm, "success"))  lm = ASSIST_SUCCESS;
+            else if (!strcmp(fm, "warning"))  lm = ASSIST_WARNING;
+        }
+        long total  = getenv("ATOMIK_LIVELOOP_MS") ? atol(getenv("ATOMIK_LIVELOOP_MS")) : 40000;
+        long summon = getenv("ATOMIK_LIVELOOP_SUMMON") ? atol(getenv("ATOMIK_LIVELOOP_SUMMON")) : 2000;
+        long next_summon = summon;
+        for (long t = 0; t <= total; t += 16) {
+            anim_set_sim_time((unsigned long)t);
+            /* re-summon after each auto-dismiss so multiple summon/dismiss
+             * cycles run (the board's demo re-summons on each event). */
+            if (t >= next_summon && !assistant_visible()) {
+                assistant_summon_mode(lm);
+                next_summon = t + 13000;   /* dismiss is at +12s; re-arm after */
+            }
+            stocks_tick();
+            workloads_tick();
+            fabric_tick();
+            bench_tick();
+            wlmeasure_tick();
+            state_watch_tick();
+            replica_flow_tick();
+            status_tick();
+            redraw_frame();   /* drives assistant_tick (auto-dismiss) + draw */
+            if ((t % 1000) == 0) {
+                long rss_kb = 0;
+                FILE *sf = fopen("/proc/self/statm", "r");
+                if (sf) { long pages = 0, res = 0;
+                    if (fscanf(sf, "%ld %ld", &pages, &res) == 2) rss_kb = res * (sysconf(_SC_PAGESIZE) / 1024);
+                    fclose(sf); }
+                fprintf(stderr, "[liveloop] sim t=%ldms  RSS=%ldKB\n", t, rss_kb);
+            }
+        }
+        fprintf(stderr, "[liveloop] survived %ldms — no crash\n", total);
+        fb_close();
+        return 0;
+    }
+
     /* Host preview build: redraw_frame() above already wrote the PNG via the
      * host fb backend.  Exit instead of entering the interactive input loop
      * so `make host-shot` dumps a faithful frame of the REAL renderer in
      * seconds.  Gated on ATOMIK_PREVIEW so the binary could still loop. */
     if (getenv("ATOMIK_PREVIEW")) {
+        seed_demo_usage();   /* representative usage so PREDICTIVE INSIGHTS populates */
+        fabric_seed_waveforms();   /* lively Resource Fabric waves for the capture */
+        /* v0.41: open a named surface for the host shot (layout verify only). */
+        if (getenv("ATOMIK_PREVIEW_WORKLOAD")) workloads_surface_open();
+        /* v0.42: summon Atom in a chosen mood for animation host-shots:
+         * ATOMIK_PREVIEW_ASSIST=success|thinking|warning|explain */
+        {
+            const char *am = getenv("ATOMIK_PREVIEW_ASSIST");
+            if (am) {
+                assistant_mode_t m = ASSIST_EXPLAIN;
+                if      (!strcmp(am, "success"))  m = ASSIST_SUCCESS;
+                else if (!strcmp(am, "thinking")) m = ASSIST_THINKING;
+                else if (!strcmp(am, "warning"))  m = ASSIST_WARNING;
+                assistant_summon_mode(m);
+            }
+        }
         /* Optional warm-up: run N frames (ticking fabric/status each) before
          * the final dump so time-evolving surfaces — the self-driving demo
          * workload, building waveforms — are visible in the capture.  Default
@@ -372,11 +773,23 @@ int main(int argc, char **argv) {
         for (int i = 0; i < frames; i++) {
             status_tick();
             fabric_tick();
+            bench_tick();                   /* parse the live sweep file too   */
+            wlmeasure_tick();               /* + memory-workload measurements  */
             redraw_frame();                 /* host fb_present() dumps the PNG */
             if (i + 1 < frames) usleep(120000);  /* real-time advance for timers */
         }
+        /* clean idle home for concept comparison — no transient assistant */
+        if (getenv("ATOMIK_PREVIEW_CLEAN")) { assistant_dismiss(); redraw_frame(); }
         fb_close();
         return 0;
+    }
+
+    /* Demo/capture startup hook: open the Workloads surface on launch if the
+     * flag file exists — robust where the stdin 'w' keystroke is timing-flaky
+     * (the launcher just `touch`es it). */
+    if (access("/tmp/atomik_open_workloads", F_OK) == 0) {
+        workloads_surface_open();
+        redraw_frame();
     }
 
     unsigned long autoshot_start = anim_now_ms();
@@ -397,37 +810,33 @@ int main(int argc, char **argv) {
         /* Frame-loop: when an animation is active or the terminal is
          * focused (async pty output), poll fast (16ms = ~60Hz). Otherwise
          * idle at 100ms to save CPU. */
-        int poll_ms = anim_active() ? 16 : 100;
+        int poll_ms = (anim_active() || wm_dragging()) ? 16 : 100;
         if (s_terminal_id) {
             window_t *top = wm_topmost();
             if (top && top->id == s_terminal_id) poll_ms = 16;
         }
         event_t ev = input_poll(poll_ms);
-        /* v0.23: stocks ticker mutates one row's price every ~1 s.
-         * Cheap call (no allocation, no I/O) — safe to invoke every
-         * frame; it self-rate-limits via an internal counter. v0.23.1:
-         * returns 1 when it actually changed something so we can
-         * force a repaint. */
-        int stocks_changed = stocks_tick();
-        /* v0.30: tick the Resource Fabric once per frame so its
-         * personality auto-detection re-classifies based on recent
-         * LLM/state activity.  Cheap (no I/O, no allocation). */
-        fabric_tick();
-        /* v0.35: tick the State Watch sampler.  Self-rate-limits to
-         * 200 ms per sample, so calling it every frame is fine.
-         * Passive observer — reads existing producers + maintains
-         * its own personality timeline + speedup sparkline rings. */
-        state_watch_tick();
-        /* v0.37: tick the Replica Flow surface.  Spawns/expires the
-         * in-flight delta pulses based on EVT_SYNC_REPLICA event-bus
-         * deltas.  Passive observer; cheap. */
-        replica_flow_tick();
-        /* v0.38-C: tick the Pulse Bar's event-pulse sparkline sampler.
-         * Self-rate-limits to 150 ms.  Cheap. */
-        status_tick();
+        /* Per-frame producers (stocks/fabric/bench/state/replica/status).  All
+         * cheap + self-rate-limited, BUT during a window drag they're pure
+         * latency between mouse events (and their repaints are suppressed
+         * anyway), so skip them to keep the drag loop tight. */
+        int stocks_changed = 0, wl_changed = 0;
+        if (!wm_dragging()) {
+            stocks_changed = stocks_tick();
+            wl_changed     = workloads_tick();   /* v0.41 demo auto-cycle */
+            fabric_tick();
+            bench_tick();
+            wlmeasure_tick();
+            state_watch_tick();
+            replica_flow_tick();
+            status_tick();
+        }
         if (ev.kind == EV_QUIT) { s_running = 0; break; }
         if (ev.kind == EV_KEY) {
             int dirty = 0;
+            /* any key also releases a (possibly stuck) window drag, then the key
+             * is handled normally — never leave a drag frozen. */
+            if (wm_dragging()) { wm_drag_end(); wdrag_end(); }
 
             /* v0.31 patch 8 — Global Input Router.  Order matters and
              * is now explicit (per ChatGPT review 2026-05-06):
@@ -473,6 +882,15 @@ int main(int argc, char **argv) {
              * apps because they ARE chrome. */
             else if (ev.key == 'r' || ev.key == 'R') {
                 fabric_open();
+                dirty = 1;
+            }
+            else if (ev.key == 'w' || ev.key == 'W') {
+                /* v0.41: open the Workloads surface; re-pressing W while it's
+                 * already up cycles through the scenarios (Telemetry Sync ->
+                 * Control Coalescing -> Parallel Aggregate). */
+                if (workloads_surface_is_open()) workloads_cycle_scenario();
+                workloads_surface_open();
+                agent_log(ACT_OPEN_WORKLOAD);
                 dirty = 1;
             }
             else if (ev.key == 'p' || ev.key == 'P') {
@@ -631,7 +1049,7 @@ int main(int argc, char **argv) {
                 s_dock_hover = slot;
                 action_t a = dock_action_for_slot(slot);
                 if      (a == ACT_OPEN_ABOUT)     open_about();
-                else if (a == ACT_OPEN_MONITOR)   open_monitor();
+                else if (a == ACT_OPEN_MONITOR)   system_surface_open();  /* SYSTEM rail */
                 else if (a == ACT_OPEN_TERMINAL)  open_terminal();
                 else if (a == ACT_OPEN_FILES)     open_files();
                 else if (a == ACT_OPEN_NOTES)     open_notes();
@@ -655,6 +1073,80 @@ int main(int argc, char **argv) {
             }
 
             if (dirty) redraw_frame();
+        } else if (ev.kind == EV_MOUSE_MOVE || ev.kind == EV_MOUSE_DOWN ||
+                   ev.kind == EV_MOUSE_UP) {
+            /* v0.41 pointer: motion moves the cursor + updates rail hover;
+             * a left-click on a rail cell activates that capability (same
+             * dispatch as the number-key launcher). */
+            s_last_mouse_ms = anim_now_ms();   /* freezes Atom's float while moving */
+            int slot = dock_hit_test(ev.mx, ev.my);
+            int s_wl_click = 0;
+            if (wm_dragging()) {
+                /* a title-bar drag owns all motion until the button releases.
+                 * Move = save-under memcpy (smooth); release = one recomposite.
+                 * End on EITHER up OR a fresh down — if a button-up is ever
+                 * dropped (USB input is flaky on this board) a new click must
+                 * still release the drag, never leave it stuck (a stuck drag
+                 * suppresses redraws and freezes the screen). */
+                if (ev.kind == EV_MOUSE_UP || ev.kind == EV_MOUSE_DOWN) {
+                    wm_drag_end(); wdrag_end();
+                } else {
+                    wdrag_move(ev.mx, ev.my);
+                }
+            } else if (ev.kind == EV_MOUSE_DOWN && slot >= 0) {
+                s_dock_hover = slot;
+                action_t a = dock_action_for_slot(slot);
+                if      (a == ACT_OPEN_ABOUT)     open_about();
+                else if (a == ACT_OPEN_MONITOR)   system_surface_open();
+                else if (a == ACT_OPEN_TERMINAL)  open_terminal();
+                else if (a == ACT_OPEN_FILES)     open_files();
+                else if (a == ACT_OPEN_NOTES)     open_notes();
+                else if (a == ACT_OPEN_ASSISTANT) assistant_summon();
+                else if (a == ACT_OPEN_WORKLOAD)  workloads_surface_open();
+                if (a != ACT_NONE) agent_log(a); else agent_log(ACT_DOCK_HOVER);
+                redraw_frame();
+            } else if (ev.kind == EV_MOUSE_DOWN) {
+                /* v0.43: window manager owns clicks on chrome — title-bar drag,
+                 * close dot, and raise-on-body.  Card content (tabs/lanes/Shuffle)
+                 * is checked first so those keep their cheap delta repaints. */
+                int region; int wid = wm_pick(ev.mx, ev.my, &region);
+                if ((s_wl_click = workloads_surface_handle_click(ev.mx, ev.my))) {
+                    if (s_wl_click == 2) redraw_window_delta(workloads_surface_window_id());
+                    else                 redraw_selection_delta();
+                } else if (wid && region == WM_HIT_CLOSE) {
+                    wm_close(wid);
+                    redraw_frame();
+                } else if (wid && region == WM_HIT_TITLE) {
+                    wm_focus(wid);
+                    wm_drag_begin(wid, ev.mx, ev.my);
+                    wdrag_begin(wid, ev.mx, ev.my);   /* raise + start wireframe drag */
+                } else if (wid) {
+                    wm_focus(wid);           /* raise on body click */
+                    redraw_frame();
+                } else {
+                    cursor_move_delta();     /* press on bare desktop */
+                }
+            } else if (ev.kind == EV_MOUSE_MOVE && slot != s_dock_hover) {
+                /* moved across a rail-slot boundary: the hover highlight changed,
+                 * so repaint (full — the dock spans the rail). */
+                s_dock_hover = slot;
+                redraw_frame();
+            } else {
+                /* pure cursor motion (same hover), button RELEASE, or a press on
+                 * dead space — nothing composited changes, so a DELTA cursor
+                 * update only.  No full recomposite.  (A mouse-up landing here
+                 * used to trigger redraw_frame() — that was the ~1s post-click
+                 * freeze.)  This is ATOMiK on its own desktop. */
+                s_dock_hover = slot;
+                cursor_move_delta();
+            }
+        } else if (wm_dragging()) {
+            /* A drag is in progress (button held, cursor momentarily still).
+             * Skip idle redraws so the dragged window isn't erased.  BUT if no
+             * pointer event has arrived for 2.5 s the button-up was almost
+             * certainly dropped and the drag is stuck (which freezes the whole
+             * screen) — force-end it so the desktop recovers on its own. */
+            if (anim_now_ms() - s_last_mouse_ms > 2500) { wm_drag_end(); wdrag_end(); }
         } else {
             /* No event arrived. Redraw a frame if an animation is in
              * progress (window fade-in, predicted-icon pulse, etc.) OR if
@@ -665,7 +1157,24 @@ int main(int argc, char **argv) {
                 if (top && top->id == s_terminal_id) need_frame = 1;
             }
             if (!need_frame && stocks_changed && s_stocks_id) need_frame = 1;
-            if (need_frame) redraw_frame();
+            if (!need_frame && wl_changed) need_frame = 1;
+            /* live parallel-bank sweep refreshed -> repaint the open Workloads
+             * surface (it launches with no input; nothing else would). */
+            { int bd = bench_take_dirty();
+              if (!need_frame && bd && workloads_surface_is_open()) need_frame = 1; }
+            if (need_frame) {
+                redraw_frame();
+            } else if (assistant_animating() &&
+                       anim_now_ms() - s_last_mouse_ms > 220) {
+                /* nothing else changed — Atom's float is the only thing moving.
+                 * Animate it as a regional delta so the cursor stays smooth
+                 * instead of a full recomposite every 160 ms.  AND only when the
+                 * cursor has been idle >220 ms: a float frame costs ~10-25 ms, so
+                 * letting it fire mid-motion makes the cursor hitch + jump to
+                 * catch up.  Atom bobs when you're not moving; freezes when you
+                 * are.  Cursor smoothness wins. */
+                redraw_assistant_delta();
+            }
         }
     }
 

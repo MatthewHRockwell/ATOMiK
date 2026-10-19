@@ -1,73 +1,76 @@
-import type { Metadata } from "next";
-export const metadata: Metadata = {
-  title: "Compatibility Matrix — ATOMiK Docs",
-  description:
-    "ATOMiK platform support matrix, reference architectures, and cloud provider deployment benchmarks.",
-};
+import { pageMetadata } from "@/lib/siteMetadata";
+export const metadata = pageMetadata({
+  title: 'Evaluation Compatibility — ATOMiK Docs',
+  description: 'ATOMiK platform review matrix with evidence-scoped software, hardware, and evaluation surfaces.',
+  path: '/docs/compatibility',
+  openGraphTitle: 'ATOMiK Evaluation Compatibility',
+});
 
 /* ── Platform support data ─────────────────────────────────────────── */
 
 const platforms = [
   {
     platform: "Python SDK",
-    status: "GA",
+    status: "Public",
     minVersion: "Python 3.9+",
-    testedOn: "Linux, macOS, Windows",
+    testedOn: "Public software path; verify package version before quoting support.",
   },
   {
     platform: "C99 Header",
-    status: "GA",
+    status: "Public",
     minVersion: "Any C99 compiler",
-    testedOn: "GCC, Clang, MSVC, ARM GCC, RISC-V GCC",
+    testedOn: "Source-review path; compiler claims require current CI or local artifacts.",
   },
   {
     platform: "Linux Kernel Module",
-    status: "GA",
+    status: "Evaluation",
     minVersion: "Linux 5.15+",
-    testedOn: "Ubuntu 22.04/24.04, Debian 12, RHEL 9",
+    testedOn: "Request-based technical evaluation surface.",
   },
   {
     platform: "FPGA (Tang Nano 9K)",
-    status: "GA",
+    status: "Archived",
     minVersion: "Gowin EDA 1.9+",
-    testedOn: "GW1NR-9K (8,640 LUT)",
+    testedOn: "Historical prototype path; use current proof notes for public claims.",
   },
   {
     platform: "FPGA (Zynq)",
-    status: "Beta",
+    status: "Validated",
     minVersion: "Vivado 2025.2+",
-    testedOn: "XC7Z020 (53,200 LUT)",
+    testedOn: "AX7020 / XC7Z020 artifacts with proof-level labels.",
   },
   {
     platform: "npm Package",
-    status: "Preview",
+    status: "Roadmap",
     minVersion: "Node.js 16+",
-    testedOn: "\u2014",
+    testedOn: "Do not quote as a current public product path.",
   },
 ];
 
 const statusColor: Record<string, { bg: string; text: string; border: string }> = {
-  GA: { bg: "#22c55e18", text: "#22c55e", border: "#22c55e40" },
-  Beta: { bg: "#d4a84318", text: "#d4a843", border: "#d4a84340" },
-  Preview: { bg: "#4f8fff18", text: "#4f8fff", border: "#4f8fff40" },
+  Public: { bg: "#22c55e18", text: "#22c55e", border: "#22c55e40" },
+  Evaluation: { bg: "#4f8fff18", text: "#4f8fff", border: "#4f8fff40" },
+  Archived: { bg: "#8b5cf618", text: "#8b5cf6", border: "#8b5cf640" },
+  Validated: { bg: "#22d3ee18", text: "#22d3ee", border: "#22d3ee40" },
+  Roadmap: { bg: "#d4a84318", text: "#d4a843", border: "#d4a84340" },
 };
 
 /* ── Reference architectures ───────────────────────────────────────── */
 
 const refArchitectures = [
   {
-    title: "Microservices State Sync",
-    description: "Python SDK + SyncTable + Redis adapter",
+    title: "State-heavy service path",
+    description: "Review where repeated state diffing, replay, or sync work dominates.",
     color: "#4f8fff",
   },
   {
-    title: "Edge-to-Cloud Pipeline",
-    description: "Kernel module + IoT sensors + cgroup tracking",
+    title: "Edge / embedded path",
+    description: "Scope battery, heat, backhaul, and local-latency constraints before claims.",
     color: "#22c55e",
   },
   {
-    title: "High-Throughput Data Plane",
-    description: "FPGA + AXI4-Lite + 512 parallel banks",
+    title: "Hardware proof path",
+    description: "Map the workload to measured, hardware-validated, or synthesis-labeled artifacts.",
     color: "#d4a843",
   },
 ];
@@ -76,18 +79,18 @@ const refArchitectures = [
 
 const cloudProviders = [
   {
-    provider: "AWS",
+    provider: "Software baseline",
     detail: "c7g.xlarge (Graviton3): run local benchmark before quoting throughput",
     color: "#ff9900",
   },
   {
-    provider: "GCP",
-    detail: "c3-standard-4: estimate requires workload-specific benchmark",
+    provider: "Hardware baseline",
+    detail: "Use AX7020 artifacts and interpretation notes before quoting board behavior.",
     color: "#4285f4",
   },
   {
-    provider: "Azure",
-    detail: "Dv5 series: estimate requires workload-specific benchmark",
+    provider: "Deployment target",
+    detail: "Cloud, edge, and rack claims require a workload-specific benchmark exchange.",
     color: "#00bcf2",
   },
 ];
@@ -104,15 +107,16 @@ export default function CompatibilityPage() {
         Compatibility
       </p>
       <h1 className="text-4xl font-bold tracking-tight mb-4">
-        Hardware &amp; Platform Compatibility
+        Evaluation Compatibility
       </h1>
       <p className="text-lg mb-12" style={{ color: "#8888a0" }}>
-        Supported platforms, reference architectures, and cloud deployment
-        benchmarks.
+        Public review surfaces, hardware paths, and deployment targets with
+        evidence boundaries. Treat this as an evaluation map, not a production
+        support contract.
       </p>
 
-      {/* ─── Section 1: Platform Support Matrix ─────────────────── */}
-      <h2 className="text-2xl font-bold mb-6">Platform Support Matrix</h2>
+      {/* ─── Section 1: Platform Review Matrix ─────────────────── */}
+      <h2 className="text-2xl font-bold mb-6">Platform Review Matrix</h2>
 
       <div
         className="rounded-xl overflow-hidden mb-12 border"
@@ -181,8 +185,8 @@ export default function CompatibilityPage() {
         </div>
       </div>
 
-      {/* ─── Section 2: Reference Architectures ─────────────────── */}
-      <h2 className="text-2xl font-bold mb-6">Reference Architectures</h2>
+      {/* ─── Section 2: Evaluation Patterns ─────────────────── */}
+      <h2 className="text-2xl font-bold mb-6">Evaluation Patterns</h2>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
         {refArchitectures.map((arch) => (
@@ -208,8 +212,8 @@ export default function CompatibilityPage() {
         ))}
       </div>
 
-      {/* ─── Section 3: Cloud Provider Deployment ───────────────── */}
-      <h2 className="text-2xl font-bold mb-6">Cloud Provider Deployment</h2>
+      {/* ─── Section 3: Benchmark Boundary ───────────────── */}
+      <h2 className="text-2xl font-bold mb-6">Benchmark Boundary</h2>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         {cloudProviders.map((cp) => (

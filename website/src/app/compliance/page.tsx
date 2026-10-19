@@ -1,12 +1,13 @@
-import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/siteMetadata";
 import Link from "next/link";
 import Nav from "@/components/Nav";
 
-export const metadata: Metadata = {
-  title: "Evidence & Security Posture - ATOMiK",
-  description:
-    "ATOMiK public evidence posture, security-review notes, and claim-labeling policy.",
-};
+export const metadata = pageMetadata({
+  title: 'Evidence & Security Posture - ATOMiK',
+  description: 'ATOMiK public evidence posture, security-review notes, and claim-labeling policy.',
+  path: '/compliance',
+  openGraphTitle: 'ATOMiK Evidence and Security Posture',
+});
 
 const colors = {
   bg: "#070b12",
@@ -15,7 +16,7 @@ const colors = {
   text: "#f4f8ff",
   muted: "#9fb1c7",
   cyan: "#22d3ee",
-  blue: "#4f8fff",
+  blue: "#2563eb",
 };
 
 const posture = [
@@ -33,7 +34,7 @@ const posture = [
   },
   {
     title: "Commercial claims",
-    body: "SOC, ISO, customer, production, and enterprise-readiness claims should not be made until reviewed and backed by appropriate artifacts.",
+    body: "SOC, ISO, customer, production, and enterprise-readiness claims are not made until reviewed and backed by appropriate artifacts.",
   },
 ];
 

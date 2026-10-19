@@ -6,7 +6,6 @@ for merging N independent sensor streams into a single fused state.
 
 from __future__ import annotations
 
-import os
 import random
 import time
 from dataclasses import dataclass

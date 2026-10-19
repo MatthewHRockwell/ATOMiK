@@ -13,6 +13,7 @@ export default function robots(): MetadataRoute.Robots {
         "/integrations",
         "/community",
         "/roi",
+        "/compare",
         "/blog",
         "/demo",
         "/ai-demo",

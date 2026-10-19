@@ -1,0 +1,11 @@
+{
+  "name": "Real-time per-entity counters",
+  "customer": "Risk & Fraud (archetype)",
+  "aggregation": "sum",
+  "required_throughput": 100000000,
+  "requires_reorder_stability": true,
+  "producers": 512,
+  "out_of_order": true,
+  "unit": "events/s",
+  "notes": "Per-entity (IP/user/card) counters over sliding windows, updated concurrently from many edge nodes; a threshold decision reads the count so it must be exact. Today a distributed lock/CAS per key -> hot keys contend, lock caps throughput + adds tail latency."
+}

@@ -1,0 +1,28 @@
+# =============================================================================
+# ATOMiK ASIC Synthesis — SKY130 Standard Cells
+#
+# Tool:    Yosys
+# PDK:     SKY130 HD (High Density) standard cells
+# Target:  Validate ATOMiK synthesizes on SKY130, get area/cell count
+#
+# Usage:   yosys synth_sky130.ys
+# =============================================================================
+
+# Read the ATOMiK core (already ASIC-portable behavioral Verilog)
+read_verilog ../v3/rtl/atomik_v3_atomik.v
+
+# Synthesize for generic gates first
+synth -top atomik_v3_atomik
+
+# Technology mapping to SKY130 standard cells
+dfflibmap -liberty sky130/skywater-pdk-libs-sky130_fd_sc_hd/timing/sky130_fd_sc_hd__tt_025C_1v80.lib
+abc -liberty sky130/skywater-pdk-libs-sky130_fd_sc_hd/timing/sky130_fd_sc_hd__tt_025C_1v80.lib
+
+# Clean up
+opt_clean -purge
+
+# Print statistics
+stat -liberty sky130/skywater-pdk-libs-sky130_fd_sc_hd/timing/sky130_fd_sc_hd__tt_025C_1v80.lib
+
+# Write output netlist
+write_verilog asic_output/atomik_sky130_netlist.v

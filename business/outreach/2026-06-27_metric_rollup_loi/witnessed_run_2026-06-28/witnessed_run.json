@@ -1,0 +1,28 @@
+{
+  "workload": "High-cardinality metric rollup",
+  "source": "live (on-call)",
+  "run_on": "live",
+  "board": "ALINX/HamGeek AX7020 (XC7Z020-2CLG484)",
+  "count": 65537,
+  "seed": "0xDEADBEEF0BADF00D",
+  "clock_hz": 100000000,
+  "n_banks": 8,
+  "cycles": {
+    "1": 65537,
+    "2": 32769,
+    "4": 16385,
+    "8": 8193
+  },
+  "result_hex": "0x17e9fe29b5dc0aad",
+  "identical_across_banks": true,
+  "peak_throughput": 799914561.2107897,
+  "per_bank_throughput": 100000000.0,
+  "reproduce": "abench 65537 0xDEADBEEF0BADF00D",
+  "transcript": "/abench 65537 0xDEADBEEF0BADF00D\r\n\u001b[?2004l\rATOMiK parallel-bench  v2  N_BANKS=8\r\ncount=65537  seed=0xdeadbeef0badf00d\r\n\r\nbanks  hw_cycles   speedup  result              ok\r\n1      65537       1.00    0x17e9fe29b5dc0aad  OK\r\n2      32769       1.99    0x17e9fe29b5dc0aad  OK\r\n4      16385       3.99    0x17e9fe29b5dc0aad  OK\r\n8      8193        7.99    0x17e9fe29b5dc0aad  OK\r\n\r\nsoftware reference = 0x17e9fe29b5dc0aad\r\nVERIFY: ALL MATCH\r\n\u001b[?2004hroot@atomik-rv64:/# ",
+  "fields": {
+    "peak_throughput": 799914561.2107897,
+    "per_bank_throughput": 100000000.0,
+    "result_hex": "0x17e9fe29b5dc0aad",
+    "identical_across_banks": true
+  }
+}

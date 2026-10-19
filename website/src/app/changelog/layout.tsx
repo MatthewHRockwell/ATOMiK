@@ -1,10 +1,11 @@
-import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/siteMetadata";
 
-export const metadata: Metadata = {
-  title: "Changelog — ATOMiK Delta-State Computing",
-  description:
-    "Every ATOMiK release, from Python SDK to FPGA silicon. Detailed changelog with version history, features, and improvements.",
-};
+export const metadata = pageMetadata({
+  title: 'Changelog — ATOMiK Evidence-Labeled Updates',
+  description: 'Evidence-labeled ATOMiK updates from software proof to FPGA hardware artifacts, with current status separated from historical notes.',
+  path: '/changelog',
+  openGraphTitle: 'ATOMiK Evidence-Labeled Changelog',
+});
 
 export default function ChangelogLayout({
   children,

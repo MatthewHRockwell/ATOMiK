@@ -446,24 +446,192 @@ static double hero_uptime(void) {
     return up;
 }
 
+/* blended line (Bresenham) */
+static void hero_line(int x0, int y0, int x1, int y1, pixel_t c, uint8_t a) {
+    int dx = x1 > x0 ? x1 - x0 : x0 - x1;
+    int dy = y1 > y0 ? y1 - y0 : y0 - y1;
+    int sx = x0 < x1 ? 1 : -1, sy = y0 < y1 ? 1 : -1, err = dx - dy;
+    for (;;) {
+        draw_blend_pixel(x0, y0, c, a);
+        if (x0 == x1 && y0 == y1) break;
+        int e2 = err * 2;
+        if (e2 > -dy) { err -= dy; x0 += sx; }
+        if (e2 <  dx) { err += dx; y0 += sy; }
+    }
+}
+
+/* SYSTEM OVERVIEW glowing particle sphere (concept-01): a dense globe of light
+ * particles — hundreds of surface dots (front bright, back dim), dotted
+ * meridian arcs for structure, and a bright radial core glow.  Rotates slowly.
+ * Decorative chrome — no telemetry. */
+#define HERO_NSPH 320
+static void constellation_sphere(int cx, int cy, int r, unsigned long now) {
+    double ang = (double)(now % 22000) / 22000.0 * 6.28318531;
+    double ca = cos(ang), sa = sin(ang);
+
+    /* core glow: 3 stacked radial passes (wide halo -> mid -> hot core) so the
+     * orb reads as luminous, like the concept.  Additive. */
+    struct { int rad; pixel_t c; uint8_t peak; } glow[3] = {
+        { r * 8 / 5, rgb(0x1A, 0x4C, 0x80),  62 },
+        { r * 9 / 10, rgb(0x3C, 0x8A, 0xCC),  86 },
+        { r * 2 / 5, rgb(0x9A, 0xD2, 0xF6),  96 },
+    };
+    for (int g = 0; g < 3; g++) {
+        int gg = glow[g].rad; long g2 = (long)gg * gg;
+        for (int dy = -gg; dy <= gg; dy++) {
+            int yy = cy + dy; if (yy < 0 || yy >= FB_H) continue;
+            for (int dx = -gg; dx <= gg; dx++) {
+                int xx = cx + dx; if (xx < 0 || xx >= FB_W) continue;
+                long d2 = (long)dx*dx + (long)dy*dy; if (d2 >= g2) continue;
+                uint8_t a = (uint8_t)((long)glow[g].peak * (g2 - d2) / g2);
+                if (a) draw_blend_pixel(xx, yy, glow[g].c, a);
+            }
+        }
+    }
+
+    /* dense surface particles (fibonacci sphere) — bright on the front face */
+    const double ga = 2.39996323;
+    for (int i = 0; i < HERO_NSPH; i++) {
+        double t  = (i + 0.5) / HERO_NSPH;
+        double y  = 1.0 - 2.0 * t;
+        double rr = sqrt(1.0 - y * y);
+        double th = ga * i;
+        double x = rr * cos(th), z = rr * sin(th);
+        double xr = x * ca - z * sa, zr = x * sa + z * ca;
+        int px = cx + (int)(xr * r), py2 = cy + (int)(y * r);
+        double f = (zr + 1.0) * 0.5;              /* 0 back .. 1 front */
+        uint8_t a = (uint8_t)(40 + 215 * f * f);
+        pixel_t c = f > 0.66 ? rgb(0xE8, 0xF4, 0xFF)
+                  : f > 0.38 ? rgb(0x7C, 0xD8, 0xFF) : rgb(0x34, 0x70, 0xA4);
+        draw_blend_pixel(px, py2, c, a);
+        if (f > 0.6) {   /* 2px + bloom on front particles */
+            draw_blend_pixel(px+1, py2, c, (uint8_t)(a*3/5));
+            draw_blend_pixel(px, py2+1, c, (uint8_t)(a*3/5));
+            if (f > 0.86) { draw_blend_pixel(px-1, py2, c, a/2);
+                            draw_blend_pixel(px, py2-1, c, a/2); }
+        }
+    }
+
+    /* dotted meridian arcs (great circles through the poles) for globe depth */
+    for (int L = 0; L < 5; L++) {
+        double lon = ang * 0.6 + L * 0.6283185;
+        double cl = cos(lon), sl = sin(lon);
+        for (int k = 0; k < 54; k++) {
+            double phi = (double)k / 54.0 * 6.28318531;
+            double cp = cos(phi);
+            double x = cp * cl, y = sin(phi), z = cp * sl;
+            double f = (z + 1.0) * 0.5;
+            int px = cx + (int)(x * r), py2 = cy + (int)(y * r);
+            uint8_t a = (uint8_t)(14 + 120 * f);
+            draw_blend_pixel(px, py2, f > 0.5 ? ATOMIK_ACCENT : rgb(0x24, 0x52, 0x80), a);
+        }
+    }
+}
+
+/* PREDICTIVE INSIGHTS "pebble" gauge: a dashed ring of short radial ticks;
+ * the leading `pct`% are bright, the rest dim.  `pct` 0..100. */
+static void dashed_ring_gauge(int cx, int cy, int r, int pct, pixel_t color) {
+    const int N = 62;                                     /* fine dense ticks  */
+    int lit = N * pct / 100;
+    for (int i = 0; i < N; i++) {
+        double a = -1.5707963 + (double)i / N * 6.28318531;  /* from top, CW */
+        double co = cos(a), si = sin(a);
+        int on = (i < lit);
+        uint8_t al = on ? 240 : 26;
+        pixel_t c = on ? color : rgb(0x36, 0x44, 0x5E);
+        int r0 = r - 3, r1 = r + 1;                       /* short thin dash   */
+        hero_line(cx + (int)(co * r0), cy + (int)(si * r0),
+                  cx + (int)(co * r1), cy + (int)(si * r1), c, al);
+        if (on)   /* faint inner bloom on lit ticks */
+            draw_blend_pixel(cx + (int)(co * (r - 2)), cy + (int)(si * (r - 2)), color, 80);
+    }
+}
+
+/* CTA bar at the bottom of a panel: a hairline divider + label + right arrow. */
+static void hero_cta(int x, int y, int w, const char *label) {
+    draw_rect(x, y, w, 1, wm_card_border());
+    int ty = y + ATOMIK_GRID_M;
+    pixel_t c = ATOMIK_ACCENT;
+    if (font_aa_loaded(FONT_AA_LABEL)) {
+        draw_text_aa(FONT_AA_LABEL, x, ty, label, c);
+    } else {
+        draw_text(x, ty, label, 1, c);
+    }
+    /* right arrow ">" */
+    int ah = (font_aa_loaded(FONT_AA_LABEL) ? text_height_aa(FONT_AA_LABEL)
+                                            : text_height(1));
+    int axc = x + w - 8, ayc = ty + ah / 2;
+    for (int i = 0; i < 5; i++) {
+        draw_blend_pixel(axc - 4 + i, ayc - 4 + i, c, 220);
+        draw_blend_pixel(axc - 4 + i, ayc + 4 - i, c, 220);
+    }
+}
+
+/* one status row with a colored value, right-aligned (concept SYSTEM OVERVIEW). */
+static void hero_row(int x, int y, int w, const char *label,
+                     const char *value, pixel_t vcol) {
+    int lab_aa = font_aa_loaded(FONT_AA_LABEL);
+    if (lab_aa) draw_text_aa(FONT_AA_LABEL, x, y, label, rgb(0x7C, 0x88, 0x9E));
+    else        draw_text(x, y, label, 1, rgb(0x7C, 0x88, 0x9E));
+    int vw = lab_aa ? text_width_aa(FONT_AA_LABEL, value) : text_width(value, 1);
+    if (lab_aa) draw_text_aa(FONT_AA_LABEL, x + w - vw, y, value, vcol);
+    else        draw_text(x + w - vw, y, value, 1, vcol);
+}
+
+/* small panel header (concept-01): a node icon + a 14px muted-white title.
+ * Returns the y below the header. */
+static int hero_panel_header(int x, int y, const char *label) {
+    int lab = font_aa_loaded(FONT_AA_LABEL);
+    int h = lab ? text_height_aa(FONT_AA_LABEL) : text_height(1);
+    int icy = y + h / 2;
+    disk(x + 4, icy, 2, ATOMIK_ACCENT, 230);
+    ring(x + 4, icy, 5, 1, ATOMIK_ACCENT, 120);
+    pixel_t tc = rgb(0xC6, 0xD2, 0xE6);
+    if (lab) draw_text_aa(FONT_AA_LABEL, x + 16, y, label, tc);
+    else     draw_text(x + 16, y, label, 1, tc);
+    return y + h + ATOMIK_GRID_M;
+}
+
 void hero_draw(void) {
     int left_edge  = dock_right_edge() + ATOMIK_GRID_L * 2;
     int right_edge = fabric_shelf_x() - ATOMIK_GRID_L * 2;
-    int ws_w  = right_edge - left_edge;
-    int ws_cx = (left_edge + right_edge) / 2;
+    (void)left_edge; (void)right_edge;
+    /* concept-01 proportions: the hero + twin-panel group is centered around
+     * screen x~0.484, with the twin panels spanning x 0.255..0.712 (each ~21%),
+     * NOT filling the rail..fabric workspace.  Background shows on both sides. */
+    int panel_left  = FB_W * 255 / 1000;
+    int panel_right = FB_W * 712 / 1000;
+    int ws_w  = panel_right - panel_left;
+    int ws_cx = (panel_left + panel_right) / 2;
     int top   = ATOMIK_SAFE_TOP + ATOMIK_PULSE_BAR_H + ATOMIK_GRID_L * 3;
     unsigned long now = anim_now_ms();
     personality_t act = fabric_active();
 
     /* ---- title block ---- */
-    /* Atom mark above the wordmark (concept-01): concentric cyan rings +
-     * bright core, echoing the Pulse Bar logo orb. */
-    int icon_cy = top + 26;
-    ring(ws_cx, icon_cy, 17, 2, ATOMIK_ACCENT, 70);
-    ring(ws_cx, icon_cy, 16, 1, ATOMIK_ACCENT, 150);
-    ring(ws_cx, icon_cy,  9, 2, ATOMIK_ACCENT, 150);
-    disk(ws_cx, icon_cy, 4, ATOMIK_FG, 240);
-    int y = icon_cy + 24;
+    /* ATOMiK hex mark above the wordmark (concept-01): a glowing cyan hexagon
+     * with the atom-node glyph inside. */
+    int icon_cy = top + 28;
+    int hr = 22, hxr = hr * 866 / 1000, hyr = hr / 2;
+    /* soft glow behind the mark */
+    for (int gr = hr + 9; gr > 4; gr -= 2)
+        ring(ws_cx, icon_cy, gr, 1, ATOMIK_ACCENT,
+             (uint8_t)(3 + 12 * (hr + 9 - gr) / (hr + 9)));
+    int vx[6] = { ws_cx, ws_cx + hxr, ws_cx + hxr, ws_cx, ws_cx - hxr, ws_cx - hxr };
+    int vy[6] = { icon_cy - hr, icon_cy - hyr, icon_cy + hyr,
+                  icon_cy + hr, icon_cy + hyr, icon_cy - hyr };
+    for (int i = 0; i < 6; i++) {
+        hero_line(vx[i], vy[i], vx[(i+1)%6], vy[(i+1)%6], ATOMIK_ACCENT, 235);
+        hero_line(vx[i], vy[i] + 1, vx[(i+1)%6], vy[(i+1)%6] + 1, ATOMIK_ACCENT, 70);
+    }
+    /* atom-node glyph: center + 3 satellites with connectors */
+    disk(ws_cx, icon_cy, 2, ATOMIK_FG, 245);
+    disk(ws_cx, icon_cy - 8, 1, ATOMIK_ACCENT, 210);
+    disk(ws_cx + 7, icon_cy + 4, 1, ATOMIK_ACCENT, 210);
+    disk(ws_cx - 7, icon_cy + 4, 1, ATOMIK_ACCENT, 210);
+    hero_line(ws_cx, icon_cy, ws_cx, icon_cy - 7, ATOMIK_ACCENT, 150);
+    hero_line(ws_cx, icon_cy, ws_cx + 6, icon_cy + 4, ATOMIK_ACCENT, 150);
+    hero_line(ws_cx, icon_cy, ws_cx - 6, icon_cy + 4, ATOMIK_ACCENT, 150);
+    int y = icon_cy + 28;
     const char *wm = "ATOMiK Desk";
     if (font_aa_loaded(FONT_AA_BRAND)) {
         int tw = text_width_aa(FONT_AA_BRAND, wm);
@@ -485,9 +653,12 @@ void hero_draw(void) {
         y += text_height(1) + 16;
     }
 
-    /* status line — honest: ACTIVE only when a workload event is recent. */
+    /* status line — ACTIVE only when a real workload is RUNNING (the
+     * self-driving demo), not merely from seeded usage history (agent_log
+     * emits EVT_STATE_DELTA, which would otherwise read as "busy").  Idle
+     * home reads "Idle / Ready" like concept-01. */
     int busy = 0;
-    if (atomik_event_total() > 0) {
+    if (fabric_demo_enabled()) {
         unsigned long t1 = atomik_event_last_ts(EVT_STATE_DELTA);
         unsigned long t2 = atomik_event_last_ts(EVT_SYNC_REPLICA);
         unsigned long t3 = atomik_event_last_ts(EVT_AGENT_CONTEXT);
@@ -503,8 +674,7 @@ void hero_draw(void) {
                                         : text_height(2);
     if (font_aa_loaded(FONT_AA_UI)) {
         int tw = text_width_aa(FONT_AA_UI, status);
-        label_halo(ws_cx, y, tw, sh, st_c, busy);
-        draw_text_aa(FONT_AA_UI, ws_cx - tw / 2, y, status, st_c);
+        draw_text_aa(FONT_AA_UI, ws_cx - tw / 2, y, status, st_c);  /* plain, concept-01 */
     } else {
         int tw = text_width(status, 2);
         draw_text(ws_cx - tw / 2, y, status, 2, st_c);
@@ -525,109 +695,132 @@ void hero_draw(void) {
         y += text_height(1) + ATOMIK_GRID_L * 2;
     }
 
-    /* ---- twin glass panels ---- */
+    /* ---- twin glass panels (concept-01 bounds) ---- */
     int gap   = ATOMIK_GRID_L;
     int pw    = (ws_w - gap) / 2;
-    int avail = (FB_H - ATOMIK_GRID_L * 2) - y;   /* vertical space below title */
-    int ph    = avail - ATOMIK_GRID_L * 2;
-    if (ph > 340) ph = 340;
-    if (ph < 160) ph = 160;
-    int py    = y + (avail - ph) / 2;             /* center in lower workspace */
-    if (py < y) py = y;
-    int lx = left_edge;
-    int rx = left_edge + pw + gap;
+    int ph    = FB_H * 315 / 1000;                /* ~340 px, concept height    */
+    int py    = FB_H * 560 / 1000;                /* ~605 px, concept top        */
+    if (py < y + ATOMIK_GRID_M) py = y + ATOMIK_GRID_M;   /* never overlap title */
+    if (py + ph > FB_H - ATOMIK_GRID_L * 2) ph = FB_H - ATOMIK_GRID_L * 2 - py;
+    int lx = panel_left;
+    int rx = panel_left + pw + gap;
 
-    /* Left — SYSTEM OVERVIEW (real facts). */
+    int lab_h  = font_aa_loaded(FONT_AA_LABEL) ? text_height_aa(FONT_AA_LABEL)
+                                               : text_height(1);
+    int cta_h  = lab_h + ATOMIK_GRID_M * 2;     /* reserved at panel bottom    */
+
+    /* Left — SYSTEM OVERVIEW: constellation sphere + operating-state rows. */
     glass_panel(lx, py, pw, ph);
     {
         int ix = lx + ATOMIK_GRID_L, iw = pw - ATOMIK_GRID_L * 2;
         int ty = py + ATOMIK_GRID_M;
-        if (font_aa_loaded(FONT_AA_UI)) {
-            draw_text_aa(FONT_AA_UI, ix, ty, "SYSTEM OVERVIEW", ATOMIK_FG);
-            ty += text_height_aa(FONT_AA_UI) + ATOMIK_GRID_M;
-        } else {
-            draw_text(ix, ty, "SYSTEM OVERVIEW", 2, ATOMIK_FG);
-            ty += text_height(2) + ATOMIK_GRID_M;
-        }
-        int rowh = (font_aa_loaded(FONT_AA_LABEL) ? text_height_aa(FONT_AA_LABEL)
-                                                  : text_height(1)) + 9;
-        double u = hero_uptime();
-        char up[24];
-        snprintf(up, sizeof up, "%02d:%02d:%02d",
-                 (int)u / 3600, ((int)u % 3600) / 60, (int)u % 60);
-        hero_stat(ix, ty, iw, "CORE",    "RV64 NaxRiscv"); ty += rowh;
-        hero_stat(ix, ty, iw, "ISA",     "RV64GC");        ty += rowh;
-        hero_stat(ix, ty, iw, "ADAPTER", "0xF0020000");    ty += rowh;
-        hero_stat(ix, ty, iw, "ACTIVE",  fabric_personality_name(act)); ty += rowh;
-        hero_stat(ix, ty, iw, "UPTIME",  up);              ty += rowh;
-        /* Fill the lower panel with the ATOMiK orbital motif (concept-01's
-         * System-Overview circular viz) + a divider above it. */
-        if (py + ph - ty > 130) {
-            draw_rect(ix, ty + ATOMIK_GRID_S, iw, 1, wm_card_border());
-            core_node(lx + pw / 2, ty + (py + ph - ty) / 2 + 8, now);
-        }
+        ty = hero_panel_header(ix, ty, "SYSTEM OVERVIEW");
+        int body_bot = py + ph - cta_h;
+
+        /* constellation sphere on the left ~30% */
+        int sph_cx = lx + (int)(pw * 0.29);
+        int sph_cy = (ty + body_bot) / 2;
+        int sph_r  = pw * 22 / 100;
+        int maxr = (body_bot - ty) / 2 - 6;
+        if (sph_r > maxr) sph_r = maxr;
+        if (sph_r < 26) sph_r = 26;
+        constellation_sphere(sph_cx, sph_cy, sph_r, now);
+
+        /* operating-state rows on the right ~55% (qualitative state + one
+         * not-yet-connected placeholder dash, per the no-fake-numbers rule). */
+        int rx2 = lx + (int)(pw * 0.49);
+        int rw2 = (lx + pw - ATOMIK_GRID_L) - rx2;
+        int rowh = lab_h + 11;
+        int rblock = 5 * rowh;
+        int rty = ty + ((body_bot - ty) - rblock) / 2;
+        if (rty < ty) rty = ty;
+        pixel_t green = ATOMIK_SEM_SAVINGS;
+        int idle = (act == PERSONALITY_NONE);
+        hero_row(rx2, rty, rw2, "STATUS",     idle ? "IDLE" : "ACTIVE",
+                 idle ? green : ATOMIK_ACCENT);                       rty += rowh;
+        hero_row(rx2, rty, rw2, "MODE",       "ADAPTIVE", ATOMIK_ACCENT); rty += rowh;
+        hero_row(rx2, rty, rw2, "LEARNING",   "ACTIVE",   green);        rty += rowh;
+        hero_row(rx2, rty, rw2, "QUEUE",      "--", ATOMIK_FG_DIM);       rty += rowh;
+        hero_row(rx2, rty, rw2, "THROUGHPUT", "NOMINAL", ATOMIK_ACCENT);  rty += rowh;
+
+        hero_cta(ix, body_bot, iw, "VIEW SYSTEM INSIGHTS");
     }
 
-    /* Right — DELTA COALESCING gauge (REAL perf_last_for STATE). */
+    /* Right — PREDICTIVE INSIGHTS: next likely actions (real agent_predict)
+     * + a dashed "pebble" confidence ring + CTA.  We deliberately do NOT show
+     * the concept's fabricated "Focus 92"; the ring is the top prediction's
+     * real confidence, the list is the real Markov scorer. */
     glass_panel(rx, py, pw, ph);
     {
-        int ix = rx + ATOMIK_GRID_L;
+        int ix = rx + ATOMIK_GRID_L, iw = pw - ATOMIK_GRID_L * 2;
         int ty = py + ATOMIK_GRID_M;
-        const char *title = "DELTA COALESCING";
-        if (font_aa_loaded(FONT_AA_UI)) {
-            draw_text_aa(FONT_AA_UI, ix, ty, title, ATOMIK_FG);
-        } else {
-            draw_text(ix, ty, title, 2, ATOMIK_FG);
-        }
-        const perf_sample_t *s = perf_last_for(PERSONALITY_STATE);
-        int have = (s && s->ops_logical > 0);
-        int pct  = have ? (int)(100u * (s->ops_logical - s->ops_issued)
-                                 / s->ops_logical) : 0;
-        /* real raw counts under the title (honest provenance for the gauge) */
-        char sub[28];
-        if (have) snprintf(sub, sizeof sub, "%u -> %u ops",
-                           (unsigned)s->ops_logical, (unsigned)s->ops_issued);
-        else      snprintf(sub, sizeof sub, "awaiting workload");
-        int sty = py + ATOMIK_GRID_M +
-                  (font_aa_loaded(FONT_AA_UI) ? text_height_aa(FONT_AA_UI)
-                                              : text_height(2)) + 4;
+        ty = hero_panel_header(ix, ty, "PREDICTIVE INSIGHTS");
+        int body_bot = py + ph - cta_h;
+
+        /* real top-3 predicted actions */
+        double sc[ACT_MAX]; double tot = 0;
+        for (int a = ACT_OPEN_ABOUT; a < ACT_MAX; a++) { sc[a] = agent_score((action_t)a); tot += sc[a]; }
+        int top[3] = {0,0,0}; double topv[3] = {-1,-1,-1};
+        for (int a = ACT_OPEN_ABOUT; a < ACT_MAX; a++)
+            for (int k = 0; k < 3; k++)
+                if (sc[a] > topv[k]) {
+                    for (int m = 2; m > k; m--) { topv[m] = topv[m-1]; top[m] = top[m-1]; }
+                    topv[k] = sc[a]; top[k] = a; break;
+                }
+        int have_pred = tot > 0.0;
+
         if (font_aa_loaded(FONT_AA_LABEL))
-            draw_text_aa(FONT_AA_LABEL, ix, sty, sub, ATOMIK_FG_DIM);
-        else
-            draw_text(ix, sty, sub, 1, ATOMIK_FG_DIM);
-        int gcx = rx + pw / 2;
-        int gcy = py + ph / 2 + 10;
-        int gr  = (ph < 170) ? 44 : 54;
-        hero_gauge(gcx, gcy, gr, pct, ATOMIK_SEM_HARDWARE);
-        /* center value */
-        char pc[8];
-        if (have) snprintf(pc, sizeof pc, "%d", pct);
-        else      snprintf(pc, sizeof pc, "--");
+            draw_text_aa(FONT_AA_LABEL, ix, ty, "Next likely actions", rgb(0x7C,0x88,0x9E));
+        else draw_text(ix, ty, "Next likely actions", 1, rgb(0x7C,0x88,0x9E));
+        ty += lab_h + ATOMIK_GRID_M;
+
+        int list_w = (int)(iw * 0.56);
+        pixel_t dotc[3] = { ATOMIK_ACCENT, rgb(0x58,0xAE,0xF0), rgb(0x46,0x84,0xDA) };
+        int rowh2 = lab_h + 18;                 /* more breathing room (concept) */
+        for (int k = 0; k < 3; k++) {
+            int ry = ty + k * rowh2;
+            disk(ix + 3, ry + lab_h/2, 3, dotc[k], 235);   /* smaller dot       */
+            const char *nm = have_pred ? agent_action_name((action_t)top[k]) : "learning";
+            char pct[8];
+            if (have_pred) snprintf(pct, sizeof pct, "%d%%", (int)(topv[k]*100.0/tot + 0.5));
+            else           snprintf(pct, sizeof pct, "--");
+            int nx = ix + 16;
+            if (font_aa_loaded(FONT_AA_LABEL)) {
+                draw_text_aa(FONT_AA_LABEL, nx, ry, nm, ATOMIK_FG);
+                int pw2 = text_width_aa(FONT_AA_LABEL, pct);
+                draw_text_aa(FONT_AA_LABEL, ix + list_w - pw2, ry, pct, dotc[k]);
+            } else {
+                draw_text(nx, ry, nm, 1, ATOMIK_FG);
+                int pw2 = text_width(pct, 1);
+                draw_text(ix + list_w - pw2, ry, pct, 1, dotc[k]);
+            }
+        }
+
+        /* dashed pebble confidence ring on the right ~40% */
+        int gcx = rx + pw - (int)(iw * 0.21) - ATOMIK_GRID_L;
+        int gcy = (ty + body_bot) / 2;
+        int gr  = (int)(iw * 0.17);
+        int maxgr = (body_bot - ty) / 2 - 4;
+        if (gr > maxgr) gr = maxgr;
+        if (gr < 30) gr = 30;
+        int conf = have_pred ? (int)(topv[0]*100.0/tot + 0.5) : 0;
+        dashed_ring_gauge(gcx, gcy, gr, conf, ATOMIK_ACCENT);
+        char cv[8];
+        if (have_pred) snprintf(cv, sizeof cv, "%d", conf); else snprintf(cv, sizeof cv, "--");
         if (font_aa_loaded(FONT_AA_DISPLAY)) {
-            int nw = text_width_aa(FONT_AA_DISPLAY, pc);
-            int nh = text_height_aa(FONT_AA_DISPLAY);
-            draw_text_aa(FONT_AA_DISPLAY, gcx - nw / 2, gcy - nh / 2, pc,
-                         ATOMIK_SEM_HARDWARE);
+            int nw = text_width_aa(FONT_AA_DISPLAY, cv), nh = text_height_aa(FONT_AA_DISPLAY);
+            draw_text_aa(FONT_AA_DISPLAY, gcx - nw/2, gcy - nh/2 - 4, cv, ATOMIK_ACCENT);
         } else {
-            int nw = text_width(pc, 3);
-            draw_text(gcx - nw / 2, gcy - text_height(3) / 2, pc, 3,
-                      ATOMIK_SEM_HARDWARE);
+            int nw = text_width(cv, 3);
+            draw_text(gcx - nw/2, gcy - text_height(3)/2 - 4, cv, 3, ATOMIK_ACCENT);
         }
-        /* unit + honest source tag under the gauge */
-        const char *unit = "% ops coalesced";
-        const char *src  = have ? "live perf-bench" : "waiting for workload";
         if (font_aa_loaded(FONT_AA_LABEL)) {
-            int uw = text_width_aa(FONT_AA_LABEL, unit);
-            draw_text_aa(FONT_AA_LABEL, gcx - uw / 2, gcy + gr + 6, unit,
-                         ATOMIK_FG_DIM);
-            int sw = text_width_aa(FONT_AA_LABEL, src);
-            draw_text_aa(FONT_AA_LABEL, gcx - sw / 2,
-                         gcy + gr + 6 + text_height_aa(FONT_AA_LABEL) + 2, src,
-                         have ? ATOMIK_SEM_SAVINGS : ATOMIK_FG_DIM);
-        } else {
-            int uw = text_width(unit, 1);
-            draw_text(gcx - uw / 2, gcy + gr + 6, unit, 1, ATOMIK_FG_DIM);
+            const char *cl = "CONFIDENCE";
+            int cw = text_width_aa(FONT_AA_LABEL, cl);
+            draw_text_aa(FONT_AA_LABEL, gcx - cw/2, gcy + gr - lab_h, cl, rgb(0x7C,0x88,0x9E));
         }
+
+        hero_cta(ix, body_bot, iw, "EXPLORE INSIGHTS");
     }
 
     /* Footer caption (concept-01) — quiet brand line under the surface. */

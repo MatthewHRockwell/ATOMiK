@@ -124,7 +124,7 @@ const migrationChecklist = [
     items: [
       "Run convergence tests: all replicas must reach identical state regardless of delta order",
       "Verify self-inverse property: double-applying any delta returns to previous state",
-      "Load test: confirm accumulator-path performance under production traffic",
+      "Load test: confirm accumulator-path performance under representative traffic",
       "Monitor bandwidth: measure actual reduction vs CRDT baseline",
     ],
   },

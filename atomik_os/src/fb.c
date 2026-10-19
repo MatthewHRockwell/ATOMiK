@@ -58,6 +58,38 @@ void fb_present(void) {
     memcpy(s_fb_map, s_back, FB_BYTES);
 }
 
+/* Present ONLY a rectangular delta to the scanout surface — the ATOMiK way:
+ * push the pixels that changed, not the 2 megapixels that didn't.  Used for
+ * cursor moves (two ~10x18 rects) so the cursor tracks at the mouse's full
+ * report rate instead of being gated by a full-frame recomposite+copy. */
+void fb_present_rect(int x, int y, int w, int h) {
+    if (x < 0) { w += x; x = 0; }
+    if (y < 0) { h += y; y = 0; }
+    if (x + w > FB_W) w = FB_W - x;
+    if (y + h > FB_H) h = FB_H - y;
+    if (w <= 0 || h <= 0) return;
+    for (int r = 0; r < h; r++) {
+        size_t off = (size_t)(y + r) * FB_W + x;
+        memcpy(s_fb_map + off, s_back + off, (size_t)w * sizeof(pixel_t));
+    }
+}
+
+/* v0.43 drag: blit a standalone w*h buffer (its own stride) STRAIGHT to the
+ * scanout surface at (dx,dy), clipped.  One framebuffer write, no s_back
+ * round-trip — measured ~23ms for a 780x560 window (vs ~86ms for the
+ * compose-into-back-then-present path).  Used by window drag. */
+void fb_blit_to_screen(const pixel_t *src, int sw, int sh, int dx, int dy) {
+    for (int r = 0; r < sh; r++) {
+        int py = dy + r; if (py < 0 || py >= FB_H) continue;
+        int x0 = dx < 0 ? 0 : dx;
+        int x1 = dx + sw > FB_W ? FB_W : dx + sw;
+        if (x1 <= x0) continue;
+        memcpy(s_fb_map + (size_t)py * FB_W + x0,
+               src + (size_t)r * sw + (x0 - dx),
+               (size_t)(x1 - x0) * sizeof(pixel_t));
+    }
+}
+
 void fb_clear(pixel_t color) {
     pixel_t *p = s_back;
     for (size_t i = 0; i < (size_t)FB_W * FB_H; i++) p[i] = color;

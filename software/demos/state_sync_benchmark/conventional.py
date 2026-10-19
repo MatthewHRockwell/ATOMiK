@@ -6,7 +6,6 @@ so benchmarks can measure ATOMiK's improvements against real alternatives.
 
 from __future__ import annotations
 
-import copy
 import threading
 from dataclasses import dataclass, field
 

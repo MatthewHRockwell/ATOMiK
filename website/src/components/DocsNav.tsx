@@ -6,16 +6,17 @@ import { usePathname } from "next/navigation";
 /* ── Ordered list of docs pages ──────────────────────────────────── */
 
 const docsPages = [
-  { href: "/docs", label: "Overview" },
+  { href: "/docs", label: "Start Here" },
+  { href: "/docs/hardware", label: "Hardware Proof" },
+  { href: "/benchmarks", label: "Proof Packet" },
+  { href: "/docs/architecture", label: "Architecture" },
+  { href: "/docs/compatibility", label: "Compatibility" },
   { href: "/docs/quickstart", label: "Quick Start" },
   { href: "/docs/api", label: "API Reference" },
-  { href: "/docs/architecture", label: "Architecture" },
   { href: "/docs/examples", label: "Examples" },
   { href: "/docs/kernel-module", label: "Kernel Module" },
-  { href: "/docs/hardware", label: "Hardware" },
   { href: "/docs/migrate-crdt", label: "From CRDTs" },
   { href: "/docs/migrate-event-sourcing", label: "From Event Sourcing" },
-  { href: "/docs/compatibility", label: "Compatibility" },
 ];
 
 /* ── Breadcrumbs (top of page) ───────────────────────────────────── */

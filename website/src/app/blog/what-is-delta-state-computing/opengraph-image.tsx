@@ -1,8 +1,15 @@
 import { generateOGImage, ogSize } from "@/lib/og";
+
 export const runtime = "edge";
-export const alt = "ATOMiK Blog";
+export const alt = "ATOMiK archived route redirect";
 export const size = ogSize;
 export const contentType = "image/png";
+
 export default function OG() {
-  return generateOGImage({ title: "What is Delta-State Computing?", subtitle: "The definitive guide. Mathematical foundations, comparisons, and code.", accent: "#4f8fff", badge: "Pillar" });
+  return generateOGImage({
+    title: "ATOMiK Technical Proof",
+    subtitle: "Archived route redirected to current evidence-bounded proof material.",
+    accent: "#22d3ee",
+    badge: "Archived",
+  });
 }

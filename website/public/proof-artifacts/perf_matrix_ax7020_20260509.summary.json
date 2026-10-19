@@ -1,0 +1,35 @@
+{
+  "board": "AX7020",
+  "date": "2026-05-09",
+  "version": "v0.33-D",
+  "clock_assumption": "100 MHz, approximately 10 ns per cycle, per interpretation document",
+  "metric": "RV64 cycles from csrr cycle",
+  "profiles": [
+    "STATE",
+    "SYNC",
+    "AGENT"
+  ],
+  "columns": [
+    "software",
+    "atomik_direct",
+    "atomik_batched",
+    "atomik_profile"
+  ],
+  "row_count": 9,
+  "primary_interpretation": "wins when batching/coalescing/personality rules apply; naive direct hardware can lose",
+  "headline_context": {
+    "row": "8 regs / 64 ops / STATE",
+    "software_cycles": 8800,
+    "atomik_profile_cycles": 6406,
+    "speedup_profile_vs_software": 1.3737,
+    "coalescing_context": "64 logical ops collapsed to 4 emitted hardware ops in the profiled STATE row",
+    "caveat": "workload-specific; not a universal speedup claim"
+  },
+  "known_limitations": [
+    "SYNC repeat limitation: current matrix does not exercise inter-batch unchanged-state skipping",
+    "AGENT small-workload overhead: relevance sort overhead dominates small workloads",
+    "first-run lazy mmap overhead can affect direct hardware timing in the smallest row",
+    "AX7020 matrix is not customer workload validation"
+  ],
+  "safe_public_claim": "The AX7020 matrix shows workload-specific behavior, including wins when batching/coalescing is used and losses in other paths."
+}

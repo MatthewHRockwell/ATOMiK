@@ -151,3 +151,65 @@ FUNDING_CONTEXT.md
 
 # --- Node.js ---
 node_modules/
+
+# ============================================================
+# Portability pass — keep the repo clonable on a fresh laptop.
+# Everything below is either a vendor clone or regenerable output.
+# ============================================================
+
+# --- Vendor / reference clones (multi-GB; clone separately) ---
+hardware/asic/caravel_atomik/
+hardware/zynq/alinx_reference/
+
+# --- LiteX/Vivado FPGA build output (regenerate from hardware/zynq/litex/) ---
+hardware/zynq/litex-build*/
+/litex-build/
+
+# --- Vivado project scratch ---
+.Xil/
+.gen/
+.srcs/
+.flash/
+/prog/
+clockInfo.txt
+
+# --- OpenLane / sky130 ASIC flow output ---
+hardware/asic/sky130/
+hardware/asic/openlane/runs/
+hardware/asic/asic_output/
+
+# --- Rootfs & boot images (100MB+, rebuilt by the ubuntu/ scripts) ---
+hardware/zynq/ubuntu/rootfs/
+hardware/zynq/ubuntu/fakeroot.state
+hardware/zynq/ubuntu/*.cpio
+hardware/zynq/ubuntu/*.cpio.gz
+hardware/zynq/ubuntu/ubuntu-base-*.tar.gz
+hardware/zynq/fsbl_build/BOOT.bin.old
+hardware/zynq/fsbl_build/BOOT.bin.prefix
+
+# --- Next.js build output ---
+/.next/
+website/.next/
+
+# --- Compiled binaries (rebuilt from the C/Rust sources beside them) ---
+atomik_os/tools/fbcrop
+hardware/zynq/ps_loader/atomik_demo
+hardware/zynq/ps_loader/atomik_demo_dyn
+hardware/zynq/ps_loader/atomik_example
+hardware/zynq/ps_loader/atomik_live
+hardware/zynq/ps_loader/atomik_live_dyn
+hardware/zynq/sim/obj_*/
+hardware/zynq/test/adapter_test
+hardware/zynq/test/aprobe
+hardware/zynq/test/atomik_bench_sweep
+hardware/zynq/test/atomik_bench_sweep_tiny
+hardware/zynq/test/atomik_test
+hardware/zynq/test/atomik_test_adapter
+hardware/zynq/test/aworkload
+hardware/zynq/test/mmap_diag
+hardware/zynq/test/*.elf
+software/atomik-agent-mem/atomik-agent-mem
+software/atomik-sync/atomik-sync
+
+# --- SDK codegen test output (recreated by the test suite) ---
+software/atomik_sdk/generated/

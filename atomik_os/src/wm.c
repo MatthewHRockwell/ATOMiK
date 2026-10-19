@@ -214,11 +214,118 @@ void wm_draw_all(void) {
     }
 }
 
+/* v0.42 delta render: recomposite ONLY window `id` (plus any visible window
+ * stacked above it that overlaps its rect, so z-order stays correct) into the
+ * back buffer.  Does NOT touch the wallpaper, hero, dock, status bar, or other
+ * windows — they didn't change, so a click that only mutates one window's
+ * content costs that window's pixels, not the whole 1080p desktop.  The caller
+ * presents the returned rect.  Sets *rw=0 if the window isn't found/visible. */
+void wm_redraw_window(int id, int *rx, int *ry, int *rw, int *rh) {
+    window_t *win = find_by_id(id);
+    if (!win || !win->visible) { if (rw) *rw = 0; if (rh) *rh = 0; return; }
+    if (rx) *rx = win->x; if (ry) *ry = win->y;
+    if (rw) *rw = win->w; if (rh) *rh = win->h;
+
+    int order[WM_MAX_WINDOWS];
+    for (int i = 0; i < s_count; i++) order[i] = i;
+    for (int i = 0; i < s_count - 1; i++)
+        for (int j = i + 1; j < s_count; j++)
+            if (s_windows[order[i]].z > s_windows[order[j]].z) {
+                int t = order[i]; order[i] = order[j]; order[j] = t;
+            }
+    window_t *top = wm_topmost();
+    for (int i = 0; i < s_count; i++) {
+        window_t *w = &s_windows[order[i]];
+        if (!w->visible || w->z < win->z) continue;        /* target + above only */
+        if (w->x < win->x + win->w && w->x + w->w > win->x &&  /* overlaps target  */
+            w->y < win->y + win->h && w->y + w->h > win->y)
+            draw_one(w, w == top);
+    }
+}
+
 /* v0.31: enumeration getters for the status-bar window-strip. */
 int wm_count(void) { return s_count; }
 const window_t *wm_get(int idx) {
     if (idx < 0 || idx >= s_count) return NULL;
     return &s_windows[idx];
+}
+
+/* ── v0.43 mouse: window pick + title-bar drag ──────────────────────────── */
+static int s_drag_id = 0;          /* window being dragged (0 = none)        */
+static int s_drag_dx, s_drag_dy;   /* grab offset within the window          */
+
+/* Topmost visible window at (x,y); *region = WM_HIT_CLOSE/TITLE/BODY, or
+ * WM_HIT_NONE with return 0 if the point is over bare desktop. */
+int wm_pick(int x, int y, int *region) {
+    if (region) *region = WM_HIT_NONE;
+    window_t *best = NULL;
+    for (int i = 0; i < s_count; i++) {
+        window_t *w = &s_windows[i];
+        if (!w->visible) continue;
+        if (x >= w->x && x < w->x + w->w && y >= w->y && y < w->y + w->h)
+            if (!best || w->z > best->z) best = w;
+    }
+    if (!best) return 0;
+    if (region) {
+        if (best->title[0] && y < best->y + WM_TITLE_H) {
+            int cb = 10;
+            int cbx = best->x + best->w - cb - 14;
+            int cby = best->y + (WM_TITLE_H - cb) / 2;
+            if (x >= cbx - 5 && x <= cbx + cb + 5 && y >= cby - 5 && y <= cby + cb + 5)
+                *region = WM_HIT_CLOSE;
+            else
+                *region = WM_HIT_TITLE;
+        } else {
+            *region = WM_HIT_BODY;
+        }
+    }
+    return best->id;
+}
+
+int wm_exists(int id) { return find_by_id(id) != NULL; }
+
+int wm_window_rect(int id, int *x, int *y, int *w, int *h) {
+    window_t *win = find_by_id(id);
+    if (!win) return 0;
+    if (x) *x = win->x; if (y) *y = win->y;
+    if (w) *w = win->w; if (h) *h = win->h;
+    return 1;
+}
+
+void wm_set_visible(int id, int vis) {
+    window_t *win = find_by_id(id);
+    if (win) win->visible = vis ? 1 : 0;
+}
+
+void wm_move_to(int id, int x, int y) {
+    window_t *win = find_by_id(id);
+    if (!win) return;
+    if (y < 0) y = 0;
+    if (y > FB_H - WM_TITLE_H) y = FB_H - WM_TITLE_H;
+    if (x < 80 - win->w) x = 80 - win->w;
+    if (x > FB_W - 80)    x = FB_W - 80;
+    win->x = x; win->y = y;
+}
+
+void wm_drag_begin(int id, int px, int py) {
+    window_t *w = find_by_id(id);
+    if (!w) { s_drag_id = 0; return; }
+    s_drag_id = id; s_drag_dx = px - w->x; s_drag_dy = py - w->y;
+}
+int  wm_dragging(void) { return s_drag_id; }
+void wm_drag_end(void) { s_drag_id = 0; }
+
+void wm_drag_to(int px, int py) {
+    if (!s_drag_id) return;
+    window_t *w = find_by_id(s_drag_id);
+    if (!w) { s_drag_id = 0; return; }
+    int x = px - s_drag_dx, y = py - s_drag_dy;
+    /* keep the title bar on-screen and grabbable. */
+    if (y < 0) y = 0;
+    if (y > FB_H - WM_TITLE_H) y = FB_H - WM_TITLE_H;
+    if (x < 80 - w->w) x = 80 - w->w;
+    if (x > FB_W - 80)  x = FB_W - 80;
+    w->x = x; w->y = y;
 }
 
 int wm_handle_key(int key) {

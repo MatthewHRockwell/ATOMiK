@@ -80,6 +80,42 @@ safe "APER_CLK_CTRL 0xF800012C" {
     mrd -force 0xF800012C 1
 }
 
+safe "PS UART0/UART1 state" {
+    foreach a {
+        0xF8000728
+        0xF800072C
+        0xF8000228
+        0xF8000154
+        0xE0000000
+        0xE0000004
+        0xE0000018
+        0xE000002C
+        0xE0000034
+        0xE0001000
+        0xE0001004
+        0xE0001018
+        0xE000102C
+        0xE0001034
+    } {
+        set v [mrd -value -force $a 1]
+        puts [format "0x%08x: 0x%08x" $a $v]
+    }
+}
+
+safe "PL clock/reset/level-shifter state" {
+    foreach a {
+        0xF8000170
+        0xF8000174
+        0xF8000178
+        0xF800017C
+        0xF8000240
+        0xF8000900
+    } {
+        set v [mrd -value -force $a 1]
+        puts [format "0x%08x: 0x%08x" $a $v]
+    }
+}
+
 safe "SDIO_CLK_CTRL 0xF8000150" {
     mrd -force 0xF8000150 1
 }

@@ -1,0 +1,11 @@
+===================================
+Configuration Memory information
+===================================
+File Format        BIN
+Interface          SMAPX32
+Size               4M
+Start Address      0x00000000
+End Address        0x003FFFFF
+
+Addr1         Addr2         Date                    File(s)
+0x00000000    0x003DBAFB    Mar 31 20:55:48 2026    /home/mattrock/Projects/ATOMiK/hardware/zynq/test/hdmi_test_bank34_l11_l14_exact_hi.bit

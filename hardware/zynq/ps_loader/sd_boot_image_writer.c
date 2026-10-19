@@ -55,6 +55,13 @@ static int sdhc_read_sectors(uint32_t lba, void *dst, uint32_t n) {
 #define SCRATCH_PART_BYTES  (*(volatile uint32_t *)(SCRATCH_BASE + 0x2Cu))
 #define SCRATCH_BOOT_LBA    (*(volatile uint32_t *)(SCRATCH_BASE + 0x30u))
 
+/* Additional file slots — for writing Image69, fw_jump69.bin, etc.
+ * Each slot: LBA(4B) + BYTES(4B) + DDR_ADDR(4B) + reserved(4B) = 16B */
+#define SCRATCH_FILE_LBA(n)  (*(volatile uint32_t *)(SCRATCH_BASE + 0x40u + (n)*16u))
+#define SCRATCH_FILE_BYTES(n)(*(volatile uint32_t *)(SCRATCH_BASE + 0x44u + (n)*16u))
+#define SCRATCH_FILE_DDR(n)  (*(volatile uint32_t *)(SCRATCH_BASE + 0x48u + (n)*16u))
+#define MAX_EXTRA_FILES 4u
+
 #define DONE_MAGIC          0xC0DEC0DEu
 
 #define SRC_MBR             ((const uint8_t *)0x14000000u)
@@ -201,6 +208,16 @@ int main(void)
               ERR_WRITE_META);
     if (boot_bytes)
         write_job(SRC_BOOT, boot_lba, boot_bytes, PHASE_WRITE_BOOT, ERR_WRITE_BOOT);
+
+    /* Write any additional files specified in extra file slots */
+    for (uint32_t fi = 0; fi < MAX_EXTRA_FILES; fi++) {
+        uint32_t flba   = SCRATCH_FILE_LBA(fi);
+        uint32_t fbytes = SCRATCH_FILE_BYTES(fi);
+        uint32_t fddr   = SCRATCH_FILE_DDR(fi);
+        if (!flba || !fbytes || !fddr) break;
+        write_job((const uint8_t *)(uintptr_t)fddr, flba, fbytes,
+                  0x50u + fi, 0xBAD2000Au + fi);
+    }
 
     SCRATCH_PHASE = PHASE_DONE;
     SCRATCH_STATUS = DONE_MAGIC;

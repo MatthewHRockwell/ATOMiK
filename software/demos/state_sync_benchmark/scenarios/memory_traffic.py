@@ -7,7 +7,6 @@ dense full-state updates across N state updates.
 from __future__ import annotations
 
 import random
-import time
 from dataclasses import dataclass
 
 from ..atomik_delta import AtomikAccumulator, AtomikParallelBank

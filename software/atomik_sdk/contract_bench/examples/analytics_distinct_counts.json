@@ -1,0 +1,11 @@
+{
+  "name": "Distinct-count cardinality rollup",
+  "customer": "Product Analytics (archetype)",
+  "aggregation": "hll_merge",
+  "required_throughput": 20000000,
+  "requires_reorder_stability": true,
+  "producers": 1024,
+  "out_of_order": true,
+  "unit": "sketch-merges/s",
+  "notes": "Unique users/devices/sessions via HyperLogLog/sketches merged across shards and rolling windows. Register merge is order-independent, but production pipelines serialize it through a reducer/lock to keep the estimate stable; the reducer caps merge throughput and adds dashboard latency at peak cardinality."
+}

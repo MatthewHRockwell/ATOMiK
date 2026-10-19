@@ -1,12 +1,13 @@
-import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/siteMetadata";
 import Link from "next/link";
 import Nav from "@/components/Nav";
 
-export const metadata: Metadata = {
-  title: "Start Technical Evaluation - ATOMiK",
-  description:
-    "Start a technical evaluation of ATOMiK with a workload, proof review, or design-partner conversation.",
-};
+export const metadata = pageMetadata({
+  title: 'Start Technical Evaluation - ATOMiK',
+  description: 'Start a technical evaluation of ATOMiK with a workload, proof review, or design-partner conversation.',
+  path: '/get-started',
+  openGraphTitle: 'Start Technical Evaluation - ATOMiK',
+});
 
 const colors = {
   bg: "#070b12",
@@ -15,7 +16,7 @@ const colors = {
   text: "#f4f8ff",
   muted: "#9fb1c7",
   cyan: "#22d3ee",
-  blue: "#4f8fff",
+  blue: "#2563eb",
 };
 
 const steps = [
@@ -34,9 +35,9 @@ const steps = [
 ];
 
 const requestTypes = [
-  ["Request Evaluation Access", "/contact?intent=evaluation"],
-  ["Request Technical Demo", "/contact?intent=demo"],
-  ["Discuss Design Partnership", "/contact?intent=design-partner"],
+  ["Reserve Proof Review", "/pricing"],
+  ["Request Evaluation Access", "/contact?intent=evaluation&source=get-started&cta=request-evaluation-access"],
+  ["Discuss Design Partnership", "/contact?intent=design-partner&source=get-started&cta=discuss-design-partnership"],
 ];
 
 export default function GetStartedPage() {
@@ -84,7 +85,7 @@ export default function GetStartedPage() {
             ))}
           </div>
           <p className="mt-5 text-xs leading-6" style={{ color: colors.muted }}>
-            Live screenshots show current prototypes. Concept visuals show product direction and are not represented as current commercial functionality. Performance claims are only stated when backed by measured artifacts.
+Proof-review and technical-evaluation reservations hold focused review or scoping time. Larger design-partner and licensing work is still confirmed through written scope. Live screenshots show current prototypes, and performance claims are only stated when backed by measured artifacts.
           </p>
         </div>
       </section>

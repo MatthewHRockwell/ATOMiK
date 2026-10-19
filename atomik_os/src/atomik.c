@@ -43,12 +43,21 @@ int atomik_read_slots(uint32_t *out) {
         for (int i = 0; i < ATOMIK_N_SLOTS; i++) out[i] = 0xDEADBEEFu;
         return -1;
     }
-    /* Each slot's RD register lives at +0x0C within its 4-register block.
-     * We assume slot stride = 16 bytes (4 regs × 4 bytes) and 8 slots fit
-     * within the 4 KiB page. This matches the wishbone wrapper layout. */
+    /* Each slot's RD register lives at +0x0C within its 4-register block
+     * (stride 16).  CRITICAL: the adapter only DECODES a small window — on the
+     * current gateware ATOMIK_ADAPTER is just 0x20 bytes (csr.csv) even though
+     * mmap maps a full 4 KiB page.  Reading a slot whose offset lands past the
+     * decoded window hits an undecoded address; the wishbone bus raises a load
+     * access fault and the SIGSEGV takes down the whole compositor (this is the
+     * "MMIO from the long-running PIE is fragile" hazard, made concrete).  So
+     * read ONLY slots that fall inside the decoded window and report the rest as
+     * unavailable — telemetry must never be able to crash the desktop. */
     for (int i = 0; i < ATOMIK_N_SLOTS; i++) {
         unsigned long off = (unsigned long)i * 16 + 0x0C;
-        out[i] = *(volatile uint32_t *)(s_map + (off & 0xFFFUL));
+        if (off + 4 <= ATOMIK_ADAPTER_WINDOW)
+            out[i] = *(volatile uint32_t *)(s_map + (off & 0xFFFUL));
+        else
+            out[i] = 0xDEADBEEFu;   /* outside decoded region -> "no slot" */
     }
     return 0;
 }

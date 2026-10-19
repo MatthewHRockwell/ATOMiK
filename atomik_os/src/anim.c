@@ -13,7 +13,15 @@
 static unsigned long s_last_tick_ms = 0;
 static int           s_active       = 0;
 
+/* Host repro harness (ATOMIK_PREVIEW_LIVELOOP): when sim mode is on, the clock
+ * returns an injected value so the live event loop can be fast-forwarded under
+ * a sanitizer to reproduce time-triggered crashes (e.g. Atom auto-dismiss). */
+static int           s_sim_mode   = 0;
+static unsigned long s_sim_now_ms = 0;
+void anim_set_sim_time(unsigned long ms) { s_sim_mode = 1; s_sim_now_ms = ms; }
+
 unsigned long anim_now_ms(void) {
+    if (s_sim_mode) return s_sim_now_ms;
     struct timespec ts;
     clock_gettime(CLOCK_MONOTONIC, &ts);
     return (unsigned long)ts.tv_sec * 1000UL +

@@ -129,6 +129,7 @@ static personality_t detect(unsigned long now) {
 }
 
 void fabric_cycle_override(void) {
+    personality_t prev = s_active;        /* current effective personality */
     switch (s_override_p) {
     case PERSONALITY_NONE:  s_override_p = PERSONALITY_STATE; break;
     case PERSONALITY_STATE: s_override_p = PERSONALITY_SYNC;  break;
@@ -137,6 +138,20 @@ void fabric_cycle_override(void) {
     }
     s_override_set_ms = anim_now_ms();
     atomik_event_emit(EVT_OVERRIDE, (int)s_override_p);
+    /* v0.42: a MANUAL personality switch is the clearest "explain this state"
+     * moment — summon Atom for it too.  The fabric_tick() auto-summon is gated
+     * on !fabric_override_active(), so without this an override switch (the P
+     * key, the user-facing control) would never summon.  Reflect s_active now so
+     * Atom's title names the new personality before the next tick.  Cycling back
+     * to NONE releases the override (the explain moment is over) — dismiss Atom
+     * rather than leaving it to time out, so the switch/release lifecycle is
+     * symmetric. */
+    if (s_override_p == PERSONALITY_NONE) {
+        assistant_dismiss();
+    } else if (s_override_p != prev) {
+        s_active = s_override_p;
+        assistant_on_personality_change(prev, s_override_p);
+    }
 }
 
 int fabric_override_active(void) {
@@ -168,6 +183,34 @@ static void history_push(fabric_lane_t lane, unsigned long now,
     }
     h->v_min = (h->count > 0) ? mn : 0;
     h->v_max = (h->count > 0) ? mx : 0;
+}
+
+/* v0.40: seed each lane's waveform history with a lively flowing pattern so the
+ * Resource Fabric reads like the concept (bold bright waves) on first paint and
+ * in the host preview, before live workload data accumulates.  The waveform is
+ * DECORATIVE chrome (Class B) — the lane's real telemetry is the big NUMBER,
+ * not this shape; on the board the demo's real varied workload supersedes it. */
+void fabric_seed_waveforms(void) {
+    unsigned long now = anim_now_ms();
+    for (int L = 0; L < FABRIC_N_LANES_V2; L++) {
+        fabric_lane_history_t *h = &s_history[L];
+        uint16_t mn = 0xFFFF, mx = 0;
+        double base = 34 + L * 5, amp = 30 + (L % 3) * 7, ph = L * 1.27;
+        for (int i = 0; i < FABRIC_HISTORY_N; i++) {
+            double u = (double)i / FABRIC_HISTORY_N * 6.2831853;
+            double v = base + amp * sin(u * 1.6 + ph)
+                            + amp * 0.45 * sin(u * 3.3 + ph * 1.7)
+                            + (double)((i * 7 + L * 13) % 9);
+            if (v < 3) v = 3;
+            uint16_t vi = (uint16_t)v;
+            h->values[i] = vi;
+            if (vi < mn) mn = vi;
+            if (vi > mx) mx = vi;
+        }
+        h->head = 0; h->count = FABRIC_HISTORY_N;
+        h->v_min = mn; h->v_max = mx;
+        h->fresh = FABRIC_FRESH_LIVE; h->last_update_ms = now;
+    }
 }
 
 static void freshness_decay(unsigned long now) {
@@ -333,11 +376,12 @@ void fabric_tick(void) {
 
 static pixel_t lane_color(fabric_lane_t lane) {
     switch (lane) {
-    case FABRIC_LANE_STATE:  return ATOMIK_SEM_HARDWARE;     /* cyan   */
-    case FABRIC_LANE_SYNC:   return ATOMIK_SEM_SAVINGS;      /* green  */
-    case FABRIC_LANE_AGENT:  return ATOMIK_SEM_AGENT;        /* violet */
-    case FABRIC_LANE_EVENT:  return rgb(0xF0, 0x9C, 0x55);   /* amber-warm: cross-cutting bus */
-    case FABRIC_LANE_VISUAL: return rgb(0xE5, 0x6E, 0xC0);   /* magenta: pixel/render */
+    /* concept-01 grouping: STATE/SYNC cyan, AGENT/EVENT violet-magenta, VISUAL green */
+    case FABRIC_LANE_STATE:  return ATOMIK_SEM_HARDWARE;     /* cyan          */
+    case FABRIC_LANE_SYNC:   return rgb(0x52, 0xC4, 0xF0);   /* lighter cyan  */
+    case FABRIC_LANE_AGENT:  return ATOMIK_SEM_AGENT;        /* violet        */
+    case FABRIC_LANE_EVENT:  return rgb(0xCE, 0x72, 0xE6);   /* magenta-violet*/
+    case FABRIC_LANE_VISUAL: return ATOMIK_SEM_SAVINGS;      /* green         */
     default:                 return ATOMIK_FG_DIM;
     }
 }
@@ -359,11 +403,11 @@ static const char *lane_oneliner(fabric_lane_t lane) {
  * without making the panel text-heavy again. */
 static const char *lane_subtitle(fabric_lane_t lane) {
     switch (lane) {
-    case FABRIC_LANE_STATE:  return "coalesce writes";
-    case FABRIC_LANE_SYNC:   return "skip unchanged";
-    case FABRIC_LANE_AGENT:  return "retain hot context";
-    case FABRIC_LANE_EVENT:  return "event bus activity";
-    case FABRIC_LANE_VISUAL: return "render deltas";
+    case FABRIC_LANE_STATE:  return "Memory & Context";
+    case FABRIC_LANE_SYNC:   return "Determinism & Time";
+    case FABRIC_LANE_AGENT:  return "Execution & Reasoning";
+    case FABRIC_LANE_EVENT:  return "Signals & Triggers";
+    case FABRIC_LANE_VISUAL: return "Render & Visualization";
     default:                 return "";
     }
 }
@@ -589,8 +633,8 @@ static pixel_t fresh_color(fabric_fresh_t f) {
 static void draw_filled_waveform(const fabric_lane_history_t *h,
                                  int x, int y, int w, int hgt,
                                  pixel_t fill, pixel_t line) {
-    pixel_t bed = rgb(0x1F, 0x27, 0x38);
-    draw_rect(x, y + hgt - 1, w, 1, bed);
+    /* v0.40 (2026-05-31): centered flowing-ribbon style (concept-01 Fabric).
+     * No bottom floor line — the trace oscillates around the band center. */
 
     /* v0.38-J+ WAITING baseline glow — when the lane has no data, paint
      * a calm low-amplitude glow band in lane color instead of nothing.
@@ -641,24 +685,34 @@ static void draw_filled_waveform(const fabric_lane_history_t *h,
     }
 
     uint16_t mn = h->v_min, mx = h->v_max;
+    int center = y + hgt / 2;
+    /* v0.40-06: gentler amplitude (0.4·h vs 0.5·h) for the concept's calm,
+     * low-amplitude flowing ribbon rather than a dramatic EKG. */
+    int amp    = (hgt - 6) * 2 / 5; if (amp < 4) amp = 4;
+
     if (mx <= mn) {
-        /* Constant series — flat glow band near the bottom. */
-        for (int gy = 0; gy < 4; gy++) {
-            uint8_t a = (uint8_t)(40 + gy * 25);
-            for (int sx = 0; sx < w; sx++) {
-                draw_blend_pixel(x + sx, y + hgt - 4 + gy, line, a);
+        /* Constant series — calm bright trace through the band center with a
+         * soft symmetric glow (never a dead bottom band). */
+        for (int sx = 0; sx < w; sx++) {
+            int px = x + sx;
+            draw_blend_pixel(px, center, line, 170);
+            for (int g = 1; g <= 4; g++) {
+                uint8_t a = (uint8_t)(60 - (g - 1) * 14);
+                draw_blend_pixel(px, center - g, line, a);
+                draw_blend_pixel(px, center + g, line, a);
             }
         }
         return;
     }
     uint16_t span = mx - mn;
 
-    int col_h[256];
+    /* Center-relative trace: each value maps to a vertical OFFSET from the
+     * band center, so the waveform reads as a flowing oscilloscope ribbon
+     * (concept-01 Fabric) rather than a bottom-anchored area chart.  Linear
+     * interpolation between adjacent history samples keeps the curve smooth. */
+    int cy_arr[256];
     int n_cols = (w < 256) ? w : 256;
     for (int col = 0; col < n_cols; col++) {
-        /* v0.40-05-30: LINEAR-interpolate between adjacent history samples so
-         * the waveform is a smooth flowing curve (concept Fabric), not the
-         * blocky step function nearest-sampling produced. */
         long num    = (long)col * (h->count - 1);
         int  si     = (int)(num / (n_cols - 1));
         long frac_n = num - (long)si * (n_cols - 1);     /* 0 .. (n_cols-1) */
@@ -667,76 +721,73 @@ static void draw_filled_waveform(const fabric_lane_history_t *h,
         int  idx1   = (h->head - h->count + si2 + FABRIC_HISTORY_N) % FABRIC_HISTORY_N;
         long v0     = h->values[idx0], v1 = h->values[idx1];
         long v      = v0 + (v1 - v0) * frac_n / (n_cols - 1);
-        int  hh     = (int)((v - mn) * (hgt - 2) / span);
-        if (hh < 1) hh = 1;
-        if (hh > hgt - 2) hh = hgt - 2;
-        col_h[col] = hh;
+        int  off    = (int)(((v - mn) * 2 - span) * amp / span);  /* -amp..+amp */
+        cy_arr[col] = center - off;                               /* high => up */
     }
 
-    /* Pass 1: TRANSLUCENT gradient fill — bright at the wave edge, fading to
-     * the card floor.  v0.40-05-30: reads as a glowing band (concept Fabric),
-     * never a solid block, even when the curve is near full height.  `fill`
-     * (dim lane color) tints the deep floor so it doesn't read pure black. */
+    /* v0.40-06: smooth the trace (7-wide moving average) so it reads as a
+     * gentle flowing ribbon (concept-01), not a jagged EKG.  Applied twice
+     * for a softer curve. */
+    for (int pass = 0; pass < 2; pass++) {
+        int tmp[256];
+        for (int col = 0; col < n_cols; col++) {
+            int acc = 0, cnt = 0;
+            for (int k = -3; k <= 3; k++) {
+                int c = col + k;
+                if (c < 0 || c >= n_cols) continue;
+                acc += cy_arr[c]; cnt++;
+            }
+            tmp[col] = acc / cnt;
+        }
+        for (int col = 0; col < n_cols; col++) cy_arr[col] = tmp[col];
+    }
+
+    /* Pass 1: translucent ribbon body — fill between the trace and the band
+     * center, fading toward center.  Reads as a luminous flowing band. */
     for (int col = 0; col < n_cols; col++) {
-        int px    = x + col;
-        int top_y = y + hgt - 1 - col_h[col];
-        int floor = y + hgt - 1;
-        int span  = floor - top_y; if (span < 1) span = 1;
-        for (int yy = top_y; yy < floor; yy++) {
-            int d = yy - top_y;                          /* 0 at the edge */
-            uint8_t a = (uint8_t)(56 - 48 * d / span);   /* 56 -> ~8 downward */
+        int px = x + col;
+        int cy = cy_arr[col];
+        int lo = cy < center ? cy : center;
+        int hi = cy < center ? center : cy;
+        int sp = hi - lo; if (sp < 1) sp = 1;
+        for (int yy = lo; yy <= hi; yy++) {
+            int d = (cy < center) ? (yy - lo) : (hi - yy);  /* 0 at trace edge */
+            uint8_t a = (uint8_t)(66 - 58 * d / sp);
             draw_blend_pixel(px, yy, line, a);
         }
         (void)fill;
     }
 
-    /* Pass 2: outer glow halo above the edge — soft, 9 px. */
+    /* Pass 2: BROAD symmetric soft glow around the trace (above + below) —
+     * v0.40-06 widened 7→11 with a gentler falloff for the concept's
+     * luminous, atmospheric ribbon. */
     for (int col = 0; col < n_cols; col++) {
-        int px    = x + col;
-        int top_y = y + hgt - 1 - col_h[col];
-        for (int g = 1; g <= 9; g++) {
-            int gy = top_y - g;
-            if (gy < y) break;
-            uint8_t a = (uint8_t)(22 - (g - 1) * 2);
-            draw_blend_pixel(px, gy, line, a);
+        int px = x + col;
+        int cy = cy_arr[col];
+        for (int g = 1; g <= 11; g++) {
+            uint8_t a = (uint8_t)(40 - (g - 1) * 3);
+            if (cy - g >= y)        draw_blend_pixel(px, cy - g, line, a);
+            if (cy + g <  y + hgt)  draw_blend_pixel(px, cy + g, line, a);
         }
     }
 
-    /* Pass 3: mid glow above the edge — 4 px, brighter. */
+    /* Pass 3: SOFT core trace with segment connectors — v0.40-06 softened
+     * (no hard 255-px line / 205 connectors) so the ribbon glows rather than
+     * cutting a sharp EKG line. */
+    int prev_cy = -1;
     for (int col = 0; col < n_cols; col++) {
-        int px    = x + col;
-        int top_y = y + hgt - 1 - col_h[col];
-        for (int g = 1; g <= 4; g++) {
-            int gy = top_y - g;
-            if (gy < y) break;
-            uint8_t a = (uint8_t)(46 - (g - 1) * 9);
-            draw_blend_pixel(px, gy, line, a);
+        int px = x + col;
+        int cy = cy_arr[col];
+        draw_blend_pixel(px, cy, line, 205);
+        if (cy + 1 < y + hgt) draw_blend_pixel(px, cy + 1, line, 95);
+        if (cy - 1 >= y)      draw_blend_pixel(px, cy - 1, line, 95);
+        if (prev_cy >= 0 && prev_cy != cy) {
+            int lo = prev_cy < cy ? prev_cy : cy;
+            int hi = prev_cy < cy ? cy : prev_cy;
+            for (int yy = lo; yy <= hi; yy++)
+                draw_blend_pixel(px, yy, line, 140);
         }
-    }
-
-    /* Pass 4: core line — 2 px thick at the wave top.  Bright. */
-    for (int col = 0; col < n_cols; col++) {
-        int px    = x + col;
-        int top_y = y + hgt - 1 - col_h[col];
-        draw_pixel(px, top_y, line);
-        if (top_y - 1 >= y) {
-            draw_blend_pixel(px, top_y - 1, line, 220);
-        }
-    }
-
-    /* Pass 5: hot points — 3 px square highlights at local maxima.
-     * Local max = column whose col_h exceeds both neighbors by 2+. */
-    for (int col = 1; col < n_cols - 1; col++) {
-        if (col_h[col] >= col_h[col - 1] + 2 &&
-            col_h[col] >= col_h[col + 1] + 2) {
-            int px    = x + col;
-            int top_y = y + hgt - 1 - col_h[col];
-            for (int dy = -1; dy <= 1; dy++) {
-                for (int dx = -1; dx <= 1; dx++) {
-                    draw_pixel(px + dx, top_y + dy, line);
-                }
-            }
-        }
+        prev_cy = cy;
     }
 }
 
@@ -822,10 +873,157 @@ static void lane_big_metric(fabric_lane_t lane,
 
 /* === main draw === */
 
-#define LANE_ROW_H        158    /* v0.38-G: was 76; taller panels = instrument feel */
+#define LANE_ROW_H        156    /* v0.40: 5 tall lanes + header subtitle + bottom
+                                  * capacity line fit the shelf (concept-01) */
 #define LANE_GAP          ATOMIK_GRID_M
-#define LANE_ACCENT_W     3      /* v0.38-J: thicker active rim (was 2) */
-#define LANE_ACTIVE_HALO  6      /* v0.38-J: outer alpha halo px */
+#define LANE_ACCENT_W     1      /* v0.40-05-31: thin active rim (concept: subtle, not a box) */
+#define LANE_ACTIVE_HALO  7      /* outer alpha halo px — soft glow carries the active state */
+
+/* v0.40: PARALLEL BANKS panel — the live, self-verifying parallel-bank
+ * throughput measured on the engine @0xF0021000 (bench.c).  Drawn below the
+ * 5 lanes.  Bars are throughput per active-bank-count (1/2/4/8); the bar for
+ * the currently-allocated count glows; the chip reports VERIFIED only when
+ * the hardware XOR result matched the software recompute this measurement.
+ * No fabricated values: if the engine is absent the panel dims to WAITING. */
+static void draw_banks_panel(int x, int y, int wd, int h) {
+    pixel_t accent = ATOMIK_SEM_HARDWARE;           /* cyan: silicon */
+    /* card */
+    draw_rect_rounded(x, y, wd, h, 10, wm_card_bg());
+    draw_rect(x, y, wd, 1, wm_card_border());
+    draw_rect(x, y + h - 1, wd, 1, wm_card_border());
+    draw_rect(x, y, 1, h, wm_card_border());
+    draw_rect(x + wd - 1, y, 1, h, wm_card_border());
+    /* tinted top shoulder */
+    for (int sy = 0; sy < 10; sy++) {
+        uint8_t a = (uint8_t)(55 - sy * 5);
+        for (int sx = 0; sx < wd; sx++) draw_blend_pixel(x + sx, y + sy, accent, a);
+    }
+
+    int pad = ATOMIK_GRID_L;
+    int tx  = x + pad;
+    int ty  = y + ATOMIK_GRID_M;
+
+    /* title */
+    int title_h;
+    if (font_aa_loaded(FONT_AA_UI)) {
+        draw_text_aa(FONT_AA_UI, tx, ty, "PARALLEL BANKS", accent);
+        title_h = text_height_aa(FONT_AA_UI);
+    } else {
+        draw_text(tx, ty, "PARALLEL BANKS", 2, accent);
+        title_h = text_height(2);
+    }
+
+    int src = bench_source();
+    const char *chip; pixel_t chipc;
+    if      (src == METRIC_LIVE)  { chip = "VERIFIED";  chipc = ATOMIK_SEM_SAVINGS; }
+    else if (src == METRIC_STALE) { chip = "MEASURING"; chipc = ATOMIK_SEM_WASTE;  }
+    else                          { chip = "WAITING";   chipc = ATOMIK_FG_DIM;     }
+    int cu = font_aa_loaded(FONT_AA_LABEL);
+    int cw = cu ? text_width_aa(FONT_AA_LABEL, chip) : text_width(chip, 1);
+    int chh = (cu ? text_height_aa(FONT_AA_LABEL) : text_height(1)) + 4;
+    int cwp = cw + ATOMIK_GRID_M;
+    int cxp = x + wd - cwp - pad;
+    int cyp = ty + (title_h - chh) / 2;
+    draw_rect_rounded(cxp, cyp, cwp, chh, chh / 2, wm_card_bg() & 0x0F0F0F);
+    draw_rect(cxp + chh / 2, cyp, cwp - chh, 1, chipc);
+    draw_rect(cxp + chh / 2, cyp + chh - 1, cwp - chh, 1, chipc);
+    if (cu) draw_text_aa(FONT_AA_LABEL, cxp + ATOMIK_GRID_S, cyp + 2, chip, chipc);
+    else    draw_text(cxp + ATOMIK_GRID_S, cyp + 2, chip, 1, chipc);
+
+    /* bar chart region (left ~58%), readout (right) */
+    int npts = 0;
+    const bench_point_t *pts = bench_sweep_points(&npts);
+    int chart_x = tx;
+    int chart_w = (wd - pad * 2) * 58 / 100;
+    int bars_top = ty + title_h + ATOMIK_GRID_M;
+    int label_h  = cu ? text_height_aa(FONT_AA_LABEL) : text_height(1);
+    int bars_h   = (y + h - ATOMIK_GRID_M) - bars_top - label_h - 2;
+    if (bars_h < 16) bars_h = 16;
+
+    double vmax = 0.0;
+    for (int i = 0; i < npts; i++) if (pts[i].mdeltas_s > vmax) vmax = pts[i].mdeltas_s;
+
+    int slots = (npts > 0) ? npts : BENCH_N_POINTS;
+    /* Highlight the MAX-bank bar (the headline result).  We deliberately do
+     * NOT animate a "currently allocated" cursor here: atomik_os doesn't yet
+     * control the allocation (the tool measures all bank counts each cycle),
+     * so a moving cursor would imply a live reallocation that isn't happening.
+     * The bars + live re-measurement carry the dynamism honestly. */
+    int active = (npts > 0) ? (int)pts[npts - 1].banks : 8;
+    int bw = chart_w / (slots * 2);            /* bar width; gaps between */
+    if (bw < 6) bw = 6;
+    for (int i = 0; i < slots; i++) {
+        int bx = chart_x + (chart_w * (2 * i + 1)) / (slots * 2) - bw / 2;
+        int banks = (npts > 0) ? (int)pts[i].banks : (1 << i);
+        int bh; pixel_t fill;
+        if (npts > 0 && vmax > 0.0) {
+            bh = (int)(pts[i].mdeltas_s / vmax * bars_h);
+            int is_active = (pts[i].banks == (uint32_t)active);
+            fill = is_active ? accent : ATOMIK_ACCENT_DIM;
+            if (bh < 2) bh = 2;
+            int by = bars_top + bars_h - bh;
+            draw_rect_rounded(bx, by, bw, bh, 3, fill);
+            if (is_active) {                    /* glow rim on the live allocation */
+                for (int g = 1; g <= 4; g++) {
+                    uint8_t a = (uint8_t)(40 - (g - 1) * 9);
+                    for (int sx = -g; sx < bw + g; sx++) {
+                        draw_blend_pixel(bx + sx, by - g, accent, a);
+                    }
+                    for (int sy = -g; sy < bh + g; sy++) {
+                        draw_blend_pixel(bx - g, by + sy, accent, a);
+                        draw_blend_pixel(bx + bw - 1 + g, by + sy, accent, a);
+                    }
+                }
+            }
+        } else {
+            /* WAITING: ambient dim stub bars, no data */
+            bh = bars_h / 6 + i * 3;
+            int by = bars_top + bars_h - bh;
+            draw_rect_rounded(bx, by, bw, bh, 3, rgb(0x2A, 0x34, 0x48));
+        }
+        /* bank-count label under each bar */
+        char bl[8]; snprintf(bl, sizeof bl, "%d", banks);
+        int blw = cu ? text_width_aa(FONT_AA_LABEL, bl) : text_width(bl, 1);
+        int blx = bx + bw / 2 - blw / 2;
+        int bly = bars_top + bars_h + 1;
+        pixel_t lcol = (npts > 0 && pts[i].banks == (uint32_t)active) ? accent
+                                                                      : ATOMIK_FG_DIM;
+        if (cu) draw_text_aa(FONT_AA_LABEL, blx, bly, bl, lcol);
+        else    draw_text(blx, bly, bl, 1, lcol);
+    }
+
+    /* right-side readout: big speedup + throughput-at-current-allocation */
+    int rx = chart_x + chart_w + ATOMIK_GRID_L;
+    int ry = bars_top;
+    if (npts > 0) {
+        double max_spd = pts[npts - 1].speedup;
+        char big[16]; snprintf(big, sizeof big, "%.2f", max_spd);
+        /* draw the "x" suffix in dim after the big number */
+        if (font_aa_loaded(FONT_AA_DISPLAY)) {
+            draw_text_aa(FONT_AA_DISPLAY, rx, ry, big, accent);
+            int nbw = text_width_aa(FONT_AA_DISPLAY, big);
+            draw_text_aa(FONT_AA_LABEL, rx + nbw + 2,
+                         ry + text_height_aa(FONT_AA_DISPLAY)
+                            - text_height_aa(FONT_AA_LABEL),
+                         "x", ATOMIK_FG_DIM);
+            ry += text_height_aa(FONT_AA_DISPLAY) + 2;
+        } else {
+            draw_text(rx, ry, big, 3, accent);
+            ry += text_height(3) + 2;
+        }
+        /* headline throughput: the measured MAX (matches the speedup above) */
+        int mi = npts - 1;
+        char sub[48];
+        snprintf(sub, sizeof sub, "up to %.0f Md/s @ %d banks",
+                 pts[mi].mdeltas_s, (int)pts[mi].banks);
+        if (cu) draw_text_aa(FONT_AA_LABEL, rx, ry, sub, ATOMIK_FG_DIM);
+        else    draw_text(rx, ry, sub, 1, ATOMIK_FG_DIM);
+    } else {
+        const char *msg = "engine @0xF0021000 — waiting";
+        if (cu) draw_text_aa(FONT_AA_LABEL, rx, ry, msg, ATOMIK_FG_DIM);
+        else    draw_text(rx, ry, msg, 1, ATOMIK_FG_DIM);
+    }
+}
 
 void fabric_draw(window_t *w, int x, int y, int wd, int ht) {
     (void)w; (void)ht;
@@ -840,6 +1038,13 @@ void fabric_draw(window_t *w, int x, int y, int wd, int ht) {
     } else {
         draw_text(x + ATOMIK_GRID_L, y + ATOMIK_GRID_M,
                   "RESOURCE FABRIC", 2, ATOMIK_FG);
+    }
+    /* concept subtitle */
+    if (font_aa_loaded(FONT_AA_LABEL)) {
+        int sy = y + ATOMIK_GRID_M + (font_aa_loaded(FONT_AA_UI)
+                 ? text_height_aa(FONT_AA_UI) : text_height(2)) + 2;
+        draw_text_aa(FONT_AA_LABEL, x + ATOMIK_GRID_L, sy,
+                     "ATOMIK COMPUTE BANKS", rgb(0x76, 0x82, 0x98));
     }
 
     pixel_t badge_color;
@@ -884,7 +1089,8 @@ void fabric_draw(window_t *w, int x, int y, int wd, int ht) {
     int header_h = font_aa_loaded(FONT_AA_UI)
                    ? text_height_aa(FONT_AA_UI)
                    : text_height(2);
-    int lanes_y = y + ATOMIK_GRID_M + header_h + ATOMIK_GRID_L;
+    int sub_hh   = font_aa_loaded(FONT_AA_LABEL) ? text_height_aa(FONT_AA_LABEL) : 0;
+    int lanes_y = y + ATOMIK_GRID_M + header_h + sub_hh + 2 + ATOMIK_GRID_M;
     int lane_x  = x + ATOMIK_GRID_L;
     int lane_w  = wd - ATOMIK_GRID_L * 2;
 
@@ -941,7 +1147,7 @@ void fabric_draw(window_t *w, int x, int y, int wd, int ht) {
              * falling off with distance.  Reads as luminous spill from
              * the lane border, mirrors concept-image instrument glow. */
             for (int g = 1; g <= LANE_ACTIVE_HALO; g++) {
-                uint8_t a = (uint8_t)(48 - (g - 1) * 7);
+                uint8_t a = (uint8_t)(34 - (g - 1) * 4);
                 int hx = lane_x - g;
                 int hy = ly - g;
                 int hw = lane_w + 2 * g;
@@ -1006,85 +1212,49 @@ void fabric_draw(window_t *w, int x, int y, int wd, int ht) {
         }
         (void)sub_h;
 
-        /* v0.38-K3 — freshness chip AA + WAITING dimmed further.
-         * v0.38-K3A — when this lane IS the active personality,
-         * override the label to "ACTIVE" and force the bright
-         * lane-color bordered capsule so the top bar doesn't
-         * contradict the panel. Inactive lanes keep LIVE/WAITING/
-         * STALE based on metric source. ChatGPT 2026-05-16:
-         * "Active means active. Waiting means waiting. Never let
-         * the UI contradict itself." */
-        int is_active_lane = (lp != PERSONALITY_NONE &&
-                              lp == s_active);
-        const char *fl = is_active_lane ? "ACTIVE"
-                                         : fresh_label(h->fresh);
-        int chip_use_aa = font_aa_loaded(FONT_AA_LABEL);
-        int fw = chip_use_aa ? text_width_aa(FONT_AA_LABEL, fl)
-                             : text_width(fl, 1);
-        pixel_t fcol = is_active_lane ? lc : fresh_color(h->fresh);
-        int chip_h = (chip_use_aa ? text_height_aa(FONT_AA_LABEL)
-                                  : text_height(1)) + 4;
-        int chip_w = fw + ATOMIK_GRID_M;
-        int chip_x = lane_x + lane_w - chip_w - pad_x;
-        int chip_y = ty1 + (name_h - chip_h) / 2;
-        if (is_active_lane || h->fresh == FABRIC_FRESH_LIVE) {
-            int radius = chip_h / 2;
-            draw_rect_rounded(chip_x, chip_y, chip_w, chip_h, radius,
-                              wm_card_bg() & 0x0F0F0F);
-            draw_rect(chip_x + radius, chip_y, chip_w - radius * 2, 1, fcol);
-            draw_rect(chip_x + radius, chip_y + chip_h - 1,
-                      chip_w - radius * 2, 1, fcol);
-            if (chip_use_aa) {
-                draw_text_aa(FONT_AA_LABEL,
-                             chip_x + ATOMIK_GRID_S, chip_y + 2,
-                             fl, fcol);
-            } else {
-                draw_text(chip_x + ATOMIK_GRID_S, chip_y + 2,
-                          fl, 1, fcol);
-            }
-        } else {
-            /* Quiet: tiny dim text right-aligned at the same baseline,
-             * no body, no border. */
-            pixel_t quiet = rgb(0x5A, 0x66, 0x82);
-            if (chip_use_aa) {
-                draw_text_aa(FONT_AA_LABEL,
-                             chip_x + ATOMIK_GRID_S, chip_y + 2,
-                             fl, quiet);
-            } else {
-                draw_text(chip_x + ATOMIK_GRID_S, chip_y + 2,
-                          fl, 1, quiet);
-            }
-        }
+        /* v0.40: LIVE/ACTIVE chip removed — the concept puts the big metric
+         * figure in this top-right space, not a freshness badge.  (void) the
+         * now-unused per-lane personality so -Wunused stays quiet.) */
+        (void)lp;
 
-        /* Row 2: stacked metric layout — BIG NUMBER above DIM UNIT
-         * (v0.38-K3, ChatGPT 2026-05-16: "stacked is cleaner than
-         * baseline-aligning a tiny unit to a giant number").
-         * Number in AA DISPLAY, unit on its own line in AA LABEL. */
-        int ty2 = ty1 + name_h + sub_h + ATOMIK_GRID_S;
-        char big[16], unit[24];
+        /* Big metric (real telemetry) — concept-01 layout: top-RIGHT, right-
+         * aligned in lane color, with the dim unit below it. */
+        char big[16], unit[32];
         lane_big_metric(lane, big, sizeof big, unit, sizeof unit);
-        int big_h, unit_h;
-        if (font_aa_loaded(FONT_AA_DISPLAY)) {
-            draw_text_aa(FONT_AA_DISPLAY, tx, ty2, big, lc);
-            big_h = text_height_aa(FONT_AA_DISPLAY);
-        } else {
-            draw_text(tx, ty2, big, 3, lc);
-            big_h = text_height(3);
-        }
-        int unit_y = ty2 + big_h + 2;
-        if (font_aa_loaded(FONT_AA_LABEL)) {
-            unit_h = text_height_aa(FONT_AA_LABEL);
-            draw_text_aa(FONT_AA_LABEL, tx, unit_y, unit,
-                         ATOMIK_FG_DIM);
-        } else {
-            unit_h = text_height(1);
-            draw_text(tx, unit_y, unit, 1, ATOMIK_FG_DIM);
+        int disp  = font_aa_loaded(FONT_AA_DISPLAY);
+        int big_h = disp ? text_height_aa(FONT_AA_DISPLAY) : text_height(3);
+        int nw    = disp ? text_width_aa(FONT_AA_DISPLAY, big) : text_width(big, 3);
+        if (disp) draw_text_aa(FONT_AA_DISPLAY, lane_x + lane_w - pad_x - nw, ty1, big, lc);
+        else      draw_text(lane_x + lane_w - pad_x - nw, ty1, big, 3, lc);
+        {
+            int ulab = font_aa_loaded(FONT_AA_LABEL);
+            int uw   = ulab ? text_width_aa(FONT_AA_LABEL, unit) : text_width(unit, 1);
+            int uy   = ty1 + big_h + 1;
+            if (ulab) draw_text_aa(FONT_AA_LABEL, lane_x + lane_w - pad_x - uw, uy, unit, rgb(0x86,0x92,0xA8));
+            else      draw_text(lane_x + lane_w - pad_x - uw, uy, unit, 1, rgb(0x86,0x92,0xA8));
         }
 
         /* (Waveform is drawn earlier as a card-spanning background.)
          * v0.40 (2026-05-30): progress bars REMOVED per design direction —
          * the Resource Fabric is a glowing-waveform instrument, not a bar
          * chart.  The waveform carries every lane. */
+    }
+    /* v0.40: PARALLEL BANKS moved to the SYSTEM surface (system_surface.c) so
+     * the Fabric is the concept's 5 tall lanes. */
+
+    /* bottom: TOTAL FABRIC CAPACITY — concept's summary line.  Per-bank GB is
+     * not wired yet, so this is a clearly-labeled PLACEHOLDER (dim, no live
+     * implication) until real memory accounting exists. */
+    if (font_aa_loaded(FONT_AA_LABEL)) {
+        int cap_y = lanes_y + FABRIC_N_LANES_V2 * (LANE_ROW_H + LANE_GAP) + 2;
+        if (cap_y + text_height_aa(FONT_AA_LABEL) < y + ht) {
+            draw_rect(lane_x, cap_y - 4, lane_w, 1, wm_card_border());
+            const char *cl = "TOTAL FABRIC CAPACITY";
+            draw_text_aa(FONT_AA_LABEL, lane_x, cap_y, cl, rgb(0x76, 0x82, 0x98));
+            const char *cv = "-- / -- GB  (placeholder)";
+            int cvw = text_width_aa(FONT_AA_LABEL, cv);
+            draw_text_aa(FONT_AA_LABEL, lane_x + lane_w - cvw, cap_y, cv, ATOMIK_FG_DIM);
+        }
     }
 }
 

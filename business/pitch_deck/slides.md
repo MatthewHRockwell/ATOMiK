@@ -109,9 +109,9 @@ The common trigger is expensive pressure from battery life, heat, size, weight, 
 
 # Hardware-Validated UI Proof
 
-![ATOMiK Desk v0.39-K prototype UI running on Zynq hardware](../../website/public/09-current-live-atomik-desk-v039k.png)
+![ATOMiK Desk v0.40-A prototype UI captured live from the framebuffer on Zynq hardware](../../website/public/10-current-live-atomik-desk-v040a.png)
 
-`HARDWARE_VALIDATED` recorded prototype screenshot of ATOMiK Desk v0.39-K running on Zynq hardware. Not a real-time demo and not customer workload proof.
+`HARDWARE_VALIDATED` capture of ATOMiK Desk v0.40-A from `/dev/fb0` on Zynq hardware. The OS renders and is driven by real measured on-board data. Not a real-time interactive demo and not customer workload proof.
 
 This screenshot is not customer workload proof, production-readiness proof, battery proof, thermal proof, water proof, or footprint proof.
 
@@ -121,7 +121,9 @@ This screenshot is not customer workload proof, production-readiness proof, batt
 
 | Proof | Label | Status |
 |---|---|---|
-| Zynq Desk v0.39-K | `HARDWARE_VALIDATED` | current UI proof image |
+| Zynq Desk v0.40-A | `HARDWARE_VALIDATED` | current UI proof image, captured from `/dev/fb0` |
+| Live Workloads demo on AX7020 | `LIVE_MEASURED` | first customer-facing workload demo on hardware: 800 Mevents/s @ 8 banks, byte-identical |
+| Parallel-bank throughput on AX7020 | `LIVE_MEASURED` | 8-bank accumulator scales 1/2/4/8x, byte-identical to software |
 | Linux userspace to FPGA path | `HARDWARE_VALIDATED` | documented OS-to-bus validation path |
 | AX7020 board matrix | `LIVE_MEASURED` | raw artifact with wins and losses |
 | Lean4-checked formal algebra | `FORMAL_PROOF` where directly audited | exact audited properties only |
@@ -133,9 +135,13 @@ Every proof claim requires artifact, context, and caveat.
 
 # Where We Are / What v0.40 Funds
 
-**Today (v0.39-K, `HARDWARE_VALIDATED`):** the ATOMiK Desk shell runs on real silicon — Capability Rail, 5-lane Resource Fabric (STATE / SYNC / AGENT / EVENT / VISUAL), semantic Pulse Bar, personality hero — captured from `/dev/fb0` on a Zynq AX7020. Shell scores 95% against its V-phase target.
+**Today (v0.40-A, `HARDWARE_VALIDATED`):** the ATOMiK Desk shell runs on real silicon — Capability Rail, 5-lane Resource Fabric (STATE / SYNC / AGENT / EVENT / VISUAL), semantic Pulse Bar, personality hero — captured from `/dev/fb0` on a Zynq AX7020, with on-screen metrics driven by real measured on-board data. The display path is `HARDWARE_VALIDATED` at 1080p30 over HDMI (1080p60 is physically impossible on this board: an OSERDES2 pulse-width limit).
 
-**Active bring-up, not yet validated:** standalone SD boot is `BUILD_ARTIFACT` only. The currently validated path is JTAG-assisted; public power-on boot artifact remains gated.
+**Measured throughput substrate (`LIVE_MEASURED`):** an 8-bank ATOMiK XOR accumulator scales linearly with allocated banks on the AX7020 — 1/2/4/8 banks complete the same work in 1/2/4/8x fewer cycles (about 100 to 800 Mdeltas/s at the 100 MHz sys clock) — with a byte-identical result across every bank count that matches a software recompute. This is the throughput substrate, not a customer-workload speedup.
+
+**First customer-facing workload demo, proven on hardware (`LIVE_MEASURED`):** the Workloads surface (real-time telemetry aggregation) runs on the AX7020 over HDMI showing live measured throughput from the parallel-bank engine — 800 Mevents/s at 8 banks, byte-identical across configs. Only the throughput figures are measured; the surface's other on-screen values are derived/scenario, and this is a static capture, not an interactive session.
+
+**Active bring-up, not yet validated:** standalone SD boot is `BUILD_ARTIFACT` only. The Workloads surface with live data is now board-proven (above), but its **interactivity and USB keyboard/mouse input** remain software-complete and host-verified only, not board-confirmed (USB input gated on a VBUS/power path). The currently validated boot path is JTAG-assisted; public power-on boot artifact remains gated.
 
 **v0.40 funds the move from proof artifacts to repeatable demo and productization:**
 

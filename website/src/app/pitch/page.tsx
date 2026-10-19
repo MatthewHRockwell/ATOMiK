@@ -14,11 +14,11 @@ import {
 import { contactHref } from "@/lib/tracking";
 
 export const metadata: Metadata = {
-  title: "ATOMiK Friday Brief - Make Change the Unit of Compute",
+  title: "ATOMiK Pitch Brief - Make Change the Unit of Compute",
   description:
-    "A meeting-ready ATOMiK pitch narrative: pain, insight, evaluation offer, proof today, business model, roadmap, and next conversation.",
+    "A VC-ready ATOMiK pitch narrative: buyer pain, ROI pressure, evaluation offer, proof today, business model, roadmap, and next conversation.",
   openGraph: {
-    title: "ATOMiK Friday Brief",
+    title: "ATOMiK Pitch Brief",
     description:
       "ATOMiK makes change the unit of compute for constrained edge and embedded systems.",
     url: "https://atomik.tech/pitch",
@@ -51,6 +51,13 @@ const painLanes = [
 
 const proofCards = [
   {
+    title: "Zynq Desk v0.40-A UI artifact",
+    label: "HARDWARE_VALIDATED",
+    body:
+      "The current UI proof image shows ATOMiK Desk v0.40-A captured live from /dev/fb0 on Zynq hardware, with on-screen metrics driven by real measured on-board data. It is not a customer workload benchmark or production-readiness claim.",
+    href: "/10-current-live-atomik-desk-v040a.png",
+  },
+  {
     title: "Linux userspace to FPGA validation",
     label: "HARDWARE_VALIDATED",
     body:
@@ -66,16 +73,23 @@ const proofCards = [
   },
   {
     title: "Hardware synthesis and bank scaling",
-    label: "HARDWARE_VALIDATED",
+    label: "SYNTHESIS_VALIDATED",
     body:
-      "The synthesis artifact reports parallel accumulator bank scaling and Tang Nano 9K validation. It is not production silicon proof.",
+      "The synthesis artifact reports toolchain-characterized scaling context. It is not live-board performance proof and not production silicon proof.",
     href: "https://github.com/MatthewHRockwell/ATOMiK/blob/main/docs/HARDWARE_SYNTHESIS.md",
+  },
+  {
+    title: "Formal proof foundation",
+    label: "FORMAL_PROOF",
+    body:
+      "Formal proof work supports directly audited algebraic statements. It should not be expanded into workload, customer, or production outcomes.",
+    href: "https://github.com/MatthewHRockwell/ATOMiK/tree/main/math/proofs",
   },
   {
     title: "Claims registry and labels",
     label: "CLAIM_CONTROL",
     body:
-      "Public claims are separated by live measured, hardware validated, software validated, synthesis validated, build artifact, projected, conceptual, and roadmap.",
+      "Public claims are separated by live measured, hardware validated, software validated, formal proof, synthesis validated, build artifact, projected, conceptual, and roadmap.",
     href: "https://github.com/MatthewHRockwell/ATOMiK/blob/main/results/claims_registry.yaml",
   },
 ];
@@ -196,7 +210,7 @@ export default function PitchPage() {
       <section className="px-6 pb-16 pt-14 md:pt-20" style={{ background: `linear-gradient(135deg, ${colors.bg} 0%, ${colors.charcoal} 100%)` }}>
         <div className="mx-auto grid max-w-6xl gap-10 md:grid-cols-[1.05fr_0.95fr] md:items-center">
           <div>
-            <Pill tone={colors.amber}>Friday brief</Pill>
+            <Pill tone={colors.amber}>Pitch brief</Pill>
             <h1 className="mt-6 max-w-4xl text-4xl font-bold leading-none sm:text-5xl md:text-7xl">
               Make change the unit of compute.
             </h1>
@@ -316,6 +330,21 @@ export default function PitchPage() {
         </div>
       </Section>
 
+      <Section eyebrow="ROI path" title="ATOMiK turns waste into an investment decision.">
+        <div className="grid gap-5 md:grid-cols-3">
+          {[
+            ["Find paid waste", "Identify where state movement creates power, bandwidth, heat, latency, footprint, or engineering-time pressure."],
+            ["Measure against baseline", "Compare one constrained path against the current implementation, with correctness preserved and caveats attached."],
+            ["Convert to next step", "Use the result to decide whether the right commercial path is no-fit, proof review, design partner, licensing, or investor diligence."],
+          ].map(([title, body]) => (
+            <article key={title} className="rounded p-6" style={{ background: colors.charcoal, border: `1px solid ${colors.border}` }}>
+              <h3 className="text-xl font-bold">{title}</h3>
+              <p className="mt-3 text-sm leading-6" style={{ color: colors.muted }}>{body}</p>
+            </article>
+          ))}
+        </div>
+      </Section>
+
       <Section eyebrow="Measurement" title="Every evaluation starts with a metric, baseline, and decision threshold.">
         <div className="grid gap-4 md:grid-cols-3">
           {selectedMetrics.map((metric) => (
@@ -343,7 +372,7 @@ export default function PitchPage() {
         </div>
         <div className="mt-6 rounded p-5" style={{ background: "rgba(249, 202, 103, 0.1)", border: `1px solid ${colors.amber}` }}>
           <p className="text-sm leading-6" style={{ color: colors.warm }}>
-            Benchmark rule: quote the artifact, context, and caveat. Do not isolate the biggest number. The AX7020 matrix shows workload-specific wins and workload-specific losses.
+            Benchmark rule: quote the artifact, context, and caveat. Do not isolate the biggest number. The proof story is artifact-bound, not a universal performance claim.
           </p>
         </div>
       </Section>

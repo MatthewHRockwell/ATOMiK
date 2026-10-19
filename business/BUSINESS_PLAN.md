@@ -93,8 +93,12 @@ Evidence labels:
 - `CONCEPTUAL`
 - `ROADMAP`
 
-Current proof stack includes the v0.39-K Zynq Desk UI proof image, Linux
-userspace-to-FPGA validation, AX7020 board-run matrix, hardware synthesis
+Current proof stack includes the v0.40-A Zynq Desk UI proof image (captured
+from /dev/fb0, driven by real measured on-board data), the first customer-facing
+live Workloads demo on AX7020 hardware (telemetry aggregation, 800 Mevents/s at
+8 banks, byte-identical across configs), live-measured parallel-bank throughput
+on the AX7020 (1/2/4/8x, byte-identical to software), Linux userspace-to-FPGA
+validation, AX7020 board-run matrix, hardware synthesis
 artifacts, formal proof work, and build artifacts for the standalone SD boot
 path. Do not isolate the biggest performance number without artifact, context,
 and caveat.

@@ -1,22 +1,23 @@
-import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/siteMetadata";
 import Link from "next/link";
 
-export const metadata: Metadata = {
-  title: "Documentation - ATOMiK",
-  description:
-    "ATOMiK public docs, evidence labels, proof artifacts, hardware validation, and roadmap concepts.",
-};
+export const metadata = pageMetadata({
+  title: 'Documentation - ATOMiK',
+  description: 'ATOMiK public docs, evidence labels, proof artifacts, hardware validation, and roadmap concepts.',
+  path: '/docs',
+  openGraphTitle: 'ATOMiK Proof Documentation',
+});
 
 const cards = [
   {
     href: "https://github.com/MatthewHRockwell/ATOMiK/blob/main/docs/evidence-labels.md",
     title: "Evidence Labels",
-    desc: "Definitions for LIVE_MEASURED, HARDWARE_VALIDATED, SOFTWARE_VALIDATED, SYNTHESIS_VALIDATED, PROJECTED, CONCEPTUAL, and ROADMAP.",
+    desc: "Definitions for LIVE_MEASURED, HARDWARE_VALIDATED, SOFTWARE_VALIDATED, FORMAL_PROOF, SYNTHESIS_VALIDATED, PROJECTED, CONCEPTUAL, and ROADMAP.",
   },
   {
-    href: "https://github.com/MatthewHRockwell/ATOMiK/blob/main/docs/technical-proof.md",
-    title: "Technical Proof",
-    desc: "Artifact map for current proof, benchmark outputs, hardware validation, software proof, and concept material.",
+    href: "/benchmarks",
+    title: "Current Proof Packet",
+    desc: "Public proof story, evidence labels, artifact interpretations, and current claim boundaries.",
   },
   {
     href: "https://github.com/MatthewHRockwell/ATOMiK/blob/main/docs/hardware-validation.md",
@@ -31,7 +32,7 @@ const cards = [
   {
     href: "https://github.com/MatthewHRockwell/ATOMiK/blob/main/docs/design-partners.md",
     title: "Design Partners",
-    desc: "Evaluation access, paid technical evaluation, qualification questions, and expected deliverables.",
+    desc: "Proof-review reservation, technical-evaluation scoping, qualification questions, and expected deliverables.",
   },
   {
     href: "https://github.com/MatthewHRockwell/ATOMiK/blob/main/results/claims_registry.yaml",
@@ -44,11 +45,11 @@ export default function DocsIndexPage() {
   return (
     <div className="mx-auto max-w-5xl px-6 py-16">
       <p className="text-sm font-semibold uppercase" style={{ color: "#22d3ee" }}>
-        Developer documentation
+        Proof documentation
       </p>
       <h1 className="mt-4 text-4xl font-bold md:text-5xl">Docs</h1>
       <p className="mt-4 max-w-3xl text-lg leading-8" style={{ color: "#8888a0" }}>
-        Start with the evidence framework and proof map. Deep implementation docs remain available in the repository, but public claims should route through the labeled artifacts.
+        Start with the current proof packet and evidence framework. Deep implementation docs remain available in the repository; public claims route through labeled artifacts, context, and caveats.
       </p>
 
       <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">

@@ -1,23 +1,23 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "ATOMiK White Paper — Delta-State Algebra Technical Deep-Dive",
+  title: "Technical Proof Brief - ATOMiK",
   description:
-    "Mathematical foundations, hardware implementation notes, and proof artifacts with evidence labels.",
+    "Artifact-first technical proof map for ATOMiK state-aware compute.",
   openGraph: {
-    title: "ATOMiK White Paper — Delta-State Algebra Technical Deep-Dive",
+    title: "ATOMiK Technical Proof Brief",
     description:
-      "Technical background for state-aware compute. Performance claims require linked measured artifacts.",
+      "Review ATOMiK by linked evidence artifacts, not headline numbers.",
     url: "https://atomik.tech/whitepaper",
-    images: [{ url: "https://atomik.tech/og-image.jpg", width: 1200, height: 630 }],
+    images: [{ url: "https://atomik.tech/10-current-live-atomik-desk-v040a.png", width: 1920, height: 1080 }],
     type: "article",
   },
   twitter: {
     card: "summary_large_image",
-    title: "ATOMiK White Paper — Delta-State Algebra Technical Deep-Dive",
+    title: "ATOMiK Technical Proof Brief",
     description:
-      "Technical background, proof notes, and evidence-labeled artifact guidance.",
-    images: ["https://atomik.tech/og-image.jpg"],
+      "Evidence-labeled technical proof map for state-aware compute.",
+    images: ["https://atomik.tech/10-current-live-atomik-desk-v040a.png"],
   },
 };
 

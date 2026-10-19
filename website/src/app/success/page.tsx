@@ -5,6 +5,7 @@ import Nav from "@/components/Nav";
 export const metadata: Metadata = {
   title: "Payment Received - ATOMiK",
   description: "ATOMiK paid evaluation checkout confirmation.",
+  robots: { index: false, follow: false },
 };
 
 const colors = {

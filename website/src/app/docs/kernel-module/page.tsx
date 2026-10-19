@@ -1,12 +1,13 @@
-import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/siteMetadata";
 import EvaluationGate from "@/components/EvaluationGate";
 import { codeBlockStyle } from "../shared";
 
-export const metadata: Metadata = {
-  title: "Kernel Module - ATOMiK Docs",
-  description:
-    "ATOMiK Linux kernel module notes for request-based technical evaluation and proof review.",
-};
+export const metadata = pageMetadata({
+  title: 'Kernel Module - ATOMiK Docs',
+  description: 'ATOMiK Linux kernel module notes for request-based technical evaluation and proof review.',
+  path: '/docs/kernel-module',
+  openGraphTitle: 'ATOMiK Kernel Module Notes',
+});
 
 const sections = [
   {
@@ -17,7 +18,7 @@ const sections = [
   {
     title: "Evidence boundary",
     body:
-      "Use measured artifacts for performance claims. The website should not infer data-center, Kubernetes, or subscription behavior from illustrative terminal output.",
+      "Use measured artifacts for performance claims. Do not infer data-center, Kubernetes, or subscription behavior from illustrative terminal output.",
   },
   {
     title: "Evaluation fit",
@@ -38,8 +39,8 @@ export default function KernelModulePage() {
       <h1 className="mb-4 text-4xl font-bold tracking-tight">Kernel Module</h1>
       <p className="mb-10 max-w-3xl text-lg" style={{ color: "#8888a0" }}>
         The ATOMiK Linux kernel-module path is handled as a request-based
-        technical evaluation surface. Public docs should anchor on install
-        shape, interface review, and evidence boundaries rather than fake
+        technical evaluation surface. Public docs anchor on install shape,
+        interface review, and evidence boundaries rather than illustrative
         subscription, cluster, or savings output.
       </p>
 
