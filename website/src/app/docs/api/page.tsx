@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/siteMetadata";
 import {
   codeBlockStyle,
   kwColor,
@@ -12,11 +12,12 @@ import {
 import EvaluationGate from "@/components/EvaluationGate";
 import LangTabs from "@/components/LangTabs";
 
-export const metadata: Metadata = {
-  title: "API Reference — ATOMiK Docs",
-  description:
-    "Python, C, and kernel module APIs for ATOMiK delta-state operations. Multi-context tables and full operation reference.",
-};
+export const metadata = pageMetadata({
+  title: 'API Reference — ATOMiK Docs',
+  description: 'Python, C, and kernel-module interface shapes for ATOMiK delta-state operations, scoped for technical evaluation.',
+  path: '/docs/api',
+  openGraphTitle: 'ATOMiK API Reference',
+});
 
 /* ── API reference cards data ─────────────────────────────────────── */
 
@@ -45,7 +46,7 @@ const apiLinks = [
       "ATOMIK_IOC_SWAP",
       "ATOMIK_IOC_BATCH",
     ],
-    install: "sudo ./install.sh",
+    install: "review software/atomik_kmod",
     color: "#d4a843",
   },
 ];
@@ -61,8 +62,9 @@ export default function ApiReferencePage() {
       </p>
       <h1 className="text-4xl font-bold tracking-tight mb-4">API Reference</h1>
       <p className="text-lg mb-10" style={{ color: "#8888a0" }}>
-        Three interfaces, one algebra. Every API exposes the same four operations:
-        LOAD, ACCUM, READ, SWAP.
+        Public interface shapes share the same four operations: LOAD, ACCUM,
+        READ, SWAP. Treat kernel and hardware paths as evaluation surfaces until
+        a workload-specific proof plan is agreed.
       </p>
 
       {/* API cards */}
@@ -111,8 +113,8 @@ export default function ApiReferencePage() {
       {/* ─────────────── Core Operations Reference ─────────────── */}
       <h2 className="text-3xl font-bold mb-3">Core Operations</h2>
       <p className="mb-8 text-lg" style={{ color: "#8888a0" }}>
-        Every ATOMiK SDK exposes the same four operations. Select a language to see
-        signatures, descriptions, and examples.
+        The public SDK and interface examples use the same operation vocabulary.
+        Select a language to review signatures, descriptions, and examples.
       </p>
 
       <LangTabs />

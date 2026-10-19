@@ -15,7 +15,7 @@ const colors = {
   text: "#f4f8ff",
   muted: "#9fb1c7",
   cyan: "#22d3ee",
-  blue: "#4f8fff",
+  blue: "#2563eb",
 };
 
 const links = [

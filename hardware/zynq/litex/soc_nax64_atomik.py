@@ -31,6 +31,9 @@ from litex.soc.cores.clock import S7MMCM
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from wb_framebuffer import WishboneVideoFrameBuffer
 from ps_uart0_bridge import PSUart0Bridge
+# usb_irq_poller.UsbIrqPoller: a PL-side USBSTS poller — delivers IRQs reliably
+# but breaks USB enumeration as a 3rd bus master (2026-06-19 dead end). Kept for
+# reference; not instantiated.  See the USB0 interrupt section below.
 
 # Phase 9.2: framebuffer lives 128 MiB into main_ram, well clear of kernel
 # (0x40000000-0x408xxxxx), trampoline (0x40A00000), DTB (0x40EF0000),
@@ -195,32 +198,34 @@ class BaseSoC(SoCCore):
         # cached PS-side status.
         self.irq.add("uart", use_loc_if_exists=True)
 
-        # USB0 interrupt from PS to NaxRiscv PLIC, via a LEVEL->EDGE converter.
-        # PS7 IRQ_P2F_USB0 is LEVEL-triggered (active high, stays asserted while
-        # the chipidea controller has unserviced events).  The LiteX/NaxRiscv
-        # PLIC input is EDGE-triggered, so when several USB completion events
-        # stack up the line stays high, the PLIC latches only the first rising
-        # edge, and every subsequent completion IRQ is dropped — the kernel's
-        # URB never completes and control transfers time out -110 (the residual
-        # marginality after the mBus DMA fix; see project_usb_irq_root_cause).
+        # USB0 interrupt -> NaxRiscv PLIC, via a PL-side poller (NOT IRQ_P2F).
         #
-        # Fix: while usb0_irq is high, re-pulse the PLIC input for 1 cycle every
-        # 2^PERIOD_BITS sys cycles.  Each pulse is a fresh edge, so the PLIC
-        # keeps re-latching the pending bit for every still-unserviced USB
-        # event until the kernel ACKs them all and the line finally drops.
-        # 256 cycles @100 MHz = 2.56 us re-fire period — far below the USB
-        # control-transfer timeout, and pulses arriving while one is already
-        # pending are harmlessly absorbed by the PLIC's single pending bit.
+        # Root cause, isolated 2026-06-19 by reading registers live: the PS->PL
+        # fabric tap IRQ_P2F_USB0 does NOT track the controller's interrupt out to
+        # the PL.  With the controller asserting (USBSTS=0xc408b, USBINTR enabling
+        # the bits) the PLIC source-3 pending stayed CLEAR — so native delivery and
+        # irqpoll were both marginal/dead for steady-state HID.  The PLIC gateway
+        # itself is level-sensitive and fine (netlist: io_sources[2] = port[3]); the
+        # break is upstream on the PS side.
+        #
+        # The PLIC gateway is level-sensitive (netlist: io_sources[2] = port[3]),
+        # so drive the raw active-high level.  NOTE: IRQ_P2F_USB0 itself is the
+        # unreliable link — it does not consistently track the controller's
+        # interrupt — so the kernel needs `irqpoll` (DTB bootargs) to poll the
+        # handler and carry steady-state HID delivery.  This stays MARGINAL.
+        #
+        # 2026-06-19 DEAD END (reverted): a PL-side poller that read USBSTS/USBINTR
+        # over GP1 and drove this line itself DID deliver reliably (FLR-verified)
+        # but broke USB enumeration — even gated idle, adding it as a third bus
+        # master disrupts the timing-sensitive ps_iop path the kernel uses for
+        # enumeration control transfers (13 boots / 0 enumerations vs. attempt-1
+        # success without it).  See usb_irq_poller.py (kept for reference) and
+        # [[project_usb_irq_pulse_width_fix]].  A reliable fix needs a path that
+        # does NOT add a bus master sharing ps_iop (kernel-side fast polling, or
+        # an MCU HID bridge).
         usb0_irq = ps.get_irq_p2f_usb0()
         self.irq.add("usb0", use_loc_if_exists=True)
-        USB_IRQ_PERIOD_BITS = 8
-        usb_irq_ctr = Signal(USB_IRQ_PERIOD_BITS)
-        self.sync += If(usb0_irq,
-                        usb_irq_ctr.eq(usb_irq_ctr + 1),
-                     ).Else(
-                        usb_irq_ctr.eq(0),
-                     )
-        self.comb += self.cpu.interrupt[3].eq(usb0_irq & (usb_irq_ctr == 0))
+        self.comb += self.cpu.interrupt[3].eq(usb0_irq)
 
         # LCD ST7789V 320x172 — GPIO bitbang SPI
         # Pins confirmed from RK-ZYNQ7020-F Schematics.pdf page 5, Bank 33.

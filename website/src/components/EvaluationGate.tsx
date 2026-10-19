@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { contactHref } from "@/lib/tracking";
 
 export default function EvaluationGate({
   title,
@@ -10,7 +11,7 @@ export default function EvaluationGate({
   title: string;
   description: string;
   ctaText?: string;
-  intent?: "evaluation" | "demo" | "design-partner" | "licensing";
+  intent?: "evaluation" | "demo" | "design-partner" | "licensing" | "proof" | "question" | "investor";
   accent?: string;
 }) {
   return (
@@ -44,7 +45,7 @@ export default function EvaluationGate({
         </p>
 
         <Link
-          href={`/contact?intent=${intent}`}
+          href={contactHref(intent, "evaluation-gate", ctaText)}
           className="inline-block rounded-lg px-5 py-2.5 text-sm font-semibold text-white no-underline transition-opacity hover:opacity-90"
           style={{ background: accent }}
         >

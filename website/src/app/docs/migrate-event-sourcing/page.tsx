@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/siteMetadata";
 import {
   codeBlockStyle,
   kwColor,
@@ -10,26 +10,12 @@ import {
   strColor,
 } from "../shared";
 
-export const metadata: Metadata = {
-  title: "Migrate from Event Sourcing to ATOMiK — Docs",
-  description:
-    "Replace event logs and snapshot replay with ATOMiK O(1) state reconstruction. Migration guide with code examples and trade-off analysis.",
-  keywords: [
-    "event sourcing migration",
-    "event sourcing alternative",
-    "CQRS alternative",
-    "snapshot elimination",
-    "delta-state algebra",
-    "ATOMiK migration guide",
-    "event replay elimination",
-  ],
-  openGraph: {
-    title: "Migrate from Event Sourcing to ATOMiK — ATOMiK Docs",
-    description:
-      "Eliminate event replay and snapshot overhead. O(1) state reconstruction replaces O(n) event log replay.",
-    type: "website",
-  },
-};
+export const metadata = pageMetadata({
+  title: 'Migrate from Event Sourcing to ATOMiK — Docs',
+  description: 'Evaluate replacing hot event-replay paths with ATOMiK accumulator-state reconstruction. Migration guide with code examples and trade-off analysis.',
+  path: '/docs/migrate-event-sourcing',
+  openGraphTitle: 'Migrate from Event Sourcing to ATOMiK — ATOMiK Docs',
+});
 
 /* ------------------------------------------------------------------ */
 /*  Data                                                               */
@@ -39,12 +25,12 @@ const conceptMap = [
   {
     es: "Event Log",
     atomik: "Accumulator",
-    notes: "Event sourcing appends every event to an ordered log (linear growth). ATOMiK XOR-accumulates every delta into a single fixed-size value (constant space).",
+    notes: "Event sourcing appends every event to an ordered log (linear growth). In the fit model, ATOMiK XOR-accumulates deltas into a fixed-width accumulator value.",
   },
   {
     es: "Event Replay",
     atomik: "ctx.read()",
-    notes: "ES replays all events since last snapshot to reconstruct state: O(n). ATOMiK reconstructs in O(1): initial_state XOR accumulator.",
+    notes: "ES replays all events since the last snapshot to reconstruct state: O(n). ATOMiK reconstructs with one accumulator read in the fit model: initial_state XOR accumulator.",
   },
   {
     es: "Snapshot",
@@ -72,19 +58,19 @@ const tradeoffs = [
   {
     dimension: "State reconstruction",
     es: "O(n) -- replay from last snapshot",
-    atomik: "O(1) -- initial XOR accumulator",
+    atomik: "O(1) in the accumulator model -- initial XOR accumulator",
     winner: "atomik",
   },
   {
     dimension: "Storage growth",
     es: "Linear -- every event stored forever",
-    atomik: "Constant -- single accumulator value",
+    atomik: "Fixed-width accumulator for hot state; audit history must stay elsewhere",
     winner: "atomik",
   },
   {
     dimension: "Undo / Compensation",
     es: "Manual compensating events",
-    atomik: "Free -- self-inverse (XOR twice = identity)",
+    atomik: "Algebraic for fit XOR deltas -- self-inverse",
     winner: "atomik",
   },
   {
@@ -102,19 +88,19 @@ const tradeoffs = [
   {
     dimension: "CQRS pattern",
     es: "Native -- separate command and query models",
-    atomik: "Not needed -- read() returns current state directly",
+    atomik: "Hot read model can be simplified when the state fits the accumulator model",
     winner: "atomik",
   },
   {
     dimension: "Ordering requirements",
     es: "Strict -- events must be totally ordered",
-    atomik: "None -- deltas commute (any order, same result)",
+    atomik: "Accumulator deltas commute; business ordering remains workload-specific",
     winner: "atomik",
   },
   {
     dimension: "Infrastructure complexity",
     es: "High -- event store, projectors, snapshot store",
-    atomik: "Minimal -- single context object, pip install",
+    atomik: "Small accumulator API; integration and audit needs remain workload-specific",
     winner: "atomik",
   },
 ];
@@ -134,7 +120,7 @@ const keepESWhen = [
   },
   {
     reason: "Existing projections that work well",
-    detail: "If your CQRS read models are performant and your event store handles production load without issues, migration cost may exceed benefit. ATOMiK is most valuable when replay latency, snapshot overhead, or storage growth are actual pain points.",
+    detail: "If your CQRS read models are performant and your event store handles representative load without issues, migration cost may exceed benefit. ATOMiK is most valuable when replay latency, snapshot overhead, or storage growth are actual pain points.",
   },
 ];
 
@@ -156,8 +142,8 @@ export default function MigrateEventSourcingPage() {
       </h1>
       <p className="text-lg mb-6" style={{ color: "#8888a0" }}>
         Event sourcing gives you a complete history. ATOMiK gives you instant current
-        state. This guide shows how to evaluate replacing event replay with O(1) state
-        reconstruction, reduce snapshot pressure, and simplify undo -- and when to keep
+        state. This guide shows how to evaluate replacing hot event replay paths with accumulator-model state
+        reconstruction, reduce snapshot pressure, and simplify fit-model undo -- and when to keep
         your event log.
       </p>
 
@@ -181,8 +167,9 @@ export default function MigrateEventSourcingPage() {
           >
             current_state = initial_state &oplus; accumulator
           </code>
-          . You trade history for speed: O(1) instead of O(n), constant storage instead of
-          linear growth, and free undo via self-inverse instead of compensating events.
+          . In fit workloads, you trade history for a faster hot-state path: accumulator reads
+          instead of replay, fixed-width accumulator state instead of linear hot-state growth,
+          and algebraic undo via self-inverse deltas.
         </p>
       </div>
 
@@ -232,11 +219,11 @@ export default function MigrateEventSourcingPage() {
         </table>
       </div>
 
-      {/* Pattern 1: Event Replay to O(1) Read */}
-      <h2 className="text-2xl font-bold mb-4">Pattern 1: Eliminate Event Replay</h2>
+      {/* Pattern 1: Event Replay to Accumulator Read */}
+      <h2 className="text-2xl font-bold mb-4">Pattern 1: Reduce Hot-Path Event Replay</h2>
       <p className="text-sm mb-6" style={{ color: "#8888a0" }}>
-        The most impactful migration: replace O(n) event replay with O(1) state
-        reconstruction. No more snapshot management, no more replay lag on startup.
+        The most impactful migration candidate is a hot read path where replay latency
+        or snapshot pressure is already measurable.
       </p>
       <div className="grid md:grid-cols-2 gap-4 mb-12">
         <div>
@@ -364,7 +351,7 @@ export default function MigrateEventSourcingPage() {
                 <span style={{ color: fnColor }}> current_state</span>
                 <span style={{ color: varColor }}>(self):</span>
                 {"\n"}
-                <span style={{ color: cmtColor }}>{"        "}# O(1). Always. No replay.</span>
+                <span style={{ color: cmtColor }}>{"        "}# Accumulator-model read; no event replay here.</span>
                 {"\n"}
                 <span style={{ color: varColor }}>{"        "}</span>
                 <span style={{ color: kwColor }}>return</span>
@@ -385,9 +372,9 @@ export default function MigrateEventSourcingPage() {
                 <span style={{ color: fnColor }}>swap</span>
                 <span style={{ color: varColor }}>()</span>
                 {"\n\n"}
-                <span style={{ color: cmtColor }}># No event store. No snapshots.</span>
+                <span style={{ color: cmtColor }}># Event store can remain for audit/history.</span>
                 {"\n"}
-                <span style={{ color: cmtColor }}># No replay. No snapshot scheduling.</span>
+                <span style={{ color: cmtColor }}># Hot read path avoids replay scheduling.</span>
               </code>
             </pre>
           </div>
@@ -395,10 +382,11 @@ export default function MigrateEventSourcingPage() {
       </div>
 
       {/* Pattern 2: Compensating Events to Self-Inverse */}
-      <h2 className="text-2xl font-bold mb-4">Pattern 2: Eliminate Compensating Events</h2>
+      <h2 className="text-2xl font-bold mb-4">Pattern 2: Simplify Fit-Model Compensation</h2>
       <p className="text-sm mb-6" style={{ color: "#8888a0" }}>
         In event sourcing, undo requires designing and publishing a compensating event
-        with reversal semantics. In ATOMiK, undo is algebraic and free.
+        with reversal semantics. In ATOMiK, undo is algebraic when the state change is
+        represented as a fit XOR delta.
       </p>
       <div className="grid md:grid-cols-2 gap-4 mb-12">
         <div>
@@ -462,7 +450,7 @@ export default function MigrateEventSourcingPage() {
                 <span style={{ color: fnColor }}>accum</span>
                 <span style={{ color: varColor }}>(original_delta)</span>
                 {"\n"}
-                <span style={{ color: cmtColor }}>{"    "}# That&apos;s it.</span>
+                <span style={{ color: cmtColor }}>{"    "}# For fit XOR deltas, that&apos;s the accumulator undo.</span>
                 {"\n"}
                 <span style={{ color: cmtColor }}>{"    "}#</span>
                 {"\n"}
@@ -478,7 +466,7 @@ export default function MigrateEventSourcingPage() {
                 {"\n"}
                 <span style={{ color: cmtColor }}>{"    "}# No additional storage.</span>
                 {"\n"}
-                <span style={{ color: cmtColor }}>{"    "}# Works for every delta type.</span>
+                <span style={{ color: cmtColor }}>{"    "}# Validate domain semantics before replacing events.</span>
                 {"\n\n"}
                 <span style={{ color: cmtColor }}># Algebraic property:</span>
                 {"\n"}
@@ -631,14 +619,14 @@ export default function MigrateEventSourcingPage() {
             <span style={{ color: fnColor }}> current_state</span>
             <span style={{ color: varColor }}>(self):</span>
             {"\n"}
-            <span style={{ color: cmtColor }}>{"        "}# Read path: O(1) via ATOMiK</span>
+            <span style={{ color: cmtColor }}>{"        "}# Hot read path via ATOMiK accumulator</span>
             {"\n"}
             <span style={{ color: varColor }}>{"        "}</span>
             <span style={{ color: kwColor }}>return</span>
             <span style={{ color: varColor }}> self.ctx.</span>
             <span style={{ color: fnColor }}>read</span>
             <span style={{ color: varColor }}>()</span>
-            <span style={{ color: cmtColor }}> # no replay</span>
+            <span style={{ color: cmtColor }}> # no replay on this path</span>
             {"\n\n"}
             <span style={{ color: varColor }}>{"    "}</span>
             <span style={{ color: kwColor }}>def</span>
@@ -669,8 +657,8 @@ export default function MigrateEventSourcingPage() {
         <p style={{ color: "#b0b0c0" }}>
           Event sourcing optimizes for <strong>understanding the past</strong>. ATOMiK optimizes
           for <strong>knowing the present</strong>. If you need both, use both -- ATOMiK on the
-          hot read path, event sourcing for audit and temporal queries. The write path
-          (one accum() call) adds negligible overhead.
+          hot read path, event sourcing for audit and temporal queries. Validate the write-path
+          overhead and replay reduction against the actual workload before making a production claim.
         </p>
       </div>
 

@@ -4,5 +4,5 @@ export const alt = "ATOMiK";
 export const size = ogSize;
 export const contentType = "image/png";
 export default function OG() {
-  return generateOGImage({ title: "ATOMiK Solutions", subtitle: "Delta-state algebra for distributed systems, IoT, financial, gaming, and databases.", accent: "#22c55e", badge: "Solutions" });
+  return generateOGImage({ title: "ATOMiK Solutions", subtitle: "Use cases for heat, battery, bandwidth, latency, and hardware footprint constraints.", accent: "#22c55e", badge: "Solutions" });
 }

@@ -6,11 +6,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   return [
     { url: baseUrl, lastModified: now, changeFrequency: "weekly", priority: 1 },
-    { url: `${baseUrl}/pitch`, lastModified: now, changeFrequency: "weekly", priority: 0.98 },
     { url: `${baseUrl}/pricing`, lastModified: now, changeFrequency: "weekly", priority: 0.96 },
     { url: `${baseUrl}/benchmarks`, lastModified: now, changeFrequency: "weekly", priority: 0.94 },
     { url: `${baseUrl}/solutions`, lastModified: now, changeFrequency: "weekly", priority: 0.92 },
     { url: `${baseUrl}/contact`, lastModified: now, changeFrequency: "monthly", priority: 0.9 },
+    { url: `${baseUrl}/pitch`, lastModified: now, changeFrequency: "weekly", priority: 0.82 },
     { url: `${baseUrl}/investor-brief`, lastModified: now, changeFrequency: "weekly", priority: 0.78 },
     { url: `${baseUrl}/docs/hardware`, lastModified: now, changeFrequency: "weekly", priority: 0.74 },
     { url: `${baseUrl}/docs`, lastModified: now, changeFrequency: "weekly", priority: 0.68 },

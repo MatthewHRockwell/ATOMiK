@@ -1,9 +1,10 @@
-import type { Metadata } from "next";
-export const metadata: Metadata = {
-  title: "Architecture — ATOMiK Docs",
-  description:
-    "The fundamental equation, four algebraic properties, and four operations that define ATOMiK delta-state computing.",
-};
+import { pageMetadata } from "@/lib/siteMetadata";
+export const metadata = pageMetadata({
+  title: 'Architecture — ATOMiK Docs',
+  description: 'The reference-state equation, algebraic properties, and operation vocabulary behind ATOMiK state-aware evaluation.',
+  path: '/docs/architecture',
+  openGraphTitle: 'ATOMiK Architecture Docs',
+});
 
 const properties = [
   {
@@ -70,7 +71,7 @@ export default function ArchitecturePage() {
       </p>
       <h1 className="text-4xl font-bold tracking-tight mb-4">Architecture</h1>
       <p className="text-lg mb-10" style={{ color: "#8888a0" }}>
-        ATOMiK is not Von Neumann. State is reconstructed, not stored.
+        ATOMiK evaluates workloads where current state can be represented from a reference state plus meaningful deltas, with correctness checked before performance claims.
       </p>
 
       <div

@@ -27,7 +27,7 @@ Request Evaluation
 
 ## Claim policy
 
-Public copy must separate measured, hardware-validated, software-validated, synthesis-validated, build-artifact, projected, conceptual, and roadmap claims. Cooling, battery, speed, bandwidth, water, power, footprint, and production-readiness language remains evaluation-target language unless a linked artifact supports the exact claim.
+Public copy must separate live-measured, hardware-validated, software-validated, formal-proof, synthesis-validated, build-artifact, projected, conceptual, and roadmap claims. Cooling, battery, speed, bandwidth, water, power, footprint, and production-readiness language remains evaluation-target language unless a linked artifact supports the exact claim.
 
 ## Messaging source of truth
 

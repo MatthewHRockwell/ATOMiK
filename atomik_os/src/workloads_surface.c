@@ -122,7 +122,7 @@ void workloads_set_scenario(int n) {
     s_scenario = n;
 }
 
-int  workloads_surface_is_open(void) { return s_window_id >= 0; }
+int  workloads_surface_is_open(void) { return s_window_id >= 0 && wm_exists(s_window_id); }
 int  workloads_surface_window_id(void) { return s_window_id; }
 
 /* v0.42 interactive: hit-test a screen-space click against the surface.
@@ -341,17 +341,27 @@ static int parallel_ladder(int x, int y, int w, const bench_point_t *pts, int np
     if (lab) {
         char sline[48];
         snprintf(sline, sizeof sline, "live deltas - seed %s", bench_seed_hex());
-        const char *blab = "Shuffle deltas";
-        int bw = text_width_aa(FONT_AA_LABEL, blab) + ATOMIK_GRID_L;
-        int bh = lh + 10;
+        const char *blab = "Shuffle deltas >";
+        int pad = ATOMIK_GRID_L;
+        int bw = text_width_aa(FONT_AA_LABEL, blab) + pad * 2;
+        int bh = lh + 16;
         int bx = x + w - bw;
+        /* the live seed (left) */
         draw_text_aa(FONT_AA_LABEL, x, y + (bh - lh) / 2, sline, rgb(0x6E, 0x7A, 0x90));
-        draw_rect_rounded(bx, y, bw, bh, 6, rgb(0x13, 0x2A, 0x36));
-        draw_rect(bx + 6, y, bw - 12, 1, ATOMIK_ACCENT);   /* top accent edge */
-        draw_text_aa(FONT_AA_LABEL, bx + ATOMIK_GRID_S, y + (bh - lh) / 2, blab, ATOMIK_ACCENT);
+        /* FILLED accent pill — the one obvious clickable control on the card.
+         * Soft glow + dark label so it reads as a button, not a chip. */
+        for (int g = 1; g <= 3; g++) {
+            uint8_t a = (uint8_t)(40 - (g - 1) * 12);
+            for (int sx = 0; sx < bw; sx++) {
+                draw_blend_pixel(bx + sx, y - g,        ATOMIK_ACCENT, a);
+                draw_blend_pixel(bx + sx, y + bh - 1 + g, ATOMIK_ACCENT, a);
+            }
+        }
+        draw_rect_rounded(bx, y, bw, bh, 8, ATOMIK_ACCENT);
+        draw_text_aa(FONT_AA_LABEL, bx + pad, y + (bh - lh) / 2, blab, rgb(0x06, 0x12, 0x1A));
         s_shuffle_rect[0] = bx; s_shuffle_rect[1] = y;
         s_shuffle_rect[2] = bw; s_shuffle_rect[3] = bh;
-        y += bh + 2;
+        y += bh + 4;
     }
     return y - y0;
 }
@@ -626,7 +636,10 @@ void workloads_surface_open(void) {
     /* preview: pre-select a lane rung for host shots of the interactive state. */
     const char *es = getenv("ATOMIK_PREVIEW_WL_SEL");
     if (es && *es) s_sel_idx = atoi(es);
-    if (s_window_id >= 0) { wm_focus(s_window_id); return; }
+    if (s_window_id >= 0) {
+        if (wm_exists(s_window_id)) { wm_focus(s_window_id); return; }
+        s_window_id = -1;   /* was closed (e.g. via the title-bar X) — reopen */
+    }
     int ww = 780, wh = 560;
     int wx = (FB_W - ww) / 2, wy = (FB_H - wh) / 2 - 20;
     window_t *win = wm_open("WORKLOADS", wx, wy, ww, wh, workloads_surface_draw, NULL);

@@ -1,10 +1,12 @@
-import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/siteMetadata";
 import Link from "next/link";
 
-export const metadata: Metadata = {
-  title: "Terms of Service - ATOMiK",
-  description: "ATOMiK terms of service for public review, request-based evaluation, and written commercial agreements.",
-};
+export const metadata = pageMetadata({
+  title: 'Terms of Service - ATOMiK',
+  description: 'ATOMiK terms of service for public review, request-based evaluation, and written commercial agreements.',
+  path: '/terms',
+  openGraphTitle: 'ATOMiK Terms of Service',
+});
 
 export default function TermsPage() {
   return (
@@ -18,7 +20,7 @@ export default function TermsPage() {
         </Link>
 
         <h1 className="text-4xl font-bold tracking-tight mb-2">Terms of Service</h1>
-        <p className="text-[#8888a0] text-sm mb-12">Effective March 1, 2026</p>
+        <p className="text-[#8888a0] text-sm mb-12">Last updated May 28, 2026</p>
 
         <div className="space-y-10">
           <Section title="1. Acceptance of Terms">
@@ -43,10 +45,20 @@ export default function TermsPage() {
               <TierCard
                 name="Evaluation Access"
                 price="Request-based"
-                description="Limited evaluation access, proof artifact review, technical updates, and early demo availability for qualified evaluators."
+                description="Limited evaluation access, proof artifact review, technical updates, and proof-review availability for qualified evaluators."
               />
               <TierCard
-                name="Design Partner / Paid Technical Evaluation"
+                name="Proof Review Reservation"
+                price="$750"
+                description="A one-time reservation to hold proof-review time around a workload, constraint, and evidence path. The reservation can be credited toward a larger scoped evaluation when both sides continue."
+              />
+              <TierCard
+                name="Technical Evaluation Reservation"
+                price="$2,500"
+                description="A one-time reservation for evaluation scoping. Final deliverables, timelines, and commercial terms are confirmed in writing before larger work begins."
+              />
+              <TierCard
+                name="Design Partner / Scoped Technical Evaluation"
                 price="Scoped"
                 description="Technical discovery, workload mapping, success criteria, prototype mapping where appropriate, and evaluation deliverables."
               />
@@ -61,10 +73,13 @@ export default function TermsPage() {
           <Section title="3. Billing and Written Agreements">
             <ul className="list-disc list-inside space-y-2">
               <li>
-                Paid technical evaluations and commercial engagements are scoped in writing.
+                Proof-review and technical-evaluation reservations hold review or scoping time and do not create a commercial license by themselves.
               </li>
               <li>
-                Payment timing, deliverables, and renewal terms are defined in the applicable agreement.
+                Larger scoped technical evaluations and commercial engagements are confirmed in writing.
+              </li>
+              <li>
+                Payment timing, deliverables, credit treatment, refund handling, and renewal terms must be confirmed in the applicable agreement or written follow-up before larger work begins.
               </li>
               <li>
                 Self-serve subscriptions and public free trials are not currently presented as the public evaluation model.
@@ -77,10 +92,10 @@ export default function TermsPage() {
 
           <Section title="4. Intellectual Property">
             <p>
-              All ATOMiK software, hardware designs, documentation, trademarks, and related
-              intellectual property are owned by ATOMiK. Your license grants you the right to use
-              the software and hardware IP according to the applicable repository license or written agreement. You do not acquire
-              any ownership rights.
+              ATOMiK software, hardware designs, documentation, trademarks, and related
+              intellectual property are owned or controlled by ATOMiK Project, its contributors,
+              or its licensors as reflected in the applicable repository license or written agreement.
+              Your license grants only the rights stated in that license or agreement.
             </p>
             <ul className="list-disc list-inside space-y-2 mt-3">
               <li>
@@ -113,10 +128,10 @@ export default function TermsPage() {
 
           <Section title="6. Limitation of Liability">
             <p>
-              To the maximum extent permitted by applicable law, ATOMiK and its officers,
-              directors, and employees shall not be liable for any indirect, incidental, special,
-              consequential, or punitive damages, including but not limited to loss of profits,
-              data, or business opportunities, arising from your use of the Services.
+              To the maximum extent permitted by applicable law, ATOMiK Project and its contributors
+              shall not be liable for any indirect, incidental, special, consequential, or punitive
+              damages, including but not limited to loss of profits, data, or business opportunities,
+              arising from your use of the Services.
             </p>
             <p>
               Our total aggregate liability for any claims arising under these Terms shall not
@@ -170,10 +185,10 @@ export default function TermsPage() {
             <p>
               For questions about these Terms of Service, contact us at{" "}
               <a
-                href="mailto:mrockwell@atomik.tech"
+                href="mailto:matthew.h.rockwell@gmail.com"
                 className="text-[#8b5cf6] hover:underline"
               >
-                mrockwell@atomik.tech
+                matthew.h.rockwell@gmail.com
               </a>
               .
             </p>

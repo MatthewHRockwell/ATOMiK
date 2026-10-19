@@ -11,8 +11,6 @@ const nextConfig: NextConfig = {
       { source: "/integrations/:path*", destination: "/docs/hardware", permanent: false },
       { source: "/community", destination: "/contact?intent=evaluation", permanent: false },
       { source: "/community/:path*", destination: "/contact?intent=evaluation", permanent: false },
-      { source: "/success", destination: "/contact?intent=evaluation", permanent: false },
-      { source: "/success/:path*", destination: "/contact?intent=evaluation", permanent: false },
       { source: "/roi", destination: "/investor-brief", permanent: false },
       { source: "/roi/:path*", destination: "/investor-brief", permanent: false },
       { source: "/compare", destination: "/whitepaper", permanent: false },
@@ -33,6 +31,14 @@ const nextConfig: NextConfig = {
       { source: "/landing.html", destination: "/", permanent: false },
       { source: "/ATOMiK_White_Paper.pdf", destination: "/docs/hardware", permanent: false },
       { source: "/ATOMiK_Benchmarks.pdf", destination: "/benchmarks", permanent: false },
+      { source: "/proof", destination: "/benchmarks", permanent: false },
+      { source: "/proof/:path*", destination: "/benchmarks", permanent: false },
+      { source: "/evaluation", destination: "/pricing", permanent: false },
+      { source: "/evaluation/:path*", destination: "/pricing", permanent: false },
+      { source: "/licensing", destination: "/contact?intent=licensing&source=licensing-route&cta=discuss-licensing", permanent: false },
+      { source: "/licensing/:path*", destination: "/contact?intent=licensing&source=licensing-route&cta=discuss-licensing", permanent: false },
+      { source: "/investor", destination: "/investor-brief", permanent: false },
+      { source: "/investor/:path*", destination: "/investor-brief", permanent: false },
     ];
   },
 };

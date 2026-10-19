@@ -17,6 +17,7 @@ const footerCols: { title: string; links: [string, string][] }[] = [
     title: "Proof",
     links: [
       ["/benchmarks", "Proof Packet"],
+      ["/proof-artifacts/PROOF_CARDS.md", "Download Proof Cards"],
       ["/docs/hardware", "Hardware Proof Map"],
       ["https://github.com/MatthewHRockwell/ATOMiK/blob/main/docs/evidence-labels.md", "Evidence Labels"],
       ["https://github.com/MatthewHRockwell/ATOMiK/blob/main/results/claims_registry.yaml", "Claims Registry"],
@@ -26,10 +27,10 @@ const footerCols: { title: string; links: [string, string][] }[] = [
     title: "Routes",
     links: [
       ["/solutions", "Use Cases"],
-      ["/pitch", "Friday Brief"],
+      ["/pitch", "Pitch Brief"],
       ["/about", "About"],
       ["/about/roadmap", "Validation Roadmap"],
-      ["mailto:matthew.h.rockwell@gmail.com", "Contact"],
+      ["/contact?source=footer-routes&cta=contact", "Contact"],
     ],
   },
   {
@@ -67,7 +68,7 @@ export default function Footer() {
               <div className="flex flex-col gap-2">
                 {col.links.map(([href, label]) => {
                   const isExternal =
-                    href.startsWith("http") || href.startsWith("mailto:");
+                    href.startsWith("http");
                   const cls =
                     "text-xs no-underline transition-colors hover:text-white";
                   const s = { color: "#b7c4bb" as const };
@@ -99,9 +100,9 @@ export default function Footer() {
               <Link href="/terms" className="no-underline transition-colors hover:text-white" style={{ color: "#b7c4bb" }}>
                 Terms
               </Link>
-              <a href="mailto:matthew.h.rockwell@gmail.com?subject=ATOMiK%20Evaluation" className="no-underline transition-colors hover:text-white" style={{ color: "#b7c4bb" }}>
+              <Link href="/contact?source=footer-legal&cta=contact" className="no-underline transition-colors hover:text-white" style={{ color: "#b7c4bb" }}>
                 Contact
-              </a>
+              </Link>
             </div>
           </div>
         </div>

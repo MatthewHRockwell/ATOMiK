@@ -18,7 +18,7 @@ export default function NotFound() {
           <Link
             href="/"
             className="px-6 py-2.5 rounded-lg text-sm font-semibold"
-            style={{ background: "#4f8fff", color: "#fff" }}
+            style={{ background: "#2563eb", color: "#fff" }}
           >
             Go Home
           </Link>

@@ -192,7 +192,7 @@ export default function DecisionTree() {
             onClick={handleViewComparison}
             className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-opacity hover:opacity-90"
             style={{
-              background: "#4f8fff",
+              background: "#2563eb",
               color: "#fff",
               cursor: "pointer",
             }}

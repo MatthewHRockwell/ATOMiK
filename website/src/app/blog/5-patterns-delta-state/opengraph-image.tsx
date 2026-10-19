@@ -1,8 +1,15 @@
 import { generateOGImage, ogSize } from "@/lib/og";
+
 export const runtime = "edge";
-export const alt = "ATOMiK Blog";
+export const alt = "ATOMiK archived route redirect";
 export const size = ogSize;
 export const contentType = "image/png";
+
 export default function OG() {
-  return generateOGImage({ title: "5 Design Patterns for Delta-State Algebra", subtitle: "Fan-in, checkpointing, fingerprint gates, rollback chains, multi-stream.", accent: "#8b5cf6", badge: "Patterns" });
+  return generateOGImage({
+    title: "ATOMiK Technical Proof",
+    subtitle: "Archived route redirected to current evidence-bounded proof material.",
+    accent: "#22d3ee",
+    badge: "Archived",
+  });
 }
