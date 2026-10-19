@@ -1,0 +1,18 @@
+# =============================================================================
+# ATOMiK Caravel Integration — Full SKY130 Synthesis
+# Synthesizes: user_project_wrapper + atomik_wb_wrapper + atomik_v3_atomik
+# =============================================================================
+
+read_verilog -DMPRJ_IO_PADS=38 rtl/user_project_wrapper.v
+read_verilog rtl/atomik_wb_wrapper.v
+read_verilog ../v3/rtl/atomik_v3_atomik.v
+
+synth -top user_project_wrapper
+
+dfflibmap -liberty sky130/skywater-pdk-libs-sky130_fd_sc_hd/timing/sky130_fd_sc_hd__tt_025C_1v80.lib
+abc -liberty sky130/skywater-pdk-libs-sky130_fd_sc_hd/timing/sky130_fd_sc_hd__tt_025C_1v80.lib
+
+opt_clean -purge
+stat -liberty sky130/skywater-pdk-libs-sky130_fd_sc_hd/timing/sky130_fd_sc_hd__tt_025C_1v80.lib
+
+write_verilog asic_output/atomik_caravel_netlist.v

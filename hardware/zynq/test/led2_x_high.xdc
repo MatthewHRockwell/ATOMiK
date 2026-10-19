@@ -1,0 +1,8 @@
+set_property PACKAGE_PIN U12 [get_ports {p[0]}]
+set_property IOSTANDARD LVCMOS33 [get_ports {p[0]}]
+set_property PACKAGE_PIN U17 [get_ports {p[1]}]
+set_property IOSTANDARD LVCMOS33 [get_ports {p[1]}]
+set_property PACKAGE_PIN U22 [get_ports {p[2]}]
+set_property IOSTANDARD LVCMOS33 [get_ports {p[2]}]
+set_property SEVERITY {Warning} [get_drc_checks UCIO-1]
+set_property SEVERITY {Warning} [get_drc_checks NSTD-1]

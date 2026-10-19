@@ -1,0 +1,13 @@
+AI systems, databases, and edge devices spend enormous energy asking one question: what changed?
+
+Atomic makes change a hardware signal.
+
+Instead of repeatedly scanning memory, Atomic tracks delta state directly and exposes it to software as a simple primitive.
+
+The result is a new layer beneath runtimes, agents, and operating systems: faster awareness, lower waste, and cleaner orchestration.
+
+We've already validated the core path on FPGA hardware, including Linux userspace talking through the OS stack into the accelerator, and a Zynq-backed desktop UI showing the product direction.
+
+Now we are turning a validated hardware primitive into a platform for real workloads.
+
+Atomic is building the state-change layer for the next generation of adaptive computing.

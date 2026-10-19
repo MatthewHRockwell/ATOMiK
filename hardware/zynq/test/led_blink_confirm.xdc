@@ -1,0 +1,6 @@
+set_property PACKAGE_PIN V15 [get_ports pl_led1]
+set_property IOSTANDARD LVCMOS33 [get_ports pl_led1]
+set_property PACKAGE_PIN V13 [get_ports pl_led2]
+set_property IOSTANDARD LVCMOS33 [get_ports pl_led2]
+set_property SEVERITY {Warning} [get_drc_checks UCIO-1]
+set_property SEVERITY {Warning} [get_drc_checks NSTD-1]
